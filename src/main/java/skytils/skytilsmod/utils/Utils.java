@@ -4,9 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.ScoreObjective;
 import skytils.skytilsmod.utils.handlers.ScoreboardHandler;
 
+import java.util.List;
+
 public class Utils {
 
     public static boolean inSkyblock = false;
+    public static boolean inDungeons = false;
 
     public static boolean isOnHypixel() {
         Minecraft mc = Minecraft.getMinecraft();
@@ -34,6 +37,25 @@ public class Utils {
             }
         }
         inSkyblock = false;
+    }
+
+    /**
+     * Taken from Danker's Skyblock Mod under GNU 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    public static void checkForDungeons() {
+        if (inSkyblock) {
+            List<String> scoreboard = ScoreboardHandler.getSidebarLines();
+            for (String s : scoreboard) {
+                String sCleaned = ScoreboardHandler.cleanSB(s);
+                if (sCleaned.contains("The Catacombs")) {
+                    inDungeons = true;
+                    return;
+                }
+            }
+        }
+        inDungeons = false;
     }
 
 }
