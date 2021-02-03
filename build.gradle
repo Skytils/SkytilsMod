@@ -6,6 +6,8 @@ buildscript {
             url = "http://files.minecraftforge.net/maven"
         }
         maven { url = "https://repo.spongepowered.org/maven" }
+        // search through the 'libs' folder
+        flatDir dirs: 'libs'
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
@@ -65,10 +67,12 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     compile("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    provided files("libs/modcore.jar")
 }
 
 jar {
     manifest.attributes(
+            "FMLCorePlugin": "skytils.skytilsmod.tweaker.FMLLoadingPlugin",
             "FMLCorePluginContainsFMLMod": true,
             "ForceLoadAsMod": true,
             "MixinConfigs": "mixins.skytils.json",
