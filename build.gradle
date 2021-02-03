@@ -12,13 +12,11 @@ buildscript {
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
         classpath "org.spongepowered:mixingradle:0.6-SNAPSHOT"
-        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
     }
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
-apply plugin: "com.github.johnrengelman.shadow"
 
 version = "1.0"
 group = "skytils.skytilsmod"
@@ -35,15 +33,18 @@ minecraft {
     runDir = "run"
     mappings = "stable_22"
     makeObfSourceJar = false
+    clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.FMLLoadingPlugin"
 }
 
 repositories {
     jcenter()
     maven { url "https://repo.spongepowered.org/maven/" }
-    flatDir {
-        dirs "deps"
-    }
 }
+
+configurations {
+    packageLib
+}
+
 
 dependencies {
     // you may put jars on which you depend on in ./libs
@@ -66,11 +67,18 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compile("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    packageLib("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        exclude module: 'guava'
+        exclude module: 'commons-io'
+        exclude module: 'gson'
+    }
     provided files("libs/modcore.jar")
+    configurations.compile.extendsFrom(configurations.packageLib)
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest.attributes(
             "FMLCorePlugin": "skytils.skytilsmod.tweaker.FMLLoadingPlugin",
             "FMLCorePluginContainsFMLMod": true,
@@ -81,19 +89,9 @@ jar {
             "TweakOrder": "0",
     )
 
-    enabled = false
-}
-
-shadowJar {
-    archiveName = jar.archiveName
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    exclude("dummyThing")
-    exclude("META-INF/maven/")
-    exclude("META-INF/nar/")
-    exclude("module-info.class")
-    exclude("META-INF/versions/")
+    from {
+        configurations.packageLib.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 processResources {
@@ -114,5 +112,3 @@ processResources {
         exclude "mcmod.info"
     }
 }
-
-tasks.reobfJar.dependsOn(shadowJar)
