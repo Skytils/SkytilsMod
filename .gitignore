@@ -20,3 +20,4 @@ build
 # other
 eclipse
 run
+/gradle.properties
