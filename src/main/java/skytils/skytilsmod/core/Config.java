@@ -16,6 +16,16 @@ public class Config extends Vigilant {
     )
     public String apiKey = "";
 
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Override other reparty commands",
+            description = "Uses Skytils' reparty command instead of other mods' \nRequires restart to work",
+            category = "General",
+            subcategory = "Commands"
+    )
+    public boolean overrideReparty = false;
+
     @Property(
             type = PropertyType.SWITCH,
             name = "[WIP] Show Griffin Burrows",

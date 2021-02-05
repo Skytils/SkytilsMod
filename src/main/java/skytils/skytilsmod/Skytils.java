@@ -1,15 +1,19 @@
 package skytils.skytilsmod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.command.ICommand;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.events.SendPacketEvent;
@@ -19,6 +23,8 @@ import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 @Mod(modid = Skytils.MODID, name = Skytils.MOD_NAME, version = Skytils.VERSION, acceptedMinecraftVersions = "[1.8.9]", clientSideOnly = true)
 public class Skytils {
@@ -46,6 +52,23 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new ChatListener());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
+            ClientCommandHandler.instance.registerCommand(new RepartyCommand());
+        } else if (Skytils.config.overrideReparty) {
+            if(!ClientCommandHandler.instance.getCommands().containsKey("rp")) {
+                ((Set<ICommand>) ObfuscationReflectionHelper.getPrivateValue(ClientCommandHandler.class, ClientCommandHandler.instance, "CommandSet")).add(new RepartyCommand());
+                ((Map<String, ICommand>)ObfuscationReflectionHelper.getPrivateValue(ClientCommandHandler.class, ClientCommandHandler.instance, "CommandMap")).put("rp", new RepartyCommand());
+            }
+            for(Map.Entry<String, ICommand> entry : ClientCommandHandler.instance.getCommands().entrySet()) {
+                if (entry.getKey().equals("reparty") || entry.getKey().equals("rp")) {
+                    entry.setValue(new RepartyCommand());
+                }
+            }
+        }
     }
 
     @SubscribeEvent
