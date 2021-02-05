@@ -162,6 +162,7 @@ public class RenderUtil {
         worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex();
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex();
         tessellator.draw();
+        GlStateManager.enableTexture2D();
     }
 
     /**

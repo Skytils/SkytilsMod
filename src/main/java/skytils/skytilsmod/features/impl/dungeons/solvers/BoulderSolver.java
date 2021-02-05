@@ -107,10 +107,12 @@ public class BoulderSolver {
                     }
 
                     BlockPos buttonPos = boulderPos.offset(actualDirection.getOpposite(), 2).down();
+                    double x = buttonPos.getX() - viewerX;
+                    double y = buttonPos.getY() - viewerY;
+                    double z = buttonPos.getZ() - viewerZ;
                     GlStateManager.disableCull();
-                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(buttonPos.add(-viewerX, -viewerY, -viewerZ), buttonPos.add(-viewerX, -viewerY, -viewerZ).add(1, 1, 1)).expand(0.01f, 0.01f, 0.01f), new Color(255, 0, 0), 1f);
+                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(255, 0, 0), 1f);
                     GlStateManager.enableCull();
-                    GlStateManager.enableTexture2D();
                     break;
                 }
             }

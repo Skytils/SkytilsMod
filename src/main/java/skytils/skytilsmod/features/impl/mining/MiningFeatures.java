@@ -14,14 +14,33 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MiningFeatures {
 
     public static BlockPos puzzlerSolution = null;
+    public static HashMap<String, String> fetchurItems = new HashMap<>();
+
+
     private final static Minecraft mc = Minecraft.getMinecraft();
 
+    public MiningFeatures() {
+        fetchurItems.put("theyre yellow and see through", "20 Yellow Stained Glass");
+        fetchurItems.put("its circlular and sometimes moves", "1 Compass");
+        fetchurItems.put("theyre expensive minerals", "20 Mithril");
+        fetchurItems.put("its useful during celebrations", "1 Firework Rocket");
+        fetchurItems.put("its hot and gives energy", "1 Cheap Coffee or 1 Decent Coffee");
+        fetchurItems.put("its tall and can be opened", "1 Wooden Door");
+        //hypixel disabled fetchur for a couple of days here, some may be missing
+        fetchurItems.put("its explosive but more than usual", "1 Superboom TNT");
+        fetchurItems.put("its wearable and grows", "1 Pumpkin");
+        fetchurItems.put("its shiny and makes sparks", "1 Flint and Steel");
+        fetchurItems.put("theyre red and white and you can mine it", "50 Nether Quartz Ore");
+        fetchurItems.put("theyre round and green or purple", "16 Ender Pearls");
+        fetchurItems.put("theyre red and soft", "50 Red Wool");
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
@@ -65,6 +84,26 @@ public class MiningFeatures {
                 }
             }
         }
+
+        if (Skytils.config.fetchurSolver && unformatted.contains("[NPC]") && unformatted.contains("Fetchur")) {
+            String solution = fetchurItems.keySet().stream().filter(unformatted::contains).findFirst().map(fetchurItems::get).orElse(null);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (solution != null) {
+                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Fetchur needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"));
+                } else {
+                    if (unformatted.contains("its") || unformatted.contains("theyre")) {
+                        System.out.println("Missing Fetchur item: " + unformatted);
+                        mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils couldn't determine the Fetchur item."));
+                    }
+                }
+
+            }).start();
+        }
     }
 
     @SubscribeEvent
@@ -74,10 +113,12 @@ public class MiningFeatures {
         double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks;
         double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks;
         if (Skytils.config.puzzlerSolver && puzzlerSolution != null) {
-            GlStateManager.disableCull();
-            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(puzzlerSolution.add(-viewerX, -viewerY, -viewerZ), puzzlerSolution.add(-viewerX, -viewerY, -viewerZ).add(1, 1, 1)).expand(0.01f, 0.01f, 0.01f), new Color(255, 0, 0, 200), 1f);
+            double x = puzzlerSolution.getX() - viewerX;
+            double y = puzzlerSolution.getY() - viewerY;
+            double z = puzzlerSolution.getZ() - viewerZ;
             GlStateManager.enableCull();
-            GlStateManager.enableTexture2D();
+            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), new Color(255, 0, 0, 200), 1f);
+            GlStateManager.disableCull();
         }
     }
 

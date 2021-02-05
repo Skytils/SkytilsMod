@@ -94,6 +94,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Fetchur Solver",
+            description = "Tells you what item Fetchur wants.",
+            category = "Mining",
+            subcategory = "Solvers"
+    )
+    public boolean fetchurSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Puzzler Solver",
             description = "Shows which block to mine for Puzzler.",
             category = "Mining",
