@@ -42,6 +42,7 @@ public class GriffinBurrows {
     public static ArrayList<Burrow> burrows = new ArrayList<>();
     public static ArrayList<BlockPos> dugBurrows = new ArrayList<>();
     public static BlockPos lastDugBurrow = null;
+    public static ArrayList<PartialBurrow> partialBurrows = new ArrayList<>();
 
     public static StopWatch lastBurrowCheck = new StopWatch();
 
@@ -166,6 +167,28 @@ public class GriffinBurrows {
         }).start();
     }
 
+    public static class PartialBurrow {
+        public int x, y, z;
+        public boolean hasFootstep, hasOtherParticle;
+
+        public PartialBurrow(int x, int y, int z, boolean hasFootstep, boolean hasOtherParticle) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.hasFootstep = hasFootstep;
+            this.hasOtherParticle = hasOtherParticle;
+        }
+
+        public PartialBurrow(Vec3i vec3, boolean hasFootstep, boolean hasOtherParticle) {
+            this(vec3.getX(), vec3.getY(), vec3.getZ(), hasFootstep, hasOtherParticle);
+        }
+
+        public BlockPos getBlockPos() {
+            return new BlockPos(x, y, z);
+        }
+
+    }
+
     public static class Burrow {
         public int x, y, z;
         public int type;
@@ -210,22 +233,18 @@ public class GriffinBurrows {
 
         public void drawWaypoint(float partialTicks) {
 
-            Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-            double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
-            double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
-            double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+            Vec3i viewer = RenderUtil.getViewerPos(partialTicks);
 
             BlockPos pos = this.getBlockPos();
-            double x = pos.getX() - viewerX;
-            double y = pos.getY() - viewerY;
-            double z = pos.getZ() - viewerZ;
-
+            double x = pos.getX() - viewer.getX();
+            double y = pos.getY() - viewer.getY();
+            double z = pos.getZ() - viewer.getZ();
             double distSq = x*x + y*y + z*z;
 
             GlStateManager.disableDepth();
             GlStateManager.disableCull();
             GlStateManager.disableTexture2D();
-            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(173, 216, 230), partialTicks);
+            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(173, 216, 230), 1f);
             if (distSq > 5*5) RenderUtil.renderBeaconBeam(x, y, z, new Color(173, 216, 230).getRGB(), 1.0f, partialTicks);
             RenderUtil.renderWaypointText(getWaypointText(), getBlockPos().up(5), partialTicks);
             GlStateManager.disableLighting();

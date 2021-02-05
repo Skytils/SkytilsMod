@@ -1,0 +1,247 @@
+package skytils.skytilsmod.features.impl.dungeons.solvers;
+
+import com.google.common.collect.Lists;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.RenderUtil;
+import skytils.skytilsmod.utils.Utils;
+
+import java.awt.*;
+import java.util.ArrayList;
+
+public class BoulderSolver {
+
+    public static BlockPos boulderChest = null;
+    public static EnumFacing boulderFacing = null;
+    public static BoulderState[][] grid = new BoulderState[7][6];
+    public static int roomVariant = -1;
+    public static ArrayList<ArrayList<BoulderPush>> variantSteps = new ArrayList<>();
+    public static ArrayList<ArrayList<BoulderState>> expectedBoulders = new ArrayList<>();
+
+    private static int ticks = 0;
+    private static Minecraft mc = Minecraft.getMinecraft();
+
+    public BoulderSolver() {
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.EMPTY, BoulderState.FILLED, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(2, 4, Direction.RIGHT), new BoulderPush(2, 3, Direction.FORWARD), new BoulderPush(3, 3, Direction.RIGHT), new BoulderPush(4, 3, Direction.RIGHT), new BoulderPush(4, 1, Direction.FORWARD), new BoulderPush(5, 1, Direction.RIGHT)));
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.FILLED, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(3, 4, Direction.FORWARD), new BoulderPush(2, 4, Direction.LEFT), new BoulderPush(3, 3, Direction.RIGHT), new BoulderPush(3, 2, Direction.FORWARD), new BoulderPush(2, 2, Direction.LEFT), new BoulderPush(4, 2, Direction.RIGHT), new BoulderPush(2, 1, Direction.FORWARD), new BoulderPush(4, 1, Direction.FORWARD), new BoulderPush(3, 1, Direction.RIGHT)));
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.FILLED, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(1, 1, Direction.RIGHT)));
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.FILLED, BoulderState.FILLED, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED, BoulderState.FILLED));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(4, 3, Direction.FORWARD), new BoulderPush(3, 3, Direction.LEFT), new BoulderPush(3, 1, Direction.FORWARD), new BoulderPush(2, 1, Direction.LEFT)));
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(3, 4, Direction.FORWARD), new BoulderPush(3, 3, Direction.FORWARD), new BoulderPush(2, 1, Direction.FORWARD), new BoulderPush(1, 1, Direction.LEFT)));
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.FILLED, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED, BoulderState.EMPTY, BoulderState.FILLED, BoulderState.EMPTY));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(1, 4, Direction.FORWARD), new BoulderPush(1, 1, Direction.RIGHT)));
+
+        expectedBoulders.add(Lists.newArrayList(BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.EMPTY, BoulderState.FILLED));
+        variantSteps.add(Lists.newArrayList(new BoulderPush(0, 1, Direction.FORWARD)));
+
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        ticks++;
+        if (ticks % 20 == 0) {
+            ticks = 0;
+            update();
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderWorld(RenderWorldLastEvent event) {
+        if (!Skytils.config.boulderSolver) return;
+        if (boulderChest == null) return;
+        Vec3i viewer = RenderUtil.getViewerPos(event.partialTicks);
+
+        RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(boulderChest.subtract(viewer), boulderChest.subtract(viewer).add(1, 1, 1)), new Color(255, 0, 0), 1f);
+
+        if (roomVariant >= 0) {
+            ArrayList<BoulderPush> steps = variantSteps.get(roomVariant);
+            for (BoulderPush step : steps) {
+                if (grid[step.x][step.y] != BoulderState.EMPTY) {
+                    EnumFacing downRow = boulderFacing.getOpposite();
+                    EnumFacing rightColumn = boulderFacing.rotateY();
+                    BlockPos farLeftPos = boulderChest.offset(downRow, 5).offset(rightColumn.getOpposite(), 9);
+
+                    BlockPos boulderPos = farLeftPos.offset(rightColumn, 3 * step.x).offset(downRow, 3 * step.y);
+
+                    EnumFacing actualDirection = null;
+
+                    switch (step.direction) {
+                        case FORWARD:
+                            actualDirection = boulderFacing;
+                            break;
+                        case BACKWARD:
+                            actualDirection = boulderFacing.getOpposite();
+                            break;
+                        case LEFT:
+                            actualDirection = boulderFacing.rotateYCCW();
+                            break;
+                        case RIGHT:
+                            actualDirection = boulderFacing.rotateY();
+                            break;
+                    }
+
+                    BlockPos buttonPos = boulderPos.offset(actualDirection.getOpposite(), 2).down();
+                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(buttonPos.subtract(viewer), buttonPos.subtract(viewer).add(1, 1, 1)), new Color(255, 0, 0), 1f);
+                    break;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.pos == boulderChest) {
+            reset();
+        }
+    }
+
+    @SubscribeEvent
+    public void onWorldChange(WorldEvent.Load event) {
+        reset();
+    }
+
+    public static void update() {
+        if (!Skytils.config.boulderSolver) return;
+        EntityPlayerSP player = mc.thePlayer;
+        World world = mc.theWorld;
+        if (Utils.inDungeons && world != null && player != null) {
+            new Thread(() -> {
+                boolean foundBirch = false;
+                boolean foundBarrier = false;
+                for (int x = (int) (player.posX - 13); x <= player.posX + 13; x++) {
+                    if (foundBarrier && foundBirch) break;
+                    for (int z = (int) (player.posZ - 13); z <= player.posZ + 13; z++) {
+                        if (foundBarrier && foundBirch) break;
+                        if (!foundBarrier) {
+                            BlockPos potentialBarrier = new BlockPos(x, 68, z);
+                            if (world.getBlockState(potentialBarrier).getBlock() == Blocks.barrier) {
+                                foundBarrier = true;
+                            }
+                        }
+                        if (!foundBirch) {
+                            BlockPos potentialBirch = new BlockPos(x, 66, z);
+                            if (world.getBlockState(potentialBirch).getBlock() == Blocks.planks && Blocks.planks.getDamageValue(world, potentialBirch) == 2) {
+                                foundBirch = true;
+                            }
+                        }
+                    }
+                }
+
+                if (foundBirch && foundBarrier) {
+                    if (boulderChest == null || boulderFacing == null) {
+                        for (int x = (int) (player.posX - 25); x <= player.posX + 25; x++) {
+                            for (int z = (int) (player.posZ - 25); z <= player.posZ + 25; z++) {
+                                BlockPos potentialChestPos = new BlockPos(x, 66, z);
+                                if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {
+                                    if (world.getBlockState(potentialChestPos.down()).getBlock() == Blocks.stonebrick && world.getBlockState(potentialChestPos.up(3)).getBlock() == Blocks.barrier) {
+                                        boulderChest = potentialChestPos;
+                                        System.out.println("Boulder chest is at " + boulderChest);
+                                        for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                                            if (world.getBlockState(potentialChestPos.offset(direction)).getBlock() == Blocks.stained_hardened_clay) {
+                                                boulderFacing = direction;
+                                                System.out.println("Boulder room is facing " + direction);
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        EnumFacing downRow = boulderFacing.getOpposite();
+                        EnumFacing rightColumn = boulderFacing.rotateY();
+                        BlockPos farLeftPos = boulderChest.offset(downRow, 5).offset(rightColumn.getOpposite(), 9);
+                        for (int row = 0; row < 6; row++) {
+                            for (int column = 0; column < 7; column++) {
+                                BlockPos current = farLeftPos.offset(rightColumn, 3 * column).offset(downRow, 3 * row);
+                                IBlockState state = world.getBlockState(current);
+                                grid[column][row] = state.getBlock() == Blocks.air ? BoulderState.EMPTY : BoulderState.FILLED;
+                            }
+                        }
+                        if (roomVariant == -1) {
+                            roomVariant = -2;
+                            for (int i = 0; i < expectedBoulders.size(); i++) {
+                                ArrayList<BoulderState> expected = expectedBoulders.get(i);
+                                boolean isRight = true;
+                                for (int j = 0; j < expected.size(); j++) {
+                                    int column = j % 7;
+                                    int row = (int) Math.floor(j / 7);
+                                    BoulderState state = expected.get(j);
+                                    if (grid[column][row] != state && state != BoulderState.PLACEHOLDER) {
+                                        isRight = false;
+                                        break;
+                                    }
+                                }
+                                if (isRight) {
+                                    roomVariant = i;
+                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils detected variant: " + (roomVariant + 1)));
+                                    break;
+                                }
+                            }
+                            if (roomVariant == -2) {
+                                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils couldn't detect the boulder variant."));
+                            }
+                        }
+                    }
+                }
+
+            }).start();
+        }
+    }
+
+
+    public static void reset() {
+        boulderChest = null;
+        boulderFacing = null;
+        grid = new BoulderState[7][6];
+        roomVariant = -1;
+    }
+
+    public static class BoulderPush {
+        int x, y;
+        Direction direction;
+        public BoulderPush(int x, int y, Direction direction) {
+            this.x = x;
+            this.y = y;
+            this.direction = direction;
+        }
+    }
+
+    public enum Direction {
+        FORWARD,
+        BACKWARD,
+        LEFT,
+        RIGHT
+    }
+
+    public enum BoulderState {
+        EMPTY,
+        FILLED,
+        PLACEHOLDER
+    }
+
+}
