@@ -22,9 +22,30 @@ public class Config extends Vigilant {
             name = "Override other reparty commands",
             description = "Uses Skytils' reparty command instead of other mods' \nRequires restart to work",
             category = "General",
-            subcategory = "Commands"
+            subcategory = "Reparty"
     )
-    public boolean overrideReparty = false;
+    public boolean overrideReparty = true;
+
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Auto-accept reparty",
+            description = "Automatically accepts reparty invites",
+            category = "General",
+            subcategory = "Reparty"
+    )
+    public boolean autoReparty = true;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Auto-accept reparty timeout",
+            description = "timeout in seconds for accepting a reparty invite",
+            category = "General",
+            subcategory = "Reparty",
+            min = 0,
+            max = 120
+    )
+    public Integer autoRepartyTimeout = 60;
 
     @Property(
             type = PropertyType.SWITCH,

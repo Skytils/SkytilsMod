@@ -83,7 +83,6 @@ public class RepartyCommand extends CommandBase implements ICommand {
         party.clear();
         repartyFailList.clear();
 
-        // MULTI THREAD DRIFTING
         partyThread = new Thread(() -> {
             EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 

@@ -3,6 +3,7 @@ package skytils.skytilsmod.listeners;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 public class ChatListener {
 
     public static Minecraft mc = Minecraft.getMinecraft();
+    static Thread rejoinThread;
+    static String lastPartyDisbander = "";
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     public void onChat(ClientChatReceivedEvent event) {
@@ -29,6 +32,40 @@ public class ChatListener {
             Skytils.config.markDirty();
             Skytils.config.writeData();
             mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Set API key to " + EnumChatFormatting.DARK_GREEN + apiKey));
+        }
+
+        if (Skytils.config.autoReparty) {
+            if (unformatted.contains("has disbanded the party!")) {
+                Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
+                Matcher matcher = player_pattern.matcher(unformatted);
+                if (matcher.find()) {
+                    String disbander = matcher.group(1);
+                    lastPartyDisbander = disbander;
+                    System.out.println("Party disbanded by " + lastPartyDisbander);
+                    rejoinThread = new Thread(() -> {
+                        if (Skytils.config.autoRepartyTimeout == 0) return;
+                        try {
+                            System.out.println("waiting for timeout");
+                            Thread.sleep(Skytils.config.autoRepartyTimeout * 1000);
+                            lastPartyDisbander = "";
+                            System.out.println("cleared last party disbander");
+                        } catch (Exception e) {
+
+                        }
+                    });
+                    rejoinThread.start();
+                    return;
+                }
+            }
+            if (unformatted.contains("You have 60 seconds to accept") && lastPartyDisbander.length() > 0 && event.message.getSiblings().size() > 0) {
+                ChatStyle acceptMessage = event.message.getSiblings().get(6).getChatStyle();
+                if (acceptMessage.getChatHoverEvent().getValue().getUnformattedText().contains(lastPartyDisbander)) {
+                    mc.thePlayer.sendChatMessage("/party accept " + lastPartyDisbander);
+                    rejoinThread.interrupt();
+                    lastPartyDisbander = "";
+                    return;
+                }
+            }
         }
 
         // Reparty command
