@@ -14,6 +14,8 @@ import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
+import skytils.skytilsmod.features.impl.events.GriffinBurrows;
+import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
@@ -41,14 +43,16 @@ public class Skytils {
         ClientCommandHandler.instance.registerCommand(new SkytilsCommand());
 
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new ChatListener());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
+        MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
     }
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
 
-        if (chatMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
+        if (mc.thePlayer != null && chatMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
             mc.thePlayer.sendChatMessage(chatMessageQueue.remove(0));
         }
 

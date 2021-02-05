@@ -2,7 +2,6 @@ package skytils.skytilsmod.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.ScoreObjective;
-import skytils.skytilsmod.utils.handlers.ScoreboardHandler;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class Utils {
         if (isOnHypixel()) {
             ScoreObjective scoreboardObj = mc.theWorld.getScoreboard().getObjectiveInDisplaySlot(1);
             if (scoreboardObj != null) {
-                String scObjName = ScoreboardHandler.cleanSB(scoreboardObj.getDisplayName());
+                String scObjName = ScoreboardUtil.cleanSB(scoreboardObj.getDisplayName());
                 if (scObjName.contains("SKYBLOCK")) {
                     inSkyblock = true;
                     return;
@@ -46,9 +45,9 @@ public class Utils {
      */
     public static void checkForDungeons() {
         if (inSkyblock) {
-            List<String> scoreboard = ScoreboardHandler.getSidebarLines();
+            List<String> scoreboard = ScoreboardUtil.getSidebarLines();
             for (String s : scoreboard) {
-                String sCleaned = ScoreboardHandler.cleanSB(s);
+                String sCleaned = ScoreboardUtil.cleanSB(s);
                 if (sCleaned.contains("The Catacombs")) {
                     inDungeons = true;
                     return;

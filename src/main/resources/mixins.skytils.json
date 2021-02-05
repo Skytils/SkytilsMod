@@ -1,6 +1,9 @@
 {
   "compatibilityLevel": "JAVA_8",
   "package": "skytils.skytilsmod.mixins",
-  "mixins": [],
+  "mixins": [
+    "MixinNetHandlerPlayClient",
+    "MixinPlayerControllerMP"
+  ],
   "verbose": true
 }

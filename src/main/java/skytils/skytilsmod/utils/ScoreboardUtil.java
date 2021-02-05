@@ -1,4 +1,4 @@
-package skytils.skytilsmod.utils.handlers;
+package skytils.skytilsmod.utils;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  * @author bowser0000
  */
-public class ScoreboardHandler {
+public class ScoreboardUtil {
 
     public static String cleanSB(String scoreboard) {
         char[] nvString = StringUtils.stripControlCodes(scoreboard).toCharArray();
