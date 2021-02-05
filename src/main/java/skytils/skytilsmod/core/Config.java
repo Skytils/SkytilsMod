@@ -20,7 +20,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Override other reparty commands",
-            description = "Uses Skytils' reparty command instead of other mods' \nRequires restart to work",
+            description = "Uses Skytils' reparty command instead of other mods'. \nRequires restart to work",
             category = "General",
             subcategory = "Reparty"
     )
