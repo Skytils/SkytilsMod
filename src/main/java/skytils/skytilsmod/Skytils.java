@@ -1,8 +1,8 @@
 package skytils.skytilsmod;
 
 import net.minecraft.client.Minecraft;
+
 import net.minecraft.command.ICommand;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -12,13 +12,14 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
+import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
+import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.utils.Utils;
 
@@ -30,7 +31,7 @@ import java.util.Set;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "0.0.1";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -50,8 +51,14 @@ public class Skytils {
 
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new ChatListener());
+
+        MinecraftForge.EVENT_BUS.register(new BlazeSolver());
+        MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
+        MinecraftForge.EVENT_BUS.register(new MiningFeatures());
+        MinecraftForge.EVENT_BUS.register(new TriviaSolver());
+
     }
 
     @Mod.EventHandler

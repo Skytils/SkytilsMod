@@ -34,6 +34,7 @@ minecraft {
     mappings = "stable_22"
     makeObfSourceJar = false
     clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.FMLLoadingPlugin"
+    clientRunArgs += "--mixin mixins.skytils.json"
 }
 
 repositories {
@@ -77,7 +78,8 @@ dependencies {
 }
 
 jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE;
 
     manifest.attributes(
             "FMLCorePlugin": "skytils.skytilsmod.tweaker.FMLLoadingPlugin",
@@ -101,14 +103,18 @@ processResources {
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
+        include 'mcmod.info'
 
         // replace version and mcversion
-        expand "version": project.version, "mcversion": project.minecraft.version
+        expand 'version':project.version, 'mcversion':project.minecraft.version
     }
 
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude "mcmod.info"
+        exclude 'mcmod.info'
     }
+}
+
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
 }

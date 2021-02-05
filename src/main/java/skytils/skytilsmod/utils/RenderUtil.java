@@ -5,8 +5,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
 
@@ -15,14 +17,6 @@ import java.awt.*;
 public class RenderUtil {
 
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
-
-    public static Vec3i getViewerPos(float partialTicks) {
-        Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
-        double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
-        double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
-        return new Vec3i(viewerX, viewerY, viewerZ);
-    }
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -168,6 +162,35 @@ public class RenderUtil {
         worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex();
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex();
         tessellator.draw();
+    }
+
+    /**
+     * Taken from Danker's Skyblock Mod under GNU 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    public static void draw3DString(BlockPos pos, String text, Color color, float partialTicks) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        double x = (pos.getX() - player.lastTickPosX) + ((pos.getX() - player.posX) - (pos.getX() - player.lastTickPosX)) * partialTicks;
+        double y = (pos.getY() - player.lastTickPosY) + ((pos.getY() - player.posY) - (pos.getY() - player.lastTickPosY)) * partialTicks;
+        double z = (pos.getZ() - player.lastTickPosZ) + ((pos.getZ() - player.posZ) - (pos.getZ() - player.lastTickPosZ)) * partialTicks;
+        RenderManager renderManager = mc.getRenderManager();
+
+        float f = 1.6F;
+        float f1 = 0.016666668F * f;
+        int width = mc.fontRendererObj.getStringWidth(text) / 2;
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        GL11.glNormal3f(0f, 1f, 0f);
+        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f);
+        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f);
+        GlStateManager.scale(-f1, -f1, -f1);
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        mc.fontRendererObj.drawString(text, -width, 0, color.getRGB());
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
     }
 
     /**

@@ -5,6 +5,8 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.*;
@@ -72,9 +74,10 @@ public class BoulderSolver {
     public void onRenderWorld(RenderWorldLastEvent event) {
         if (!Skytils.config.boulderSolver) return;
         if (boulderChest == null) return;
-        Vec3i viewer = RenderUtil.getViewerPos(event.partialTicks);
-
-        RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(boulderChest.subtract(viewer), boulderChest.subtract(viewer).add(1, 1, 1)), new Color(255, 0, 0), 1f);
+        Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+        double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks;
+        double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks;
+        double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks;
 
         if (roomVariant >= 0) {
             ArrayList<BoulderPush> steps = variantSteps.get(roomVariant);
@@ -104,7 +107,10 @@ public class BoulderSolver {
                     }
 
                     BlockPos buttonPos = boulderPos.offset(actualDirection.getOpposite(), 2).down();
-                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(buttonPos.subtract(viewer), buttonPos.subtract(viewer).add(1, 1, 1)), new Color(255, 0, 0), 1f);
+                    GlStateManager.disableCull();
+                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(buttonPos.add(-viewerX, -viewerY, -viewerZ), buttonPos.add(-viewerX, -viewerY, -viewerZ).add(1, 1, 1)).expand(0.01f, 0.01f, 0.01f), new Color(255, 0, 0), 1f);
+                    GlStateManager.enableCull();
+                    GlStateManager.enableTexture2D();
                     break;
                 }
             }
@@ -198,7 +204,7 @@ public class BoulderSolver {
                                 }
                                 if (isRight) {
                                     roomVariant = i;
-                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils detected variant: " + (roomVariant + 1)));
+                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils detected boulder variant " + (roomVariant + 1) + "."));
                                     break;
                                 }
                             }

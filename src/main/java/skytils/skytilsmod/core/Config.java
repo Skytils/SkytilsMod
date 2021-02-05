@@ -49,8 +49,8 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "[WIP] Show Griffin Burrows",
-            description = "Shows the location of burrows during the event.",
+            name = "Show Griffin Burrows",
+            description = "[WIP] Shows the location of burrows during the event.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -67,12 +67,39 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "[WIP] Boulder Solver",
-            description = "Show which buttons to press on the Boulder/Box Puzzle.",
+            name = "Blaze Solver",
+            description = "Changes the color of the blaze to shoot on Higher or Lower.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean blazeSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Boulder Solver",
+            description = "[WIP] Show which boxes to move on the Boulder puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
     public boolean boulderSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Trivia Solver",
+            description = "Shows the correct answer for the questions on the Trivia puzzle.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean triviaSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Puzzler Solver",
+            description = "Shows which block to mine for Puzzler.",
+            category = "Mining",
+            subcategory = "Solvers"
+    )
+    public boolean puzzlerSolver = false;
 
     public Config() {
         super(new File("./config/skytils.toml"));

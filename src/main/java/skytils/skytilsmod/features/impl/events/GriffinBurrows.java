@@ -233,18 +233,21 @@ public class GriffinBurrows {
 
         public void drawWaypoint(float partialTicks) {
 
-            Vec3i viewer = RenderUtil.getViewerPos(partialTicks);
+            Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+            double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
+            double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
+            double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
 
             BlockPos pos = this.getBlockPos();
-            double x = pos.getX() - viewer.getX();
-            double y = pos.getY() - viewer.getY();
-            double z = pos.getZ() - viewer.getZ();
+            double x = pos.getX() - viewerX;
+            double y = pos.getY() - viewerY;
+            double z = pos.getZ() - viewerZ;
             double distSq = x*x + y*y + z*z;
 
             GlStateManager.disableDepth();
             GlStateManager.disableCull();
-            GlStateManager.disableTexture2D();
             RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(173, 216, 230), 1f);
+            GlStateManager.disableTexture2D();
             if (distSq > 5*5) RenderUtil.renderBeaconBeam(x, y, z, new Color(173, 216, 230).getRGB(), 1.0f, partialTicks);
             RenderUtil.renderWaypointText(getWaypointText(), getBlockPos().up(5), partialTicks);
             GlStateManager.disableLighting();

@@ -8,6 +8,7 @@ import skytils.skytilsmod.ModCoreInstaller;
 
 import java.util.Map;
 
+@IFMLLoadingPlugin.MCVersion("1.8.9")
 public class FMLLoadingPlugin implements IFMLLoadingPlugin {
 
     public FMLLoadingPlugin() {
