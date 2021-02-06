@@ -3,8 +3,11 @@ package skytils.skytilsmod.features.impl.mining;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -12,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
+import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -119,6 +123,15 @@ public class MiningFeatures {
             GlStateManager.enableCull();
             RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), new Color(255, 0, 0, 200), 1f);
             GlStateManager.disableCull();
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderLivingPre(RenderLivingEvent.Pre event) {
+        if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
+            if (Skytils.config.showGhosts && event.entity.isInvisible() && event.entity instanceof EntityCreeper) {
+                event.entity.setInvisible(false);
+            }
         }
     }
 

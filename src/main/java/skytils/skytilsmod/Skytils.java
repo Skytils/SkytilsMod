@@ -20,6 +20,7 @@ import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
+import skytils.skytilsmod.features.impl.misc.ItemFeatures;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.utils.Utils;
 
@@ -56,6 +57,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
+        MinecraftForge.EVENT_BUS.register(new ItemFeatures());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
 

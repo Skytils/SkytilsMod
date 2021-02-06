@@ -31,7 +31,7 @@ public class ChatListener {
             Skytils.config.apiKey = apiKey;
             Skytils.config.markDirty();
             Skytils.config.writeData();
-            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Set API key to " + EnumChatFormatting.DARK_GREEN + apiKey));
+            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils updated your set Hypixel API key to " + EnumChatFormatting.DARK_GREEN + apiKey));
         }
 
         if (Skytils.config.autoReparty) {

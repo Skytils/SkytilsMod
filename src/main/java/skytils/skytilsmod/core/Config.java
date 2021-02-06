@@ -10,7 +10,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.TEXT,
             name = "Hypixel API Key",
-            description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
+            description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.\nSet this with /skytils setkey <key>.",
             category = "General",
             subcategory = "API"
     )
@@ -29,7 +29,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Auto-accept reparty",
+            name = "Auto-Accept Reparty",
             description = "Automatically accepts reparty invites",
             category = "General",
             subcategory = "Reparty"
@@ -38,8 +38,8 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SLIDER,
-            name = "Auto-accept reparty timeout",
-            description = "timeout in seconds for accepting a reparty invite",
+            name = "Auto-Accept Reparty Timeout",
+            description = "Timeout in seconds for accepting a reparty invite",
             category = "General",
             subcategory = "Reparty",
             min = 0,
@@ -91,6 +91,24 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean triviaSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Soul Eater Bonus",
+            description = "Shows the current Soul Eater bonus from the last mob kill.",
+            category = "Items",
+            subcategory = "Lore"
+    )
+    public boolean soulEaterLore = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Ghosts",
+            description = "Makes the ghosts in the Mist visible.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean showGhosts = false;
 
     @Property(
             type = PropertyType.SWITCH,
