@@ -20,7 +20,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Override other reparty commands",
-            description = "Uses Skytils' reparty command instead of other mods'. \nRequires restart to work",
+            description = "Uses Skytils' reparty command instead of other mods'. \n\u00a7cRequires restart to work",
             category = "General",
             subcategory = "Reparty"
     )
@@ -42,7 +42,6 @@ public class Config extends Vigilant {
             description = "Timeout in seconds for accepting a reparty invite",
             category = "General",
             subcategory = "Reparty",
-            min = 0,
             max = 120
     )
     public Integer autoRepartyTimeout = 60;
@@ -50,7 +49,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
-            description = "[WIP] Shows the location of burrows during the event.",
+            description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -77,7 +76,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Boulder Solver",
-            description = "[WIP] Show which boxes to move on the Boulder puzzle.",
+            description = "\u00a7b[WIP] \u00a7rShow which boxes to move on the Boulder puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -86,7 +85,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Simon Says Solver",
-            description = "[WIP] Show which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
