@@ -23,6 +23,7 @@ import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.ItemFeatures;
 import skytils.skytilsmod.listeners.ChatListener;
+import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class Skytils {
 
     public static int ticks = 0;
 
-    public static ArrayList<String> chatMessageQueue = new ArrayList<>();
+    public static ArrayList<String> sendMessageQueue = new ArrayList<>();
     private static long lastChatMessage = 0;
 
     @Mod.EventHandler
@@ -53,6 +54,7 @@ public class Skytils {
 
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new ChatListener());
+        MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
 
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
@@ -87,8 +89,8 @@ public class Skytils {
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
 
-        if (mc.thePlayer != null && chatMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(chatMessageQueue.remove(0));
+        if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
+            mc.thePlayer.sendChatMessage(sendMessageQueue.remove(0));
         }
 
         if (ticks % 20 == 0) {

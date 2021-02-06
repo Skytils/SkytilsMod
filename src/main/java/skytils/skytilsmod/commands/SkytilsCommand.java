@@ -6,9 +6,11 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.utils.APIUtil;
 
 import java.util.List;
@@ -37,6 +39,11 @@ public class SkytilsCommand extends CommandBase {
     }
 
     @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return null;
+    }
+
+    @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         EntityPlayerSP player = (EntityPlayerSP) sender;
         if (args.length == 0) {
@@ -58,6 +65,22 @@ public class SkytilsCommand extends CommandBase {
                     Skytils.config.writeData();
                 } else {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide a valid Hypixel API key!"));
+                }
+                break;
+            case "griffin":
+                if (args.length == 1) {
+                    player.addChatMessage(new ChatComponentText("/skytils griffin <refresh>"));
+                } else {
+                    String action = args[1].toLowerCase(Locale.ENGLISH);
+                    switch (action) {
+                        case "refresh":
+                            GriffinBurrows.burrows.clear();
+                            GriffinBurrows.burrowRefreshTimer.reset();
+                            GriffinBurrows.shouldRefreshBurrows = true;
+                            break;
+                        default:
+                            player.addChatMessage(new ChatComponentText("/skytils griffin <refresh>"));
+                    }
                 }
                 break;
             default:

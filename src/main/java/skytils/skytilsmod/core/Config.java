@@ -129,6 +129,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Implosion Particles",
+            description = "Removes the explosion created by the Implosion ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean hideImplosionParticles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Soul Eater Bonus",
             description = "Shows the current Soul Eater bonus from the last mob kill.",
             category = "Miscellaneous",

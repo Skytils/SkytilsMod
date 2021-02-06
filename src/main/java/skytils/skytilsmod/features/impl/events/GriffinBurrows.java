@@ -22,6 +22,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.DamageBlockEvent;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.RenderUtil;
+import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
@@ -36,18 +37,20 @@ public class GriffinBurrows {
     public static BlockPos lastDugBurrow = null;
     public static ArrayList<PartialBurrow> partialBurrows = new ArrayList<>();
 
-    public static StopWatch lastBurrowCheck = new StopWatch();
+    public static StopWatch burrowRefreshTimer = new StopWatch();
+    public static boolean shouldRefreshBurrows = false;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         EntityPlayerSP player = mc.thePlayer;
+        if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("hub")) return;
+        if (!burrowRefreshTimer.isStarted()) burrowRefreshTimer.start();
 
-        if (!lastBurrowCheck.isStarted()) lastBurrowCheck.start();
-
-        if (lastBurrowCheck.getTime() >= 60000) {
-            lastBurrowCheck.reset();
+        if (burrowRefreshTimer.getTime() >= 60000 || shouldRefreshBurrows) {
+            burrowRefreshTimer.reset();
+            shouldRefreshBurrows = false;
             if (Skytils.config.showGriffinBurrows && Utils.inSkyblock && player != null) {
                 for (int i = 0; i < 8; i++) {
                     ItemStack hotbarItem = player.inventory.getStackInSlot(i);
@@ -64,7 +67,8 @@ public class GriffinBurrows {
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     public void onChat(ClientChatReceivedEvent event) {
-        if (Skytils.config.showGriffinBurrows && event.message.getUnformattedText().contains("You dug out a Griffin Burrow") || event.message.getUnformattedText().contains("You finished the Griffin burrow chain!")) {
+        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+        if (Skytils.config.showGriffinBurrows && (unformatted.contains("You died!") || unformatted.contains("You dug out a Griffin Burrow") || unformatted.contains("You finished the Griffin burrow chain!"))) {
             if (lastDugBurrow != null) {
                 dugBurrows.add(lastDugBurrow);
                 burrows.removeIf(burrow -> burrow.getBlockPos().equals(lastDugBurrow));
@@ -104,6 +108,8 @@ public class GriffinBurrows {
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         burrows.clear();
+        burrowRefreshTimer.reset();
+        shouldRefreshBurrows = true;
     }
 
     public static void refreshBurrows() {
@@ -183,6 +189,9 @@ public class GriffinBurrows {
 
     public static class Burrow {
         public int x, y, z;
+        /**
+         * This variable holds the order in the chain, from a 0 based index.
+        */
         public int type;
         /**
          * This variable holds the Griffin used, -1 means no Griffin, 0 means Common, etc.
