@@ -85,7 +85,7 @@ public class ChatListener {
                         event.setCanceled(true);
                         return;
                 }
-            }else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")){
+            } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")){
                 EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 
                 Pattern party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$");

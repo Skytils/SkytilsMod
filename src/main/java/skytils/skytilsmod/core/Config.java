@@ -102,15 +102,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Soul Eater Bonus",
-            description = "Shows the current Soul Eater bonus from the last mob kill.",
-            category = "Items",
-            subcategory = "Lore"
-    )
-    public boolean soulEaterLore = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Show Ghosts",
             description = "Makes the ghosts in the Mist visible.",
             category = "Mining",
@@ -135,6 +126,15 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean puzzlerSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Soul Eater Bonus",
+            description = "Shows the current Soul Eater bonus from the last mob kill.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean soulEaterLore = false;
 
     public Config() {
         super(new File("./config/skytils.toml"));
