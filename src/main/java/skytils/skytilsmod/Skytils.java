@@ -59,6 +59,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
+        MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
 
     }

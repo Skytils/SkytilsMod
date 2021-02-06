@@ -85,6 +85,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Simon Says Solver",
+            description = "[WIP] Show which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean simonSaysSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Trivia Solver",
             description = "Shows the correct answer for the questions on the Trivia puzzle.",
             category = "Dungeons",
