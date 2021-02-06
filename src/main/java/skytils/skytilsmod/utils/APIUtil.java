@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Taken from Danker's Skyblock Mod under GNU 3.0 license
+ * Taken from Danker's Skyblock Mod under GPL 3.0 license
  * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  * @author bowser0000
  */

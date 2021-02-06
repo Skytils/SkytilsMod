@@ -6,7 +6,7 @@
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://github.com/Skytils/SkytilsMod",
-  "updateUrl": "",
+  "updateUrl": "https://github.com/Skytils/SkytilsMod/releases/latest",
   "authorList": ["Sychic", "My-Name-Is-Jeff"],
   "credits": "",
   "logoFile": "",

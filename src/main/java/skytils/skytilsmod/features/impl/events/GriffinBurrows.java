@@ -154,7 +154,7 @@ public class GriffinBurrows {
 
             burrows.clear();
             burrows.addAll(receivedBurrows);
-            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size() + EnumChatFormatting.GREEN + " burrows!"));
+            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size() + EnumChatFormatting.GREEN + " burrows!"));
 
         }).start();
     }

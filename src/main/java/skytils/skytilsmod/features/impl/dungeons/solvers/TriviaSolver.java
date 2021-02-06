@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Original code was taken from Danker's Skyblock Mod under GNU 3.0 license and modified by the Skytils team
+ * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
  * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  * @author bowser0000
  */
