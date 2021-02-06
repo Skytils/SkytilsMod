@@ -6,6 +6,7 @@ import net.minecraft.command.ICommand;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -43,6 +44,7 @@ public class Skytils {
 
     public static ArrayList<String> sendMessageQueue = new ArrayList<>();
     private static long lastChatMessage = 0;
+    public static boolean usingNEU = false;
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
@@ -83,6 +85,7 @@ public class Skytils {
                 }
             }
         }
+        if (Loader.isModLoaded("notenoughupdates")) usingNEU = true;
     }
 
     @SubscribeEvent

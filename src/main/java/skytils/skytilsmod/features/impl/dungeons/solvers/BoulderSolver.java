@@ -1,14 +1,12 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers;
 
 import com.google.common.collect.Lists;
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;

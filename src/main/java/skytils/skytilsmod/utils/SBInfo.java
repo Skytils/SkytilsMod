@@ -63,7 +63,7 @@ public class SBInfo {
             try {
                 JsonObject obj = new Gson().fromJson(event.message.getUnformattedText(), JsonObject.class);
                 if (obj.has("server")) {
-                    if (true || System.currentTimeMillis() - lastLocRaw < 5000) event.setCanceled(true);
+                    if (!Skytils.usingNEU && System.currentTimeMillis() - lastLocRaw < 5000) event.setCanceled(true);
                     if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
                         locraw = obj;
                         mode = locraw.get("mode").getAsString();

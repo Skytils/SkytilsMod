@@ -108,7 +108,6 @@ public class GriffinBurrows {
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         burrows.clear();
-        burrowRefreshTimer.reset();
         shouldRefreshBurrows = true;
     }
 
@@ -249,7 +248,7 @@ public class GriffinBurrows {
             GlStateManager.disableCull();
             RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(173, 216, 230), 1f);
             GlStateManager.disableTexture2D();
-            if (distSq > 5*5) RenderUtil.renderBeaconBeam(x, y, z, new Color(173, 216, 230).getRGB(), 1.0f, partialTicks);
+            if (distSq > 5*5) RenderUtil.renderBeaconBeam(x, y + 1, z, new Color(173, 216, 230).getRGB(), 1.0f, partialTicks);
             RenderUtil.renderWaypointText(getWaypointText(), getBlockPos().up(5), partialTicks);
             GlStateManager.disableLighting();
             GlStateManager.enableTexture2D();
