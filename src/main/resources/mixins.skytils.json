@@ -4,6 +4,7 @@
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "MixinChunk",
+    "MixinEntityBlaze",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
