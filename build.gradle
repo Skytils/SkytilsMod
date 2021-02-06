@@ -3,9 +3,9 @@ buildscript {
         jcenter()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://files.minecraftforge.net/maven"
         }
-        maven { url = "https://repo.spongepowered.org/maven" }
+        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
         // search through the 'libs' folder
         flatDir dirs: 'libs'
     }
@@ -39,7 +39,7 @@ minecraft {
 
 repositories {
     jcenter()
-    maven { url "https://repo.spongepowered.org/maven/" }
+    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
 }
 
 configurations {
@@ -75,6 +75,10 @@ dependencies {
     }
     provided files("libs/modcore.jar")
     configurations.compile.extendsFrom(configurations.packageLib)
+}
+
+mixin {
+    add sourceSets.main, "mixins.skytils.refmap.json"
 }
 
 jar {

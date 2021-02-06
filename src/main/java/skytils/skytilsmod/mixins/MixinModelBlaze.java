@@ -14,7 +14,7 @@ import java.awt.*;
 @Mixin(ModelBlaze.class)
 public class MixinModelBlaze {
     @Inject(method = "render", at = @At(value = "HEAD"))
-    private void onRender(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale, CallbackInfo ci) {
+    private void changeBlazeColor(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale, CallbackInfo ci) {
        if (entityIn.isEntityEqual(BlazeSolver.lowestBlaze) && BlazeSolver.blazeMode <= 0) {
            Color colour = new Color(255, 0, 0, 200);
            GlStateManager.color((float)colour.getRed()/255, (float)colour.getGreen()/255, (float)colour.getBlue()/255);

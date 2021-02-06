@@ -17,7 +17,7 @@ public abstract class MixinChunk {
     public abstract IBlockState getBlockState(final BlockPos pos);
 
     @Inject(method = "setBlockState", at = @At("HEAD"))
-    private void onSetBlockState(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {
+    private void onBlockChange(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {
         IBlockState old = this.getBlockState(pos);
         if (old != state) {
             MinecraftForge.EVENT_BUS.post(new BlockChangeEvent(pos, old, state));

@@ -1,6 +1,7 @@
 {
   "compatibilityLevel": "JAVA_8",
   "package": "skytils.skytilsmod.mixins",
+  "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "MixinChunk",
     "MixinModelBlaze",

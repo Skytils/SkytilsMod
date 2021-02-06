@@ -16,7 +16,7 @@ public class MixinRenderBlaze {
     private static final ResourceLocation BLANK_BLAZE_TEXTURE = new ResourceLocation("skytils", "blankblaze.png");
 
     @Inject(method = "getEntityTexture", at = @At("RETURN"), cancellable = true)
-    private void setEntityTexture(EntityBlaze entity, CallbackInfoReturnable<ResourceLocation> cir) {
+    private void setBlazeColor(EntityBlaze entity, CallbackInfoReturnable<ResourceLocation> cir) {
         if (Skytils.config.blazeSolver && Utils.inDungeons) {
             cir.setReturnValue(BLANK_BLAZE_TEXTURE);
         }
