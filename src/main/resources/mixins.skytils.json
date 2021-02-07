@@ -4,6 +4,7 @@
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "AccessorCommandHandler",
+    "MixinBossStatus",
     "MixinChunk",
     "MixinEntityBlaze",
     "MixinGuiContainer",
@@ -11,8 +12,7 @@
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinPlayerControllerMP",
-    "MixinRenderBlaze",
-    "MixinBossStatus"
+    "MixinRenderBlaze"
   ],
   "verbose": true
 }

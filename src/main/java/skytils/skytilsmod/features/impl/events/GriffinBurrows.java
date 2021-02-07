@@ -125,7 +125,7 @@ public class GriffinBurrows {
             String latestProfile = APIUtil.getLatestProfileID(uuid, apiKey);
             if (latestProfile == null) return;
 
-            JsonObject profileResponse = APIUtil.getResponse("https://api.hypixel.net/skyblock/profile?profile=" + latestProfile + "&key=" + apiKey);
+            JsonObject profileResponse = APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=" + latestProfile + "&key=" + apiKey);
             if (!profileResponse.get("success").getAsBoolean()) {
                 String reason = profileResponse.get("cause").getAsString();
                 mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed getting burrows with reason: " + reason));

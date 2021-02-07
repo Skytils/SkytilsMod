@@ -47,6 +47,16 @@ public class Config extends Vigilant {
     public Integer autoRepartyTimeout = 60;
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Update Channel",
+            description = "Choose what type of updates you get notified for.",
+            category = "General",
+            subcategory = "Updates",
+            options = {"Release", "Pre-Release"}
+    )
+    public int updateChannel = 0;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
             description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",

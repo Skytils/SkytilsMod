@@ -195,7 +195,7 @@ public class BoulderSolver {
                                 boolean isRight = true;
                                 for (int j = 0; j < expected.size(); j++) {
                                     int column = j % 7;
-                                    int row = (int) Math.floor(j / 7);
+                                    int row = (int) Math.floor(j / 7f);
                                     BoulderState state = expected.get(j);
                                     if (grid[column][row] != state && state != BoulderState.PLACEHOLDER) {
                                         isRight = false;

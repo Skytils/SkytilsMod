@@ -6,14 +6,11 @@ import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.APIUtil;
-
-import java.util.ArrayList;
 
 /**
  * Original version taken from Danker's Skyblock Mod under GPL 3.0 license. Modified by the Skytils team.
@@ -35,7 +32,8 @@ public class UpdateChecker {
 
                 new Thread(() -> {
                     System.out.println("Checking for updates...");
-                    JsonObject latestRelease = APIUtil.getResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases/latest");
+
+                    JsonObject latestRelease = Skytils.config.updateChannel == 0 ? APIUtil.getJSONResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases/latest") : APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases").get(0).getAsJsonObject();
                     String latestTag = latestRelease.get("tag_name").getAsString();
                     DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(Skytils.VERSION);
                     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(latestTag.substring(1));

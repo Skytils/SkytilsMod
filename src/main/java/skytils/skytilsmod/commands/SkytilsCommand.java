@@ -58,7 +58,7 @@ public class SkytilsCommand extends CommandBase {
                     return;
                 }
                 String apiKey = args[1];
-                if (APIUtil.getResponse("https://api.hypixel.net/key?key=" + apiKey).get("success").getAsBoolean()) {
+                if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=" + apiKey).get("success").getAsBoolean()) {
                     Skytils.config.apiKey = apiKey;
                     Skytils.config.markDirty();
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Updated your API key to " + apiKey));

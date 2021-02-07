@@ -23,7 +23,7 @@ import java.util.Scanner;
  * @author bowser0000
  */
 public class APIUtil {
-    public static JsonObject getResponse(String urlString) {
+    public static JsonObject getJSONResponse(String urlString) {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
         try {
@@ -103,7 +103,7 @@ public class APIUtil {
     }
 
     public static String getUUID(String username) {
-        JsonObject uuidResponse = getResponse("https://api.mojang.com/users/profiles/minecraft/" + username);
+        JsonObject uuidResponse = getJSONResponse("https://api.mojang.com/users/profiles/minecraft/" + username);
         return uuidResponse.get("id").getAsString();
     }
 
@@ -113,7 +113,7 @@ public class APIUtil {
         // Get profiles
         System.out.println("Fetching profiles...");
 
-        JsonObject profilesResponse = getResponse("https://api.hypixel.net/skyblock/profiles?uuid=" + UUID + "&key=" + key);
+        JsonObject profilesResponse = getJSONResponse("https://api.hypixel.net/skyblock/profiles?uuid=" + UUID + "&key=" + key);
         if (!profilesResponse.get("success").getAsBoolean()) {
             String reason = profilesResponse.get("cause").getAsString();
             player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed with reason: " + reason));
