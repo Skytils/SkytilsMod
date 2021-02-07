@@ -75,7 +75,12 @@ public class Skytils {
     public void postInit(FMLPostInitializationEvent event) {
         if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
             ClientCommandHandler.instance.registerCommand(new RepartyCommand());
-        } else if (Skytils.config.overrideReparty) {
+        }
+        if(!ClientCommandHandler.instance.getCommands().containsKey("rp")) {
+            ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandSet().add(new RepartyCommand());
+            ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandMap().put("rp", new RepartyCommand());
+        }
+        if (Skytils.config.overrideReparty) {
             if(!ClientCommandHandler.instance.getCommands().containsKey("rp")) {
                 ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandSet().add(new RepartyCommand());
                 ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandMap().put("rp", new RepartyCommand());
