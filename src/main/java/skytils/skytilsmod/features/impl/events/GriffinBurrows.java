@@ -117,7 +117,7 @@ public class GriffinBurrows {
             String uuid = mc.thePlayer.getGameProfile().getId().toString().replaceAll("[\\-]", "");
             String apiKey = Skytils.config.apiKey;
             if (apiKey.length() == 0) {
-                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Your API key is required in order to use this feature."));
+                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7c\u00a7lYour API key is required in order to use the burrow feature. \u00a7cPlease set it with /api new or /st setkey <key>"));
                 Skytils.config.showGriffinBurrows = false;
                 return;
             }
@@ -250,6 +250,7 @@ public class GriffinBurrows {
             GlStateManager.disableLighting();
             GlStateManager.enableTexture2D();
             GlStateManager.enableDepth();
+            GlStateManager.enableCull();
         }
 
     }

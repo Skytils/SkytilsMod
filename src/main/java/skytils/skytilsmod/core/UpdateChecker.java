@@ -27,13 +27,13 @@ public class UpdateChecker {
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
         if (mc.thePlayer != null) {
-            if (!updateChecked) {
+            if (!updateChecked && Skytils.config.updateChannel > 0) {
                 updateChecked = true;
 
                 new Thread(() -> {
                     System.out.println("Checking for updates...");
 
-                    JsonObject latestRelease = Skytils.config.updateChannel == 0 ? APIUtil.getJSONResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases/latest") : APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases").get(0).getAsJsonObject();
+                    JsonObject latestRelease = Skytils.config.updateChannel == 1 ? APIUtil.getJSONResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases/latest") : APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases").get(0).getAsJsonObject();
                     String latestTag = latestRelease.get("tag_name").getAsString();
                     DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(Skytils.VERSION);
                     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(latestTag.substring(1));

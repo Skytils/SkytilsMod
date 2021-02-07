@@ -163,6 +163,7 @@ public class RenderUtil {
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
+        GlStateManager.enableBlend();
     }
 
     /**

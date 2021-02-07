@@ -52,9 +52,9 @@ public class Config extends Vigilant {
             description = "Choose what type of updates you get notified for.",
             category = "General",
             subcategory = "Updates",
-            options = {"Release", "Pre-Release"}
+            options = {"None", "Pre-Release", "Release"}
     )
-    public int updateChannel = 0;
+    public int updateChannel = 2;
 
     @Property(
             type = PropertyType.SWITCH,
