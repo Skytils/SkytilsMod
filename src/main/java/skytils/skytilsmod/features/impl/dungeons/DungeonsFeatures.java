@@ -79,7 +79,7 @@ public class DungeonsFeatures {
                                 x -= fr.getStringWidth(text) / 2;
 
                                 boolean shouldDrawBkg = true;
-                                if (Loader.isModLoaded("notenoughupdates")) {
+                                if (Skytils.usingNEU) {
                                     try {
                                         Class<?> neuClass = Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates");
                                         Field neuInstance = neuClass.getDeclaredField("INSTANCE");

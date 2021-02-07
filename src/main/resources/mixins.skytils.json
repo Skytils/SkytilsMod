@@ -6,12 +6,12 @@
     "AccessorCommandHandler",
     "MixinChunk",
     "MixinEntityBlaze",
+    "MixinGuiContainer",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinPlayerControllerMP",
-    "MixinRenderBlaze",
-    "MixinGuiContainer"
+    "MixinRenderBlaze"
   ],
   "verbose": true
 }
