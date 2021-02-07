@@ -173,6 +173,15 @@ public class Config extends Vigilant {
     )
     public boolean soulEaterLore = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Only Collect Enchanted Items",
+            description = "Prevents you from collecting unenchanted items from minions if there is a Super Compactor.",
+            category = "Miscellaneous",
+            subcategory = "Minions"
+    )
+    public boolean onlyCollectEnchantedItems = false;
+
     public Config() {
         super(new File("./config/skytils.toml"));
         initialize();

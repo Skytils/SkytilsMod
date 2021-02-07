@@ -1,7 +1,10 @@
 package skytils.skytilsmod.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.util.List;
 
@@ -55,6 +58,10 @@ public class Utils {
             }
         }
         inDungeons = false;
+    }
+
+    public static Slot getSlotUnderMouse(GuiContainer gui) {
+        return ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, gui, "theSlot", "field_147006_u");
     }
 
 }
