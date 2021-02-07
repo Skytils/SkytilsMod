@@ -11,7 +11,8 @@
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinPlayerControllerMP",
-    "MixinRenderBlaze"
+    "MixinRenderBlaze",
+    "MixinBossStatus"
   ],
   "verbose": true
 }

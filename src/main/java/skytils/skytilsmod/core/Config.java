@@ -34,7 +34,7 @@ public class Config extends Vigilant {
             category = "General",
             subcategory = "Reparty"
     )
-    public boolean autoReparty = true;
+    public boolean autoReparty = false;
 
     @Property(
             type = PropertyType.SLIDER,
@@ -135,6 +135,15 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean puzzlerSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Boss Bar Fix",
+            description = "Hides the Witherborn boss bars",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean bossBarFix = false;
 
     @Property(
             type = PropertyType.SWITCH,
