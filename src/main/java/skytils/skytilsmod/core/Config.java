@@ -57,6 +57,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Spirit Leap Names",
+            description = "Shows names next to the head when you click",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean spiritLeapNames = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Hidden Fels",
             description = "Make Fels in dungeons visible.",
             category = "Dungeons",

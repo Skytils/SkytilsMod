@@ -10,7 +10,8 @@
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinPlayerControllerMP",
-    "MixinRenderBlaze"
+    "MixinRenderBlaze",
+    "MixinGuiContainer"
   ],
   "verbose": true
 }
