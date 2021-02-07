@@ -188,9 +188,6 @@ public class GriffinBurrows {
 
     public static class Burrow {
         public int x, y, z;
-        /**
-         * This variable holds the order in the chain, from a 0 based index.
-        */
         public int type;
         /**
          * This variable holds the Griffin used, -1 means no Griffin, 0 means Common, etc.
@@ -220,15 +217,15 @@ public class GriffinBurrows {
                     type = EnumChatFormatting.GREEN + "Start";
                     break;
                 case 1:
-                case 2:
                     type = EnumChatFormatting.RED + "Mob";
                     break;
+                case 2:
                 case 3:
                     type = EnumChatFormatting.GOLD + "Treasure";
                     break;
             }
 
-            return String.format("%s \u00a7bPosition: %s/4", type, this.type + 1);
+            return String.format("%s \u00a7bPosition: %s/4", type, this.chain + 1);
         }
 
         public void drawWaypoint(float partialTicks) {
