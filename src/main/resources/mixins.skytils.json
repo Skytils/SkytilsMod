@@ -3,6 +3,7 @@
   "package": "skytils.skytilsmod.mixins",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
+    "AccessorCommandHandler",
     "MixinChunk",
     "MixinEntityBlaze",
     "MixinModelBlaze",
