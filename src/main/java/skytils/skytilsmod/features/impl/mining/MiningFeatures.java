@@ -43,7 +43,7 @@ public class MiningFeatures {
         fetchurItems.put("theyre red and white and you can mine it", "50 Nether Quartz Ore");
         fetchurItems.put("theyre round and green or purple", "16 Ender Pearls");
         fetchurItems.put("theyre red and soft", "50 Red Wool");
-        fetchurItems.put("theyre brown and fluffy", "3 Rabbit Feet");
+        fetchurItems.put("theyre brown and fluffy", "3 Rabbit's Feet");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

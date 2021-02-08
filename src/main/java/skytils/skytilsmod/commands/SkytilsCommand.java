@@ -57,15 +57,17 @@ public class SkytilsCommand extends CommandBase {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide your Hypixel API key!"));
                     return;
                 }
-                String apiKey = args[1];
-                if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=" + apiKey).get("success").getAsBoolean()) {
-                    Skytils.config.apiKey = apiKey;
-                    Skytils.config.markDirty();
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Updated your API key to " + apiKey));
-                    Skytils.config.writeData();
-                } else {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide a valid Hypixel API key!"));
-                }
+                new Thread(() -> {
+                    String apiKey = args[1];
+                    if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=" + apiKey).get("success").getAsBoolean()) {
+                        Skytils.config.apiKey = apiKey;
+                        Skytils.config.markDirty();
+                        player.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Updated your API key to " + apiKey));
+                        Skytils.config.writeData();
+                    } else {
+                        player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide a valid Hypixel API key!"));
+                    }
+                }).start();
                 break;
             case "griffin":
                 if (args.length == 1) {

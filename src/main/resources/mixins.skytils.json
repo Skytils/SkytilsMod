@@ -12,7 +12,8 @@
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinPlayerControllerMP",
-    "MixinRenderBlaze"
+    "MixinRenderBlaze",
+    "MixinRenderEntityItem",
   ],
   "verbose": true
 }

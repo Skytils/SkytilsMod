@@ -165,6 +165,16 @@ public class Config extends Vigilant {
     public boolean hideImplosionParticles = false;
 
     @Property(
+            type = PropertyType.SLIDER,
+            name = "Dropped Item Scale",
+            description = "Change the size of dropped items.",
+            category = "Miscellaneous",
+            subcategory = "Items",
+            max = 400
+    )
+    public Integer itemDropScale = 100;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Soul Eater Bonus",
             description = "Shows the current Soul Eater bonus from the last mob kill.",
