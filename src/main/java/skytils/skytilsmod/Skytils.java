@@ -86,7 +86,7 @@ public class Skytils {
                 ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandMap().put("rp", new RepartyCommand());
             }
             for(Map.Entry<String, ICommand> entry : ClientCommandHandler.instance.getCommands().entrySet()) {
-                if (entry.getKey().equals("reparty") || entry.getKey().equals("rp")) {
+                if ("reparty".equals(entry.getKey()) || "rp".equals(entry.getKey())) {
                     entry.setValue(new RepartyCommand());
                 }
             }
