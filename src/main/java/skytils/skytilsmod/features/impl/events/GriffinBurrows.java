@@ -188,11 +188,17 @@ public class GriffinBurrows {
 
     public static class Burrow {
         public int x, y, z;
+        /**
+         * This variable seems to hold whether or not the burrow is the start/empty, a mob, or treasure
+         */
         public int type;
         /**
          * This variable holds the Griffin used, -1 means no Griffin, 0 means Common, etc.
-        */
+         */
         public int tier;
+        /**
+         * This variable appears to hold what order the burrow is in the chain
+         */
         public int chain;
 
         public Burrow(int x, int y, int z, int type, int tier, int chain) {
@@ -214,7 +220,7 @@ public class GriffinBurrows {
 
             switch (this.type) {
                 case 0:
-                    type = EnumChatFormatting.GREEN + "Start";
+                    type = chain == 0 ? EnumChatFormatting.GREEN + "Start" : EnumChatFormatting.WHITE + "Empty";
                     break;
                 case 1:
                     type = EnumChatFormatting.RED + "Mob";
