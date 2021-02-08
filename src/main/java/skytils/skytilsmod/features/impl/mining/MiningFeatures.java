@@ -37,13 +37,13 @@ public class MiningFeatures {
         fetchurItems.put("its useful during celebrations", "1 Firework Rocket");
         fetchurItems.put("its hot and gives energy", "1 Cheap Coffee or 1 Decent Coffee");
         fetchurItems.put("its tall and can be opened", "1 Wooden Door");
-        //hypixel disabled fetchur for a couple of days here, some may be missing
         fetchurItems.put("its explosive but more than usual", "1 Superboom TNT");
         fetchurItems.put("its wearable and grows", "1 Pumpkin");
         fetchurItems.put("its shiny and makes sparks", "1 Flint and Steel");
         fetchurItems.put("theyre red and white and you can mine it", "50 Nether Quartz Ore");
         fetchurItems.put("theyre round and green or purple", "16 Ender Pearls");
         fetchurItems.put("theyre red and soft", "50 Red Wool");
+        fetchurItems.put("theyre brown and fluffy", "3 Rabbit Feet");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
