@@ -86,7 +86,8 @@ public class SBInfo {
     public void tick(TickEvent.ClientTickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START || Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null) return;
         if (Minecraft.getMinecraft().theWorld != null &&
-                locraw == null && (System.currentTimeMillis() - lastLocRaw) > 20000) {
+                locraw == null && (System.currentTimeMillis() - lastLocRaw) > 20000 &&
+                Utils.isOnHypixel()) {
             lastLocRaw = System.currentTimeMillis();
             Skytils.sendMessageQueue.add("/locraw");
         }
