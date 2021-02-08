@@ -24,6 +24,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.ItemFeatures;
+import skytils.skytilsmod.features.impl.misc.MinionFeatures;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
@@ -66,6 +67,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
+        MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
 

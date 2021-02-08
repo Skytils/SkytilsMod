@@ -1,7 +1,9 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
@@ -16,12 +18,16 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ItemFeatures {
 
@@ -101,63 +107,60 @@ public class ItemFeatures {
     }
 
     @SubscribeEvent
-    public void onMouseInputPre(GuiScreenEvent.MouseInputEvent.Pre event) {
-        if (!Utils.inSkyblock) return;
-        if (Mouse.getEventButton() != 0 && Mouse.getEventButton() != 1 && Mouse.getEventButton() != 2) return;
-        if (!Mouse.getEventButtonState()) return;
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.entityPlayer != mc.thePlayer) return;
+        ItemStack item = event.entityPlayer.getHeldItem();
+        if (item == null) return;
 
-        if (event.gui instanceof GuiChest) {
-            Container containerChest = ((GuiChest) event.gui).inventorySlots;
-            if (containerChest instanceof ContainerChest) {
-                GuiChest chest = (GuiChest) event.gui;
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
+            if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
+                event.setCanceled(true);
+            }
+        } else if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            ArrayList<Block> interactables = new ArrayList<>(Arrays.asList(
+                    Blocks.acacia_door,
+                    Blocks.anvil,
+                    Blocks.beacon,
+                    Blocks.bed,
+                    Blocks.birch_door,
+                    Blocks.brewing_stand,
+                    Blocks.command_block,
+                    Blocks.crafting_table,
+                    Blocks.chest,
+                    Blocks.dark_oak_door,
+                    Blocks.daylight_detector,
+                    Blocks.daylight_detector_inverted,
+                    Blocks.dispenser,
+                    Blocks.dropper,
+                    Blocks.enchanting_table,
+                    Blocks.ender_chest,
+                    Blocks.furnace,
+                    Blocks.hopper,
+                    Blocks.jungle_door,
+                    Blocks.lever,
+                    Blocks.noteblock,
+                    Blocks.powered_comparator,
+                    Blocks.unpowered_comparator,
+                    Blocks.powered_repeater,
+                    Blocks.unpowered_repeater,
+                    Blocks.standing_sign,
+                    Blocks.wall_sign,
+                    Blocks.trapdoor,
+                    Blocks.trapped_chest,
+                    Blocks.wooden_button,
+                    Blocks.stone_button,
+                    Blocks.oak_door,
+                    Blocks.skull
+            ));
 
-                IInventory inventory = ((ContainerChest) containerChest).getLowerChestInventory();
-                Slot mouseSlot = Utils.getSlotUnderMouse(chest);
-                if (mouseSlot == null) return;
-                ItemStack item = mouseSlot.getStack();
-                String inventoryName = inventory.getDisplayName().getUnformattedText();
-
-                if (Skytils.config.onlyCollectEnchantedItems && inventoryName.contains("Minion") && item != null) {
-                    if (!item.isItemEnchanted()) {
-                        if (inventoryName.equals("Minion Chest")) {
-                            boolean chestHasEnchantedItem = false;
-                            for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                                ItemStack stack = inventory.getStackInSlot(i);
-                                if (stack == null) continue;
-                                if (stack.isItemEnchanted()) {
-                                    chestHasEnchantedItem = true;
-                                    break;
-                                }
-                            }
-                            if (chestHasEnchantedItem) {
-                                event.setCanceled(true);
-                                return;
-                            }
-                        } else {
-                            ItemStack minionType = inventory.getStackInSlot(4);
-                            if (minionType != null) {
-                                if (StringUtils.stripControlCodes(minionType.getDisplayName()).contains("Minion")) {
-                                    int index = mouseSlot.getSlotIndex();
-                                    if (index >= 21 && index <= 43 && index % 9 >= 3 && index % 9 <= 7) {
-                                        ItemStack firstUpgrade = inventory.getStackInSlot(37);
-                                        ItemStack secondUpgrade = inventory.getStackInSlot(46);
-                                        if (firstUpgrade != null) {
-                                            if (StringUtils.stripControlCodes(firstUpgrade.getDisplayName()).contains("Super Compactor 3000")) {
-                                                event.setCanceled(true);
-                                                return;
-                                            }
-                                        }
-                                        if (secondUpgrade != null) {
-                                            if (StringUtils.stripControlCodes(secondUpgrade.getDisplayName()).contains("Super Compactor 3000")) {
-                                                event.setCanceled(true);
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+            Block block = event.world.getBlockState(event.pos).getBlock();
+            if (Utils.inDungeons) {
+                interactables.add(Blocks.coal_block);
+                interactables.add(Blocks.stained_hardened_clay);
+            }
+            if (!interactables.contains(block)) {
+                if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
+                    event.setCanceled(true);
                 }
             }
         }

@@ -1,0 +1,24 @@
+package skytils.skytilsmod.mixins;
+
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import skytils.skytilsmod.events.GuiRenderItemEvent;
+import skytils.skytilsmod.utils.Utils;
+
+@Mixin(RenderItem.class)
+public class MixinRenderItem {
+
+    @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
+    public void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
+        MinecraftForge.EVENT_BUS.post(new GuiRenderItemEvent.RenderOverlayEvent.Post(fr, stack, xPosition, yPosition, text));
+    }
+}

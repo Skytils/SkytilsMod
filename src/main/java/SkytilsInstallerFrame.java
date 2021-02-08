@@ -20,7 +20,7 @@ import java.util.zip.ZipEntry;
 /**
  * Taken from SkyblockAddons under MIT License
  * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
- * @author biscuut
+ * @author BiscuitDevelopment
  */
 public class SkytilsInstallerFrame extends JFrame implements ActionListener, MouseListener {
 

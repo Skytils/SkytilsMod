@@ -148,12 +148,12 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Boss Bar Fix",
-            description = "Hides the Witherborn boss bars",
+            name = "Block Useless Zombie Sword",
+            description = "Prevents you from using the Zombie Sword when at full health.",
             category = "Miscellaneous",
-            subcategory = "Quality of Life"
+            subcategory = "Items"
     )
-    public boolean bossBarFix = false;
+    public boolean blockUselessZombieSword = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -170,7 +170,7 @@ public class Config extends Vigilant {
             description = "Change the size of dropped items.",
             category = "Miscellaneous",
             subcategory = "Items",
-            max = 400
+            max = 500
     )
     public Integer itemDropScale = 100;
 
@@ -191,6 +191,24 @@ public class Config extends Vigilant {
             subcategory = "Minions"
     )
     public boolean onlyCollectEnchantedItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Minion Tier",
+            description = "Shows the tier of minions as the stack size.",
+            category = "Miscellaneous",
+            subcategory = "Minions"
+    )
+    public boolean showMinionTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Boss Bar Fix",
+            description = "Hides the Witherborn boss bars.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean bossBarFix = false;
 
     public Config() {
         super(new File("./config/skytils.toml"));
