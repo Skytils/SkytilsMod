@@ -176,6 +176,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Larger Heads",
+            description = "Makes the size of heads larger.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean largerHeads = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Soul Eater Bonus",
             description = "Shows the current Soul Eater bonus from the last mob kill.",
             category = "Miscellaneous",
