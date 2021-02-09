@@ -33,7 +33,10 @@ public class TriviaSolver {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
         if (Skytils.config.triviaSolver && Utils.inDungeons) {
             if (unformatted.contains("Oruo the Omniscient") && unformatted.contains("correctly")) triviaAnswer = null;
-
+            if (unformatted.contains("I am Oruo the Omniscient") && triviaSolutions.size() == 0) {
+                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load solutions for Trivia."));
+                DataFetcher.reloadData();
+            }
             if (unformatted.contains("What SkyBlock year is it?")) {
                 double currentTime = System.currentTimeMillis() / 1000d;
 
@@ -42,11 +45,6 @@ public class TriviaSolver {
                 int year = (int) (diff / 446400 + 1);
                 triviaAnswers = new String[]{"Year " + year};
             } else {
-                if (triviaSolutions.size() == 0) {
-                    mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils was unable to load any solutions."));
-                    DataFetcher.reloadData();
-                    return;
-                }
                 for (String question : triviaSolutions.keySet()) {
                     if (unformatted.contains(question)) {
                         triviaAnswers = triviaSolutions.get(question);

@@ -26,7 +26,7 @@ public class DataFetcher {
             }
             JsonObject triviaData = APIUtil.getJSONResponse(dataUrl + "solvers/oruotrivia.json");
             for (Map.Entry<String, JsonElement> solution : triviaData.entrySet()) {
-                TriviaSolver.triviaSolutions.put(solution.getKey(), getStringArrayFromJsonArray(triviaData.getAsJsonArray()));
+                TriviaSolver.triviaSolutions.put(solution.getKey(), getStringArrayFromJsonArray(solution.getValue().getAsJsonArray()));
             }
         }).start();
     }
