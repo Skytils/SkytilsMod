@@ -60,7 +60,7 @@ public class ChatListener {
             if (unformatted.contains("You have 60 seconds to accept") && lastPartyDisbander.length() > 0 && event.message.getSiblings().size() > 0) {
                 ChatStyle acceptMessage = event.message.getSiblings().get(6).getChatStyle();
                 if (acceptMessage.getChatHoverEvent().getValue().getUnformattedText().contains(lastPartyDisbander)) {
-                    mc.thePlayer.sendChatMessage("/party accept " + lastPartyDisbander);
+                    Skytils.sendMessageQueue.add("/p accept " + lastPartyDisbander);
                     rejoinThread.interrupt();
                     lastPartyDisbander = "";
                     return;

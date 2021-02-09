@@ -9,6 +9,7 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import skytils.skytilsmod.Skytils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class RepartyCommand extends CommandBase implements ICommand {
 
 
                 try {
-                    player.sendChatMessage("/p " + String.join(" ", repartyFailList));
+                    Skytils.sendMessageQueue.add("/p " + String.join(" ", repartyFailList));
                     String members = String.join(EnumChatFormatting.WHITE + "\n- " + EnumChatFormatting.YELLOW, repartyFailList);
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.BLUE + "-----------------------------\n" +
                             EnumChatFormatting.GREEN + "Partying:" + EnumChatFormatting.WHITE + "\n- " +
@@ -88,13 +89,13 @@ public class RepartyCommand extends CommandBase implements ICommand {
 
 
             try {
-                player.sendChatMessage("/pl");
+                Skytils.sendMessageQueue.add("/pl");
                 gettingParty = true;
                 while (gettingParty) {
                     Thread.sleep(10);
                 }
                 if (party.size() == 0) return;
-                player.sendChatMessage("/p disband");
+                Skytils.sendMessageQueue.add("/p disband");
                 disbanding = true;
                 while (disbanding) {
                     Thread.sleep(10);
@@ -106,7 +107,7 @@ public class RepartyCommand extends CommandBase implements ICommand {
                         EnumChatFormatting.BLUE + "-----------------------------"));
                 repartyFailList = new ArrayList<>(party);
                 for (String invitee : party) {
-                    player.sendChatMessage("/p " + invitee);
+                    Skytils.sendMessageQueue.add("/p " + invitee);
                     inviting = true;
                     while (inviting) {
                         Thread.sleep(10);
