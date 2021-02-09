@@ -33,12 +33,39 @@ public class UpdateChecker {
                 new Thread(() -> {
                     System.out.println("Checking for updates...");
 
-                    JsonObject latestRelease = Skytils.config.updateChannel == 1 ? APIUtil.getJSONResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases/latest") : APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases").get(0).getAsJsonObject();
+                    JsonObject latestRelease = Skytils.config.updateChannel == 2 ? APIUtil.getJSONResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases/latest") : APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases").get(0).getAsJsonObject();
                     String latestTag = latestRelease.get("tag_name").getAsString();
                     DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(Skytils.VERSION);
                     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(latestTag.substring(1));
 
-                    if (currentVersion.compareTo(latestVersion) < 0) {
+                    if (latestTag.contains("pre") || Skytils.VERSION.contains("pre") && currentVersion.compareTo(latestVersion) >= 0) {
+                        int currentPre = 0;
+                        int latestPre = 0;
+                        if (Skytils.VERSION.contains("pre")) {
+                            currentPre = Integer.parseInt(Skytils.VERSION.substring(Skytils.VERSION.indexOf("pre") + 3));
+                        }
+
+                        if (latestTag.contains("pre")) {
+                            latestPre = Integer.parseInt(latestTag.substring(latestTag.indexOf("pre") + 3));
+                        }
+
+                        if (latestPre > currentPre || (latestPre == 0 && currentVersion.compareTo(latestVersion) == 0)) {
+                            String releaseURL = latestRelease.get("html_url").getAsString();
+
+                            ChatComponentText update = new ChatComponentText(EnumChatFormatting.GREEN + "" + EnumChatFormatting.BOLD + "  [UPDATE]  ");
+                            update.setChatStyle(update.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, releaseURL)));
+
+                            ChatComponentText discord = new ChatComponentText(EnumChatFormatting.BLUE + "" + EnumChatFormatting.BOLD + "  [DISCORD]  ");
+                            discord.setChatStyle(discord.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/K2wJsBRUqR")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to join the Discord!"))));
+
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Your version of Skytils is outdated. Please update to version " + latestTag + ".\n").appendSibling(update).appendSibling(discord));
+                        }                    
+                    } else if (currentVersion.compareTo(latestVersion) < 0) {
                         String releaseURL = latestRelease.get("html_url").getAsString();
 
                         ChatComponentText update = new ChatComponentText(EnumChatFormatting.GREEN + "" + EnumChatFormatting.BOLD + "  [UPDATE]  ");
@@ -54,6 +81,8 @@ public class UpdateChecker {
                         }
                         mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Your version of Skytils is outdated. Please update to version " + latestTag + ".\n").appendSibling(update).appendSibling(discord));
                     }
+
+
                 }).start();
             }
         }
