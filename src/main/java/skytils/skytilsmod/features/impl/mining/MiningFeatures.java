@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -13,9 +12,9 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
-import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -27,24 +26,7 @@ public class MiningFeatures {
     public static BlockPos puzzlerSolution = null;
     public static HashMap<String, String> fetchurItems = new HashMap<>();
 
-
     private final static Minecraft mc = Minecraft.getMinecraft();
-
-    public MiningFeatures() {
-        fetchurItems.put("theyre yellow and see through", "20 Yellow Stained Glass");
-        fetchurItems.put("its circlular and sometimes moves", "1 Compass");
-        fetchurItems.put("theyre expensive minerals", "20 Mithril");
-        fetchurItems.put("its useful during celebrations", "1 Firework Rocket");
-        fetchurItems.put("its hot and gives energy", "1 Cheap Coffee or 1 Decent Coffee");
-        fetchurItems.put("its tall and can be opened", "1 Wooden Door");
-        fetchurItems.put("its explosive but more than usual", "1 Superboom TNT");
-        fetchurItems.put("its wearable and grows", "1 Pumpkin");
-        fetchurItems.put("its shiny and makes sparks", "1 Flint and Steel");
-        fetchurItems.put("theyre red and white and you can mine it", "50 Nether Quartz Ore");
-        fetchurItems.put("theyre round and green or purple", "16 Ender Pearls");
-        fetchurItems.put("theyre red and soft", "50 Red Wool");
-        fetchurItems.put("theyre brown and fluffy", "3 Rabbit's Feet");
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
@@ -90,6 +72,11 @@ public class MiningFeatures {
         }
 
         if (Skytils.config.fetchurSolver && unformatted.contains("[NPC]") && unformatted.contains("Fetchur")) {
+            if (fetchurItems.size() == 0) {
+                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils did not load any solutions."));
+                DataFetcher.reloadData();
+                return;
+            }
             String solution = fetchurItems.keySet().stream().filter(unformatted::contains).findFirst().map(fetchurItems::get).orElse(null);
             new Thread(() -> {
                 try {
@@ -102,7 +89,7 @@ public class MiningFeatures {
                 } else {
                     if (unformatted.contains("its") || unformatted.contains("theyre")) {
                         System.out.println("Missing Fetchur item: " + unformatted);
-                        mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils couldn't determine the Fetchur item."));
+                        mc.thePlayer.addChatMessage(new ChatComponentText(String.format("\u00a7cSkytils couldn't determine the Fetchur item. There were %s solutions loaded.", fetchurItems.size())));
                     }
                 }
 

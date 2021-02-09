@@ -10,6 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.utils.APIUtil;
 
@@ -84,6 +85,9 @@ public class SkytilsCommand extends CommandBase {
                             player.addChatMessage(new ChatComponentText("/skytils griffin <refresh>"));
                     }
                 }
+                break;
+            case "reloaddata":
+                DataFetcher.reloadData();
                 break;
             default:
                 player.addChatMessage(new ChatComponentText("/" + getCommandName()));
