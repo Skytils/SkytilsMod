@@ -2,28 +2,23 @@ package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ContainerChest;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.StringUtils;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
@@ -32,43 +27,6 @@ import java.util.Arrays;
 public class ItemFeatures {
 
     private final static Minecraft mc = Minecraft.getMinecraft();
-
-    @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
-        if (event.packet instanceof S2APacketParticles) {
-            S2APacketParticles packet = (S2APacketParticles) event.packet;
-
-            EnumParticleTypes type = packet.getParticleType();
-
-            boolean longDistance = packet.isLongDistance();
-            int count = packet.getParticleCount();
-            float speed = packet.getParticleSpeed();
-            float xOffset = packet.getXOffset();
-            float yOffset = packet.getYOffset();
-            float zOffset = packet.getZOffset();
-
-            double x = packet.getXCoordinate();
-            double y = packet.getYCoordinate();
-            double z = packet.getZCoordinate();
-
-            BlockPos pos = new BlockPos(x, y, z);
-
-            if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
-                if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    boolean flag = mc.theWorld.playerEntities.stream().anyMatch(p -> {
-                        if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
-                            ItemStack item = p.getHeldItem();
-                            if (item != null) {
-                                return item.getItem() == Items.iron_sword;
-                            }
-                        }
-                        return false;
-                    });
-                    if (flag) event.setCanceled(true);
-                }
-            }
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTooltip(ItemTooltipEvent event) {
@@ -163,4 +121,61 @@ public class ItemFeatures {
             }
         }
     }
+
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (event.packet instanceof S2APacketParticles) {
+            S2APacketParticles packet = (S2APacketParticles) event.packet;
+
+            EnumParticleTypes type = packet.getParticleType();
+
+            boolean longDistance = packet.isLongDistance();
+            int count = packet.getParticleCount();
+            float speed = packet.getParticleSpeed();
+            float xOffset = packet.getXOffset();
+            float yOffset = packet.getYOffset();
+            float zOffset = packet.getZOffset();
+
+            double x = packet.getXCoordinate();
+            double y = packet.getYCoordinate();
+            double z = packet.getZCoordinate();
+
+            BlockPos pos = new BlockPos(x, y, z);
+
+            if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
+                if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
+                    boolean flag = mc.theWorld.playerEntities.stream().anyMatch(p -> {
+                        if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
+                            ItemStack item = p.getHeldItem();
+                            if (item != null) {
+                                return item.getItem() == Items.iron_sword;
+                            }
+                        }
+                        return false;
+                    });
+                    if (flag) event.setCanceled(true);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderItemOverlayPost(GuiRenderItemEvent.RenderOverlayEvent.Post event) {
+        ItemStack item = event.stack;
+        if (!Utils.inSkyblock || item == null || item.stackSize != 1) return;
+
+        NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(item);
+
+        if (Skytils.config.showPotionTier && extraAttributes != null && extraAttributes.hasKey("potion_level")) {
+            String s = String.valueOf(extraAttributes.getInteger("potion_level"));
+
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            GlStateManager.disableBlend();
+            event.fr.drawStringWithShadow(s, (float)(event.x + 17 - event.fr.getStringWidth(s)), (float)(event.y + 9), 16777215);
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+        }
+    }
+
 }

@@ -85,7 +85,7 @@ public class MinionFeatures {
     @SubscribeEvent
     public void onRenderItemOverlayPost(GuiRenderItemEvent.RenderOverlayEvent.Post event) {
         ItemStack item = event.stack;
-        if (!Utils.inSkyblock || item == null) return;
+        if (!Utils.inSkyblock || item == null || item.stackSize != 1) return;
 
         NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(item);
 

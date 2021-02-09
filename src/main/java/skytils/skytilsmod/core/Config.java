@@ -194,6 +194,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Potion Tier",
+            description = "Shows the tier of potions as the stack size.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showPotionTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Soul Eater Bonus",
             description = "Shows the current Soul Eater bonus from the last mob kill.",
             category = "Miscellaneous",
