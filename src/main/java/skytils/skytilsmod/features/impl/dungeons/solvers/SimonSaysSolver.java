@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class SimonSaysSolver {
 
-    private static ArrayList<BlockPos> clickInOrder = new ArrayList<>();
+    private static final ArrayList<BlockPos> clickInOrder = new ArrayList<>();
     private static int clickNeeded = 0;
 
     @SubscribeEvent

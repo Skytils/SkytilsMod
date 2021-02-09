@@ -23,7 +23,7 @@ public class MixinRenderItem {
         MinecraftForge.EVENT_BUS.post(new GuiRenderItemEvent.RenderOverlayEvent.Post(fr, stack, xPosition, yPosition, text));
     }
 
-    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/GlStateManager.scale(FFF)V", shift = At.Shift.BY, by = 1), require = 1)
+    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/GlStateManager.scale(FFF)V", shift = At.Shift.BY, by = 1))
     public void renderItemPre(ItemStack stack, IBakedModel model, CallbackInfo ci) {
         if (!Utils.inSkyblock) return;
         if (Skytils.config.largerHeads && stack.getItem() == Items.skull) {

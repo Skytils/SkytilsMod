@@ -11,9 +11,9 @@ import java.util.Set;
 @Mixin(CommandHandler.class)
 public interface AccessorCommandHandler {
     @Accessor("commandSet")
-    public Set<ICommand> getCommandSet();
+    Set<ICommand> getCommandSet();
 
     @Accessor("commandMap")
-    public Map<String, ICommand> getCommandMap();
+    Map<String, ICommand> getCommandMap();
 
 }

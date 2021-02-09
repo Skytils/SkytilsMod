@@ -59,9 +59,7 @@ public class ItemFeatures {
                         if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
                             ItemStack item = p.getHeldItem();
                             if (item != null) {
-                                if (item.getItem() == Items.iron_sword) {
-                                    return true;
-                                }
+                                return item.getItem() == Items.iron_sword;
                             }
                         }
                         return false;

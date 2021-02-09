@@ -31,7 +31,7 @@ public class BoulderSolver {
     public static ArrayList<ArrayList<BoulderState>> expectedBoulders = new ArrayList<>();
 
     private static int ticks = 0;
-    private static Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     public BoulderSolver() {
 

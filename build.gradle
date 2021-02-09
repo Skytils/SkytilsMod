@@ -83,7 +83,7 @@ mixin {
 
 jar {
 
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE;
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest.attributes(
             "Main-Class": "SkytilsInstallerFrame",
