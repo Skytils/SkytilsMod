@@ -194,6 +194,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Enchanted Book Tier",
+            description = "Shows the tier of books with only 1 enchantment.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showEnchantedBookTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Potion Tier",
             description = "Shows the tier of potions as the stack size.",
             category = "Miscellaneous",
