@@ -3,6 +3,7 @@ package skytils.skytilsmod.features.impl.events;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -231,7 +232,21 @@ public class GriffinBurrows {
                     break;
             }
 
-            return String.format("%s \u00a7bPosition: %s/4", type, this.chain + 1);
+
+            FastTravelLocations closest = null;
+
+            if (Skytils.config.showBurrowFastTravel) {
+                double distance = mc.thePlayer.getPosition().distanceSq(getBlockPos());
+                for (FastTravelLocations warp : FastTravelLocations.values()) {
+                    double warpDistance = getBlockPos().distanceSq(warp.pos);
+                    if (warpDistance < distance) {
+                        distance = warpDistance;
+                        closest = warp;
+                    }
+                }
+            }
+
+            return String.format("%s \u00a7bPosition: %s/4%s", type, this.chain + 1, closest != null ? " \u00a75" + closest.name() : "");
         }
 
         public void drawWaypoint(float partialTicks) {
@@ -257,6 +272,23 @@ public class GriffinBurrows {
             GlStateManager.enableTexture2D();
             GlStateManager.enableDepth();
             GlStateManager.enableCull();
+        }
+
+    }
+
+    public enum FastTravelLocations {
+        CASTLE(-250, 130, 45),
+        CRYPTS(-162, 60, -100),
+        DA(91, 74, 173),
+        HUB(-3, 70, -70);
+
+        int x, y, z;
+        BlockPos pos;
+        FastTravelLocations(int x, int y, int z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.pos = new BlockPos(x, y, z);
         }
 
     }

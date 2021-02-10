@@ -76,6 +76,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Fast-Travel Addon",
+            description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean showBurrowFastTravel = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Spirit Leap Names",
             description = "Shows names next to the head when you click.",
             category = "Dungeons",
