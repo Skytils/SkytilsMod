@@ -18,10 +18,7 @@ import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
-import skytils.skytilsmod.features.impl.dungeons.solvers.BlazeSolver;
-import skytils.skytilsmod.features.impl.dungeons.solvers.BoulderSolver;
-import skytils.skytilsmod.features.impl.dungeons.solvers.SimonSaysSolver;
-import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver;
+import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.ItemFeatures;
@@ -71,6 +68,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
+        MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
 
     }

@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3i;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.util.List;
@@ -65,6 +67,12 @@ public class Utils {
 
     public static Slot getSlotUnderMouse(GuiContainer gui) {
         return ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, gui, "theSlot", "field_147006_u");
+    }
+
+    public static Iterable<BlockPos> getBlocksWithinRangeAtSameY(BlockPos center, int radius, int y) {
+        BlockPos corner1 = new BlockPos(center.getX() - radius, y, center.getZ() - radius);
+        BlockPos corner2 = new BlockPos(center.getX() + radius, y, center.getZ() + radius);
+        return BlockPos.getAllInBox(corner1, corner2);
     }
 
 }

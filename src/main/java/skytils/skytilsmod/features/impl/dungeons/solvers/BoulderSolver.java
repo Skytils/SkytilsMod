@@ -137,44 +137,37 @@ public class BoulderSolver {
             new Thread(() -> {
                 boolean foundBirch = false;
                 boolean foundBarrier = false;
-                for (int x = (int) (player.posX - 13); x <= player.posX + 13; x++) {
+                for (BlockPos potentialBarrier : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 13, 68)) {
                     if (foundBarrier && foundBirch) break;
-                    for (int z = (int) (player.posZ - 13); z <= player.posZ + 13; z++) {
-                        if (foundBarrier && foundBirch) break;
-                        if (!foundBarrier) {
-                            BlockPos potentialBarrier = new BlockPos(x, 68, z);
-                            if (world.getBlockState(potentialBarrier).getBlock() == Blocks.barrier) {
-                                foundBarrier = true;
-                            }
+                    if (!foundBarrier) {
+                        if (world.getBlockState(potentialBarrier).getBlock() == Blocks.barrier) {
+                            foundBarrier = true;
                         }
-                        if (!foundBirch) {
-                            BlockPos potentialBirch = new BlockPos(x, 66, z);
-                            if (world.getBlockState(potentialBirch).getBlock() == Blocks.planks && Blocks.planks.getDamageValue(world, potentialBirch) == 2) {
-                                foundBirch = true;
-                            }
+                    }
+                    if (!foundBirch) {
+                        BlockPos potentialBirch = potentialBarrier.down(2);
+                        if (world.getBlockState(potentialBirch).getBlock() == Blocks.planks && Blocks.planks.getDamageValue(world, potentialBirch) == 2) {
+                            foundBirch = true;
                         }
                     }
                 }
 
                 if (foundBirch && foundBarrier) {
                     if (boulderChest == null || boulderFacing == null) {
-                        for (int x = (int) (player.posX - 25); x <= player.posX + 25; x++) {
+                        for (BlockPos potentialChestPos : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 25, 66)) {
                             if (boulderChest != null && boulderFacing != null) break;
-                            for (int z = (int) (player.posZ - 25); z <= player.posZ + 25; z++) {
-                                BlockPos potentialChestPos = new BlockPos(x, 66, z);
-                                if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {
-                                    if (world.getBlockState(potentialChestPos.down()).getBlock() == Blocks.stonebrick && world.getBlockState(potentialChestPos.up(3)).getBlock() == Blocks.barrier) {
-                                        boulderChest = potentialChestPos;
-                                        System.out.println("Boulder chest is at " + boulderChest);
-                                        for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                                            if (world.getBlockState(potentialChestPos.offset(direction)).getBlock() == Blocks.stained_hardened_clay) {
-                                                boulderFacing = direction;
-                                                System.out.println("Boulder room is facing " + direction);
-                                                break;
-                                            }
+                            if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {
+                                if (world.getBlockState(potentialChestPos.down()).getBlock() == Blocks.stonebrick && world.getBlockState(potentialChestPos.up(3)).getBlock() == Blocks.barrier) {
+                                    boulderChest = potentialChestPos;
+                                    System.out.println("Boulder chest is at " + boulderChest);
+                                    for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                                        if (world.getBlockState(potentialChestPos.offset(direction)).getBlock() == Blocks.stained_hardened_clay) {
+                                            boulderFacing = direction;
+                                            System.out.println("Boulder room is facing " + direction);
+                                            break;
                                         }
-                                        break;
                                     }
+                                    break;
                                 }
                             }
                         }
