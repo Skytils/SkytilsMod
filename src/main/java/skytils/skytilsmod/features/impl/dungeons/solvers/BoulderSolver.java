@@ -159,6 +159,7 @@ public class BoulderSolver {
                 if (foundBirch && foundBarrier) {
                     if (boulderChest == null || boulderFacing == null) {
                         for (int x = (int) (player.posX - 25); x <= player.posX + 25; x++) {
+                            if (boulderChest != null && boulderFacing != null) break;
                             for (int z = (int) (player.posZ - 25); z <= player.posZ + 25; z++) {
                                 BlockPos potentialChestPos = new BlockPos(x, 66, z);
                                 if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {

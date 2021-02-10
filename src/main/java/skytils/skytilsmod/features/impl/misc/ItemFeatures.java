@@ -168,29 +168,23 @@ public class ItemFeatures {
         NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(item);
 
         if (extraAttributes != null) {
+            String stackTip = "";
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
-                String s = String.valueOf(extraAttributes.getInteger("potion_level"));
-
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
-                GlStateManager.disableBlend();
-                event.fr.drawStringWithShadow(s, (float)(event.x + 17 - event.fr.getStringWidth(s)), (float)(event.y + 9), 16777215);
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
-            }
-            if (Skytils.config.showEnchantedBookTier && item.getItem() == Items.enchanted_book && extraAttributes.hasKey("enchantments")) {
+                stackTip = String.valueOf(extraAttributes.getInteger("potion_level"));
+            } else if (Skytils.config.showEnchantedBookTier && item.getItem() == Items.enchanted_book && extraAttributes.hasKey("enchantments")) {
                 NBTTagCompound enchantments = extraAttributes.getCompoundTag("enchantments");
                 Set<String> enchantmentNames = enchantments.getKeySet();
                 if (enchantments.getKeySet().size() == 1) {
-                    String s = String.valueOf(enchantments.getInteger(enchantmentNames.iterator().next()));
-
-                    GlStateManager.disableLighting();
-                    GlStateManager.disableDepth();
-                    GlStateManager.disableBlend();
-                    event.fr.drawStringWithShadow(s, (float)(event.x + 17 - event.fr.getStringWidth(s)), (float)(event.y + 9), 16777215);
-                    GlStateManager.enableLighting();
-                    GlStateManager.enableDepth();
+                    stackTip = String.valueOf(enchantments.getInteger(enchantmentNames.iterator().next()));
                 }
+            }
+            if (stackTip.length() > 0) {
+                GlStateManager.disableLighting();
+                GlStateManager.disableDepth();
+                GlStateManager.disableBlend();
+                event.fr.drawStringWithShadow(stackTip, (float)(event.x + 17 - event.fr.getStringWidth(stackTip)), (float)(event.y + 9), 16777215);
+                GlStateManager.enableLighting();
+                GlStateManager.enableDepth();
             }
         }
     }
