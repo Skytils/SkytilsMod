@@ -246,7 +246,7 @@ public class GriffinBurrows {
                 }
             }
 
-            return String.format("%s \u00a7bPosition: %s/4%s", type, this.chain + 1, closest != null ? " \u00a75" + closest.name() : "");
+            return String.format("%s \u00a7bPosition: %s/4%s", type, this.chain + 1, closest != null ? " " + closest.getNameWithColor() : "");
         }
 
         public void drawWaypoint(float partialTicks) {
@@ -291,6 +291,20 @@ public class GriffinBurrows {
             this.pos = new BlockPos(x, y, z);
         }
 
+        public String getNameWithColor() {
+            switch (this) {
+                case CASTLE:
+                    return EnumChatFormatting.GRAY + "CASTLE";
+                case CRYPTS:
+                    return EnumChatFormatting.DARK_GREEN + "CRYPTS";
+                case DA:
+                    return EnumChatFormatting.DARK_PURPLE + "DA";
+                case HUB:
+                    return EnumChatFormatting.WHITE + "HUB";
+                default:
+                    return "";
+            }
+        }
     }
 
 
