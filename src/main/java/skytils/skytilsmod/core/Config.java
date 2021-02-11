@@ -264,6 +264,15 @@ public class Config extends Vigilant {
     )
     public boolean bossBarFix = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Lightning",
+            description = "Prevents all lightning from rendering.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideLightning = false;
+
     public Config() {
         super(new File("./config/skytils.toml"));
         initialize();
