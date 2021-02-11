@@ -51,28 +51,28 @@ public class BlazeSolver {
                     } else if (blazes.size() > 0) {
                         int diffY = 5 * (10 - blazes.size());
                         EntityBlaze blaze = blazes.get(0);
-                        for (int x = (int) (blaze.posX - 13); x <= blaze.posX + 13; x++) {
-                            for (int z = (int) (blaze.posZ - 13); z <= blaze.posZ + 13; z++) {
-                                BlockPos blockPos1 = new BlockPos(x, 70 + diffY, z);
-                                BlockPos blockPos2 = new BlockPos(x, 69 - diffY, z);
-                                if (world.getBlockState(blockPos1).getBlock() == Blocks.chest) {
-                                    if (world.getBlockState(blockPos1.up()).getBlock() == Blocks.iron_bars) {
-                                        blazeChest = blockPos1;
-                                        if (blazes.size() < 10) {
-                                            blazeMode = -1;
-                                            System.out.println("Block scanning determined lowest -> highest");
-                                        }
-                                        break;
+                        for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(blaze.getPosition(), 13, 69)) {
+                            int x = pos.getX();
+                            int z = pos.getZ();
+                            BlockPos blockPos1 = new BlockPos(x, 70 + diffY, z);
+                            BlockPos blockPos2 = new BlockPos(x, 69 - diffY, z);
+                            if (world.getBlockState(blockPos1).getBlock() == Blocks.chest) {
+                                if (world.getBlockState(blockPos1.up()).getBlock() == Blocks.iron_bars) {
+                                    blazeChest = blockPos1;
+                                    if (blazes.size() < 10) {
+                                        blazeMode = -1;
+                                        System.out.println("Block scanning determined lowest -> highest");
                                     }
-                                } else if (world.getBlockState(blockPos2).getBlock() == Blocks.chest) {
-                                    if (world.getBlockState(blockPos2.up()).getBlock() == Blocks.iron_bars) {
-                                        blazeChest = blockPos2;
-                                        if (blazes.size() < 10) {
-                                            blazeMode = 1;
-                                            System.out.println("Block scanning determined highest -> lowest");
-                                        }
-                                        break;
+                                    break;
+                                }
+                            } else if (world.getBlockState(blockPos2).getBlock() == Blocks.chest) {
+                                if (world.getBlockState(blockPos2.up()).getBlock() == Blocks.iron_bars) {
+                                    blazeChest = blockPos2;
+                                    if (blazes.size() < 10) {
+                                        blazeMode = 1;
+                                        System.out.println("Block scanning determined highest -> lowest");
                                     }
+                                    break;
                                 }
                             }
                         }
@@ -101,9 +101,9 @@ public class BlazeSolver {
                         try {
                             int health = Integer.parseInt(blazeName.substring(blazeName.indexOf("/") + 1, blazeName.length() - 1));
                             AxisAlignedBB aabb = new AxisAlignedBB(entity.posX - 0.5, entity.posY - 2, entity.posZ - 0.5, entity.posX + 0.5, entity.posY, entity.posZ + 0.5);
-                            EntityBlaze blaze = mc.theWorld.getEntitiesWithinAABB(EntityBlaze.class, aabb).get(0);
-                            if (blaze == null) continue;
-                            orderedBlazes.add(new ShootableBlaze(blaze, health));
+                            List<EntityBlaze> blazes = mc.theWorld.getEntitiesWithinAABB(EntityBlaze.class, aabb);
+                            if (blazes.size() == 0) continue;
+                            orderedBlazes.add(new ShootableBlaze(blazes.get(0), health));
                         } catch (NumberFormatException ex) {
                             ex.printStackTrace();
                         }
