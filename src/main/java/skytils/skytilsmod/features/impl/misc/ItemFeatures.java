@@ -1,5 +1,7 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -177,6 +179,10 @@ public class ItemFeatures {
                 if (enchantments.getKeySet().size() == 1) {
                     stackTip = String.valueOf(enchantments.getInteger(enchantmentNames.iterator().next()));
                 }
+            } else if (Skytils.config.showPetCandies && item.getItem() == Items.skull && extraAttributes.hasKey("petInfo")) {
+                Gson g = new Gson();
+                String candies = g.fromJson(extraAttributes.getString("petInfo"),JsonObject.class).get("candyUsed").toString();
+                stackTip = (candies.equals("0")) ? "" : candies;
             }
             if (stackTip.length() > 0) {
                 GlStateManager.disableLighting();

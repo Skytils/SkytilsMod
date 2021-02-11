@@ -230,6 +230,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Pet Candies",
+            description = "Shows the number of candies used as the stack size",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showPetCandies = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Soul Eater Bonus",
             description = "Shows the current Soul Eater bonus from the last mob kill.",
             category = "Miscellaneous",
