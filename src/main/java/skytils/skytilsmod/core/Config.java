@@ -284,6 +284,16 @@ public class Config extends Vigilant {
     public boolean bossBarFix = false;
 
     @Property(
+            type = PropertyType.SLIDER,
+            name = "Dungeon Pot Lock",
+            description = "Only allows you to purchase this dungeon pot from Ophelia, no other items.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life",
+            max = 7
+    )
+    public int dungeonPotLock = 0;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Hide Lightning",
             description = "Prevents all lightning from rendering.",
