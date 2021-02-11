@@ -181,8 +181,11 @@ public class ItemFeatures {
                 }
             } else if (Skytils.config.showPetCandies && item.getItem() == Items.skull && extraAttributes.hasKey("petInfo")) {
                 Gson g = new Gson();
-                String candies = g.fromJson(extraAttributes.getString("petInfo"),JsonObject.class).get("candyUsed").toString();
-                stackTip = (candies.equals("0")) ? "" : candies;
+                JsonObject petInfo = g.fromJson(extraAttributes.getString("petInfo"), JsonObject.class);
+                if (petInfo.has("candyUsed")) {
+                    String candies = petInfo.get("candyUsed").getAsString();
+                    stackTip = (candies.equals("0")) ? "" : candies;
+                }
             }
             if (stackTip.length() > 0) {
                 GlStateManager.disableLighting();
