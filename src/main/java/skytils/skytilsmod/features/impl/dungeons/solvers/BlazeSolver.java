@@ -17,6 +17,8 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -26,11 +28,9 @@ import java.util.List;
  */
 public class BlazeSolver {
     private int ticks = 0;
-    
-    public static EntityArmorStand highestBlazeLabel = null;
-    public static EntityArmorStand lowestBlazeLabel = null;
-    public static EntityBlaze highestBlaze = null;
-    public static EntityBlaze lowestBlaze = null;
+
+    public static ArrayList<ShootableBlaze> orderedBlazes = new ArrayList<>();
+
     public static int blazeMode = 0;
     public static BlockPos blazeChest = null;
 
@@ -43,7 +43,7 @@ public class BlazeSolver {
 
         if (ticks % 20 == 0) {
             ticks = 0;
-            if (Utils.inDungeons && blazeMode == 0 && (lowestBlazeLabel != null || highestBlazeLabel != null) && world != null && player != null) {
+            if (Utils.inDungeons && blazeMode == 0 && orderedBlazes.size() > 0 && world != null && player != null) {
                 new Thread(() -> {
                     List<EntityBlaze> blazes = mc.theWorld.getEntities(EntityBlaze.class, (blaze) -> player.getDistanceToEntity(blaze) < 100);
                     if (blazes.size() > 10) {
@@ -93,30 +93,25 @@ public class BlazeSolver {
 
         if (ticks % 4 == 0) {
             if (Skytils.config.blazeSolver && Utils.inDungeons && world != null) {
-                List<Entity> entities = world.getLoadedEntityList();
-                int highestHealth = 0;
-                highestBlazeLabel = null;
-                int lowestHealth = 99999999;
-                lowestBlazeLabel = null;
+                orderedBlazes.clear();
 
-                for (Entity entity : entities) {
+                for (Entity entity : world.getLoadedEntityList()) {
                     if (entity instanceof EntityArmorStand && entity.getName().contains("Blaze") && entity.getName().contains("/")) {
                         String blazeName = StringUtils.stripControlCodes(entity.getName());
                         try {
                             int health = Integer.parseInt(blazeName.substring(blazeName.indexOf("/") + 1, blazeName.length() - 1));
-                            if (health > highestHealth) {
-                                highestHealth = health;
-                                highestBlazeLabel = (EntityArmorStand) entity;
-                            }
-                            if (health < lowestHealth) {
-                                lowestHealth = health;
-                                lowestBlazeLabel = (EntityArmorStand) entity;
-                            }
+                            AxisAlignedBB aabb = new AxisAlignedBB(entity.posX - 0.5, entity.posY - 2, entity.posZ - 0.5, entity.posX + 0.5, entity.posY, entity.posZ + 0.5);
+                            EntityBlaze blaze = mc.theWorld.getEntitiesWithinAABB(EntityBlaze.class, aabb).get(0);
+                            if (blaze == null) continue;
+                            orderedBlazes.add(new ShootableBlaze(blaze, health));
                         } catch (NumberFormatException ex) {
                             ex.printStackTrace();
                         }
                     }
                 }
+
+                orderedBlazes.sort(Comparator.comparingInt(blaze -> blaze.health));
+
             }
         }
 
@@ -125,32 +120,18 @@ public class BlazeSolver {
 
     @SubscribeEvent
     public void onWorldRender(RenderWorldLastEvent event) {
-        if (Skytils.config.blazeSolver && Utils.inDungeons) {
-            if (lowestBlazeLabel != null && blazeMode <= 0) {
-                AxisAlignedBB aabb = new AxisAlignedBB(lowestBlazeLabel.posX - 0.5, lowestBlazeLabel.posY - 2, lowestBlazeLabel.posZ - 0.5, lowestBlazeLabel.posX + 0.5, lowestBlazeLabel.posY, lowestBlazeLabel.posZ + 0.5);
-                for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if (entity instanceof EntityBlaze) {
-                        if (entity.getEntityBoundingBox().intersectsWith(aabb)) {
-                            lowestBlaze = (EntityBlaze) entity;
-                            break;
-                        }
-                    }
-                }
+        if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size() > 0) {
+            if (blazeMode <= 0) {
+                ShootableBlaze shootableBlaze = orderedBlazes.get(0);
+                EntityBlaze lowestBlaze = shootableBlaze.blaze;
                 if (lowestBlaze != null) {
                     BlockPos stringPos = new BlockPos(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ);
                     RenderUtil.draw3DString(stringPos, EnumChatFormatting.BOLD + "Smallest", new Color(255, 0, 0, 200), event.partialTicks);
                 }
             }
-            if (highestBlazeLabel != null && blazeMode >= 0) {
-                AxisAlignedBB aabb = new AxisAlignedBB(highestBlazeLabel.posX - 0.5, highestBlazeLabel.posY - 2, highestBlazeLabel.posZ - 0.5, highestBlazeLabel.posX + 0.5, highestBlazeLabel.posY, highestBlazeLabel.posZ + 0.5);
-                for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if (entity instanceof EntityBlaze) {
-                        if (entity.getEntityBoundingBox().intersectsWith(aabb)) {
-                            highestBlaze = (EntityBlaze) entity;
-                            break;
-                        }
-                    }
-                }
+            if (blazeMode >= 0) {
+                ShootableBlaze shootableBlaze = orderedBlazes.get(orderedBlazes.size() - 1);
+                EntityBlaze highestBlaze = shootableBlaze.blaze;
                 if (highestBlaze != null) {
                     BlockPos stringPos = new BlockPos(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ);
                     RenderUtil.draw3DString(stringPos, EnumChatFormatting.BOLD + "Biggest", new Color(0, 255, 0, 200), event.partialTicks);
@@ -161,12 +142,20 @@ public class BlazeSolver {
 
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
-        highestBlazeLabel = null;
-        lowestBlazeLabel = null;
-        highestBlaze = null;
-        lowestBlaze = null;
+        orderedBlazes.clear();
         blazeMode = 0;
         blazeChest = null;
+    }
+
+    public static class ShootableBlaze {
+        public EntityBlaze blaze;
+        public int health;
+
+        public ShootableBlaze(EntityBlaze blaze, int health) {
+            this.blaze = blaze;
+            this.health = health;
+        }
+
     }
 
 }
