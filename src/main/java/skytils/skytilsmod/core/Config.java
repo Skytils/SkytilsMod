@@ -112,6 +112,16 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Next Blaze",
+            description = "\u00a7b[WIP] \u00a7rColors the next blaze to shoot in Higher or Lower yellow.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean showNextBlaze = false;
+
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boulder Solver",
             description = "\u00a7b[WIP] \u00a7rShow which boxes to move on the Boulder puzzle.",
             category = "Dungeons",
