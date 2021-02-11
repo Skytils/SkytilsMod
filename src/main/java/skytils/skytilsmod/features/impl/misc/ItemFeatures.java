@@ -25,7 +25,10 @@ import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ItemFeatures {
 
@@ -167,10 +170,11 @@ public class ItemFeatures {
         ItemStack item = event.stack;
         if (!Utils.inSkyblock || item == null || item.stackSize != 1) return;
 
+        String stackTip = "";
+
         NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(item);
 
         if (extraAttributes != null) {
-            String stackTip = "";
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
                 stackTip = String.valueOf(extraAttributes.getInteger("potion_level"));
             } else if (Skytils.config.showEnchantedBookTier && item.getItem() == Items.enchanted_book && extraAttributes.hasKey("enchantments")) {
@@ -179,22 +183,32 @@ public class ItemFeatures {
                 if (enchantments.getKeySet().size() == 1) {
                     stackTip = String.valueOf(enchantments.getInteger(enchantmentNames.iterator().next()));
                 }
-            } else if (Skytils.config.showPetCandies && item.getItem() == Items.skull && extraAttributes.hasKey("petInfo")) {
-                Gson g = new Gson();
-                JsonObject petInfo = g.fromJson(extraAttributes.getString("petInfo"), JsonObject.class);
-                if (petInfo.has("candyUsed")) {
-                    String candies = petInfo.get("candyUsed").getAsString();
-                    stackTip = (candies.equals("0")) ? "" : candies;
+            }
+        }
+
+        List<String> lore = ItemUtil.getItemLore(item);
+
+        if(!lore.isEmpty()) {
+            if (Skytils.config.showPetCandies && item.getItem() == Items.skull) {
+                Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
+                for(String line : lore) {
+                    Matcher candyLineMatcher = candyPattern.matcher(line);
+                    if(candyLineMatcher.matches()) {
+                        stackTip = String.valueOf(candyLineMatcher.group(1));
+                        break;
+                    }
                 }
             }
-            if (stackTip.length() > 0) {
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
-                GlStateManager.disableBlend();
-                event.fr.drawStringWithShadow(stackTip, (float)(event.x + 17 - event.fr.getStringWidth(stackTip)), (float)(event.y + 9), 16777215);
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
-            }
+        }
+
+
+        if (stackTip.length() > 0) {
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            GlStateManager.disableBlend();
+            event.fr.drawStringWithShadow(stackTip, (float)(event.x + 17 - event.fr.getStringWidth(stackTip)), (float)(event.y + 9), 16777215);
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
         }
     }
 
