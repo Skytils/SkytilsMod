@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.SendChatMessageEvent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,7 +83,9 @@ public class SBInfo {
 
     private static final Pattern JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}");
 
-    public void onSendChatMessage(String msg) {
+    @SubscribeEvent
+    public void onSendChatMessage(SendChatMessageEvent event) {
+        String msg = event.message;
         if(msg.trim().startsWith("/locraw") || msg.trim().startsWith("/locraw ")) {
             lastManualLocRaw = System.currentTimeMillis();
         }

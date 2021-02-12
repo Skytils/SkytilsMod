@@ -1,6 +1,7 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
@@ -8,14 +9,29 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
 public class MiscFeatures {
+
+    @SubscribeEvent
+    public void onBossBarSet(BossBarEvent.Set event) {
+        IBossDisplayData displayData = event.displayData;
+
+        if(Utils.inSkyblock) {
+            if(Skytils.config.bossBarFix && StringUtils.stripControlCodes(displayData.getDisplayName().getUnformattedText()).equals("Wither")) {
+                event.setCanceled(true);
+                return;
+            }
+        }
+    }
+
     @SubscribeEvent
     public void onMouseInputPre(GuiScreenEvent.MouseInputEvent.Pre event) {
         if (!Utils.inSkyblock) return;
