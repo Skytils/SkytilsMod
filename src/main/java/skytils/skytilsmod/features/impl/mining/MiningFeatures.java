@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -112,7 +113,7 @@ public class MiningFeatures {
         if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
             if (SBInfo.getInstance().getLocation() != null && SBInfo.getInstance().getLocation().startsWith("dynamic")) {
                 if (Skytils.config.onlyPickaxeAbilitiesInMines && itemId != null && (itemId.contains("PICKAXE") || itemId.contains("DRILL"))) {
-                    event.setCanceled(true);
+                    event.setCanceled(event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.pos == null || mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.chest);
                 }
             }
         }
