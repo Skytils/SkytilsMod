@@ -27,6 +27,16 @@ public class Config extends Vigilant {
     public String apiKey = "";
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Command Alias Mode",
+            description = "Choose which mode to use for Command Aliases.\nDon't know what this is? Ask us on our Discord.",
+            category = "General",
+            subcategory = "Command Aliases",
+            options = {"Simple", "Advanced"}
+    )
+    public int commandAliasMode = 0;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Override other reparty commands",
             description = "Uses Skytils' reparty command instead of other mods'. \n\u00a7cRequires restart to work",

@@ -12,6 +12,7 @@ import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
+import skytils.skytilsmod.features.impl.misc.CommandAliases;
 import skytils.skytilsmod.utils.APIUtil;
 
 import java.util.List;
@@ -86,8 +87,24 @@ public class SkytilsCommand extends CommandBase {
                     }
                 }
                 break;
-            case "reloaddata":
-                DataFetcher.reloadData();
+            case "reload":
+                if (args.length == 1) {
+                    player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
+                } else {
+                    String action = args[1].toLowerCase(Locale.ENGLISH);
+                    switch (action) {
+                        case "aliases":
+                            CommandAliases.reloadAliases();
+                            player.addChatMessage(new ChatComponentText("Skytils reloaded your Command Aliases."));
+                            break;
+                        case "data":
+                            DataFetcher.reloadData();
+                            player.addChatMessage(new ChatComponentText("Skytils reloaded the repository data."));
+                            break;
+                        default:
+                            player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
+                    }
+                }
                 break;
             default:
                 player.addChatMessage(new ChatComponentText("/" + getCommandName()));

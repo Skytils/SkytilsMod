@@ -22,6 +22,7 @@ import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
+import skytils.skytilsmod.features.impl.misc.CommandAliases;
 import skytils.skytilsmod.features.impl.misc.ItemFeatures;
 import skytils.skytilsmod.features.impl.misc.MinionFeatures;
 import skytils.skytilsmod.features.impl.misc.MiscFeatures;
@@ -55,6 +56,7 @@ public class Skytils {
         modDir = new File(event.getModConfigurationDirectory(), "skytils");
         if (!modDir.exists()) modDir.mkdirs();
     }
+
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         ModCoreInstaller.initializeModCore(mc.mcDataDir);
@@ -71,6 +73,7 @@ public class Skytils {
 
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
+        MinecraftForge.EVENT_BUS.register(new CommandAliases());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());

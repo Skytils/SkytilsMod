@@ -11,9 +11,12 @@ import skytils.skytilsmod.events.SendChatMessageEvent;
 @Mixin(GuiScreen.class)
 public class MixinGuiScreen {
 
-    @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at=@At("HEAD"), cancellable = true)
-    public void onSendChatMessage(String message, boolean addToChat, CallbackInfo ci) {
-        if (MinecraftForge.EVENT_BUS.post(new SendChatMessageEvent(message, addToChat))) ci.cancel();
+    @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
+    private void onSendChatMessage(String message, boolean addToChat, CallbackInfo ci) {
+        SendChatMessageEvent event = new SendChatMessageEvent(message, addToChat);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            ci.cancel();
+        }
     }
 
 }
