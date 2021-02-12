@@ -4,16 +4,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
+import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.ScoreboardUtil;
 
 import java.awt.*;
@@ -95,6 +99,24 @@ public class MiningFeatures {
 
             }).start();
         }
+    }
+
+    @SubscribeEvent
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.entity != mc.thePlayer) return;
+        ItemStack item = event.entityPlayer.getHeldItem();
+        if (item == null) return;
+
+        String itemId = ItemUtil.getSkyBlockItemID(item);
+
+        if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
+            if (SBInfo.getInstance().getLocation() != null && SBInfo.getInstance().getLocation().startsWith("dynamic")) {
+                if (Skytils.config.onlyPickaxeAbilitiesInMines && itemId != null && (itemId.contains("PICKAXE") || itemId.contains("DRILL"))) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+
     }
 
     @SubscribeEvent

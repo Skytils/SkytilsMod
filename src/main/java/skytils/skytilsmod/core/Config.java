@@ -158,6 +158,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Disable Pickaxe Ability on Private Island",
+            description = "Prevents you from using pickaxe abilities on your island.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean onlyPickaxeAbilitiesInMines = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Ghosts",
             description = "Makes the ghosts in the Mist visible.",
             category = "Mining",
