@@ -312,7 +312,7 @@ public class Config extends Vigilant {
     public boolean hideLightning = false;
 
     public Config() {
-        super(new File("./config/skytils.toml"));
+        super(new File("./config/skytils/config.toml"));
         initialize();
     }
 }

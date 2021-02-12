@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.commands.RepartyCommand;
@@ -29,6 +30,7 @@ import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -40,6 +42,7 @@ public class Skytils {
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
+    public static File modDir;
 
     public static int ticks = 0;
 
@@ -47,6 +50,11 @@ public class Skytils {
     private static long lastChatMessage = 0;
     public static boolean usingNEU = false;
 
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        modDir = new File(event.getModConfigurationDirectory(), "skytils");
+        if (!modDir.exists()) modDir.mkdirs();
+    }
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         ModCoreInstaller.initializeModCore(mc.mcDataDir);
