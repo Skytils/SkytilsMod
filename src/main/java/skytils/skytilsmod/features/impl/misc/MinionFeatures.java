@@ -9,6 +9,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
@@ -18,6 +19,13 @@ import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
 public class MinionFeatures {
+
+    private static boolean blockUnenchanted = false;
+
+    @SubscribeEvent
+    public void onGuiOpen(GuiOpenEvent event) {
+        blockUnenchanted = false;
+    }
 
     @SubscribeEvent
     public void onMouseInputPre(GuiScreenEvent.MouseInputEvent.Pre event) {
@@ -39,39 +47,39 @@ public class MinionFeatures {
                 if (Skytils.config.onlyCollectEnchantedItems && inventoryName.contains("Minion") && item != null) {
                     if (!item.isItemEnchanted()) {
                         if (inventoryName.equals("Minion Chest")) {
-                            boolean chestHasEnchantedItem = false;
-                            for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                                ItemStack stack = inventory.getStackInSlot(i);
-                                if (stack == null) continue;
-                                if (stack.isItemEnchanted()) {
-                                    chestHasEnchantedItem = true;
-                                    break;
+                            if (!blockUnenchanted) {
+                                for (int i = 0; i < inventory.getSizeInventory(); i++) {
+                                    ItemStack stack = inventory.getStackInSlot(i);
+                                    if (stack == null) continue;
+                                    if (stack.isItemEnchanted()) {
+                                        blockUnenchanted = true;
+                                        break;
+                                    }
                                 }
                             }
-                            if (chestHasEnchantedItem) {
-                                event.setCanceled(true);
-                                return;
-                            }
+                            if (blockUnenchanted) event.setCanceled(true);
                         } else {
                             ItemStack minionType = inventory.getStackInSlot(4);
                             if (minionType != null) {
                                 if (StringUtils.stripControlCodes(minionType.getDisplayName()).contains("Minion")) {
-                                    int index = mouseSlot.getSlotIndex();
-                                    if (index >= 21 && index <= 43 && index % 9 >= 3 && index % 9 <= 7) {
+                                    if (!blockUnenchanted) {
                                         ItemStack firstUpgrade = inventory.getStackInSlot(37);
                                         ItemStack secondUpgrade = inventory.getStackInSlot(46);
                                         if (firstUpgrade != null) {
                                             if (StringUtils.stripControlCodes(firstUpgrade.getDisplayName()).contains("Super Compactor 3000")) {
-                                                event.setCanceled(true);
-                                                return;
+                                                blockUnenchanted = true;
                                             }
                                         }
                                         if (secondUpgrade != null) {
                                             if (StringUtils.stripControlCodes(secondUpgrade.getDisplayName()).contains("Super Compactor 3000")) {
-                                                event.setCanceled(true);
-                                                return;
+                                                blockUnenchanted = true;
                                             }
                                         }
+                                    }
+
+                                    int index = mouseSlot.getSlotIndex();
+                                    if (blockUnenchanted && index >= 21 && index <= 43 && index % 9 >= 3 && index % 9 <= 7) {
+                                        event.setCanceled(true);
                                     }
                                 }
                             }
