@@ -6,11 +6,13 @@ import com.google.gson.JsonObject;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.Utils;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class DataFetcher {
@@ -24,6 +26,12 @@ public class DataFetcher {
             for (Map.Entry<String, JsonElement> solution : fetchurData.entrySet()) {
                 MiningFeatures.fetchurItems.put(solution.getKey(), solution.getValue().getAsString());
             }
+
+            JsonArray threeWeirdosSolutions = APIUtil.getArrayResponse(dataUrl + "solvers/threeweirdos.json");
+            for (JsonElement solution : threeWeirdosSolutions) {
+                ThreeWeirdosSolver.solutions.add(solution.getAsString());
+            }
+
             JsonObject triviaData = APIUtil.getJSONResponse(dataUrl + "solvers/oruotrivia.json");
             for (Map.Entry<String, JsonElement> solution : triviaData.entrySet()) {
                 TriviaSolver.triviaSolutions.put(solution.getKey(), getStringArrayFromJsonArray(solution.getValue().getAsJsonArray()));
@@ -33,6 +41,7 @@ public class DataFetcher {
 
     private static void clearData() {
         MiningFeatures.fetchurItems.clear();
+        ThreeWeirdosSolver.solutions.clear();
         TriviaSolver.triviaSolutions.clear();
     }
 

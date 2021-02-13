@@ -7,7 +7,9 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3i;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import skytils.skytilsmod.Skytils;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class Utils {
@@ -78,6 +80,19 @@ public class Utils {
         BlockPos corner1 = new BlockPos(center.getX() - radius, y, center.getZ() - radius);
         BlockPos corner2 = new BlockPos(center.getX() + radius, y, center.getZ() + radius);
         return BlockPos.getAllInBox(corner1, corner2);
+    }
+
+    public static void setNEUDungeonBlockOverlay(boolean state) {
+        if (Skytils.usingNEU) {
+            try {
+                Class neuUtilsClass = Class.forName("io.github.moulberry.notenoughupdates.util.Utils");
+                Field disableField = neuUtilsClass.getDeclaredField("disableCustomDungColours");
+                disableField.setAccessible(true);
+                disableField.set(null, !state);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e)  {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

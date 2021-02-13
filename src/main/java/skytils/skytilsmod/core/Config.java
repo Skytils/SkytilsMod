@@ -159,6 +159,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Three Weirdos Solver",
+            description = "Shows which chest to click in the Three Weirdos puzzle.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean threeWeirdosSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Trivia Solver",
             description = "Shows the correct answer for the questions on the Trivia puzzle.",
             category = "Dungeons",
