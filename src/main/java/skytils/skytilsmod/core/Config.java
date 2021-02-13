@@ -242,7 +242,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Larger Heads",
-            description = "Makes the size of heads larger.",
+            description = "Makes the size of heads larger in your inventory.",
             category = "Miscellaneous",
             subcategory = "Items"
     )

@@ -27,7 +27,7 @@ public class MixinRenderItem {
     public void renderItemPre(ItemStack stack, IBakedModel model, CallbackInfo ci) {
         if (!Utils.inSkyblock) return;
         if (Skytils.config.largerHeads && stack.getItem() == Items.skull) {
-            float factor = 1.25f;
+            float factor = 1.2f;
             GlStateManager.scale(factor, factor, factor);
         }
     }

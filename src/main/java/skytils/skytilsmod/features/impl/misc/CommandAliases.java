@@ -58,7 +58,7 @@ public class CommandAliases {
 	        if (aliases.containsKey(command)) {
                 event.setCanceled(true);
                 try {
-                    String msg = Skytils.config.commandAliasMode == 0 ? "/" + aliases.get(command) + String.join(" ", args) : "/" + String.format(aliases.get(command), args.toArray());
+                    String msg = Skytils.config.commandAliasMode == 0 ? "/" + aliases.get(command) + " " + String.join(" ", args) : "/" + String.format(aliases.get(command), args.toArray());
                     if (event.addToChat) {
                         mc.ingameGUI.getChatGUI().addToSentMessages(msg);
                     }
