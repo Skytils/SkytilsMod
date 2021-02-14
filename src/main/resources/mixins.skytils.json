@@ -11,6 +11,7 @@
     "MixinEntityRenderer",
     "MixinGuiContainer",
     "MixinGuiScreen",
+    "MixinItemArmor",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",

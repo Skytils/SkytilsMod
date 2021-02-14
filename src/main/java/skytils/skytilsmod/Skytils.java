@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import skytils.skytilsmod.commands.ArmorColorCommand;
 import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
@@ -63,6 +64,7 @@ public class Skytils {
 
         config.preload();
 
+        ClientCommandHandler.instance.registerCommand(new ArmorColorCommand());
         ClientCommandHandler.instance.registerCommand(new SkytilsCommand());
 
         MinecraftForge.EVENT_BUS.register(this);
