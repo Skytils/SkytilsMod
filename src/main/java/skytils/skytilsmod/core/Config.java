@@ -187,11 +187,20 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Ghosts",
-            description = "Makes the ghosts in the Mist visible.",
+            description = "Makes the ghosts in The Mist visible.",
             category = "Mining",
             subcategory = "Quality of Life"
     )
     public boolean showGhosts = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Ghosts' Health",
+            description = "Displays the health bar of ghosts in The Mist.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean showGhostHealth = false;
 
     @Property(
             type = PropertyType.SWITCH,

@@ -16,10 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
-import skytils.skytilsmod.utils.ItemUtil;
-import skytils.skytilsmod.utils.RenderUtil;
-import skytils.skytilsmod.utils.SBInfo;
-import skytils.skytilsmod.utils.ScoreboardUtil;
+import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -133,6 +130,17 @@ public class MiningFeatures {
             GlStateManager.enableCull();
             RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), new Color(255, 0, 0, 200), 1f);
             GlStateManager.disableCull();
+        }
+        if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
+            if (Skytils.config.showGhostHealth) {
+                for (EntityCreeper creeper : mc.theWorld.getEntities(EntityCreeper.class, (creeper) -> {
+                    if (creeper.getMaxHealth() != 1024 || creeper.isDead) return false;
+                    return creeper.isInRangeToRenderDist(mc.gameSettings.renderDistanceChunks * 16);
+                })) {
+                    String healthText = String.format("\u00a7cGhost \u00a7a%s\u00a7f/\u00a7a1M\u00a7c ❤", NumberUtil.format((long) creeper.getHealth()));
+                    RenderUtil.draw3DString(creeper.getPosition().add(-mc.fontRendererObj.getStringWidth(healthText) / 2f, creeper.getEyeHeight() + 0.5, 0), healthText, new Color(255, 255, 255), event.partialTicks);
+                }
+            }
         }
     }
 
