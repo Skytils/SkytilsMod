@@ -82,17 +82,4 @@ public class Utils {
         return BlockPos.getAllInBox(corner1, corner2);
     }
 
-    public static void setNEUDungeonBlockOverlay(boolean state) {
-        if (Skytils.usingNEU) {
-            try {
-                Class neuUtilsClass = Class.forName("io.github.moulberry.notenoughupdates.util.Utils");
-                Field disableField = neuUtilsClass.getDeclaredField("disableCustomDungColours");
-                disableField.setAccessible(true);
-                disableField.set(null, !state);
-            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e)  {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }

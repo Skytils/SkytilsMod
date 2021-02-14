@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import skytils.skytilsmod.commands.ArmorColorCommand;
 import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
@@ -23,10 +24,7 @@ import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
-import skytils.skytilsmod.features.impl.misc.CommandAliases;
-import skytils.skytilsmod.features.impl.misc.ItemFeatures;
-import skytils.skytilsmod.features.impl.misc.MinionFeatures;
-import skytils.skytilsmod.features.impl.misc.MiscFeatures;
+import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
@@ -66,6 +64,7 @@ public class Skytils {
 
         config.preload();
 
+        ClientCommandHandler.instance.registerCommand(new ArmorColorCommand());
         ClientCommandHandler.instance.registerCommand(new SkytilsCommand());
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -75,6 +74,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
         MinecraftForge.EVENT_BUS.register(GUIMANAGER);
 
+        MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new CommandAliases());

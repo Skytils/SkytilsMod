@@ -3,6 +3,7 @@ package skytils.skytilsmod.features.impl.mining;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -131,17 +132,6 @@ public class MiningFeatures {
             RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), new Color(255, 0, 0, 200), 1f);
             GlStateManager.disableCull();
         }
-        if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
-            if (Skytils.config.showGhostHealth) {
-                for (EntityCreeper creeper : mc.theWorld.getEntities(EntityCreeper.class, (creeper) -> {
-                    if (creeper.getMaxHealth() != 1024 || creeper.isDead) return false;
-                    return creeper.isInRangeToRenderDist(mc.gameSettings.renderDistanceChunks * 16);
-                })) {
-                    String healthText = String.format("\u00a7cGhost \u00a7a%s\u00a7f/\u00a7a1M\u00a7c ❤", NumberUtil.format((long) creeper.getHealth()));
-                    RenderUtil.draw3DString(creeper.getPosition().add(-mc.fontRendererObj.getStringWidth(healthText) / 2f, creeper.getEyeHeight() + 0.5, 0), healthText, new Color(255, 255, 255), event.partialTicks);
-                }
-            }
-        }
     }
 
     @SubscribeEvent
@@ -149,6 +139,16 @@ public class MiningFeatures {
         if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
             if (Skytils.config.showGhosts && event.entity.isInvisible() && event.entity instanceof EntityCreeper) {
                 event.entity.setInvisible(false);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderLivingPost(RenderLivingEvent.Post event) {
+        if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
+            if (Skytils.config.showGhostHealth && event.entity instanceof EntityCreeper) {
+                String healthText = String.format("\u00a7cGhost \u00a7a%s\u00a7f/\u00a7a1M\u00a7c ❤", NumberUtil.format((long) event.entity.getHealth()));
+                RenderUtil.draw3DString(event.entity.getPosition().add(0, event.entity.getEyeHeight() + 0.5, 0), healthText, new Color(255, 255, 255), 1f);
             }
         }
     }
