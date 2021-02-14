@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -20,6 +21,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.lang3.time.StopWatch;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
+import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.DamageBlockEvent;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.RenderUtil;
@@ -42,6 +45,10 @@ public class GriffinBurrows {
     public static boolean shouldRefreshBurrows = false;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
+
+    static {
+        new GriffinGuiElement();
+    }
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -163,6 +170,40 @@ public class GriffinBurrows {
             mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size() + EnumChatFormatting.GREEN + " burrows!"));
 
         }).start();
+    }
+
+    public static class GriffinGuiElement extends GuiElement {
+
+        public GriffinGuiElement() {
+            super("Griffin Timer", 1.0F, new FloatPair(100, 10));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        public void render() {
+            if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("hub")) return;
+            EntityPlayerSP player = mc.thePlayer;
+            if (Skytils.config.showGriffinCountdown && Utils.inSkyblock && player != null) {
+                for (int i = 0; i < 8; i++) {
+                    ItemStack hotbarItem = player.inventory.getStackInSlot(i);
+                    if (hotbarItem == null) continue;
+                    if (hotbarItem.getDisplayName().contains("Ancestral Spade")) {
+                        long diff = Math.round((60_000L - GriffinBurrows.burrowRefreshTimer.getTime()) / 1000L);
+                        ScaledResolution sr = new ScaledResolution(mc);
+                        float x = this.getPos().getX() * sr.getScaledWidth();
+                        float y = this.getPos().getY() * sr.getScaledHeight();
+
+                        GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                        Minecraft.getMinecraft().fontRendererObj.drawString("Time until refresh: " + diff + "s", x, y, 0xFFFFFF, true);
+                        GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public boolean getToggled() {
+            return Skytils.config.showGriffinBurrows;
+        }
     }
 
     public static class PartialBurrow {

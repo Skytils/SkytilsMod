@@ -16,6 +16,7 @@ import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
@@ -44,12 +45,14 @@ public class Skytils {
 
     public static Config config = new Config();
     public static File modDir;
+    public static GuiManager GUIMANAGER = new GuiManager();
 
     public static int ticks = 0;
 
     public static ArrayList<String> sendMessageQueue = new ArrayList<>();
     private static long lastChatMessage = 0;
     public static boolean usingNEU = false;
+    public static boolean usingLabymod = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -70,6 +73,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new DataFetcher());
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
+        MinecraftForge.EVENT_BUS.register(GUIMANAGER);
 
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
@@ -89,6 +93,8 @@ public class Skytils {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        usingLabymod = Loader.isModLoaded("labymod");
+
         if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
             ClientCommandHandler.instance.registerCommand(new RepartyCommand());
         }

@@ -86,6 +86,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Time Until Burrow Refresh",
+            description = "Displays a gui",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean showGriffinCountdown = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Fast-Travel Addon",
             description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
             category = "Events",
