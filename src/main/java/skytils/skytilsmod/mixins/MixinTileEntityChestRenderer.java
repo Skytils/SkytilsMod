@@ -28,5 +28,5 @@ public class MixinTileEntityChestRenderer {
     private void setChestColorPost(TileEntityChest te, double x, double y, double z, float partialTicks, int destroyStage, CallbackInfo ci) {
         GlStateManager.enableTexture2D();
     }
-    
+
 }
