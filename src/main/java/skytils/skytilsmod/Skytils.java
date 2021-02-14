@@ -23,10 +23,7 @@ import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
-import skytils.skytilsmod.features.impl.misc.CommandAliases;
-import skytils.skytilsmod.features.impl.misc.ItemFeatures;
-import skytils.skytilsmod.features.impl.misc.MinionFeatures;
-import skytils.skytilsmod.features.impl.misc.MiscFeatures;
+import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
@@ -73,6 +70,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
 
+        MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
