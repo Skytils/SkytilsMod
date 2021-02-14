@@ -41,7 +41,6 @@ public class ThreeWeirdosSolver {
             if (unformatted.contains("wasn't fooled by ")) {
                 riddleNPC = null;
                 riddleChest = null;
-                Utils.setNEUDungeonBlockOverlay(true);
             }
         }
 
@@ -138,7 +137,6 @@ public class ThreeWeirdosSolver {
     public void onWorldChange(WorldEvent.Load event) {
         riddleNPC = null;
         riddleChest = null;
-        Utils.setNEUDungeonBlockOverlay(true);
     }
 
 }
