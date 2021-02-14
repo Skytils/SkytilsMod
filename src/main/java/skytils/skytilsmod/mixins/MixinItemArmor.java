@@ -13,6 +13,7 @@ import skytils.skytilsmod.utils.Utils;
 
 @Mixin(ItemArmor.class)
 public class MixinItemArmor {
+
     @Inject(method = "getColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getTagCompound()Lnet/minecraft/nbt/NBTTagCompound;"), cancellable = true)
     private void replaceArmorColor(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
         if (!Utils.inSkyblock) return;
@@ -21,6 +22,30 @@ public class MixinItemArmor {
             String uuid = extraAttributes.getString("uuid");
             if (ArmorColor.armorColors.containsKey(uuid)) {
                 cir.setReturnValue(ArmorColor.armorColors.get(uuid).getRGB());
+            }
+        }
+    }
+
+    @Inject(method = "getColorFromItemStack", at = @At("HEAD"), cancellable = true)
+    private void replaceStackArmorColor(ItemStack stack, int renderPass, CallbackInfoReturnable<Integer> cir) {
+        if (!Utils.inSkyblock) return;
+        NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(stack);
+        if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
+            String uuid = extraAttributes.getString("uuid");
+            if (ArmorColor.armorColors.containsKey(uuid)) {
+                cir.setReturnValue(ArmorColor.armorColors.get(uuid).getRGB());
+            }
+        }
+    }
+
+    @Inject(method = "hasColor", at = @At("HEAD"), cancellable = true)
+    private void hasCustomArmorColor(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        if (!Utils.inSkyblock) return;
+        NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(stack);
+        if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
+            String uuid = extraAttributes.getString("uuid");
+            if (ArmorColor.armorColors.containsKey(uuid)) {
+                cir.setReturnValue(true);
             }
         }
     }

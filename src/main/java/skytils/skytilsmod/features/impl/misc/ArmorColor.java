@@ -34,8 +34,8 @@ public class ArmorColor {
             dataObject = new JsonObject();
             try (FileWriter writer = new FileWriter(colorFile)) {
                 gson.toJson(dataObject, writer);
-            } catch (Exception ignored) {
-
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
         for (Map.Entry<String, JsonElement> colors : dataObject.entrySet()) {
@@ -51,8 +51,8 @@ public class ArmorColor {
                 obj.addProperty(colors.getKey(), String.format("#%06X", (0xFFFFFF & colors.getValue().getRGB())));
             }
             gson.toJson(obj, writer);
-        } catch (Exception ignored) {
-
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
