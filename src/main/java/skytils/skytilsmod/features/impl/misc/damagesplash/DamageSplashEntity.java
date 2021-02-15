@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.ScreenRenderer;
 import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.SmartFontRenderer;
 import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CustomColor;
-import skytils.skytilsmod.utils.NumberFormatUtil;
+import skytils.skytilsmod.utils.NumberUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.Random;
@@ -48,7 +48,7 @@ public class DamageSplashEntity extends FakeEntity {
             color = Damage.fromSymbol(symbol).getColor();
         }
 
-        displayText = NumberFormatUtil.format(Long.parseLong(damage));
+        displayText = NumberUtil.format(Long.parseLong(damage));
 
         if (love) {
             displayText += '❤';

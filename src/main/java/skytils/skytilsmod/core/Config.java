@@ -87,7 +87,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Time Until Burrow Refresh",
-            description = "Displays a gui",
+            description = "Displays the amount of time until the next refresh.",
             category = "Events",
             subcategory = "Mythological"
     )
