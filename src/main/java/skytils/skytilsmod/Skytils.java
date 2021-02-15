@@ -25,6 +25,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
+import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.ScreenRenderer;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
@@ -73,6 +74,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
         MinecraftForge.EVENT_BUS.register(GUIMANAGER);
+        MinecraftForge.EVENT_BUS.register(new DamageSplash());
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
@@ -119,6 +121,8 @@ public class Skytils {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
+
+        ScreenRenderer.refresh();
 
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
             mc.thePlayer.sendChatMessage(sendMessageQueue.remove(0));

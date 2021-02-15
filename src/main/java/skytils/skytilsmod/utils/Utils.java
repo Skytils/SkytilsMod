@@ -11,11 +11,14 @@ import skytils.skytilsmod.Skytils;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Random;
 
 public class Utils {
 
     public static boolean inSkyblock = false;
     public static boolean inDungeons = false;
+
+    static Random random = new Random();
 
     public static boolean isOnHypixel() {
         try {
@@ -80,6 +83,10 @@ public class Utils {
         BlockPos corner1 = new BlockPos(center.getX() - radius, y, center.getZ() - radius);
         BlockPos corner2 = new BlockPos(center.getX() + radius, y, center.getZ() + radius);
         return BlockPos.getAllInBox(corner1, corner2);
+    }
+
+    public static Random getRandom() {
+        return random;
     }
 
 }

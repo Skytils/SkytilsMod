@@ -357,6 +357,15 @@ public class Config extends Vigilant {
     )
     public boolean hideLightning = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Custom Damage Splash",
+            description = "Replaces Skyblock damage splashes with custom rendered ones.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean customDamageSplash = false;
+
     public Config() {
         super(new File("./config/skytils/config.toml"));
         initialize();
