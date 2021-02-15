@@ -86,12 +86,30 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Time Until Burrow Refresh",
+            description = "Displays the amount of time until the next refresh.",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean showGriffinCountdown = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Fast-Travel Addon",
             description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
             category = "Events",
             subcategory = "Mythological"
     )
     public boolean showBurrowFastTravel = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Terminal Completion Titles",
+            description = "Removes the title that shows up when a terminal is completed.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideTerminalCompletionTitles = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -338,6 +356,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideLightning = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Custom Damage Splash",
+            description = "Replaces Skyblock damage splashes with custom rendered ones.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean customDamageSplash = false;
 
     public Config() {
         super(new File("./config/skytils/config.toml"));

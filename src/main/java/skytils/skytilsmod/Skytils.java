@@ -17,6 +17,7 @@ import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
@@ -24,6 +25,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
+import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.ScreenRenderer;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
@@ -37,17 +39,19 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.6";
+    public static final String VERSION = "0.0.7-pre1";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
     public static File modDir;
+    public static GuiManager GUIMANAGER = new GuiManager();
 
     public static int ticks = 0;
 
     public static ArrayList<String> sendMessageQueue = new ArrayList<>();
     private static long lastChatMessage = 0;
     public static boolean usingNEU = false;
+    public static boolean usingLabymod = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -69,6 +73,8 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new DataFetcher());
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
+        MinecraftForge.EVENT_BUS.register(GUIMANAGER);
+        MinecraftForge.EVENT_BUS.register(new DamageSplash());
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
@@ -89,6 +95,8 @@ public class Skytils {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        usingLabymod = Loader.isModLoaded("labymod");
+
         if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
             ClientCommandHandler.instance.registerCommand(new RepartyCommand());
         }
@@ -113,6 +121,8 @@ public class Skytils {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
+
+        ScreenRenderer.refresh();
 
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
             mc.thePlayer.sendChatMessage(sendMessageQueue.remove(0));
