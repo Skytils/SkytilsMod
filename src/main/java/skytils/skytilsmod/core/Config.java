@@ -104,6 +104,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Terminal Completion Titles",
+            description = "Removes the title that shows up when a terminal is completed.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideTerminalCompletionTitles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Spirit Leap Names",
             description = "Shows names next to the head when you click.",
             category = "Dungeons",
