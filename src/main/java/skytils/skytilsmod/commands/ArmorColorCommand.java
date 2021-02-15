@@ -35,7 +35,7 @@ public class ArmorColorCommand extends CommandBase {
 
     @Override
     public List<String> getCommandAliases() {
-        return Lists.newArrayList();
+        return Lists.newArrayList("armourcolour");
     }
 
     @Override
