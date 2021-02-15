@@ -3,16 +3,12 @@ package skytils.skytilsmod.utils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Taken from SkyblockAddons under MIT License
- * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
- * @author BiscuitDevelopment
- */
 public class ItemUtil {
     public static final int NBT_INTEGER = 3;
     public static final int NBT_STRING = 8;
@@ -22,6 +18,7 @@ public class ItemUtil {
     /**
      * Returns the Skyblock Item ID of a given Skyblock item
      *
+     * @author BiscuitDevelopment
      * @param item the Skyblock item to check
      * @return the Skyblock Item ID of this item or {@code null} if this isn't a valid Skyblock item
      */
@@ -45,6 +42,7 @@ public class ItemUtil {
     /**
      * Returns the {@code ExtraAttributes} compound tag from the item's NBT data.
      *
+     * @author BiscuitDevelopment
      * @param item the item to get the tag from
      * @return the item's {@code ExtraAttributes} compound tag or {@code null} if the item doesn't have one
      */
@@ -59,6 +57,7 @@ public class ItemUtil {
     /**
      * Returns the Skyblock Item ID of a given Skyblock Extra Attributes NBT Compound
      *
+     * @author BiscuitDevelopment
      * @param extraAttributes the NBT to check
      * @return the Skyblock Item ID of this item or {@code null} if this isn't a valid Skyblock NBT
      */
@@ -80,6 +79,7 @@ public class ItemUtil {
      * an empty list if this item doesn't have a lore. The returned lore
      * list is unmodifiable since it has been converted from an NBTTagList.
      *
+     * @author BiscuitDevelopment
      * @param itemStack the ItemStack to get the lore from
      * @return the lore of an ItemStack as a string list
      */
@@ -100,6 +100,13 @@ public class ItemUtil {
         }
 
         return Collections.emptyList();
+    }
+
+    public static boolean hasRightClickAbility(ItemStack itemStack) {
+        return ItemUtil.getItemLore(itemStack).stream().anyMatch(line -> {
+            String stripped = StringUtils.stripControlCodes(line);
+            return stripped.startsWith("Item Ability:") && stripped.endsWith("RIGHT CLICK");
+        });
     }
 
 }

@@ -339,6 +339,15 @@ public class Config extends Vigilant {
     public boolean bossBarFix = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Custom Damage Splash",
+            description = "Replaces Skyblock damage splashes with custom rendered ones.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean customDamageSplash = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Pot Lock",
             description = "Only allows you to purchase this dungeon pot from Ophelia, no other items.",
@@ -359,12 +368,13 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Custom Damage Splash",
-            description = "Replaces Skyblock damage splashes with custom rendered ones.",
+            name = "Prioritize Item Abilities",
+            description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
-    public boolean customDamageSplash = false;
+    public boolean prioritizeItemAbilities = false;
+
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
