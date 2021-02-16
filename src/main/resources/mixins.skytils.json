@@ -12,6 +12,7 @@
     "MixinGuiContainer",
     "MixinGuiScreen",
     "MixinItemArmor",
+    "MixinItemStack",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",

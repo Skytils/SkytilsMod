@@ -359,6 +359,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Enchant Glint Fix",
+            description = "Fixes some items not having the enchantment glint.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean enchantGlintFix = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Lightning",
             description = "Prevents all lightning from rendering.",
             category = "Miscellaneous",
