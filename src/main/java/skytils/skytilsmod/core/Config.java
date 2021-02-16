@@ -386,6 +386,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Autopet Messages",
+            description = "Removes all autopet messages from chat.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideAutopetMessages = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Pet Item Confirmation",
             description = "Requires a confirmation before using a pet item.",
             category = "Pets",

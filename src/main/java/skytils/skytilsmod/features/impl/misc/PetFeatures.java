@@ -6,6 +6,9 @@ import net.minecraft.event.HoverEvent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.*;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.SendChatMessageEvent;
@@ -19,6 +22,18 @@ public class PetFeatures {
 
     private static long lastPetConfirmation = 0;
     private static long lastPetLockNotif = 0;
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onChatLow(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock) return;
+        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+
+        if (Skytils.config.hideAutopetMessages) {
+            if (unformatted.startsWith("Autopet equipped your")) {
+                event.setCanceled(true);
+            }
+        }
+    }
 
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent event) {
