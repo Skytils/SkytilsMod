@@ -375,6 +375,15 @@ public class Config extends Vigilant {
     )
     public boolean prioritizeItemAbilities = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Pet Item Confirmation",
+            description = "Requires a confirmation before using a pet item.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean petItemConfirmation = false;
+
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
