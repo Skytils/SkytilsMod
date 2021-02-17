@@ -106,6 +106,11 @@ public class SkytilsCommand extends CommandBase {
                     }
                 }
                 break;
+            case "help":
+                if (args.length == 1) {
+                    player.addChatMessage(new ChatComponentText("\n" + EnumChatFormatting.AQUA + "Skytils" + " Version " + Skytils.VERSION + "\n" + EnumChatFormatting.GOLD + " /skytils" + EnumChatFormatting.AQUA + " - Opens the main GUI" + "\n" + EnumChatFormatting.GOLD + " /skytils help" + EnumChatFormatting.AQUA + " - Returns this message" + "\n" + EnumChatFormatting.GOLD + " /skytils setkey <key>" + EnumChatFormatting.AQUA + " - Sets your API key" + "\n" + EnumChatFormatting.GOLD + " /skytils griffin refresh" + EnumChatFormatting.AQUA + " - Forces a refresh for the Griffin Burrow waypoints" + "\n" + EnumChatFormatting.GOLD + " /skytils reload <aliases/data>" + EnumChatFormatting.AQUA + " - Forces Skytils to re-fetch your command aliases or solutions from the data repository." + "\n" + EnumChatFormatting.GOLD + "/reparty" + EnumChatFormatting.AQUA + " - Disbands and sends a party invite to everyone who was in your party." + "\n" + EnumChatFormatting.GOLD + "/armorcolor <set/clear/clearall>" + EnumChatFormatting.AQUA + " - Changes the color of an armor piece to the hexcode or decimal color provided. (Alias is /armourcolour)"));
+                    return;
+                }
             default:
                 player.addChatMessage(new ChatComponentText("/" + getCommandName()));
         }
