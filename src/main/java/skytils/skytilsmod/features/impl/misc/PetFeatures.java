@@ -29,7 +29,7 @@ public class PetFeatures {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
 
         if (Skytils.config.hideAutopetMessages) {
-            if (unformatted.startsWith("Autopet equipped your")) {
+            if (unformatted.contains("Autopet equipped your")) {
                 event.setCanceled(true);
             }
         }
