@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.dungeons.solvers;
+package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 
 import net.minecraft.block.BlockButtonStone;
 import net.minecraft.block.state.IBlockState;

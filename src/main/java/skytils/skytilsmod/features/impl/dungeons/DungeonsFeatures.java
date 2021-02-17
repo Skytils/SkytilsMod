@@ -6,10 +6,12 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.StringUtils;
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.Utils;
 
@@ -107,6 +110,24 @@ public class DungeonsFeatures {
 
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
+        if (!Utils.inSkyblock) return;
+        Slot slot = event.slot;
+        if (event.container instanceof ContainerChest) {
+            ContainerChest cc = (ContainerChest) event.container;
+            String displayName = cc.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            if (slot.getHasStack()) {
+                ItemStack item = slot.getStack();
+                if (Skytils.config.spiritLeapNames && displayName.equals("Spirit Leap")) {
+                    if (item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) {
+                        event.setCanceled(true);
                     }
                 }
             }

@@ -159,15 +159,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Simon Says Solver",
-            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
-            category = "Dungeons",
-            subcategory = "Solvers"
-    )
-    public boolean simonSaysSolver = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Teleport Maze Solver",
             description = "\u00a7b[WIP] \u00a7rShows which pads you've stepped on in the Teleport Maze puzzle.",
             category = "Dungeons",
@@ -192,6 +183,24 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean triviaSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Click in Order Solver",
+            description = "Shows the items to click on the Click in Order terminal.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean clickInOrderTerminalSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Simon Says Solver",
+            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean simonSaysSolver = false;
 
     @Property(
             type = PropertyType.SWITCH,

@@ -2,6 +2,8 @@ package skytils.skytilsmod.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -164,6 +166,25 @@ public class RenderUtil {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.enableBlend();
+    }
+
+    /**
+     * Taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int colour) {
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        int guiLeft = (sr.getScaledWidth() - 176) / 2;
+        int guiTop = (sr.getScaledHeight() - 222) / 2;
+        int x = guiLeft + xSlotPos;
+        int y = guiTop + ySlotPos;
+        // Move down when chest isn't 6 rows
+        if (size != 90) y += (6 - (size - 36) / 9) * 9;
+
+        GL11.glTranslated(0, 0, 10);
+        Gui.drawRect(x, y, x + 16, y + 16, colour);
+        GL11.glTranslated(0, 0, -10);
     }
 
     /**
