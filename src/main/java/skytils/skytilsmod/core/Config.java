@@ -413,7 +413,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Hide dungeon abilities",
+            name = "Hide Dungeon Abilities",
             description = "Hides dungeon abilities messages and ultimates messages in chat",
             category = "Dungeons",
             subcategory = "Quality of Life"
@@ -431,7 +431,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Hide milestones in chat",
+            name = "Hide Milestones in Chat",
             description = "Hides damage milestones while in dungeons",
             category = "Dungeons",
             subcategory = "Quality of Life"

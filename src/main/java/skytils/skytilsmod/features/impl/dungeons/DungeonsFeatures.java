@@ -142,7 +142,7 @@ public class DungeonsFeatures {
             }
         }
         if (Skytils.config.hideBlessings && Utils.inDungeons) {
-            if (unformatted.startsWith("DUNGEON BUFF!") || unformatted.startsWith("A Blessing") || unformatted.contains("has obtained Blessing of") || unformatted.contains("Grants you") || unformatted.contains("Granted you")) {
+            if (unformatted.startsWith("DUNGEON BUFF!") || unformatted.startsWith("A Blessing") || unformatted.contains("has obtained Blessing of") || unformatted.contains("Grants you") || unformatted.contains("Granted you") || unformatted.contains("found a Wither Essence!")) {
                 event.setCanceled(true);
             }
         }
