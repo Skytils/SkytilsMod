@@ -13,6 +13,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.Loader;
@@ -113,8 +114,6 @@ public class DungeonsFeatures {
         }
     }
 
-    String username = Minecraft.getMinecraft().getSession().getUsername();
-
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
@@ -124,10 +123,30 @@ public class DungeonsFeatures {
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
-                if (unformatted.contains(username)) {
-                    event.setCanceled(false);
-                }
             }
         }
     }
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock) return;
+        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+
+        if (Skytils.config.hideAbilities && Utils.inDungeons) {
+            if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
+                event.setCanceled(true);
+            }
+        }
+        if (Skytils.config.hideBlessings && Utils.inDungeons) {
+            if (unformatted.startsWith("DUNGEON BUFF!") || unformatted.startsWith("A Blessing") || unformatted.contains("has obtained Blessing of") || unformatted.contains("Grants you") || unformatted.contains("Granted you")) {
+                event.setCanceled(true);
+            }
+        }
+        if (Skytils.config.hideMilestones && Utils.inDungeons) {
+            if (unformatted.startsWith("Mage Milestone") || unformatted.startsWith("Berserk Milestone") || unformatted.startsWith("Archer Milestone") || unformatted.startsWith("Tank Milestone") || unformatted.startsWith("Healer Milestone")) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
 }
+

@@ -411,6 +411,33 @@ public class Config extends Vigilant {
     )
     public boolean petItemConfirmation = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide dungeon abilities",
+            description = "Hides dungeon abilities messages and ultimates messages in chat",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideAbilities = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Blessings in Chat",
+            description = "Hides blessings in chat while in dungeons",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideBlessings = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide milestones in chat",
+            description = "Hides damage milestones while in dungeons",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideMilestones = false;
+
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
