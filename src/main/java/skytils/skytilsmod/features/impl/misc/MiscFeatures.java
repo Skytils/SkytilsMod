@@ -9,12 +9,14 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.BossBarEvent;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -28,6 +30,19 @@ public class MiscFeatures {
             if(Skytils.config.bossBarFix && StringUtils.stripControlCodes(displayData.getDisplayName().getUnformattedText()).equals("Wither")) {
                 event.setCanceled(true);
                 return;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (event.packet instanceof S45PacketTitle) {
+            S45PacketTitle packet = (S45PacketTitle) event.packet;
+            if (packet.getMessage() != null) {
+                String unformatted = StringUtils.stripControlCodes(packet.getMessage().getUnformattedText());
+                if (Skytils.config.hideFarmingRNGTitles && Utils.inSkyblock && unformatted.contains("DROP!")) {
+                    event.setCanceled(true);
+                }
             }
         }
     }

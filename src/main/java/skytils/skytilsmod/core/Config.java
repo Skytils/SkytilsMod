@@ -438,6 +438,15 @@ public class Config extends Vigilant {
     )
     public boolean hideMilestones = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Farming RNG Titles",
+            description = "Removes the titles that show up after getting an RNG with Pumpkin Dicer / Melon Dicer",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideFarmingRNGTitles = false;
+
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
