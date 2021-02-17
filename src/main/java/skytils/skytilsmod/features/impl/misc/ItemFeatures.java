@@ -1,7 +1,5 @@
 package skytils.skytilsmod.features.impl.misc;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;

@@ -39,14 +39,14 @@ public class UpdateChecker {
                     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(latestTag.substring(1));
 
                     if (latestTag.contains("pre") || Skytils.VERSION.contains("pre") && currentVersion.compareTo(latestVersion) >= 0) {
-                        int currentPre = 0;
-                        int latestPre = 0;
+                        double currentPre = 0;
+                        double latestPre = 0;
                         if (Skytils.VERSION.contains("pre")) {
-                            currentPre = Integer.parseInt(Skytils.VERSION.substring(Skytils.VERSION.indexOf("pre") + 3));
+                            currentPre = Double.parseDouble(Skytils.VERSION.substring(Skytils.VERSION.indexOf("pre") + 3));
                         }
 
                         if (latestTag.contains("pre")) {
-                            latestPre = Integer.parseInt(latestTag.substring(latestTag.indexOf("pre") + 3));
+                            latestPre = Double.parseDouble(latestTag.substring(latestTag.indexOf("pre") + 3));
                         }
 
                         if (latestPre > currentPre || (latestPre == 0 && currentVersion.compareTo(latestVersion) == 0)) {
