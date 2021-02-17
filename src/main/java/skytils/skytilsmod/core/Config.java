@@ -257,6 +257,15 @@ public class Config extends Vigilant {
     public boolean hideImplosionParticles = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Midas Staff Gold",
+            description = "Prevents the gold blocks from Molten Wave from rendering, leaving only the particles.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean hideMidasStaffGoldBlocks = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dropped Item Scale",
             description = "Change the size of dropped items.",
@@ -359,6 +368,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Enchant Glint Fix",
+            description = "Fixes some items not having the enchantment glint.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean enchantGlintFix = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Lightning",
             description = "Prevents all lightning from rendering.",
             category = "Miscellaneous",
@@ -374,6 +392,24 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean prioritizeItemAbilities = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Autopet Messages",
+            description = "Removes all autopet messages from chat.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideAutopetMessages = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Pet Item Confirmation",
+            description = "Requires a confirmation before using a pet item.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean petItemConfirmation = false;
 
 
     public Config() {

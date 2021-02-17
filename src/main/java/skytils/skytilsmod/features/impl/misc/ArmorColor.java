@@ -39,7 +39,7 @@ public class ArmorColor {
             }
         }
         for (Map.Entry<String, JsonElement> colors : dataObject.entrySet()) {
-            System.out.println(String.format("Loaded color for '%s', hex code'%s'", colors.getKey(), colors.getValue().getAsString()));
+            System.out.println(String.format("Loaded color for '%s', hex code '%s'", colors.getKey(), colors.getValue().getAsString()));
             armorColors.put(colors.getKey(), Color.decode(colors.getValue().getAsString()));
         }
     }

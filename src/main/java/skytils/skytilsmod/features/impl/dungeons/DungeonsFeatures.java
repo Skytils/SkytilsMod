@@ -113,6 +113,8 @@ public class DungeonsFeatures {
         }
     }
 
+    String username = Minecraft.getMinecraft().getSession().getUsername();
+
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
@@ -122,8 +124,10 @@ public class DungeonsFeatures {
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
+                if (unformatted.contains(username)) {
+                    event.setCanceled(false);
+                }
             }
         }
     }
-
 }

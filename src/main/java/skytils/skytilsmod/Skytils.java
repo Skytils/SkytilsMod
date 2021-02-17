@@ -39,7 +39,7 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.7-pre1";
+    public static final String VERSION = "0.0.7-pre3";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -86,6 +86,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new MiscFeatures());
+        MinecraftForge.EVENT_BUS.register(new PetFeatures());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
         MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
