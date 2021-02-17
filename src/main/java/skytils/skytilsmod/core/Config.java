@@ -257,6 +257,15 @@ public class Config extends Vigilant {
     public boolean hideImplosionParticles = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Midas Staff Gold",
+            description = "Prevents the gold blocks from Molten Wave from rendering, leaving only the particles.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean hideMidasStaffGoldBlocks = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dropped Item Scale",
             description = "Change the size of dropped items.",
