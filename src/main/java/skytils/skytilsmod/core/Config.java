@@ -159,6 +159,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Ice Path Solver",
+            description = "\u00a7b[WIP] \u00a7rShow the path for the silverfish to follow on the Ice Path puzzle.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean icePathSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Teleport Maze Solver",
             description = "\u00a7b[WIP] \u00a7rShows which pads you've stepped on in the Teleport Maze puzzle.",
             category = "Dungeons",
