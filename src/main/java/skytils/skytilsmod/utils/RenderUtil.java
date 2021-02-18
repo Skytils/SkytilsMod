@@ -192,7 +192,7 @@ public class RenderUtil {
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
      * @author bowser0000
      */
-    public static void draw3DLine(Vec3i pos1, Vec3i pos2, int width, Color color, float partialTicks) {
+    public static void draw3DLine(Vec3 pos1, Vec3 pos2, int width, Color color, float partialTicks) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
 
@@ -210,8 +210,8 @@ public class RenderUtil {
         GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
 
-        worldRenderer.pos(pos1.getX(), pos1.getY(), pos1.getZ()).endVertex();
-        worldRenderer.pos(pos2.getX(), pos2.getY(), pos2.getZ()).endVertex();
+        worldRenderer.pos(pos1.xCoord, pos1.yCoord, pos1.zCoord).endVertex();
+        worldRenderer.pos(pos2.xCoord, pos2.yCoord, pos2.zCoord).endVertex();
         Tessellator.getInstance().draw();
 
         GlStateManager.translate(realX, realY, realZ);

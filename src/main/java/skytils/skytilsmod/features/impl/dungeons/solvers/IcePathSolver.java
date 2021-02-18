@@ -7,6 +7,7 @@ import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -77,10 +78,10 @@ public class IcePathSolver {
             for (int i = 0; i < steps.size() - 1; i++) {
                 Point point = steps.get(i);
                 Point point2 = steps.get(i + 1);
-                BlockPos pos = getBlockPosRelativeToGrid(point.x, point.y);
-                BlockPos pos2 = getBlockPosRelativeToGrid(point2.x, point2.y);
+                Vec3 pos = getVec3RelativeToGrid(point.x, point.y);
+                Vec3 pos2 = getVec3RelativeToGrid(point2.x, point2.y);
                 GlStateManager.disableCull();
-                RenderUtil.draw3DLine(pos.add(0.5, -0.5, 0.5), pos2.add(0.5, -0.5, 0.5), 5, new Color(255, 0, 0), event.partialTicks);
+                RenderUtil.draw3DLine(pos.addVector(0.5, -0.5, 0.5), pos2.addVector(0.5, -0.5, 0.5), 5, new Color(255, 0, 0), event.partialTicks);
                 GlStateManager.enableCull();
             }
         }
@@ -92,13 +93,16 @@ public class IcePathSolver {
         roomFacing = null;
     }
 
-    private BlockPos getBlockPosRelativeToGrid(int row, int column) {
+
+    private Vec3 getVec3RelativeToGrid(int row, int column) {
         if (silverfishChestPos == null || roomFacing == null) return null;
-        return silverfishChestPos
+
+        return new Vec3(silverfishChestPos
                 .offset(roomFacing.getOpposite(), 4)
                 .offset(roomFacing.rotateYCCW(), 8)
                 .offset(roomFacing.rotateY(), row)
                 .offset(roomFacing.getOpposite(), column)
-                .up();
+                .up());
     }
+
 }
