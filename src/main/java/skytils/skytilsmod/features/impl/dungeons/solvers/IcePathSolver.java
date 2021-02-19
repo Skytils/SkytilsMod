@@ -17,8 +17,8 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class IcePathSolver {
 
@@ -27,22 +27,20 @@ public class IcePathSolver {
     private static BlockPos silverfishChestPos;
     private static EnumFacing roomFacing;
 
-    private static final ArrayList<Point> steps = new ArrayList<>();
+    private int ticks = 0;
 
-    public IcePathSolver() {
-        steps.addAll(Arrays.asList(
-                new Point(15, 15),
-                new Point(11, 15),
-                new Point(11, 16),
-                new Point(3, 16),
-                new Point(3, 0),
-                new Point(4,0),
-                new Point(4, 1),
-                new Point(2, 1),
-                new Point(2, 10),
-                new Point(9, 10),
-                new Point(9, 0)));
-    }
+    private static final List<Point> steps = Arrays.asList(
+            new Point(15, 15),
+            new Point(11, 15),
+            new Point(11, 16),
+            new Point(3, 16),
+            new Point(3, 0),
+            new Point(4,0),
+            new Point(4, 1),
+            new Point(2, 1),
+            new Point(2, 10),
+            new Point(9, 10),
+            new Point(9, 0));
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -50,24 +48,31 @@ public class IcePathSolver {
 
         if (!Skytils.config.icePathSolver) return;
 
-        if (mc.theWorld.getEntities(EntitySilverfish.class, silverfish -> mc.thePlayer.getDistanceToEntity(silverfish) < 20).size() > 0) {
-            if (silverfishChestPos == null || roomFacing == null) {
-                findChest:
-                for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.getPosition(), 25, 67)) {
-                    IBlockState block = mc.theWorld.getBlockState(pos);
-                    if (block.getBlock() == Blocks.chest && mc.theWorld.getBlockState(pos.down()).getBlock() == Blocks.packed_ice && mc.theWorld.getBlockState(pos.up(2)).getBlock() == Blocks.hopper) {
-                        for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                            if (mc.theWorld.getBlockState(pos.offset(direction)).getBlock() == Blocks.stonebrick) {
-                                silverfishChestPos = pos;
-                                roomFacing = direction;
-                                System.out.println(String.format("Silverfish chest is at %s and is facing %s", silverfishChestPos, roomFacing));
-                                break findChest;
+        if (ticks % 20 == 0) {
+            new Thread(() -> {
+                if (mc.theWorld.getEntities(EntitySilverfish.class, silverfish -> mc.thePlayer.getDistanceToEntity(silverfish) < 20).size() > 0) {
+                    if (silverfishChestPos == null || roomFacing == null) {
+                        findChest:
+                        for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.getPosition(), 25, 67)) {
+                            IBlockState block = mc.theWorld.getBlockState(pos);
+                            if (block.getBlock() == Blocks.chest && mc.theWorld.getBlockState(pos.down()).getBlock() == Blocks.packed_ice && mc.theWorld.getBlockState(pos.up(2)).getBlock() == Blocks.hopper) {
+                                for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                                    if (mc.theWorld.getBlockState(pos.offset(direction)).getBlock() == Blocks.stonebrick) {
+                                        silverfishChestPos = pos;
+                                        roomFacing = direction;
+                                        System.out.println(String.format("Silverfish chest is at %s and is facing %s", silverfishChestPos, roomFacing));
+                                        break findChest;
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+            }).start();
+            ticks = 0;
         }
+
+        ticks++;
     }
 
     @SubscribeEvent
@@ -92,7 +97,6 @@ public class IcePathSolver {
         silverfishChestPos = null;
         roomFacing = null;
     }
-
 
     private Vec3 getVec3RelativeToGrid(int row, int column) {
         if (silverfishChestPos == null || roomFacing == null) return null;

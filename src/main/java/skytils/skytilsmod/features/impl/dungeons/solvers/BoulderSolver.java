@@ -122,7 +122,7 @@ public class BoulderSolver {
 
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.pos == boulderChest) {
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.pos.equals(boulderChest)) {
             roomVariant = -2;
         }
     }
