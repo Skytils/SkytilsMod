@@ -14,6 +14,7 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
@@ -104,12 +105,15 @@ public class SelectAllColorSolver {
     }
 
     @SubscribeEvent
-    public void onSendPacket(SendPacketEvent event) {
-        if (Skytils.config.blockIncorrectTerminalClicks && event.packet instanceof C0EPacketClickWindow) {
-            C0EPacketClickWindow packet = (C0EPacketClickWindow) event.packet;
-            if (shouldClick.size() > 0) {
-                if (shouldClick.stream().noneMatch(slot -> slot.slotNumber == packet.getSlotId())) {
-                    event.setCanceled(true);
+    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (event.container instanceof ContainerChest) {
+            ContainerChest chest = (ContainerChest) event.container;
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            if (Skytils.config.blockIncorrectTerminalClicks && chestName.startsWith("Select all the")) {
+                if (shouldClick.size() > 0) {
+                    if (shouldClick.stream().noneMatch(slot -> slot.slotNumber == event.slot.slotNumber)) {
+                        event.setCanceled(true);
+                    }
                 }
             }
         }

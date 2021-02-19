@@ -25,7 +25,11 @@ public class MixinGuiContainer {
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(Slot slot, CallbackInfo ci) {
-        Container container = this.inventorySlots;
-        if (MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawSlotEvent.Pre(container, slot))) ci.cancel();
+        if (MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawSlotEvent.Pre(inventorySlots, slot))) ci.cancel();
+    }
+
+    @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
+        if (MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.SlotClickEvent(inventorySlots, slot, slotId, clickedButton, clickType))) ci.cancel();
     }
 }

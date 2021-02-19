@@ -1,5 +1,6 @@
 package skytils.skytilsmod.events;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
@@ -27,6 +28,19 @@ public class GuiContainerEvent extends Event {
                 super(container, slot);
             }
         }
+    }
 
+    @Cancelable
+    public static class SlotClickEvent extends GuiContainerEvent {
+
+        public Slot slot;
+        public int slotId, clickedButton, clickType;
+        public SlotClickEvent(Container container, Slot slot, int slotId, int clickedButton, int clickType) {
+            super(container);
+            this.slot = slot;
+            this.slotId = slotId;
+            this.clickedButton = clickedButton;
+            this.clickType = clickType;
+        }
     }
 }
