@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -42,8 +41,9 @@ public class IceFillSolver {
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return;
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return;
 
+        if (!Skytils.config.iceFillSolver) return;
         World world = mc.theWorld;
 
         if (ticks % 20 == 0) {
@@ -141,6 +141,8 @@ public class IceFillSolver {
 
     @SubscribeEvent
     public void onWorldRender(RenderWorldLastEvent event) {
+        if (!Skytils.config.iceFillSolver) return;
+
         if (chestPos != null && roomFacing != null) {
             if (iceFillData.size() == 0) return;
             if (variant3.size() > 0) {
