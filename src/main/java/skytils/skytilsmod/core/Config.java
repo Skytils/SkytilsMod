@@ -284,6 +284,76 @@ public class Config extends Vigilant {
     public boolean puzzlerSolver = false;
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Text Shadow",
+            description = "Changes the shadow type for the text displayed",
+            category = "Spam",
+            subcategory = "Display",
+            options = {"Normal", "None", "Outline"}
+    )
+    public int spamShadow = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Implosion Hider",
+            description = "Removes Implosion messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int implosionHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Midas Staff Hider",
+            description = "Removes Midas Staff messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int midasStaffHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Spirit Sceptre Hider",
+            description = "Removes Spirit Sceptre messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int spiritSceptreHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blocks in the way Hider",
+            description = "Removes blocks in the way messages from your chat",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int inTheWayHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Cooldown Hider",
+            description = "Removes ability still on cooldown messages from your chat",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int cooldownHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Out of mana Hider",
+            description = "Removes out of mana messages from your chat",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int manaMessages = 0;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Block Useless Zombie Sword",
             description = "Prevents you from using the Zombie Sword when at full health.",

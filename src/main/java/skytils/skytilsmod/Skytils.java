@@ -25,6 +25,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.ClickInOrderSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SimonSaysSolver;
+import skytils.skytilsmod.features.impl.dungeons.spam.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
@@ -77,6 +78,8 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(GUIMANAGER);
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
+
+        MinecraftForge.EVENT_BUS.register(new SpamHider());
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
