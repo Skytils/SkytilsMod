@@ -79,15 +79,15 @@ public class ClickInOrderSolver {
 
                 if (slotOrder.size() > neededClick) {
                     Slot slot = invSlots.get(slotOrder.get(neededClick));
-                    RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(0, 255, 246, 200).getRGB());
+                    RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(2, 62, 138, 255).getRGB());
                 }
                 if (slotOrder.size() - 1 > neededClick) {
                     Slot slot = invSlots.get(slotOrder.get(neededClick + 1));
-                    RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(0, 255, 246, 160).getRGB());
+                    RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(65, 102, 245, 255).getRGB());
                 }
                 if (slotOrder.size() - 2> neededClick) {
                     Slot slot = invSlots.get(slotOrder.get(neededClick + 2));
-                    RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(0, 255, 246, 100).getRGB());
+                    RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(144, 224, 239, 255).getRGB());
                 }
             }
         }

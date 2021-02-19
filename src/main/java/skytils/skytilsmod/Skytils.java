@@ -74,16 +74,16 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new ChatListener());
         MinecraftForge.EVENT_BUS.register(new DataFetcher());
+        MinecraftForge.EVENT_BUS.register(GUIMANAGER);
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
-        MinecraftForge.EVENT_BUS.register(GUIMANAGER);
-        MinecraftForge.EVENT_BUS.register(new DamageSplash());
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new ClickInOrderSolver());
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
+        MinecraftForge.EVENT_BUS.register(new DamageSplash());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
