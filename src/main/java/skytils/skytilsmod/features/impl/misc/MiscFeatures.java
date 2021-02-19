@@ -30,7 +30,6 @@ public class MiscFeatures {
             }
         }
     }
-
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
@@ -43,7 +42,6 @@ public class MiscFeatures {
             }
         }
     }
-
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inSkyblock) return;

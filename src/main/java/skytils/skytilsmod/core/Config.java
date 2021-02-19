@@ -525,7 +525,7 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean petItemConfirmation = false;
-
+  
     @Property(
             type = PropertyType.SWITCH,
             name = "Hide Dungeon Abilities",
@@ -561,7 +561,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideFarmingRNGTitles = false;
-
 
     public Config() {
         super(new File("./config/skytils/config.toml"));

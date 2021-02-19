@@ -20,6 +20,7 @@ A Hypixel Skyblock Utilities mod.
 ## Features
 ***
 #### General
+ - Custom command aliases
  - Griffin burrow locator and waypoints
  - Reparty command which yields to other mods
  - Auto accept reparty
@@ -30,18 +31,38 @@ A Hypixel Skyblock Utilities mod.
  - Boulder puzzle solver [WIP]
  - Simon Says solver [WIP]
  - Trivia solver (updated with the latest answers)
+ - Three weirdo solver
+ - Spirit leap names
 #### Mining 
  - Show ghosts in the mist
+ - Disable pickaxe ability on private island
  - Fetchur solver (Currently only has known hints and items, will be updated in the future)
  - Puzzler solver
+#### Miscellaneous
+ - Block useless zombie sword uses
+ - Hide implosion particles
+ - Big Item drops
+ - Larger heads
+ - Show Enchanted book tier
+ - Show potion tier
+ - Show pet candies
+ - Show minion tier
+ - Only collect enchanted items
+ - Hide witherborn boss bars
+ - Dungeon potion lock
+ - Hide lightning
+ - Custom damage splash
 
 And more to come!
 
 ## Commands
 ***
- - /skytils - Opens the main settings gui.
- - /skytils setkey <apiKey> - Sets your api key (will also grab it from /api new).
- - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
+- /skytils (/st) - Opens the main settings gui.
+- /skytils setkey <apikey> - Sets your api key (will also grab it from /api new).
+- /skytils reload <aliases/data> - Forces Skytils to re-fetch your command aliases or solutions from the data repository.
+- /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
+- /armorcolor (/armourcolour) <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided.
+- /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 
 
 ### Credits to Open Source Software
