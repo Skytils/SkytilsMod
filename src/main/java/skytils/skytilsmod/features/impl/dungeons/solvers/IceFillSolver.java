@@ -36,9 +36,9 @@ public class IceFillSolver {
     private static BlockPos chestPos;
     private static EnumFacing roomFacing;
 
-    private static ArrayList<Vec3> variant3 = new ArrayList<>();
-    private static ArrayList<Vec3> variant5 = new ArrayList<>();
-    private static ArrayList<Vec3> variant7 = new ArrayList<>();
+    private static final ArrayList<Vec3> variant3 = new ArrayList<>();
+    private static final ArrayList<Vec3> variant5 = new ArrayList<>();
+    private static final ArrayList<Vec3> variant7 = new ArrayList<>();
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -118,8 +118,6 @@ public class IceFillSolver {
                                 JsonArray blocks = el.getAsJsonObject().get("blocks").getAsJsonArray();
                                 for (int i = 0; i < blocks.size(); i++) {
                                     JsonArray point = blocks.get(i).getAsJsonArray();
-                                    System.out.println(point.get(0).getAsInt() + " " + point.get(1).getAsInt());
-                                    System.out.println(world.getBlockState(new BlockPos(getVec3RelativeToGrid7(point.get(0).getAsInt(), point.get(1).getAsInt()))).getBlock());
                                     if (world.getBlockState(new BlockPos(getVec3RelativeToGrid7(point.get(0).getAsInt(), point.get(1).getAsInt()))).getBlock() == Blocks.air) break;
                                     if (i == blocks.size() - 1) {
                                         JsonArray steps = el.getAsJsonObject().get("steps").getAsJsonArray();
