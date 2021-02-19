@@ -204,12 +204,30 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Block Incorrect Terminal Clicks",
+            description = "Blocks incorrect clicks on terminals.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean blockIncorrectTerminalClicks = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Click in Order Solver",
             description = "Shows the items to click on the Click in Order terminal.",
             category = "Dungeons",
             subcategory = "Terminal Solvers"
     )
     public boolean clickInOrderTerminalSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Select All Colors Solver",
+            description = "Shows the items to click on the Select All Color terminal.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean selectAllColorTerminalSolver = false;
 
     @Property(
             type = PropertyType.SWITCH,

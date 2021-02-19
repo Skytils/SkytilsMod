@@ -23,6 +23,7 @@ import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.ClickInOrderSolver;
+import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SimonSaysSolver;
 import skytils.skytilsmod.features.impl.dungeons.spam.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
@@ -95,6 +96,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new MiscFeatures());
         MinecraftForge.EVENT_BUS.register(new PetFeatures());
+        MinecraftForge.EVENT_BUS.register(new SelectAllColorSolver());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
         MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
