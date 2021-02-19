@@ -159,12 +159,21 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Simon Says Solver",
-            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            name = "Ice Fill Solver",
+            description = "\u00a7b[Help Wanted] \u00a7rShows the path to take on the Ice Fill puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
-    public boolean simonSaysSolver = false;
+    public boolean iceFillSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Ice Path Solver",
+            description = "\u00a7b[WIP] \u00a7rShow the path for the silverfish to follow on the Ice Path puzzle.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean icePathSolver = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -192,6 +201,42 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean triviaSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Block Incorrect Terminal Clicks",
+            description = "Blocks incorrect clicks on terminals.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean blockIncorrectTerminalClicks = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Click in Order Solver",
+            description = "Shows the items to click on the Click in Order terminal.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean clickInOrderTerminalSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Select All Colors Solver",
+            description = "Shows the items to click on the Select All Color terminal.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean selectAllColorTerminalSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Simon Says Solver",
+            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean simonSaysSolver = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -237,6 +282,76 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean puzzlerSolver = false;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Text Shadow",
+            description = "Changes the shadow type for the text displayed",
+            category = "Spam",
+            subcategory = "Display",
+            options = {"Normal", "None", "Outline"}
+    )
+    public int spamShadow = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Implosion Hider",
+            description = "Removes Implosion messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int implosionHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Midas Staff Hider",
+            description = "Removes Midas Staff messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int midasStaffHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Spirit Sceptre Hider",
+            description = "Removes Spirit Sceptre messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int spiritSceptreHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blocks in the way Hider",
+            description = "Removes blocks in the way messages from your chat",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int inTheWayHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Cooldown Hider",
+            description = "Removes ability still on cooldown messages from your chat",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int cooldownHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Out of mana Hider",
+            description = "Removes out of mana messages from your chat",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int manaMessages = 0;
 
     @Property(
             type = PropertyType.SWITCH,

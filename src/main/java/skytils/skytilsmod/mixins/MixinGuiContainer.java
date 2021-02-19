@@ -1,6 +1,8 @@
 package skytils.skytilsmod.mixins;
 
+import net.minecraftforge.common.MinecraftForge;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.utils.Utils;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.init.Blocks;
@@ -23,20 +25,11 @@ public class MixinGuiContainer {
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(Slot slot, CallbackInfo ci) {
-        if (!Utils.inSkyblock) return;
-        Container container = this.inventorySlots;
-        if (container instanceof ContainerChest) {
-            ContainerChest cc = (ContainerChest) container;
-            String displayName = cc.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
-            if (slot.getHasStack()) {
-                ItemStack item = slot.getStack();
-                if (Skytils.config.spiritLeapNames && displayName.equals("Spirit Leap")) {
-                    if (item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) {
-                        ci.cancel();
-                        return;
-                    }
-                }
-            }
-        }
+        if (MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawSlotEvent.Pre(inventorySlots, slot))) ci.cancel();
+    }
+
+    @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
+        if (MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.SlotClickEvent(inventorySlots, slot, slotId, clickedButton, clickType))) ci.cancel();
     }
 }

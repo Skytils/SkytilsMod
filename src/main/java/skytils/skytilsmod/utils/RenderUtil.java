@@ -2,6 +2,8 @@ package skytils.skytilsmod.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -164,6 +166,60 @@ public class RenderUtil {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.enableBlend();
+    }
+
+    /**
+     * Taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int colour) {
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        int guiLeft = (sr.getScaledWidth() - 176) / 2;
+        int guiTop = (sr.getScaledHeight() - 222) / 2;
+        int x = guiLeft + xSlotPos;
+        int y = guiTop + ySlotPos;
+        // Move down when chest isn't 6 rows
+        if (size != 90) y += (6 - (size - 36) / 9) * 9;
+
+        GL11.glTranslated(0, 0, 10);
+        Gui.drawRect(x, y, x + 16, y + 16, colour);
+        GL11.glTranslated(0, 0, -10);
+    }
+
+    /**
+     * Taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    public static void draw3DLine(Vec3 pos1, Vec3 pos2, int width, Color color, float partialTicks) {
+        Entity render = Minecraft.getMinecraft().getRenderViewEntity();
+        WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
+
+        double realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks;
+        double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
+        double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-realX, -realY, -realZ);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GL11.glLineWidth(width);
+        GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+
+        worldRenderer.pos(pos1.xCoord, pos1.yCoord, pos1.zCoord).endVertex();
+        worldRenderer.pos(pos2.xCoord, pos2.yCoord, pos2.zCoord).endVertex();
+        Tessellator.getInstance().draw();
+
+        GlStateManager.translate(realX, realY, realZ);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
     }
 
     /**
