@@ -36,7 +36,7 @@ public class ClickInOrderSolver {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
 
-        if (event.phase != TickEvent.Phase.START || !Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return;
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return;
 
         if (!Skytils.config.clickInOrderTerminalSolver) return;
 
@@ -106,7 +106,7 @@ public class ClickInOrderSolver {
             if (chestName.equals("Click in order!")) {
                 if (slot.getHasStack() && slot.inventory != mc.thePlayer.inventory) {
                     ItemStack item = slot.getStack();
-                    if (item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane) && item.getItemDamage() == 5 || item.getItemDamage() == 14) {
+                    if (item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane) && item.getItemDamage() == 14) {
                         GlStateManager.disableLighting();
                         GlStateManager.disableDepth();
                         GlStateManager.disableBlend();
