@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.dungeons.spam;
+package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -137,6 +137,12 @@ public class SpamHider {
             Skytils.GUIMANAGER.registerElement(this);
         }
 
+
+        /**
+         * Based off of Soopyboo32's SoopyApis module
+         * https://github.com/Soopyboo32
+         * @author Soopyboo32
+         */
         public void render() {
             long now = new Date().getTime();
 
