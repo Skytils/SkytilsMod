@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors;
+package skytils.skytilsmod.utils.graphics.colors;
 
 import net.minecraft.client.renderer.GlStateManager;
 import org.apache.commons.codec.digest.DigestUtils;

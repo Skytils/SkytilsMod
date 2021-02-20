@@ -1,7 +1,6 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -10,9 +9,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.ScreenRenderer;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.SmartFontRenderer;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CommonColors;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.*;
 

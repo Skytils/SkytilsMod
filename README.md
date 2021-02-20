@@ -20,38 +20,47 @@ A Hypixel Skyblock Utilities mod.
 ## Features
 ***
 #### General
- - Custom command aliases
- - Griffin burrow locator and waypoints
- - Reparty command which yields to other mods
- - Auto accept reparty
- - Soul Eater bonus strength
+ - Client Side Custom Armor Rolors
+ - Custom Command Aliases
+ - Griffin Burrow Locator and Waypoints
+ - Reparty Command Which Yields to Other Mods
+ - Auto Accept Reparty
+ - Soul Eater Bonus Strength
+ - Spam Hider
 ##### Dungeons
- - Show hidden Fels
- - Blaze solver which replaces the skin textures
- - Boulder puzzle solver [WIP]
- - Simon Says solver [WIP]
- - Trivia solver (updated with the latest answers)
- - Three weirdo solver
- - Spirit leap names
+ - Show Hidden Fels
+ - Blaze Solver Which Replaces The Skin Textures
+ - Boulder Puzzle Solver [WIP]
+ - Simon Says Solver [WIP]
+ - Trivia Solver (updated with the latest answers)
+ - Three Weirdo Solver
+ - Spirit Leap Names
+ - Click in Order Terminal Solver
+ - Ice Path Solver
+ - Select All Color Solver
 #### Mining 
- - Show ghosts in the mist
- - Disable pickaxe ability on private island
- - Fetchur solver (Currently only has known hints and items, will be updated in the future)
- - Puzzler solver
+ - Show Ghosts in the Mist (Also their health)
+ - Disable Pickaxe Ability on Private Island
+ - Fetchur Solver
+ - Puzzler Solver
 #### Miscellaneous
- - Block useless zombie sword uses
- - Hide implosion particles
- - Big Item drops
- - Larger heads
- - Show Enchanted book tier
- - Show potion tier
- - Show pet candies
- - Show minion tier
- - Only collect enchanted items
- - Hide witherborn boss bars
- - Dungeon potion lock
+ - Block Useless Zombie Sword Uses
+ - Prioritize Item Abilities
+ - Pet Item Confirmation
+ - Hide Autopet Messages
+ - Hide Implosion Particles
+ - Hide Midas Staff Gold Blocks
+ - Big Item Drops
+ - Larger Heads
+ - Show Enchanted Book Tier
+ - Show Potion Tier
+ - Show Pet Candies
+ - Show Minion Tier
+ - Only Collect Enchanted Items
+ - Hide Witherborn Boss Bars
+ - Dungeon Potion Lock
  - Hide lightning
- - Custom damage splash
+ - Custom Damage Splash
 
 And more to come!
 

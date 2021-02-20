@@ -3,9 +3,9 @@ package skytils.skytilsmod.features.impl.misc.damagesplash;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.ScreenRenderer;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.SmartFontRenderer;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CustomColor;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 import skytils.skytilsmod.utils.NumberUtil;
 import skytils.skytilsmod.utils.Utils;
 

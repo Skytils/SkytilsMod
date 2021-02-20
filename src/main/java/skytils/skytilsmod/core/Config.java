@@ -162,7 +162,8 @@ public class Config extends Vigilant {
             name = "Ice Fill Solver",
             description = "\u00a7b[Help Wanted] \u00a7rShows the path to take on the Ice Fill puzzle.",
             category = "Dungeons",
-            subcategory = "Solvers"
+            subcategory = "Solvers",
+            hidden = true
     )
     public boolean iceFillSolver = false;
 

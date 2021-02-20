@@ -1,10 +1,9 @@
-package skytils.skytilsmod.features.impl.misc.damagesplash.graphics;
+package skytils.skytilsmod.utils.graphics;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CustomColor;
+import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 
 import java.awt.*;
 

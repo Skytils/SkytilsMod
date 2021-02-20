@@ -1,6 +1,6 @@
 package skytils.skytilsmod.features.impl.misc.damagesplash;
 
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CommonColors;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.regex.Pattern;
 
