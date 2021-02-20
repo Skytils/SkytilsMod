@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
@@ -141,7 +142,7 @@ public class SpamHider {
         }
 
         //Hide Abilities
-        if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
+        if (Utils.inDungeons && unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
             switch (Skytils.config.hideAbilities) {
                 case 1:
                     event.setCanceled(true);
