@@ -134,7 +134,7 @@ public class DungeonsFeatures {
             }
         }
     }
-    String username = Minecraft.getMinecraft().thePlayer.getName();
+    String username = Minecraft.getMinecraft().getSession().getUsername();
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
