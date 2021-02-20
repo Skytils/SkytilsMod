@@ -3,6 +3,7 @@ package skytils.skytilsmod.features.impl.dungeons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -14,11 +15,14 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import skytils.skytilsmod.Skytils;
@@ -29,9 +33,44 @@ import skytils.skytilsmod.utils.Utils;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DungeonsFeatures {
 
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock) return;
+        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+
+        if (Skytils.config.hideAbilities && Utils.inDungeons) {
+            if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
+                event.setCanceled(true);
+            }
+        }
+        if (Skytils.config.hideBlessings && Utils.inDungeons) {
+            if (unformatted.startsWith("DUNGEON BUFF!") || unformatted.startsWith("A Blessing") || unformatted.contains("has obtained Blessing of") || unformatted.contains("Grants you") || unformatted.contains("Granted you") || unformatted.contains("found a Wither Essence!")) {
+                event.setCanceled(true);
+            }
+        }
+        if (Skytils.config.hideMilestones && Utils.inDungeons) {
+            if (unformatted.startsWith("Mage Milestone") || unformatted.startsWith("Berserk Milestone") || unformatted.startsWith("Archer Milestone") || unformatted.startsWith("Tank Milestone") || unformatted.startsWith("Healer Milestone")) {
+                event.setCanceled(true);
+            }
+        }
+
+        if (Utils.inDungeons && Skytils.config.autoCopyFailToClipboard) {
+            Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)").matcher(unformatted);
+            if (deathFailMatcher.matches()) {
+                GuiScreen.setClipboardString(unformatted);
+                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+            }
+        }
+    }
+
+    
     // Show hidden fels
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
@@ -47,7 +86,6 @@ public class DungeonsFeatures {
     public void onGuiDrawPost(GuiScreenEvent.DrawScreenEvent.Post event) {
         if (!Utils.inSkyblock) return;
         if (event.gui instanceof GuiChest) {
-            Minecraft mc = Minecraft.getMinecraft();
             GuiChest inventory = (GuiChest) event.gui;
             Container containerChest = inventory.inventorySlots;
             if (containerChest instanceof ContainerChest) {
@@ -134,7 +172,9 @@ public class DungeonsFeatures {
             }
         }
     }
+
     String username = Minecraft.getMinecraft().getSession().getUsername();
+
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
@@ -144,34 +184,14 @@ public class DungeonsFeatures {
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
-
                 if (unformatted.contains(username)) {
                     event.setCanceled(false);
                 }
+
             }
         }
     }
-
-    @SubscribeEvent
-    public void onChat(ClientChatReceivedEvent event) {
-        if (!Utils.inSkyblock) return;
-        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-
-        if (Skytils.config.hideAbilities && Utils.inDungeons) {
-            if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
-                event.setCanceled(true);
-            }
-        }
-        if (Skytils.config.hideBlessings && Utils.inDungeons) {
-            if (unformatted.startsWith("DUNGEON BUFF!") || unformatted.startsWith("A Blessing") || unformatted.contains("has obtained Blessing of") || unformatted.contains("Grants you") || unformatted.contains("Granted you") || unformatted.contains("found a Wither Essence!")) {
-                event.setCanceled(true);
-            }
-        }
-        if (Skytils.config.hideMilestones && Utils.inDungeons) {
-            if (unformatted.startsWith("Mage Milestone") || unformatted.startsWith("Berserk Milestone") || unformatted.startsWith("Archer Milestone") || unformatted.startsWith("Tank Milestone") || unformatted.startsWith("Healer Milestone")) {
-                event.setCanceled(true);
-            }
-        }
-    }
-
 }
+
+
+

@@ -89,7 +89,12 @@ public class ArmorColorCommand extends CommandBase {
             if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw new WrongUsageException("This item does not have a UUID!");
             if (args.length != 2) throw new WrongUsageException("You must specify a valid hex color!");
             String uuid = extraAttributes.getString("uuid");
-            Color color = Color.decode(args[1]);
+            Color color;
+            try {
+                 color = Color.decode(args[1]);
+            } catch (NumberFormatException e) {
+                throw new WrongUsageException("You must specify a valid hex color!");
+            }
             ArmorColor.armorColors.put(uuid, color);
             ArmorColor.saveColors();
             sender.addChatMessage(new ChatComponentText("\u00a7aSet the color of your " + item.getDisplayName() + " to " + args[1] + "!"));
