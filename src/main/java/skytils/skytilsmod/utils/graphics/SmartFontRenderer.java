@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.misc.damagesplash.graphics;
+package skytils.skytilsmod.utils.graphics;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -6,9 +6,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CommonColors;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.CustomColor;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors.MinecraftChatColors;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
+import skytils.skytilsmod.utils.graphics.colors.CustomColor;
+import skytils.skytilsmod.utils.graphics.colors.MinecraftChatColors;
 
 import java.awt.Color;
 import java.util.Random;

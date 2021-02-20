@@ -29,7 +29,7 @@ import skytils.skytilsmod.features.impl.misc.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
-import skytils.skytilsmod.features.impl.misc.damagesplash.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;

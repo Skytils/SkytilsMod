@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.misc.damagesplash.graphics.colors;
+package skytils.skytilsmod.utils.graphics.colors;
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
