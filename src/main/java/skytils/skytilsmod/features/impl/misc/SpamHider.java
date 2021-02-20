@@ -28,9 +28,10 @@ public class SpamHider {
     public void onChat(ClientChatReceivedEvent event) {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
         if (unformatted.contains(":")) return;
-        // Spirit Sceptre
-        if (unformatted.contains("Your Spirit Sceptre hit ")) {
-            switch (Skytils.config.spiritSceptreHider) {
+
+        // Implosion
+        if (unformatted.contains("Your Implosion hit ")) {
+            switch(Skytils.config.implosionHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
@@ -56,9 +57,37 @@ public class SpamHider {
             }
         }
 
-        // Implosion
-        if (unformatted.contains("Your Implosion hit ")) {
-            switch(Skytils.config.implosionHider) {
+        // Spirit Sceptre
+        if (unformatted.contains("Your Spirit Sceptre hit ")) {
+            switch (Skytils.config.spiritSceptreHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        // Giant Sword
+        if (unformatted.contains("Your Giant's Sword hit ")) {
+            switch (Skytils.config.giantSwordHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        // Livid Dagger
+        if (unformatted.contains("Your Livid Dagger hit ")) {
+            switch (Skytils.config.lividHider) {
                 case 1:
                     event.setCanceled(true);
                     break;

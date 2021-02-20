@@ -325,6 +325,26 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Giant Sword Hider",
+            description = "Removes Giant Sword messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int giantSwordHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Livid Dagger Hider",
+            description = "Removes Livid Dagger messages from your chat",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int lividHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
             description = "Removes blocks in the way messages from your chat",
             category = "Spam",
@@ -465,7 +485,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Custom Damage Splash",
-            description = "Replaces Skyblock damage splashes with custom rendered ones.",
+            description = "\u00a7b[WIP] \u00a7rReplaces Skyblock damage splashes with custom rendered ones.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
