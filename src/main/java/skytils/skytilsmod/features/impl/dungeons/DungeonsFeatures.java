@@ -45,6 +45,7 @@ public class DungeonsFeatures {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
 
+
         if (Skytils.config.hideAbilities && Utils.inDungeons) {
             if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
                 event.setCanceled(true);
@@ -60,7 +61,6 @@ public class DungeonsFeatures {
                 event.setCanceled(true);
             }
         }
-
         if (Utils.inDungeons && Skytils.config.autoCopyFailToClipboard) {
             Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)").matcher(unformatted);
             if (deathFailMatcher.matches()) {
@@ -69,7 +69,6 @@ public class DungeonsFeatures {
             }
         }
     }
-
     
     // Show hidden fels
     @SubscribeEvent
