@@ -586,7 +586,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Hide Farming RNG Titles",
-            description = "Removes the titles that show up after getting an RNG with Pumpkin Dicer / Melon Dicer",
+            description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )

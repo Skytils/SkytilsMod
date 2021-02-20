@@ -14,4 +14,4 @@ public class MixinWorld {
         if (Skytils.config.hideLightning && Utils.inSkyblock) return 0;
         else return world.getLastLightningBolt();
     }
-}
+};

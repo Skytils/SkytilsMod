@@ -16,10 +16,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -37,12 +39,11 @@ import java.util.regex.Pattern;
 public class DungeonsFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
-
+    
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-
 
         if (Skytils.config.hideAbilities && Utils.inDungeons) {
             if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
@@ -59,6 +60,7 @@ public class DungeonsFeatures {
                 event.setCanceled(true);
             }
         }
+
         if (Utils.inDungeons && Skytils.config.autoCopyFailToClipboard) {
             Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)").matcher(unformatted);
             if (deathFailMatcher.matches()) {
@@ -68,6 +70,7 @@ public class DungeonsFeatures {
         }
     }
 
+    
     // Show hidden fels
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
@@ -139,9 +142,8 @@ public class DungeonsFeatures {
 
                                 GL11.glPushMatrix();
                                 GL11.glTranslated(0, 0, 10);
-                                if (shouldDrawBkg)
-                                    Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
-                                fr.drawStringWithShadow(text, x, y, new Color(255, 255, 255).getRGB());
+                                if (shouldDrawBkg) Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
+                                fr.drawStringWithShadow(text, x, y, new Color(255, 255,255).getRGB());
                                 GL11.glTranslated(0, 0, -10);
                                 GL11.glPopMatrix();
 
@@ -171,15 +173,21 @@ public class DungeonsFeatures {
         }
     }
 
+    String username = Minecraft.getMinecraft().getSession().getUsername();
+
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
             S45PacketTitle packet = (S45PacketTitle) event.packet;
-            if (packet.getMessage() != null && mc.thePlayer != null) {
+            if (packet.getMessage() != null) {
                 String unformatted = StringUtils.stripControlCodes(packet.getMessage().getUnformattedText());
-                if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.getName()) && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
+                if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
+                if (unformatted.contains(username)) {
+                    event.setCanceled(false);
+                }
+
             }
         }
     }
