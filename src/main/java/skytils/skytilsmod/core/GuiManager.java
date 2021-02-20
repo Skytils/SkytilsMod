@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 public class GuiManager {
-    private Map<Integer, GuiElement> elements = new HashMap<>();
+    private final Map<Integer, GuiElement> elements = new HashMap<>();
     private int counter = 0;
-    private Map<String, GuiElement> names = new HashMap<>();
+    private final Map<String, GuiElement> names = new HashMap<>();
 
     public boolean registerElement(GuiElement e) {
         try {
