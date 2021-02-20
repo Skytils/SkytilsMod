@@ -139,6 +139,20 @@ public class SpamHider {
                 default:
             }
         }
+
+        //Hide Abilities
+        if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
+            switch (Skytils.config.hideAbilities) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
     }
 
     static void newMessage(String message) {

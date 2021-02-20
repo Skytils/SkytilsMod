@@ -44,23 +44,6 @@ public class DungeonsFeatures {
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-
-        if (Skytils.config.hideAbilities && Utils.inDungeons) {
-            if (unformatted.contains("is now available!") || unformatted.contains("is ready to use!")) {
-                event.setCanceled(true);
-            }
-        }
-        if (Skytils.config.hideBlessings && Utils.inDungeons) {
-            if (unformatted.startsWith("DUNGEON BUFF!") || unformatted.startsWith("A Blessing") || unformatted.contains("has obtained Blessing of") || unformatted.contains("Grants you") || unformatted.contains("Granted you") || unformatted.contains("found a Wither Essence!")) {
-                event.setCanceled(true);
-            }
-        }
-        if (Skytils.config.hideMilestones && Utils.inDungeons) {
-            if (unformatted.startsWith("Mage Milestone") || unformatted.startsWith("Berserk Milestone") || unformatted.startsWith("Archer Milestone") || unformatted.startsWith("Tank Milestone") || unformatted.startsWith("Healer Milestone")) {
-                event.setCanceled(true);
-            }
-        }
-
         if (Utils.inDungeons && Skytils.config.autoCopyFailToClipboard) {
             Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)").matcher(unformatted);
             if (deathFailMatcher.matches()) {

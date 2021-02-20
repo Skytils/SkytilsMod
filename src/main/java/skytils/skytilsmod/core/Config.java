@@ -557,31 +557,14 @@ public class Config extends Vigilant {
     public boolean petItemConfirmation = false;
 
     @Property(
-            type = PropertyType.SWITCH,
+            type = PropertyType.SELECTOR,
             name = "Hide Dungeon Abilities",
             description = "Hides dungeon abilities messages and ultimates messages in chat",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
     )
-    public boolean hideAbilities = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Blessings in Chat",
-            description = "Hides blessings in chat while in dungeons",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideBlessings = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Milestones in Chat",
-            description = "Hides damage milestones while in dungeons",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideMilestones = false;
+    public int hideAbilities = 0;
 
     @Property(
             type = PropertyType.SWITCH,
