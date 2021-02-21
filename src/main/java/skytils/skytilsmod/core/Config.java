@@ -558,13 +558,43 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
-            name = "Hide Dungeon Abilities",
+            name = "Abilities Messages Hider",
             description = "Hides dungeon abilities messages and ultimates messages in chat",
             category = "Spam",
-            subcategory = "Abilities",
+            subcategory = "Dungeons",
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int hideAbilities = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Mort Messages Hider",
+            description = "Hides Mort's messages while in dungeons",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideMortMessages = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Countdown and Ready Messages Hider",
+            description = "Hides the Dungeon countdown and ready messages",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideCountdownAndReady = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Boss Messages Hider",
+            description = "Hides Boss Messages",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideBossMessages = 0;
 
     @Property(
             type = PropertyType.SWITCH,
