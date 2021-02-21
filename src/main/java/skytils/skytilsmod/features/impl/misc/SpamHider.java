@@ -28,6 +28,21 @@ public class SpamHider {
     public void onChat(ClientChatReceivedEvent event) {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
 
+        // CantUseAbilityHider
+        if(unformatted.startsWith("You cannot use abilities in this room!")) {
+            if (unformatted.contains(":")) return;
+            switch (Skytils.config.CantUseAbilityHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
         // Implosion
         if (unformatted.contains("Your Implosion hit ")) {
             if (unformatted.contains(":")) return;
@@ -163,23 +178,8 @@ public class SpamHider {
             }
         }
 
-        // Hide Mort Messages
-        if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
-            switch (Skytils.config.hideMortMessages) {
-                case 1:
-                    event.setCanceled(true);
-                    break;
-                case 2:
-                    newMessage(event.message.getFormattedText());
-                    event.setCanceled(true);
-                    break;
-                default:
-
-            }
-        }
-
         // Hide Dungeon Countdown / Ready messages
-        if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in")) {
+        if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")) {
             if (unformatted.contains(":")) return;
             switch (Skytils.config.hideCountdownAndReady) {
                 case 1:
@@ -194,8 +194,23 @@ public class SpamHider {
 
         }
 
+
+        // Hide Mort Messages
+        if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
+            switch (Skytils.config.hideMortMessages) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
         // Hide Boss Messages
-        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && unformatted.startsWith("[CROWD]") && !unformatted.startsWith("[BOSS] The Watcher")) {
+        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher") || unformatted.startsWith("[CROWD]")) {
             switch (Skytils.config.hideBossMessages) {
                 case 1:
                     event.setCanceled(true);

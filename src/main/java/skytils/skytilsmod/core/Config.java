@@ -597,6 +597,16 @@ public class Config extends Vigilant {
     public int hideBossMessages = 0;
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Can't use Ability Hider",
+            description = "Hides the you can't use abilities in this room message ",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int CantUseAbilityHider = 0;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Hide Farming RNG Titles",
             description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
