@@ -18,26 +18,25 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class IcePathSolver {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
-
+    private static final List<Point> steps = new ArrayList<>();
     private static BlockPos silverfishChestPos;
     private static EnumFacing roomFacing;
-
-    private int ticks = 0;
-
-    private static final List<Point> steps = new ArrayList<>();
     private static int[][] grid = null;
     private static EntitySilverfish silverfish = null;
     private static Point silverfishPos = null;
+    private int ticks = 0;
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || /*!Utils.inDungeons ||*/ mc.thePlayer == null || mc.theWorld == null) return;
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null)
+            return;
 
         if (!Skytils.config.icePathSolver) return;
 
@@ -145,6 +144,7 @@ public class IcePathSolver {
 
     /**
      * This code was modified into returning an ArrayList and was taken under CC BY-SA 4.0
+     *
      * @link https://stackoverflow.com/a/55271133
      * @author ofekp
      */
@@ -164,7 +164,7 @@ public class IcePathSolver {
                 Point nextPos = move(iceCave, iceCaveColors, currPos, dir);
                 if (nextPos != null) {
                     queue.addLast(nextPos);
-                    iceCaveColors[(int) nextPos.getY()][(int) nextPos.getX()] = new Point((int)currPos.getX(), (int)currPos.getY());
+                    iceCaveColors[(int) nextPos.getY()][(int) nextPos.getX()] = new Point((int) currPos.getX(), (int) currPos.getY());
                     if (nextPos.getY() == endY && nextPos.getX() == endX) {
                         ArrayList<Point> steps = new ArrayList<>();
                         // we found the end point
@@ -188,6 +188,7 @@ public class IcePathSolver {
 
     /**
      * This code was modified to fit Minecraft and was taken under CC BY-SA 4.0
+     *
      * @link https://stackoverflow.com/a/55271133
      * @author ofekp
      */
