@@ -421,13 +421,14 @@ public class Config extends Vigilant {
     public Integer itemDropScale = 100;
 
     @Property(
-            type = PropertyType.SWITCH,
+            type = PropertyType.SLIDER,
             name = "Larger Heads",
-            description = "Makes the size of heads larger in your inventory.",
+            description = "Change the size of heads in your inventory.",
             category = "Miscellaneous",
-            subcategory = "Items"
+            subcategory = "Items",
+            max = 200
     )
-    public boolean largerHeads = false;
+    public Integer largerHeadScale = 100;
 
     @Property(
             type = PropertyType.SWITCH,
