@@ -104,6 +104,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Auto Copy Fails to Clipboard",
+            description = "Copies deaths and fails in dungeons to your clipboard.",
+            category = "Dungeons",
+            subcategory = "Miscellaneous"
+    )
+    public boolean autoCopyFailToClipboard = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Terminal Completion Titles",
             description = "Removes the title that shows up when a terminal is completed.",
             category = "Dungeons",
@@ -412,13 +421,14 @@ public class Config extends Vigilant {
     public Integer itemDropScale = 100;
 
     @Property(
-            type = PropertyType.SWITCH,
+            type = PropertyType.SLIDER,
             name = "Larger Heads",
-            description = "Makes the size of heads larger in your inventory.",
+            description = "Change the size of heads in your inventory.",
             category = "Miscellaneous",
-            subcategory = "Items"
+            subcategory = "Items",
+            max = 200
     )
-    public boolean largerHeads = false;
+    public Integer largerHeadScale = 100;
 
     @Property(
             type = PropertyType.SWITCH,
