@@ -214,6 +214,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Water Board Solver",
+            description = "\u00a7b[WIP] \u00a7rDisplays which levers to flip for the Water Board puzzle.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean waterBoardSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Block Incorrect Terminal Clicks",
             description = "Blocks incorrect clicks on terminals.",
             category = "Dungeons",

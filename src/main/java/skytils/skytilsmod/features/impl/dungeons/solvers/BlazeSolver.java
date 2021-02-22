@@ -126,7 +126,7 @@ public class BlazeSolver {
                 EntityBlaze lowestBlaze = shootableBlaze.blaze;
                 if (lowestBlaze != null) {
                     BlockPos stringPos = new BlockPos(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ);
-                    RenderUtil.draw3DString(stringPos, EnumChatFormatting.BOLD + "Smallest", new Color(255, 0, 0, 200), event.partialTicks);
+                    RenderUtil.draw3DString(new Vec3(stringPos), EnumChatFormatting.BOLD + "Smallest", new Color(255, 0, 0, 200), event.partialTicks);
                 }
             }
             if (blazeMode >= 0) {
@@ -134,7 +134,7 @@ public class BlazeSolver {
                 EntityBlaze highestBlaze = shootableBlaze.blaze;
                 if (highestBlaze != null) {
                     BlockPos stringPos = new BlockPos(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ);
-                    RenderUtil.draw3DString(stringPos, EnumChatFormatting.BOLD + "Biggest", new Color(0, 255, 0, 200), event.partialTicks);
+                    RenderUtil.draw3DString(new Vec3(stringPos), EnumChatFormatting.BOLD + "Biggest", new Color(0, 255, 0, 200), event.partialTicks);
                 }
             }
         }
