@@ -355,6 +355,26 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Blessing Hider",
+            description = "Removes blessing messages from your chat",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Toasts"}
+    )
+    public int blessingHider = 0;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Blessing Time",
+            description = "Number of milliseconds that blessing toasts are displayed for",
+            category = "Spam",
+            subcategory = "Dungeons",
+            max = 10_000
+    )
+    public int blessingTime = 2500;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
             description = "Removes blocks in the way messages from your chat",
             category = "Spam",

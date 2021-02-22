@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.utils.toasts.GuiToast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class GuiManager {
     private Map<Integer, GuiElement> elements = new HashMap<>();
     private int counter = 0;
     private Map<String, GuiElement> names = new HashMap<>();
+    public static GuiToast toastGui = new GuiToast(Minecraft.getMinecraft());
 
     public boolean registerElement(GuiElement e) {
         try {
