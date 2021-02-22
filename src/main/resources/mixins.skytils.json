@@ -3,7 +3,6 @@
   "package": "skytils.skytilsmod.mixins",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
-    "MixinMinecraft",
     "AccessorCommandHandler",
     "MixinBossStatus",
     "MixinChunk",
@@ -13,6 +12,7 @@
     "MixinGuiScreen",
     "MixinItemArmor",
     "MixinItemStack",
+    "MixinMinecraft",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
