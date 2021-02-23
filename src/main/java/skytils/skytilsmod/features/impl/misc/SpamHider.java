@@ -162,7 +162,7 @@ public class SpamHider {
         }
 
         // Cooldown
-        if (unformatted.contains("This ability is currently on cooldown for")) {
+        if (unformatted.contains("cooldown")) {
             switch (Skytils.config.cooldownHider) {
                 case 1:
                     event.setCanceled(true);
