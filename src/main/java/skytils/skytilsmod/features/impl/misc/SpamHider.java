@@ -187,6 +187,7 @@ public class SpamHider {
 
         // Cooldown
         if (unformatted.contains("cooldown")) {
+
             if (unformatted.contains(":")) return;
             switch (Skytils.config.cooldownHider) {
                 case 1:
