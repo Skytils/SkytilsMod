@@ -116,7 +116,7 @@ public class SelectAllColorSolver {
                         }
                     }
                 }
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 3, mc.thePlayer);
+                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer);
             }
         }
     }
