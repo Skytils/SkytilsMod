@@ -8,14 +8,12 @@ import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.C0EPacketClickWindow;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
-import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -109,7 +107,7 @@ public class SelectAllColorSolver {
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
-            if (Skytils.config.blockIncorrectTerminalClicks && chestName.startsWith("Select all the")) {
+            if (Skytils.config.blockIncorrectTerminalClicks && chestName.startsWith("Select all the") && event.slot != null) {
                 if (shouldClick.size() > 0) {
                     if (shouldClick.stream().noneMatch(slot -> slot.slotNumber == event.slot.slotNumber)) {
                         event.setCanceled(true);
