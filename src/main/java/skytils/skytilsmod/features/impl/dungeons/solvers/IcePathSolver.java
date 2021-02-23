@@ -21,6 +21,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class IcePathSolver {
 
@@ -64,7 +65,7 @@ public class IcePathSolver {
                         grid = getLayout();
                         silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
                         steps.clear();
-                        if (silverfishPos.x < 17 && silverfishPos.y < 17) {
+                        if (silverfishPos != null) {
                             steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
                         }
                     }
@@ -74,10 +75,10 @@ public class IcePathSolver {
         }
 
         if (IcePathSolver.silverfish != null && grid != null) {
-            if (IcePathSolver.silverfish.isEntityAlive() && !getGridPointFromPos(IcePathSolver.silverfish.getPosition()).equals(silverfishPos)) {
-                silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
-
-                if (silverfishPos.x < 17 && silverfishPos.y < 17) {
+            Point silverfishGridPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
+            if (IcePathSolver.silverfish.isEntityAlive() && !Objects.equals(silverfishGridPos, silverfishPos)) {
+                silverfishPos = silverfishGridPos;
+                if (silverfishPos != null) {
                     steps.clear();
                     steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
                 }
@@ -91,7 +92,7 @@ public class IcePathSolver {
     public void onWorldRender(RenderWorldLastEvent event) {
         if (!Skytils.config.icePathSolver) return;
 
-        if (silverfishChestPos != null && roomFacing != null && grid != null) {
+        if (silverfishChestPos != null && roomFacing != null && grid != null && IcePathSolver.silverfish.isEntityAlive()) {
             for (int i = 0; i < steps.size() - 1; i++) {
                 Point point = steps.get(i);
                 Point point2 = steps.get(i + 1);
@@ -126,12 +127,13 @@ public class IcePathSolver {
 
     private Point getGridPointFromPos(BlockPos pos) {
         if (silverfishChestPos == null || roomFacing == null) return null;
-        BlockPos topLeft = silverfishChestPos.offset(roomFacing.getOpposite(), 4).offset(roomFacing.rotateYCCW(), 8);
-        int xChange = (pos.getX() - topLeft.getX()) * (roomFacing.getOpposite().getDirectionVec().getX() == -1 ? -1 : 1);
-        int zChange = (pos.getZ() - topLeft.getZ()) * (roomFacing.getOpposite().getDirectionVec().getZ() == -1 ? -1 : 1);
-
-        if (roomFacing.getAxis() == EnumFacing.Axis.Z) return new Point(xChange, zChange);
-        if (roomFacing.getAxis() == EnumFacing.Axis.X) return new Point(zChange, xChange);
+        for (int row = 0; row < 17; row++) {
+            for (int column = 0; column < 17; column++) {
+                if (new BlockPos(getVec3RelativeToGrid(column, row)).equals(pos)) {
+                    return new Point(column, row);
+                }
+            }
+        }
         return null;
     }
 
