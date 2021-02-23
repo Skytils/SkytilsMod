@@ -497,6 +497,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Compact Item Stars",
+            description = "Shortens item names with stars in them.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean compactStars = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Only Collect Enchanted Items",
             description = "Prevents you from collecting unenchanted items from minions if there is a Super Compactor.",
             category = "Miscellaneous",
