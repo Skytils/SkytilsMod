@@ -85,7 +85,7 @@ public class ClickInOrderSolver {
                     Slot slot = invSlots.get(slotOrder.get(neededClick + 1));
                     RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(65, 102, 245, 255).getRGB());
                 }
-                if (slotOrder.size() - 2> neededClick) {
+                if (slotOrder.size() - 2 > neededClick) {
                     Slot slot = invSlots.get(slotOrder.get(neededClick + 2));
                     RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(144, 224, 239, 255).getRGB());
                 }
@@ -122,7 +122,7 @@ public class ClickInOrderSolver {
 
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
-        if (!Skytils.config.clickInOrderTerminalSolver || !Utils.inDungeons) return;
+        if (!Utils.inDungeons) return;
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();

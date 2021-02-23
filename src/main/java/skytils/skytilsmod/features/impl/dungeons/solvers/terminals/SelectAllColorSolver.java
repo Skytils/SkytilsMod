@@ -104,6 +104,7 @@ public class SelectAllColorSolver {
 
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (!Utils.inDungeons) return;
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
