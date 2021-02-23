@@ -128,7 +128,7 @@ public class ClickInOrderSolver {
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
             if (chestName.equals("Click in order!")) {
                 event.setCanceled(true);
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer);
+                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 3, mc.thePlayer);
             }
         }
     }
