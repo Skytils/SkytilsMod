@@ -19,6 +19,7 @@ public abstract class MixinItemStack {
     private final static Pattern starPattern = Pattern.compile("(§6✪)");
 
     @Shadow public abstract ItemStack copy();
+    @Shadow private NBTTagCompound stackTagCompound;
 
     @Inject(method = "isItemEnchanted", at = @At("HEAD"), cancellable = true)
     private void showEnchantmentGlint(CallbackInfoReturnable<Boolean> cir) {
@@ -30,9 +31,6 @@ public abstract class MixinItemStack {
             }
         }
     }
-
-    @Shadow
-    private NBTTagCompound stackTagCompound;
 
     @Inject(method="getDisplayName",at=@At("HEAD"), cancellable=true)
     public void getDisplayName(CallbackInfoReturnable<String> returnable) {
