@@ -68,7 +68,7 @@ public class ClickInOrderSolver {
 
     @SubscribeEvent
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
-        if (!Utils.inSkyblock) return;
+        if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver) return;
         if (event.gui instanceof GuiChest) {
             GuiChest inventory = (GuiChest) event.gui;
@@ -95,7 +95,7 @@ public class ClickInOrderSolver {
 
     @SubscribeEvent
     public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
-        if (!Utils.inSkyblock) return;
+        if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver) return;
         if (event.container instanceof ContainerChest) {
             FontRenderer fr = mc.fontRendererObj;
@@ -120,9 +120,22 @@ public class ClickInOrderSolver {
         }
     }
 
+    @SubscribeEvent
+    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (!Skytils.config.clickInOrderTerminalSolver || !Utils.inDungeons) return;
+        if (event.container instanceof ContainerChest) {
+            ContainerChest chest = (ContainerChest) event.container;
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            if (chestName.equals("Click in order!")) {
+                event.setCanceled(true);
+                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer);
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onTooltip(ItemTooltipEvent event) {
-        if (!Utils.inSkyblock) return;
+        if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver) return;
         if (event.toolTip == null) return;
 

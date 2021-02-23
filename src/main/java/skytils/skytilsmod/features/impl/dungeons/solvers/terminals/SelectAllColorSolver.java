@@ -107,12 +107,16 @@ public class SelectAllColorSolver {
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
-            if (Skytils.config.blockIncorrectTerminalClicks && chestName.startsWith("Select all the") && event.slot != null) {
-                if (shouldClick.size() > 0) {
-                    if (shouldClick.stream().noneMatch(slot -> slot.slotNumber == event.slot.slotNumber)) {
-                        event.setCanceled(true);
+            if (chestName.startsWith("Select all the")) {
+                event.setCanceled(true);
+                if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
+                    if (shouldClick.size() > 0) {
+                        if (shouldClick.stream().noneMatch(slot -> slot.slotNumber == event.slot.slotNumber)) {
+                            return;
+                        }
                     }
                 }
+                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer);
             }
         }
     }
