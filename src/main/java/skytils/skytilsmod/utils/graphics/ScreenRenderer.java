@@ -3,6 +3,9 @@ package skytils.skytilsmod.utils.graphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.item.ItemStack;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 
 import java.awt.*;
@@ -30,6 +33,7 @@ public class ScreenRenderer {
     private static Point drawingOrigin = new Point(0, 0); public static Point drawingOrigin() { return drawingOrigin; }
     private static Point transformationOrigin = new Point(0, 0);
     public static void transformationOrigin(int x, int y) {transformationOrigin.x = x; transformationOrigin.y = y;}protected static Point transformationOrigin() {return transformationOrigin;}
+    private static RenderItem itemRenderer = null;
 
     public static boolean isRendering() { return rendering; }
     public static float getScale() { return scale; }
@@ -53,21 +57,23 @@ public class ScreenRenderer {
             } finally {
                 fontRenderer.onResourceManagerReload(mc.getResourceManager());
             }
+        if (itemRenderer == null)
+            itemRenderer = Minecraft.getMinecraft().getRenderItem();
     }
 
-    /** void beginGL
-     * Sets everything needed to start rendering,
-     * sets the drawing origin to {x} and {y} and
-     * allows the ability to render on the screen
-     * (on the 2D plane).
-     * Do not call this method unless you truly
-     * understand what you're doing, This method
-     * is being called before each overlay render
-     * is called automagically.
-     *
-     * @param x drawing origin's X
-     * @param y drawing origin's Y
-     */
+//    /** void beginGL
+//     * Sets everything needed to start rendering,
+//     * sets the drawing origin to {x} and {y} and
+//     * allows the ability to render on the screen
+//     * (on the 2D plane).
+//     * Do not call this method unless you truly
+//     * understand what you're doing, This method
+//     * is being called before each overlay render
+//     * is called automagically.
+//     *
+//     * @param x drawing origin's X
+//     * @param y drawing origin's Y
+//     */
 //    public static void beginGL(int x, int y) {
 //        if (rendering) return;
 //        rendering = true;
@@ -82,11 +88,11 @@ public class ScreenRenderer {
 //        GlStateManager.blendFunc(770, 769);
 //    }
 
-    /** endGL
-     * Resets everything related to the ScreenRenderer
-     * and stops the ability to render on screen(the
-     * 2D plane).
-     */
+//    /** endGL
+//     * Resets everything related to the ScreenRenderer
+//     * and stops the ability to render on screen(the
+//     * 2D plane).
+//     */
 //    public static void endGL() {
 //        if (!rendering) return;
 //        resetScale();
@@ -101,13 +107,13 @@ public class ScreenRenderer {
 //        rendering = false;
 //    }
 
-    /** rotate
-     * Appends rotation(in degrees) to the rotation
-     * field and rotates the following renders around
-     * (drawingOrigin+transformationOrigin).
-     *
-     * @param degrees amount of degrees to rotate
-     */
+//    /** rotate
+//     * Appends rotation(in degrees) to the rotation
+//     * field and rotates the following renders around
+//     * (drawingOrigin+transformationOrigin).
+//     *
+//     * @param degrees amount of degrees to rotate
+//     */
 //    public static void rotate(float degrees) {
 //        if (!rendering) return;
 //        GlStateManager.translate((drawingOrigin.x+transformationOrigin.x), (drawingOrigin.y+transformationOrigin.y), 0);
@@ -116,10 +122,10 @@ public class ScreenRenderer {
 //        rotation += degrees;
 //    }
 
-    /** resetRotation
-     * Resets the rotation field and makes the
-     * following renders render as usual(pre-scaling).
-     */
+//    /** resetRotation
+//     * Resets the rotation field and makes the
+//     * following renders render as usual(pre-scaling).
+//     */
 //    public static void resetRotation() {
 //        if (!rendering) return;
 //        if (rotation != 0.0f) {
@@ -130,13 +136,13 @@ public class ScreenRenderer {
 //        }
 //    }
 
-    /** scale
-     * Multiplies the scale field(in multiplier amount) by
-     * {multiplier} and makes the following renders scale
-     * by {multiplier} around (drawingOrigin+transformationOrigin).
-     *
-     * @param multiplier amount to multiply the current scale by
-     */
+//    /** scale
+//     * Multiplies the scale field(in multiplier amount) by
+//     * {multiplier} and makes the following renders scale
+//     * by {multiplier} around (drawingOrigin+transformationOrigin).
+//     *
+//     * @param multiplier amount to multiply the current scale by
+//     */
 //    public static void scale(float multiplier) {
 //        if (!rendering) return;
 //        GlStateManager.translate(drawingOrigin.x+transformationOrigin.x, drawingOrigin.y+transformationOrigin.y, 0);
@@ -145,10 +151,10 @@ public class ScreenRenderer {
 //        scale *= multiplier;
 //    }
 
-    /** resetScale
-     * Resets the scale field and makes the
-     * following renders render as usual(pre-scaling).
-     */
+//    /** resetScale
+//     * Resets the scale field and makes the
+//     * following renders render as usual(pre-scaling).
+//     */
 //    public static void resetScale() {
 //        if (!rendering) return;
 //        if (scale != 1.0f) {
@@ -310,17 +316,17 @@ public class ScreenRenderer {
 //        }
 //    }
 
-    /**
-     * Enables the scissor test so that only things drawn within the rectangle
-     * (x, y) and (x + width, y + height) are drawn, including the start and excluding the end.
-     * In other words, a width x height box, starting from (x, y)
-     * Does *not* respect rotation, but is fast.
-     *
-     * @param x Starting coordinate x (relative to drawing origin, 0 at the left)
-     * @param y Starting coordinate y (relative to drawing origin, in regular coordinates, so 0 is at the top)
-     * @param width Width of box
-     * @param height Height of box
-     */
+//    /**
+//     * Enables the scissor test so that only things drawn within the rectangle
+//     * (x, y) and (x + width, y + height) are drawn, including the start and excluding the end.
+//     * In other words, a width x height box, starting from (x, y)
+//     * Does *not* respect rotation, but is fast.
+//     *
+//     * @param x Starting coordinate x (relative to drawing origin, 0 at the left)
+//     * @param y Starting coordinate y (relative to drawing origin, in regular coordinates, so 0 is at the top)
+//     * @param width Width of box
+//     * @param height Height of box
+//     */
 //    public static void enableScissorTest(int x, int y, int width, int height) {
 //        if (!rendering) return;
 //
@@ -391,20 +397,20 @@ public class ScreenRenderer {
         return f;
     }
 
-    /**
-     * Draw a string being corrected split every x pixels, without cutting out words
-     *
-     * @param text the text to render
-     * @param maxSize the max pixel size of a sentence
-     * @param x x(from drawingOrigin) to render at
-     * @param y y(from drawingOrigin) to render at
-     * @param offsetY the offset that will increase by every split
-     * @param color the starting color to render(without codes, its basically the actual text's color)
-     * @param alignment the alignment around {x} and {y} to render the text about
-     * @param shadow should the text have a shadow behind it
-     *
-     * @return the number of lines rendered
-     */
+//    /**
+//     * Draw a string being corrected split every x pixels, without cutting out words
+//     *
+//     * @param text the text to render
+//     * @param maxSize the max pixel size of a sentence
+//     * @param x x(from drawingOrigin) to render at
+//     * @param y y(from drawingOrigin) to render at
+//     * @param offsetY the offset that will increase by every split
+//     * @param color the starting color to render(without codes, its basically the actual text's color)
+//     * @param alignment the alignment around {x} and {y} to render the text about
+//     * @param shadow should the text have a shadow behind it
+//     *
+//     * @return the number of lines rendered
+//     */
 //    public int drawSplitString(String text, int maxSize, float x, float y, float offsetY, CustomColor color, SmartFontRenderer.TextAlignment alignment, SmartFontRenderer.TextShadow shadow) {
 //        float currentY = y;
 //        int lines = 0;
@@ -450,15 +456,15 @@ public class ScreenRenderer {
 //        return fontRenderer.getCharWidth(text.charAt(0)) + SmartFontRenderer.CHAR_SPACING + getStringWidth(text.substring(1));
 //    }
 
-    /** void drawRect
-     * Draws a rectangle with a filled color.
-     *
-     * @param color color of the rectangle
-     * @param x1 bottom-left x
-     * @param y1 bottom-left y
-     * @param x2 top-right x
-     * @param y2 top-right y
-     */
+//    /** void drawRect
+//     * Draws a rectangle with a filled color.
+//     *
+//     * @param color color of the rectangle
+//     * @param x1 bottom-left x
+//     * @param y1 bottom-left y
+//     * @param x2 top-right x
+//     * @param y2 top-right y
+//     */
 //    public void drawRect(CustomColor color, int x1, int y1, int x2, int y2) {
 //        if (!rendering) return;
 //
@@ -481,20 +487,20 @@ public class ScreenRenderer {
 //        GlStateManager.color(1f, 1f, 1f, 1f);
 //    }
 
-    /** void drawRect
-     * Draws a rectangle with a texture filling with texture
-     * being defined by uv 0.0 -> 1.0 values.
-     *
-     * @param texture the texture to draw
-     * @param x1 bottom-left x(on screen)
-     * @param y1 bottom-left y(on screen)
-     * @param x2 top-right x(on screen)
-     * @param y2 top-right y(on screen)
-     * @param tx1 bottom-left x of uv on texture(0.0 -> 1.0)
-     * @param ty1 bottom-left y of uv on texture(0.0 -> 1.0)
-     * @param tx2 top-right x of uv on texture(0.0 -> 1.0)
-     * @param ty2 top-right y of uv on texture(0.0 -> 1.0)
-     */
+//    /** void drawRect
+//     * Draws a rectangle with a texture filling with texture
+//     * being defined by uv 0.0 -> 1.0 values.
+//     *
+//     * @param texture the texture to draw
+//     * @param x1 bottom-left x(on screen)
+//     * @param y1 bottom-left y(on screen)
+//     * @param x2 top-right x(on screen)
+//     * @param y2 top-right y(on screen)
+//     * @param tx1 bottom-left x of uv on texture(0.0 -> 1.0)
+//     * @param ty1 bottom-left y of uv on texture(0.0 -> 1.0)
+//     * @param tx2 top-right x of uv on texture(0.0 -> 1.0)
+//     * @param ty2 top-right y of uv on texture(0.0 -> 1.0)
+//     */
 //    public void drawRect(Texture texture, int x1, int y1, int x2, int y2, float tx1, float ty1, float tx2, float ty2) {
 //        if (!rendering || texture == null || !texture.loaded) return;
 //        GlStateManager.enableAlpha();
@@ -518,20 +524,20 @@ public class ScreenRenderer {
 //        GlStateManager.glEnd();
 //    }
 
-    /** void drawRect
-     * Draws a rectangle with a texture filling with texture
-     * being defined by uv in pixels.
-     *
-     * @param texture the texture to draw
-     * @param x1 bottom-left x(on screen)
-     * @param y1 bottom-left y(on screen)
-     * @param x2 top-right x(on screen)
-     * @param y2 top-right y(on screen)
-     * @param tx1 bottom-left x of uv on texture(0 -> texture width)
-     * @param ty1 bottom-left y of uv on texture(0 -> texture height)
-     * @param tx2 top-right x of uv on texture(0 -> texture width)
-     * @param ty2 top-right y of uv on texture(0 -> texture height)
-     */
+//    /** void drawRect
+//     * Draws a rectangle with a texture filling with texture
+//     * being defined by uv in pixels.
+//     *
+//     * @param texture the texture to draw
+//     * @param x1 bottom-left x(on screen)
+//     * @param y1 bottom-left y(on screen)
+//     * @param x2 top-right x(on screen)
+//     * @param y2 top-right y(on screen)
+//     * @param tx1 bottom-left x of uv on texture(0 -> texture width)
+//     * @param ty1 bottom-left y of uv on texture(0 -> texture height)
+//     * @param tx2 top-right x of uv on texture(0 -> texture width)
+//     * @param ty2 top-right y of uv on texture(0 -> texture height)
+//     */
 //    public void drawRect(Texture texture, int x1, int y1, int x2, int y2, int tx1, int ty1, int tx2, int ty2) {
 //        drawRect(texture, x1, y1, x2, y2, (float)tx1/texture.width, (float)ty1/texture.height, (float)tx2/texture.width, (float)ty2/texture.height);
 //    }
@@ -789,51 +795,51 @@ public class ScreenRenderer {
         GlStateManager.color(r, g, b, alpha);
     }
 
-//    public void drawItemStack(ItemStack is, int x, int y) {
-//        drawItemStack(is, x, y, false, "", true);
-//    }
-//
-//    public void drawItemStack(ItemStack is, int x, int y, boolean count) {
-//        drawItemStack(is, x, y, count, "", true);
-//    }
+    public void drawItemStack(ItemStack is, int x, int y) {
+        drawItemStack(is, x, y, false, "", true);
+    }
 
-//    public void drawItemStack(ItemStack is, int x, int y, boolean count, boolean effects) {
-//        drawItemStack(is, x, y, count, "", effects);
-//    }
-//
-//    public void drawItemStack(ItemStack is, int x, int y, String text) {
-//        drawItemStack(is, x, y, false, text, true);
-//    }
-//
-//    public void drawItemStack(ItemStack is, int x, int y, String text, boolean effects) {
-//        drawItemStack(is, x, y, false, text, effects);
-//    }
+    public void drawItemStack(ItemStack is, int x, int y, boolean count) {
+        drawItemStack(is, x, y, count, "", true);
+    }
 
-//    /**
-//     * drawItemStack
-//     * Draws an item
-//     *
-//     * @param is      the itemstack to render
-//     * @param x       x on screen
-//     * @param y       y on screen
-//     * @param count   show numbers
-//     * @param text    custom text
-//     * @param effects show shimmer
-//     */
-//    private void drawItemStack(ItemStack is, int x, int y, boolean count, String text, boolean effects) {
-//        if (!rendering) return;
-//        RenderHelper.enableGUIStandardItemLighting();
-//        itemRenderer.zLevel = 200.0F;
-//        net.minecraft.client.gui.FontRenderer font = is.getItem().getFontRenderer(is);
-//        if (font == null) font = fontRenderer;
-//        if (effects)
-//            itemRenderer.renderItemAndEffectIntoGUI(is, x + drawingOrigin.x, y + drawingOrigin.y);
-//        else
-//            itemRenderer.renderItemIntoGUI(is, x + drawingOrigin.x, y + drawingOrigin.y);
-//        itemRenderer.renderItemOverlayIntoGUI(font, is, x + drawingOrigin.x, y + drawingOrigin.y, text.isEmpty() ? count ? Integer.toString(is.getCount()) : null : text);
-//        itemRenderer.zLevel = 0.0F;
-//        RenderHelper.disableStandardItemLighting();
-//    }
+    public void drawItemStack(ItemStack is, int x, int y, boolean count, boolean effects) {
+        drawItemStack(is, x, y, count, "", effects);
+    }
+
+    public void drawItemStack(ItemStack is, int x, int y, String text) {
+        drawItemStack(is, x, y, false, text, true);
+    }
+
+    public void drawItemStack(ItemStack is, int x, int y, String text, boolean effects) {
+        drawItemStack(is, x, y, false, text, effects);
+    }
+
+    /**
+     * drawItemStack
+     * Draws an item
+     *
+     * @param is      the itemstack to render
+     * @param x       x on screen
+     * @param y       y on screen
+     * @param count   show numbers
+     * @param text    custom text
+     * @param effects show shimmer
+     */
+    private void drawItemStack(ItemStack is, int x, int y, boolean count, String text, boolean effects) {
+        if (!rendering) return;
+        RenderHelper.enableGUIStandardItemLighting();
+        itemRenderer.zLevel = 200.0F;
+        net.minecraft.client.gui.FontRenderer font = is.getItem().getFontRenderer(is);
+        if (font == null) font = fontRenderer;
+        if (effects)
+            itemRenderer.renderItemAndEffectIntoGUI(is, x + drawingOrigin.x, y + drawingOrigin.y);
+        else
+            itemRenderer.renderItemIntoGUI(is, x + drawingOrigin.x, y + drawingOrigin.y);
+        itemRenderer.renderItemOverlayIntoGUI(font, is, x + drawingOrigin.x, y + drawingOrigin.y, text.isEmpty() ? count ? Integer.toString(is.stackSize) : null : text);
+        itemRenderer.zLevel = 0.0F;
+        RenderHelper.disableStandardItemLighting();
+    }
 
     public static void setRendering(boolean status) {
         rendering = status;

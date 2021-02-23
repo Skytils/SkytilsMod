@@ -58,7 +58,7 @@ public class IceFillSolver {
                                     chestPos = pos;
                                     roomFacing = direction;
                                     System.out.println(String.format("Ice fill chest is at %s and is facing %s", chestPos, roomFacing));
-                                    if (iceFillData.size() == 0) {
+                                    if (iceFillData.keySet().size() == 0) {
                                         mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load solutions for Ice Fill."));
                                         DataFetcher.reloadData();
                                     }
@@ -144,7 +144,7 @@ public class IceFillSolver {
         if (!Skytils.config.iceFillSolver) return;
 
         if (chestPos != null && roomFacing != null) {
-            if (iceFillData.size() == 0) return;
+            if (iceFillData.keySet().size() == 0) return;
             if (variant3.size() > 0) {
                 for (int i = 0; i < variant3.size() - 1; i++) {
                     Vec3 pos = variant3.get(i);

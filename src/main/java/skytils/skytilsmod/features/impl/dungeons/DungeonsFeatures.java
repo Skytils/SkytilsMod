@@ -16,7 +16,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -44,6 +43,7 @@ public class DungeonsFeatures {
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+
         if (Utils.inDungeons && Skytils.config.autoCopyFailToClipboard) {
             Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)").matcher(unformatted);
             if (deathFailMatcher.matches()) {
@@ -52,7 +52,6 @@ public class DungeonsFeatures {
             }
         }
     }
-
     
     // Show hidden fels
     @SubscribeEvent
@@ -170,6 +169,3 @@ public class DungeonsFeatures {
         }
     }
 }
-
-
-

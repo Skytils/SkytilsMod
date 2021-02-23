@@ -105,7 +105,6 @@ public class SkytilsCommand extends CommandBase {
                             player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
                     }
                 }
-                break;
             case "help":
                 if (args.length == 1) {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Skytils" + " Version " + Skytils.VERSION + "\n" +
@@ -118,6 +117,7 @@ public class SkytilsCommand extends CommandBase {
                             EnumChatFormatting.GOLD + "/armorcolor <set/clear/clearall>" + EnumChatFormatting.AQUA + " - Changes the color of an armor piece to the hexcode or decimal color provided. (Alias is /armourcolour)"));
                     return;
                 }
+                break;
             default:
                 player.addChatMessage(new ChatComponentText("/" + getCommandName()));
         }

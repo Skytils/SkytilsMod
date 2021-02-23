@@ -214,6 +214,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Water Board Solver",
+            description = "\u00a7b[WIP] \u00a7rDisplays which levers to flip for the Water Board puzzle.",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean waterBoardSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Block Incorrect Terminal Clicks",
             description = "Blocks incorrect clicks on terminals.",
             category = "Dungeons",
@@ -355,6 +364,26 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Blessing Hider",
+            description = "Removes blessing messages from your chat",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Toasts"}
+    )
+    public int blessingHider = 0;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Blessing Time",
+            description = "Number of milliseconds that blessing toasts are displayed for",
+            category = "Spam",
+            subcategory = "Dungeons",
+            max = 10_000
+    )
+    public int blessingTime = 2500;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
             description = "Removes blocks in the way messages from your chat",
             category = "Spam",
@@ -421,13 +450,14 @@ public class Config extends Vigilant {
     public Integer itemDropScale = 100;
 
     @Property(
-            type = PropertyType.SWITCH,
+            type = PropertyType.SLIDER,
             name = "Larger Heads",
-            description = "Makes the size of heads larger in your inventory.",
+            description = "Change the size of heads in your inventory.",
             category = "Miscellaneous",
-            subcategory = "Items"
+            subcategory = "Items",
+            max = 200
     )
-    public boolean largerHeads = false;
+    public Integer largerHeadScale = 100;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -464,6 +494,15 @@ public class Config extends Vigilant {
             subcategory = "Items"
     )
     public boolean soulEaterLore = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Compact Item Stars",
+            description = "Shortens item names with stars in them.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean compactStars = false;
 
     @Property(
             type = PropertyType.SWITCH,

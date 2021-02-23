@@ -44,7 +44,8 @@ public class MiscFeatures {
         }
     }
 
-    @SubscribeEvent
+
+            @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inSkyblock) return;
 

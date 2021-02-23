@@ -18,7 +18,7 @@ buildscript {
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
 
-version = "0.0.7"
+version = "0.0.8-pre1"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 

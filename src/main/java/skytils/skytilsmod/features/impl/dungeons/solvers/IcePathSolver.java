@@ -1,5 +1,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers;
 
+import com.google.common.collect.Lists;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -17,40 +18,34 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class IcePathSolver {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
-
+    private static final List<Point> steps = new ArrayList<>();
     private static BlockPos silverfishChestPos;
     private static EnumFacing roomFacing;
-
+    private static int[][] grid = null;
+    private static EntitySilverfish silverfish = null;
+    private static Point silverfishPos = null;
     private int ticks = 0;
-
-    private static final List<Point> steps = Arrays.asList(
-            new Point(15, 15),
-            new Point(11, 15),
-            new Point(11, 16),
-            new Point(3, 16),
-            new Point(3, 0),
-            new Point(4,0),
-            new Point(4, 1),
-            new Point(2, 1),
-            new Point(2, 10),
-            new Point(9, 10),
-            new Point(9, 0));
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return;
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null)
+            return;
 
         if (!Skytils.config.icePathSolver) return;
 
         if (ticks % 20 == 0) {
             new Thread(() -> {
-                if (mc.theWorld.getEntities(EntitySilverfish.class, silverfish -> mc.thePlayer.getDistanceToEntity(silverfish) < 20).size() > 0) {
+                List<EntitySilverfish> silverfish = mc.theWorld.getEntities(EntitySilverfish.class, s -> mc.thePlayer.getDistanceToEntity(s) < 20);
+                if (silverfish.size() > 0) {
+                    IcePathSolver.silverfish = silverfish.get(0);
                     if (silverfishChestPos == null || roomFacing == null) {
                         findChest:
                         for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.getPosition(), 25, 67)) {
@@ -66,10 +61,28 @@ public class IcePathSolver {
                                 }
                             }
                         }
+                    } else if (grid == null) {
+                        grid = getLayout();
+                        silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
+                        steps.clear();
+                        if (silverfishPos != null) {
+                            steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+                        }
                     }
                 }
             }).start();
             ticks = 0;
+        }
+
+        if (IcePathSolver.silverfish != null && grid != null) {
+            Point silverfishGridPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
+            if (IcePathSolver.silverfish.isEntityAlive() && !Objects.equals(silverfishGridPos, silverfishPos)) {
+                silverfishPos = silverfishGridPos;
+                if (silverfishPos != null) {
+                    steps.clear();
+                    steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+                }
+            }
         }
 
         ticks++;
@@ -79,14 +92,14 @@ public class IcePathSolver {
     public void onWorldRender(RenderWorldLastEvent event) {
         if (!Skytils.config.icePathSolver) return;
 
-        if (silverfishChestPos != null && roomFacing != null) {
+        if (silverfishChestPos != null && roomFacing != null && grid != null && IcePathSolver.silverfish.isEntityAlive()) {
             for (int i = 0; i < steps.size() - 1; i++) {
                 Point point = steps.get(i);
                 Point point2 = steps.get(i + 1);
                 Vec3 pos = getVec3RelativeToGrid(point.x, point.y);
                 Vec3 pos2 = getVec3RelativeToGrid(point2.x, point2.y);
                 GlStateManager.disableCull();
-                RenderUtil.draw3DLine(pos.addVector(0.5, -0.5, 0.5), pos2.addVector(0.5, -0.5, 0.5), 5, new Color(255, 0, 0), event.partialTicks);
+                RenderUtil.draw3DLine(pos.addVector(0.5, 0.5, 0.5), pos2.addVector(0.5, 0.5, 0.5), 5, new Color(255, 0, 0), event.partialTicks);
                 GlStateManager.enableCull();
             }
         }
@@ -96,17 +109,120 @@ public class IcePathSolver {
     public void onWorldChange(WorldEvent.Load event) {
         silverfishChestPos = null;
         roomFacing = null;
+        grid = null;
+        steps.clear();
+        silverfish = null;
+        silverfishPos = null;
     }
 
-    private Vec3 getVec3RelativeToGrid(int row, int column) {
+    private Vec3 getVec3RelativeToGrid(int column, int row) {
         if (silverfishChestPos == null || roomFacing == null) return null;
 
         return new Vec3(silverfishChestPos
                 .offset(roomFacing.getOpposite(), 4)
                 .offset(roomFacing.rotateYCCW(), 8)
-                .offset(roomFacing.rotateY(), row)
-                .offset(roomFacing.getOpposite(), column)
-                .up());
+                .offset(roomFacing.rotateY(), column)
+                .offset(roomFacing.getOpposite(), row));
+    }
+
+    private Point getGridPointFromPos(BlockPos pos) {
+        if (silverfishChestPos == null || roomFacing == null) return null;
+        for (int row = 0; row < 17; row++) {
+            for (int column = 0; column < 17; column++) {
+                if (new BlockPos(getVec3RelativeToGrid(column, row)).equals(pos)) {
+                    return new Point(column, row);
+                }
+            }
+        }
+        return null;
+    }
+
+    private int[][] getLayout() {
+        if (silverfishChestPos == null || roomFacing == null) return null;
+        int[][] grid = new int[17][17];
+        for (int row = 0; row < 17; row++) {
+            for (int column = 0; column < 17; column++) {
+                grid[row][column] = mc.theWorld.getBlockState(new BlockPos(getVec3RelativeToGrid(column, row))).getBlock() != Blocks.air ? 1 : 0;
+            }
+            if (row == 16) return grid;
+        }
+        return null;
+    }
+
+    /**
+     * This code was modified into returning an ArrayList and was taken under CC BY-SA 4.0
+     *
+     * @link https://stackoverflow.com/a/55271133
+     * @author ofekp
+     */
+    private ArrayList<Point> solve(int[][] iceCave, int startX, int startY, int endX, int endY) {
+        Point startPoint = new Point(startX, startY);
+
+        LinkedList<Point> queue = new LinkedList<>();
+        Point[][] iceCaveColors = new Point[iceCave.length][iceCave[0].length];
+
+        queue.addLast(new Point(startX, startY));
+        iceCaveColors[startY][startX] = startPoint;
+
+        while (queue.size() != 0) {
+            Point currPos = queue.pollFirst();
+            // traverse adjacent nodes while sliding on the ice
+            for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+                Point nextPos = move(iceCave, iceCaveColors, currPos, dir);
+                if (nextPos != null) {
+                    queue.addLast(nextPos);
+                    iceCaveColors[(int) nextPos.getY()][(int) nextPos.getX()] = new Point((int) currPos.getX(), (int) currPos.getY());
+                    if (nextPos.getY() == endY && nextPos.getX() == endX) {
+                        ArrayList<Point> steps = new ArrayList<>();
+                        // we found the end point
+                        Point tmp = currPos;  // if we start from nextPos we will count one too many edges
+                        int count = 0;
+                        steps.add(nextPos);
+                        steps.add(currPos);
+                        while (tmp != startPoint) {
+                            count++;
+                            tmp = iceCaveColors[(int) tmp.getY()][(int) tmp.getX()];
+                            steps.add(tmp);
+                        }
+                        //System.out.println("Silverfish solved in " + count + " moves.");
+                        return steps;
+                    }
+                }
+            }
+        }
+        return Lists.newArrayList();
+    }
+
+    /**
+     * This code was modified to fit Minecraft and was taken under CC BY-SA 4.0
+     *
+     * @link https://stackoverflow.com/a/55271133
+     * @author ofekp
+     */
+    private Point move(int[][] iceCave, Point[][] iceCaveColors, Point currPos, EnumFacing dir) {
+        int x = (int) currPos.getX();
+        int y = (int) currPos.getY();
+
+        int diffX = dir.getDirectionVec().getX();
+        int diffY = dir.getDirectionVec().getZ();
+
+        int i = 1;
+        while (x + i * diffX >= 0
+                && x + i * diffX < iceCave[0].length
+                && y + i * diffY >= 0
+                && y + i * diffY < iceCave.length
+                && iceCave[y + i * diffY][x + i * diffX] != 1) {
+            i++;
+        }
+
+        i--;  // reverse the last step
+
+        if (iceCaveColors[y + i * diffY][x + i * diffX] != null) {
+            // we've already seen this point
+            return null;
+        }
+
+        return new Point(x + i * diffX, y + i * diffY);
     }
 
 }
