@@ -79,7 +79,7 @@ public class WaterBoardSolver {
                             if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {
                                 if (world.getBlockState(potentialChestPos.down()).getBlock() == Blocks.stone && world.getBlockState(potentialChestPos.up(2)).getBlock() == Blocks.stained_glass) {
                                     for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                                        if (world.getBlockState(potentialChestPos.offset(direction.getOpposite(), 3).down()).getBlock() == Blocks.wool && world.getBlockState(potentialChestPos.offset(direction, 2)).getBlock() == Blocks.stone) {
+                                        if (world.getBlockState(potentialChestPos.offset(direction.getOpposite(), 3).down(2)).getBlock() == Blocks.sticky_piston && world.getBlockState(potentialChestPos.offset(direction, 2)).getBlock() == Blocks.stone) {
                                             chestPos = potentialChestPos;
                                             System.out.println("Water board chest is at " + chestPos);
                                             roomFacing = direction;
@@ -204,7 +204,7 @@ public class WaterBoardSolver {
                     boolean switched = entry.getValue();
                     if ((switched && !solution.contains(lever)) || (!switched && solution.contains(lever))) {
                         BlockPos pos = lever.getLeverPos();
-                        Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c-> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue);
+                        Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c-> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue).brighter();
                         Integer displayed = renderTimes.compute(lever, (k, v) -> {
                             if (v == null) return 0;
                             else return ++v;
