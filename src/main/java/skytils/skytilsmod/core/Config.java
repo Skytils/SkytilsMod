@@ -579,6 +579,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Prevent Breaking Farms",
+            description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventBreakingFarms = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Autopet Messages",
             description = "Removes all autopet messages from chat.",
             category = "Pets",
