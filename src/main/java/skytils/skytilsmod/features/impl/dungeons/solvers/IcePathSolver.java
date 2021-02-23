@@ -64,7 +64,9 @@ public class IcePathSolver {
                         grid = getLayout();
                         silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
                         steps.clear();
-                        steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+                        if (silverfishPos.x < 17 && silverfishPos.y < 17) {
+                            steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+                        }
                     }
                 }
             }).start();
@@ -72,10 +74,13 @@ public class IcePathSolver {
         }
 
         if (IcePathSolver.silverfish != null && grid != null) {
-            if (!getGridPointFromPos(IcePathSolver.silverfish.getPosition()).equals(silverfishPos)) {
+            if (IcePathSolver.silverfish.isEntityAlive() && !getGridPointFromPos(IcePathSolver.silverfish.getPosition()).equals(silverfishPos)) {
                 silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
-                steps.clear();
-                steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+
+                if (silverfishPos.x < 17 && silverfishPos.y < 17) {
+                    steps.clear();
+                    steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+                }
             }
         }
 
