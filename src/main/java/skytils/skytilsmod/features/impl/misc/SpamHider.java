@@ -11,10 +11,13 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 import skytils.skytilsmod.utils.toasts.BlessingToast;
+import skytils.skytilsmod.utils.toasts.KeyToast;
+import skytils.skytilsmod.utils.toasts.SuperboomToast;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -145,6 +148,92 @@ public class SpamHider {
                     event.setCanceled(true);
                 default:
             }
+        }
+
+        // Keys
+        // Wither
+        if (unformatted.contains("Wither Key") && Utils.inDungeons) {
+            switch (Skytils.config.witherKeyHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                case 3:
+                    event.setCanceled(true);
+                    if (unformatted.contains("was picked up")) {
+                        GuiManager.toastGui.add(new KeyToast("wither", ""));
+                    } else {
+                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
+                        GuiManager.toastGui.add(new KeyToast("wither", player));
+                    }
+                    break;
+                default:
+            }
+        } else if (unformatted.contains("RIGHT CLICK on a WITHER door to open it.")) {
+            switch (Skytils.config.witherKeyHider) {
+                case 1:
+                case 2:
+                case 3:
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+        // Blood
+        if (unformatted.contains("Blood Key") && Utils.inDungeons) {
+            switch (Skytils.config.bloodKeyHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                case 3:
+                    event.setCanceled(true);
+                    if (unformatted.contains("was picked up")) {
+                        GuiManager.toastGui.add(new KeyToast("blood", ""));
+                    } else {
+                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
+                        GuiManager.toastGui.add(new KeyToast("blood", player));
+                    }
+                    break;
+                default:
+            }
+        } else if (unformatted.contains("RIGHT CLICK on the BLOOD DOOR to open it.")) {
+            switch (Skytils.config.bloodKeyHider) {
+                case 1:
+                case 2:
+                case 3:
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        // Superboom tnt
+        if (unformatted.contains("Superboom TNT!") && Utils.inDungeons) {
+            switch (Skytils.config.superboomHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                case 3:
+                    event.setCanceled(true);
+                    String username = Minecraft.getMinecraft().thePlayer.getName();
+                    String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
+                    if (StringUtils.stripControlCodes(player.substring(player.indexOf(" "))).equals(username)) return;
+                    GuiManager.toastGui.add(new SuperboomToast());
+                    break;
+                default:
+            }
+
         }
 
         // Blocks in the way

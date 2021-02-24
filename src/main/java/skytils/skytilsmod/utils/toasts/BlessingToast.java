@@ -1,28 +1,16 @@
 package skytils.skytilsmod.utils.toasts;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.features.impl.misc.damagesplash.Damage;
-import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.nio.FloatBuffer;
 import java.util.List;
 
-/**
- * Taken from Skyblockcatia under MIT License
- * Modified
- * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
- * @author SteveKunG
- */
 public class BlessingToast implements IToast<BlessingToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
@@ -32,7 +20,7 @@ public class BlessingToast implements IToast<BlessingToast> {
 
     public BlessingToast(String blessing, List<BlessingBuff> buffs)
     {
-        this.maxDrawTime = Skytils.config.blessingTime;
+        this.maxDrawTime = Skytils.config.toastTime;
         this.blessing = Blessing.fromName(blessing);
         this.buffs = buffs;
     }
@@ -75,7 +63,7 @@ public class BlessingToast implements IToast<BlessingToast> {
             }
             buffStats += color + buff.amount + buff.symbol + " ";
         }
-        GuiToast.drawLongItemName(toastGui, delta, 0L, this.maxDrawTime, this.buffer, buffStats, false);
+        GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, buffStats, false);
         RenderHelper.enableGUIStandardItemLighting();
 
         GuiToast.renderTexture(this.blessing.texture, 8, 8);

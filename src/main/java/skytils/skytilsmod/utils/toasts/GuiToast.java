@@ -58,14 +58,14 @@ public class GuiToast extends Gui
         }
     }
 
-    public static void drawLongItemName(GuiToast toastGui, long delta, long firstDrawTime, long maxDrawTime, FloatBuffer buffer, String itemName, boolean shadow)
+    public static void drawSubline(GuiToast toastGui, long delta, long firstDrawTime, long maxDrawTime, FloatBuffer buffer, String subLine, boolean shadow)
     {
         long minDraw = (long)(maxDrawTime * 0.1D);
         long maxDraw = maxDrawTime + 500L;
         long backwardDraw = (long)(maxDrawTime * 0.5D);
         long textSpeed = 1500L + (long)(maxDrawTime * 0.1D);
         int x = 30;
-        int textWidth = toastGui.mc.fontRendererObj.getStringWidth(itemName);
+        int textWidth = toastGui.mc.fontRendererObj.getStringWidth(subLine);
         int maxSize = textWidth - 135;
         long timeElapsed = delta - firstDrawTime - minDraw;
         long timeElapsed2 = maxDraw - delta - backwardDraw;
@@ -101,11 +101,11 @@ public class GuiToast extends Gui
 
         if (shadow)
         {
-            toastGui.mc.fontRendererObj.drawStringWithShadow(itemName, x, 18, 0xFFFFFF);
+            toastGui.mc.fontRendererObj.drawStringWithShadow(subLine, x, 18, 0xFFFFFF);
         }
         else
         {
-            toastGui.mc.fontRendererObj.drawString(itemName, x, 18, 0xFFFFFF);
+            toastGui.mc.fontRendererObj.drawString(subLine, x, 18, 0xFFFFFF);
         }
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
