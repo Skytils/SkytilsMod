@@ -64,7 +64,7 @@ public class DungeonsFeatures {
             if (Skytils.config.hideWitherMinerNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
                 String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
                 if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                    event.setCanceled(true);
+                    mc.theWorld.removeEntity(event.entity);
                 }
             }
         }
