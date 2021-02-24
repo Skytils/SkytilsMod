@@ -579,6 +579,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Prevent Log Spam",
+            description = "Prevents your logs from being spammed with exceptions while in dungeons.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventLogSpam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Prioritize Item Abilities",
             description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
             category = "Miscellaneous",

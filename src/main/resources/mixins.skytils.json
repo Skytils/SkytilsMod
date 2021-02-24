@@ -23,6 +23,7 @@
     "MixinRenderItem",
     "MixinRenderLightningBolt",
     "MixinTileEntityChestRenderer",
+    "MixinUtil",
     "MixinWorld"
   ],
   "verbose": true
