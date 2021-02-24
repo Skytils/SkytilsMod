@@ -1,5 +1,6 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
@@ -16,6 +17,8 @@ import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
 public class MinionFeatures {
+
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     private static boolean blockUnenchanted = false;
 
@@ -50,7 +53,7 @@ public class MinionFeatures {
                                 }
                             }
                         }
-                        if (blockUnenchanted) event.setCanceled(true);
+                        if (blockUnenchanted && slot.inventory != mc.thePlayer.inventory) event.setCanceled(true);
                     } else {
                         ItemStack minionType = inventory.getStackInSlot(4);
                         if (minionType != null) {
@@ -71,7 +74,7 @@ public class MinionFeatures {
                                 }
 
                                 int index = slot.getSlotIndex();
-                                if (blockUnenchanted && index >= 21 && index <= 43 && index % 9 >= 3 && index % 9 <= 7) {
+                                if (blockUnenchanted && slot.inventory != mc.thePlayer.inventory && index >= 21 && index <= 43 && index % 9 >= 3 && index % 9 <= 7) {
                                     event.setCanceled(true);
                                 }
                             }
