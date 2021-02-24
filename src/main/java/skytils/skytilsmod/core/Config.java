@@ -122,6 +122,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Wither Miner Nametags",
+            description = "Removes the nametags above Wither Miners in Floor 7.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideWitherMinerNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Spirit Leap Names",
             description = "Shows names next to the head when you click.",
             category = "Dungeons",
