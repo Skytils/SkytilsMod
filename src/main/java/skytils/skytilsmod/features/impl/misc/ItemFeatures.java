@@ -5,17 +5,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2APacketParticles;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
@@ -31,6 +33,51 @@ import java.util.regex.Pattern;
 public class ItemFeatures {
 
     private final static Minecraft mc = Minecraft.getMinecraft();
+
+    @SubscribeEvent
+    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (event.container instanceof ContainerChest) {
+            ContainerChest chest = (ContainerChest) event.container;
+            IInventory inv = chest.getLowerChestInventory();
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            if (event.slot != null && event.slot.getHasStack()) {
+                ItemStack item = event.slot.getStack();
+                if (item == null) return;
+                NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+                if (Skytils.config.protectStarredItems) {
+                    if (chestName.startsWith("Salvage") && extraAttr != null) {
+                        boolean inSalvageGui = false;
+                        if (item.getDisplayName().contains("Salvage") || item.getDisplayName().contains("Essence")) {
+                            ItemStack salvageItem = inv.getStackInSlot(13);
+                            if (salvageItem == null) return;
+                            item = salvageItem;
+                            inSalvageGui = true;
+                        }
+                        if ((item.getDisplayName().contains("✪") || extraAttr.hasKey("dungeon_item_level")) && (event.slot.inventory == mc.thePlayer.inventory || inSalvageGui)) {
+                            mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from salvaging that item!"));
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                    if (!chestName.equals("Chest") && !chestName.contains("Auction")) {
+                        ItemStack sellItem = inv.getStackInSlot(49);
+                        if (sellItem != null) {
+                            if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
+                                if ((item.getDisplayName().contains("✪") || extraAttr.hasKey("dungeon_item_level")) && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
+                                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
+                                    event.setCanceled(true);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTooltip(ItemTooltipEvent event) {

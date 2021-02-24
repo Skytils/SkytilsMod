@@ -588,6 +588,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Protect Starred Items",
+            description = "Prevents you from salvaging or selling starred dungeon items.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean protectStarredItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Autopet Messages",
             description = "Removes all autopet messages from chat.",
             category = "Pets",
