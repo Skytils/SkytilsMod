@@ -7,6 +7,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -15,6 +16,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -121,9 +123,13 @@ public class BoulderSolver {
     }
 
     @SubscribeEvent
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.pos.equals(boulderChest)) {
-            roomVariant = -2;
+    public void onSendPacket(SendPacketEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (event.packet instanceof C08PacketPlayerBlockPlacement) {
+            C08PacketPlayerBlockPlacement packet = (C08PacketPlayerBlockPlacement) event.packet;
+            if (packet.getPosition() != null && packet.getPosition().equals(boulderChest)) {
+                roomVariant = 2;
+            }
         }
     }
 

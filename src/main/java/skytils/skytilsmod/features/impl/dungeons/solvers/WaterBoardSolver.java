@@ -195,8 +195,10 @@ public class WaterBoardSolver {
         }
 
         HashMap<LeverBlock, Integer> renderTimes = new HashMap<>();
+        int matching = 0;
 
         for (WoolColor color : WoolColor.values()) {
+            Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c-> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue).brighter();
             if (color.isExtended()) {
                 ArrayList<LeverBlock> solution = solutions.get(color);
                 for (Map.Entry<LeverBlock, Boolean> entry : leverStates.entrySet()) {
@@ -204,13 +206,16 @@ public class WaterBoardSolver {
                     boolean switched = entry.getValue();
                     if ((switched && !solution.contains(lever)) || (!switched && solution.contains(lever))) {
                         BlockPos pos = lever.getLeverPos();
-                        Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c-> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue).brighter();
                         Integer displayed = renderTimes.compute(lever, (k, v) -> {
                             if (v == null) return 0;
                             else return ++v;
                         });
                         RenderUtil.draw3DString(new Vec3(pos.up()).addVector(0.5, 0.5 + 0.5 * displayed, 0.5), "\u00a7l" + color.name(), renderColor, event.partialTicks);
                     }
+                }
+                if (leverStates.entrySet().stream().allMatch(entry -> (entry.getValue() && solution.contains(entry.getKey()) || (!entry.getValue() && !solution.contains(entry.getKey()))))) {
+                    RenderUtil.draw3DString(new Vec3(chestPos.offset(roomFacing.getOpposite(), 17).up(5)).addVector(0.5, 0.5 + 0.5 * matching, 0.5), "\u00a7l" + color.name(), renderColor, event.partialTicks);
+                    matching++;
                 }
             }
         }

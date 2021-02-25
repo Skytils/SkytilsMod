@@ -77,7 +77,7 @@ public class ArmorColorCommand extends CommandBase {
             if (ArmorColor.armorColors.containsKey(uuid)) {
                 ArmorColor.armorColors.remove(uuid);
                 ArmorColor.saveColors();
-                sender.addChatMessage(new ChatComponentText("\u00a7aCleared the custom color for your " + item.getDisplayName() + "!"));
+                sender.addChatMessage(new ChatComponentText("\u00a7aCleared the custom color for your " + item.getDisplayName() + "\u00a7a!"));
             } else sender.addChatMessage(new ChatComponentText("\u00a7cThat item doesn't have a custom color!"));
         } else if (subcommand.equals("set")) {
             if (!Utils.inSkyblock) throw new WrongUsageException("You must be in Skyblock to use this command!");
@@ -97,7 +97,7 @@ public class ArmorColorCommand extends CommandBase {
             }
             ArmorColor.armorColors.put(uuid, color);
             ArmorColor.saveColors();
-            sender.addChatMessage(new ChatComponentText("\u00a7aSet the color of your " + item.getDisplayName() + " to " + args[1] + "!"));
+            sender.addChatMessage(new ChatComponentText("\u00a7aSet the color of your " + item.getDisplayName() + "\u00a7a to " + args[1] + "!"));
         } else player.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
     }
 }

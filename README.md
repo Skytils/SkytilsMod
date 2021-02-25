@@ -20,7 +20,7 @@ A Hypixel Skyblock Utilities mod.
 ## Features
 ***
 #### General
- - Client Side Custom Armor Rolors
+ - Client Side Custom Armor Colors
  - Custom Command Aliases
  - Griffin Burrow Locator and Waypoints
  - Reparty Command Which Yields to Other Mods

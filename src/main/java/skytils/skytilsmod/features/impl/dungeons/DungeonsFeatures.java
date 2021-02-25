@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -59,6 +60,12 @@ public class DungeonsFeatures {
         if (Utils.inDungeons) {
             if (Skytils.config.showHiddenFels && event.entity.isInvisible() && event.entity instanceof EntityEnderman) {
                 event.entity.setInvisible(false);
+            }
+            if (Skytils.config.hideWitherMinerNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                    mc.theWorld.removeEntity(event.entity);
+                }
             }
         }
     }

@@ -15,10 +15,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.commands.ArmorColorCommand;
 import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
-import skytils.skytilsmod.core.Config;
-import skytils.skytilsmod.core.DataFetcher;
-import skytils.skytilsmod.core.GuiManager;
-import skytils.skytilsmod.core.UpdateChecker;
+import skytils.skytilsmod.core.*;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
@@ -26,6 +23,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.ClickInOrderS
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SimonSaysSolver;
 import skytils.skytilsmod.features.impl.misc.SpamHider;
+import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.TerminalFeatures;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
@@ -43,7 +41,7 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.8-pre1";
+    public static final String VERSION = "0.0.8-pre2";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -88,6 +86,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
         MinecraftForge.EVENT_BUS.register(new DamageSplash());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
+        MinecraftForge.EVENT_BUS.register(new FarmingFeatures());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
         MinecraftForge.EVENT_BUS.register(new IcePathSolver());
@@ -99,6 +98,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new SelectAllColorSolver());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
         MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
+        MinecraftForge.EVENT_BUS.register(new TerminalFeatures());
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
         MinecraftForge.EVENT_BUS.register(new WaterBoardSolver());

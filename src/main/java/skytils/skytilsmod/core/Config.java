@@ -122,6 +122,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Wither Miner Nametags",
+            description = "Removes the nametags above Wither Miners in Floor 7.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideWitherMinerNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Spirit Leap Names",
             description = "Shows names next to the head when you click.",
             category = "Dungeons",
@@ -305,7 +314,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Text Shadow",
-            description = "Changes the shadow type for the text displayed",
+            description = "Changes the shadow type for the text displayed.",
             category = "Spam",
             subcategory = "Display",
             options = {"Normal", "None", "Outline"}
@@ -315,7 +324,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Implosion Hider",
-            description = "Removes Implosion messages from your chat",
+            description = "Removes Implosion messages from your chat.",
             category = "Spam",
             subcategory = "Abilities",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -325,7 +334,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Midas Staff Hider",
-            description = "Removes Midas Staff messages from your chat",
+            description = "Removes Midas Staff messages from your chat.",
             category = "Spam",
             subcategory = "Abilities",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -335,7 +344,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Spirit Sceptre Hider",
-            description = "Removes Spirit Sceptre messages from your chat",
+            description = "Removes Spirit Sceptre messages from your chat.",
             category = "Spam",
             subcategory = "Abilities",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -345,7 +354,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Giant Sword Hider",
-            description = "Removes Giant Sword messages from your chat",
+            description = "Removes Giant Sword messages from your chat.",
             category = "Spam",
             subcategory = "Abilities",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -355,7 +364,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Livid Dagger Hider",
-            description = "Removes Livid Dagger messages from your chat",
+            description = "Removes Livid Dagger messages from your chat.",
             category = "Spam",
             subcategory = "Abilities",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -364,8 +373,18 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Mana Use Hider",
+            description = "Removes mana usage updates from the action bar.\nWorks best with SkyblockAddons.",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int manaUseHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Blessing Hider",
-            description = "Removes blessing messages from your chat",
+            description = "Removes blessing messages from your chat.",
             category = "Spam",
             subcategory = "Dungeons",
             options = {"Normal", "Hidden", "Toasts"}
@@ -373,19 +392,49 @@ public class Config extends Vigilant {
     public int blessingHider = 0;
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blood Key Hider",
+            description = "Removes Blood Key messages from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
+    )
+    public int bloodKeyHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Wither Key Hider",
+            description = "Removes Wither Key messages from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
+    )
+    public int witherKeyHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Superboom Pickup Hider",
+            description = "Removes Superboom pickup messages from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
+    )
+    public int superboomHider = 0;
+
+    @Property(
             type = PropertyType.SLIDER,
-            name = "Blessing Time",
-            description = "Number of milliseconds that blessing toasts are displayed for",
+            name = "Toast Time",
+            description = "Number of milliseconds that toasts are displayed for.",
             category = "Spam",
             subcategory = "Dungeons",
             max = 10_000
     )
-    public int blessingTime = 2500;
+    public int toastTime = 2500;
 
     @Property(
             type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
-            description = "Removes blocks in the way messages from your chat",
+            description = "Removes blocks in the way messages from your chat.",
             category = "Spam",
             subcategory = "Miscellaneous",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -395,7 +444,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Cooldown Hider",
-            description = "Removes ability still on cooldown messages from your chat",
+            description = "Removes ability still on cooldown messages from your chat.",
             category = "Spam",
             subcategory = "Miscellaneous",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -405,7 +454,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Out of mana Hider",
-            description = "Removes out of mana messages from your chat",
+            description = "Removes out of mana messages from your chat.",
             category = "Spam",
             subcategory = "Miscellaneous",
             options = {"Normal", "Hidden", "Separate GUI"}
@@ -570,12 +619,39 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Prevent Log Spam",
+            description = "Prevents your logs from being spammed with exceptions while in dungeons.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventLogSpam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Prioritize Item Abilities",
             description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
     public boolean prioritizeItemAbilities = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Prevent Breaking Farms",
+            description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventBreakingFarms = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Protect Starred Items",
+            description = "Prevents you from salvaging or selling starred dungeon items.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean protectStarredItems = false;
 
     @Property(
             type = PropertyType.SWITCH,

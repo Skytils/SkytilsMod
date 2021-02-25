@@ -9,6 +9,7 @@
     "MixinEntityBlaze",
     "MixinEntityRenderer",
     "MixinGuiContainer",
+    "MixinGuiIngame",
     "MixinGuiScreen",
     "MixinItemArmor",
     "MixinItemStack",
@@ -23,6 +24,7 @@
     "MixinRenderItem",
     "MixinRenderLightningBolt",
     "MixinTileEntityChestRenderer",
+    "MixinUtil",
     "MixinWorld"
   ],
   "verbose": true
