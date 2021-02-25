@@ -164,6 +164,7 @@ public class DungeonsFeatures {
 
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
+        if (!Utils.inSkyblock) return;
         if (event.packet instanceof S45PacketTitle) {
             S45PacketTitle packet = (S45PacketTitle) event.packet;
             if (packet.getMessage() != null && mc.thePlayer != null) {
@@ -171,7 +172,6 @@ public class DungeonsFeatures {
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.getName()) &&(unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
-
             }
         }
     }
