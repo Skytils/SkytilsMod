@@ -166,7 +166,7 @@ public class SpamHider {
                     if (unformatted.contains("was picked up")) {
                         GuiManager.toastGui.add(new KeyToast("wither", ""));
                     } else {
-                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
+                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f §r§ehas"));
                         GuiManager.toastGui.add(new KeyToast("wither", player));
                     }
                     break;
@@ -197,7 +197,7 @@ public class SpamHider {
                     if (unformatted.contains("was picked up")) {
                         GuiManager.toastGui.add(new KeyToast("blood", ""));
                     } else {
-                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
+                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f §r§ehas"));
                         GuiManager.toastGui.add(new KeyToast("blood", player));
                     }
                     break;
