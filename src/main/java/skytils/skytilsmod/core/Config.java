@@ -330,6 +330,207 @@ public class Config extends Vigilant {
     public boolean puzzlerSolver = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Block Useless Zombie Sword",
+            description = "Prevents you from using the Zombie Sword when at full health.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean blockUselessZombieSword = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Compact Item Stars",
+            description = "Shortens item names with stars in them.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean compactStars = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Implosion Particles",
+            description = "Removes the explosion created by the Implosion ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean hideImplosionParticles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Midas Staff Gold",
+            description = "Prevents the gold blocks from Molten Wave from rendering, leaving only the particles.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean hideMidasStaffGoldBlocks = false;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Dropped Item Scale",
+            description = "Change the size of dropped items.",
+            category = "Miscellaneous",
+            subcategory = "Items",
+            max = 500
+    )
+    public Integer itemDropScale = 100;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Larger Heads",
+            description = "Change the size of heads in your inventory.",
+            category = "Miscellaneous",
+            subcategory = "Items",
+            max = 200
+    )
+    public Integer largerHeadScale = 100;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Enchanted Book Tier",
+            description = "Shows the tier of books with only 1 enchantment.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showEnchantedBookTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Potion Tier",
+            description = "Shows the tier of potions as the stack size.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showPotionTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Pet Candies",
+            description = "Shows the number of candies used as the stack size",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showPetCandies = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Soul Eater Bonus",
+            description = "Shows the current Soul Eater bonus from the last mob kill.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean soulEaterLore = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Only Collect Enchanted Items",
+            description = "Prevents you from collecting unenchanted items from minions if there is a Super Compactor.",
+            category = "Miscellaneous",
+            subcategory = "Minions"
+    )
+    public boolean onlyCollectEnchantedItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Minion Tier",
+            description = "Shows the tier of minions as the stack size.",
+            category = "Miscellaneous",
+            subcategory = "Minions"
+    )
+    public boolean showMinionTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Boss Bar Fix",
+            description = "Hides the Witherborn boss bars.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean bossBarFix = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Custom Damage Splash",
+            description = "\u00a7b[WIP] \u00a7rReplaces Skyblock damage splashes with custom rendered ones.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean customDamageSplash = false;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Dungeon Pot Lock",
+            description = "Only allows you to purchase this dungeon pot from Ophelia, no other items.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life",
+            max = 7
+    )
+    public int dungeonPotLock = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Enchant Glint Fix",
+            description = "Fixes some items not having the enchantment glint.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean enchantGlintFix = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Lightning",
+            description = "Prevents all lightning from rendering.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideLightning = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Prevent Log Spam",
+            description = "Prevents your logs from being spammed with exceptions while in dungeons.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventLogSpam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Prioritize Item Abilities",
+            description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean prioritizeItemAbilities = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Protect Starred Items",
+            description = "Prevents you from salvaging or selling starred dungeon items.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean protectStarredItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Autopet Messages",
+            description = "Removes all autopet messages from chat.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideAutopetMessages = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Pet Item Confirmation",
+            description = "Requires a confirmation before using a pet item.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean petItemConfirmation = false;
+
+    @Property(
             type = PropertyType.SELECTOR,
             name = "Text Shadow",
             description = "Changes the shadow type for the text displayed.",
@@ -528,207 +729,6 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int manaMessages = 0;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Block Useless Zombie Sword",
-            description = "Prevents you from using the Zombie Sword when at full health.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean blockUselessZombieSword = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Implosion Particles",
-            description = "Removes the explosion created by the Implosion ability.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean hideImplosionParticles = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Midas Staff Gold",
-            description = "Prevents the gold blocks from Molten Wave from rendering, leaving only the particles.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean hideMidasStaffGoldBlocks = false;
-
-    @Property(
-            type = PropertyType.SLIDER,
-            name = "Dropped Item Scale",
-            description = "Change the size of dropped items.",
-            category = "Miscellaneous",
-            subcategory = "Items",
-            max = 500
-    )
-    public Integer itemDropScale = 100;
-
-    @Property(
-            type = PropertyType.SLIDER,
-            name = "Larger Heads",
-            description = "Change the size of heads in your inventory.",
-            category = "Miscellaneous",
-            subcategory = "Items",
-            max = 200
-    )
-    public Integer largerHeadScale = 100;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Enchanted Book Tier",
-            description = "Shows the tier of books with only 1 enchantment.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean showEnchantedBookTier = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Potion Tier",
-            description = "Shows the tier of potions as the stack size.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean showPotionTier = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Pet Candies",
-            description = "Shows the number of candies used as the stack size",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean showPetCandies = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Soul Eater Bonus",
-            description = "Shows the current Soul Eater bonus from the last mob kill.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean soulEaterLore = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Compact Item Stars",
-            description = "Shortens item names with stars in them.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean compactStars = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Only Collect Enchanted Items",
-            description = "Prevents you from collecting unenchanted items from minions if there is a Super Compactor.",
-            category = "Miscellaneous",
-            subcategory = "Minions"
-    )
-    public boolean onlyCollectEnchantedItems = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Minion Tier",
-            description = "Shows the tier of minions as the stack size.",
-            category = "Miscellaneous",
-            subcategory = "Minions"
-    )
-    public boolean showMinionTier = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Boss Bar Fix",
-            description = "Hides the Witherborn boss bars.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean bossBarFix = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Custom Damage Splash",
-            description = "\u00a7b[WIP] \u00a7rReplaces Skyblock damage splashes with custom rendered ones.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean customDamageSplash = false;
-
-    @Property(
-            type = PropertyType.SLIDER,
-            name = "Dungeon Pot Lock",
-            description = "Only allows you to purchase this dungeon pot from Ophelia, no other items.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life",
-            max = 7
-    )
-    public int dungeonPotLock = 0;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Enchant Glint Fix",
-            description = "Fixes some items not having the enchantment glint.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean enchantGlintFix = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Lightning",
-            description = "Prevents all lightning from rendering.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideLightning = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Prevent Log Spam",
-            description = "Prevents your logs from being spammed with exceptions while in dungeons.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean preventLogSpam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Prioritize Item Abilities",
-            description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean prioritizeItemAbilities = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Protect Starred Items",
-            description = "Prevents you from salvaging or selling starred dungeon items.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean protectStarredItems = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Autopet Messages",
-            description = "Removes all autopet messages from chat.",
-            category = "Pets",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideAutopetMessages = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Pet Item Confirmation",
-            description = "Requires a confirmation before using a pet item.",
-            category = "Pets",
-            subcategory = "Quality of Life"
-    )
-    public boolean petItemConfirmation = false;
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
