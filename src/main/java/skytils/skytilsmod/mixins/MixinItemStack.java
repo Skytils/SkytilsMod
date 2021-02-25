@@ -32,8 +32,8 @@ public abstract class MixinItemStack {
         }
     }
 
-    @Inject(method="getDisplayName",at=@At("HEAD"), cancellable=true)
-    public void getDisplayName(CallbackInfoReturnable<String> returnable) {
+    @Inject(method = "getDisplayName",at = @At("HEAD"), cancellable = true)
+    public void getDisplayName(CallbackInfoReturnable<String> cir) {
         try {
             if (Skytils.config.compactStars) {
                 if (stackTagCompound.hasKey("display", 10)) {
@@ -48,10 +48,8 @@ public abstract class MixinItemStack {
                                 count++;
                                 i = starMatcher.start() + 1;
                             }
-                            name = name.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
+                            cir.setReturnValue(name.replaceAll(starPattern.toString(), "") + "§6" + count + "✪");
                         }
-                        returnable.setReturnValue(name);
-
                     }
                 }
 
