@@ -372,13 +372,14 @@ public class Config extends Vigilant {
     public int lividHider = 0;
 
     @Property(
-            type = PropertyType.SWITCH,
+            type = PropertyType.SELECTOR,
             name = "Mana Use Hider",
             description = "Removes mana usage updates from the action bar.\nWorks best with SkyblockAddons.",
             category = "Spam",
-            subcategory = "Abilities"
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
     )
-    public boolean manaUseHider = false;
+    public int manaUseHider = 0;
 
     @Property(
             type = PropertyType.SELECTOR,

@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 public class SpamHider {
 
     private String lastBlessingType = "";
+    private int abilityUses = 0;
+    private String lastAbilityUsed = "";
 
     static ArrayList<SpamMessage> spamMessages = new ArrayList<>();
 
@@ -36,8 +38,18 @@ public class SpamHider {
 
     @SubscribeEvent
     public void onActionBarDisplay(SetActionBarEvent event) {
-        if (Skytils.config.manaUseHider && event.message.matches("§b-\\d+ Mana \\(§6.+§b\\)")) {
+        Matcher manaUsageMatcher = Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))").matcher(event.message);
+
+        if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
             event.setCanceled(true);
+            String manaUsage = manaUsageMatcher.group(1);
+            if (Skytils.config.manaUseHider == 2) {
+                if ((!lastAbilityUsed.equals(manaUsage) || abilityUses % 3 == 0)) {
+                    lastAbilityUsed = manaUsage;
+                    abilityUses = 1;
+                    newMessage(manaUsage);
+                } else abilityUses++;
+            }
         }
     }
 
