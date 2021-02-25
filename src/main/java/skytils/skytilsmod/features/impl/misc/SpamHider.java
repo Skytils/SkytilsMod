@@ -55,8 +55,8 @@ public class SpamHider {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-        
-        
+        String formatted = event.message.getFormattedText();
+
         // Hide Mort Messages
         if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
             switch (Skytils.config.hideMortMessages) {
@@ -64,7 +64,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -78,7 +78,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -93,7 +93,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -101,13 +101,13 @@ public class SpamHider {
         }
 
         // Implosion
-        if (unformatted.contains("Your Implosion hit ")) {
+        if (formatted.contains("§r§7Your Implosion hit ")) {
             switch(Skytils.config.implosionHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -115,13 +115,13 @@ public class SpamHider {
         }
 
         // Midas Staff
-        if (unformatted.contains("Your Molten Wave hit ")) {
+        if (formatted.contains("§r§7Your Molten Wave hit ")) {
             switch (Skytils.config.midasStaffHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -129,13 +129,13 @@ public class SpamHider {
         }
 
         // Spirit Sceptre
-        if (unformatted.contains("Your Spirit Sceptre hit ")) {
+        if (formatted.contains("§r§7Your Spirit Sceptre hit ")) {
             switch (Skytils.config.spiritSceptreHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -143,13 +143,13 @@ public class SpamHider {
         }
 
         // Giant Sword
-        if (unformatted.contains("Your Giant's Sword hit ")) {
+        if (unformatted.contains("§r§7Your Giant's Sword hit ")) {
             switch (Skytils.config.giantSwordHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -157,13 +157,13 @@ public class SpamHider {
         }
 
         // Livid Dagger
-        if (unformatted.contains("Your Livid Dagger hit ")) {
+        if (unformatted.contains("§r§7Your Livid Dagger hit ")) {
             switch (Skytils.config.lividHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -171,7 +171,7 @@ public class SpamHider {
         }
 
         // Blessings
-        if (unformatted.contains("DUNGEON BUFF!")) {
+        if (formatted.contains("§r§6§lDUNGEON BUFF!")) {
             switch (Skytils.config.blessingHider) {
                 case 1:
                     event.setCanceled(true);
@@ -214,7 +214,7 @@ public class SpamHider {
 
         // Keys
         // Wither
-        if (unformatted.contains("Wither Key") && Utils.inDungeons) {
+        if (formatted.contains("§r§8Wither Key") && Utils.inDungeons) {
             switch (Skytils.config.witherKeyHider) {
                 case 1:
                     event.setCanceled(true);
@@ -228,13 +228,13 @@ public class SpamHider {
                     if (unformatted.contains("was picked up")) {
                         GuiManager.toastGui.add(new KeyToast("wither", ""));
                     } else {
-                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f §r§ehas"));
+                        String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
                         GuiManager.toastGui.add(new KeyToast("wither", player));
                     }
                     break;
                 default:
             }
-        } else if (unformatted.contains("RIGHT CLICK on a WITHER door to open it.")) {
+        } else if (formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.")) {
             switch (Skytils.config.witherKeyHider) {
                 case 1:
                 case 2:
@@ -259,7 +259,7 @@ public class SpamHider {
                     if (unformatted.contains("was picked up")) {
                         GuiManager.toastGui.add(new KeyToast("blood", ""));
                     } else {
-                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f §r§ehas"));
+                        String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
                         GuiManager.toastGui.add(new KeyToast("blood", player));
                     }
                     break;
@@ -277,7 +277,7 @@ public class SpamHider {
         }
 
         // Superboom tnt
-        if (unformatted.contains("Superboom TNT!") && Utils.inDungeons) {
+        if (formatted.contains("§r§9Superboom TNT") && Utils.inDungeons) {
             switch (Skytils.config.superboomHider) {
                 case 1:
                     event.setCanceled(true);
@@ -289,8 +289,8 @@ public class SpamHider {
                 case 3:
                     event.setCanceled(true);
                     String username = Minecraft.getMinecraft().thePlayer.getName();
-                    String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
-                    if (StringUtils.stripControlCodes(player.substring(player.indexOf(" "))).equals(username)) return;
+                    String player = formatted.substring(0, formatted.indexOf("§r§f"));
+                    if (!StringUtils.stripControlCodes(player.substring(player.indexOf(" ") + 1)).equals(username)) return;
                     GuiManager.toastGui.add(new SuperboomToast());
                     break;
                 default:
@@ -305,7 +305,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -319,7 +319,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -333,7 +333,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -347,7 +347,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -361,7 +361,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
