@@ -38,10 +38,4 @@ public abstract class MixinRenderItem {
             GlStateManager.scale(scale, scale, scale);
         }
     }
-
-    @Redirect(method = "renderEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderModel(Lnet/minecraft/client/resources/model/IBakedModel;I)V"))
-    private void changeEnchantColor(RenderItem renderItem, IBakedModel model, int color) {
-        this.renderModel(model, new Color(0, 255, 255).getRGB() | -16777216);
-    }
-
 }
