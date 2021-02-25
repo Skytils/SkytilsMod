@@ -77,33 +77,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Show Griffin Burrows",
-            description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
-            category = "Events",
-            subcategory = "Mythological"
-    )
-    public boolean showGriffinBurrows = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Time Until Burrow Refresh",
-            description = "Displays the amount of time until the next refresh.",
-            category = "Events",
-            subcategory = "Mythological"
-    )
-    public boolean showGriffinCountdown = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Fast-Travel Addon",
-            description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
-            category = "Events",
-            subcategory = "Mythological"
-    )
-    public boolean showBurrowFastTravel = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Auto Copy Fails to Clipboard",
             description = "Copies deaths and fails in dungeons to your clipboard.",
             category = "Dungeons",
@@ -268,6 +241,51 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Griffin Burrows",
+            description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean showGriffinBurrows = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Time Until Burrow Refresh",
+            description = "Displays the amount of time until the next refresh.",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean showGriffinCountdown = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Fast-Travel Addon",
+            description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean showBurrowFastTravel = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Prevent Breaking Farms",
+            description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventBreakingFarms = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Farming RNG Titles",
+            description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideFarmingRNGTitles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Disable Pickaxe Ability on Private Island",
             description = "Prevents you from using pickaxe abilities on your island.",
             category = "Mining",
@@ -403,13 +421,43 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
-            name = "Wither Key Hider",
-            description = "Removes Wither Key messages from your chat.",
+            name = "Boss Messages Hider",
+            description = "Hides Boss Messages",
             category = "Spam",
             subcategory = "Dungeons",
-            options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
+            options = {"Normal", "Hidden", "Separate GUI"}
     )
-    public int witherKeyHider = 0;
+    public int hideBossMessages = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Countdown and Ready Messages Hider",
+            description = "Hides the Dungeon countdown and ready messages",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideDungeonCountdownAndReady = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Dungeon Abilities Messages Hider",
+            description = "Hides dungeon abilities messages and ultimates messages in chat",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideDungeonAbilities = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Mort Messages Hider",
+            description = "Hides Mort's messages while in dungeons",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideMortMessages = 0;
 
     @Property(
             type = PropertyType.SELECTOR,
@@ -420,6 +468,16 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
     )
     public int superboomHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Wither Key Hider",
+            description = "Removes Wither Key messages from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
+    )
+    public int witherKeyHider = 0;
 
     @Property(
             type = PropertyType.SLIDER,
@@ -440,6 +498,16 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int inTheWayHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Can't use Ability Hider",
+            description = "Hides the you can't use abilities in this room message ",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int CantUseAbilityHider = 0;
 
     @Property(
             type = PropertyType.SELECTOR,
@@ -637,15 +705,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Prevent Breaking Farms",
-            description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean preventBreakingFarms = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Protect Starred Items",
             description = "Prevents you from salvaging or selling starred dungeon items.",
             category = "Miscellaneous",
@@ -670,66 +729,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean petItemConfirmation = false;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Abilities Messages Hider",
-            description = "Hides dungeon abilities messages and ultimates messages in chat",
-            category = "Spam",
-            subcategory = "Dungeons",
-            options = {"Normal", "Hidden", "Separate GUI"}
-    )
-    public int hideAbilities = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Mort Messages Hider",
-            description = "Hides Mort's messages while in dungeons",
-            category = "Spam",
-            subcategory = "Dungeons",
-            options = {"Normal", "Hidden", "Separate GUI"}
-    )
-    public int hideMortMessages = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Countdown and Ready Messages Hider",
-            description = "Hides the Dungeon countdown and ready messages",
-            category = "Spam",
-            subcategory = "Dungeons",
-            options = {"Normal", "Hidden", "Separate GUI"}
-    )
-    public int hideCountdownAndReady = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Boss Messages Hider",
-            description = "Hides Boss Messages",
-            category = "Spam",
-            subcategory = "Dungeons",
-            options = {"Normal", "Hidden", "Separate GUI"}
-    )
-    public int hideBossMessages = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Can't use Ability Hider",
-            description = "Hides the you can't use abilities in this room message ",
-            category = "Spam",
-            subcategory = "Miscellaneous",
-            options = {"Normal", "Hidden", "Separate GUI"}
-    )
-    public int CantUseAbilityHider = 0;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Farming RNG Titles",
-            description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideFarmingRNGTitles = false;
-
 
     public Config() {
         super(new File("./config/skytils/config.toml"));

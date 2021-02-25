@@ -2,7 +2,6 @@ package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -329,7 +328,6 @@ public class SpamHider {
 
         // Out of mana
         if (unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!")) {
-            if (unformatted.contains(":")) return;
             switch (Skytils.config.manaMessages) {
                 case 1:
                     event.setCanceled(true);
@@ -344,7 +342,7 @@ public class SpamHider {
 
         //Hide Abilities
         if (Utils.inDungeons && unformatted.contains("is now available!") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
-            switch (Skytils.config.hideAbilities) {
+            switch (Skytils.config.hideDungeonAbilities) {
                 case 1:
                     event.setCanceled(true);
                     break;
@@ -358,7 +356,7 @@ public class SpamHider {
 
         // Hide Dungeon Countdown / Ready messages
         if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")) {
-            switch (Skytils.config.hideCountdownAndReady) {
+            switch (Skytils.config.hideDungeonCountdownAndReady) {
                 case 1:
                     event.setCanceled(true);
                     break;
