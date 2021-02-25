@@ -61,7 +61,7 @@ public class ItemFeatures {
                             return;
                         }
                     }
-                    if (!chestName.equals("Chest") && !chestName.contains("Auction")) {
+                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54) {
                         ItemStack sellItem = inv.getStackInSlot(49);
                         if (sellItem != null) {
                             if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
