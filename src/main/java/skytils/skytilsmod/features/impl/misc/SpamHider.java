@@ -11,6 +11,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.events.SetActionBarEvent;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
@@ -31,6 +32,13 @@ public class SpamHider {
 
     static {
         new SpamGuiElement();
+    }
+
+    @SubscribeEvent
+    public void onActionBarDisplay(SetActionBarEvent event) {
+        if (Skytils.config.manaUseHider && event.message.matches("§b-\\d+ Mana \\(§6.+§b\\)")) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

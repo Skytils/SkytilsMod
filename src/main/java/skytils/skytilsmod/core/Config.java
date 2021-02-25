@@ -372,6 +372,15 @@ public class Config extends Vigilant {
     public int lividHider = 0;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Mana Use Hider",
+            description = "Removes mana usage updates from the action bar.\nWorks best with SkyblockAddons.",
+            category = "Spam",
+            subcategory = "Abilities"
+    )
+    public boolean manaUseHider = false;
+
+    @Property(
             type = PropertyType.SELECTOR,
             name = "Blessing Hider",
             description = "Removes blessing messages from your chat.",
@@ -403,7 +412,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
-            name = "Superboom pickup Hider",
+            name = "Superboom Pickup Hider",
             description = "Removes Superboom pickup messages from your chat.",
             category = "Spam",
             subcategory = "Dungeons",
