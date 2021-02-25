@@ -671,6 +671,65 @@ public class Config extends Vigilant {
     )
     public boolean petItemConfirmation = false;
 
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Abilities Messages Hider",
+            description = "Hides dungeon abilities messages and ultimates messages in chat",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideAbilities = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Mort Messages Hider",
+            description = "Hides Mort's messages while in dungeons",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideMortMessages = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Countdown and Ready Messages Hider",
+            description = "Hides the Dungeon countdown and ready messages",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideCountdownAndReady = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Boss Messages Hider",
+            description = "Hides Boss Messages",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideBossMessages = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Can't use Ability Hider",
+            description = "Hides the you can't use abilities in this room message ",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int CantUseAbilityHider = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Farming RNG Titles",
+            description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideFarmingRNGTitles = false;
+
 
     public Config() {
         super(new File("./config/skytils/config.toml"));

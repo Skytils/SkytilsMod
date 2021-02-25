@@ -166,13 +166,13 @@ public class DungeonsFeatures {
     public void onReceivePacket(ReceivePacketEvent event) {
         if (event.packet instanceof S45PacketTitle) {
             S45PacketTitle packet = (S45PacketTitle) event.packet;
-            if (packet.getMessage() != null) {
+            if (packet.getMessage() != null && mc.thePlayer != null) {
                 String unformatted = StringUtils.stripControlCodes(packet.getMessage().getUnformattedText());
-                if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
+                if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.getName()) &&(unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
+
             }
         }
     }
-
 }

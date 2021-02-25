@@ -7,11 +7,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -30,6 +32,20 @@ public class MiscFeatures {
     }
 
     @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (event.packet instanceof S45PacketTitle) {
+            S45PacketTitle packet = (S45PacketTitle) event.packet;
+            if (packet.getMessage() != null) {
+                String unformatted = StringUtils.stripControlCodes(packet.getMessage().getUnformattedText());
+                if (Skytils.config.hideFarmingRNGTitles && Utils.inSkyblock && unformatted.contains("DROP!")) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
+
+            @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inSkyblock) return;
 

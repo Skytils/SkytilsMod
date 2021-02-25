@@ -56,7 +56,50 @@ public class SpamHider {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+        
+        
+        // Hide Mort Messages
+        if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
+            switch (Skytils.config.hideMortMessages) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        // Hide Boss Messages
+        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher") || unformatted.startsWith("[CROWD]")) {
+            switch (Skytils.config.hideBossMessages) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
         if (unformatted.contains(":")) return;
+        // CantUseAbilityHider
+        if(unformatted.startsWith("You cannot use abilities in this room!")) {
+            switch (Skytils.config.CantUseAbilityHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
 
         // Implosion
         if (unformatted.contains("Your Implosion hit ")) {
@@ -285,8 +328,37 @@ public class SpamHider {
         }
 
         // Out of mana
-        if (unformatted.contains("You do not have enough mana to do this!")) {
+        if (unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!")) {
+            if (unformatted.contains(":")) return;
             switch (Skytils.config.manaMessages) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        //Hide Abilities
+        if (Utils.inDungeons && unformatted.contains("is now available!") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
+            switch (Skytils.config.hideAbilities) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(event.message.getFormattedText());
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        // Hide Dungeon Countdown / Ready messages
+        if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")) {
+            switch (Skytils.config.hideCountdownAndReady) {
                 case 1:
                     event.setCanceled(true);
                     break;
