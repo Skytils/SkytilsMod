@@ -1,5 +1,6 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -61,7 +62,7 @@ public class ItemFeatures {
                             return;
                         }
                     }
-                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54) {
+                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
                         ItemStack sellItem = inv.getStackInSlot(49);
                         if (sellItem != null) {
                             if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
@@ -195,7 +196,7 @@ public class ItemFeatures {
 
             if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
                 if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    boolean flag = mc.theWorld.playerEntities.stream().anyMatch(p -> {
+                    boolean flag = ImmutableList.copyOf(mc.theWorld.playerEntities).stream().anyMatch(p -> {
                         if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
                             ItemStack item = p.getHeldItem();
                             if (item != null) {
