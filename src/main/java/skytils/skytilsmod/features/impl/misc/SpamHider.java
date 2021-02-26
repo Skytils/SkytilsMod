@@ -157,7 +157,7 @@ public class SpamHider {
         }
 
         // Livid Dagger
-        if (unformatted.contains("§r§7Your Livid Dagger hit ")) {
+        if (unformatted.contains("§r§7Your Livid Dagger hit")) {
             switch (Skytils.config.lividHider) {
                 case 1:
                     event.setCanceled(true);
