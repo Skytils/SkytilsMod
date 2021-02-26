@@ -513,6 +513,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Mob Death Particles",
+            description = "Hides the little poof of smoke when mobs die.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideDeathParticles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Autopet Messages",
             description = "Removes all autopet messages from chat.",
             category = "Pets",

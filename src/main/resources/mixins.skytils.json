@@ -7,6 +7,7 @@
     "MixinBossStatus",
     "MixinChunk",
     "MixinEntityBlaze",
+    "MixinEntityLivingBase",
     "MixinEntityRenderer",
     "MixinGuiContainer",
     "MixinGuiIngame",
