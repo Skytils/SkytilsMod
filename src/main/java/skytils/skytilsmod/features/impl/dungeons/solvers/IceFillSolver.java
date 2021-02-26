@@ -27,9 +27,7 @@ public class IceFillSolver {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static int ticks = 0;
-
-    public static JsonObject iceFillData = new JsonObject();
-
+    
     private static BlockPos chestPos;
     private static EnumFacing roomFacing;
 
