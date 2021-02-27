@@ -48,27 +48,28 @@ public class StartsWithSequenceSolver {
             List<Slot> invSlots = ((GuiChest) mc.currentScreen).inventorySlots.inventorySlots;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
             Matcher nameMatcher = titlePattern.matcher(chestName);
-            System.out.println("Yes");
-            if (sequenceNeeded == null && nameMatcher.find()) {
-                sequenceNeeded = nameMatcher.group(1);
-            } else if (shouldClick.size() == 0) {
-                for (Slot slot : invSlots) {
-                    if (slot.inventory == mc.thePlayer.inventory || !slot.getHasStack()) continue;
-                    ItemStack item = slot.getStack();
-                    if (item == null) continue;
-                    if (item.isItemEnchanted()) continue;
-                    if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8)
-                        continue;
-                    if (item.getDisplayName().startsWith(sequenceNeeded)) {
-                        shouldClick.add(slot);
+            if (nameMatcher.find()) {
+                if (sequenceNeeded == null) {
+                    sequenceNeeded = nameMatcher.group(1);
+                } else if (shouldClick.size() == 0) {
+                    for (Slot slot : invSlots) {
+                        if (slot.inventory == mc.thePlayer.inventory || !slot.getHasStack()) continue;
+                        ItemStack item = slot.getStack();
+                        if (item == null) continue;
+                        if (item.isItemEnchanted()) continue;
+                        if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8)
+                            continue;
+                        if (item.getDisplayName().startsWith(sequenceNeeded)) {
+                            shouldClick.add(slot);
+                        }
                     }
-                }
-            } else {
-                for (Slot slot : ImmutableList.copyOf(shouldClick)) {
-                    ItemStack item = slot.getStack();
-                    if (item == null) continue;
-                    if (item.isItemEnchanted()) {
-                        shouldClick.remove(slot);
+                } else {
+                    for (Slot slot : ImmutableList.copyOf(shouldClick)) {
+                        ItemStack item = slot.getStack();
+                        if (item == null) continue;
+                        if (item.isItemEnchanted()) {
+                            shouldClick.remove(slot);
+                        }
                     }
                 }
             }
