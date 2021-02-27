@@ -9,6 +9,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
+import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -32,7 +33,6 @@ public class StartsWithSequenceSolver {
 
     private static final ArrayList<Slot> shouldClick = new ArrayList<>();
     private static String sequenceNeeded = null;
-
     private static final Pattern titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$");
 
     @SubscribeEvent
@@ -59,7 +59,7 @@ public class StartsWithSequenceSolver {
                         if (item.isItemEnchanted()) continue;
                         if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8)
                             continue;
-                        if (item.getDisplayName().startsWith(sequenceNeeded)) {
+                        if (StringUtils.stripControlCodes(item.getDisplayName()).startsWith(sequenceNeeded)) {
                             shouldClick.add(slot);
                         }
                     }

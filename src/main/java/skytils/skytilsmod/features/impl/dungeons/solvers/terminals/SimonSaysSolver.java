@@ -79,7 +79,7 @@ public class SimonSaysSolver {
             double z = pos.getZ() - viewerZ;
             GlStateManager.disableCull();
             GlStateManager.disableBlend();
-            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(255, 0, 0), 1f);
+            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(255, 0, 0), 0.5f);
             GlStateManager.enableBlend();
             GlStateManager.enableCull();
         }
