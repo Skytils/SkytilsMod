@@ -504,6 +504,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Highlight Salvageable Items",
+            description = "Highlights items that can be salvaged.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean highlightSalvageableItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Prevent Log Spam",
             description = "Prevents your logs from being spammed with exceptions while in dungeons.",
             category = "Miscellaneous",
