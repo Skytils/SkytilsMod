@@ -114,7 +114,7 @@ public class BoulderSolver {
                     double y = buttonPos.getY() - viewerY;
                     double z = buttonPos.getZ() - viewerZ;
                     GlStateManager.disableCull();
-                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(255, 0, 0, 180), 1f);
+                    RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(255, 0, 0, 255), 0.7f);
                     GlStateManager.enableCull();
                     break;
                 }
