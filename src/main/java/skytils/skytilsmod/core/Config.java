@@ -258,6 +258,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Burrow Particle Add-on",
+            description = "\u00a7b[WIP] \u00a7rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
+            category = "Events",
+            subcategory = "Mythological"
+    )
+    public boolean particleBurrows = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Time Until Burrow Refresh",
             description = "Displays the amount of time until the next refresh.",
             category = "Events",

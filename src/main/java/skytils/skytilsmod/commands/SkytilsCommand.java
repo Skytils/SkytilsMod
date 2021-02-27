@@ -78,6 +78,7 @@ public class SkytilsCommand extends CommandBase {
                     String action = args[1].toLowerCase(Locale.ENGLISH);
                     switch (action) {
                         case "refresh":
+                            GriffinBurrows.particleBurrows.removeIf(pb -> !pb.dug);
                             GriffinBurrows.burrows.clear();
                             GriffinBurrows.burrowRefreshTimer.reset();
                             GriffinBurrows.shouldRefreshBurrows = true;

@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -24,6 +25,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.DamageBlockEvent;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.SBInfo;
@@ -39,7 +41,8 @@ public class GriffinBurrows {
     public static ArrayList<Burrow> burrows = new ArrayList<>();
     public static ArrayList<BlockPos> dugBurrows = new ArrayList<>();
     public static BlockPos lastDugBurrow = null;
-    public static ArrayList<PartialBurrow> partialBurrows = new ArrayList<>();
+    public static ArrayList<ParticleBurrow> particleBurrows = new ArrayList<>();
+    public static BlockPos lastDugParticleBurrow = null;
 
     public static StopWatch burrowRefreshTimer = new StopWatch();
     public static boolean shouldRefreshBurrows = false;
@@ -80,6 +83,16 @@ public class GriffinBurrows {
             if (lastDugBurrow != null) {
                 dugBurrows.add(lastDugBurrow);
                 burrows.removeIf(burrow -> burrow.getBlockPos().equals(lastDugBurrow));
+                lastDugBurrow = null;
+            }
+            if (lastDugParticleBurrow != null) {
+                ParticleBurrow particleBurrow = particleBurrows.stream().filter(pb -> pb.getBlockPos().equals(lastDugParticleBurrow)).findFirst().orElse(null);
+                if (particleBurrow != null) {
+                    particleBurrow.dug = true;
+                    dugBurrows.add(lastDugParticleBurrow);
+                    particleBurrows.remove(particleBurrow);
+                    lastDugParticleBurrow = null;
+                }
             }
         }
     }
@@ -98,6 +111,9 @@ public class GriffinBurrows {
                     if (GriffinBurrows.burrows.stream().anyMatch(burrow -> burrow.getBlockPos().equals(event.pos))) {
                         GriffinBurrows.lastDugBurrow = event.pos;
                     }
+                    if (GriffinBurrows.particleBurrows.stream().anyMatch(pb -> pb.getBlockPos().equals(event.pos))) {
+                        lastDugParticleBurrow = event.pos;
+                    }
                 }
             }
         }
@@ -110,12 +126,19 @@ public class GriffinBurrows {
             for (Burrow burrow : burrows) {
                 burrow.drawWaypoint(event.partialTicks);
             }
+            List<ParticleBurrow> particleBurrows = ImmutableList.copyOf(GriffinBurrows.particleBurrows);
+            for (ParticleBurrow pb : particleBurrows) {
+                if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
+                    pb.drawWaypoint(event.partialTicks);
+                }
+            }
         }
     }
 
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         burrows.clear();
+        particleBurrows.clear();
         shouldRefreshBurrows = true;
     }
 
@@ -163,7 +186,8 @@ public class GriffinBurrows {
             });
 
             dugBurrows.removeIf(dug -> receivedBurrows.stream().noneMatch(burrow -> burrow.getBlockPos().equals(dug)));
-            receivedBurrows.removeIf(burrow -> dugBurrows.contains(burrow.getBlockPos()));
+            particleBurrows.removeIf(pb -> receivedBurrows.stream().anyMatch(rb -> rb.getBlockPos().equals(pb.getBlockPos())));
+            receivedBurrows.removeIf(burrow -> dugBurrows.contains(burrow.getBlockPos()) || particleBurrows.stream().anyMatch(pb -> pb.dug && pb.getBlockPos().equals(burrow.getBlockPos())));
 
             burrows.clear();
             burrows.addAll(receivedBurrows);
@@ -206,24 +230,121 @@ public class GriffinBurrows {
         }
     }
 
-    public static class PartialBurrow {
-        public int x, y, z;
-        public boolean hasFootstep, hasOtherParticle;
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet instanceof S2APacketParticles) {
+            if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("hub")) return;
+            S2APacketParticles packet = (S2APacketParticles) event.packet;
 
-        public PartialBurrow(int x, int y, int z, boolean hasFootstep, boolean hasOtherParticle) {
+            EnumParticleTypes type = packet.getParticleType();
+
+            boolean longDistance = packet.isLongDistance();
+            int count = packet.getParticleCount();
+            float speed = packet.getParticleSpeed();
+            float xOffset = packet.getXOffset();
+            float yOffset = packet.getYOffset();
+            float zOffset = packet.getZOffset();
+
+            double x = packet.getXCoordinate();
+            double y = packet.getYCoordinate();
+            double z = packet.getZCoordinate();
+
+            BlockPos pos = new BlockPos((int)x, (int)y, (int)z).down();
+
+            boolean footstepFilter = type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f;
+            boolean enchantFilter  = type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f;
+
+            boolean startFilter = type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f;
+            boolean mobFilter = type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f;
+            boolean treasureFilter = type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f;
+
+            if (longDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
+                if (burrows.stream().noneMatch(b -> b.getBlockPos().equals(pos)) && dugBurrows.stream().noneMatch(b -> b.equals(pos))) {
+                    ParticleBurrow burrow = particleBurrows.stream().filter(b -> b.getBlockPos().equals(pos)).findFirst().orElse(new ParticleBurrow(pos, false, false, -1));
+                    if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow);
+                    if (!burrow.hasFootstep && footstepFilter) {
+                        burrow.hasFootstep = true;
+                    } else if (!burrow.hasEnchant && enchantFilter) {
+                        burrow.hasEnchant = true;
+                    } else if (burrow.type == -1 && type != EnumParticleTypes.FOOTSTEP && type != EnumParticleTypes.ENCHANTMENT_TABLE) {
+                        if (startFilter) burrow.type = 0;
+                        else if (mobFilter) burrow.type = 1;
+                        else if (treasureFilter) burrow.type = 2;
+                    }
+                }
+                //System.out.println(String.format("%s %s %s particles with %s speed at %s, %s, %s, offset by %s %s %s", count, longDistance ? "long-distance" : "", type.getParticleName(), speed, x, y, z, xOffset, yOffset, zOffset));
+            }
+
+        }
+    }
+
+    public static class ParticleBurrow {
+        public int x, y, z;
+        public boolean hasFootstep, hasEnchant;
+        public int type = -1;
+        public long timestamp;
+        public boolean dug = false;
+
+        public ParticleBurrow(int x, int y, int z, boolean hasFootstep, boolean hasEnchant, int type) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.hasFootstep = hasFootstep;
-            this.hasOtherParticle = hasOtherParticle;
+            this.hasEnchant = hasEnchant;
+            this.type = type;
+            this.timestamp = System.currentTimeMillis();
         }
 
-        public PartialBurrow(Vec3i vec3, boolean hasFootstep, boolean hasOtherParticle) {
-            this(vec3.getX(), vec3.getY(), vec3.getZ(), hasFootstep, hasOtherParticle);
+        public ParticleBurrow(Vec3i vec3, boolean hasFootstep, boolean hasEnchant, int type) {
+            this(vec3.getX(), vec3.getY(), vec3.getZ(), hasFootstep, hasEnchant, type);
         }
 
         public BlockPos getBlockPos() {
             return new BlockPos(x, y, z);
+        }
+
+        public String getWaypointText() {
+
+            String type = "Burrow";
+
+            switch (this.type) {
+                case 0:
+                    type = EnumChatFormatting.GREEN + "Start";
+                    break;
+                case 1:
+                    type = EnumChatFormatting.RED + "Mob";
+                    break;
+                case 2:
+                    type = EnumChatFormatting.GOLD + "Treasure";
+                    break;
+            }
+
+            return String.format("%s \u00a7a(Particle)", type);
+        }
+
+        public void drawWaypoint(float partialTicks) {
+
+            Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+            double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
+            double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
+            double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+
+            BlockPos pos = this.getBlockPos();
+            double x = pos.getX() - viewerX;
+            double y = pos.getY() - viewerY;
+            double z = pos.getZ() - viewerZ;
+            double distSq = x*x + y*y + z*z;
+
+            GlStateManager.disableDepth();
+            GlStateManager.disableCull();
+            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(2, 250, 39), 1f);
+            GlStateManager.disableTexture2D();
+            if (distSq > 5*5) RenderUtil.renderBeaconBeam(x, y + 1, z, new Color(2, 250, 39).getRGB(), 1.0f, partialTicks);
+            RenderUtil.renderWaypointText(getWaypointText(), getBlockPos().up(5), partialTicks);
+            GlStateManager.disableLighting();
+            GlStateManager.enableTexture2D();
+            GlStateManager.enableDepth();
+            GlStateManager.enableCull();
         }
 
     }
@@ -347,6 +468,4 @@ public class GriffinBurrows {
             }
         }
     }
-
-
 }
