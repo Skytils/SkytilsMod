@@ -110,6 +110,7 @@ public class RenderUtil {
      */
     public static void drawFilledBoundingBox(AxisAlignedBB aabb, Color c, float alphaMultiplier) {
         GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.disableTexture2D();
 
@@ -165,7 +166,7 @@ public class RenderUtil {
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
-        GlStateManager.enableBlend();
+        GlStateManager.disableBlend();
     }
 
     /**
@@ -205,6 +206,7 @@ public class RenderUtil {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
         GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
@@ -245,6 +247,7 @@ public class RenderUtil {
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f);
         GlStateManager.scale(-f1, -f1, -f1);
         GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         mc.fontRendererObj.drawString(text, -width, 0, color.getRGB());
         GlStateManager.disableBlend();
