@@ -231,6 +231,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Starts With Sequence Solver",
+            description = "Shows the items to click on the What starts with? terminal.",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public boolean startsWithSequenceTerminalSolver = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Simon Says Solver",
             description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
             category = "Dungeons",
