@@ -35,6 +35,8 @@ public class IceFillSolver {
     private static IceFillPuzzle five = null;
     private static IceFillPuzzle seven = null;
 
+    private static Thread solverThread = null;
+
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return;
@@ -43,8 +45,9 @@ public class IceFillSolver {
         World world = mc.theWorld;
 
         if (ticks % 20 == 0) {
-            new Thread(() -> {
-                if (chestPos == null || roomFacing == null) {
+
+            if (chestPos == null || roomFacing == null) {
+                new Thread(() -> {
                     findChest:
                     for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.getPosition(), 25, 75)) {
                         IBlockState block = world.getBlockState(pos);
@@ -59,7 +62,11 @@ public class IceFillSolver {
                             }
                         }
                     }
-                } else {
+                }).start();
+            }
+
+            if ((solverThread == null || !solverThread.isAlive()) && chestPos != null) {
+                solverThread = new Thread(() -> {
                     if (three == null) {
                         three = new IceFillPuzzle(world, 70);
                     }
@@ -69,8 +76,18 @@ public class IceFillSolver {
                     if (seven == null) {
                         seven = new IceFillPuzzle(world, 72);
                     }
-                }
-            }).start();
+                    if (three.paths.size() == 0) {
+                        three.genPaths(world);
+                    }
+                    if (five.paths.size() == 0) {
+                        five.genPaths(world);
+                    }
+                    if (seven.paths.size() == 0) {
+                        seven.genPaths(world);
+                    }
+                });
+                solverThread.start();
+            }
             ticks = 0;
         }
 
@@ -201,7 +218,7 @@ public class IceFillSolver {
         public List<List<BlockPos>> paths = new ArrayList<>();
 
         IceFillPuzzle(World world, int y) {
-            for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.getPosition(), 25, y)) {
+            for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(chestPos, 25, y)) {
                 IBlockState block = world.getBlockState(pos);
                 if(world.getBlockState(pos.down()).getBlock() == Blocks.ice) {
                     if(block.getBlock() == Blocks.air) {
@@ -213,7 +230,9 @@ public class IceFillSolver {
                     }
                 }
             }
+        }
 
+        public void genPaths(World world) {
             // Generate paths
             List<Move> moves = generatePairs(world, spaces);
             Graph g = new Graph(moves, world);
@@ -232,7 +251,6 @@ public class IceFillSolver {
 
         private void getPaths(Graph g, BlockPos v, Map<BlockPos, Boolean> visited, List<BlockPos> path, int N) {
             if (path.size() == N) {
-                System.out.println(path);
                 List<BlockPos> newPath = ImmutableList.copyOf(path);
                 if (!paths.contains(path)) paths.add(newPath);
                 return;
