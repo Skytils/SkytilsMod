@@ -249,7 +249,7 @@ public class GriffinBurrows {
             double y = packet.getYCoordinate();
             double z = packet.getZCoordinate();
 
-            BlockPos pos = new BlockPos((int)x, (int)y, (int)z).down();
+            BlockPos pos = new BlockPos(x, y, z).down();
 
             boolean footstepFilter = type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f;
             boolean enchantFilter  = type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f;
