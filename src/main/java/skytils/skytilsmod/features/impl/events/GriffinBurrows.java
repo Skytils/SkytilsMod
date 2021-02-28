@@ -187,11 +187,14 @@ public class GriffinBurrows {
 
             dugBurrows.removeIf(dug -> receivedBurrows.stream().noneMatch(burrow -> burrow.getBlockPos().equals(dug)));
             particleBurrows.removeIf(pb -> receivedBurrows.stream().anyMatch(rb -> rb.getBlockPos().equals(pb.getBlockPos())));
-            receivedBurrows.removeIf(burrow -> dugBurrows.contains(burrow.getBlockPos()) || particleBurrows.stream().anyMatch(pb -> pb.dug && pb.getBlockPos().equals(burrow.getBlockPos())));
+            boolean removedDupes = receivedBurrows.removeIf(burrow -> dugBurrows.contains(burrow.getBlockPos()) || particleBurrows.stream().anyMatch(pb -> pb.dug && pb.getBlockPos().equals(burrow.getBlockPos())));
 
             burrows.clear();
             burrows.addAll(receivedBurrows);
-            mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size() + EnumChatFormatting.GREEN + " burrows!"));
+            if (receivedBurrows.size() == 0) {
+                if (!removedDupes) mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs."));
+                else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."));
+            } else mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size() + EnumChatFormatting.GREEN + " burrows!"));
 
         }).start();
     }
