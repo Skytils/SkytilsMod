@@ -122,6 +122,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Hidden Shadow Assassins",
+            description = "Make Shadow Assassins in dungeons visible.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean showHiddenShadowAssassins = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Blaze Solver",
             description = "Changes the color of the blaze to shoot on Higher or Lower.",
             category = "Dungeons",
