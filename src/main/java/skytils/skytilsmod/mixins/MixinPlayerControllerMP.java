@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -32,20 +33,18 @@ public class MixinPlayerControllerMP {
 
     @Inject(method = "isPlayerRightClickingOnEntity", at = @At("HEAD"), cancellable = true)
     private void onRightClickEntity(EntityPlayer player, Entity target, MovingObjectPosition movingObject, CallbackInfoReturnable<Boolean> cir) {
-        if (!Skytils.config.prioritizeItemAbilities || !Utils.inSkyblock || Utils.inDungeons) return;
-        ItemStack item = player.getHeldItem();
-        if (item != null) {
-            if (ItemUtil.hasRightClickAbility(item)) {
-                cir.setReturnValue(false);
-            }
-        }
+        handleRightClickEntity(player, target, cir);
     }
 
     @Inject(method = "interactWithEntitySendPacket", at = @At("HEAD"), cancellable = true)
     private void onInteractWithEntitySendPacket(EntityPlayer player, Entity target, CallbackInfoReturnable<Boolean> cir) {
+        handleRightClickEntity(player, target, cir);
+    }
+
+    private void handleRightClickEntity(EntityPlayer player, Entity target, CallbackInfoReturnable<Boolean> cir) {
         if (!Skytils.config.prioritizeItemAbilities || !Utils.inSkyblock || Utils.inDungeons) return;
         ItemStack item = player.getHeldItem();
-        if (item != null) {
+        if (item != null && !(target instanceof EntityArmorStand)) {
             if (ItemUtil.hasRightClickAbility(item)) {
                 cir.setReturnValue(false);
             }
