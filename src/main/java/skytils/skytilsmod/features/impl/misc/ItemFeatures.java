@@ -150,6 +150,9 @@ public class ItemFeatures {
             if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
                 event.setCanceled(true);
             }
+            if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
+                event.setCanceled(true);
+            }
         } else if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             ArrayList<Block> interactables = new ArrayList<>(Arrays.asList(
                     Blocks.acacia_door,
@@ -194,6 +197,9 @@ public class ItemFeatures {
             }
             if (!interactables.contains(block)) {
                 if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
+                    event.setCanceled(true);
+                }
+                if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
                     event.setCanceled(true);
                 }
             }

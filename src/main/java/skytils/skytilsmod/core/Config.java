@@ -147,7 +147,6 @@ public class Config extends Vigilant {
     )
     public boolean showNextBlaze = false;
 
-
     @Property(
             type = PropertyType.SWITCH,
             name = "Boulder Solver",
@@ -363,6 +362,15 @@ public class Config extends Vigilant {
             subcategory = "Items"
     )
     public boolean blockUselessZombieSword = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Block Giant's Slam",
+            description = "Prevents you from using the Giant's Sword ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean blockGiantsSlam = false;
 
     @Property(
             type = PropertyType.SWITCH,
