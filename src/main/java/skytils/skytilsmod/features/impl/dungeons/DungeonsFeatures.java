@@ -22,7 +22,6 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -97,7 +96,7 @@ public class DungeonsFeatures {
                 String displayName = ((ContainerChest) containerChest).getLowerChestInventory().getDisplayName().getUnformattedText().trim();
                 int chestSize = inventory.inventorySlots.inventorySlots.size();
 
-                if (Skytils.config.spiritLeapNames && Utils.inDungeons && displayName.equals("Spirit Leap")) {
+                if (Utils.inDungeons && ((Skytils.config.spiritLeapNames && displayName.equals("Spirit Leap")) || (Skytils.config.reviveStoneNames && displayName.equals("Revive A Teammate")))) {
                     int people = 0;
                     for (Slot slot : invSlots) {
                         if (slot.inventory == mc.thePlayer.inventory) continue;
@@ -119,11 +118,14 @@ public class DungeonsFeatures {
                                     y += 20;
                                 }
 
-                                String text = fr.trimStringToWidth(name, 32);
+                                Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
+                                Matcher matcher = player_pattern.matcher(StringUtils.stripControlCodes(name));
+                                if (!matcher.find()) continue;
+                                String text = fr.trimStringToWidth(name.substring(0, 2) + matcher.group(1), 32);
                                 x -= fr.getStringWidth(text) / 2;
 
                                 boolean shouldDrawBkg = true;
-                                if (Skytils.usingNEU) {
+                                if (Skytils.usingNEU && !displayName.equals("Revive A Teammate")) {
                                     try {
                                         Class<?> neuClass = Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates");
                                         Field neuInstance = neuClass.getDeclaredField("INSTANCE");
