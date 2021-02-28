@@ -39,7 +39,7 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.8-pre5";
+    public static final String VERSION = "0.0.8";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
