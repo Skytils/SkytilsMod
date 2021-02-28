@@ -350,6 +350,11 @@ public class RenderUtil {
         }
     }
 
+    /**
+     * Taken from Skyblockcatia under MIT License
+     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+     * @author SteveKunG
+     */
     private static void renderRarity(int xPos, int yPos, ItemRarity rarity) {
         if (rarity != null) {
             float alpha = Skytils.config.itemRarityOpacity / 100.0F;

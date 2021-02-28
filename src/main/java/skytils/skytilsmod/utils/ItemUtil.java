@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 public class ItemUtil {
     private static final Pattern RARITY_PATTERN = Pattern.compile("(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)");
+    private static final Pattern PET_PATTERN = Pattern.compile("\\u00a77\\[Lvl \\d+\\] (?<color>\\u00a7[0-9a-fk-or]).+");
     public static final int NBT_INTEGER = 3;
     public static final int NBT_STRING = 8;
     public static final int NBT_LIST = 9;
@@ -115,7 +116,7 @@ public class ItemUtil {
 
     /**
      * Returns the rarity of a given Skyblock item
-     *
+     * Modified
      * @author BiscuitDevelopment
      * @param item the Skyblock item to check
      * @return the rarity of the item if a valid rarity is found, {@code INVALID} if no rarity is found, {@code null} if item is {@code null}
@@ -132,12 +133,14 @@ public class ItemUtil {
         }
 
         NBTTagList lore = display.getTagList("Lore", Constants.NBT.TAG_STRING);
+        String name = display.getString("Name");
 
         // Determine the item's rarity
         for (int i = 0; i < lore.tagCount(); i++) {
             String currentLine = lore.getStringTagAt(i);
 
             Matcher rarityMatcher = RARITY_PATTERN.matcher(currentLine);
+            Matcher petRarityMatcher = PET_PATTERN.matcher(name);
             if (rarityMatcher.find()) {
                 String rarity = rarityMatcher.group("rarity");
 
@@ -146,6 +149,10 @@ public class ItemUtil {
                         return itemRarity;
                     }
                 }
+            } else if (petRarityMatcher.find()) {
+                String color = petRarityMatcher.group("color");
+
+                return ItemRarity.byBaseColor(color);
             }
         }
 

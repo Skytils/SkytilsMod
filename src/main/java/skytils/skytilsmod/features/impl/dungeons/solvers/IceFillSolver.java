@@ -1,7 +1,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonObject;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -249,6 +248,11 @@ public class IceFillSolver {
             }
         }
 
+        /**
+         * Take from Techie delight
+         * Modified
+         * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
+         */
         private void getPaths(Graph g, BlockPos v, Map<BlockPos, Boolean> visited, List<BlockPos> path, int N) {
             if (path.size() == N) {
                 List<BlockPos> newPath = ImmutableList.copyOf(path);
@@ -278,6 +282,11 @@ public class IceFillSolver {
         }
     }
 
+    /**
+     * Take from Techie delight
+     * Modified
+     * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
+     */
     private class Move {
         BlockPos source, dest;
 
@@ -306,6 +315,11 @@ public class IceFillSolver {
         }
     }
 
+    /**
+     * Take from Techie delight
+     * Modified
+     * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
+     */
     class Graph {
         Map<BlockPos, List<BlockPos>> adjList;
 

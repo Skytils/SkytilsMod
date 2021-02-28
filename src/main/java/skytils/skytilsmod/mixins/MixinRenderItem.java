@@ -26,6 +26,12 @@ public abstract class MixinRenderItem {
 
     @Shadow protected abstract void renderModel(IBakedModel model, int color);
 
+    /**
+     * Taken from Skyblockcatia under MIT License
+     * Modified
+     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+     * @author SteveKunG
+     */
     @Inject(method = "renderItemIntoGUI(Lnet/minecraft/item/ItemStack;II)V", at = @At("HEAD"))
     private void renderRarity(ItemStack itemStack, int xPosition, int yPosition, CallbackInfo info)
     {

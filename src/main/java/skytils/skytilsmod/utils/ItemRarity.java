@@ -6,6 +6,12 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * Taken from Skyblockcatia under MIT License
+ * Modified
+ * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+ * @author SteveKunG
+ */
 public enum ItemRarity {
     COMMON("COMMON", EnumChatFormatting.WHITE, new Color(255,255,255)),
     UNCOMMON("UNCOMMON", EnumChatFormatting.GREEN, new Color(85,255,85)),
