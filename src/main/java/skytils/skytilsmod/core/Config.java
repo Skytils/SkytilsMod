@@ -122,6 +122,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Hidden Shadow Assassins",
+            description = "Make Shadow Assassins in dungeons visible.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean showHiddenShadowAssassins = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Blaze Solver",
             description = "Changes the color of the blaze to shoot on Higher or Lower.",
             category = "Dungeons",
@@ -137,7 +146,6 @@ public class Config extends Vigilant {
             subcategory = "Solvers"
     )
     public boolean showNextBlaze = false;
-
 
     @Property(
             type = PropertyType.SWITCH,
@@ -357,6 +365,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Block Giant's Slam",
+            description = "Prevents you from using the Giant's Sword ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean blockGiantsSlam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Compact Item Stars",
             description = "Shortens item names with stars in them.",
             category = "Miscellaneous",
@@ -501,6 +518,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideLightning = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Highlight Salvageable Items",
+            description = "Highlights items that can be salvaged.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean highlightSalvageableItems = false;
 
     @Property(
             type = PropertyType.SWITCH,

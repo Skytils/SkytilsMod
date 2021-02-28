@@ -110,6 +110,7 @@ public class RenderUtil {
      */
     public static void drawFilledBoundingBox(AxisAlignedBB aabb, Color c, float alphaMultiplier) {
         GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.disableTexture2D();
 
@@ -165,7 +166,7 @@ public class RenderUtil {
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
-        GlStateManager.enableBlend();
+        GlStateManager.disableBlend();
     }
 
     /**
@@ -173,7 +174,7 @@ public class RenderUtil {
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
      * @author bowser0000
      */
-    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int colour) {
+    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int color) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         int guiLeft = (sr.getScaledWidth() - 176) / 2;
         int guiTop = (sr.getScaledHeight() - 222) / 2;
@@ -183,7 +184,7 @@ public class RenderUtil {
         if (size != 90) y += (6 - (size - 36) / 9) * 9;
 
         GL11.glTranslated(0, 0, 10);
-        Gui.drawRect(x, y, x + 16, y + 16, colour);
+        Gui.drawRect(x, y, x + 16, y + 16, color);
         GL11.glTranslated(0, 0, -10);
     }
 
@@ -205,6 +206,7 @@ public class RenderUtil {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
         GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
@@ -245,6 +247,7 @@ public class RenderUtil {
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f);
         GlStateManager.scale(-f1, -f1, -f1);
         GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         mc.fontRendererObj.drawString(text, -width, 0, color.getRGB());
         GlStateManager.disableBlend();

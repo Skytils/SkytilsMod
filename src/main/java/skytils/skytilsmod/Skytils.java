@@ -31,6 +31,7 @@ import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.8-pre4";
+    public static final String VERSION = "0.0.8-pre5";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -47,10 +48,10 @@ public class Skytils {
 
     public static int ticks = 0;
 
-    public static ArrayList<String> sendMessageQueue = new ArrayList<>();
+    public static ArrayDeque<String> sendMessageQueue = new ArrayDeque<>();
     private static long lastChatMessage = 0;
-    public static boolean usingNEU = false;
     public static boolean usingLabymod = false;
+    public static boolean usingNEU = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -106,6 +107,7 @@ public class Skytils {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         usingLabymod = Loader.isModLoaded("labymod");
+        usingNEU = Loader.isModLoaded("notenoughupdates");
 
         if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
             ClientCommandHandler.instance.registerCommand(new RepartyCommand());
@@ -125,7 +127,6 @@ public class Skytils {
                 }
             }
         }
-        if (Loader.isModLoaded("notenoughupdates")) usingNEU = true;
     }
 
     @SubscribeEvent
@@ -135,7 +136,7 @@ public class Skytils {
         ScreenRenderer.refresh();
 
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(sendMessageQueue.remove(0));
+            mc.thePlayer.sendChatMessage(sendMessageQueue.pollFirst());
         }
 
         if (ticks % 20 == 0) {

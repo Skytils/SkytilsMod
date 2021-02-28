@@ -54,6 +54,7 @@ public class SpamHider {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
+        if (event.type == 2) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
         String formatted = event.message.getFormattedText();
 
@@ -143,7 +144,7 @@ public class SpamHider {
         }
 
         // Giant Sword
-        if (unformatted.contains("§r§7Your Giant's Sword hit ")) {
+        if (formatted.contains("§r§7Your Giant's Sword hit ")) {
             switch (Skytils.config.giantSwordHider) {
                 case 1:
                     event.setCanceled(true);

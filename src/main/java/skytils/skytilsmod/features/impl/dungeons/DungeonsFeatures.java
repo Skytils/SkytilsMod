@@ -8,6 +8,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -58,9 +59,18 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-            if (Skytils.config.showHiddenFels && event.entity.isInvisible() && event.entity instanceof EntityEnderman) {
-                event.entity.setInvisible(false);
+            if (event.entity.isInvisible()) {
+                if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+                    event.entity.setInvisible(false);
+                }
+
+                if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
+                    if (event.entity.getName().contains("Shadow Assassin")) {
+                        event.entity.setInvisible(false);
+                    }
+                }
             }
+
             if (Skytils.config.hideWitherMinerNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
                 String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
                 if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {

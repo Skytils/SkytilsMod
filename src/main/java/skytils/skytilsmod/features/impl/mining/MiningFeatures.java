@@ -148,9 +148,7 @@ public class MiningFeatures {
         if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
             if (Skytils.config.showGhostHealth && event.entity instanceof EntityCreeper) {
                 String healthText = String.format("\u00a7cGhost \u00a7a%s\u00a7f/\u00a7a1M\u00a7c ❤", NumberUtil.format((long) event.entity.getHealth()));
-                GlStateManager.disableLighting();
                 RenderUtil.draw3DString(new Vec3(event.entity.getPosition().add(0, event.entity.getEyeHeight() + 0.5, 0)), healthText, new Color(255, 255, 255), 1f);
-                GlStateManager.enableLighting();
             }
         }
     }
