@@ -457,6 +457,25 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Item Rarity",
+            description = "Shows the rarity of an item in the color",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showItemRarity = false;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Item Rarity Opacity",
+            description = "How opaque the rarity color will be",
+            category = "Miscellaneous",
+            subcategory = "Items",
+            max = 100
+    )
+    public int itemRarityOpacity = 75;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Only Collect Enchanted Items",
             description = "Prevents you from collecting unenchanted items from minions if there is a Super Compactor.",
             category = "Miscellaneous",

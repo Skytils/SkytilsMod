@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
+import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
@@ -24,6 +25,14 @@ import java.awt.*;
 public abstract class MixinRenderItem {
 
     @Shadow protected abstract void renderModel(IBakedModel model, int color);
+
+    @Inject(method = "renderItemIntoGUI(Lnet/minecraft/item/ItemStack;II)V", at = @At("HEAD"))
+    private void renderRarity(ItemStack itemStack, int xPosition, int yPosition, CallbackInfo info)
+    {
+        if (Skytils.config.showItemRarity) {
+            RenderUtil.renderRarity(itemStack, xPosition, yPosition);
+        }
+    }
 
     @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
     private void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {

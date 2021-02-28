@@ -11,13 +11,16 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
+import skytils.skytilsmod.Skytils;
 
 import java.awt.*;
 
 public class RenderUtil {
 
+    private static final ResourceLocation RARITY = new ResourceLocation("skytils:gui/rarity.png");
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
 
     /**
@@ -341,5 +344,28 @@ public class RenderUtil {
         GlStateManager.popMatrix();
     }
 
+    public static void renderRarity(ItemStack itemStack, int xPos, int yPos) {
+        if (itemStack != null) {
+            renderRarity(xPos, yPos, ItemUtil.getRarity(itemStack));
+        }
+    }
 
+    private static void renderRarity(int xPos, int yPos, ItemRarity rarity) {
+        if (rarity != null) {
+            float alpha = Skytils.config.itemRarityOpacity / 100.0F;
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            GlStateManager.enableBlend();
+            GlStateManager.enableAlpha();
+            Minecraft.getMinecraft().getTextureManager().bindTexture(RARITY);
+            GlStateManager.color(rarity.getColor().getRed() / 255.0F, rarity.getColor().getGreen() / 255.0F, rarity.getColor().getBlue() / 255.0F, alpha);
+            GlStateManager.blendFunc(770, 771);
+            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND);
+            Gui.drawModalRectWithCustomSizedTexture(xPos, yPos, 0, 0, 16, 16, 16, 16);
+            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+            GlStateManager.disableAlpha();
+        }
+    }
 }
