@@ -79,7 +79,6 @@ public class Config extends Vigilant {
             type = PropertyType.SWITCH,
             name = "Auto Copy Fails to Clipboard",
             description = "Copies deaths and fails in dungeons to your clipboard.",
-
             category = "Dungeons",
             subcategory = "Miscellaneous"
     )
@@ -840,7 +839,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
-
             name = "Out of mana Hider",
             description = "Removes out of mana messages from your chat.",
             category = "Spam",
