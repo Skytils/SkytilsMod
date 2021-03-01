@@ -85,6 +85,24 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Floor 4 Crowd Messages",
+            description = "Hides the messages from the Crowd on Floor 4.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideF4Spam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Spirit Animal Nametags",
+            description = "Removes the nametags above spirit animals on Floor 4.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideF4Nametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Terminal Completion Titles",
             description = "Removes the title that shows up when a terminal is completed.",
             category = "Dungeons",
@@ -95,29 +113,11 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Hide Wither Miner Nametags",
-            description = "Removes the nametags above Wither Miners in Floor 7.",
+            description = "Removes the nametags above Wither Miners on Floor 7.",
             category = "Dungeons",
             subcategory = "Quality of Life"
     )
     public boolean hideWitherMinerNametags = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide F4 Spam",
-            description = "Hides the messages from the Crowd in the F4 Boss",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideF4Spam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide F4 Nametags",
-            description = "Hides the nametags in the F4 Boss",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideF4Nametags = false;
 
     @Property(
             type = PropertyType.SWITCH,
