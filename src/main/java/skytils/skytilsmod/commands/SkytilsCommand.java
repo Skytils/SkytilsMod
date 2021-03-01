@@ -110,15 +110,20 @@ public class SkytilsCommand extends CommandBase {
                 }
             case "help":
                 if (args.length == 1) {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Skytils" + " Version " + Skytils.VERSION + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils" + EnumChatFormatting.AQUA + " - Opens the main GUI" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils help" + EnumChatFormatting.AQUA + " - Returns this message" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils setkey <key>" + EnumChatFormatting.AQUA + " - Sets your API key" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils griffin refresh" + EnumChatFormatting.AQUA + " - Forces a refresh for the Griffin Burrow waypoints" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils reload <aliases/data>" + EnumChatFormatting.AQUA + " - Forces Skytils to re-fetch your command aliases or solutions from the data repository." + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils editlocations" + EnumChatFormatting.AQUA + " - [WIP] Opens the location editing gui" + "\n" +
-                            EnumChatFormatting.GOLD + "/reparty" + EnumChatFormatting.AQUA + " - Disbands and sends a party invite to everyone who was in your party." + "\n" +
-                            EnumChatFormatting.GOLD + "/armorcolor <set/clear/clearall>" + EnumChatFormatting.AQUA + " - Changes the color of an armor piece to the hexcode or decimal color provided. (Alias is /armourcolour)"));
+                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.BLUE + "➜ Skytils Commands and Info" + "\n" +
+                            " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
+                            " §2§l ❣ §7§oThe current mod version is §f§o"+ Skytils.VERSION + "§7§o." + "\n" +
+                            "§9§l➜ Setup:" + "\n" +
+                            " §3/Skytils §l➡ §bOpens the main mod configuration GUI." + "\n" +
+                            " §3/Skytils Setkey §l➡ §bSets your Hypixel API key." + "\n" +
+                            " §3/Skytils Help §l➡ §bShows this help menu." + "\n" +
+                            " §3/Skytils Reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +
+                            " §3/Skytils Editlocations §l➡ §bOpens the location editing GUI." + "\n" +
+                            " §3/Skytils Aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
+                            "§9§l➜ Miscellaneous:" + "\n" +
+                            " §3/Skytils Griffin Refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
+                            " §3/Reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
+                            "§3/Armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)"));
                     return;
                 }
                 break;
