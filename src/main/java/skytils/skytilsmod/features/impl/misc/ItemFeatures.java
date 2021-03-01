@@ -310,6 +310,7 @@ public class ItemFeatures {
             Skytils.GUIMANAGER.registerElement(this);
         }
 
+        @Override
         public void render() {
             EntityPlayerSP player = mc.thePlayer;
             if (this.getToggled() && Utils.inSkyblock && player != null) {
@@ -334,18 +335,22 @@ public class ItemFeatures {
             }
         }
 
+        @Override
         public void demoRender() {
             ScreenRenderer.fontRenderer.drawString("\u00a7cSoul Strength: \u00a7a1000", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
+        @Override
         public int getHeight() {
             return ScreenRenderer.fontRenderer.FONT_HEIGHT;
         }
 
+        @Override
         public int getWidth() {
             return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cSoul Strength: \u00a7a1000");
         }
 
+        @Override
         public boolean getToggled() {
             return Skytils.config.showSoulEaterBonus;
         }
