@@ -8,6 +8,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -21,7 +22,6 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -52,18 +52,35 @@ public class DungeonsFeatures {
                 mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
             }
         }
+        if (Utils.inDungeons && Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
+            event.setCanceled(true);
     }
     
     // Show hidden fels
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-            if (Skytils.config.showHiddenFels && event.entity.isInvisible() && event.entity instanceof EntityEnderman) {
-                event.entity.setInvisible(false);
+            if (event.entity.isInvisible()) {
+                if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+                    event.entity.setInvisible(false);
+                }
+
+                if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
+                    if (event.entity.getName().contains("Shadow Assassin")) {
+                        event.entity.setInvisible(false);
+                    }
+                }
             }
+
             if (Skytils.config.hideWitherMinerNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
                 String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
                 if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                    mc.theWorld.removeEntity(event.entity);
+                }
+            }
+            if (Skytils.config.hideF4Nametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
                     mc.theWorld.removeEntity(event.entity);
                 }
             }
@@ -87,7 +104,7 @@ public class DungeonsFeatures {
                 String displayName = ((ContainerChest) containerChest).getLowerChestInventory().getDisplayName().getUnformattedText().trim();
                 int chestSize = inventory.inventorySlots.inventorySlots.size();
 
-                if (Skytils.config.spiritLeapNames && Utils.inDungeons && displayName.equals("Spirit Leap")) {
+                if (Utils.inDungeons && ((Skytils.config.spiritLeapNames && displayName.equals("Spirit Leap")) || (Skytils.config.reviveStoneNames && displayName.equals("Revive A Teammate")))) {
                     int people = 0;
                     for (Slot slot : invSlots) {
                         if (slot.inventory == mc.thePlayer.inventory) continue;
@@ -109,11 +126,14 @@ public class DungeonsFeatures {
                                     y += 20;
                                 }
 
-                                String text = fr.trimStringToWidth(name, 32);
+                                Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
+                                Matcher matcher = player_pattern.matcher(StringUtils.stripControlCodes(name));
+                                if (!matcher.find()) continue;
+                                String text = fr.trimStringToWidth(name.substring(0, 2) + matcher.group(1), 32);
                                 x -= fr.getStringWidth(text) / 2;
 
                                 boolean shouldDrawBkg = true;
-                                if (Skytils.usingNEU) {
+                                if (Skytils.usingNEU && !displayName.equals("Revive A Teammate")) {
                                     try {
                                         Class<?> neuClass = Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates");
                                         Field neuInstance = neuClass.getDeclaredField("INSTANCE");
@@ -164,6 +184,7 @@ public class DungeonsFeatures {
 
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
+        if (!Utils.inSkyblock) return;
         if (event.packet instanceof S45PacketTitle) {
             S45PacketTitle packet = (S45PacketTitle) event.packet;
             if (packet.getMessage() != null && mc.thePlayer != null) {
@@ -171,7 +192,6 @@ public class DungeonsFeatures {
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.getName()) &&(unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
-
             }
         }
     }

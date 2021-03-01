@@ -11,13 +11,16 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
+import skytils.skytilsmod.Skytils;
 
 import java.awt.*;
 
 public class RenderUtil {
 
+    private static final ResourceLocation RARITY = new ResourceLocation("skytils:gui/rarity.png");
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
 
     /**
@@ -110,6 +113,7 @@ public class RenderUtil {
      */
     public static void drawFilledBoundingBox(AxisAlignedBB aabb, Color c, float alphaMultiplier) {
         GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.disableTexture2D();
 
@@ -165,7 +169,7 @@ public class RenderUtil {
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
-        GlStateManager.enableBlend();
+        GlStateManager.disableBlend();
     }
 
     /**
@@ -173,7 +177,7 @@ public class RenderUtil {
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
      * @author bowser0000
      */
-    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int colour) {
+    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int color) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         int guiLeft = (sr.getScaledWidth() - 176) / 2;
         int guiTop = (sr.getScaledHeight() - 222) / 2;
@@ -183,7 +187,7 @@ public class RenderUtil {
         if (size != 90) y += (6 - (size - 36) / 9) * 9;
 
         GL11.glTranslated(0, 0, 10);
-        Gui.drawRect(x, y, x + 16, y + 16, colour);
+        Gui.drawRect(x, y, x + 16, y + 16, color);
         GL11.glTranslated(0, 0, -10);
     }
 
@@ -205,6 +209,7 @@ public class RenderUtil {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
         GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
@@ -245,6 +250,7 @@ public class RenderUtil {
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f);
         GlStateManager.scale(-f1, -f1, -f1);
         GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         mc.fontRendererObj.drawString(text, -width, 0, color.getRGB());
         GlStateManager.disableBlend();
@@ -338,5 +344,33 @@ public class RenderUtil {
         GlStateManager.popMatrix();
     }
 
+    public static void renderRarity(ItemStack itemStack, int xPos, int yPos) {
+        if (itemStack != null) {
+            renderRarity(xPos, yPos, ItemUtil.getRarity(itemStack));
+        }
+    }
 
+    /**
+     * Taken from Skyblockcatia under MIT License
+     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+     * @author SteveKunG
+     */
+    private static void renderRarity(int xPos, int yPos, ItemRarity rarity) {
+        if (rarity != null) {
+            float alpha = Skytils.config.itemRarityOpacity / 100.0F;
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            GlStateManager.enableBlend();
+            GlStateManager.enableAlpha();
+            Minecraft.getMinecraft().getTextureManager().bindTexture(RARITY);
+            GlStateManager.color(rarity.getColor().getRed() / 255.0F, rarity.getColor().getGreen() / 255.0F, rarity.getColor().getBlue() / 255.0F, alpha);
+            GlStateManager.blendFunc(770, 771);
+            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND);
+            Gui.drawModalRectWithCustomSizedTexture(xPos, yPos, 0, 0, 16, 16, 16, 16);
+            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+            GlStateManager.disableAlpha();
+        }
+    }
 }

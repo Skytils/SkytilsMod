@@ -11,6 +11,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.core.LocationEditGui;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.misc.CommandAliases;
 import skytils.skytilsmod.utils.APIUtil;
@@ -78,6 +79,7 @@ public class SkytilsCommand extends CommandBase {
                     String action = args[1].toLowerCase(Locale.ENGLISH);
                     switch (action) {
                         case "refresh":
+                            GriffinBurrows.particleBurrows.removeIf(pb -> !pb.dug);
                             GriffinBurrows.burrows.clear();
                             GriffinBurrows.burrowRefreshTimer.reset();
                             GriffinBurrows.shouldRefreshBurrows = true;
@@ -113,10 +115,14 @@ public class SkytilsCommand extends CommandBase {
                             EnumChatFormatting.GOLD + " /skytils setkey <key>" + EnumChatFormatting.AQUA + " - Sets your API key" + "\n" +
                             EnumChatFormatting.GOLD + " /skytils griffin refresh" + EnumChatFormatting.AQUA + " - Forces a refresh for the Griffin Burrow waypoints" + "\n" +
                             EnumChatFormatting.GOLD + " /skytils reload <aliases/data>" + EnumChatFormatting.AQUA + " - Forces Skytils to re-fetch your command aliases or solutions from the data repository." + "\n" +
+                            EnumChatFormatting.GOLD + " /skytils editlocations" + EnumChatFormatting.AQUA + " - [WIP] Opens the location editing gui" + "\n" +
                             EnumChatFormatting.GOLD + "/reparty" + EnumChatFormatting.AQUA + " - Disbands and sends a party invite to everyone who was in your party." + "\n" +
                             EnumChatFormatting.GOLD + "/armorcolor <set/clear/clearall>" + EnumChatFormatting.AQUA + " - Changes the color of an armor piece to the hexcode or decimal color provided. (Alias is /armourcolour)"));
                     return;
                 }
+                break;
+            case "editlocations":
+                ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
                 break;
             default:
                 player.addChatMessage(new ChatComponentText("/" + getCommandName()));

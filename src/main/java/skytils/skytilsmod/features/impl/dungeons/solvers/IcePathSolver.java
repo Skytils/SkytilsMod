@@ -41,12 +41,12 @@ public class IcePathSolver {
 
         if (!Skytils.config.icePathSolver) return;
 
-        if (ticks % 20 == 0) {
-            new Thread(() -> {
-                List<EntitySilverfish> silverfish = mc.theWorld.getEntities(EntitySilverfish.class, s -> mc.thePlayer.getDistanceToEntity(s) < 20);
-                if (silverfish.size() > 0) {
-                    IcePathSolver.silverfish = silverfish.get(0);
-                    if (silverfishChestPos == null || roomFacing == null) {
+        List<EntitySilverfish> silverfish = mc.theWorld.getEntities(EntitySilverfish.class, s -> mc.thePlayer.getDistanceToEntity(s) < 20);
+        if (silverfish.size() > 0) {
+            IcePathSolver.silverfish = silverfish.get(0);
+            if (silverfishChestPos == null || roomFacing == null) {
+                if (ticks % 20 == 0) {
+                    new Thread(() -> {
                         findChest:
                         for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.getPosition(), 25, 67)) {
                             IBlockState block = mc.theWorld.getBlockState(pos);
@@ -61,17 +61,18 @@ public class IcePathSolver {
                                 }
                             }
                         }
-                    } else if (grid == null) {
-                        grid = getLayout();
-                        silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
-                        steps.clear();
-                        if (silverfishPos != null) {
-                            steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
-                        }
-                    }
+
+                    }).start();
+                    ticks = 0;
                 }
-            }).start();
-            ticks = 0;
+            } else if (grid == null) {
+                grid = getLayout();
+                silverfishPos = getGridPointFromPos(IcePathSolver.silverfish.getPosition());
+                steps.clear();
+                if (silverfishPos != null) {
+                    steps.addAll(solve(grid, silverfishPos.x, silverfishPos.y, 9, 0));
+                }
+            }
         }
 
         if (IcePathSolver.silverfish != null && grid != null) {

@@ -2,7 +2,6 @@ package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -55,9 +54,10 @@ public class SpamHider {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
+        if (event.type == 2) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-        
-        
+        String formatted = event.message.getFormattedText();
+
         // Hide Mort Messages
         if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
             switch (Skytils.config.hideMortMessages) {
@@ -65,7 +65,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -73,13 +73,13 @@ public class SpamHider {
         }
 
         // Hide Boss Messages
-        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher") || unformatted.startsWith("[CROWD]")) {
+        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher")) {
             switch (Skytils.config.hideBossMessages) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -94,7 +94,21 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+
+        //No enemies nearby
+        if (unformatted.contains("There are no enemies nearby!")) {
+            switch (Skytils.config.hideNoEnemiesNearby) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -102,13 +116,13 @@ public class SpamHider {
         }
 
         // Implosion
-        if (unformatted.contains("Your Implosion hit ")) {
+        if (formatted.contains("§r§7Your Implosion hit ")) {
             switch(Skytils.config.implosionHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -116,13 +130,13 @@ public class SpamHider {
         }
 
         // Midas Staff
-        if (unformatted.contains("Your Molten Wave hit ")) {
+        if (formatted.contains("§r§7Your Molten Wave hit ")) {
             switch (Skytils.config.midasStaffHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -130,13 +144,13 @@ public class SpamHider {
         }
 
         // Spirit Sceptre
-        if (unformatted.contains("Your Spirit Sceptre hit ")) {
+        if (formatted.contains("§r§7Your Spirit Sceptre hit ")) {
             switch (Skytils.config.spiritSceptreHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -144,13 +158,13 @@ public class SpamHider {
         }
 
         // Giant Sword
-        if (unformatted.contains("Your Giant's Sword hit ")) {
+        if (formatted.contains("§r§7Your Giant's Sword hit ")) {
             switch (Skytils.config.giantSwordHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -158,13 +172,13 @@ public class SpamHider {
         }
 
         // Livid Dagger
-        if (unformatted.contains("Your Livid Dagger hit ")) {
+        if (formatted.contains("§r§7Your Livid Dagger hit")) {
             switch (Skytils.config.lividHider) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -172,7 +186,7 @@ public class SpamHider {
         }
 
         // Blessings
-        if (unformatted.contains("DUNGEON BUFF!")) {
+        if (formatted.contains("§r§6§lDUNGEON BUFF!")) {
             switch (Skytils.config.blessingHider) {
                 case 1:
                     event.setCanceled(true);
@@ -215,7 +229,7 @@ public class SpamHider {
 
         // Keys
         // Wither
-        if (unformatted.contains("Wither Key") && Utils.inDungeons) {
+        if (formatted.contains("§r§8Wither Key") && Utils.inDungeons) {
             switch (Skytils.config.witherKeyHider) {
                 case 1:
                     event.setCanceled(true);
@@ -229,13 +243,13 @@ public class SpamHider {
                     if (unformatted.contains("was picked up")) {
                         GuiManager.toastGui.add(new KeyToast("wither", ""));
                     } else {
-                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f §r§ehas"));
+                        String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
                         GuiManager.toastGui.add(new KeyToast("wither", player));
                     }
                     break;
                 default:
             }
-        } else if (unformatted.contains("RIGHT CLICK on a WITHER door to open it.")) {
+        } else if (formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.")) {
             switch (Skytils.config.witherKeyHider) {
                 case 1:
                 case 2:
@@ -260,7 +274,7 @@ public class SpamHider {
                     if (unformatted.contains("was picked up")) {
                         GuiManager.toastGui.add(new KeyToast("blood", ""));
                     } else {
-                        String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f §r§ehas"));
+                        String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
                         GuiManager.toastGui.add(new KeyToast("blood", player));
                     }
                     break;
@@ -278,7 +292,7 @@ public class SpamHider {
         }
 
         // Superboom tnt
-        if (unformatted.contains("Superboom TNT!") && Utils.inDungeons) {
+        if (formatted.contains("§r§9Superboom TNT") && Utils.inDungeons) {
             switch (Skytils.config.superboomHider) {
                 case 1:
                     event.setCanceled(true);
@@ -290,8 +304,8 @@ public class SpamHider {
                 case 3:
                     event.setCanceled(true);
                     String username = Minecraft.getMinecraft().thePlayer.getName();
-                    String player = event.message.getFormattedText().substring(0,event.message.getFormattedText().indexOf("§r§f"));
-                    if (StringUtils.stripControlCodes(player.substring(player.indexOf(" "))).equals(username)) return;
+                    String player = formatted.substring(0, formatted.indexOf("§r§f"));
+                    if (!StringUtils.stripControlCodes(player.substring(player.indexOf(" ") + 1)).equals(username)) return;
                     GuiManager.toastGui.add(new SuperboomToast());
                     break;
                 default:
@@ -306,7 +320,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -320,7 +334,7 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -329,13 +343,12 @@ public class SpamHider {
 
         // Out of mana
         if (unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!")) {
-            if (unformatted.contains(":")) return;
             switch (Skytils.config.manaMessages) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -343,13 +356,13 @@ public class SpamHider {
         }
 
         //Hide Abilities
-        if (Utils.inDungeons && unformatted.contains("is now available!") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
-            switch (Skytils.config.hideAbilities) {
+        if (Utils.inDungeons && unformatted.contains("is now available!") && !unformatted.contains("Mining Speed Boost") && !unformatted.contains("Pickobulus") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
+            switch (Skytils.config.hideDungeonAbilities) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -358,12 +371,12 @@ public class SpamHider {
 
         // Hide Dungeon Countdown / Ready messages
         if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")) {
-            switch (Skytils.config.hideCountdownAndReady) {
+            switch (Skytils.config.hideDungeonCountdownAndReady) {
                 case 1:
                     event.setCanceled(true);
                     break;
                 case 2:
-                    newMessage(event.message.getFormattedText());
+                    newMessage(formatted);
                     event.setCanceled(true);
                     break;
                 default:
@@ -391,7 +404,7 @@ public class SpamHider {
         static long lastTimeRender = new Date().getTime();
 
         public SpamGuiElement() {
-            super("Spam Gui", 1.0F, new FloatPair(0.8F, 0.7F));
+            super("Spam Gui", 1.0F, new FloatPair(0.65F, 0.925F));
             Skytils.GUIMANAGER.registerElement(this);
         }
 
@@ -406,8 +419,6 @@ public class SpamHider {
 
             long timePassed = now - lastTimeRender;
             ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-            int width = sr.getScaledWidth();
-            int height = sr.getScaledHeight();
 
             double animDiv = (double) timePassed / 1000.0;
             lastTimeRender = now;
@@ -418,10 +429,13 @@ public class SpamHider {
                 SpamMessage message = spamMessages.get(i);
                 int messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(StringUtils.stripControlCodes(message.message));
 
-                double x;
-                double y;
-                x = width - 20 - messageWidth;
-                message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
+                double x= this.getActualX();
+                double y = 0;
+                if (this.getActualY() > sr.getScaledHeight() / 2) {
+                    message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
+                } else if (this.getActualY() < sr.getScaledHeight() / 2) {
+                    message.height = (message.height + ((i * -10) - message.height) * (animDiv * 5));
+                }
 
                 double animOnOff = 0;
                 if (message.time < 500) {
@@ -441,8 +455,12 @@ public class SpamHider {
                 animOnOff *= -1;
                 animOnOff += 1;
 
-                x += (animOnOff * (messageWidth + 30));
-                y = height - 30 - (message.height);
+                if (x < sr.getScaledWidth() / 2) {
+                    x += ((animOnOff * -1) * (messageWidth + 30));
+                } else {
+                    x += (animOnOff * (messageWidth + 30));
+                }
+                y = this.getActualY() - (message.height);
 
                 SmartFontRenderer.TextShadow shadow;
                 switch (Skytils.config.spamShadow) {
@@ -458,7 +476,7 @@ public class SpamHider {
 
                 ScreenRenderer.fontRenderer.drawString(message.message, (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
 
-                if (message.time > 5000) {
+                if (message.time > 4000) {
                     spamMessages.remove(message);
                 }
 
@@ -466,6 +484,34 @@ public class SpamHider {
             }
 
             Collections.reverse(spamMessages);
+        }
+
+        public void demoRender() {
+            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+            int messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(StringUtils.stripControlCodes("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r"));
+            SmartFontRenderer.TextShadow shadow;
+            switch (Skytils.config.spamShadow) {
+                case 1:
+                    shadow = SmartFontRenderer.TextShadow.NONE;
+                    break;
+                case 2:
+                    shadow = SmartFontRenderer.TextShadow.OUTLINE;
+                    break;
+                default:
+                    shadow = SmartFontRenderer.TextShadow.NORMAL;
+            }
+
+            double x = this.getActualX()  + ((Math.sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30));
+            double y = this.getActualY();
+            ScreenRenderer.fontRenderer.drawString("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r", (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
+        }
+
+        public int getHeight() {
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+        }
+
+        public int getWidth() {
+            return ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r");
         }
 
         public boolean getToggled() {

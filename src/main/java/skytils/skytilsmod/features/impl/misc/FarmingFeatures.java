@@ -7,11 +7,14 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.DamageBlockEvent;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
@@ -68,6 +71,20 @@ public class FarmingFeatures {
                     p.playSound("note.bass", 1, 0.5f);
                     ChatComponentText notif = new ChatComponentText(EnumChatFormatting.RED + "Skytils has prevented you from breaking that block!");
                     p.addChatMessage(notif);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (event.packet instanceof S45PacketTitle) {
+            S45PacketTitle packet = (S45PacketTitle) event.packet;
+            if (packet.getMessage() != null) {
+                String unformatted = StringUtils.stripControlCodes(packet.getMessage().getUnformattedText());
+                if (Skytils.config.hideFarmingRNGTitles && unformatted.contains("DROP!")) {
+                    event.setCanceled(true);
                 }
             }
         }

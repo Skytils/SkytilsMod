@@ -1,17 +1,21 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.*;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -21,8 +25,10 @@ import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,12 +41,33 @@ public class ItemFeatures {
     private final static Minecraft mc = Minecraft.getMinecraft();
 
     @SubscribeEvent
+    public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
+        if (event.gui instanceof GuiChest) {
+            GuiChest gui = (GuiChest) event.gui;
+            ContainerChest chest = (ContainerChest) gui.inventorySlots;
+            IInventory inv = chest.getLowerChestInventory();
+            String chestName = inv.getDisplayName().getUnformattedText().trim();
+            if (chestName.startsWith("Salvage")) {
+                if (Skytils.config.highlightSalvageableItems) {
+                    for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
+                        ItemStack stack = slot.getStack();
+                        if (stack == null) continue;
+                        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(stack);
+                        if (extraAttr == null || !extraAttr.hasKey("baseStatBoostPercentage") || extraAttr.hasKey("dungeon_item_level")) continue;
+                        RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(15, 233, 233, 225).getRGB());
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inSkyblock) return;
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             IInventory inv = chest.getLowerChestInventory();
-            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            String chestName = inv.getDisplayName().getUnformattedText().trim();
             if (event.slot != null && event.slot.getHasStack()) {
                 ItemStack item = event.slot.getStack();
                 if (item == null) return;
@@ -61,7 +88,7 @@ public class ItemFeatures {
                             return;
                         }
                     }
-                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54) {
+                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
                         ItemStack sellItem = inv.getStackInSlot(49);
                         if (sellItem != null) {
                             if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
@@ -123,6 +150,9 @@ public class ItemFeatures {
             if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
                 event.setCanceled(true);
             }
+            if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
+                event.setCanceled(true);
+            }
         } else if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             ArrayList<Block> interactables = new ArrayList<>(Arrays.asList(
                     Blocks.acacia_door,
@@ -169,6 +199,9 @@ public class ItemFeatures {
                 if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
                     event.setCanceled(true);
                 }
+                if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
+                    event.setCanceled(true);
+                }
             }
         }
     }
@@ -195,7 +228,7 @@ public class ItemFeatures {
 
             if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
                 if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    boolean flag = mc.theWorld.playerEntities.stream().anyMatch(p -> {
+                    boolean flag = ImmutableList.copyOf(mc.theWorld.playerEntities).stream().anyMatch(p -> {
                         if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
                             ItemStack item = p.getHeldItem();
                             if (item != null) {

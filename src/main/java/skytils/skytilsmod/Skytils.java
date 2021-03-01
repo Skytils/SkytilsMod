@@ -19,11 +19,8 @@ import skytils.skytilsmod.core.*;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
-import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.ClickInOrderSolver;
-import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver;
-import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SimonSaysSolver;
+import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
 import skytils.skytilsmod.features.impl.misc.SpamHider;
-import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.TerminalFeatures;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
@@ -34,6 +31,7 @@ import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -41,24 +39,25 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.8-pre2";
+    public static final String VERSION = "0.0.8-pre6";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
     public static File modDir;
-    public static GuiManager GUIMANAGER = new GuiManager();
+    public static GuiManager GUIMANAGER;
 
     public static int ticks = 0;
 
-    public static ArrayList<String> sendMessageQueue = new ArrayList<>();
+    public static ArrayDeque<String> sendMessageQueue = new ArrayDeque<>();
     private static long lastChatMessage = 0;
-    public static boolean usingNEU = false;
     public static boolean usingLabymod = false;
+    public static boolean usingNEU = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         modDir = new File(event.getModConfigurationDirectory(), "skytils");
         if (!modDir.exists()) modDir.mkdirs();
+        GUIMANAGER = new GuiManager();
     }
 
     @Mod.EventHandler
@@ -97,17 +96,21 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new PetFeatures());
         MinecraftForge.EVENT_BUS.register(new SelectAllColorSolver());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
+        MinecraftForge.EVENT_BUS.register(new StartsWithSequenceSolver());
         MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
         MinecraftForge.EVENT_BUS.register(new TerminalFeatures());
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
         MinecraftForge.EVENT_BUS.register(new WaterBoardSolver());
 
+        ScreenRenderer.refresh();
+        
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         usingLabymod = Loader.isModLoaded("labymod");
+        usingNEU = Loader.isModLoaded("notenoughupdates");
 
         if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
             ClientCommandHandler.instance.registerCommand(new RepartyCommand());
@@ -127,7 +130,6 @@ public class Skytils {
                 }
             }
         }
-        if (Loader.isModLoaded("notenoughupdates")) usingNEU = true;
     }
 
     @SubscribeEvent
@@ -137,7 +139,7 @@ public class Skytils {
         ScreenRenderer.refresh();
 
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(sendMessageQueue.remove(0));
+            mc.thePlayer.sendChatMessage(sendMessageQueue.pollFirst());
         }
 
         if (ticks % 20 == 0) {

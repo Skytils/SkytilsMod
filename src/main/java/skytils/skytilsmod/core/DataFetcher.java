@@ -28,8 +28,6 @@ public class DataFetcher {
                 MiningFeatures.fetchurItems.put(solution.getKey(), solution.getValue().getAsString());
             }
 
-            IceFillSolver.iceFillData = APIUtil.getJSONResponse(dataUrl + "solvers/icefill.json");
-
             JsonArray threeWeirdosSolutions = APIUtil.getArrayResponse(dataUrl + "solvers/threeweirdos.json");
             for (JsonElement solution : threeWeirdosSolutions) {
                 ThreeWeirdosSolver.solutions.add(solution.getAsString());
@@ -44,7 +42,6 @@ public class DataFetcher {
 
     private static void clearData() {
         MiningFeatures.fetchurItems.clear();
-        IceFillSolver.iceFillData = new JsonObject();
         ThreeWeirdosSolver.solutions.clear();
         TriviaSolver.triviaSolutions.clear();
     }
