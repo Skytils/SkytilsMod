@@ -12,7 +12,7 @@ import skytils.skytilsmod.utils.Utils;
 public class MixinUtil {
     @Redirect(method = "runTask", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;fatal(Ljava/lang/String;Ljava/lang/Throwable;)V"))
     private static void interceptTaskExceptions(Logger logger, String string, Throwable exception) {
-        if (!Skytils.config.preventLogSpam || !Utils.inDungeons) {
+        if (!Skytils.config.preventLogSpam || !Utils.isOnHypixel()) {
             logger.fatal(string, exception);
         }
     }

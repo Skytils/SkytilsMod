@@ -559,7 +559,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Prevent Log Spam",
-            description = "Prevents your logs from being spammed with exceptions while in dungeons.",
+            description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
