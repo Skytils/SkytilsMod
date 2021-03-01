@@ -14,6 +14,7 @@ import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.LocationEditGui;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.misc.CommandAliases;
+import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
 
 import java.util.List;
@@ -120,6 +121,12 @@ public class SkytilsCommand extends CommandBase {
                             EnumChatFormatting.GOLD + "/armorcolor <set/clear/clearall>" + EnumChatFormatting.AQUA + " - Changes the color of an armor piece to the hexcode or decimal color provided. (Alias is /armourcolour)"));
                     return;
                 }
+                break;
+            case "aliases":
+            case "alias":
+            case "editaliases":
+            case "commandaliases":
+                ModCore.getInstance().getGuiHandler().open(new CommandAliasesGui());
                 break;
             case "editlocations":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());

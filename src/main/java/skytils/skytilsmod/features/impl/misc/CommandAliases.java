@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -23,7 +24,7 @@ public class CommandAliases {
     private static final Minecraft mc = Minecraft.getMinecraft();
 
     private static File aliasesFile;
-    private static final HashMap<String, String> aliases = new HashMap<>();
+    public static final HashMap<String, String> aliases = new HashMap<>();
 
     public CommandAliases() {
         aliasesFile = new File(Skytils.modDir, "commandaliases.json");
@@ -46,6 +47,18 @@ public class CommandAliases {
         for (Map.Entry<String, JsonElement> alias : aliasesObject.entrySet()) {
             System.out.println(String.format("Loaded alias '%s', mapped to '%s'", alias.getKey(), alias.getValue().getAsString()));
             aliases.put(alias.getKey(), alias.getValue().getAsString());
+        }
+    }
+
+    public static void saveAliases() {
+        try (FileWriter writer = new FileWriter(aliasesFile)) {
+            JsonObject obj = new JsonObject();
+            for (Map.Entry<String, String> alias : aliases.entrySet()) {
+                obj.addProperty(alias.getKey(), alias.getValue());
+            }
+            gson.toJson(obj, writer);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
