@@ -70,6 +70,7 @@ And more to come!
 - /skytils setkey <apikey> - Sets your api key (will also grab it from /api new).
 - /skytils reload <aliases/data> - Forces Skytils to re-fetch your command aliases or solutions from the data repository.
 - /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
+- /skytils editlocation - [WIP] Opens the location editing gui.
 - /armorcolor (/armourcolour) <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided.
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 

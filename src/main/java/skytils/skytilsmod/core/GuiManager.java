@@ -1,25 +1,42 @@
 package skytils.skytilsmod.core;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.utils.toasts.GuiToast;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class GuiManager {
-    private Map<Integer, GuiElement> elements = new HashMap<>();
+
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static File positionFile;
+    public static Map<String, FloatPair> GUIPOSITIONS;
+
+    private static Map<Integer, GuiElement> elements = new HashMap<>();
     private int counter = 0;
-    private Map<String, GuiElement> names = new HashMap<>();
+    private static Map<String, GuiElement> names = new HashMap<>();
     public static GuiToast toastGui = new GuiToast(Minecraft.getMinecraft());
+
+    public GuiManager() {
+        positionFile  = new File(Skytils.modDir, "guipositions.json");
+        GUIPOSITIONS = new HashMap<>();
+        readConfig();
+    }
 
     public boolean registerElement(GuiElement e) {
         try {
@@ -51,6 +68,38 @@ public class GuiManager {
 
     public Map<Integer,GuiElement> getElements() {
         return this.elements;
+    }
+
+    public static void readConfig() {
+        JsonObject file;
+        try (FileReader in = new FileReader(positionFile)) {
+            file = gson.fromJson(in, JsonObject.class);
+            for (Map.Entry<String, JsonElement> e : file.entrySet()) {
+                try {
+                    GUIPOSITIONS.put(e.getKey(), new FloatPair(e.getValue().getAsJsonObject().get("x").getAsJsonObject().get("value").getAsFloat(), e.getValue().getAsJsonObject().get("y").getAsJsonObject().get("value").getAsFloat()));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            GUIPOSITIONS = new HashMap<>();
+            try (FileWriter writer = new FileWriter(positionFile)) {
+                gson.toJson(GUIPOSITIONS, writer);
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    public static void saveConfig() {
+        for (Map.Entry<String, GuiElement> e : names.entrySet()) {
+            GUIPOSITIONS.put(e.getKey(), e.getValue().getPos());
+        }
+        try (FileWriter writer = new FileWriter(positionFile)) {
+            gson.toJson(GUIPOSITIONS, writer);
+        } catch (Exception ignored) {
+
+        }
     }
 
     @SubscribeEvent

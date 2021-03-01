@@ -390,7 +390,7 @@ public class SpamHider {
         static long lastTimeRender = new Date().getTime();
 
         public SpamGuiElement() {
-            super("Spam Gui", 1.0F, new FloatPair(0.8F, 0.7F));
+            super("Spam Gui", 1.0F, new FloatPair(0.65F, 0.925F));
             Skytils.GUIMANAGER.registerElement(this);
         }
 
@@ -405,8 +405,6 @@ public class SpamHider {
 
             long timePassed = now - lastTimeRender;
             ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-            int width = sr.getScaledWidth();
-            int height = sr.getScaledHeight();
 
             double animDiv = (double) timePassed / 1000.0;
             lastTimeRender = now;
@@ -417,10 +415,13 @@ public class SpamHider {
                 SpamMessage message = spamMessages.get(i);
                 int messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(StringUtils.stripControlCodes(message.message));
 
-                double x;
-                double y;
-                x = width - 20 - messageWidth;
-                message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
+                double x= this.getActualX();
+                double y = 0;
+                if (this.getActualY() > sr.getScaledHeight() / 2) {
+                    message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
+                } else if (this.getActualY() < sr.getScaledHeight() / 2) {
+                    message.height = (message.height + ((i * -10) - message.height) * (animDiv * 5));
+                }
 
                 double animOnOff = 0;
                 if (message.time < 500) {
@@ -440,8 +441,12 @@ public class SpamHider {
                 animOnOff *= -1;
                 animOnOff += 1;
 
-                x += (animOnOff * (messageWidth + 30));
-                y = height - 30 - (message.height);
+                if (x < sr.getScaledWidth() / 2) {
+                    x += ((animOnOff * -1) * (messageWidth + 30));
+                } else {
+                    x += (animOnOff * (messageWidth + 30));
+                }
+                y = this.getActualY() - (message.height);
 
                 SmartFontRenderer.TextShadow shadow;
                 switch (Skytils.config.spamShadow) {
@@ -457,7 +462,7 @@ public class SpamHider {
 
                 ScreenRenderer.fontRenderer.drawString(message.message, (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
 
-                if (message.time > 5000) {
+                if (message.time > 4000) {
                     spamMessages.remove(message);
                 }
 
@@ -465,6 +470,34 @@ public class SpamHider {
             }
 
             Collections.reverse(spamMessages);
+        }
+
+        public void demoRender() {
+            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+            int messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(StringUtils.stripControlCodes("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r"));
+            SmartFontRenderer.TextShadow shadow;
+            switch (Skytils.config.spamShadow) {
+                case 1:
+                    shadow = SmartFontRenderer.TextShadow.NONE;
+                    break;
+                case 2:
+                    shadow = SmartFontRenderer.TextShadow.OUTLINE;
+                    break;
+                default:
+                    shadow = SmartFontRenderer.TextShadow.NORMAL;
+            }
+
+            double x = this.getActualX()  + ((Math.sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30));
+            double y = this.getActualY();
+            ScreenRenderer.fontRenderer.drawString("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r", (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
+        }
+
+        public int getHeight() {
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+        }
+
+        public int getWidth() {
+            return ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r");
         }
 
         public boolean getToggled() {

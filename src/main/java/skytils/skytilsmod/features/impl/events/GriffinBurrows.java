@@ -3,11 +3,9 @@ package skytils.skytilsmod.features.impl.events;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -30,6 +28,9 @@ import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -202,22 +203,21 @@ public class GriffinBurrows {
     public static class GriffinGuiElement extends GuiElement {
 
         public GriffinGuiElement() {
-            super("Griffin Timer", 1.0F, new FloatPair(100, 10));
+            super("Griffin Timer", new FloatPair(100, 10));
             Skytils.GUIMANAGER.registerElement(this);
         }
 
         public void render() {
             if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("hub")) return;
             EntityPlayerSP player = mc.thePlayer;
-            if (Skytils.config.showGriffinCountdown && Utils.inSkyblock && player != null) {
+            if (this.getToggled() && Utils.inSkyblock && player != null) {
                 for (int i = 0; i < 8; i++) {
                     ItemStack hotbarItem = player.inventory.getStackInSlot(i);
                     if (hotbarItem == null) continue;
                     if (hotbarItem.getDisplayName().contains("Ancestral Spade")) {
                         long diff = Math.round((60_000L - GriffinBurrows.burrowRefreshTimer.getTime()) / 1000L);
-                        ScaledResolution sr = new ScaledResolution(mc);
-                        float x = this.getPos().getX() * sr.getScaledWidth();
-                        float y = this.getPos().getY() * sr.getScaledHeight();
+                        float x = this.getActualX();
+                        float y = this.getActualY();
 
                         GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                         Minecraft.getMinecraft().fontRendererObj.drawString("Time until refresh: " + diff + "s", x, y, 0xFFFFFF, true);
@@ -226,6 +226,18 @@ public class GriffinBurrows {
                     }
                 }
             }
+        }
+
+        public void demoRender() {
+            ScreenRenderer.fontRenderer.drawString("Time until refresh: 10s", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        public int getHeight() {
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+        }
+
+        public int getWidth() {
+            return ScreenRenderer.fontRenderer.getStringWidth("Time until refresh: 10s");
         }
 
         public boolean getToggled() {

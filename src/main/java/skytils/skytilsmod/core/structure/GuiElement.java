@@ -2,14 +2,17 @@ package skytils.skytilsmod.core.structure;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import skytils.skytilsmod.utils.EnumUtil;
+import skytils.skytilsmod.Skytils;
 
 public abstract class GuiElement {
     private static ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
     String name;
-    EnumUtil.AnchorPoint anchor;
     float scale;
     FloatPair pos;
+
+    public GuiElement(String name) {
+        this(name, new FloatPair(0, 0));
+    }
 
     public GuiElement (String name, FloatPair fp) {
         this(name, 1.0F, fp);
@@ -23,6 +26,8 @@ public abstract class GuiElement {
 
     public abstract void render();
 
+    public abstract void demoRender();
+
     public float getScale() {
         return this.scale;
     }
@@ -32,10 +37,6 @@ public abstract class GuiElement {
     }
 
     public abstract boolean getToggled();
-
-    public EnumUtil.AnchorPoint getAnchor() {
-        return (this.anchor==null) ? EnumUtil.AnchorPoint.BOTTOM_MIDDLE : this.anchor;
-    }
 
     public void setPos(FloatPair newPos) {
         this.pos = newPos;
@@ -61,11 +62,15 @@ public abstract class GuiElement {
 
     public float getActualX() {
         int maxX = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
-        return getAnchor().getX(maxX) + getPos().getX();
+        return maxX * getPos().getX();
     }
 
     public float getActualY() {
         int maxY = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
-        return getAnchor().getY(maxY) + getPos().getY();
+        return maxY * getPos().getY();
     }
+
+    public abstract int getHeight();
+
+    public abstract int getWidth();
 }

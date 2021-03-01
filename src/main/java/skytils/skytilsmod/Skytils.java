@@ -44,7 +44,7 @@ public class Skytils {
 
     public static Config config = new Config();
     public static File modDir;
-    public static GuiManager GUIMANAGER = new GuiManager();
+    public static GuiManager GUIMANAGER;
 
     public static int ticks = 0;
 
@@ -57,6 +57,7 @@ public class Skytils {
     public void preInit(FMLPreInitializationEvent event) {
         modDir = new File(event.getModConfigurationDirectory(), "skytils");
         if (!modDir.exists()) modDir.mkdirs();
+        GUIMANAGER = new GuiManager();
     }
 
     @Mod.EventHandler
@@ -102,6 +103,8 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
         MinecraftForge.EVENT_BUS.register(new WaterBoardSolver());
 
+        ScreenRenderer.refresh();
+        
     }
 
     @Mod.EventHandler
