@@ -29,7 +29,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Command Alias Mode",
-            description = "Choose which mode to use for Command Aliases.\nDon't know what this is? Ask us on our Discord.",
+            description = "Choose which mode to use for Command Aliases.",
             category = "General",
             subcategory = "Command Aliases",
             options = {"Simple", "Advanced"}
@@ -44,7 +44,6 @@ public class Config extends Vigilant {
             subcategory = "Reparty"
     )
     public boolean overrideReparty = true;
-
 
     @Property(
             type = PropertyType.SWITCH,
