@@ -73,7 +73,7 @@ public class SpamHider {
         }
 
         // Hide Boss Messages
-        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher") || unformatted.startsWith("[CROWD]")) {
+        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher")) {
             switch (Skytils.config.hideBossMessages) {
                 case 1:
                     event.setCanceled(true);
@@ -90,6 +90,20 @@ public class SpamHider {
         // CantUseAbilityHider
         if(unformatted.startsWith("You cannot use abilities in this room!")) {
             switch (Skytils.config.CantUseAbilityHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(formatted);
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
+      
+        //No enemies nearby
+        if (unformatted.contains("There are no enemies nearby!")) {
+            switch (Skytils.config.hideNoEnemiesNearby) {
                 case 1:
                     event.setCanceled(true);
                     break;
@@ -342,7 +356,7 @@ public class SpamHider {
         }
 
         //Hide Abilities
-        if (Utils.inDungeons && unformatted.contains("is now available!") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
+        if (Utils.inDungeons && unformatted.contains("is now available!") && !unformatted.contains("Mining Speed Boost") && !unformatted.contains("Pickobulus") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
             switch (Skytils.config.hideDungeonAbilities) {
                 case 1:
                     event.setCanceled(true);

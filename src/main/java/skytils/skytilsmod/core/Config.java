@@ -103,6 +103,24 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide F4 Spam",
+            description = "Hides the messages from the Crowd in the F4 Boss",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideF4Spam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide F4 Nametags",
+            description = "Hides the nametags in the F4 Boss",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideF4Nametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Revive Stone Names",
             description = "Shows names next to the heads on the Revive Stone menu.",
             category = "Dungeons",
@@ -807,6 +825,16 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int cooldownHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "No Enemies Nearby Hider",
+            description = "Hides the 'There are no enemies nearby!' message",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideNoEnemiesNearby = 0;
 
     @Property(
             type = PropertyType.SELECTOR,

@@ -52,6 +52,8 @@ public class DungeonsFeatures {
                 mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
             }
         }
+        if (Utils.inDungeons && Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
+            event.setCanceled(true);
     }
     
     // Show hidden fels
@@ -73,6 +75,12 @@ public class DungeonsFeatures {
             if (Skytils.config.hideWitherMinerNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
                 String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
                 if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                    mc.theWorld.removeEntity(event.entity);
+                }
+            }
+            if (Skytils.config.hideF4Nametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
                     mc.theWorld.removeEntity(event.entity);
                 }
             }
