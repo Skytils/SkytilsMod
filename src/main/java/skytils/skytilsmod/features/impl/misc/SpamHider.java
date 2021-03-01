@@ -100,7 +100,7 @@ public class SpamHider {
                 default:
             }
         }
-
+      
         //No enemies nearby
         if (unformatted.contains("There are no enemies nearby!")) {
             switch (Skytils.config.hideNoEnemiesNearby) {

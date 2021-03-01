@@ -107,6 +107,8 @@ public class GuiManager {
         if (Skytils.usingLabymod && !(Minecraft.getMinecraft().ingameGUI instanceof GuiIngameForge)) return;
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE && event.type != RenderGameOverlayEvent.ElementType.JUMPBAR)
             return;
+        if (Minecraft.getMinecraft().currentScreen instanceof LocationEditGui)
+            return;
         for(Map.Entry<Integer, GuiElement> e : elements.entrySet()) {
             try {
                 e.getValue().render();
@@ -121,6 +123,8 @@ public class GuiManager {
     public void renderPlayerInfoLabyMod(final RenderGameOverlayEvent event) {
         if (!Skytils.usingLabymod) return;
         if (event.type != null) return;
+        if (Minecraft.getMinecraft().currentScreen instanceof LocationEditGui)
+            return;
         for(Map.Entry<Integer, GuiElement> e : elements.entrySet()) {
             try {
                 e.getValue().render();

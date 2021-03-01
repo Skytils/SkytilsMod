@@ -79,6 +79,7 @@ public class Config extends Vigilant {
             type = PropertyType.SWITCH,
             name = "Auto Copy Fails to Clipboard",
             description = "Copies deaths and fails in dungeons to your clipboard.",
+
             category = "Dungeons",
             subcategory = "Miscellaneous"
     )
@@ -119,6 +120,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideF4Nametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Revive Stone Names",
+            description = "Shows names next to the heads on the Revive Stone menu.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean reviveStoneNames = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -480,7 +490,7 @@ public class Config extends Vigilant {
             category = "Miscellaneous",
             subcategory = "Items"
     )
-    public boolean soulEaterLore = false;
+    public boolean showSoulEaterBonus = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -577,7 +587,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Prevent Log Spam",
-            description = "Prevents your logs from being spammed with exceptions while in dungeons.",
+            description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
@@ -830,6 +840,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+
             name = "Out of mana Hider",
             description = "Removes out of mana messages from your chat.",
             category = "Spam",

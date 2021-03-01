@@ -3,6 +3,7 @@ package skytils.skytilsmod.features.impl.misc;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
@@ -21,12 +22,17 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
+import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -110,7 +116,7 @@ public class ItemFeatures {
     public void onTooltip(ItemTooltipEvent event) {
         ItemStack item = event.itemStack;
 
-        if (Skytils.config.soulEaterLore) {
+        if (Skytils.config.showSoulEaterBonus) {
             if (item.hasTagCompound()) {
                 NBTTagCompound tags = item.getSubCompound("ExtraAttributes", false);
                 if (tags != null) {
@@ -287,6 +293,63 @@ public class ItemFeatures {
             event.fr.drawStringWithShadow(stackTip, (float)(event.x + 17 - event.fr.getStringWidth(stackTip)), (float)(event.y + 9), 16777215);
             GlStateManager.enableLighting();
             GlStateManager.enableDepth();
+        }
+    }
+
+    static {
+        new SoulStrengthGuiElement();
+    }
+
+    public static class SoulStrengthGuiElement extends GuiElement {
+
+        public SoulStrengthGuiElement() {
+            super("Soul Eater Strength", new FloatPair(200, 10));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        @Override
+        public void render() {
+            EntityPlayerSP player = mc.thePlayer;
+            if (this.getToggled() && Utils.inSkyblock && player != null) {
+                ItemStack item = mc.thePlayer.getHeldItem();
+
+                if (item != null) {
+                    NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+                    if (extraAttr != null) {
+                        if (extraAttr.hasKey("ultimateSoulEaterData")) {
+
+                            int bonus = extraAttr.getInteger("ultimateSoulEaterData");
+
+                            float x = this.getActualX();
+                            float y = this.getActualY();
+
+                            GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                            mc.fontRendererObj.drawString("\u00a7cSoul Strength: \u00a7a" + bonus, x, y, 0xFFFFFF, true);
+                            GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void demoRender() {
+            ScreenRenderer.fontRenderer.drawString("\u00a7cSoul Strength: \u00a7a1000", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        @Override
+        public int getHeight() {
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+        }
+
+        @Override
+        public int getWidth() {
+            return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cSoul Strength: \u00a7a1000");
+        }
+
+        @Override
+        public boolean getToggled() {
+            return Skytils.config.showSoulEaterBonus;
         }
     }
 
