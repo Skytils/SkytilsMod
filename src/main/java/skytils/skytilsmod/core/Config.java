@@ -131,15 +131,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Revive Stone Names",
-            description = "Shows names next to the heads on the Revive Stone menu.",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean reviveStoneNames = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Spirit Leap Names",
             description = "Shows names next to the heads on the Spirit Leap menu.",
             category = "Dungeons",
