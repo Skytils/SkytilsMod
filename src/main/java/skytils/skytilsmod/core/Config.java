@@ -462,7 +462,7 @@ public class Config extends Vigilant {
             category = "Miscellaneous",
             subcategory = "Items"
     )
-    public boolean soulEaterLore = false;
+    public boolean showSoulEaterBonus = false;
 
     @Property(
             type = PropertyType.SWITCH,
