@@ -128,7 +128,7 @@ public class BoulderSolver {
         if (event.packet instanceof C08PacketPlayerBlockPlacement) {
             C08PacketPlayerBlockPlacement packet = (C08PacketPlayerBlockPlacement) event.packet;
             if (packet.getPosition() != null && packet.getPosition().equals(boulderChest)) {
-                roomVariant = 2;
+                roomVariant = -2;
             }
         }
     }
