@@ -1,5 +1,6 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
@@ -16,6 +17,8 @@ import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
 public class MiscFeatures {
+
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     @SubscribeEvent
     public void onBossBarSet(BossBarEvent.Set event) {
@@ -46,6 +49,7 @@ public class MiscFeatures {
 
             if (inventoryName.equals("Ophelia")) {
                 if (Skytils.config.dungeonPotLock > 0) {
+                    if (slot.inventory == mc.thePlayer.inventory || slot.slotNumber == 49) return;
                     if (item.getItem() != Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
                         event.setCanceled(true);
                         return;
