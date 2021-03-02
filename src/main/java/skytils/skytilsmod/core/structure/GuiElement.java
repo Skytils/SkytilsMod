@@ -21,7 +21,11 @@ public abstract class GuiElement {
     public GuiElement(String name, float scale, FloatPair fp) {
         this.name = name;
         this.scale = scale;
-        this.pos = fp;
+        if (Skytils.GUIMANAGER.GUIPOSITIONS.containsKey(name)) {
+            this.pos = Skytils.GUIMANAGER.GUIPOSITIONS.get(name);
+        } else {
+            this.pos = fp;
+        }
     }
 
     public abstract void render();
