@@ -102,7 +102,7 @@ public class SpamHider {
         }
       
         //No enemies nearby
-        if (unformatted.contains("There are no enemies nearby!")) {
+        if (formatted.startsWith("§r§cThere are no enemies nearby!")) {
             switch (Skytils.config.hideNoEnemiesNearby) {
                 case 1:
                     event.setCanceled(true);
