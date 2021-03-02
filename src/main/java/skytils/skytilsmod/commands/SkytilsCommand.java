@@ -11,12 +11,15 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
-import skytils.skytilsmod.core.LocationEditGui;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
+import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.CommandAliases;
+import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,6 +75,9 @@ public class SkytilsCommand extends CommandBase {
                         player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide a valid Hypixel API key!"));
                     }
                 }).start();
+                break;
+            case "fetchur":
+                player.addChatMessage(new ChatComponentText("\u00a7aToday's Fetchur item is: \u00a72" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
                 break;
             case "griffin":
                 if (args.length == 1) {

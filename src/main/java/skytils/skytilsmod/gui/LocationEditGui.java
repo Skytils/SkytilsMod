@@ -1,4 +1,4 @@
-package skytils.skytilsmod.core;
+package skytils.skytilsmod.gui;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

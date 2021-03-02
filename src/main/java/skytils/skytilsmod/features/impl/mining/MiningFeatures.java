@@ -21,13 +21,14 @@ import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MiningFeatures {
 
     public static BlockPos puzzlerSolution = null;
-    public static HashMap<String, String> fetchurItems = new HashMap<>();
+    public static LinkedHashMap<String, String> fetchurItems = new LinkedHashMap<>();
 
     private final static Minecraft mc = Minecraft.getMinecraft();
 
