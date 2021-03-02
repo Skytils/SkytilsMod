@@ -21,6 +21,8 @@ import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
+import java.util.Objects;
+
 public class MiscFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
@@ -51,10 +53,8 @@ public class MiscFeatures {
             EntityItem entity = (EntityItem) event.entity;
             if (Skytils.config.hideJerryRune) {
                 ItemStack item = entity.getEntityItem();
-                if(item.getItem() == Items.spawn_egg && item.getDisplayName().equals("Spawn Villager") && entity.lifespan == 6000) {
-                    if (ItemMonsterPlacer.getEntityName(item).equals("Villager")) {
-                        event.setCanceled(true);
-                    }
+                if(item.getItem() == Items.spawn_egg && Objects.equals(ItemMonsterPlacer.getEntityName(item), "Villager") && item.getDisplayName().equals("Spawn Villager") && entity.lifespan == 6000) {
+                    event.setCanceled(true);
                 }
             }
         }
