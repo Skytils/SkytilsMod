@@ -2,16 +2,21 @@ package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.BossBarEvent;
+import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
@@ -28,6 +33,29 @@ public class MiscFeatures {
             if(Skytils.config.bossBarFix && StringUtils.stripControlCodes(displayData.getDisplayName().getUnformattedText()).equals("Wither")) {
                 event.setCanceled(true);
                 return;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onCheckRender(CheckRenderEntityEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (event.entity instanceof EntityFallingBlock) {
+            EntityFallingBlock entity = (EntityFallingBlock) event.entity;
+            if (Skytils.config.hideMidasStaffGoldBlocks && entity.getBlock().getBlock() == Blocks.gold_block) {
+                event.setCanceled(true);
+            }
+        }
+
+        if (event.entity instanceof EntityItem) {
+            EntityItem entity = (EntityItem) event.entity;
+            if (Skytils.config.hideJerryRune) {
+                ItemStack item = entity.getEntityItem();
+                if(item.getItem() == Items.spawn_egg && item.getDisplayName().equals("Spawn Villager") && entity.lifespan == 6000) {
+                    if (ItemMonsterPlacer.getEntityName(item).equals("Villager")) {
+                        event.setCanceled(true);
+                    }
+                }
             }
         }
     }
