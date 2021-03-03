@@ -241,7 +241,7 @@ public class GriffinBurrows {
         }
 
         public boolean getToggled() {
-            return Skytils.config.showGriffinBurrows;
+            return Skytils.config.showGriffinCountdown;
         }
     }
 

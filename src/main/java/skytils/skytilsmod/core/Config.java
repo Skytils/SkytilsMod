@@ -584,6 +584,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Mob Death Particles",
+            description = "Hides the smoke particles created when mobs die.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideDeathParticles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Highlight Salvageable Items",
             description = "Highlights items that can be salvaged.",
             category = "Miscellaneous",
@@ -617,15 +626,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean protectStarredItems = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Mob Death Particles",
-            description = "Hides the little poof of smoke when mobs die.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideDeathParticles = false;
 
     @Property(
             type = PropertyType.SWITCH,
