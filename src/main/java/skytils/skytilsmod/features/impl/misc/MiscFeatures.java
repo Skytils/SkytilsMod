@@ -2,6 +2,7 @@ package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
@@ -56,6 +57,12 @@ public class MiscFeatures {
                 if(item.getItem() == Items.spawn_egg && Objects.equals(ItemMonsterPlacer.getEntityName(item), "Villager") && item.getDisplayName().equals("Spawn Villager") && entity.lifespan == 6000) {
                     event.setCanceled(true);
                 }
+            }
+        }
+
+        if (event.entity instanceof EntityLightningBolt) {
+            if (Skytils.config.hideLightning) {
+                event.setCanceled(true);
             }
         }
     }
