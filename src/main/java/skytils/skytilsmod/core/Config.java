@@ -247,15 +247,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Disable Terracotta Sounds",
-            description = "Prevent the game from playing the loud sounds created by the Terracotta.",
-            category = "Dungeons",
-            subcategory = "Sounds"
-    )
-    public boolean disableTerracottaSounds = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Block Incorrect Terminal Clicks",
             description = "Blocks incorrect clicks on terminals.",
             category = "Dungeons",
@@ -658,10 +649,19 @@ public class Config extends Vigilant {
             type = PropertyType.SWITCH,
             name = "Disable Cooldown Sounds",
             description = "Blocks the sound effect played while an item is on cooldown.",
-            category = "Pets",
-            subcategory = "Quality of Life"
+            category = "Sounds",
+            subcategory = "Abilities"
     )
     public boolean disableCooldownSounds = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Terracotta Sounds",
+            description = "Prevent the game from playing the loud sounds created by the Terracotta.",
+            category = "Sounds",
+            subcategory = "Dungeons"
+    )
+    public boolean disableTerracottaSounds = false;
 
     @Property(
             type = PropertyType.SELECTOR,
