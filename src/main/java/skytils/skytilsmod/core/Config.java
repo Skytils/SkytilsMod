@@ -247,6 +247,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Disable Terracotta Sounds",
+            description = "Prevent the game from playing the loud sounds created by the Terracotta.",
+            category = "Dungeons",
+            subcategory = "Sounds"
+    )
+    public boolean disableTerracottaSounds = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Block Incorrect Terminal Clicks",
             description = "Blocks incorrect clicks on terminals.",
             category = "Dungeons",

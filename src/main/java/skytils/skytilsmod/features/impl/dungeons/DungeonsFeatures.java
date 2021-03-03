@@ -16,12 +16,14 @@ import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -39,22 +41,31 @@ import java.util.regex.Pattern;
 public class DungeonsFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
+
+    private static boolean isInTerracottaPhase = false;
     
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
 
-        if (Utils.inDungeons && Skytils.config.autoCopyFailToClipboard) {
-            Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
-            if (deathFailMatcher.matches()) {
-                GuiScreen.setClipboardString(unformatted);
-                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+        if (Utils.inDungeons) {
+            if (Skytils.config.autoCopyFailToClipboard) {
+                Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
+                if (deathFailMatcher.matches()) {
+                    GuiScreen.setClipboardString(unformatted);
+                    mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                }
             }
-        }
 
-        if (Utils.inDungeons && Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
-            event.setCanceled(true);
+            if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
+                event.setCanceled(true);
+
+            if (unformatted.equals("[BOSS] Sadan : So you made it all the way here...and you wish to defy me? Sadan?!"))
+                isInTerracottaPhase = true;
+            if (unformatted.startsWith("[BOSS] Sadan : ENOUGH!") || unformatted.startsWith("[BOSS] Sadan : It was inevitable."))
+                isInTerracottaPhase = false;
+        }
     }
     
     // Show hidden fels
@@ -198,5 +209,24 @@ public class DungeonsFeatures {
                 }
             }
         }
+        if (event.packet instanceof S29PacketSoundEffect) {
+            S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
+            if (Skytils.config.disableTerracottaSounds && isInTerracottaPhase) {
+                String sound = packet.getSoundName();
+                float pitch = packet.getPitch();
+                float volume = packet.getVolume();
+
+                if (sound.equals("game.player.hurt") && pitch == 0 && volume == 0)
+                    event.setCanceled(true);
+                if (sound.equals("random.eat") && pitch == 0.6984127f && volume == 1)
+                    event.setCanceled(true);
+            }
+        }
     }
+
+    @SubscribeEvent
+    public void onWorldChange(WorldEvent.Load event) {
+        isInTerracottaPhase = false;
+    }
+
 }
