@@ -56,11 +56,16 @@ public class BossHPDisplays {
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock || event.type == 2) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-        if (unformatted.equals("[BOSS] Sadan: My giants! Unleashed!") || unformatted.equals("[BOSS] The Watcher: Plus I needed to give my new friends some space to roam...")) {
-            canGiantsSpawn = true;
-        } else if (unformatted.equals("[BOSS] Sadan: It was inevitable. You are fighting forces beyond your imagination.") || unformatted.equals("[BOSS] Sadan: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!") || unformatted.startsWith("[BOSS] The Watcher: You have failed to prove yourself, and have paid with your lives.") || unformatted.startsWith("[BOSS] The Watcher: You have proven yourself")) {
-           canGiantsSpawn = false;
+        if (unformatted.startsWith("[BOSS] Sadan")) {
+            if (unformatted.contains("My giants! Unleashed!"))
+                canGiantsSpawn = true;
+            if (unformatted.contains("It was inevitable.") || unformatted.contains("NOOOOOOOOO"))
+                canGiantsSpawn = false;
         }
+        if (unformatted.equals("[BOSS] The Watcher: Plus I needed to give my new friends some space to roam..."))
+            canGiantsSpawn = true;
+        if (unformatted.startsWith("[BOSS] The Watcher: You have failed to prove yourself, and have paid with your lives.") || unformatted.startsWith("[BOSS] The Watcher: You have proven yourself"))
+           canGiantsSpawn = false;
     }
 
     @SubscribeEvent
