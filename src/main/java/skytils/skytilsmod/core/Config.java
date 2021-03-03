@@ -139,6 +139,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Giant HP",
+            description = "Shows the HP of Giants in your HUD.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean showGiantHP = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Hidden Fels",
             description = "Make Fels in dungeons visible.",
             category = "Dungeons",
