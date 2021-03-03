@@ -646,6 +646,15 @@ public class Config extends Vigilant {
     public boolean petItemConfirmation = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Cooldown Sounds",
+            description = "Blocks the sound effect played while an item is on cooldown.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean disableCooldownSounds = false;
+
+    @Property(
             type = PropertyType.SELECTOR,
             name = "Text Shadow",
             description = "Changes the shadow type for the text displayed.",
