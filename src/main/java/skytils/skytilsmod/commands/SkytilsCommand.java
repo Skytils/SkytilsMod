@@ -119,17 +119,20 @@ public class SkytilsCommand extends CommandBase {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.BLUE + "➜ Skytils Commands and Info" + "\n" +
                             " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
                             " §2§l ❣ §7§oThe current mod version is §f§o"+ Skytils.VERSION + "§7§o." + "\n" +
+                            " §2§l ❣ §7§oAn alias for all commands starting with §f§o/skytils §7§ois §f§o/st§7§o." + "\n" +
                             "§9§l➜ Setup:" + "\n" +
-                            " §3/Skytils §l➡ §bOpens the main mod configuration GUI." + "\n" +
-                            " §3/Skytils Setkey §l➡ §bSets your Hypixel API key." + "\n" +
-                            " §3/Skytils Help §l➡ §bShows this help menu." + "\n" +
-                            " §3/Skytils Reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +
-                            " §3/Skytils Editlocations §l➡ §bOpens the location editing GUI." + "\n" +
-                            " §3/Skytils Aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
+                            " §3/skytils §l➡ §bOpens the main mod configuration GUI." + "\n" +
+                            " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
+                            " §3/skytils help §l➡ §bShows this help menu." + "\n" +
+                            " §3/skytils reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +
+                            " §3/skytils editlocations §l➡ §bOpens the location editing GUI." + "\n" +
+                            " §3/skytils aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
+                            "§9§l➜ Events:" + "\n" +
+                            " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
+                            " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
                             "§9§l➜ Miscellaneous:" + "\n" +
-                            " §3/Skytils Griffin Refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
-                            " §3/Reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
-                            "§3/Armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)"));
+                            " §3/reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
+                            " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)"));
                     return;
                 }
                 break;
