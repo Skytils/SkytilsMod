@@ -566,6 +566,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Air Display",
+            description = "Prevents the game from rendering the air bubbles while underwater.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideAirDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Jerry Rune",
             description = "Prevents the game from rendering the items spawned by the Jerry rune.",
             category = "Miscellaneous",

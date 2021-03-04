@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.BossBarEvent;
@@ -66,6 +67,14 @@ public class MiscFeatures {
             if (Skytils.config.hideLightning) {
                 event.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderOverlayPre(RenderGameOverlayEvent.Pre event) {
+        if (!Utils.inSkyblock) return;
+        if (event.type == RenderGameOverlayEvent.ElementType.AIR && Skytils.config.hideAirDisplay && !Utils.inDungeons) {
+            event.setCanceled(true);
         }
     }
 
