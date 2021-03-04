@@ -34,4 +34,14 @@ public class NumberUtil {
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
+
+    /**
+     * This code was unmodified and taken under CC BY-SA 3.0 license
+     * @link https://stackoverflow.com/a/22186845
+     * @author jpdymond
+     */
+    public static double round(double value, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return (double) Math.round(value * scale) / scale;
+    }
 }

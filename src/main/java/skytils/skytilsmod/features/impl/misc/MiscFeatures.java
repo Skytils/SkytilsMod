@@ -1,6 +1,9 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
@@ -15,21 +18,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
+import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.NumberUtil;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.Objects;
 
 public class MiscFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
+
+    private static long golemSpawnTime = 0;
 
     @SubscribeEvent
     public void onBossBarSet(BossBarEvent.Set event) {
@@ -40,6 +53,16 @@ public class MiscFeatures {
                 event.setCanceled(true);
                 return;
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock) return;
+        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText()).trim();
+
+        if (unformatted.equals("The ground begins to shake as an Endstone Protector rises from below!")) {
+            golemSpawnTime = System.currentTimeMillis() + 20_000;
         }
     }
 
@@ -117,6 +140,54 @@ public class MiscFeatures {
                     }
                 }
             }
+        }
+    }
+
+    static {
+        new GolemSpawnTimerElement();
+    }
+
+    public static class GolemSpawnTimerElement extends GuiElement {
+
+        public GolemSpawnTimerElement() {
+            super("Endstone Protector Spawn Timer", new FloatPair(150, 20));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        @Override
+        public void render() {
+            EntityPlayerSP player = mc.thePlayer;
+            if (this.getToggled() && Utils.inSkyblock && player != null && ((golemSpawnTime - System.currentTimeMillis()) > 0)) {
+                ScaledResolution sr = new ScaledResolution(mc);
+
+                boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
+
+                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                String text = "\u00a7cGolem spawn in: \u00a7a" + NumberUtil.round((golemSpawnTime - System.currentTimeMillis()) / 1000d, 1) + "s";
+                SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+                ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+            }
+        }
+
+        @Override
+        public void demoRender() {
+            ScreenRenderer.fontRenderer.drawString("\u00a7cGolem spawn in: \u00a7a20.0s", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        @Override
+        public int getHeight() {
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+        }
+
+        @Override
+        public int getWidth() {
+            return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cGolem spawn in: \u00a7a20.0s");
+        }
+
+        @Override
+        public boolean getToggled() {
+            return Skytils.config.golemSpawnTimer;
         }
     }
 }

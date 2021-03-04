@@ -529,6 +529,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Endstone Protector Spawn Timer",
+            description = "Counts down the time until the Endstone Protector spawns.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean golemSpawnTimer = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
