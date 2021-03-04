@@ -647,6 +647,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Dolphin Pet Display",
+            description = "Shows the players within the range of the Dolphin pet.",
+            category = "Pets",
+            subcategory = "Displays"
+    )
+    public boolean dolphinPetDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Autopet Messages",
             description = "Removes all autopet messages from chat.",
             category = "Pets",

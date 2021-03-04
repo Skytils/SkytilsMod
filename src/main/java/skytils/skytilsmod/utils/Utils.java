@@ -2,6 +2,9 @@ package skytils.skytilsmod.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
@@ -15,6 +18,8 @@ import java.util.Random;
 
 public class Utils {
 
+    private static final Minecraft mc = Minecraft.getMinecraft();
+
     public static boolean inSkyblock = false;
     public static boolean inDungeons = false;
 
@@ -22,7 +27,6 @@ public class Utils {
 
     public static boolean isOnHypixel() {
         try {
-            Minecraft mc = Minecraft.getMinecraft();
             if (mc != null && mc.theWorld != null && !mc.isSingleplayer()) {
                 if (mc.thePlayer != null && mc.thePlayer.getClientBrand() != null) {
                     if (mc.thePlayer.getClientBrand().toLowerCase().contains("hypixel")) return true;
@@ -42,7 +46,6 @@ public class Utils {
      * @author bowser0000
     */
     public static void checkForSkyblock() {
-        Minecraft mc = Minecraft.getMinecraft();
         if (isOnHypixel()) {
             ScoreObjective scoreboardObj = mc.theWorld.getScoreboard().getObjectiveInDisplaySlot(1);
             if (scoreboardObj != null) {
@@ -89,4 +92,15 @@ public class Utils {
         return random;
     }
 
+    public static boolean isInTablist(EntityPlayer player){
+        if (mc.isSingleplayer()) {
+            return true;
+        }
+        for (NetworkPlayerInfo pi : mc.getNetHandler().getPlayerInfoMap()) {
+            if (pi.getGameProfile().getName().equalsIgnoreCase(player.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
