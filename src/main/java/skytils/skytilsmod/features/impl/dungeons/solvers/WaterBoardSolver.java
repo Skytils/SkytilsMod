@@ -156,7 +156,7 @@ public class WaterBoardSolver {
                                         solutions.put(WoolColor.ORANGE, Lists.newArrayList(LeverBlock.EMERALD));
                                         solutions.put(WoolColor.BLUE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.DIAMOND));
                                         solutions.put(WoolColor.GREEN, Lists.newArrayList());
-                                        solutions.put(WoolColor.RED, Lists.newArrayList(LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.RED, Lists.newArrayList(LeverBlock.GOLD, LeverBlock.EMERALD));
                                         break;
                                     case 3:
                                         solutions.put(WoolColor.PURPLE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
