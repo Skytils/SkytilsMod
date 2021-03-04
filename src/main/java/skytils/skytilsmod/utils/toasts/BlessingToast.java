@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -66,7 +67,7 @@ public class BlessingToast implements IToast<BlessingToast> {
         GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, buffStats, false);
         RenderHelper.enableGUIStandardItemLighting();
 
-        GuiToast.renderTexture(this.blessing.texture, 8, 8);
+        RenderUtil.renderTexture(this.blessing.texture, 8, 8);
 
         GlStateManager.disableLighting();
         return delta >= this.maxDrawTime ? IToast.Visibility.HIDE : IToast.Visibility.SHOW;
