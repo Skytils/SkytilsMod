@@ -52,7 +52,7 @@ public class DungeonsFeatures {
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
                 Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
-                if (deathFailMatcher.matches()) {
+                if (deathFailMatcher.find()) {
                     GuiScreen.setClipboardString(unformatted);
                     mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
                 }
