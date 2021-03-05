@@ -2,6 +2,7 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
@@ -21,9 +22,8 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +31,7 @@ public class StartsWithSequenceSolver {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    private static final ArrayList<Slot> shouldClick = new ArrayList<>();
+    private static final ArrayList<Integer> shouldClick = new ArrayList<>();
     private static String sequenceNeeded = null;
     private static final Pattern titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$");
 
@@ -49,8 +49,10 @@ public class StartsWithSequenceSolver {
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
             Matcher nameMatcher = titlePattern.matcher(chestName);
             if (nameMatcher.find()) {
-                if (sequenceNeeded == null) {
-                    sequenceNeeded = nameMatcher.group(1);
+                String sequence = nameMatcher.group(1);
+                if (!Objects.equals(sequence, sequenceNeeded)) {
+                    sequenceNeeded = sequence;
+                    shouldClick.clear();
                 } else if (shouldClick.size() == 0) {
                     for (Slot slot : invSlots) {
                         if (slot.inventory == mc.thePlayer.inventory || !slot.getHasStack()) continue;
@@ -60,45 +62,13 @@ public class StartsWithSequenceSolver {
                         if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8)
                             continue;
                         if (StringUtils.stripControlCodes(item.getDisplayName()).startsWith(sequenceNeeded)) {
-                            shouldClick.add(slot);
-                        }
-                    }
-                } else {
-                    for (Slot slot : ImmutableList.copyOf(shouldClick)) {
-                        ItemStack item = slot.getStack();
-                        if (item == null) continue;
-                        if (item.isItemEnchanted()) {
-                            shouldClick.remove(slot);
+                            shouldClick.add(slot.slotNumber);
                         }
                     }
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onGuiOpen(GuiOpenEvent event) {
-        shouldClick.clear();
-        sequenceNeeded = null;
-    }
-
-    @SubscribeEvent
-    public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
-        if (!Utils.inDungeons) return;
-        if (!Skytils.config.startsWithSequenceTerminalSolver) return;
-        if (event.gui instanceof GuiChest) {
-            GuiChest inventory = (GuiChest) event.gui;
-            Container container = inventory.inventorySlots;
-            if (container instanceof ContainerChest) {
-                ContainerChest chest = (ContainerChest) container;
-                int chestSize = chest.inventorySlots.size();
-                String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
-
-                if (chestName.startsWith("What starts with:")) {
-                    for (Slot slot : ImmutableList.copyOf(shouldClick)) {
-                        RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(50, 229, 35, 237).getRGB());
-                    }
-                }
+            } else {
+                shouldClick.clear();
+                sequenceNeeded = null;
             }
         }
     }
@@ -115,12 +85,56 @@ public class StartsWithSequenceSolver {
                 event.setCanceled(true);
                 if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
                     if (shouldClick.size() > 0) {
-                        if (shouldClick.stream().noneMatch(slot -> slot.slotNumber == event.slot.slotNumber)) {
+                        if (shouldClick.stream().noneMatch(slotNum -> slotNum == event.slot.slotNumber)) {
                             return;
                         }
                     }
                 }
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
+        if (!Utils.inDungeons) return;
+        if (!Skytils.config.startsWithSequenceTerminalSolver) return;
+        if (event.gui instanceof GuiChest) {
+            GuiChest inventory = (GuiChest) event.gui;
+            Container container = inventory.inventorySlots;
+            if (container instanceof ContainerChest) {
+                ContainerChest chest = (ContainerChest) container;
+                int chestSize = chest.inventorySlots.size();
+                String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+
+                if (chestName.startsWith("What starts with:")) {
+                    for (int slotNum : ImmutableList.copyOf(shouldClick)) {
+                        Slot slot = chest.getSlot(slotNum);
+                        if (slot.getHasStack() && slot.getStack().isItemEnchanted()) {
+                            shouldClick.remove((Integer) slotNum);
+                            continue;
+                        }
+                        RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(50, 229, 35, 237).getRGB());
+                    }
+                }
+            }
+        }
+    }
+
+
+    @SubscribeEvent
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
+        if (!Utils.inDungeons) return;
+        if (!Skytils.config.startsWithSequenceTerminalSolver) return;
+        if (event.container instanceof ContainerChest) {
+            Slot slot = event.slot;
+
+            ContainerChest chest = (ContainerChest) event.container;
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            if (chestName.startsWith("What starts with:")) {
+                if (shouldClick.size() > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory != mc.thePlayer.inventory) {
+                    event.setCanceled(true);
+                }
             }
         }
     }
