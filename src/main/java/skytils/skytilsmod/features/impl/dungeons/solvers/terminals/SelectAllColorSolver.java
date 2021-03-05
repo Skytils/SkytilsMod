@@ -2,28 +2,21 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
-import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class SelectAllColorSolver {
 
@@ -67,6 +60,13 @@ public class SelectAllColorSolver {
                             shouldClick.add(slot.slotNumber);
                         }
                     }
+                } else {
+                    for (int slotNum : ImmutableList.copyOf(shouldClick)) {
+                        Slot slot = chest.getSlot(slotNum);
+                        if (slot.getHasStack() && slot.getStack().isItemEnchanted()) {
+                            shouldClick.remove((Integer) slotNum);
+                        }
+                    }
                 }
             } else {
                 shouldClick.clear();
@@ -94,33 +94,6 @@ public class SelectAllColorSolver {
             }
         }
     }
-
-    @SubscribeEvent
-    public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
-        if (!Utils.inDungeons) return;
-        if (!Skytils.config.selectAllColorTerminalSolver) return;
-        if (event.gui instanceof GuiChest) {
-            GuiChest inventory = (GuiChest) event.gui;
-            Container container = inventory.inventorySlots;
-            if (container instanceof ContainerChest) {
-                ContainerChest chest = (ContainerChest) container;
-                int chestSize = chest.inventorySlots.size();
-                String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
-
-                if (chestName.startsWith("Select all the")) {
-                    for (int slotNum : ImmutableList.copyOf(shouldClick)) {
-                        Slot slot = chest.getSlot(slotNum);
-                        if (slot.getHasStack() && slot.getStack().isItemEnchanted()) {
-                            shouldClick.remove((Integer) slotNum);
-                            continue;
-                        }
-                        RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(50, 229, 35, 237).getRGB());
-                    }
-                }
-            }
-        }
-    }
-
 
     @SubscribeEvent
     public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
