@@ -142,7 +142,7 @@ public class BoulderSolver {
         if (!Skytils.config.boulderSolver) return;
         EntityPlayerSP player = mc.thePlayer;
         World world = mc.theWorld;
-        if (Utils.inDungeons && world != null && player != null) {
+        if (Utils.inDungeons && world != null && player != null && roomVariant == -1) {
             new Thread(() -> {
                 boolean foundBirch = false;
                 boolean foundBarrier = false;
