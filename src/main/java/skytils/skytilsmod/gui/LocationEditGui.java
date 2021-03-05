@@ -40,7 +40,13 @@ public class LocationEditGui extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         onMouseMove(mouseX, mouseY);
         for (GuiButton button : this.buttonList) {
-            button.drawButton(this.mc, mouseX, mouseY);
+            if (button instanceof LocationButton) {
+                if (((LocationButton) button).element.getToggled()) {
+                    button.drawButton(this.mc, mouseX, mouseY);
+                }
+            } else {
+                button.drawButton(this.mc, mouseX, mouseY);
+            }
         }
     }
 
