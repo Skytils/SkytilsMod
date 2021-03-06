@@ -199,8 +199,6 @@ public class MiscFeatures {
 
     public static class LegionPlayerDisplay extends GuiElement {
 
-        private static final ResourceLocation ICON = new ResourceLocation("skytils", "icons/enchantedbook.png");
-
         public LegionPlayerDisplay() {
             super("Legion Player Display", new FloatPair(50, 50));
             Skytils.GUIMANAGER.registerElement(this);

@@ -94,7 +94,7 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-            if (event.entity.isInvisible()) {
+            if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
                 event.entity.setInvisible(false);
             }
 
@@ -103,20 +103,20 @@ public class DungeonsFeatures {
                     event.entity.setInvisible(false);
                 }
             }
-        }
 
-        if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-            if (Skytils.config.hideWitherMinerNametags) {
-                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                    mc.theWorld.removeEntity(event.entity);
+            if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+                if (Skytils.config.hideWitherMinerNametags) {
+                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                    if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                        mc.theWorld.removeEntity(event.entity);
+                    }
                 }
-            }
 
-            if (Skytils.config.hideF4Nametags) {
-                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                    mc.theWorld.removeEntity(event.entity);
+                if (Skytils.config.hideF4Nametags) {
+                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                    if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
+                        mc.theWorld.removeEntity(event.entity);
+                    }
                 }
             }
         }
