@@ -122,6 +122,24 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Terracota Nametags",
+            description = "Hides the nametags of terracota while in Dungeons",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideTerracotaNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Non-Starred Mobs Nametags",
+            description = "Hides the nametags of non-starred mobs while in Dungeons",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideNonStarredNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Revive Stone Names",
             description = "Shows names next to the heads on the Revive Stone menu.",
             category = "Dungeons",
