@@ -26,10 +26,12 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
@@ -42,7 +44,25 @@ public class DungeonsFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
+    public static String dungeonFloor = null;
+
     private static boolean isInTerracottaPhase = false;
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return;
+        if (Utils.inDungeons) {
+            if (dungeonFloor == null) {
+                for (String s : ScoreboardUtil.getSidebarLines()) {
+                    String line = ScoreboardUtil.cleanSB(s);
+                    if (line.contains("The Catacombs (")) {
+                        dungeonFloor = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
+                        break;
+                    }
+                }
+            }
+        }
+    }
     
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
@@ -61,10 +81,12 @@ public class DungeonsFeatures {
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
                 event.setCanceled(true);
 
-            if (unformatted.equals("[BOSS] Sadan : So you made it all the way here...and you wish to defy me? Sadan?!"))
-                isInTerracottaPhase = true;
-            if (unformatted.startsWith("[BOSS] Sadan : ENOUGH!") || unformatted.startsWith("[BOSS] Sadan : It was inevitable."))
-                isInTerracottaPhase = false;
+            if (unformatted.startsWith("[BOSS] Sadan") && unformatted.contains(":")) {
+                if (unformatted.contains("So you made it all the way here...and you wish to defy me? Sadan?!"))
+                    isInTerracottaPhase = true;
+                if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
+                    isInTerracottaPhase = false;
+            }
         }
     }
     
@@ -73,30 +95,28 @@ public class DungeonsFeatures {
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
             if (event.entity.isInvisible()) {
-                if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+                event.entity.setInvisible(false);
+            }
+
+            if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
+                if (event.entity.getName().contains("Shadow Assassin")) {
                     event.entity.setInvisible(false);
                 }
+            }
+        }
 
-                if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
-                    if (event.entity.getName().contains("Shadow Assassin")) {
-                        event.entity.setInvisible(false);
-                    }
+        if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+            if (Skytils.config.hideWitherMinerNametags) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                    mc.theWorld.removeEntity(event.entity);
                 }
             }
 
-            if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-                if (Skytils.config.hideWitherMinerNametags) {
-                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                    if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                        mc.theWorld.removeEntity(event.entity);
-                    }
-                }
-
-                if (Skytils.config.hideF4Nametags) {
-                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                    if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                        mc.theWorld.removeEntity(event.entity);
-                    }
+            if (Skytils.config.hideF4Nametags) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
+                    mc.theWorld.removeEntity(event.entity);
                 }
             }
         }
@@ -226,6 +246,7 @@ public class DungeonsFeatures {
 
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
+        dungeonFloor = null;
         isInTerracottaPhase = false;
     }
 

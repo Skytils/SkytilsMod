@@ -538,6 +538,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Legion Player Display",
+            description = "Shows the amount of players within range of the Legion enchantment.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean legionPlayerDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
