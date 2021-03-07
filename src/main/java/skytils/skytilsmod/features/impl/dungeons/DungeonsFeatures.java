@@ -27,6 +27,10 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.ClickEvent.Action;
+import net.minecraftforge.client.event.*;
+import net.minecraftforge.event.entity.player.*;
 import org.lwjgl.opengl.GL11;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
@@ -94,7 +98,7 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-            if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+        	if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
                 event.entity.setInvisible(false);
             }
 
@@ -103,20 +107,20 @@ public class DungeonsFeatures {
                     event.entity.setInvisible(false);
                 }
             }
+        }
 
-            if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-                if (Skytils.config.hideWitherMinerNametags) {
-                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                    if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                        mc.theWorld.removeEntity(event.entity);
-                    }
+        if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+            if (Skytils.config.hideWitherMinerNametags) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                    mc.theWorld.removeEntity(event.entity);
                 }
+            }
 
-                if (Skytils.config.hideF4Nametags) {
-                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                    if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                        mc.theWorld.removeEntity(event.entity);
-                    }
+            if (Skytils.config.hideF4Nametags) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
+                    mc.theWorld.removeEntity(event.entity);
                 }
             }
         }
@@ -240,6 +244,31 @@ public class DungeonsFeatures {
                     event.setCanceled(true);
                 if (sound.equals("random.eat") && pitch == 0.6984127f && volume == 1)
                     event.setCanceled(true);
+            }
+        }
+    }
+    
+    // Cancel Abilities
+    /**
+     * Taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+    */
+    @SubscribeEvent
+    public void onInteract(PlayerInteractEvent event) {
+        if (!Utils.inSkyblock || Minecraft.getMinecraft().thePlayer != event.entityPlayer) return;
+        ItemStack item = event.entityPlayer.getHeldItem();
+        if (item == null) return;
+
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
+            if (Skytils.config.disableAotd && item.getDisplayName().contains("Aspect of the Dragons")) {
+                event.setCanceled(true);
+            }
+            if (Skytils.config.disableLivid && item.getDisplayName().contains("Livid Dagger")) {
+                event.setCanceled(true);
+            }
+            if (Skytils.config.disableFury && item.getDisplayName().contains("Shadow Fury")) {
+                event.setCanceled(true);
             }
         }
     }
