@@ -684,7 +684,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Protect Starred Items",
-            description = "Prevents you from salvaging or selling starred dungeon items.",
+            description = "Prevents you from dropping, salvaging, or selling starred dungeon items.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
