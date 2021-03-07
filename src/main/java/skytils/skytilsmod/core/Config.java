@@ -292,6 +292,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hidden Jerry Alert",
+            description = "Displays an alert when you find a hidden Jerry.",
+            category = "Events",
+            subcategory = "Mayor Jerry"
+    )
+    public boolean hiddenJerryAlert = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
             description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
             category = "Events",

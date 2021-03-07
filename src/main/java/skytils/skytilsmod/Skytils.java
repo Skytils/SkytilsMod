@@ -21,6 +21,7 @@ import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
+import skytils.skytilsmod.features.impl.events.MayorJerry;
 import skytils.skytilsmod.features.impl.misc.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
@@ -92,6 +93,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
         MinecraftForge.EVENT_BUS.register(new IcePathSolver());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());
+        MinecraftForge.EVENT_BUS.register(new MayorJerry());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new MiscFeatures());
