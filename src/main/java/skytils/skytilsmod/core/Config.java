@@ -908,6 +908,33 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int manaMessages = 0;
+    
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable AOTD Ability",
+            description = "Disables the Aspect of the Dragons ability.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean disableAotd = false;
+ 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Livid Dagger Ability",
+            description = "Disables the Livid Dagger ability.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean disableLivid = false;
+ 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Shadow Fury Ability",
+            description = "Disables the Shadow Fury ability.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean disableFury = false;
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
