@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 
@@ -35,7 +36,7 @@ public class SuperboomToast implements IToast<SuperboomToast>{
         GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, "", false);
         RenderHelper.enableGUIStandardItemLighting();
 
-        GuiToast.renderItem(superBoom, 8, 8);
+        RenderUtil.renderItem(superBoom, 8, 8);
 
         GlStateManager.disableLighting();
 

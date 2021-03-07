@@ -11,11 +11,15 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
-import skytils.skytilsmod.core.LocationEditGui;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
+import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.CommandAliases;
+import skytils.skytilsmod.gui.LocationEditGui;
+import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,6 +76,9 @@ public class SkytilsCommand extends CommandBase {
                     }
                 }).start();
                 break;
+            case "fetchur":
+                player.addChatMessage(new ChatComponentText("\u00a7aToday's Fetchur item is: \u00a72" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
+                break;
             case "griffin":
                 if (args.length == 1) {
                     player.addChatMessage(new ChatComponentText("/skytils griffin <refresh>"));
@@ -109,17 +116,31 @@ public class SkytilsCommand extends CommandBase {
                 }
             case "help":
                 if (args.length == 1) {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Skytils" + " Version " + Skytils.VERSION + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils" + EnumChatFormatting.AQUA + " - Opens the main GUI" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils help" + EnumChatFormatting.AQUA + " - Returns this message" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils setkey <key>" + EnumChatFormatting.AQUA + " - Sets your API key" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils griffin refresh" + EnumChatFormatting.AQUA + " - Forces a refresh for the Griffin Burrow waypoints" + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils reload <aliases/data>" + EnumChatFormatting.AQUA + " - Forces Skytils to re-fetch your command aliases or solutions from the data repository." + "\n" +
-                            EnumChatFormatting.GOLD + " /skytils editlocations" + EnumChatFormatting.AQUA + " - [WIP] Opens the location editing gui" + "\n" +
-                            EnumChatFormatting.GOLD + "/reparty" + EnumChatFormatting.AQUA + " - Disbands and sends a party invite to everyone who was in your party." + "\n" +
-                            EnumChatFormatting.GOLD + "/armorcolor <set/clear/clearall>" + EnumChatFormatting.AQUA + " - Changes the color of an armor piece to the hexcode or decimal color provided. (Alias is /armourcolour)"));
+                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.BLUE + "➜ Skytils Commands and Info" + "\n" +
+                            " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
+                            " §2§l ❣ §7§oThe current mod version is §f§o"+ Skytils.VERSION + "§7§o." + "\n" +
+                            " §2§l ❣ §7§oAn alias for all commands starting with §f§o/skytils §7§ois §f§o/st§7§o." + "\n" +
+                            "§9§l➜ Setup:" + "\n" +
+                            " §3/skytils §l➡ §bOpens the main mod configuration GUI." + "\n" +
+                            " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
+                            " §3/skytils help §l➡ §bShows this help menu." + "\n" +
+                            " §3/skytils reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +
+                            " §3/skytils editlocations §l➡ §bOpens the location editing GUI." + "\n" +
+                            " §3/skytils aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
+                            "§9§l➜ Events:" + "\n" +
+                            " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
+                            " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
+                            "§9§l➜ Miscellaneous:" + "\n" +
+                            " §3/reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
+                            " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)"));
                     return;
                 }
+                break;
+            case "aliases":
+            case "alias":
+            case "editaliases":
+            case "commandaliases":
+                ModCore.getInstance().getGuiHandler().open(new CommandAliasesGui());
                 break;
             case "editlocations":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());

@@ -29,7 +29,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SELECTOR,
             name = "Command Alias Mode",
-            description = "Choose which mode to use for Command Aliases.\nDon't know what this is? Ask us on our Discord.",
+            description = "Choose which mode to use for Command Aliases.",
             category = "General",
             subcategory = "Command Aliases",
             options = {"Simple", "Advanced"}
@@ -44,7 +44,6 @@ public class Config extends Vigilant {
             subcategory = "Reparty"
     )
     public boolean overrideReparty = true;
-
 
     @Property(
             type = PropertyType.SWITCH,
@@ -86,6 +85,24 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Floor 4 Crowd Messages",
+            description = "Hides the messages from the Crowd on Floor 4.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideF4Spam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Spirit Animal Nametags",
+            description = "Removes the nametags above spirit animals on Floor 4.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideF4Nametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Terminal Completion Titles",
             description = "Removes the title that shows up when a terminal is completed.",
             category = "Dungeons",
@@ -96,7 +113,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Hide Wither Miner Nametags",
-            description = "Removes the nametags above Wither Miners in Floor 7.",
+            description = "Removes the nametags above Wither Miners on Floor 7.",
             category = "Dungeons",
             subcategory = "Quality of Life"
     )
@@ -155,6 +172,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean spiritLeapNames = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Giant HP",
+            description = "Shows the HP of Giants in your HUD.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean showGiantHP = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -302,6 +328,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hidden Jerry Alert",
+            description = "Displays an alert when you find a hidden Jerry.",
+            category = "Events",
+            subcategory = "Mayor Jerry"
+    )
+    public boolean hiddenJerryAlert = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
             description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
             category = "Events",
@@ -410,21 +445,48 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Block Giant's Slam",
-            description = "Prevents you from using the Giant's Sword ability.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean blockGiantsSlam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Compact Item Stars",
             description = "Shortens item names with stars in them.",
             category = "Miscellaneous",
             subcategory = "Items"
     )
     public boolean compactStars = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Dragon Rage",
+            description = "Prevents you from using the Aspect of the Dragons ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableDragonRage = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Giant's Slam",
+            description = "Prevents you from using the Giant's Sword ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableGiantsSlam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Livid Dagger Throw",
+            description = "Prevents you from throwing the Livid Dagger.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableDaggerThrow = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Shadow Fury Ability",
+            description = "Prevents you from using the Shadow Fury's teleport ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableShadowFuryAbility = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -539,6 +601,24 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Endstone Protector Spawn Timer",
+            description = "Counts down the time until the Endstone Protector spawns.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean golemSpawnTimer = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Legion Player Display",
+            description = "Shows the amount of players within range of the Legion enchantment.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean legionPlayerDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
@@ -576,12 +656,39 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Air Display",
+            description = "Prevents the game from rendering the air bubbles while underwater.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideAirDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Jerry Rune",
+            description = "Prevents the game from rendering the items spawned by the Jerry rune.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideJerryRune = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Lightning",
             description = "Prevents all lightning from rendering.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
     public boolean hideLightning = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Mob Death Particles",
+            description = "Hides the smoke particles created when mobs die.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideDeathParticles = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -621,12 +728,12 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Hide Mob Death Particles",
-            description = "Hides the little poof of smoke when mobs die.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
+            name = "Dolphin Pet Display",
+            description = "Shows the players within the range of the Dolphin pet.",
+            category = "Pets",
+            subcategory = "Displays"
     )
-    public boolean hideDeathParticles = false;
+    public boolean dolphinPetDisplay = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -645,6 +752,24 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean petItemConfirmation = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Cooldown Sounds",
+            description = "Blocks the sound effect played while an item is on cooldown.",
+            category = "Sounds",
+            subcategory = "Abilities"
+    )
+    public boolean disableCooldownSounds = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Terracotta Sounds",
+            description = "Prevent the game from playing the loud sounds created by the Terracotta.",
+            category = "Sounds",
+            subcategory = "Dungeons"
+    )
+    public boolean disableTerracottaSounds = false;
 
     @Property(
             type = PropertyType.SELECTOR,

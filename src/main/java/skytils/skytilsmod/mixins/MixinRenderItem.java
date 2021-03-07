@@ -34,7 +34,7 @@ public abstract class MixinRenderItem {
      */
     @Inject(method = "renderItemIntoGUI(Lnet/minecraft/item/ItemStack;II)V", at = @At("HEAD"))
     private void renderRarity(ItemStack itemStack, int xPosition, int yPosition, CallbackInfo info) {
-        if (Skytils.config.showItemRarity) {
+        if (Utils.inSkyblock && Skytils.config.showItemRarity) {
             RenderUtil.renderRarity(itemStack, xPosition, yPosition);
         }
     }

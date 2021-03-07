@@ -1,20 +1,34 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
+import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
+
+import java.util.List;
 
 public class PetFeatures {
 
@@ -71,6 +85,57 @@ public class PetFeatures {
             lastPetConfirmation = System.currentTimeMillis();
             mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aYou may now apply pet items for 5 seconds."));
             event.setCanceled(true);
+        }
+    }
+
+    static {
+        new DolphinPetDisplay();
+    }
+
+    public static class DolphinPetDisplay extends GuiElement {
+
+        private static final ResourceLocation ICON = new ResourceLocation("skytils", "icons/dolphin.png");
+
+        public DolphinPetDisplay() {
+            super("Dolphin Pet Display", new FloatPair(50, 20));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        @Override
+        public void render() {
+            EntityPlayerSP player = mc.thePlayer;
+            if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
+                float x = getActualX();
+                float y = getActualY();
+                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                RenderUtil.renderTexture(ICON, (int)x, (int)y);
+                List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 10 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+            }
+        }
+
+        @Override
+        public void demoRender() {
+            float x = getActualX();
+            float y = getActualY();
+            RenderUtil.renderTexture(ICON, (int)x, (int)y);
+            ScreenRenderer.fontRenderer.drawString("5", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        @Override
+        public int getHeight() {
+            return 16;
+        }
+
+        @Override
+        public int getWidth() {
+            return 20 + ScreenRenderer.fontRenderer.getStringWidth("5");
+        }
+
+        @Override
+        public boolean getToggled() {
+            return Skytils.config.dolphinPetDisplay;
         }
     }
 

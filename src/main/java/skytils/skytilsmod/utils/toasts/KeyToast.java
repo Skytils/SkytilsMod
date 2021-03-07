@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 
@@ -33,7 +34,7 @@ public class KeyToast implements IToast<KeyToast>{
         GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, this.player, false);
         RenderHelper.enableGUIStandardItemLighting();
 
-        GuiToast.renderTexture(this.key.texture, 8, 8);
+        RenderUtil.renderTexture(this.key.texture, 8, 8);
 
         GlStateManager.disableLighting();
 

@@ -17,9 +17,11 @@ import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
 import skytils.skytilsmod.core.*;
 import skytils.skytilsmod.events.SendPacketEvent;
+import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
+import skytils.skytilsmod.features.impl.events.MayorJerry;
 import skytils.skytilsmod.features.impl.misc.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
@@ -39,7 +41,7 @@ import java.util.Map;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.0.8-pre6";
+    public static final String VERSION = "0.1.0";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -80,6 +82,7 @@ public class Skytils {
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
+        MinecraftForge.EVENT_BUS.register(new BossHPDisplays());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new ClickInOrderSolver());
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
@@ -90,6 +93,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
         MinecraftForge.EVENT_BUS.register(new IcePathSolver());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());
+        MinecraftForge.EVENT_BUS.register(new MayorJerry());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new MiscFeatures());

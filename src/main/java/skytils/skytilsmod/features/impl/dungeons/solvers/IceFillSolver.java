@@ -219,7 +219,7 @@ public class IceFillSolver {
         IceFillPuzzle(World world, int y) {
             for (BlockPos pos : Utils.getBlocksWithinRangeAtSameY(chestPos, 25, y)) {
                 IBlockState block = world.getBlockState(pos);
-                if(world.getBlockState(pos.down()).getBlock() == Blocks.ice) {
+                if(world.getBlockState(pos.down()).getBlock() == Blocks.ice || world.getBlockState(pos.down()).getBlock() == Blocks.packed_ice) {
                     if(block.getBlock() == Blocks.air) {
                         spaces.add(pos);
                     }

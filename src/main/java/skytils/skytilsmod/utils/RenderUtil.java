@@ -5,6 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -170,6 +171,50 @@ public class RenderUtil {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+    }
+
+    /**
+     * Taken from Skyblockcatia under MIT License
+     * Modified
+     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+     *
+     * @author SteveKunG
+     */
+    public static void renderItem(ItemStack itemStack, int x, int y) {
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.enableDepth();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(itemStack, x, y);
+    }
+
+    /**
+     * Taken from Skyblockcatia under MIT License
+     * Modified
+     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+     *
+     * @author SteveKunG
+     */
+    public static void renderTexture(ResourceLocation texture, int x, int y) {
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.enableDepth();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.pushMatrix();
+        Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(516, 0.1F);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, 16, 16, 16, 16);
+        GlStateManager.disableAlpha();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableLighting();
+        GlStateManager.popMatrix();
     }
 
     /**

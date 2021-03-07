@@ -192,6 +192,7 @@ public class GriffinBurrows {
 
             burrows.clear();
             burrows.addAll(receivedBurrows);
+            particleBurrows.clear();
             if (receivedBurrows.size() == 0) {
                 if (!removedDupes) mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs."));
                 else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."));
@@ -241,7 +242,7 @@ public class GriffinBurrows {
         }
 
         public boolean getToggled() {
-            return Skytils.config.showGriffinBurrows;
+            return Skytils.config.showGriffinBurrows && Skytils.config.showGriffinCountdown;
         }
     }
 
@@ -277,6 +278,9 @@ public class GriffinBurrows {
                 if (burrows.stream().noneMatch(b -> b.getBlockPos().equals(pos)) && dugBurrows.stream().noneMatch(b -> b.equals(pos))) {
                     ParticleBurrow burrow = particleBurrows.stream().filter(b -> b.getBlockPos().equals(pos)).findFirst().orElse(new ParticleBurrow(pos, false, false, -1));
                     if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow);
+                    for (Burrow existingBurrow : burrows) {
+                        if (existingBurrow.getBlockPos().distanceSq(x,y,z) < 4) return;
+                    }
                     if (!burrow.hasFootstep && footstepFilter) {
                         burrow.hasFootstep = true;
                     } else if (!burrow.hasEnchant && enchantFilter) {

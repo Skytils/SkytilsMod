@@ -1,18 +1,21 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -24,7 +27,22 @@ public class MinionFeatures {
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
+        if (event.gui instanceof GuiChest) {
+            ContainerChest chest = (ContainerChest) ((GuiChest) event.gui).inventorySlots;
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            if (chestName.equals("Minion Chest")) return;
+        }
         blockUnenchanted = false;
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (event.packet instanceof S29PacketSoundEffect) {
+            S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
+            if (packet.getSoundName().equals("random.chestopen") && packet.getPitch() == 1 && packet.getVolume() == 1) {
+                blockUnenchanted = false;
+            }
+        }
     }
 
     @SubscribeEvent

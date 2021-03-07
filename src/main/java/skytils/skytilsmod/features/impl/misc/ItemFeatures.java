@@ -153,12 +153,7 @@ public class ItemFeatures {
         if (item == null) return;
 
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
-                event.setCanceled(true);
-            }
-            if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
-                event.setCanceled(true);
-            }
+            if (shouldBlockAbility(item)) event.setCanceled(true);
         } else if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             ArrayList<Block> interactables = new ArrayList<>(Arrays.asList(
                     Blocks.acacia_door,
@@ -202,14 +197,34 @@ public class ItemFeatures {
                 interactables.add(Blocks.stained_hardened_clay);
             }
             if (!interactables.contains(block)) {
-                if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
-                    event.setCanceled(true);
+                if (shouldBlockAbility(item)) event.setCanceled(true);
+            }
+        }
+    }
+
+    private boolean shouldBlockAbility(ItemStack item) {
+        if (item != null) {
+            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+            String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
+            if (extraAttr != null && itemId != null) {
+                if (Skytils.config.blockUselessZombieSword && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth() && itemId.contains("ZOMBIE_SWORD")) {
+                    return true;
                 }
-                if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
-                    event.setCanceled(true);
+                if (Skytils.config.disableDragonRage && itemId.equals("ASPECT_OF_THE_DRAGON")) {
+                    return true;
+                }
+                if (Skytils.config.disableGiantsSlam && itemId.equals("GIANTS_SWORD")) {
+                    return true;
+                }
+                if (Skytils.config.disableDaggerThrow && itemId.equals("LIVID_DAGGER")) {
+                    return true;
+                }
+                if (Skytils.config.disableShadowFuryAbility && itemId.equals("SHADOW_FURY")) {
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @SubscribeEvent

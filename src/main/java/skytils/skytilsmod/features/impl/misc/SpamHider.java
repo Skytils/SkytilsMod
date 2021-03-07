@@ -102,7 +102,7 @@ public class SpamHider {
         }
       
         //No enemies nearby
-        if (unformatted.contains("There are no enemies nearby!")) {
+        if (formatted.startsWith("§r§cThere are no enemies nearby!")) {
             switch (Skytils.config.hideNoEnemiesNearby) {
                 case 1:
                     event.setCanceled(true);
@@ -456,7 +456,7 @@ public class SpamHider {
                 animOnOff += 1;
 
                 if (x < sr.getScaledWidth() / 2) {
-                    x += ((animOnOff * -1) * (messageWidth + 30));
+                    x += (-animOnOff * (messageWidth + 30));
                 } else {
                     x += (animOnOff * (messageWidth + 30));
                 }
@@ -474,7 +474,9 @@ public class SpamHider {
                         shadow = SmartFontRenderer.TextShadow.NORMAL;
                 }
 
-                ScreenRenderer.fontRenderer.drawString(message.message, (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
+                SmartFontRenderer.TextAlignment alignment = x < sr.getScaledWidth() / 2f ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+
+                ScreenRenderer.fontRenderer.drawString(message.message, (float) (x < sr.getScaledWidth() / 2f ? x : x + getWidth()), (float) y, CommonColors.WHITE, alignment, shadow);
 
                 if (message.time > 4000) {
                     spamMessages.remove(message);

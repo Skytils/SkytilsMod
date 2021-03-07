@@ -8,7 +8,7 @@ public class LocationButton extends GuiButton {
     private float x;
     private float y;
     private double scale;
-    private GuiElement element;
+    public GuiElement element;
 
     public LocationButton(GuiElement element) {
         super(-1, 0, 0, null);
