@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,11 +28,6 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.ClickEvent.Action;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.event.entity.player.*;
-import org.lwjgl.opengl.GL11;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
@@ -188,13 +184,12 @@ public class DungeonsFeatures {
                                     }
                                 }
 
-                                GL11.glPushMatrix();
-                                GL11.glTranslated(0, 0, 10);
+                                GlStateManager.pushMatrix();
+                                GlStateManager.translate(0, 0, 10);
                                 if (shouldDrawBkg) Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
                                 fr.drawStringWithShadow(text, x, y, new Color(255, 255,255).getRGB());
-                                GL11.glTranslated(0, 0, -10);
-                                GL11.glPopMatrix();
-
+                                GlStateManager.translate(0, 0, -10);
+                                GlStateManager.popMatrix();
                             }
                         }
                     }
@@ -244,31 +239,6 @@ public class DungeonsFeatures {
                     event.setCanceled(true);
                 if (sound.equals("random.eat") && pitch == 0.6984127f && volume == 1)
                     event.setCanceled(true);
-            }
-        }
-    }
-    
-    // Cancel Abilities
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-    */
-    @SubscribeEvent
-    public void onInteract(PlayerInteractEvent event) {
-        if (!Utils.inSkyblock || Minecraft.getMinecraft().thePlayer != event.entityPlayer) return;
-        ItemStack item = event.entityPlayer.getHeldItem();
-        if (item == null) return;
-
-        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if (Skytils.config.disableAotd && item.getDisplayName().contains("Aspect of the Dragons")) {
-                event.setCanceled(true);
-            }
-            if (Skytils.config.disableLivid && item.getDisplayName().contains("Livid Dagger")) {
-                event.setCanceled(true);
-            }
-            if (Skytils.config.disableFury && item.getDisplayName().contains("Shadow Fury")) {
-                event.setCanceled(true);
             }
         }
     }
