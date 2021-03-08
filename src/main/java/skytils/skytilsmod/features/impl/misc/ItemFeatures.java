@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -68,6 +69,31 @@ public class ItemFeatures {
         }
     }
 
+    private void notifyAndMoveToFreeSlot(Container container) {
+        mc.thePlayer.playSound("note.bass", 1, 0.5f);
+        mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
+        for (Slot slot : container.inventorySlots) {
+            if (slot.inventory != mc.thePlayer.inventory || slot.getHasStack()) continue;
+            mc.playerController.windowClick(container.windowId, slot.slotNumber, 0, 0, mc.thePlayer);
+            break;
+        }
+    }
+
+    @SubscribeEvent
+    public void onCloseWindow(GuiContainerEvent.CloseWindowEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (mc.thePlayer.inventory.getItemStack() != null) {
+            ItemStack item = mc.thePlayer.inventory.getItemStack();
+            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+            if (Skytils.config.protectStarredItems && extraAttr != null) {
+                if ((item.getDisplayName().contains("✪") || extraAttr.hasKey("dungeon_item_level"))) {
+                    notifyAndMoveToFreeSlot(event.container);
+                    return;
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inSkyblock) return;
@@ -116,13 +142,7 @@ public class ItemFeatures {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             if (Skytils.config.protectStarredItems && extraAttr != null) {
                 if ((item.getDisplayName().contains("✪") || extraAttr.hasKey("dungeon_item_level"))) {
-                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
-                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
-                    for (Slot slot : event.container.inventorySlots) {
-                        if (slot.inventory != mc.thePlayer.inventory || slot.getHasStack()) continue;
-                        mc.playerController.windowClick(event.container.windowId, slot.slotNumber, 0, 0, mc.thePlayer);
-                        break;
-                    }
+                    notifyAndMoveToFreeSlot(event.container);
                     event.setCanceled(true);
                     return;
                 }
