@@ -41,7 +41,6 @@ public class TerminalFeatures {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onTooltip(ItemTooltipEvent event) {
         if (!Utils.inDungeons) return;
-        if (!Skytils.config.selectAllColorTerminalSolver) return;
         if (event.toolTip == null) return;
 
         Minecraft mc = Minecraft.getMinecraft();
