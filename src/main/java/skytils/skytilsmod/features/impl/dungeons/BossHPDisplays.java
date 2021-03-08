@@ -81,7 +81,7 @@ public class BossHPDisplays {
                             return true;
                         } else if (Arrays.stream(GIANT_NAMES).anyMatch(name::contains)) {
                             return true;
-                        } else if (name.contains("Giant") && Objects.equals(DungeonsFeatures.dungeonFloor, "F7")) return true;
+                        } else return name.contains("Giant") && Objects.equals(DungeonsFeatures.dungeonFloor, "F7");
                     }
                     return false;
                 });

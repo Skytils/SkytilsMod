@@ -15,20 +15,18 @@ import java.util.List;
 public class BlessingToast implements IToast<BlessingToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
-    private long maxDrawTime;
-    private Blessing blessing;
-    private List<BlessingBuff> buffs;
+    private final long maxDrawTime;
+    private final Blessing blessing;
+    private final List<BlessingBuff> buffs;
 
-    public BlessingToast(String blessing, List<BlessingBuff> buffs)
-    {
+    public BlessingToast(String blessing, List<BlessingBuff> buffs) {
         this.maxDrawTime = Skytils.config.toastTime;
         this.blessing = Blessing.fromName(blessing);
         this.buffs = buffs;
     }
 
     @Override
-    public IToast.Visibility draw(GuiToast toastGui, long delta)
-    {
+    public IToast.Visibility draw(GuiToast toastGui, long delta) {
 
         toastGui.mc.getTextureManager().bindTexture(TEXTURE);
         GlStateManager.color(1.0F, 1.0F, 1.0F);
@@ -38,8 +36,8 @@ public class BlessingToast implements IToast<BlessingToast> {
 
         toastGui.mc.fontRendererObj.drawStringWithShadow(this.blessing.getFormattedName(), 30, 7, 16777215);
 
-        String buffStats = "";
-        for(BlessingBuff buff : this.buffs) {
+        StringBuilder buffStats = new StringBuilder();
+        for (BlessingBuff buff : this.buffs) {
             String color;
             switch (buff.symbol) {
                 case "❤":
@@ -62,9 +60,9 @@ public class BlessingToast implements IToast<BlessingToast> {
                 default:
                     color = EnumChatFormatting.GRAY.toString();
             }
-            buffStats += color + buff.amount + buff.symbol + " ";
+            buffStats.append(color).append(buff.amount).append(buff.symbol).append(" ");
         }
-        GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, buffStats, false);
+        GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, buffStats.toString(), false);
         RenderHelper.enableGUIStandardItemLighting();
 
         RenderUtil.renderTexture(this.blessing.texture, 8, 8);
@@ -73,7 +71,7 @@ public class BlessingToast implements IToast<BlessingToast> {
         return delta >= this.maxDrawTime ? IToast.Visibility.HIDE : IToast.Visibility.SHOW;
     }
 
-     private enum Blessing {
+    private enum Blessing {
         LIFE("life", "skytils:blessings/life.png", "§c§lLIFE BLESSING!"),
         POWER("power", "skytils:blessings/power.png", "§5§lPOWER BLESSING!"),
         STONE("stone", "skytils:blessings/stone.png", "§a§lSTONE BLESSING!"),

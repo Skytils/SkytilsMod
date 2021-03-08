@@ -14,11 +14,11 @@ import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 
-public class SuperboomToast implements IToast<SuperboomToast>{
+public class SuperboomToast implements IToast<SuperboomToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
-    private static ItemStack superBoom = new ItemStack(Item.getItemFromBlock(Blocks.tnt));
+    private static final ItemStack superBoom = new ItemStack(Item.getItemFromBlock(Blocks.tnt));
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
-    private long maxDrawTime;
+    private final long maxDrawTime;
 
     public SuperboomToast() {
         this.maxDrawTime = Skytils.config.toastTime;

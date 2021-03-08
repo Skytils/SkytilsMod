@@ -10,12 +10,12 @@ import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 
-public class KeyToast implements IToast<KeyToast>{
+public class KeyToast implements IToast<KeyToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
-    private long maxDrawTime;
-    private KeyType key;
-    private String player;
+    private final long maxDrawTime;
+    private final KeyType key;
+    private final String player;
 
     public KeyToast(String type, String player) {
         this.key = KeyType.fromName(type);
