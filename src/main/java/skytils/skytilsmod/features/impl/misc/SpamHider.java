@@ -213,7 +213,7 @@ public class SpamHider {
                         buffs.add(new BlessingToast.BlessingBuff(blessingBuffMatcher.group("buff1"), symbol));
                     }
 
-                    GuiManager.toastGui.add(new BlessingToast(lastBlessingType, buffs));
+                    if (!lastBlessingType.equals("")) GuiManager.toastGui.add(new BlessingToast(lastBlessingType, buffs));
                     event.setCanceled(true);
                     break;
                 default:
