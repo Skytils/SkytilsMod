@@ -164,7 +164,6 @@ public class DungeonsFeatures {
                             ItemStack item = slot.getStack();
                             if (item.getItem() == Items.skull) {
                                 people++;
-                                String name = item.getDisplayName();
 
                                 //slot is 16x16
                                 int x = guiLeft + slot.xDisplayPosition + 8;
@@ -179,9 +178,19 @@ public class DungeonsFeatures {
                                 }
 
                                 Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
-                                Matcher matcher = player_pattern.matcher(StringUtils.stripControlCodes(name));
+                                Matcher matcher = player_pattern.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
                                 if (!matcher.find()) continue;
-                                String text = fr.trimStringToWidth(name.substring(0, 2) + matcher.group(1), 32);
+                                String name = matcher.group(1);
+                                if (name.equals("Unknown")) continue;
+                                String dungeonClass = "";
+                                for (String l : ScoreboardUtil.getSidebarLines()) {
+                                    String line = ScoreboardUtil.cleanSB(l);
+                                    if (line.contains(name)) {
+                                        dungeonClass = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
+                                        break;
+                                    }
+                                }
+                                String text = fr.trimStringToWidth(item.getDisplayName().substring(0, 2) + name, 32);
                                 x -= fr.getStringWidth(text) / 2;
 
                                 boolean shouldDrawBkg = true;
@@ -201,12 +210,21 @@ public class DungeonsFeatures {
                                     }
                                 }
 
-                                GlStateManager.pushMatrix();
-                                GlStateManager.translate(0, 0, 10);
+                                double scale = 0.9f;
+                                double scaleReset = 1/scale;
+                                GlStateManager.disableLighting();
+                                GlStateManager.disableDepth();
+                                GlStateManager.disableBlend();
+                                GlStateManager.translate(0, 0, 1);
                                 if (shouldDrawBkg) Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
                                 fr.drawStringWithShadow(text, x, y, new Color(255, 255,255).getRGB());
-                                GlStateManager.translate(0, 0, -10);
-                                GlStateManager.popMatrix();
+                                GlStateManager.scale(scale, scale, scale);
+                                fr.drawString(dungeonClass, (float) (scaleReset * (x + 7)), (float) (scaleReset * (guiTop + slot.yDisplayPosition + 18)), new Color(255, 255, 0).getRGB(), true);
+                                GlStateManager.scale(scaleReset, scaleReset, scaleReset);
+                                GlStateManager.translate(0, 0, -1);
+                                GlStateManager.enableLighting();
+                                GlStateManager.enableDepth();
+
                             }
                         }
                     }
