@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.ItemUtil;
@@ -32,15 +33,15 @@ public abstract class MixinItemStack {
         }
     }
 
-    @Inject(method = "getDisplayName",at = @At("HEAD"), cancellable = true)
-    public void getDisplayName(CallbackInfoReturnable<String> cir) {
+    @ModifyVariable(method = "getDisplayName", at = @At(value = "STORE"))
+    private String modifyDisplayName(String s) {
+        if (!Utils.inSkyblock) return s;
         try {
             if (Skytils.config.compactStars) {
                 if (stackTagCompound.hasKey("display", 10)) {
                     NBTTagCompound nbtTagCompound = stackTagCompound.getCompoundTag("display");
                     if (nbtTagCompound.hasKey("Name", 8)) {
-                        String name = nbtTagCompound.getString("Name");
-                        Matcher starMatcher = starPattern.matcher(name);
+                        Matcher starMatcher = starPattern.matcher(s);
                         if (starMatcher.find()) {
                             int count = 0;
                             int i = 0;
@@ -48,12 +49,13 @@ public abstract class MixinItemStack {
                                 count++;
                                 i = starMatcher.start() + 1;
                             }
-                            cir.setReturnValue(name.replaceAll(starPattern.toString(), "") + "§6" + count + "✪");
+                            s = s.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
                         }
                     }
                 }
 
             }
         } catch(Exception e) { }
+        return s;
     }
 }
