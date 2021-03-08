@@ -21,7 +21,8 @@ import java.awt.*;
 
 public class RenderUtil {
 
-    private static final ResourceLocation RARITY = new ResourceLocation("skytils:gui/rarity.png");
+    private static final ResourceLocation RARITYCIRC = new ResourceLocation("skytils:gui/raritycirc.png");
+    private static final ResourceLocation RARITYRECT = new ResourceLocation("skytils:gui/rarityrect.png");
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
 
     /**
@@ -407,7 +408,11 @@ public class RenderUtil {
             GlStateManager.disableDepth();
             GlStateManager.enableBlend();
             GlStateManager.enableAlpha();
-            Minecraft.getMinecraft().getTextureManager().bindTexture(RARITY);
+            if(Skytils.config.showItemRarity == 1){
+                Minecraft.getMinecraft().getTextureManager().bindTexture(RARITYCIRC);
+            }else if(Skytils.config.showItemRarity == 2){
+                Minecraft.getMinecraft().getTextureManager().bindTexture(RARITYRECT);
+            }
             GlStateManager.color(rarity.getColor().getRed() / 255.0F, rarity.getColor().getGreen() / 255.0F, rarity.getColor().getBlue() / 255.0F, alpha);
             GlStateManager.blendFunc(770, 771);
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND);

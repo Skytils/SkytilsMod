@@ -526,14 +526,24 @@ public class Config extends Vigilant {
     )
     public boolean showSoulEaterBonus = false;
 
+//    @Property(
+//            type = PropertyType.SWITCH,
+//            name = "Show Item Rarity",
+//            description = "Shows the rarity of an item in the color",
+//            category = "Miscellaneous",
+//            subcategory = "Items"
+//    )
+//    public boolean showItemRarity = false;
+
     @Property(
-            type = PropertyType.SWITCH,
+            type = PropertyType.SELECTOR,
             name = "Show Item Rarity",
             description = "Shows the rarity of an item in the color",
             category = "Miscellaneous",
-            subcategory = "Items"
+            subcategory = "Items",
+            options = {"None", "Circle", "Square"}
     )
-    public boolean showItemRarity = false;
+    public int showItemRarity = 0;
 
     @Property(
             type = PropertyType.SLIDER,
