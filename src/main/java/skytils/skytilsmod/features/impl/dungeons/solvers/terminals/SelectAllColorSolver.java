@@ -2,11 +2,15 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
@@ -108,6 +112,25 @@ public class SelectAllColorSolver {
                 if (shouldClick.size() > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory != mc.thePlayer.inventory) {
                     event.setCanceled(true);
                 }
+            }
+        }
+    }
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onTooltip(ItemTooltipEvent event) {
+        if (!Utils.inDungeons) return;
+        if (!Skytils.config.selectAllColorTerminalSolver) return;
+        if (event.toolTip == null) return;
+
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayerSP player = mc.thePlayer;
+
+        if (mc.currentScreen instanceof GuiChest) {
+            ContainerChest chest = (ContainerChest) player.openContainer;
+            IInventory inv = chest.getLowerChestInventory();
+            String chestName = inv.getDisplayName().getUnformattedText();
+
+            if (chestName.startsWith("Select all the")) {
+                event.toolTip.clear();
             }
         }
     }
