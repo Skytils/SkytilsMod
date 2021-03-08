@@ -38,22 +38,16 @@ public abstract class MixinItemStack {
         if (!Utils.inSkyblock) return s;
         try {
             if (Skytils.config.compactStars) {
-                if (stackTagCompound.hasKey("display", 10)) {
-                    NBTTagCompound nbtTagCompound = stackTagCompound.getCompoundTag("display");
-                    if (nbtTagCompound.hasKey("Name", 8)) {
-                        Matcher starMatcher = starPattern.matcher(s);
-                        if (starMatcher.find()) {
-                            int count = 0;
-                            int i = 0;
-                            while (starMatcher.find(i)) {
-                                count++;
-                                i = starMatcher.start() + 1;
-                            }
-                            s = s.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
-                        }
+                Matcher starMatcher = starPattern.matcher(s);
+                if (starMatcher.find()) {
+                    int count = 0;
+                    int i = 0;
+                    while (starMatcher.find(i)) {
+                        count++;
+                        i = starMatcher.start() + 1;
                     }
+                    s = s.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
                 }
-
             }
         } catch(Exception e) { }
         return s;

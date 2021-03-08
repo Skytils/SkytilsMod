@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -31,6 +33,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -73,8 +76,13 @@ public class DungeonsFeatures {
             if (Skytils.config.autoCopyFailToClipboard) {
                 Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
                 if (deathFailMatcher.find()) {
-                    GuiScreen.setClipboardString(unformatted);
-                    mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                    if (!unformatted.contains("disconnect")) {
+                        GuiScreen.setClipboardString(unformatted);
+                        mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                    }
+                    event.message.getChatStyle()
+                            .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("\u00a7aClick to copy to clipboard.")))
+                            .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail " + unformatted));
                 }
             }
 
@@ -87,6 +95,15 @@ public class DungeonsFeatures {
                 if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
                     isInTerracottaPhase = false;
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onSendChatMessage(SendChatMessageEvent event) {
+        if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
+            mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied selected death/fail to clipboard."));
+            GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length()));
+            event.setCanceled(true);
         }
     }
     
