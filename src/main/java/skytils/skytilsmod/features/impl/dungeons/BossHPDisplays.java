@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
@@ -22,7 +21,6 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -31,26 +29,8 @@ public class BossHPDisplays {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    private static String dungeonFloor = null;
 
     private static boolean canGiantsSpawn = false;
-
-
-    @SubscribeEvent
-    public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return;
-        if (Utils.inDungeons) {
-            if (dungeonFloor == null) {
-                for (String s : ScoreboardUtil.getSidebarLines()) {
-                    String line = ScoreboardUtil.cleanSB(s);
-                    if (line.contains("The Catacombs (")) {
-                        dungeonFloor = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
-                        break;
-                    }
-                }
-            }
-        }
-    }
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     public void onChat(ClientChatReceivedEvent event) {
@@ -70,7 +50,6 @@ public class BossHPDisplays {
 
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
-        dungeonFloor = null;
         canGiantsSpawn = false;
     }
 
@@ -100,9 +79,9 @@ public class BossHPDisplays {
                     if (name.contains("❤")) {
                         if (name.contains("§e﴾ §c§lSadan§r")) {
                             return true;
-                        } else if (name.startsWith("§c§") && Arrays.stream(GIANT_NAMES).anyMatch(name::contains)) {
+                        } else if (Arrays.stream(GIANT_NAMES).anyMatch(name::contains)) {
                             return true;
-                        } else if (name.contains("Giant") && Objects.equals(dungeonFloor, "F7")) return true;
+                        } else if (name.contains("Giant") && Objects.equals(DungeonsFeatures.dungeonFloor, "F7")) return true;
                     }
                     return false;
                 });

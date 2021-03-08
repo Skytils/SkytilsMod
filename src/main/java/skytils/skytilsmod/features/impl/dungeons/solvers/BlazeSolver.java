@@ -41,9 +41,11 @@ public class BlazeSolver {
         EntityPlayerSP player = mc.thePlayer;
         WorldClient world = mc.theWorld;
 
+        if (!Utils.inDungeons || world == null || player == null) return;
+
         if (ticks % 20 == 0) {
             ticks = 0;
-            if (Utils.inDungeons && blazeMode == 0 && orderedBlazes.size() > 0 && world != null && player != null) {
+            if (blazeMode == 0 && orderedBlazes.size() > 0) {
                 new Thread(() -> {
                     List<EntityBlaze> blazes = mc.theWorld.getEntities(EntityBlaze.class, (blaze) -> player.getDistanceToEntity(blaze) < 100);
                     if (blazes.size() > 10) {
@@ -92,7 +94,7 @@ public class BlazeSolver {
         }
 
         if (ticks % 4 == 0) {
-            if (Skytils.config.blazeSolver && Utils.inDungeons && world != null) {
+            if (Skytils.config.blazeSolver) {
                 orderedBlazes.clear();
 
                 for (Entity entity : world.getLoadedEntityList()) {

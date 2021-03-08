@@ -1,6 +1,7 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -8,6 +9,7 @@ import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
@@ -17,6 +19,7 @@ import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -31,11 +34,13 @@ import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.NumberUtil;
+import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
+import java.util.List;
 import java.util.Objects;
 
 public class MiscFeatures {
@@ -145,6 +150,7 @@ public class MiscFeatures {
 
     static {
         new GolemSpawnTimerElement();
+        new LegionPlayerDisplay();
     }
 
     public static class GolemSpawnTimerElement extends GuiElement {
@@ -188,6 +194,51 @@ public class MiscFeatures {
         @Override
         public boolean getToggled() {
             return Skytils.config.golemSpawnTimer;
+        }
+    }
+
+    public static class LegionPlayerDisplay extends GuiElement {
+
+        public LegionPlayerDisplay() {
+            super("Legion Player Display", new FloatPair(50, 50));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        @Override
+        public void render() {
+            EntityPlayerSP player = mc.thePlayer;
+            if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
+                float x = getActualX();
+                float y = getActualY();
+                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
+                List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 30 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+            }
+        }
+
+        @Override
+        public void demoRender() {
+            float x = getActualX();
+            float y = getActualY();
+            RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
+            ScreenRenderer.fontRenderer.drawString("30", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        @Override
+        public int getHeight() {
+            return 16;
+        }
+
+        @Override
+        public int getWidth() {
+            return 20 + ScreenRenderer.fontRenderer.getStringWidth("30");
+        }
+
+        @Override
+        public boolean getToggled() {
+            return Skytils.config.legionPlayerDisplay;
         }
     }
 }

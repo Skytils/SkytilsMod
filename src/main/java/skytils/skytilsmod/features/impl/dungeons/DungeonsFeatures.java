@@ -6,9 +6,12 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -26,10 +29,12 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.SendChatMessageEvent;
+import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
@@ -42,7 +47,25 @@ public class DungeonsFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
+    public static String dungeonFloor = null;
+
     private static boolean isInTerracottaPhase = false;
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return;
+        if (Utils.inDungeons) {
+            if (dungeonFloor == null) {
+                for (String s : ScoreboardUtil.getSidebarLines()) {
+                    String line = ScoreboardUtil.cleanSB(s);
+                    if (line.contains("The Catacombs (")) {
+                        dungeonFloor = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
+                        break;
+                    }
+                }
+            }
+        }
+    }
     
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
@@ -52,19 +75,35 @@ public class DungeonsFeatures {
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
                 Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
-                if (deathFailMatcher.matches()) {
-                    GuiScreen.setClipboardString(unformatted);
-                    mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                if (deathFailMatcher.find()) {
+                    if (!unformatted.contains("disconnect")) {
+                        GuiScreen.setClipboardString(unformatted);
+                        mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                    }
+                    event.message.getChatStyle()
+                            .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("\u00a7aClick to copy to clipboard.")))
+                            .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail " + unformatted));
                 }
             }
 
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
                 event.setCanceled(true);
 
-            if (unformatted.equals("[BOSS] Sadan : So you made it all the way here...and you wish to defy me? Sadan?!"))
-                isInTerracottaPhase = true;
-            if (unformatted.startsWith("[BOSS] Sadan : ENOUGH!") || unformatted.startsWith("[BOSS] Sadan : It was inevitable."))
-                isInTerracottaPhase = false;
+            if (unformatted.startsWith("[BOSS] Sadan") && unformatted.contains(":")) {
+                if (unformatted.contains("So you made it all the way here...and you wish to defy me? Sadan?!"))
+                    isInTerracottaPhase = true;
+                if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
+                    isInTerracottaPhase = false;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onSendChatMessage(SendChatMessageEvent event) {
+        if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
+            mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied selected death/fail to clipboard."));
+            GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length()));
+            event.setCanceled(true);
         }
     }
     
@@ -72,31 +111,29 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-            if (event.entity.isInvisible()) {
-                if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+        	if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+                event.entity.setInvisible(false);
+            }
+
+            if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
+                if (event.entity.getName().contains("Shadow Assassin")) {
                     event.entity.setInvisible(false);
                 }
+            }
+        }
 
-                if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
-                    if (event.entity.getName().contains("Shadow Assassin")) {
-                        event.entity.setInvisible(false);
-                    }
+        if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+            if (Skytils.config.hideWitherMinerNametags) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                    mc.theWorld.removeEntity(event.entity);
                 }
             }
 
-            if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-                if (Skytils.config.hideWitherMinerNametags) {
-                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                    if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                        mc.theWorld.removeEntity(event.entity);
-                    }
-                }
-
-                if (Skytils.config.hideF4Nametags) {
-                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                    if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                        mc.theWorld.removeEntity(event.entity);
-                    }
+            if (Skytils.config.hideF4Nametags) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
+                    mc.theWorld.removeEntity(event.entity);
                 }
             }
         }
@@ -164,13 +201,12 @@ public class DungeonsFeatures {
                                     }
                                 }
 
-                                GL11.glPushMatrix();
-                                GL11.glTranslated(0, 0, 10);
+                                GlStateManager.pushMatrix();
+                                GlStateManager.translate(0, 0, 10);
                                 if (shouldDrawBkg) Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
                                 fr.drawStringWithShadow(text, x, y, new Color(255, 255,255).getRGB());
-                                GL11.glTranslated(0, 0, -10);
-                                GL11.glPopMatrix();
-
+                                GlStateManager.translate(0, 0, -10);
+                                GlStateManager.popMatrix();
                             }
                         }
                     }
@@ -226,6 +262,7 @@ public class DungeonsFeatures {
 
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
+        dungeonFloor = null;
         isInTerracottaPhase = false;
     }
 

@@ -292,6 +292,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hidden Jerry Alert",
+            description = "Displays an alert when you find a hidden Jerry.",
+            category = "Events",
+            subcategory = "Mayor Jerry"
+    )
+    public boolean hiddenJerryAlert = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
             description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
             category = "Events",
@@ -400,21 +409,48 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Block Giant's Slam",
-            description = "Prevents you from using the Giant's Sword ability.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean blockGiantsSlam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Compact Item Stars",
             description = "Shortens item names with stars in them.",
             category = "Miscellaneous",
             subcategory = "Items"
     )
     public boolean compactStars = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Dragon Rage",
+            description = "Prevents you from using the Aspect of the Dragons ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableDragonRage = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Giant's Slam",
+            description = "Prevents you from using the Giant's Sword ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableGiantsSlam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Livid Dagger Throw",
+            description = "Prevents you from throwing the Livid Dagger.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableDaggerThrow = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Shadow Fury Ability",
+            description = "Prevents you from using the Shadow Fury's teleport ability.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean disableShadowFuryAbility = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -538,6 +574,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Legion Player Display",
+            description = "Shows the amount of players within range of the Legion enchantment.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean legionPlayerDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
@@ -639,7 +684,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Protect Starred Items",
-            description = "Prevents you from salvaging or selling starred dungeon items.",
+            description = "Prevents you from dropping, salvaging, or selling starred dungeon items.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )

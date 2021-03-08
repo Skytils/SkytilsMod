@@ -34,6 +34,7 @@ public class BoulderSolver {
 
     private static int ticks = 0;
     private static final Minecraft mc = Minecraft.getMinecraft();
+    private static Thread workerThread = null;
 
     public BoulderSolver() {
 
@@ -142,8 +143,8 @@ public class BoulderSolver {
         if (!Skytils.config.boulderSolver) return;
         EntityPlayerSP player = mc.thePlayer;
         World world = mc.theWorld;
-        if (Utils.inDungeons && world != null && player != null && roomVariant == -1) {
-            new Thread(() -> {
+        if (Utils.inDungeons && world != null && player != null && roomVariant != -2 && (workerThread == null || !workerThread.isAlive() || workerThread.isInterrupted())) {
+            workerThread = new Thread(() -> {
                 boolean foundBirch = false;
                 boolean foundBarrier = false;
                 for (BlockPos potentialBarrier : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 13, 68)) {
@@ -218,7 +219,8 @@ public class BoulderSolver {
                     }
                 }
 
-            }).start();
+            });
+            workerThread.start();
         }
     }
 
@@ -228,6 +230,7 @@ public class BoulderSolver {
         boulderFacing = null;
         grid = new BoulderState[7][6];
         roomVariant = -1;
+        workerThread = null;
     }
 
     public static class BoulderPush {
