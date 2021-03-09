@@ -142,6 +142,7 @@ public class SkytilsCommand extends CommandBase {
             case "commandaliases":
                 ModCore.getInstance().getGuiHandler().open(new CommandAliasesGui());
                 break;
+            case "editlocation":
             case "editlocations":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
                 break;
