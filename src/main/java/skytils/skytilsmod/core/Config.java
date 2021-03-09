@@ -646,6 +646,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Cap Legion Display",
+            description = "Caps the legion display to the effective maximum(20)",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean legionCap = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
@@ -797,6 +806,15 @@ public class Config extends Vigilant {
             subcategory = "Displays"
     )
     public boolean dolphinPetDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Cap Dolphin Pet Display",
+            description = "Caps the doplhin pet display to the effective maximum(5)",
+            category = "Pets",
+            subcategory = "Displays"
+    )
+    public boolean dolphinCap = true;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -993,6 +1011,16 @@ public class Config extends Vigilant {
             max = 10_000
     )
     public int toastTime = 2500;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Combo Hider",
+            description = "Removes combo messages from your chat.",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI", "Toasts"}
+    )
+    public int comboHider = 0;
 
     @Property(
             type = PropertyType.SELECTOR,

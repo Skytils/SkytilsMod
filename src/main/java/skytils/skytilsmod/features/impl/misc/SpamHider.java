@@ -15,9 +15,7 @@ import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
-import skytils.skytilsmod.utils.toasts.BlessingToast;
-import skytils.skytilsmod.utils.toasts.KeyToast;
-import skytils.skytilsmod.utils.toasts.SuperboomToast;
+import skytils.skytilsmod.utils.toasts.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -311,6 +309,30 @@ public class SpamHider {
                 default:
             }
 
+        }
+
+        // Combo
+        if (unformatted.contains("Combo")) {
+            switch (Skytils.config.comboHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(formatted);
+                    event.setCanceled(true);
+                    break;
+                case 3:
+                    if (unformatted.startsWith("Your Kill Combo has expired!")) {
+                        Skytils.GUIMANAGER.toastGui.add(new ComboEndToast());
+                    } else {
+                        Skytils.GUIMANAGER.toastGui.add(new ComboToast(formatted));
+                    }
+                    event.setCanceled(true);
+                    break;
+                default:
+
+                    System.out.println(formatted);
+            }
         }
 
         // Blocks in the way
