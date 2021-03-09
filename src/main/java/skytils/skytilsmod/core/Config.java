@@ -619,6 +619,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Cap Legion Display",
+            description = "Caps the legion display to the effective maximum(20)",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean legionCap = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
@@ -770,6 +779,15 @@ public class Config extends Vigilant {
             subcategory = "Displays"
     )
     public boolean dolphinPetDisplay = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Cap Dolphin Pet Display",
+            description = "Caps the doplhin pet display to the effective maximum(5)",
+            category = "Pets",
+            subcategory = "Displays"
+    )
+    public boolean dolphinCap = true;
 
     @Property(
             type = PropertyType.SWITCH,
