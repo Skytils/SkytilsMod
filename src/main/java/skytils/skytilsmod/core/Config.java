@@ -121,24 +121,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Hide F4 Spam",
-            description = "Hides the messages from the Crowd in the F4 Boss",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideF4Spam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide F4 Nametags",
-            description = "Hides the nametags in the F4 Boss",
-            category = "Dungeons",
-            subcategory = "Quality of Life"
-    )
-    public boolean hideF4Nametags = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Hide Terracota Nametags",
             description = "Hides the nametags of terracota while in Dungeons",
             category = "Dungeons",

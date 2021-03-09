@@ -93,7 +93,10 @@ public class ItemFeatures {
                             event.setCanceled(true);
                             return;
                         }
+                        if (extraAttr != null && !extraAttr.hasKey("baseStatBoostPercentage")) {
+                            event.setCanceled(true);
                     }
+                }
                     if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
                         ItemStack sellItem = inv.getStackInSlot(49);
                         if (sellItem != null) {
