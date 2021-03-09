@@ -7,8 +7,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -34,6 +37,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
+import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -129,20 +133,24 @@ public class DungeonsFeatures {
             }
 
             if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-                    if (Skytils.config.hideWitherMinerNametags) {
-                        String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                        if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                            mc.theWorld.removeEntity(event.entity);
-                        }
-                    }
-
-                    if (Skytils.config.hideF4Nametags) {
-                        String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                        if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                            mc.theWorld.removeEntity(event.entity);
-                        }
+                if (Skytils.config.hideWitherMinerNametags) {
+                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                    if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                        mc.theWorld.removeEntity(event.entity);
                     }
                 }
+
+                if (Skytils.config.hideF4Nametags) {
+                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                    if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
+                        mc.theWorld.removeEntity(event.entity);
+                    }
+                }
+            }
+
+            if (event.entity instanceof EntityBat && Skytils.config.showBatHitboxes && !mc.getRenderManager().isDebugBoundingBox()) {
+                RenderUtil.drawOutlinedBoundingBox(event.entity.getEntityBoundingBox(), new Color(0, 255, 255, 255), 3, 1f);
+            }
         }
     }
 

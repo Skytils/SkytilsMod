@@ -121,6 +121,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Larger Bat Models",
+            description = "Increases the size of bat models.\nThe hitbox of the bat may be offset from what is shown.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean biggerBatModels = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Revive Stone Names",
             description = "Shows names next to the heads on the Revive Stone menu.",
             category = "Dungeons",
@@ -130,12 +139,12 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Spirit Leap Names",
-            description = "Shows names next to the heads on the Spirit Leap menu.",
+            name = "Show Bat Hitboxes",
+            description = "Draws the outline of a bat's bounding box.",
             category = "Dungeons",
             subcategory = "Quality of Life"
     )
-    public boolean spiritLeapNames = false;
+    public boolean showBatHitboxes = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -172,6 +181,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean showStealthyBloodMobs = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Spirit Leap Names",
+            description = "Shows names next to the heads on the Spirit Leap menu.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean spiritLeapNames = false;
 
     @Property(
             type = PropertyType.SWITCH,
