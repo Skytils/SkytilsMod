@@ -364,12 +364,12 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Prevent Breaking Farms",
-            description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
+            name = "Block Mathematical Hoe Right Clicks",
+            description = "Prevents accidentally viewing the recipe for the Mathematical Hoes.",
             category = "Farming",
             subcategory = "Quality of Life"
     )
-    public boolean preventBreakingFarms = false;
+    public boolean blockMathHoeClicks = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -379,6 +379,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideFarmingRNGTitles = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Prevent Breaking Farms",
+            description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    public boolean preventBreakingFarms = false;
 
     @Property(
             type = PropertyType.SWITCH,

@@ -257,6 +257,9 @@ public class ItemFeatures {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
             if (extraAttr != null && itemId != null) {
+                if (Skytils.config.blockMathHoeClicks && itemId.startsWith("THEORETICAL_HOE")) {
+                    return true;
+                }
                 if (Skytils.config.blockUselessZombieSword && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth() && itemId.contains("ZOMBIE_SWORD")) {
                     return true;
                 }
