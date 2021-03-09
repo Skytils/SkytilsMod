@@ -29,6 +29,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PetFeatures {
 
@@ -110,6 +111,7 @@ public class PetFeatures {
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 RenderUtil.renderTexture(ICON, (int)x, (int)y);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 10 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
+                players = players.stream().limit(5).collect(Collectors.toList());
                 ScreenRenderer.fontRenderer.drawString(String.valueOf(players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
                 GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
