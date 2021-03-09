@@ -3,14 +3,17 @@ package skytils.skytilsmod.features.impl.spidersden;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -24,7 +27,7 @@ public class SpidersDenFeatures {
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-        if (unformatted.startsWith("☄") && unformatted.contains("placed an Arachne Fragment! (")) {
+        if (unformatted.startsWith("☄") && (unformatted.contains("placed an Arachne Fragment! (") || unformatted.contains("placed an Arachne Crystal! Something is awakening!"))) {
             shouldShowArachneSpawn = true;
         }
         if (unformatted.trim().startsWith("ARACHNE DOWN!")) {

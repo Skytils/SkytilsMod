@@ -248,6 +248,7 @@ public class GriffinBurrows {
 
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
+        if (!Utils.inSkyblock) return;
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet instanceof S2APacketParticles) {
             if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("hub")) return;
             S2APacketParticles packet = (S2APacketParticles) event.packet;
