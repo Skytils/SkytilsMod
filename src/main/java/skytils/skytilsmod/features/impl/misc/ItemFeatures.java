@@ -93,7 +93,7 @@ public class ItemFeatures {
                             event.setCanceled(true);
                             return;
                         }
-                        if (extraAttr != null && !extraAttr.hasKey("baseStatBoostPercentage")) {
+                        if (!extraAttr.hasKey("baseStatBoostPercentage")) {
                             event.setCanceled(true);
                     }
                 }
