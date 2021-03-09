@@ -1,6 +1,5 @@
 package skytils.skytilsmod.features.impl.spidersden;
 
-import jdk.nashorn.internal.ir.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;

@@ -969,6 +969,16 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Combo Hider",
+            description = "Removes combo messages from your chat.",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI", "Toasts"}
+    )
+    public int comboHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
             description = "Removes blocks in the way messages from your chat.",
             category = "Spam",
