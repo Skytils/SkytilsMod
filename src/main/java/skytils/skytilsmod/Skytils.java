@@ -26,6 +26,8 @@ import skytils.skytilsmod.features.impl.misc.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
+import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
+import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
@@ -34,7 +36,6 @@ import skytils.skytilsmod.utils.Utils;
 
 import java.io.File;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Map;
 
 @Mod(modid = Skytils.MODID, name = Skytils.MOD_NAME, version = Skytils.VERSION, acceptedMinecraftVersions = "[1.8.9]", clientSideOnly = true)
@@ -101,6 +102,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new RelicWaypoints());
         MinecraftForge.EVENT_BUS.register(new SelectAllColorSolver());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
+        MinecraftForge.EVENT_BUS.register(new SpidersDenFeatures());
         MinecraftForge.EVENT_BUS.register(new StartsWithSequenceSolver());
         MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
         MinecraftForge.EVENT_BUS.register(new TerminalFeatures());

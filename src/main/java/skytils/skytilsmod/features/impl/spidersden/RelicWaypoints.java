@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.misc;
+package skytils.skytilsmod.features.impl.spidersden;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;

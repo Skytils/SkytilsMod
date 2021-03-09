@@ -7,15 +7,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.features.impl.dungeons.solvers.IceFillSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
-import skytils.skytilsmod.features.impl.misc.RelicWaypoints;
+import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.Utils;
 
-import java.util.Iterator;
 import java.util.Map;
 
 public class DataFetcher {
