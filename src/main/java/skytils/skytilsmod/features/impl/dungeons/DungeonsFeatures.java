@@ -39,6 +39,7 @@ import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,6 +51,8 @@ public class DungeonsFeatures {
     public static String dungeonFloor = null;
 
     private static boolean isInTerracottaPhase = false;
+
+    private static final String[] WATCHER_MOBS = {"Revoker", "Psycho", "Reaper", "Cannibal", "Mute", "Ooze", "Putrid", "Freak", "Leech", "Tear", "Parasite", "Flamer", "Skull", "Mr. Dead", "Vader", "Frost", "Walker", "Wandering Soul", "Bonzo", "Scarf", "Livid"};
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -111,31 +114,35 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-        	if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
-                event.entity.setInvisible(false);
-            }
+            if (event.entity.isInvisible()) {
+                if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
+                    event.entity.setInvisible(false);
+                }
 
-            if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
-                if (event.entity.getName().contains("Shadow Assassin")) {
+                if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer && event.entity.getName().contains("Shadow Assassin")) {
+                    event.entity.setInvisible(false);
+                }
+
+                if (Skytils.config.showStealthyBloodMobs && event.entity instanceof EntityPlayer && Arrays.stream(WATCHER_MOBS).anyMatch(name -> event.entity.getName().trim().equals(name))) {
                     event.entity.setInvisible(false);
                 }
             }
-        }
 
-        if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-            if (Skytils.config.hideWitherMinerNametags) {
-                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
-                    mc.theWorld.removeEntity(event.entity);
-                }
-            }
+            if (event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+                    if (Skytils.config.hideWitherMinerNametags) {
+                        String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                        if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
+                            mc.theWorld.removeEntity(event.entity);
+                        }
+                    }
 
-            if (Skytils.config.hideF4Nametags) {
-                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                    mc.theWorld.removeEntity(event.entity);
+                    if (Skytils.config.hideF4Nametags) {
+                        String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                        if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
+                            mc.theWorld.removeEntity(event.entity);
+                        }
+                    }
                 }
-            }
         }
     }
 

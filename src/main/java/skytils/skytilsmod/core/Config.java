@@ -166,6 +166,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Stealthy Watcher Undeads",
+            description = "Makes stealthy undeads spawned by The Watcher visible.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean showStealthyBloodMobs = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Blaze Solver",
             description = "Changes the color of the blaze to shoot on Higher or Lower.",
             category = "Dungeons",
