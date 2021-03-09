@@ -423,4 +423,29 @@ public class RenderUtil {
             GlStateManager.disableAlpha();
         }
     }
+    public static void renderCommission(int xPos, int yPos) {
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        int guiLeft = (sr.getScaledWidth() - 176) / 2;
+        int guiTop = (sr.getScaledHeight() - 186) / 2;
+        int x = guiLeft + xPos;
+        int y = guiTop + yPos;
+        float alpha = 45 / 100.0F;
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
+        Minecraft.getMinecraft().getTextureManager().bindTexture(RARITYRECT);
+        int redColor = 232;
+        int greenColor = 0;
+        int blueColor = 4;
+        GlStateManager.color(redColor / 255.0F, greenColor / 255.0F, blueColor / 255.0F, alpha);
+        GlStateManager.blendFunc(770, 771);
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, 16, 16, 16, 16);
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.disableAlpha();
+
+    }
 }

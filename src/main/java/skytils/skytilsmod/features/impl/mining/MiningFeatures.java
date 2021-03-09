@@ -1,14 +1,20 @@
 package skytils.skytilsmod.features.impl.mining;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -22,6 +28,7 @@ import skytils.skytilsmod.utils.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -157,6 +164,33 @@ public class MiningFeatures {
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         puzzlerSolution = null;
+    }
+
+    @SubscribeEvent
+    public void onDrawGuiPost(GuiScreenEvent.DrawScreenEvent.Post event) {
+        if (event.gui instanceof GuiChest) {
+            GuiChest inventory = (GuiChest) event.gui;
+            Container containerChest = inventory.inventorySlots;
+            String displayName = ((ContainerChest) containerChest).getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+            List<Slot> invSlots = inventory.inventorySlots.inventorySlots;
+            if (Skytils.config.highlightCommissions) {
+                if (displayName.equals("Commissions")) {
+                    for (Slot slot : invSlots) {
+                        if (slot.inventory == mc.thePlayer.inventory) continue;
+                        if (slot.getHasStack()) {
+                            ItemStack item = slot.getStack();
+                            if (item.getItem() == Items.writable_book) {
+                                List<String> loreList = ItemUtil.getItemLore(item);
+                                String completed = "§7§aCOMPLETED";
+                                if (loreList.contains(completed)) {
+                                    RenderUtil.renderCommission(slot.xDisplayPosition, slot.yDisplayPosition);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

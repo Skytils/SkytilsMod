@@ -382,6 +382,14 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Highlight completed commissions",
+            description = "Highlights completed commissions in the commissions menu.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean highlightCommissions = false;
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Fetchur Solver",
             description = "Tells you what item Fetchur wants.",
             category = "Mining",
