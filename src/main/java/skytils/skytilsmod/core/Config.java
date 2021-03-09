@@ -85,6 +85,33 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Dungeon Score Estimate",
+            description = "Shows an estimate of the current dungeon score.\nRequires the Dungeon Rooms mod in order to use.",
+            category = "Dungeons",
+            subcategory = "Score Calculation"
+    )
+    public boolean showScoreCalculation = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Score Calculation Party Assist",
+            description = "Helps your party determine the amount of secrets in the dungeon.\nRequires the Dungeon Rooms mod in order to use.",
+            category = "Dungeons",
+            subcategory = "Score Calculation"
+    )
+    public boolean scoreCalculationAssist = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Receive Help for Secret Counts",
+            description = "Receive help from your party in order to determine the amount of secrets in the dungeon.",
+            category = "Dungeons",
+            subcategory = "Score Calculation"
+    )
+    public boolean scoreCalculationReceiveAssist = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Floor 4 Crowd Messages",
             description = "Hides the messages from the Crowd on Floor 4.",
             category = "Dungeons",

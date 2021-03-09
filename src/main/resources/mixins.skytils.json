@@ -8,6 +8,7 @@
     "MixinChunk",
     "MixinEntityBlaze",
     "MixinEntityLivingBase",
+    "MixinEntityPlayerSP",
     "MixinEntityRenderer",
     "MixinGuiContainer",
     "MixinGuiIngame",
