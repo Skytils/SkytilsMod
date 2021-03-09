@@ -58,7 +58,7 @@ public class PetFeatures {
             if (item != null) {
                 String itemId = ItemUtil.getSkyBlockItemID(item);
                 if (itemId != null) {
-                    if (itemId.contains("PET_ITEM") || ItemUtil.getItemLore(item).stream().anyMatch(s -> s.contains("PET ITEM"))) {
+                    if (itemId.contains("PET_ITEM") || itemId.contains("CARROT_CANDY") || ItemUtil.getItemLore(item).stream().anyMatch(s -> s.contains("PET ITEM"))) {
                         if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
                             event.setCanceled(true);
                             if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
