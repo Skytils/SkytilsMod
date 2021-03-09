@@ -100,6 +100,20 @@ public class SpamHider {
                 default:
             }
         }
+
+        //Kill Combos
+        if (unformatted.contains("Kill Combo")) {
+            switch (Skytils.config.hideKillCombo) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(formatted);
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
+        }
       
         //No enemies nearby
         if (formatted.startsWith("§r§cThere are no enemies nearby!")) {

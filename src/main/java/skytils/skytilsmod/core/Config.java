@@ -963,6 +963,16 @@ public class Config extends Vigilant {
     )
     public int manaMessages = 0;
 
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Kill Combo Hider",
+            description = "Removes the combo messages from your chat.",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hideKillCombo = 0;
+
     public Config() {
         super(new File("./config/skytils/config.toml"));
         initialize();
