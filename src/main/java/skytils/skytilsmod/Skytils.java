@@ -98,6 +98,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
         MinecraftForge.EVENT_BUS.register(new MiscFeatures());
         MinecraftForge.EVENT_BUS.register(new PetFeatures());
+        MinecraftForge.EVENT_BUS.register(new RelicWaypoints());
         MinecraftForge.EVENT_BUS.register(new SelectAllColorSolver());
         MinecraftForge.EVENT_BUS.register(new SimonSaysSolver());
         MinecraftForge.EVENT_BUS.register(new StartsWithSequenceSolver());

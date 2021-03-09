@@ -728,6 +728,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "View Relic Waypoints",
+            description = "Shows the location of all the relics at the Spider's Den",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean relicWaypoints = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Dolphin Pet Display",
             description = "Shows the players within the range of the Dolphin pet.",
             category = "Pets",
