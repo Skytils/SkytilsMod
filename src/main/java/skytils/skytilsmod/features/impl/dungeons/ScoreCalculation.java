@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ScoreCalculation {
-    public static final Pattern dungeonRoomsModPattern = Pattern.compile("^Dungeon Rooms: You are in §a(?<dimensions>.+) - (?<name>.+)-(?<secrets>\\d+)§r$");
+    public static final Pattern dungeonRoomsModPattern = Pattern.compile("^Dungeon Rooms: You are in §a(?<dimensions>.+) - (?<name>.+)-(?<secrets>\\d+)");
     public static final Pattern internalPattern = Pattern.compile("^Party > .+: \\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)\\] \\((?<secrets>\\d+)\\)$");
     private static final Pattern secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r");
 

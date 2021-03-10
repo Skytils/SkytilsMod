@@ -12,7 +12,7 @@ import java.nio.FloatBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ComboToast implements IToast<ComboToast>{
+public class ComboToast implements IToast<ComboToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private static final Pattern comboPattern = Pattern.compile("(§r§.§l)\\+(\\d+ Kill Combo) (§r§8.+)");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
@@ -23,7 +23,7 @@ public class ComboToast implements IToast<ComboToast>{
 
     public ComboToast(String input) {
         this.maxDrawTime = Skytils.config.toastTime;
-        Matcher comboMatcher =  comboPattern.matcher(input);
+        Matcher comboMatcher = comboPattern.matcher(input);
         if (comboMatcher.find()) {
             this.length = comboMatcher.group(1) + comboMatcher.group(2);
             this.buff = comboMatcher.group(3);
