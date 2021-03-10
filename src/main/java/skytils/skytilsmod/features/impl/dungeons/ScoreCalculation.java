@@ -1,5 +1,7 @@
 package skytils.skytilsmod.features.impl.dungeons;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
@@ -9,11 +11,13 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
@@ -31,7 +35,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ScoreCalculation {
-    public static final Pattern dungeonRoomsModPattern = Pattern.compile("^Dungeon Rooms: You are in §a(?<dimensions>.+) - (?<name>.+)-(?<secrets>\\d+)");
     public static final Pattern partyAssistSecretsPattern = Pattern.compile("^Party > .+: \\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)\\] \\((?<secrets>\\d+)\\)$");
     private static final Pattern secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r");
     private static final Pattern cryptsDestroyedPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r");
@@ -41,27 +44,44 @@ public class ScoreCalculation {
     public static boolean mimicKilled = false;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
+    private static int ticks = 0;
 
     @SubscribeEvent
     public void onAddChatMessage(AddChatMessageEvent event) {
         if (!Utils.inDungeons) return;
         try {
-            Matcher matcher = ScoreCalculation.dungeonRoomsModPattern.matcher(event.message.getFormattedText());
-            if (matcher.find()) {
-                String name = matcher.group("name");
-                int secrets = Integer.parseInt(matcher.group("secrets"));
-                if (!ScoreCalculation.rooms.containsKey(name)) {
-                    ScoreCalculation.rooms.put(name, secrets);
-                    if (Skytils.config.scoreCalculationAssist) {
-                        Skytils.sendMessageQueue.add("/pc $SKYTILS-DUNGEON-SCORE-ROOM$: [" + name + "] (" + secrets + ")");
+            String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+            if (unformatted.equals("null")) {
+                event.setCanceled(true);
+            }
+            if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
+                JsonObject obj = new Gson().fromJson(unformatted, JsonObject.class);
+                if (obj.has("name") && obj.has("category") && obj.has("secrets")) {
+                    String name = obj.get("name").getAsString();
+                    int secrets = obj.get("secrets").getAsInt();
+                    if (!ScoreCalculation.rooms.containsKey(name)) {
+                        ScoreCalculation.rooms.put(name, secrets);
+                        if (Skytils.config.scoreCalculationAssist) {
+                            Skytils.sendMessageQueue.add("/pc $SKYTILS-DUNGEON-SCORE-ROOM$: [" + name + "] (" + secrets + ")");
+                        }
                     }
+                    event.setCanceled(true);
                 }
             }
-        } catch (NumberFormatException ignored) {
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+
+        if (Utils.inDungeons && ticks % 30 == 0 && mc.thePlayer != null && mc.theWorld != null) {
+            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json");
+            ticks = 0;
+        }
+
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
