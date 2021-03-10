@@ -59,7 +59,7 @@ public class DataFetcher {
         loadData();
     }
 
-    private static String[] getStringArrayFromJsonArray(JsonArray jsonArray) {
+    public static String[] getStringArrayFromJsonArray(JsonArray jsonArray) {
         int arraySize = jsonArray.size();
         String[] stringArray = new String[arraySize];
 
