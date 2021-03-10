@@ -260,7 +260,7 @@ public class ScoreCalculation {
                 }
 
                 int skillScore = (100 - (2 * deaths) - (14 * (missingPuzzles + failedPuzzles)));
-                int discoveryScore = ((60 * (clearedPercentage/100)) + ((40*foundSecrets)/Math.max(1, totalSecrets)));
+                double discoveryScore = (Math.floor(60 * (clearedPercentage/100f)) + Math.floor((40*foundSecrets)/Math.max(1, totalSecrets)));
                 double speedScore;
                 int bonusScore = ((mimicKilled ? 2 : 0) + Math.min(crypts, 5));
 
@@ -286,7 +286,7 @@ public class ScoreCalculation {
                 }
 
                 text.add("\u00a76Skill Score:\u00a7a " + skillScore);
-                text.add("\u00a76Estimated Discovery Score:\u00a7a " + discoveryScore);
+                text.add("\u00a76Estimated Discovery Score:\u00a7a " + (int)discoveryScore);
                 text.add("\u00a76Speed Score:\u00a7a " + (int)speedScore);
                 text.add("\u00a76Estimated Bonus Score:\u00a7a " + bonusScore);
                 text.add("\u00a76Estimated Total Score:\u00a7a " + (int)(skillScore + discoveryScore + speedScore + bonusScore));
