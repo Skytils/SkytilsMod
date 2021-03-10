@@ -481,42 +481,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Disable Dragon Rage",
-            description = "Prevents you from using the Aspect of the Dragons ability.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean disableDragonRage = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Disable Giant's Slam",
-            description = "Prevents you from using the Giant's Sword ability.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean disableGiantsSlam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Disable Livid Dagger Throw",
-            description = "Prevents you from throwing the Livid Dagger.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean disableDaggerThrow = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Disable Shadow Fury Ability",
-            description = "Prevents you from using the Shadow Fury's teleport ability.",
-            category = "Miscellaneous",
-            subcategory = "Items"
-    )
-    public boolean disableShadowFuryAbility = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Hide Implosion Particles",
             description = "Removes the explosion created by the Implosion ability.",
             category = "Miscellaneous",

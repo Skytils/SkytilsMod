@@ -13,27 +13,30 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.commands.ArmorColorCommand;
+import skytils.skytilsmod.commands.BlockAbilityCommand;
 import skytils.skytilsmod.commands.RepartyCommand;
 import skytils.skytilsmod.commands.SkytilsCommand;
-import skytils.skytilsmod.core.*;
+import skytils.skytilsmod.core.Config;
+import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.core.GuiManager;
+import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.ScoreCalculation;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
-import skytils.skytilsmod.features.impl.events.MayorJerry;
-import skytils.skytilsmod.features.impl.misc.SpamHider;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
+import skytils.skytilsmod.features.impl.events.MayorJerry;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
-import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.io.File;
 import java.util.ArrayDeque;
@@ -54,9 +57,9 @@ public class Skytils {
     public static int ticks = 0;
 
     public static ArrayDeque<String> sendMessageQueue = new ArrayDeque<>();
-    private static long lastChatMessage = 0;
     public static boolean usingLabymod = false;
     public static boolean usingNEU = false;
+    private static long lastChatMessage = 0;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -71,7 +74,6 @@ public class Skytils {
 
         config.preload();
 
-        ClientCommandHandler.instance.registerCommand(new ArmorColorCommand());
         ClientCommandHandler.instance.registerCommand(new SkytilsCommand());
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -85,6 +87,7 @@ public class Skytils {
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
+        MinecraftForge.EVENT_BUS.register(new BlockAbility());
         MinecraftForge.EVENT_BUS.register(new BossHPDisplays());
         MinecraftForge.EVENT_BUS.register(new BoulderSolver());
         MinecraftForge.EVENT_BUS.register(new ClickInOrderSolver());
@@ -114,7 +117,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new WaterBoardSolver());
 
         ScreenRenderer.refresh();
-        
+
     }
 
     @Mod.EventHandler
@@ -122,19 +125,29 @@ public class Skytils {
         usingLabymod = Loader.isModLoaded("labymod");
         usingNEU = Loader.isModLoaded("notenoughupdates");
 
-        if(!ClientCommandHandler.instance.getCommands().containsKey("reparty")) {
-            ClientCommandHandler.instance.registerCommand(new RepartyCommand());
+        ClientCommandHandler cch = ClientCommandHandler.instance;
+
+        if (!cch.getCommands().containsKey("armorcolor")) {
+            ClientCommandHandler.instance.registerCommand(new ArmorColorCommand());
         }
-        if(!ClientCommandHandler.instance.getCommands().containsKey("rp")) {
-            ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandSet().add(new RepartyCommand());
-            ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandMap().put("rp", new RepartyCommand());
+
+        if (!cch.getCommands().containsKey("blockability")) {
+            ClientCommandHandler.instance.registerCommand(new BlockAbilityCommand());
+        }
+
+        if (!cch.getCommands().containsKey("reparty")) {
+            cch.registerCommand(new RepartyCommand());
+        }
+        if (!cch.getCommands().containsKey("rp")) {
+            ((AccessorCommandHandler) cch).getCommandSet().add(new RepartyCommand());
+            ((AccessorCommandHandler) cch).getCommandMap().put("rp", new RepartyCommand());
         }
         if (Skytils.config.overrideReparty) {
-            if(!ClientCommandHandler.instance.getCommands().containsKey("rp")) {
-                ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandSet().add(new RepartyCommand());
-                ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandMap().put("rp", new RepartyCommand());
+            if (!cch.getCommands().containsKey("rp")) {
+                ((AccessorCommandHandler) cch).getCommandSet().add(new RepartyCommand());
+                ((AccessorCommandHandler) cch).getCommandMap().put("rp", new RepartyCommand());
             }
-            for(Map.Entry<String, ICommand> entry : ClientCommandHandler.instance.getCommands().entrySet()) {
+            for (Map.Entry<String, ICommand> entry : cch.getCommands().entrySet()) {
                 if (Objects.equals(entry.getKey(), "reparty") || Objects.equals(entry.getKey(), "rp")) {
                     entry.setValue(new RepartyCommand());
                 }
