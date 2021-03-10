@@ -19,7 +19,7 @@ public class ComboToast implements IToast<ComboToast>{
     private final long maxDrawTime;
     private String length;
     private String buff;
-    private ResourceLocation buffTexture;
+    private ResourceLocation buffTexture = new ResourceLocation("skytils:combo/comboFail.png");
 
     public ComboToast(String input) {
         this.maxDrawTime = Skytils.config.toastTime;
