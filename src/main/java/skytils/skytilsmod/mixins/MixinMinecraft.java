@@ -43,6 +43,8 @@ public class MixinMinecraft {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
+            if (itemId == null) return;
+
             if (itemId.equals("BLOCK_ZAPPER")) {
                 Skytils.sendMessageQueue.add("/undozap");
             }
