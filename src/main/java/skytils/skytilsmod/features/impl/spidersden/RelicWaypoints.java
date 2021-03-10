@@ -1,6 +1,10 @@
 package skytils.skytilsmod.features.impl.spidersden;
 
-import com.google.gson.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
@@ -25,7 +29,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Map;
 
 public class RelicWaypoints {
     public static final LinkedHashSet<BlockPos> relicLocations = new LinkedHashSet<>();
@@ -124,7 +127,7 @@ public class RelicWaypoints {
         double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks;
 
         if (Skytils.config.relicWaypoints) {
-            for (BlockPos relic : relicLocations) {
+            for (BlockPos relic : ImmutableSet.copyOf(relicLocations)) {
                 if (foundRelics.contains(relic)) continue;
                 double x = relic.getX() - viewerX;
                 double y = relic.getY() - viewerY;
@@ -145,7 +148,7 @@ public class RelicWaypoints {
         }
 
         if (Skytils.config.rareRelicFinder) {
-            for (BlockPos relic : rareRelicLocations) {
+            for (BlockPos relic : ImmutableSet.copyOf(rareRelicLocations)) {
                 double x = relic.getX() - viewerX;
                 double y = relic.getY() - viewerY;
                 double z = relic.getZ() - viewerZ;

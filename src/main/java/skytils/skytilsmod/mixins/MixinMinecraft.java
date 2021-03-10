@@ -15,6 +15,8 @@ import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
+import java.util.Objects;
+
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
     @Shadow
@@ -43,12 +45,9 @@ public class MixinMinecraft {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
-            if (itemId == null) return;
-
-            if (itemId.equals("BLOCK_ZAPPER")) {
+            if (Objects.equals(itemId, "BLOCK_ZAPPER")) {
                 Skytils.sendMessageQueue.add("/undozap");
             }
-
         }
     }
 }

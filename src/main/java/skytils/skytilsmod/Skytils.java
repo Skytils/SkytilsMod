@@ -38,6 +38,7 @@ import skytils.skytilsmod.utils.Utils;
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Map;
+import java.util.Objects;
 
 @Mod(modid = Skytils.MODID, name = Skytils.MOD_NAME, version = Skytils.VERSION, acceptedMinecraftVersions = "[1.8.9]", clientSideOnly = true)
 public class Skytils {
@@ -134,7 +135,7 @@ public class Skytils {
                 ((AccessorCommandHandler)ClientCommandHandler.instance).getCommandMap().put("rp", new RepartyCommand());
             }
             for(Map.Entry<String, ICommand> entry : ClientCommandHandler.instance.getCommands().entrySet()) {
-                if ("reparty".equals(entry.getKey()) || "rp".equals(entry.getKey())) {
+                if (Objects.equals(entry.getKey(), "reparty") || Objects.equals(entry.getKey(), "rp")) {
                     entry.setValue(new RepartyCommand());
                 }
             }
