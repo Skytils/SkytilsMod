@@ -10,7 +10,7 @@ import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 
-public class ComboEndToast implements IToast<ComboToast>{
+public class ComboEndToast implements IToast<ComboToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private static final ResourceLocation ICON = new ResourceLocation("skytils:combo/comboFail.png");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);

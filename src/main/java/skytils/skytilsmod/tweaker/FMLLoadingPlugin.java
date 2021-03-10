@@ -3,6 +3,7 @@ package skytils.skytilsmod.tweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Mixins;
 import skytils.skytilsmod.ModCoreInstaller;
 
@@ -14,6 +15,7 @@ public class FMLLoadingPlugin implements IFMLLoadingPlugin {
     public FMLLoadingPlugin() {
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.skytils.json");
+        MixinEnvironment.getCurrentEnvironment().setObfuscationContext("searge");
     }
 
     @Override
