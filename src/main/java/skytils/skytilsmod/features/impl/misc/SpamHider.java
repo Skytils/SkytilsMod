@@ -323,9 +323,9 @@ public class SpamHider {
                     break;
                 case 3:
                     if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                        Skytils.GUIMANAGER.toastGui.add(new ComboEndToast());
+                        GuiManager.toastGui.add(new ComboEndToast());
                     } else {
-                        Skytils.GUIMANAGER.toastGui.add(new ComboToast(formatted));
+                        GuiManager.toastGui.add(new ComboToast(formatted));
                     }
                     event.setCanceled(true);
                     break;

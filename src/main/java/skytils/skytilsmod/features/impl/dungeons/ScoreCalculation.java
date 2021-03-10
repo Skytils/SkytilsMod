@@ -19,6 +19,7 @@ import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.AddChatMessageEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
+import skytils.skytilsmod.utils.TabListUtils;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
@@ -31,10 +32,12 @@ import java.util.regex.Pattern;
 
 public class ScoreCalculation {
     public static final Pattern dungeonRoomsModPattern = Pattern.compile("^Dungeon Rooms: You are in §a(?<dimensions>.+) - (?<name>.+)-(?<secrets>\\d+)");
-    public static final Pattern internalPattern = Pattern.compile("^Party > .+: \\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)\\] \\((?<secrets>\\d+)\\)$");
+    public static final Pattern partyAssistSecretsPattern = Pattern.compile("^Party > .+: \\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)\\] \\((?<secrets>\\d+)\\)$");
     private static final Pattern secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r");
+    private static final Pattern cryptsDestroyedPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r");
 
     public static HashMap<String, Integer> rooms = new HashMap<>();
+
     public static boolean mimicKilled = false;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
@@ -67,20 +70,25 @@ public class ScoreCalculation {
         try {
             String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
             if (Skytils.config.scoreCalculationReceiveAssist) {
-                if (unformatted.startsWith("Party > ") && unformatted.contains("$SKYTILS-DUNGEON-SCORE-MIMIC$")) {
-                    mimicKilled = true;
-                    event.setCanceled(true);
-                    return;
-                }
-                Matcher matcher = internalPattern.matcher(unformatted);
-                if (matcher.find()) {
-                    String name = matcher.group("name");
-                    int secrets = Integer.parseInt(matcher.group("secrets"));
-                    if (!rooms.containsKey(name)) {
-                        rooms.put(name, secrets);
+                if (unformatted.startsWith("Party > ")) {
+                    if (unformatted.contains("$SKYTILS-DUNGEON-SCORE-MIMIC$")) {
+                        mimicKilled = true;
+                        event.setCanceled(true);
+                        return;
                     }
-                    event.setCanceled(true);
-                    return;
+
+                    if (unformatted.contains("$SKYTILS-DUNGEON-SCORE-ROOM$")) {
+                        Matcher matcher = partyAssistSecretsPattern.matcher(unformatted);
+                        if (matcher.find()) {
+                            String name = matcher.group("name");
+                            int secrets = Integer.parseInt(matcher.group("secrets"));
+                            if (!rooms.containsKey(name)) {
+                                rooms.put(name, secrets);
+                            }
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
                 }
             }
         } catch (NumberFormatException ignored) {
@@ -143,22 +151,28 @@ public class ScoreCalculation {
 
                 ArrayList<String> text = new ArrayList<>();
 
-                for (NetworkPlayerInfo pi : mc.getNetHandler().getPlayerInfoMap()) {
-                    if (pi.getDisplayName() == null) continue;
-                    String name = pi.getDisplayName().getFormattedText();
+                for (NetworkPlayerInfo pi : TabListUtils.getTabEntries()) {
+                    String name = mc.ingameGUI.getTabList().getPlayerName(pi);
                     if (name.contains("Secrets Found:")) {
                         Matcher matcher = secretsFoundPattern.matcher(name);
                         if (matcher.find()) {
-                            text.add("\u00a76Secrets Found: " + matcher.group("secrets"));
-                            break;
+                            text.add("\u00a76Secrets Found:\u00a7a " + matcher.group("secrets"));
+                            continue;
+                        }
+                    }
+                    if (name.contains("Crypts:")) {
+                        Matcher matcher = cryptsDestroyedPattern.matcher(name);
+                        if (matcher.find()) {
+                            text.add("\u00a76Crypts:\u00a7a " + matcher.group("crypts"));
+                            continue;
                         }
                     }
                 }
 
-                text.add("\u00a76Estimated Secret Count: " + (Integer) rooms.values().stream().mapToInt(Integer::intValue).sum());
+                text.add(1, "\u00a76Estimated Secret Count:\u00a7a " + (Integer) rooms.values().stream().mapToInt(Integer::intValue).sum());
 
                 if (DungeonsFeatures.dungeonFloor.equals("F6") || DungeonsFeatures.dungeonFloor.equals("F7")) {
-                    text.add("\u00a76Mimic Killed: " + (ScoreCalculation.mimicKilled ? "\u00a7a✓" : "\u00a7cX"));
+                    text.add("\u00a76Mimic Killed:" + (ScoreCalculation.mimicKilled ? "\u00a7a ✓" : " \u00a7c X"));
                 }
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
@@ -177,7 +191,10 @@ public class ScoreCalculation {
             boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
             ArrayList<String> text = new ArrayList<>();
+            text.add("\u00a76Secrets Found: 99");
             text.add("\u00a76Estimated Secret Count: 99");
+            text.add("\u00a76Crypts: 99");
+            text.add("\u00a76Mimic Killed:\u00a7a ✓");
 
             for (int i = 0; i < text.size(); i++) {
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
@@ -187,7 +204,7 @@ public class ScoreCalculation {
 
         @Override
         public int getHeight() {
-            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT * 4;
         }
 
         @Override

@@ -45,7 +45,6 @@ public class CommandAliases {
             }
         }
         for (Map.Entry<String, JsonElement> alias : aliasesObject.entrySet()) {
-            System.out.println(String.format("Loaded alias '%s', mapped to '%s'", alias.getKey(), alias.getValue().getAsString()));
             aliases.put(alias.getKey(), alias.getValue().getAsString());
         }
     }
