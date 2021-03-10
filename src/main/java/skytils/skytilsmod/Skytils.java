@@ -47,7 +47,7 @@ import java.util.Objects;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.1.2-pre1";
+    public static final String VERSION = "0.1.2-pre2";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
