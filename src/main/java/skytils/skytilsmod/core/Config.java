@@ -746,6 +746,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Arachne HP",
+            description = "Shows the HP of Arachne on your HUD.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean showArachneHP = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "View Relic Waypoints",
             description = "Shows the location of all the relics at the Spider's Den.",
             category = "Miscellaneous",
