@@ -636,6 +636,15 @@ public class Config extends Vigilant {
     public boolean customDamageSplash = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Night Vision",
+            description = "Removes the vanilla effects of Night Vision.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean disableNightVision = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Pot Lock",
             description = "Only allows you to purchase this dungeon pot from Ophelia, no other items.",
