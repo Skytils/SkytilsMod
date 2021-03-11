@@ -10,6 +10,7 @@ import net.minecraft.util.ChatComponentText;
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.utils.ItemUtil;
 
+import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -80,6 +81,26 @@ public class GlintCustomizeCommand extends CommandBase {
                 GlintCustomizer.overrides.remove(itemId);
                 GlintCustomizer.writeSave();
                 sender.addChatMessage(new ChatComponentText("\u00a7aCleared glint overrides for your item."));
+                return;
+            } else {
+                sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
+                return;
+            }
+        } else if (subcommand.equals("color")) {
+            if (originalMessage.contains("set")) {
+                GlintCustomizer.glintColors.put(itemId, Color.decode(args[2]));
+                GlintCustomizer.writeSave();
+                sender.addChatMessage(new ChatComponentText("\u00a7aForced an enchant glint color for your item."));
+                return;
+            } else if (originalMessage.contains("clearall")) {
+                GlintCustomizer.glintColors.clear();
+                GlintCustomizer.writeSave();
+                sender.addChatMessage(new ChatComponentText("\u00a7aRemoved all your custom glint colors."));
+                return;
+            } else if (originalMessage.contains("clear")) {
+                GlintCustomizer.glintColors.remove(itemId);
+                GlintCustomizer.writeSave();
+                sender.addChatMessage(new ChatComponentText("\u00a7aCleared the custom glint color for your item."));
                 return;
             } else {
                 sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
