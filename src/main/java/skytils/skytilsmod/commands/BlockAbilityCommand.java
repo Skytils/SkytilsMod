@@ -7,7 +7,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import skytils.skytilsmod.features.impl.misc.BlockAbility;
+import skytils.skytilsmod.features.impl.handlers.BlockAbility;
 import skytils.skytilsmod.utils.ItemUtil;
 
 import java.util.Collections;

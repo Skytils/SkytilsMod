@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.misc;
+package skytils.skytilsmod.features.impl.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

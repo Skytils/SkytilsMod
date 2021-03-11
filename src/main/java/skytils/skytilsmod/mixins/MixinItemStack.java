@@ -1,5 +1,6 @@
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -20,15 +22,22 @@ public abstract class MixinItemStack {
     private final static Pattern starPattern = Pattern.compile("(§6✪)");
 
     @Shadow public abstract ItemStack copy();
-    @Shadow private NBTTagCompound stackTagCompound;
 
     @Inject(method = "isItemEnchanted", at = @At("HEAD"), cancellable = true)
     private void showEnchantmentGlint(CallbackInfoReturnable<Boolean> cir) {
         if (!Utils.inSkyblock) return;
-        if (Skytils.config.enchantGlintFix) {
-            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(copy());
-            if (extraAttr != null && extraAttr.hasKey("enchantments") && !extraAttr.getCompoundTag("enchantments").getKeySet().isEmpty()) {
-                cir.setReturnValue(true);
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(copy());
+        if (extraAttr != null) {
+            String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
+            if (GlintCustomizer.overrides.containsKey(itemId)) {
+                cir.setReturnValue(GlintCustomizer.overrides.get(itemId));
+                return;
+            }
+            if (Skytils.config.enchantGlintFix) {
+                if (extraAttr != null && extraAttr.hasKey("enchantments") && !extraAttr.getCompoundTag("enchantments").getKeySet().isEmpty()) {
+                    cir.setReturnValue(true);
+                    return;
+                }
             }
         }
     }

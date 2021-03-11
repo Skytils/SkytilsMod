@@ -12,10 +12,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import skytils.skytilsmod.commands.ArmorColorCommand;
-import skytils.skytilsmod.commands.BlockAbilityCommand;
-import skytils.skytilsmod.commands.RepartyCommand;
-import skytils.skytilsmod.commands.SkytilsCommand;
+import skytils.skytilsmod.commands.*;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
@@ -28,6 +25,10 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.events.MayorJerry;
+import skytils.skytilsmod.features.impl.handlers.ArmorColor;
+import skytils.skytilsmod.features.impl.handlers.BlockAbility;
+import skytils.skytilsmod.features.impl.handlers.CommandAliases;
+import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
@@ -95,6 +96,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new DamageSplash());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new FarmingFeatures());
+        MinecraftForge.EVENT_BUS.register(new GlintCustomizer());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
         MinecraftForge.EVENT_BUS.register(new IcePathSolver());
@@ -133,6 +135,10 @@ public class Skytils {
 
         if (!cch.getCommands().containsKey("blockability")) {
             ClientCommandHandler.instance.registerCommand(new BlockAbilityCommand());
+        }
+
+        if (!cch.getCommands().containsKey("glintcustomize")) {
+            ClientCommandHandler.instance.registerCommand(new GlintCustomizeCommand());
         }
 
         if (!cch.getCommands().containsKey("reparty")) {
