@@ -201,6 +201,7 @@ public class WaterBoardSolver {
             Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c -> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue).brighter();
             if (color.isExtended()) {
                 ImmutableSet<LeverBlock> solution = solutions.get(color);
+                if (solution == null) continue;
                 for (Map.Entry<LeverBlock, Boolean> entry : leverStates.entrySet()) {
                     LeverBlock lever = entry.getKey();
                     boolean switched = entry.getValue();

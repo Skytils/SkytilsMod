@@ -23,6 +23,7 @@ import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.AddChatMessageEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
+import skytils.skytilsmod.utils.MathUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.TabListUtils;
 import skytils.skytilsmod.utils.Utils;
@@ -260,7 +261,7 @@ public class ScoreCalculation {
                 }
 
                 int skillScore = (100 - (2 * deaths) - (14 * (missingPuzzles + failedPuzzles)));
-                double discoveryScore = (Math.floor(60 * (clearedPercentage/100f)) + Math.floor((40*foundSecrets)/Math.max(1, totalSecrets)));
+                double discoveryScore = (MathUtil.clamp(Math.floor(60 * (clearedPercentage/100f)), 0,60) + (totalSecrets <= 0 ? 0 : MathUtil.clamp(Math.floor((40f*foundSecrets)/totalSecrets), 0, 40)));
                 double speedScore;
                 int bonusScore = ((mimicKilled ? 2 : 0) + Math.min(crypts, 5));
 

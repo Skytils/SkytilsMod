@@ -191,9 +191,10 @@ public class SpamHider {
                     break;
                 case 2:
                     Matcher blessingTypeMatcher = Pattern.compile("Blessing of (?<blessing>\\w+)").matcher(unformatted);
-                    blessingTypeMatcher.find();
-                    lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ROOT);
-                    event.setCanceled(true);
+                    if (blessingTypeMatcher.find()) {
+                        lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ENGLISH);
+                        event.setCanceled(true);
+                    };
                     break;
                 default:
             }
@@ -330,8 +331,6 @@ public class SpamHider {
                     event.setCanceled(true);
                     break;
                 default:
-
-                    System.out.println(formatted);
             }
         }
 
@@ -453,9 +452,9 @@ public class SpamHider {
 
                 double x= this.getActualX();
                 double y = 0;
-                if (this.getActualY() > sr.getScaledHeight() / 2) {
+                if (this.getActualY() > sr.getScaledHeight() / 2f) {
                     message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
-                } else if (this.getActualY() < sr.getScaledHeight() / 2) {
+                } else if (this.getActualY() < sr.getScaledHeight() / 2f) {
                     message.height = (message.height + ((i * -10) - message.height) * (animDiv * 5));
                 }
 
@@ -477,7 +476,7 @@ public class SpamHider {
                 animOnOff *= -1;
                 animOnOff += 1;
 
-                if (x < sr.getScaledWidth() / 2) {
+                if (x < sr.getScaledWidth() / 2f) {
                     x += (-animOnOff * (messageWidth + 30));
                 } else {
                     x += (animOnOff * (messageWidth + 30));
