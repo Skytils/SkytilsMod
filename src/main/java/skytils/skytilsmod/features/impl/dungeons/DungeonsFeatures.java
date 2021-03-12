@@ -53,8 +53,10 @@ public class DungeonsFeatures {
     private static final Minecraft mc = Minecraft.getMinecraft();
 
     public static String dungeonFloor = null;
+    public static boolean hasBossSpawned = false;
 
     private static boolean isInTerracottaPhase = false;
+
 
     private static final String[] WATCHER_MOBS = {"Revoker", "Psycho", "Reaper", "Cannibal", "Mute", "Ooze", "Putrid", "Freak", "Leech", "Tear", "Parasite", "Flamer", "Skull", "Mr. Dead", "Vader", "Frost", "Walker", "Wandering Soul", "Bonzo", "Scarf", "Livid"};
 
@@ -96,11 +98,16 @@ public class DungeonsFeatures {
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
                 event.setCanceled(true);
 
-            if (unformatted.startsWith("[BOSS] Sadan") && unformatted.contains(":")) {
-                if (unformatted.contains("So you made it all the way here...and you wish to defy me? Sadan?!"))
-                    isInTerracottaPhase = true;
-                if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
-                    isInTerracottaPhase = false;
+            if (unformatted.startsWith("[BOSS]") && unformatted.contains(":")) {
+                if (!unformatted.startsWith("[BOSS] The Watcher")) {
+                    hasBossSpawned = true;
+                }
+                if (unformatted.contains("Sadan")) {
+                    if (unformatted.contains("So you made it all the way here...and you wish to defy me? Sadan?!"))
+                        isInTerracottaPhase = true;
+                    if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
+                        isInTerracottaPhase = false;
+                }
             }
         }
     }
@@ -296,6 +303,7 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         dungeonFloor = null;
+        hasBossSpawned = false;
         isInTerracottaPhase = false;
     }
 

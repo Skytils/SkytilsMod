@@ -95,7 +95,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Score Calculation Party Assist",
-            description = "Helps your party determine the amount of secrets in the dungeon.\nRequires the Dungeon Rooms mod in order to use.",
+            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\nRequires the Dungeon Rooms mod in order to use.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
@@ -646,6 +646,15 @@ public class Config extends Vigilant {
     public boolean customDamageSplash = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Night Vision",
+            description = "Removes the vanilla effects of Night Vision.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean disableNightVision = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Pot Lock",
             description = "Only allows you to purchase this dungeon pot from Ophelia, no other items.",
@@ -753,6 +762,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean showArachneSpawn = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Arachne HP",
+            description = "Shows the HP of Arachne on your HUD.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean showArachneHP = false;
 
     @Property(
             type = PropertyType.SWITCH,

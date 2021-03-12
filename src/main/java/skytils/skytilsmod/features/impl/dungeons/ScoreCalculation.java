@@ -78,7 +78,9 @@ public class ScoreCalculation {
         if (event.phase != TickEvent.Phase.START) return;
 
         if (Utils.inDungeons && ticks % 30 == 0 && mc.thePlayer != null && mc.theWorld != null) {
-            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json");
+            if (!DungeonsFeatures.hasBossSpawned && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
+                ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json");
+            }
             ticks = 0;
         }
 

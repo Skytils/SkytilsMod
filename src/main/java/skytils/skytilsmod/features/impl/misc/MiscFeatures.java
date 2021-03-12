@@ -211,6 +211,18 @@ public class MiscFeatures {
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 float x = getActualX();
                 float y = getActualY();
+
+                boolean hasLegion = false;
+                for (ItemStack armor : player.inventory.armorInventory) {
+                    NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(armor);
+                    if (extraAttr != null && extraAttr.hasKey("enchantments") && extraAttr.getCompoundTag("enchantments").hasKey("ultimate_legion")) {
+                        hasLegion = true;
+                        break;
+                    }
+                }
+
+                if (!hasLegion) return;
+
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 30 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
