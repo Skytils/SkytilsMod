@@ -211,6 +211,25 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Sadan's Interest",
+            description = "Replace Sadan's interest display with Skytils' own.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean showSadanInterest = false;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Show Necron's HP",
+            description = "Shows additional info about Necron's health.",
+            category = "Dungeons",
+            subcategory = "Quality of Life",
+            options = {"None", "HP", "Percentage Health"}
+    )
+    public Integer necronHealth = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Stealthy Watcher Undeads",
             description = "Makes stealthy undeads spawned by The Watcher visible.",
             category = "Dungeons",
@@ -226,16 +245,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean spiritLeapNames = false;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Necron Health",
-            description = "Shows additional info about necron's health",
-            category = "Dungeons",
-            subcategory = "Quality of Life",
-            options = {"None", "HP", "Percentage Health"}
-    )
-    public Integer necronHealth = 0;
 
     @Property(
             type = PropertyType.SWITCH,

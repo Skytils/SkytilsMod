@@ -48,8 +48,6 @@ public class ScoreCalculation {
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static int ticks = 0;
 
-    private static double interComms = 0;
-
     @SubscribeEvent
     public void onAddChatMessage(AddChatMessageEvent event) {
         if (!Utils.inDungeons) return;

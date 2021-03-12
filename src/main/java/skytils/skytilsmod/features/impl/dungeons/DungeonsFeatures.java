@@ -7,8 +7,9 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.BossStatus;
+import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.passive.EntityBat;
@@ -34,9 +35,11 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
+import skytils.skytilsmod.utils.NumberUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
@@ -45,6 +48,7 @@ import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +60,7 @@ public class DungeonsFeatures {
     public static boolean hasBossSpawned = false;
 
     private static boolean isInTerracottaPhase = false;
+    private static double terracottaEndTime = -1;
 
 
     private static final String[] WATCHER_MOBS = {"Revoker", "Psycho", "Reaper", "Cannibal", "Mute", "Ooze", "Putrid", "Freak", "Leech", "Tear", "Parasite", "Flamer", "Skull", "Mr. Dead", "Vader", "Frost", "Walker", "Wandering Soul", "Bonzo", "Scarf", "Livid"};
@@ -73,6 +78,52 @@ public class DungeonsFeatures {
                     }
                 }
             }
+            if (terracottaEndTime > 0) {
+                double timeLeft = terracottaEndTime - (((double)System.currentTimeMillis()) / 1000f);
+                if (timeLeft >= 0) {
+                    BossStatus.healthScale = ((float) timeLeft) / 105;
+                    BossStatus.statusBarTime = 100;
+                    BossStatus.bossName = "§r§c§lSadan's Interest: §r§6" + Math.floor(timeLeft) + "s";
+                    BossStatus.hasColorModifier = false;
+                } else {
+                    terracottaEndTime = -2;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onBossBarSet(BossBarEvent.Set event) {
+        if (!Utils.inDungeons) return;
+        IBossDisplayData displayData = event.displayData;
+        String unformatted = StringUtils.stripControlCodes(event.displayData.getDisplayName().getUnformattedText());
+        if (Objects.equals(dungeonFloor, "F7")) {
+            if (unformatted.contains("Necron")) {
+                switch (Skytils.config.necronHealth) {
+                    case 2:
+                        BossStatus.healthScale = displayData.getHealth() / displayData.getMaxHealth();
+                        BossStatus.statusBarTime = 100;
+                        BossStatus.bossName = displayData.getDisplayName().getFormattedText() + "§r§8 - §r§d" + String.format("%.1f", BossStatus.healthScale * 100) + "%";
+                        BossStatus.hasColorModifier = event.hasColorModifier;
+                        event.setCanceled(true);
+                        break;
+                    case 1:
+                        BossStatus.healthScale = displayData.getHealth() / displayData.getMaxHealth();
+                        BossStatus.statusBarTime = 100;
+                        BossStatus.bossName = displayData.getDisplayName().getFormattedText() + "§r§8 - §r§a" + NumberUtil.format((long) (BossStatus.healthScale * 1_000_000_000)) + "§r§8/§r§a1B§r§c❤";
+                        BossStatus.hasColorModifier = event.hasColorModifier;
+                        event.setCanceled(true);
+                        break;
+                    case 0:
+                }
+            }
+        }
+        if (terracottaEndTime == -1) {
+            if (unformatted.contains("Sadan's Interest Level")) {
+                terracottaEndTime = (((double) System.currentTimeMillis()) / 1000f) + 105;
+            }
+        } else if (terracottaEndTime > 0) {
+            event.setCanceled(true);
         }
     }
     
@@ -103,7 +154,7 @@ public class DungeonsFeatures {
                     hasBossSpawned = true;
                 }
                 if (unformatted.contains("Sadan")) {
-                    if (unformatted.contains("So you made it all the way here...and you wish to defy me? Sadan?!"))
+                    if (unformatted.contains("So you made it all the way here"))
                         isInTerracottaPhase = true;
                     if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
                         isInTerracottaPhase = false;
@@ -305,6 +356,7 @@ public class DungeonsFeatures {
         dungeonFloor = null;
         hasBossSpawned = false;
         isInTerracottaPhase = false;
+        terracottaEndTime = -1;
     }
 
 }
