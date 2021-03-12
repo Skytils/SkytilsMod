@@ -10,6 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
 import java.util.Collections;
@@ -45,6 +46,7 @@ public class GlintCustomizeCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (!Utils.inSkyblock) throw new WrongUsageException("You must be in Skyblock to use this command!");
         EntityPlayerSP player = (EntityPlayerSP) sender;
         ItemStack item = player.getHeldItem();
         if (item == null) {
@@ -85,7 +87,7 @@ public class GlintCustomizeCommand extends CommandBase {
             }
         } else if (subcommand.equals("color")) {
             if (originalMessage.contains("set")) {
-                if (args.length != 2) throw new WrongUsageException("You must specify a valid hex color!");
+                if (args.length != 3) throw new WrongUsageException("You must specify a valid hex color!");
                 try {
                     GlintCustomizer.glintColors.put(itemId, Color.decode(args[2]));
                     GlintCustomizer.writeSave();
