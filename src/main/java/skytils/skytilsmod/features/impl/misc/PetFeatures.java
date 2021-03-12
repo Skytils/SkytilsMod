@@ -29,6 +29,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -129,7 +130,7 @@ public class PetFeatures {
         public void render() {
             EntityPlayerSP player = mc.thePlayer;
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (!lastPet.equals("Dolphin")) return;
+                if (!Objects.equals(lastPet, "Dolphin")) return;
                 float x = getActualX();
                 float y = getActualY();
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);

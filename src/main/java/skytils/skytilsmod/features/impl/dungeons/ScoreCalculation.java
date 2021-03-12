@@ -35,6 +35,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -289,7 +290,7 @@ public class ScoreCalculation {
                 double speedScore;
                 int bonusScore = ((mimicKilled ? 2 : 0) + Math.min(crypts, 5));
 
-                double countedSeconds = DungeonsFeatures.dungeonFloor.equals("F2") ? Math.max(0, secondsElapsed - 120) : secondsElapsed;
+                double countedSeconds = Objects.equals(DungeonsFeatures.dungeonFloor, "F2") ? Math.max(0, secondsElapsed - 120) : secondsElapsed;
                 if (countedSeconds <= 1320) {
                     speedScore = 100;
                 } else if (1320 < countedSeconds && countedSeconds <= 1420) {
