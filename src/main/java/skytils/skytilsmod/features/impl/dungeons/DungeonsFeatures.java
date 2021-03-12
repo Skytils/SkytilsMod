@@ -83,7 +83,7 @@ public class DungeonsFeatures {
                 if (timeLeft >= 0) {
                     BossStatus.healthScale = ((float) timeLeft) / 105;
                     BossStatus.statusBarTime = 100;
-                    BossStatus.bossName = "§r§c§lSadan's Interest: §r§6" + Math.floor(timeLeft) + "s";
+                    BossStatus.bossName = "§r§c§lSadan's Interest: §r§6" + ((int) timeLeft) + "s";
                     BossStatus.hasColorModifier = false;
                 } else {
                     terracottaEndTime = -2;
