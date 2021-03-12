@@ -95,7 +95,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Score Calculation Party Assist",
-            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\nRequires the Dungeon Rooms mod in order to use.",
+            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\u00a7cThis feature is use at your own risk.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
@@ -109,6 +109,15 @@ public class Config extends Vigilant {
             subcategory = "Score Calculation"
     )
     public boolean scoreCalculationReceiveAssist = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Remove Party Chat Notification Sounds",
+            description = "Removes party chat notification sounds caused by score calculation.\n\u00a7cDo not turn this on if you do not use the Hypixel feature.",
+            category = "Dungeons",
+            subcategory = "Score Calculation"
+    )
+    public boolean removePartyChatNotifFromScoreCalc = false;
 
     @Property(
             type = PropertyType.SWITCH,

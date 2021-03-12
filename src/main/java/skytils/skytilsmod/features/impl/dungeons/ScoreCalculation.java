@@ -8,6 +8,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
@@ -22,6 +23,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.AddChatMessageEvent;
+import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.utils.MathUtil;
 import skytils.skytilsmod.utils.ScoreboardUtil;
@@ -45,6 +47,8 @@ public class ScoreCalculation {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static int ticks = 0;
+
+    private static double interComms = 0;
 
     @SubscribeEvent
     public void onAddChatMessage(AddChatMessageEvent event) {
@@ -89,8 +93,8 @@ public class ScoreCalculation {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChatReceived(ClientChatReceivedEvent event) {
         if (!Utils.inDungeons || mc.thePlayer == null) return;
+        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
         try {
-            String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
             if (Skytils.config.scoreCalculationReceiveAssist) {
                 if (unformatted.startsWith("Party > ")) {
                     if (unformatted.contains("$SKYTILS-DUNGEON-SCORE-MIMIC$")) {
@@ -118,6 +122,11 @@ public class ScoreCalculation {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (Skytils.config.removePartyChatNotifFromScoreCalc) {
+            if (unformatted.startsWith("Party > ") && mc.thePlayer != null && !unformatted.contains(mc.thePlayer.getName())) {
+                mc.thePlayer.playSound("random.orb", 1, 1);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -132,6 +141,21 @@ public class ScoreCalculation {
                         Skytils.sendMessageQueue.add("/pc $SKYTILS-DUNGEON-SCORE-MIMIC$");
                     }
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (!Utils.inDungeons) return;
+        if (event.packet instanceof S29PacketSoundEffect) {
+            S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
+            String sound = packet.getSoundName();
+            float pitch = packet.getPitch();
+            float volume = packet.getVolume();
+
+            if (Skytils.config.removePartyChatNotifFromScoreCalc && sound.equals("random.orb") && pitch == 1f && volume == 1f) {
+                event.setCanceled(true);
             }
         }
     }
