@@ -4,6 +4,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -29,7 +30,7 @@ public class GlintCustomizeCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "todo";
+        return "glintcustomize <override/color>";
     }
 
     @Override
@@ -47,17 +48,14 @@ public class GlintCustomizeCommand extends CommandBase {
         EntityPlayerSP player = (EntityPlayerSP) sender;
         ItemStack item = player.getHeldItem();
         if (item == null) {
-            sender.addChatMessage(new ChatComponentText("\u00a7cYou need to hold an item that you wish to customize!"));
-            return;
+            throw new WrongUsageException("You need to hold an item that you wish to customize!");
         }
         String itemId = ItemUtil.getSkyBlockItemID(item);
         if (itemId == null) {
-            sender.addChatMessage(new ChatComponentText("\u00a7cThat isn't a valid item!"));
-            return;
+            throw new WrongUsageException("That isn't a valid item!");
         }
         if (args.length == 0) {
-            sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
-            return;
+            throw new WrongUsageException(getCommandUsage(sender));
         }
         String originalMessage = String.join(" ", args);
         String subcommand = args[0].toLowerCase(Locale.ENGLISH);
@@ -83,14 +81,18 @@ public class GlintCustomizeCommand extends CommandBase {
                 sender.addChatMessage(new ChatComponentText("\u00a7aCleared glint overrides for your item."));
                 return;
             } else {
-                sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
-                return;
+                throw new WrongUsageException("glintcustomize override <on/off/clear/clearall>");
             }
         } else if (subcommand.equals("color")) {
             if (originalMessage.contains("set")) {
-                GlintCustomizer.glintColors.put(itemId, Color.decode(args[2]));
-                GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aForced an enchant glint color for your item."));
+                if (args.length != 2) throw new WrongUsageException("You must specify a valid hex color!");
+                try {
+                    GlintCustomizer.glintColors.put(itemId, Color.decode(args[2]));
+                    GlintCustomizer.writeSave();
+                    sender.addChatMessage(new ChatComponentText("\u00a7aForced an enchant glint color for your item."));
+                } catch (NumberFormatException e) {
+                 throw new WrongUsageException("You must specify a valid hex color!");
+                }
                 return;
             } else if (originalMessage.contains("clearall")) {
                 GlintCustomizer.glintColors.clear();
@@ -103,11 +105,10 @@ public class GlintCustomizeCommand extends CommandBase {
                 sender.addChatMessage(new ChatComponentText("\u00a7aCleared the custom glint color for your item."));
                 return;
             } else {
-                sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
-                return;
+                throw new WrongUsageException("glintcustomize color <set/clearall/clear>");
             }
         } else {
-            player.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
+            throw new WrongUsageException(getCommandUsage(sender));
         }
     }
 }
