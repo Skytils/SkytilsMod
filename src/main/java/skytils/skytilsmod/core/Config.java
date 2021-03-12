@@ -95,7 +95,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Score Calculation Party Assist",
-            description = "Helps your party determine the amount of secrets in the dungeon.\nRequires the Dungeon Rooms mod in order to use.",
+            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\nRequires the Dungeon Rooms mod in order to use.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
