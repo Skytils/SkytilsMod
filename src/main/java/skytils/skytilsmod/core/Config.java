@@ -219,6 +219,16 @@ public class Config extends Vigilant {
     public boolean spiritLeapNames = false;
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Necron Health",
+            description = "Shows additional info about necron's health",
+            category = "Dungeons",
+            subcategory = "Quality of Life",
+            options = {"None", "HP", "Percentage Health"}
+    )
+    public Integer necronHealth = 0;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Blaze Solver",
             description = "Changes the color of the blaze to shoot on Higher or Lower.",
