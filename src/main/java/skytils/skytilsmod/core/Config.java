@@ -747,6 +747,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "No Hurtcam",
+            description = "Removes the screen shake when you are hurt.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean noHurtcam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Ping when in Atoned Horror Danger Zone",
             description = "Pings when you are standing on the Atoned Horror's TNT target.",
             category = "Miscellaneous",
