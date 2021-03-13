@@ -93,8 +93,16 @@ public class ItemFeatures {
                             event.setCanceled(true);
                             return;
                         }
-                        if (!extraAttr.hasKey("baseStatBoostPercentage")) {
+                    }
+                }
+                if (Skytils.config.DontClickNonSalvageable) {
+                    String itemId = ItemUtil.getSkyBlockItemID(item);
+                    if (chestName.startsWith("Salvage") && extraAttr != null) {
+                        if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.getDisplayName().contains("Salvage") && !item.getDisplayName().contains("Essence")) {
                             event.setCanceled(true);
+                            if (itemId.contains("BACKPACK") && !itemId.equals("JUMBO_BACKPACK_UPGRADE"))
+                                event.setCanceled(false);
+                        }
                     }
                 }
                     if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
@@ -113,7 +121,6 @@ public class ItemFeatures {
                 }
             }
         }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTooltip(ItemTooltipEvent event) {

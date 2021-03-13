@@ -710,6 +710,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Stop clicking Non-Salvageable Items",
+            description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean DontClickNonSalvageable = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Dolphin Pet Display",
             description = "Shows the players within the range of the Dolphin pet.",
             category = "Pets",
@@ -962,16 +971,6 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int manaMessages = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
-            name = "Kill Combo Hider",
-            description = "Removes the combo messages from your chat.",
-            category = "Spam",
-            subcategory = "Miscellaneous",
-            options = {"Normal", "Hidden", "Separate GUI"}
-    )
-    public int hideKillCombo = 0;
 
     public Config() {
         super(new File("./config/skytils/config.toml"));
