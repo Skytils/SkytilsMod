@@ -747,6 +747,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Ping when in Atoned Horror Danger Zone",
+            description = "Pings when you are standing on the Atoned Horror's TNT target.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean rev5TNTPing = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Prevent Log Spam",
             description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
             category = "Miscellaneous",
