@@ -35,7 +35,7 @@ public enum ItemRarity {
         }
     }
 
-    private ItemRarity(String name, EnumChatFormatting baseColor, Color color) {
+    ItemRarity(String name, EnumChatFormatting baseColor, Color color) {
         this.name = name;
         this.baseColor = baseColor;
         this.color = color;

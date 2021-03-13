@@ -13,7 +13,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
-import skytils.skytilsmod.features.impl.misc.CommandAliases;
+import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
@@ -142,6 +142,7 @@ public class SkytilsCommand extends CommandBase {
             case "commandaliases":
                 ModCore.getInstance().getGuiHandler().open(new CommandAliasesGui());
                 break;
+            case "editlocation":
             case "editlocations":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
                 break;

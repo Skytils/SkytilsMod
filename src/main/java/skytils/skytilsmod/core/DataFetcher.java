@@ -3,17 +3,17 @@ package skytils.skytilsmod.core;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.features.impl.dungeons.solvers.IceFillSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
+import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.Utils;
 
-import java.util.Iterator;
 import java.util.Map;
 
 public class DataFetcher {
@@ -37,11 +37,19 @@ public class DataFetcher {
             for (Map.Entry<String, JsonElement> solution : triviaData.entrySet()) {
                 TriviaSolver.triviaSolutions.put(solution.getKey(), getStringArrayFromJsonArray(solution.getValue().getAsJsonArray()));
             }
+
+            JsonArray relicData = APIUtil.getArrayResponse(dataUrl + "constants/relics.json");
+            for (int i = 0; i < relicData.size(); i++) {
+                JsonArray coordsArr = relicData.get(i).getAsJsonArray();
+                RelicWaypoints.relicLocations.add(new BlockPos(coordsArr.get(0).getAsInt(), coordsArr.get(1).getAsInt(), coordsArr.get(2).getAsInt()));
+            }
+
         }).start();
     }
 
     private static void clearData() {
         MiningFeatures.fetchurItems.clear();
+        RelicWaypoints.relicLocations.clear();
         ThreeWeirdosSolver.solutions.clear();
         TriviaSolver.triviaSolutions.clear();
     }
@@ -51,7 +59,7 @@ public class DataFetcher {
         loadData();
     }
 
-    private static String[] getStringArrayFromJsonArray(JsonArray jsonArray) {
+    public static String[] getStringArrayFromJsonArray(JsonArray jsonArray) {
         int arraySize = jsonArray.size();
         String[] stringArray = new String[arraySize];
 

@@ -13,6 +13,13 @@ public class GuiContainerEvent extends Event {
         this.container = container;
     }
 
+    public static class CloseWindowEvent extends GuiContainerEvent {
+
+        public CloseWindowEvent(Container container) {
+            super(container);
+        }
+    }
+
     public static class DrawSlotEvent extends GuiContainerEvent {
 
         public Slot slot;

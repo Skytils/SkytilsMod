@@ -3,16 +3,12 @@ package skytils.skytilsmod.utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3i;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import skytils.skytilsmod.Skytils;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 

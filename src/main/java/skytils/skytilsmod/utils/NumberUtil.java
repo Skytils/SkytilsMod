@@ -9,7 +9,7 @@ public class NumberUtil {
     static {
         suffixes.put(1_000L, "k");
         suffixes.put(1_000_000L, "M");
-        suffixes.put(1_000_000_000L, "G");
+        suffixes.put(1_000_000_000L, "B");
         suffixes.put(1_000_000_000_000L, "T");
         suffixes.put(1_000_000_000_000_000L, "P");
         suffixes.put(1_000_000_000_000_000_000L, "E");

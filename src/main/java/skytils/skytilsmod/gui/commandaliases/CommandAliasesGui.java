@@ -3,7 +3,7 @@ package skytils.skytilsmod.gui.commandaliases;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import skytils.skytilsmod.features.impl.misc.CommandAliases;
+import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
 import skytils.skytilsmod.gui.commandaliases.elements.ScrollingCommandAliasesList;
 
