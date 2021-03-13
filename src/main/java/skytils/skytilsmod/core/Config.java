@@ -756,6 +756,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Power Orb Lock",
+            description = "Prevents placing the power orb if the same or better power orb is within range.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean powerOrbLock = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Prevent Log Spam",
             description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
             category = "Miscellaneous",

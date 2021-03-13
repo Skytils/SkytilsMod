@@ -102,6 +102,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
         MinecraftForge.EVENT_BUS.register(new IcePathSolver());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());
+        MinecraftForge.EVENT_BUS.register(new LockOrb());
         MinecraftForge.EVENT_BUS.register(new MayorJerry());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
         MinecraftForge.EVENT_BUS.register(new MinionFeatures());
