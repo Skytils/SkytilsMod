@@ -27,8 +27,8 @@ public class MixinEntityRenderer {
     @ModifyVariable(method = "getMouseOver", at = @At(value = "STORE"))
     private List<Entity> modifyInteractables(List<Entity> entityList) {
         if (Utils.inSkyblock) {
-            List<EntityOtherPlayerMP> npcs = this.mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getUniqueID().version() == 2 && p.getHealth() == 20 && !p.isPlayerSleeping());
             if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs) {
+                List<EntityOtherPlayerMP> npcs = this.mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getUniqueID().version() == 2 && p.getHealth() == 20 && !p.isPlayerSleeping());
                 entityList.removeIf(e -> {
                     if (e instanceof EntityCreeper && e.isInvisible()) {
                         EntityCreeper entity = (EntityCreeper) e;

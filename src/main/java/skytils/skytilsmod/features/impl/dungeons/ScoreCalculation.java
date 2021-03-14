@@ -305,18 +305,18 @@ public class ScoreCalculation {
                 text.add("\u00a76Missing Puzzles:\u00a7a " + missingPuzzles);
                 text.add("\u00a76Failed Puzzles:\u00a7a " + failedPuzzles);
                 text.add("\u00a76Secrets Found:\u00a7a " + foundSecrets);
-                text.add("\u00a76Estimated Secret Count:\u00a7a " + totalSecrets);
+                if (totalSecrets != 0) text.add("\u00a76Estimated Secret Count:\u00a7a " + totalSecrets);
                 text.add("\u00a76Crypts:\u00a7a " + crypts);
                 if (DungeonsFeatures.dungeonFloor.equals("F6") || DungeonsFeatures.dungeonFloor.equals("F7")) {
                     text.add("\u00a76Mimic Killed:" + (ScoreCalculation.mimicKilled ? "\u00a7a ✓" : " \u00a7c X"));
                 }
 
                 text.add("\u00a76Skill Score:\u00a7a " + skillScore);
-                text.add("\u00a76Estimated Discovery Score:\u00a7a " + (int)discoveryScore);
-                text.add("\u00a76Speed Score:\u00a7a " + (int)speedScore);
+                if (totalSecrets != 0) text.add("\u00a76Estimated Discovery Score:\u00a7a " + (int)discoveryScore);
+                if (speedScore != 100) text.add("\u00a76Speed Score:\u00a7a " + (int)speedScore);
                 text.add("\u00a76Estimated Bonus Score:\u00a7a " + bonusScore);
-                text.add("\u00a76Estimated Total Score:\u00a7a " + (int)(skillScore + discoveryScore + speedScore + bonusScore));
-
+                if (totalSecrets != 0) text.add("\u00a76Estimated Total Score:\u00a7a " + (int)(skillScore + discoveryScore + speedScore + bonusScore));
+                if (!Skytils.usingDungeonRooms) text.add("\u00a7cDownload the Dungeon Rooms Mod for discovery estimate.");
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 for (int i = 0; i < text.size(); i++) {

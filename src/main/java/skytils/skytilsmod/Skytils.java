@@ -59,6 +59,7 @@ public class Skytils {
     public static int ticks = 0;
 
     public static ArrayDeque<String> sendMessageQueue = new ArrayDeque<>();
+    public static boolean usingDungeonRooms = false;
     public static boolean usingLabymod = false;
     public static boolean usingNEU = false;
     private static long lastChatMessage = 0;
@@ -127,6 +128,7 @@ public class Skytils {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        usingDungeonRooms = Loader.isModLoaded("dungeonrooms");
         usingLabymod = Loader.isModLoaded("labymod");
         usingNEU = Loader.isModLoaded("notenoughupdates");
 
