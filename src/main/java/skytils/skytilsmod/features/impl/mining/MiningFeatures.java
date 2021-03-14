@@ -32,7 +32,8 @@ public class MiningFeatures {
 
     public static LinkedHashMap<String, String> fetchurItems = new LinkedHashMap<>();
 
-    private final static Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final Pattern EVENT_PATTERN = Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:(?:ACTIVE IN (?<location>.+))|(?:RUNNING)) FOR (?<min>\\d+):(?<sec>\\d+)");
 
     private static BlockPos lastJukebox = null;
     private static BlockPos puzzlerSolution = null;
@@ -46,7 +47,7 @@ public class MiningFeatures {
         String unformatted = event.displayData.getDisplayName().getUnformattedText();
         if (Skytils.config.raffleWarning) {
             if (unformatted.startsWith("EVENT RAFFLE ACTIVE IN")) {
-                Matcher matcher = Pattern.compile("EVENT (?<event>.+) ACTIVE IN (?<location>.+) for (?<min>\\d+):(?<sec>\\d+)").matcher(unformatted);
+                Matcher matcher = EVENT_PATTERN.matcher(unformatted);
                 if (matcher.find()) {
                     int seconds = Integer.parseInt(matcher.group("min")) * 60 + Integer.parseInt(matcher.group("sec"));
                     if (seconds <= 15) {
