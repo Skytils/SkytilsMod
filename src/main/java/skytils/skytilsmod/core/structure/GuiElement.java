@@ -3,9 +3,10 @@ package skytils.skytilsmod.core.structure;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.GuiManager;
 
 public abstract class GuiElement {
-    private static ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+    private static final ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
     String name;
     float scale;
     FloatPair pos;
@@ -21,8 +22,8 @@ public abstract class GuiElement {
     public GuiElement(String name, float scale, FloatPair fp) {
         this.name = name;
         this.scale = scale;
-        if (Skytils.GUIMANAGER.GUIPOSITIONS.containsKey(name)) {
-            this.pos = Skytils.GUIMANAGER.GUIPOSITIONS.get(name);
+        if (GuiManager.GUIPOSITIONS.containsKey(name)) {
+            this.pos = GuiManager.GUIPOSITIONS.get(name);
         } else {
             this.pos = fp;
         }

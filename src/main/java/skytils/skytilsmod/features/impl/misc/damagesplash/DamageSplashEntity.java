@@ -88,7 +88,7 @@ public class DamageSplashEntity extends FakeEntity {
     public void render(float partialTicks, RenderGlobal context, RenderManager render) {
         boolean thirdPerson = render.options.thirdPersonView == 2;
 
-        renderer.setRendering(true);
+        ScreenRenderer.setRendering(true);
         {
             { // setting up
                 rotate(-render.playerViewY, 0f, 1f, 0f); // rotates yaw
@@ -103,6 +103,6 @@ public class DamageSplashEntity extends FakeEntity {
             renderer.drawString(displayText, 0, 0, color/*CommonColors.RAINBOW*/,
                     SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
         }
-        renderer.setRendering(false);
+        ScreenRenderer.setRendering(false);
     }
 }

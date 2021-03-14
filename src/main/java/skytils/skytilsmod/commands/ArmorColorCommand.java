@@ -1,6 +1,5 @@
 package skytils.skytilsmod.commands;
 
-import club.sk1er.mods.core.ModCore;
 import com.google.common.collect.Lists;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
@@ -12,13 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.core.DataFetcher;
-import skytils.skytilsmod.features.impl.events.GriffinBurrows;
-import skytils.skytilsmod.features.impl.misc.ArmorColor;
-import skytils.skytilsmod.features.impl.misc.CommandAliases;
-import skytils.skytilsmod.utils.APIUtil;
+import skytils.skytilsmod.features.impl.handlers.ArmorColor;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 

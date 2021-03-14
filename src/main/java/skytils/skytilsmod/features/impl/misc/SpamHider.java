@@ -15,9 +15,7 @@ import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
-import skytils.skytilsmod.utils.toasts.BlessingToast;
-import skytils.skytilsmod.utils.toasts.KeyToast;
-import skytils.skytilsmod.utils.toasts.SuperboomToast;
+import skytils.skytilsmod.utils.toasts.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -193,9 +191,10 @@ public class SpamHider {
                     break;
                 case 2:
                     Matcher blessingTypeMatcher = Pattern.compile("Blessing of (?<blessing>\\w+)").matcher(unformatted);
-                    blessingTypeMatcher.find();
-                    lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ROOT);
-                    event.setCanceled(true);
+                    if (blessingTypeMatcher.find()) {
+                        lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ENGLISH);
+                        event.setCanceled(true);
+                    };
                     break;
                 default:
             }
@@ -213,7 +212,7 @@ public class SpamHider {
                         buffs.add(new BlessingToast.BlessingBuff(blessingBuffMatcher.group("buff1"), symbol));
                     }
 
-                    GuiManager.toastGui.add(new BlessingToast(lastBlessingType, buffs));
+                    if (!lastBlessingType.equals("")) GuiManager.toastGui.add(new BlessingToast(lastBlessingType, buffs));
                     event.setCanceled(true);
                     break;
                 default:
@@ -311,6 +310,28 @@ public class SpamHider {
                 default:
             }
 
+        }
+
+        // Combo
+        if (unformatted.contains("Combo")) {
+            switch (Skytils.config.comboHider) {
+                case 1:
+                    event.setCanceled(true);
+                    break;
+                case 2:
+                    newMessage(formatted);
+                    event.setCanceled(true);
+                    break;
+                case 3:
+                    if (unformatted.startsWith("Your Kill Combo has expired!")) {
+                        GuiManager.toastGui.add(new ComboEndToast());
+                    } else {
+                        GuiManager.toastGui.add(new ComboToast(formatted));
+                    }
+                    event.setCanceled(true);
+                    break;
+                default:
+            }
         }
 
         // Blocks in the way
@@ -431,9 +452,9 @@ public class SpamHider {
 
                 double x= this.getActualX();
                 double y = 0;
-                if (this.getActualY() > sr.getScaledHeight() / 2) {
+                if (this.getActualY() > sr.getScaledHeight() / 2f) {
                     message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
-                } else if (this.getActualY() < sr.getScaledHeight() / 2) {
+                } else if (this.getActualY() < sr.getScaledHeight() / 2f) {
                     message.height = (message.height + ((i * -10) - message.height) * (animDiv * 5));
                 }
 
@@ -455,7 +476,7 @@ public class SpamHider {
                 animOnOff *= -1;
                 animOnOff += 1;
 
-                if (x < sr.getScaledWidth() / 2) {
+                if (x < sr.getScaledWidth() / 2f) {
                     x += (-animOnOff * (messageWidth + 30));
                 } else {
                     x += (animOnOff * (messageWidth + 30));

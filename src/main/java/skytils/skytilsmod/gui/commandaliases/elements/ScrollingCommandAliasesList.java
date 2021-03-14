@@ -16,8 +16,8 @@ import net.minecraftforge.fml.client.GuiScrollingList;
  */
 public class ScrollingCommandAliasesList extends GuiScrollingList {
 
-    private Minecraft mc;
-    private ArrayList<AliasListEntry> aliases;
+    private final Minecraft mc;
+    private final ArrayList<AliasListEntry> aliases;
 
     public ScrollingCommandAliasesList(Minecraft mc, int width, int height, int top, int bottom, int left, int entryHeight,
                                        int screenWidth, int screenHeight) {
@@ -116,10 +116,10 @@ public class ScrollingCommandAliasesList extends GuiScrollingList {
 
     public class AliasListEntry {
 
-        private GuiTextField key;
-        private GuiTextField message;
-        private GuiButton removeButton;
-        private int id;
+        private final GuiTextField key;
+        private final GuiTextField message;
+        private final GuiButton removeButton;
+        private final int id;
 
         public AliasListEntry(int id, GuiTextField key, GuiTextField message, GuiButton removeButton) {
             this.id = id;

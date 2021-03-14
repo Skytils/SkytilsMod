@@ -1,15 +1,18 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers;
 
+import net.minecraft.block.BlockButtonStone;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StringUtils;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.input.Keyboard;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.utils.Utils;
@@ -70,6 +73,44 @@ public class TriviaSolver {
                     return;
                 } else {
                     triviaAnswer = answer;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!Utils.inDungeons || !Skytils.config.triviaSolver || event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
+        IBlockState block = event.world.getBlockState(event.pos);
+
+        if (block.getBlock() == Blocks.stone_button) {
+            if (triviaAnswer != null) {
+                EntityArmorStand answerLabel = event.world.getEntities(EntityArmorStand.class, (entity -> {
+                    if (entity == null) return false;
+                    if (!entity.hasCustomName()) return false;
+                    String name = entity.getCustomNameTag();
+                    return name.contains(triviaAnswer) && (name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ"));
+                })).stream().findFirst().orElse(null);
+
+                if (answerLabel != null) {
+                    System.out.println("Found Answer Marker " + answerLabel.getCustomNameTag() + " at " + answerLabel.posX + ", " + answerLabel.posY + ", " + answerLabel.posZ);
+                    BlockPos buttonBlock = new BlockPos(answerLabel.posX, 70, answerLabel.posZ);
+                    BlockPos blockBehind = new BlockPos(event.pos.offset(block.getValue(BlockButtonStone.FACING).getOpposite()));
+                    if (mc.theWorld.getBlockState(buttonBlock).getBlock() == Blocks.double_stone_slab && mc.theWorld.getBlockState(blockBehind).getBlock() == Blocks.double_stone_slab && !buttonBlock.equals(blockBehind)) {
+                        boolean isRight = false;
+                        for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+                            if (buttonBlock.offset(dir).equals(event.pos)) {
+                                isRight = true;
+                                break;
+                            }
+                        }
+                        if (!isRight) {
+                            System.out.println("Wrong button clicked, position: " + event.pos.getX() + ", " + event.pos.getY() + ", " + event.pos.getZ());
+                            if (!(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
+                                event.setCanceled(true);
+                            }
+                        }
+                    }
                 }
             }
         }
