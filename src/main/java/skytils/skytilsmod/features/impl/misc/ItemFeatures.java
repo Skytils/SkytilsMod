@@ -146,8 +146,6 @@ public class ItemFeatures {
                     }
                 }
             }
-        }
-
         if (event.slotId == -999 && mc.thePlayer.inventory.getItemStack() != null) {
             ItemStack item = mc.thePlayer.inventory.getItemStack();
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);

@@ -173,6 +173,9 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideNonStarredNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Larger Bat Models",
             description = "Increases the size of bat models.\nThe hitbox of the bat may be offset from what is shown.",
             category = "Dungeons",
@@ -823,6 +826,9 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean DontClickNonSalvageable = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Arachne Spawn",
             description = "Shows the location of the Arachne Altar when a fragment is placed.",
             category = "Miscellaneous",
