@@ -67,6 +67,12 @@ public class MiningFeatures {
 
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
 
+        if (Skytils.config.powerGhastPing) {
+            if (unformatted.startsWith("Find the Powder Ghast near the")) {
+                GuiManager.createTitle("\u00a7POWER GHAST", 20);
+            }
+        }
+
         if (Skytils.config.raffleWaypoint && inRaffle) {
             if ((unformatted.startsWith("You registered") && unformatted.contains("in the raffle event!")) || unformatted.startsWith("No tickets to put in the box...")) {
                 raffleBox = lastJukebox;

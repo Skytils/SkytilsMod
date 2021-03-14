@@ -35,7 +35,7 @@ public class LockOrb {
             PowerOrbs orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.getDisplayName().getFormattedText());
             if (orb != null && orb.ordinal() >= heldOrb.ordinal()) {
                 if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= Math.pow(orb.radius, 2)) {
-                    mc.thePlayer.playSound("random.orb", 0.5f, 0.8f);
+                    mc.thePlayer.playSound("random.orb", 0.8f, 1f);
                     event.setCanceled(true);
                     break;
                 }

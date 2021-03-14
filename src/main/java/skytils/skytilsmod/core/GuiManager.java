@@ -166,7 +166,7 @@ public class GuiManager {
     }
 
     public static void createTitle(String title, int ticks) {
-        Minecraft.getMinecraft().thePlayer.playSound("random.orb", 1, 0.5f);
+        Utils.playLoudSound("random.orb", 0.5);
         GuiManager.title = title;
         GuiManager.titleDisplayTicks = ticks;
     }

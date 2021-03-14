@@ -18,6 +18,7 @@ public class Utils {
 
     public static boolean inSkyblock = false;
     public static boolean inDungeons = false;
+    public static boolean shouldBypassVolume = false;
 
     static Random random = new Random();
 
@@ -99,4 +100,16 @@ public class Utils {
         }
         return false;
     }
+
+    /**
+     * Taken from SkyblockAddons under MIT License
+     * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
+     * @author BiscuitDevelopment
+     */
+    public static void playLoudSound(String sound, double pitch) {
+        shouldBypassVolume = true;
+        mc.thePlayer.playSound(sound, 1, (float) pitch);
+        shouldBypassVolume = false;
+    }
+
 }

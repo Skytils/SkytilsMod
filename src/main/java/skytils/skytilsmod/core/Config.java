@@ -455,6 +455,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Powder Ghast Ping",
+            description = "Displays a title on your screen when a Powder Ghast spawns.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean powerGhastPing = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Raffle Warning",
             description = "Displays a title on your screen 15 seconds from the ending of the raffle.",
             category = "Mining",
