@@ -17,6 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.core.GuiManager;
+import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
@@ -31,6 +33,23 @@ public class MiningFeatures {
     public static LinkedHashMap<String, String> fetchurItems = new LinkedHashMap<>();
 
     private final static Minecraft mc = Minecraft.getMinecraft();
+
+    @SubscribeEvent
+    public void onBossBar(BossBarEvent.Set event) {
+        if (!Utils.inSkyblock) return;
+        String unformatted = event.displayData.getDisplayName().getUnformattedText();
+        if (Skytils.config.raffleWarning) {
+            if (unformatted.startsWith("EVENT RAFFLE ACTIVE IN")) {
+                Matcher matcher = Pattern.compile("EVENT (?<event>.+) ACTIVE IN (?<location>.+) for (?<min>\\d+):(?<sec>\\d+)").matcher(unformatted);
+                if (matcher.find()) {
+                    int seconds = Integer.parseInt(matcher.group("min")) * 60 + Integer.parseInt(matcher.group("sec"));
+                    if (seconds <= 15) {
+                        GuiManager.createTitle("\u00a7cRaffle ending in \u00a7a" + seconds + "s", 20);
+                    }
+                }
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {

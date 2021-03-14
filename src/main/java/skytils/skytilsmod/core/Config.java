@@ -455,6 +455,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Raffle Warning",
+            description = "Displays a title on your screen 15 seconds from the ending of the raffle.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean raffleWarning = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Ghosts",
             description = "Makes the ghosts in The Mist visible.",
             category = "Mining",
