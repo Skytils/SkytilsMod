@@ -464,6 +464,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Raffle Waypoint",
+            description = "Displays a waypoint on your screen to the raffle box after you deposit a ticket.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean raffleWaypoint = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Ghosts",
             description = "Makes the ghosts in The Mist visible.",
             category = "Mining",
