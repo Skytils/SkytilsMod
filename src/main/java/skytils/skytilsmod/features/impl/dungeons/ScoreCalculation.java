@@ -54,7 +54,7 @@ public class ScoreCalculation {
         if (!Utils.inDungeons) return;
         try {
             String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-            if (unformatted.equals("null")) {
+            if (unformatted.equals("null") || unformatted.startsWith("Dungeon Rooms: Use this command in dungeons")) {
                 event.setCanceled(true);
             }
             if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
