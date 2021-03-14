@@ -9,6 +9,7 @@ import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -75,6 +76,16 @@ public class MiscFeatures {
     @SubscribeEvent
     public void onCheckRender(CheckRenderEntityEvent event) {
         if (!Utils.inSkyblock) return;
+
+        if (event.entity instanceof EntityCreeper) {
+            EntityCreeper entity = (EntityCreeper) event.entity;
+            if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.getMaxHealth() == 20 && entity.getHealth() == 20 && entity.getPowered()) {
+                if (mc.theWorld.playerEntities.stream().anyMatch(p -> p instanceof EntityOtherPlayerMP && p.getUniqueID().version() == 2 && p.getHealth() == 20 && !p.isPlayerSleeping() && p.getDistanceSqToEntity(event.entity) <= 49)) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+
         if (event.entity instanceof EntityFallingBlock) {
             EntityFallingBlock entity = (EntityFallingBlock) event.entity;
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.getBlock().getBlock() == Blocks.gold_block) {

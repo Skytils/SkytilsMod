@@ -702,12 +702,12 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Hide Jerry Rune",
-            description = "Prevents the game from rendering the items spawned by the Jerry rune.",
+            name = "Hide Creeper Veil Near NPCs",
+            description = "Stops the Creeper Veil from blocking interaction with NPCs.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
-    public boolean hideJerryRune = false;
+    public boolean hideCreeperVeilNearNPCs = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -717,6 +717,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideEntityFire = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Jerry Rune",
+            description = "Prevents the game from rendering the items spawned by the Jerry rune.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideJerryRune = false;
 
     @Property(
             type = PropertyType.SWITCH,
