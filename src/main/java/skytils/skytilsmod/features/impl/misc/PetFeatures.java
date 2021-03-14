@@ -62,18 +62,6 @@ public class PetFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onChatLow(ClientChatReceivedEvent event) {
-        if (!Utils.inSkyblock) return;
-        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
-
-        if (Skytils.config.hideAutopetMessages) {
-            if (unformatted.contains("Autopet equipped your")) {
-                event.setCanceled(true);
-            }
-        }
-    }
-
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent event) {
         if (!Utils.inSkyblock) return;

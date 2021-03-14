@@ -890,13 +890,14 @@ public class Config extends Vigilant {
     public boolean dolphinCap = true;
 
     @Property(
-            type = PropertyType.SWITCH,
-            name = "Hide Autopet Messages",
-            description = "Removes all autopet messages from chat.",
+            type = PropertyType.SELECTOR,
+            name = "Autopet Message Hider",
+            description = "Removes autopet messages from your chat.",
             category = "Pets",
-            subcategory = "Quality of Life"
+            subcategory = "Quality of Life",
+            options = {"Normal", "Hidden", "Separate GUI"}
     )
-    public boolean hideAutopetMessages = false;
+    public int hideAutopetMessages = 0;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -1113,7 +1114,7 @@ public class Config extends Vigilant {
             subcategory = "Miscellaneous",
             options = {"Normal", "Hidden", "Separate GUI"}
     )
-    public int CantUseAbilityHider = 0;
+    public int hideCantUseAbility = 0;
 
     @Property(
             type = PropertyType.SELECTOR,
