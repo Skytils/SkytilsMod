@@ -119,12 +119,6 @@ public class DungeonsFeatures {
                     mc.theWorld.removeEntity(event.entity);
                 }
             }
-            if (Skytils.config.hideF4Nametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
-                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
-                if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
-                    mc.theWorld.removeEntity(event.entity);
-                }
-            }
             if (Skytils.config.hideNonStarredNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
                 String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
                 if (!name.startsWith("✯ ") && name.contains("❤"))

@@ -710,7 +710,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Stop clicking Non-Salvageable Items",
+            name = "Stop Clicking Non-Salvageable Items",
             description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
