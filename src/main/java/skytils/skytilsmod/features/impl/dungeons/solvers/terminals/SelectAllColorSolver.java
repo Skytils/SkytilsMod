@@ -59,7 +59,8 @@ public class SelectAllColorSolver {
                         ItemStack item = slot.getStack();
                         if (item == null) continue;
                         if (item.isItemEnchanted()) continue;
-                        if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue;
+                        if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8)
+                            continue;
                         if (item.getUnlocalizedName().contains(colorNeeded)) {
                             shouldClick.add(slot.slotNumber);
                         }
@@ -115,6 +116,7 @@ public class SelectAllColorSolver {
             }
         }
     }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onTooltip(ItemTooltipEvent event) {
         if (!Utils.inDungeons) return;

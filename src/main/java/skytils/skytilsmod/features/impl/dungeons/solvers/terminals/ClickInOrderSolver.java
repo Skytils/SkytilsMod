@@ -36,7 +36,8 @@ public class ClickInOrderSolver {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
 
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return;
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null)
+            return;
 
         if (!Skytils.config.clickInOrderTerminalSolver) return;
 
@@ -110,7 +111,7 @@ public class ClickInOrderSolver {
                         GlStateManager.disableLighting();
                         GlStateManager.disableDepth();
                         GlStateManager.disableBlend();
-                        fr.drawStringWithShadow(String.valueOf(item.stackSize), (float)(slot.xDisplayPosition + 9 - fr.getStringWidth(String.valueOf(item.stackSize)) / 2), (float)(slot.yDisplayPosition + 4), 16777215);
+                        fr.drawStringWithShadow(String.valueOf(item.stackSize), (float) (slot.xDisplayPosition + 9 - fr.getStringWidth(String.valueOf(item.stackSize)) / 2), (float) (slot.yDisplayPosition + 4), 16777215);
                         GlStateManager.enableLighting();
                         GlStateManager.enableDepth();
                         event.setCanceled(true);

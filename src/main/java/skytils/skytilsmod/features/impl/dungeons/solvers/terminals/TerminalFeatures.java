@@ -3,7 +3,6 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -51,7 +50,7 @@ public class TerminalFeatures {
             IInventory inv = chest.getLowerChestInventory();
             String chestName = inv.getDisplayName().getUnformattedText();
 
-            if (chestName.equals("Navigate the maze!") ||chestName.equals("Correct all the panes!")) {
+            if (chestName.equals("Navigate the maze!") || chestName.equals("Correct all the panes!")) {
                 event.toolTip.clear();
             }
         }
