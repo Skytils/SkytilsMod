@@ -157,6 +157,24 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Terracotta Nametags",
+            description = "Hides the nametags of the Terracotta while in Dungeons",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideTerracotaNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Non-Starred Mobs Nametags",
+            description = "Hides the nametags of non-starred mobs while in Dungeons",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideNonStarredNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Larger Bat Models",
             description = "Increases the size of bat models.\nThe hitbox of the bat may be offset from what is shown.",
             category = "Dungeons",
@@ -852,6 +870,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean showArachneHP = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Stop Clicking Non-Salvageable Items",
+            description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean stopClickingNonSalvageable = false;
 
     @Property(
             type = PropertyType.SWITCH,

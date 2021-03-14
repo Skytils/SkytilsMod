@@ -171,7 +171,7 @@ public class DungeonsFeatures {
             event.setCanceled(true);
         }
     }
-    
+
     // Show hidden fels
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
@@ -205,10 +205,21 @@ public class DungeonsFeatures {
                     }
                 }
             }
-
+			
+            if (Skytils.config.hideNonStarredNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+                String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                if (!name.startsWith("✯ ") && name.contains("❤"))
+                    if (name.contains("Lurker") || name.contains("Dreadlord") || name.contains("Souleater") || name.contains("Zombie") || name.contains("Skeleton") || name.contains("Skeletor") || name.contains("Sniper") || name.contains("Super Archer") || name.contains("Spider") || name.contains("Fels") || name.contains("Withermancer"))
+                        mc.theWorld.removeEntity(event.entity);
+            }
+        }
+        if (Skytils.config.hideTerracotaNametags && event.entity instanceof EntityArmorStand && event.entity.hasCustomName()) {
+            String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+            if (name.contains("Terracotta "))
+                mc.theWorld.removeEntity(event.entity);
+        }
             if (event.entity instanceof EntityBat && Skytils.config.showBatHitboxes && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible()) {
                 RenderUtil.drawOutlinedBoundingBox(event.entity.getEntityBoundingBox(), new Color(0, 255, 255, 255), 3, 1f);
-            }
         }
     }
 
