@@ -157,9 +157,8 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-
-            name = "Hide Terracota Nametags",
-            description = "Hides the nametags of terracota while in Dungeons",
+            name = "Hide Terracotta Nametags",
+            description = "Hides the nametags of the Terracotta while in Dungeons",
             category = "Dungeons",
             subcategory = "Quality of Life"
     )
@@ -820,15 +819,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Stop Clicking Non-Salvageable Items",
-            description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean DontClickNonSalvageable = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Show Arachne Spawn",
             description = "Shows the location of the Arachne Altar when a fragment is placed.",
             category = "Miscellaneous",
@@ -844,6 +834,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean showArachneHP = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Stop Clicking Non-Salvageable Items",
+            description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean stopClickingNonSalvageable = false;
 
     @Property(
             type = PropertyType.SWITCH,
