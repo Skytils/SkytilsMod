@@ -10,7 +10,7 @@
   <a href="https://github.com/Skytils/SkytilsMod/blob/main/LICENSE" target="_blank">
     <img alt="license" src="https://img.shields.io/github/license/Skytils/SkytilsMod?color=4166f5&style=flat-square" />
   </a>
-  <a href="https://discord.gg/K2wJsBRUqR" target="_blank">
+  <a href="https://discord.gg/skytils" target="_blank">
     <img alt="discord" src="https://img.shields.io/discord/807302538558308352?color=4166f5&label=discord&style=flat-square" />
   </a>
 </p>
@@ -28,7 +28,7 @@ A Hypixel Skyblock Utilities mod.
  - Soul Eater Bonus Strength
  - Spam Hider
 ##### Dungeons
- - Show Hidden Fels
+ - Show Hidden Fels, Shadow Assassins, and blood room mobs
  - Blaze Solver Which Replaces The Skin Textures
  - Boulder Puzzle Solver [WIP]
  - Simon Says Solver [WIP]
@@ -38,29 +38,40 @@ A Hypixel Skyblock Utilities mod.
  - Click in Order Terminal Solver
  - Ice Path Solver
  - Select All Color Solver
+ - Stop dropping, salvaging, and selling starred dungeon items
+ - Bigger bats and bat hitboxes
+ - Giant, Sadan, and Necron HP Display
+ - Better Sadan Interest timer
+ - Score Calculation
+#### Farming
+ - Block Math Hoe recipe viewer
+ - Block breaking farms
 #### Mining 
  - Show Ghosts in the Mist (Also their health)
  - Disable Pickaxe Ability on Private Island
  - Fetchur Solver
  - Puzzler Solver
+ - Raffle Waypoint and Warning
 #### Miscellaneous
  - Block Useless Zombie Sword Uses
  - Prioritize Item Abilities
  - Pet Item Confirmation
- - Hide Autopet Messages
  - Hide Implosion Particles
  - Hide Midas Staff Gold Blocks
  - Big Item Drops
  - Larger Heads
- - Show Enchanted Book Tier
- - Show Potion Tier
+ - Show Enchanted Book, Potion, and Minion Tiers
  - Show Pet Candies
- - Show Minion Tier
  - Only Collect Enchanted Items
  - Hide Witherborn Boss Bars
  - Dungeon Potion Lock
- - Hide lightning
+ - Hide Fire and Lightning
  - Custom Damage Splash
+ - Legion and Dolphin player displays
+ - Alerts for Hidden Jerry spawns
+ - Relic and Rare Uber Relic waypoints
+ - Power Orb Lock
+
 
 And more to come!
 
