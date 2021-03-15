@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
@@ -42,6 +44,18 @@ public class PetFeatures {
     private static long lastPetLockNotif = 0;
 
     public static String lastPet = null;
+
+    @SubscribeEvent
+    public void onCheckRender(CheckRenderEntityEvent event) {
+        if (!Utils.inSkyblock) return;
+
+        if (event.entity instanceof EntityArmorStand) {
+            EntityArmorStand entity = (EntityArmorStand) event.entity;
+            if (Skytils.config.hidePetNametags && entity.getCustomNameTag().contains("§8[§7Lv") && entity.getCustomNameTag().contains("'s ")) {
+                event.setCanceled(true);
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {

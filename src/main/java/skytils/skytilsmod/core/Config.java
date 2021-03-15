@@ -946,6 +946,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Pet Nametags",
+            description = "Hides the nametags above pets.",
+            category = "Pets",
+            subcategory = "Quality of Life"
+    )
+    public boolean hidePetNametags = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Pet Item Confirmation",
             description = "Requires a confirmation before using a pet item.",
             category = "Pets",
