@@ -159,7 +159,7 @@ public class MiningFeatures {
         if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
             if (SBInfo.getInstance().getLocation() != null && SBInfo.getInstance().getLocation().startsWith("dynamic")) {
                 if (Skytils.config.onlyPickaxeAbilitiesInMines && itemId != null && (itemId.contains("PICKAXE") || itemId.contains("DRILL"))) {
-                    event.setCanceled(event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.pos == null || mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.chest);
+                    event.setCanceled(event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.pos == null || mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.chest || mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.trapped_chest);
                 }
             }
             if (Skytils.config.raffleWaypoint && inRaffle && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {

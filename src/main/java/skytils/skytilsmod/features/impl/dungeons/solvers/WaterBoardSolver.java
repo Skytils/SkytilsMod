@@ -270,7 +270,7 @@ public class WaterBoardSolver {
         public BlockPos getLeverPos() {
             if (chestPos == null || roomFacing == null) return null;
 
-            int shiftBy = (ordinal() < 3 ? ordinal() : ordinal() - 3) * 5;
+            int shiftBy = (ordinal() % 3) * 5;
             EnumFacing leverSide = ordinal() < 3 ? roomFacing.rotateY() : roomFacing.rotateYCCW();
             return chestPos.up(5).offset(leverSide.getOpposite(), 6).offset(roomFacing.getOpposite(), 2 + shiftBy).offset(leverSide);
         }

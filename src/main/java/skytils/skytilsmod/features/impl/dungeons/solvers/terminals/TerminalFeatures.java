@@ -3,10 +3,12 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -17,6 +19,21 @@ import skytils.skytilsmod.utils.Utils;
 public class TerminalFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onGUIMouseInput(GuiScreenEvent.MouseInputEvent.Pre event) {
+        if (!Utils.inDungeons) return;
+        // Skytils doesn't use this event, so it must be another mod that cancelled it
+        if (event.isCanceled() && Skytils.config.blockIncorrectTerminalClicks) {
+            if (mc.thePlayer.openContainer instanceof ContainerChest) {
+                ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
+                String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
+                if (chestName.equals("Navigate the maze!") || chestName.equals("Correct all the panes!") || (chestName.startsWith("Select all the") && Skytils.config.selectAllColorTerminalSolver) || (chestName.startsWith("What starts with") && Skytils.config.startsWithSequenceTerminalSolver) || (chestName.equals("Click in order!") && Skytils.config.clickInOrderTerminalSolver)) {
+                    event.setCanceled(false);
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
