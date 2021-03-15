@@ -284,8 +284,7 @@ public class SpamHider {
                 case 3:
                     cancelChatPacket(event, false);
                     String username = Minecraft.getMinecraft().thePlayer.getName();
-                    String player = formatted.substring(0, formatted.indexOf("§r§f"));
-                    if (!StringUtils.stripControlCodes(player.substring(player.indexOf(" ") + 1)).equals(username)) return;
+                    if (!formatted.contains(username)) return;
                     GuiManager.toastGui.add(new SuperboomToast());
                     break;
                 default:
