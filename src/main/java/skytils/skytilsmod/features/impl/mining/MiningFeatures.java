@@ -44,7 +44,7 @@ public class MiningFeatures {
     @SubscribeEvent
     public void onBossBar(BossBarEvent.Set event) {
         if (!Utils.inSkyblock) return;
-        String unformatted = event.displayData.getDisplayName().getUnformattedText();
+        String unformatted = StringUtils.stripControlCodes(event.displayData.getDisplayName().getUnformattedText());
         if (Skytils.config.raffleWarning) {
             if (unformatted.startsWith("EVENT RAFFLE ACTIVE IN")) {
                 Matcher matcher = EVENT_PATTERN.matcher(unformatted);
@@ -200,8 +200,12 @@ public class MiningFeatures {
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (!Utils.inSkyblock) return;
-        if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
-            if (Skytils.config.showGhosts && event.entity.isInvisible() && event.entity instanceof EntityCreeper) {
+        if (event.entity instanceof EntityCreeper && event.entity.isInvisible()) {
+            EntityCreeper entity = (EntityCreeper) event.entity;
+            if (Skytils.config.showSneakyCreeper && !entity.getPowered() && event.entity.getMaxHealth() == 120) {
+                event.entity.setInvisible(false);
+            }
+            if (Skytils.config.showGhosts && event.entity.getMaxHealth() == 1024 && entity.getPowered()) {
                 event.entity.setInvisible(false);
             }
         }
@@ -210,8 +214,9 @@ public class MiningFeatures {
     @SubscribeEvent
     public void onRenderLivingPost(RenderLivingEvent.Post event) {
         if (!Utils.inSkyblock) return;
-        if (ScoreboardUtil.getSidebarLines().stream().anyMatch(l -> ScoreboardUtil.cleanSB(l).contains("The Mist"))) {
-            if (Skytils.config.showGhostHealth && event.entity instanceof EntityCreeper) {
+        if (Skytils.config.showGhostHealth && event.entity instanceof EntityCreeper && event.entity.getMaxHealth() == 1024) {
+            EntityCreeper entity = (EntityCreeper) event.entity;
+            if (entity.getPowered()) {
                 String healthText = String.format("\u00a7cGhost \u00a7a%s\u00a7f/\u00a7a1M\u00a7c ❤", NumberUtil.format((long) event.entity.getHealth()));
                 RenderUtil.draw3DString(new Vec3(event.entity.getPosition().add(0, event.entity.getEyeHeight() + 0.5, 0)), healthText, new Color(255, 255, 255), 1f);
             }

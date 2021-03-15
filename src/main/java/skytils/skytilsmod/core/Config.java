@@ -473,6 +473,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Sneaky Creeper",
+            description = "Makes Sneaky Creepers in the Deep Caverns visible.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean showSneakyCreeper = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Powder Ghast Ping",
             description = "Displays a title on your screen when a Powder Ghast spawns.",
             category = "Mining",
