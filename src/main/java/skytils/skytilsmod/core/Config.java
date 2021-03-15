@@ -810,6 +810,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Slayer Miniboss Spawn Alert",
+            description = "Displays a title when a slayer miniboss spawns.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerMinibossSpawnAlert = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "No Hurtcam",
             description = "Removes the screen shake when you are hurt.",
             category = "Miscellaneous",

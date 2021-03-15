@@ -27,6 +27,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.BossBarEvent;
@@ -125,6 +126,9 @@ public class MiscFeatures {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
             if (Skytils.config.disableCooldownSounds && packet.getSoundName().equals("mob.endermen.portal") && packet.getPitch() == 0 && packet.getVolume() == 8) {
                 event.setCanceled(true);
+            }
+            if (Skytils.config.slayerMinibossSpawnAlert && packet.getSoundName().equals("random.explode") && packet.getVolume() == 0.6f && packet.getPitch() == 9/7f) {
+                GuiManager.createTitle("\u00a7cMINIBOSS", 20);
             }
         }
     }
