@@ -62,6 +62,9 @@ public class DungeonsFeatures {
     private static boolean isInTerracottaPhase = false;
     private static double terracottaEndTime = -1;
 
+    private static final Pattern playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
+    private static final Pattern deathOrPuzzleFail = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)");
+
 
     private static final String[] WATCHER_MOBS = {"Revoker", "Psycho", "Reaper", "Cannibal", "Mute", "Ooze", "Putrid", "Freak", "Leech", "Tear", "Parasite", "Flamer", "Skull", "Mr. Dead", "Vader", "Frost", "Walker", "Wandering Soul", "Bonzo", "Scarf", "Livid"};
 
@@ -134,7 +137,7 @@ public class DungeonsFeatures {
 
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
-                Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
+                Matcher deathFailMatcher = deathOrPuzzleFail.matcher(unformatted);
                 if (deathFailMatcher.find()) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted);
@@ -260,8 +263,7 @@ public class DungeonsFeatures {
                                     y += 20;
                                 }
 
-                                Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
-                                Matcher matcher = player_pattern.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
+                                Matcher matcher = playerPattern.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
                                 if (!matcher.find()) continue;
                                 String name = matcher.group(1);
                                 if (name.equals("Unknown")) continue;

@@ -46,6 +46,8 @@ public class ItemFeatures {
 
     private final static Minecraft mc = Minecraft.getMinecraft();
 
+    private static final Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
+
     @SubscribeEvent
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
         if (!Utils.inSkyblock) return;
@@ -268,7 +270,6 @@ public class ItemFeatures {
 
         if (!lore.isEmpty()) {
             if (Skytils.config.showPetCandies && item.getItem() == Items.skull) {
-                Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
                 for (String line : lore) {
                     Matcher candyLineMatcher = candyPattern.matcher(line);
                     if (candyLineMatcher.matches()) {

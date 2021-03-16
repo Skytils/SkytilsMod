@@ -8,6 +8,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import scala.actors.migration.pattern;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
@@ -26,19 +27,31 @@ import java.util.regex.Pattern;
 
 public class SpamHider {
 
-    private String lastBlessingType = "";
-    private int abilityUses = 0;
-    private String lastAbilityUsed = "";
-
     static ArrayList<SpamMessage> spamMessages = new ArrayList<>();
 
     static {
         new SpamGuiElement();
     }
 
+    private String lastBlessingType = "";
+    private int abilityUses = 0;
+    private String lastAbilityUsed = "";
+
+    private static void cancelChatPacket(ReceivePacketEvent receivePacketEvent, boolean addToSpam) {
+        if (!(receivePacketEvent.packet instanceof S02PacketChat)) return;
+        receivePacketEvent.setCanceled(true);
+        S02PacketChat packet = ((S02PacketChat) receivePacketEvent.packet);
+        if (addToSpam) newMessage(packet.getChatComponent().getFormattedText());
+        MinecraftForge.EVENT_BUS.post(new ClientChatReceivedEvent(packet.getType(), packet.getChatComponent()));
+    }
+
+    private static void newMessage(String message) {
+        spamMessages.add(new SpamMessage(message, 0, 0));
+    }
+
     @SubscribeEvent
     public void onActionBarDisplay(SetActionBarEvent event) {
-        Matcher manaUsageMatcher = Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))").matcher(event.message);
+        Matcher manaUsageMatcher = Regexs.MANAUSED.pattern.matcher(event.message);
 
         if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
             event.setCanceled(true);
@@ -53,6 +66,20 @@ public class SpamHider {
         }
     }
 
+    private enum Regexs {
+
+        BLESSINGGRANT(Pattern.compile("Grant.{1,2} you .* and .*\\.")),
+        BLESSINGNAME(Pattern.compile("Blessing of (?<blessing>\\w+)")),
+        MANAUSED(Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))")),
+        ;
+
+        Pattern pattern;
+
+        Regexs(Pattern pattern) {
+            this.pattern = pattern;
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public void onChatPacket(ReceivePacketEvent event) {
         if (!(event.packet instanceof S02PacketChat)) return;
@@ -61,322 +88,317 @@ public class SpamHider {
         String unformatted = StringUtils.stripControlCodes(packet.getChatComponent().getUnformattedText());
         String formatted = packet.getChatComponent().getFormattedText();
 
-        // Hide Mort Messages
-        if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
-            switch (Skytils.config.hideMortMessages) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideMortMessages == 2);
-                    break;
-                default:
+        try {
+            // Hide Mort Messages
+            if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
+                switch (Skytils.config.hideMortMessages) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideMortMessages == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // Hide Boss Messages
-        if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher")) {
-            switch (Skytils.config.hideBossMessages) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideBossMessages == 2);
-                    break;
-                default:
+            // Hide Boss Messages
+            if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher")) {
+                switch (Skytils.config.hideBossMessages) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideBossMessages == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        if (unformatted.contains(":")) return;
+            if (unformatted.contains(":")) return;
 
-        //Autopet hider
-        if (unformatted.startsWith("Autopet equipped your")) {
-            switch (Skytils.config.hideAutopetMessages) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideAutopetMessages == 2);
-                    break;
-                default:
+            //Autopet hider
+            if (unformatted.startsWith("Autopet equipped your")) {
+                switch (Skytils.config.hideAutopetMessages) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideAutopetMessages == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // CantUseAbilityHider
-        if(unformatted.startsWith("You cannot use abilities in this room!")) {
-            switch (Skytils.config.hideCantUseAbility) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideCantUseAbility == 2);
-                    break;
-                default:
+            // CantUseAbilityHider
+            if (unformatted.startsWith("You cannot use abilities in this room!")) {
+                switch (Skytils.config.hideCantUseAbility) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideCantUseAbility == 2);
+                        break;
+                    default:
+                }
             }
-        }
-      
-        //No enemies nearby
-        if (formatted.startsWith("§r§cThere are no enemies nearby!")) {
-            switch (Skytils.config.hideNoEnemiesNearby) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideNoEnemiesNearby == 2);
-                    break;
-                default:
-            }
-        }
 
-        // Implosion
-        if (formatted.contains("§r§7Your Implosion hit ")) {
-            switch(Skytils.config.implosionHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.implosionHider == 2);
-                    break;
-                default:
+            //No enemies nearby
+            if (formatted.startsWith("§r§cThere are no enemies nearby!")) {
+                switch (Skytils.config.hideNoEnemiesNearby) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideNoEnemiesNearby == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // Midas Staff
-        if (formatted.contains("§r§7Your Molten Wave hit ")) {
-            switch (Skytils.config.midasStaffHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.midasStaffHider == 2);
-                    break;
-                default:
+            // Implosion
+            if (formatted.contains("§r§7Your Implosion hit ")) {
+                switch (Skytils.config.implosionHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.implosionHider == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // Spirit Sceptre
-        if (formatted.contains("§r§7Your Spirit Sceptre hit ")) {
-            switch (Skytils.config.spiritSceptreHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.spiritSceptreHider == 2);
-                    break;
-                default:
+            // Midas Staff
+            if (formatted.contains("§r§7Your Molten Wave hit ")) {
+                switch (Skytils.config.midasStaffHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.midasStaffHider == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // Giant Sword
-        if (formatted.contains("§r§7Your Giant's Sword hit ")) {
-            switch (Skytils.config.giantSwordHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.giantSwordHider == 2);
-                    break;
-                default:
+            // Spirit Sceptre
+            if (formatted.contains("§r§7Your Spirit Sceptre hit ")) {
+                switch (Skytils.config.spiritSceptreHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.spiritSceptreHider == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // Livid Dagger
-        if (formatted.contains("§r§7Your Livid Dagger hit")) {
-            switch (Skytils.config.lividHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.lividHider == 2);
-                    break;
-                default:
+            // Giant Sword
+            if (formatted.contains("§r§7Your Giant's Sword hit ")) {
+                switch (Skytils.config.giantSwordHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.giantSwordHider == 2);
+                        break;
+                    default:
+                }
             }
-        }
 
-        // Blessings
-        if (formatted.contains("§r§6§lDUNGEON BUFF!")) {
-            switch (Skytils.config.blessingHider) {
-                case 1:
-                    cancelChatPacket(event, false);
-                    break;
-                case 2:
-                    Matcher blessingTypeMatcher = Pattern.compile("Blessing of (?<blessing>\\w+)").matcher(unformatted);
-                    if (blessingTypeMatcher.find()) {
-                        lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ENGLISH);
+            // Livid Dagger
+            if (formatted.contains("§r§7Your Livid Dagger hit")) {
+                switch (Skytils.config.lividHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.lividHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Blessings
+            if (formatted.contains("§r§6§lDUNGEON BUFF!")) {
+                switch (Skytils.config.blessingHider) {
+                    case 1:
                         cancelChatPacket(event, false);
-                    };
-                    break;
-                default:
-            }
-        } else if (Pattern.compile("Grant.{1,2} you .* and .*\\.").matcher(unformatted).find()) {
-            switch (Skytils.config.blessingHider) {
-                case 1:
-                    cancelChatPacket(event, false);
-                    break;
-                case 2:
-                    Matcher blessingBuffMatcher = Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})").matcher(unformatted);
-                    List<BlessingToast.BlessingBuff> buffs = new ArrayList<>();
+                        break;
+                    case 2:
+                        Matcher blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.matcher(unformatted);
+                        if (blessingTypeMatcher.find()) {
+                            lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ENGLISH);
+                            cancelChatPacket(event, false);
+                        }
+                        break;
+                    default:
+                }
+            } else if (unformatted.contains("Grant")) {
+                if (Regexs.BLESSINGGRANT.pattern.matcher(unformatted).find()) {
+                    switch (Skytils.config.blessingHider) {
+                        case 1:
+                            cancelChatPacket(event, false);
+                            break;
+                        case 2:
+                            Matcher blessingBuffMatcher = Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})").matcher(unformatted);
+                            List<BlessingToast.BlessingBuff> buffs = new ArrayList<>();
 
-                    while (blessingBuffMatcher.find()) {
-                        String symbol = blessingBuffMatcher.group("symbol1").equals("he") ? "\u2764" : blessingBuffMatcher.group("symbol1");
-                        buffs.add(new BlessingToast.BlessingBuff(blessingBuffMatcher.group("buff1"), symbol));
+                            while (blessingBuffMatcher.find()) {
+                                String symbol = blessingBuffMatcher.group("symbol1").equals("he") ? "\u2764" : blessingBuffMatcher.group("symbol1");
+                                buffs.add(new BlessingToast.BlessingBuff(blessingBuffMatcher.group("buff1"), symbol));
+                            }
+
+                            if (!lastBlessingType.equals(""))
+                                GuiManager.toastGui.add(new BlessingToast(lastBlessingType, buffs));
+                            cancelChatPacket(event, false);
+                            break;
+                        default:
                     }
+                }
+            } else if (unformatted.contains("Blessing of ")) {
+                switch (Skytils.config.blessingHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, false);
+                    default:
+                }
+            }
 
-                    if (!lastBlessingType.equals("")) GuiManager.toastGui.add(new BlessingToast(lastBlessingType, buffs));
-                    cancelChatPacket(event, false);
-                    break;
-                default:
+            // Keys
+            // Wither
+            if (formatted.contains("§r§8Wither Key") && Utils.inDungeons) {
+                switch (Skytils.config.witherKeyHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.witherKeyHider == 2);
+                        break;
+                    case 3:
+                        cancelChatPacket(event, false);
+                        if (unformatted.contains("was picked up")) {
+                            GuiManager.toastGui.add(new KeyToast("wither", ""));
+                        } else {
+                            String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
+                            GuiManager.toastGui.add(new KeyToast("wither", player));
+                        }
+                        break;
+                    default:
+                }
+            } else if (formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.")) {
+                switch (Skytils.config.witherKeyHider) {
+                    case 1:
+                    case 2:
+                    case 3:
+                        cancelChatPacket(event, false);
+                        break;
+                    default:
+                }
             }
-        } else if (unformatted.contains("Blessing of ")) {
-            switch (Skytils.config.blessingHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, false);
-                default:
+            // Blood
+            if (unformatted.contains("Blood Key") && Utils.inDungeons) {
+                switch (Skytils.config.bloodKeyHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.bloodKeyHider == 2);
+                        break;
+                    case 3:
+                        cancelChatPacket(event, false);
+                        if (unformatted.contains("was picked up")) {
+                            GuiManager.toastGui.add(new KeyToast("blood", ""));
+                        } else {
+                            String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
+                            GuiManager.toastGui.add(new KeyToast("blood", player));
+                        }
+                        break;
+                    default:
+                }
+            } else if (unformatted.contains("RIGHT CLICK on the BLOOD DOOR to open it.")) {
+                switch (Skytils.config.bloodKeyHider) {
+                    case 1:
+                    case 2:
+                    case 3:
+                        cancelChatPacket(event, false);
+                        break;
+                    default:
+                }
             }
+
+            // Superboom tnt
+            if (formatted.contains("§r§9Superboom TNT") && Utils.inDungeons) {
+                switch (Skytils.config.superboomHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.superboomHider == 2);
+                        break;
+                    case 3:
+                        cancelChatPacket(event, false);
+                        String username = Minecraft.getMinecraft().thePlayer.getName();
+                        if (!formatted.contains(username)) return;
+                        GuiManager.toastGui.add(new SuperboomToast());
+                        break;
+                    default:
+                }
+
+            }
+
+            // Combo
+            if (unformatted.contains("Combo")) {
+                switch (Skytils.config.comboHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.comboHider == 2);
+                        break;
+                    case 3:
+                        if (unformatted.startsWith("Your Kill Combo has expired!")) {
+                            GuiManager.toastGui.add(new ComboEndToast());
+                        } else {
+                            GuiManager.toastGui.add(new ComboToast(formatted));
+                        }
+                        cancelChatPacket(event, false);
+                        break;
+                    default:
+                }
+            }
+
+            // Blocks in the way
+            if (unformatted.contains("There are blocks in the way")) {
+                switch (Skytils.config.inTheWayHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.inTheWayHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Cooldown
+            if (unformatted.contains("cooldown")) {
+                switch (Skytils.config.cooldownHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.cooldownHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Out of mana
+            if (unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!")) {
+                switch (Skytils.config.manaMessages) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.manaMessages == 2);
+                        break;
+                    default:
+                }
+            }
+
+            //Hide Abilities
+            if (Utils.inDungeons && unformatted.contains("is now available!") && !unformatted.contains("Mining Speed Boost") && !unformatted.contains("Pickobulus") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
+                switch (Skytils.config.hideDungeonAbilities) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideDungeonAbilities == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Hide Dungeon Countdown / Ready messages
+            if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")) {
+                switch (Skytils.config.hideDungeonCountdownAndReady) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hideDungeonCountdownAndReady == 2);
+                        break;
+                    default:
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Keys
-        // Wither
-        if (formatted.contains("§r§8Wither Key") && Utils.inDungeons) {
-            switch (Skytils.config.witherKeyHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.witherKeyHider == 2);
-                    break;
-                case 3:
-                    cancelChatPacket(event, false);
-                    if (unformatted.contains("was picked up")) {
-                        GuiManager.toastGui.add(new KeyToast("wither", ""));
-                    } else {
-                        String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
-                        GuiManager.toastGui.add(new KeyToast("wither", player));
-                    }
-                    break;
-                default:
-            }
-        } else if (formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.")) {
-            switch (Skytils.config.witherKeyHider) {
-                case 1:
-                case 2:
-                case 3:
-                    cancelChatPacket(event, false);
-                    break;
-                default:
-            }
-        }
-        // Blood
-        if (unformatted.contains("Blood Key") && Utils.inDungeons) {
-            switch (Skytils.config.bloodKeyHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.bloodKeyHider == 2);
-                    break;
-                case 3:
-                    cancelChatPacket(event, false);
-                    if (unformatted.contains("was picked up")) {
-                        GuiManager.toastGui.add(new KeyToast("blood", ""));
-                    } else {
-                        String player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"));
-                        GuiManager.toastGui.add(new KeyToast("blood", player));
-                    }
-                    break;
-                default:
-            }
-        } else if (unformatted.contains("RIGHT CLICK on the BLOOD DOOR to open it.")) {
-            switch (Skytils.config.bloodKeyHider) {
-                case 1:
-                case 2:
-                case 3:
-                    cancelChatPacket(event, false);
-                    break;
-                default:
-            }
-        }
-
-        // Superboom tnt
-        if (formatted.contains("§r§9Superboom TNT") && Utils.inDungeons) {
-            switch (Skytils.config.superboomHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.superboomHider == 2);
-                    break;
-                case 3:
-                    cancelChatPacket(event, false);
-                    String username = Minecraft.getMinecraft().thePlayer.getName();
-                    if (!formatted.contains(username)) return;
-                    GuiManager.toastGui.add(new SuperboomToast());
-                    break;
-                default:
-            }
-
-        }
-
-        // Combo
-        if (unformatted.contains("Combo")) {
-            switch (Skytils.config.comboHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.comboHider == 2);
-                    break;
-                case 3:
-                    if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                        GuiManager.toastGui.add(new ComboEndToast());
-                    } else {
-                        GuiManager.toastGui.add(new ComboToast(formatted));
-                    }
-                    cancelChatPacket(event, false);
-                    break;
-                default:
-            }
-        }
-
-        // Blocks in the way
-        if (unformatted.contains("There are blocks in the way")) {
-            switch (Skytils.config.inTheWayHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.inTheWayHider == 2);
-                    break;
-                default:
-            }
-        }
-
-        // Cooldown
-        if (unformatted.contains("cooldown")) {
-            switch (Skytils.config.cooldownHider) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.cooldownHider == 2);
-                    break;
-                default:
-            }
-        }
-
-        // Out of mana
-        if (unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!")) {
-            switch (Skytils.config.manaMessages) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.manaMessages == 2);
-                    break;
-                default:
-            }
-        }
-
-        //Hide Abilities
-        if (Utils.inDungeons && unformatted.contains("is now available!") && !unformatted.contains("Mining Speed Boost") && !unformatted.contains("Pickobulus") || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains("Your Guided Sheep hit") || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains("Your Throwing Axe hit") || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")) {
-            switch (Skytils.config.hideDungeonAbilities) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideDungeonAbilities == 2);
-                    break;
-                default:
-            }
-        }
-
-        // Hide Dungeon Countdown / Ready messages
-        if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains("is now ready!") || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")) {
-            switch (Skytils.config.hideDungeonCountdownAndReady) {
-                case 1:
-                case 2:
-                    cancelChatPacket(event, Skytils.config.hideDungeonCountdownAndReady == 2);
-                    break;
-                default:
-            }
-        }
-    }
-
-    private static void cancelChatPacket(ReceivePacketEvent receivePacketEvent, boolean addToSpam) {
-        if (!(receivePacketEvent.packet instanceof S02PacketChat)) return;
-        receivePacketEvent.setCanceled(true);
-        S02PacketChat packet = ((S02PacketChat) receivePacketEvent.packet);
-        if (addToSpam) newMessage(packet.getChatComponent().getFormattedText());
-        MinecraftForge.EVENT_BUS.post(new ClientChatReceivedEvent(packet.getType(), packet.getChatComponent()));
-    }
-
-    private static void newMessage(String message) {
-        spamMessages.add(new SpamMessage(message, 0, 0));
     }
 
     private static class SpamMessage {
@@ -391,7 +413,7 @@ public class SpamHider {
         }
     }
 
-    public static class SpamGuiElement extends GuiElement{
+    public static class SpamGuiElement extends GuiElement {
         static long lastTimeRender = new Date().getTime();
 
         public SpamGuiElement() {
@@ -403,6 +425,7 @@ public class SpamHider {
         /**
          * Based off of Soopyboo32's SoopyApis module
          * https://github.com/Soopyboo32
+         *
          * @author Soopyboo32
          */
         public void render() {
@@ -416,11 +439,11 @@ public class SpamHider {
 
             Collections.reverse(spamMessages);
 
-            for(int i = 0; i < spamMessages.size(); i++) {
+            for (int i = 0; i < spamMessages.size(); i++) {
                 SpamMessage message = spamMessages.get(i);
                 int messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(StringUtils.stripControlCodes(message.message));
 
-                double x= this.getActualX();
+                double x = this.getActualX();
                 double y = 0;
                 if (this.getActualY() > sr.getScaledHeight() / 2f) {
                     message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
@@ -494,7 +517,7 @@ public class SpamHider {
                     shadow = SmartFontRenderer.TextShadow.NORMAL;
             }
 
-            double x = this.getActualX()  + ((Math.sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30));
+            double x = this.getActualX() + ((Math.sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30));
             double y = this.getActualY();
             ScreenRenderer.fontRenderer.drawString("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r", (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
         }

@@ -179,6 +179,12 @@ public class ScoreCalculation {
 
     public static class ScoreCalculationElement extends GuiElement {
 
+        private static final Pattern deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r");
+        private static final Pattern missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7\\]§r");
+        private static final Pattern failedPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7\\] §r§f\\(§r(?<player>.+)§r§f\\)§r");
+        private static final Pattern secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
+        private static final Pattern cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r");
+
         public ScoreCalculationElement() {
             super("Dungeon Score Estimate", new FloatPair(200, 100));
             Skytils.GUIMANAGER.registerElement(this);
@@ -209,21 +215,21 @@ public class ScoreCalculation {
                     try {
                         String name = mc.ingameGUI.getTabList().getPlayerName(pi);
                         if (name.contains("Deaths:")) {
-                            Matcher matcher = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r").matcher(name);
+                            Matcher matcher = deathsTabPattern.matcher(name);
                             if (matcher.find()) {
                                 deaths = Integer.parseInt(matcher.group("deaths"));
                                 continue;
                             }
                         }
                         if (name.contains("✦")) {
-                            Matcher matcher = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7\\]§r").matcher(name);
+                            Matcher matcher = missingPuzzlePattern.matcher(name);
                             if (matcher.find()) {
                                 missingPuzzles++;
                                 continue;
                             }
                         }
                         if (name.contains("✖")) {
-                            Matcher matcher = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7\\] §r§f\\(§r(?<player>.+)§r§f\\)§r").matcher(name);
+                            Matcher matcher = failedPuzzlePattern.matcher(name);
                             if (matcher.find()) {
                                 failedPuzzles++;
                                 continue;
@@ -231,14 +237,14 @@ public class ScoreCalculation {
                             continue;
                         }
                         if (name.contains("Secrets Found:")) {
-                            Matcher matcher = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r").matcher(name);
+                            Matcher matcher = secretsFoundPattern.matcher(name);
                             if (matcher.find()) {
                                 foundSecrets = Integer.parseInt(matcher.group("secrets"));
                                 continue;
                             }
                         }
                         if (name.contains("Crypts:")) {
-                            Matcher matcher = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r").matcher(name);
+                            Matcher matcher = cryptsPattern.matcher(name);
                             if (matcher.find()) {
                                 crypts = Integer.parseInt(matcher.group("crypts"));
                                 continue;
