@@ -22,8 +22,8 @@ public class SlayerFeatures {
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return;
         if (!Utils.inSkyblock) return;
+        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return;
 
         if (ticks % 4 == 0) {
             if (Skytils.config.rev5TNTPing) {
