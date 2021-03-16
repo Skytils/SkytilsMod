@@ -69,16 +69,6 @@ public class ItemFeatures {
         }
     }
 
-    private void notifyAndMoveToFreeSlot(Container container) {
-        mc.thePlayer.playSound("note.bass", 1, 0.5f);
-        mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
-        for (Slot slot : container.inventorySlots) {
-            if (slot.inventory != mc.thePlayer.inventory || slot.getHasStack()) continue;
-            mc.playerController.windowClick(container.windowId, slot.slotNumber, 0, 0, mc.thePlayer);
-            break;
-        }
-    }
-
     @SubscribeEvent
     public void onCloseWindow(GuiContainerEvent.CloseWindowEvent event) {
         if (!Utils.inSkyblock) return;
@@ -87,7 +77,13 @@ public class ItemFeatures {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             if (Skytils.config.protectStarredItems && extraAttr != null) {
                 if (extraAttr.hasKey("dungeon_item_level")) {
-                    notifyAndMoveToFreeSlot(event.container);
+                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
+                    for (Slot slot : event.container.inventorySlots) {
+                        if (slot.inventory != mc.thePlayer.inventory || slot.getHasStack()) continue;
+                        mc.playerController.windowClick(event.container.windowId, slot.slotNumber, 0, 0, mc.thePlayer);
+                        break;
+                    }
                     return;
                 }
             }
@@ -152,7 +148,8 @@ public class ItemFeatures {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             if (Skytils.config.protectStarredItems && extraAttr != null) {
                 if (extraAttr.hasKey("dungeon_item_level")) {
-                    notifyAndMoveToFreeSlot(event.container);
+                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
                     event.setCanceled(true);
                     return;
                 }
