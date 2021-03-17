@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -15,10 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2APacketParticles;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -37,6 +35,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -209,39 +208,44 @@ public class ItemFeatures {
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
         if (!Utils.inSkyblock) return;
+        try {
+            if (event.packet instanceof S2APacketParticles) {
+                S2APacketParticles packet = (S2APacketParticles) event.packet;
 
-        if (event.packet instanceof S2APacketParticles) {
-            S2APacketParticles packet = (S2APacketParticles) event.packet;
+                EnumParticleTypes type = packet.getParticleType();
 
-            EnumParticleTypes type = packet.getParticleType();
+                boolean longDistance = packet.isLongDistance();
+                int count = packet.getParticleCount();
+                float speed = packet.getParticleSpeed();
+                float xOffset = packet.getXOffset();
+                float yOffset = packet.getYOffset();
+                float zOffset = packet.getZOffset();
 
-            boolean longDistance = packet.isLongDistance();
-            int count = packet.getParticleCount();
-            float speed = packet.getParticleSpeed();
-            float xOffset = packet.getXOffset();
-            float yOffset = packet.getYOffset();
-            float zOffset = packet.getZOffset();
+                double x = packet.getXCoordinate();
+                double y = packet.getYCoordinate();
+                double z = packet.getZCoordinate();
 
-            double x = packet.getXCoordinate();
-            double y = packet.getYCoordinate();
-            double z = packet.getZCoordinate();
+                Vec3 pos = new Vec3(x, y, z);
 
-            BlockPos pos = new BlockPos(x, y, z);
-
-            if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
-                if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    boolean flag = ImmutableList.copyOf(mc.theWorld.playerEntities).stream().anyMatch(p -> {
-                        if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
-                            ItemStack item = p.getHeldItem();
-                            if (item != null) {
-                                return item.getItem() == Items.iron_sword;
+                if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
+                    if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
+                        for (EntityPlayer player : mc.theWorld.playerEntities) {
+                            if (pos.squareDistanceTo(new Vec3(player.posX, player.posY, player.posZ)) <= 11 * 11) {
+                                ItemStack item = player.getHeldItem();
+                                if (item != null) {
+                                    String itemName = StringUtils.stripControlCodes(ItemUtil.getDisplayName(item));
+                                    if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains("Astrea") || itemName.contains("Hyperion") || itemName.contains("Valkyrie")) {
+                                        event.setCanceled(true);
+                                        break;
+                                    }
+                                }
                             }
                         }
-                        return false;
-                    });
-                    if (flag) event.setCanceled(true);
+                    }
                 }
             }
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
         }
     }
 

@@ -21,6 +21,26 @@ public class ItemUtil {
     public static final int NBT_COMPOUND = 10;
 
     /**
+     * Returns the display name of a given item
+     * @author Mojang
+     * @param item the Item to get the display name of
+     * @return the display name of the item
+     */
+    public static String getDisplayName(ItemStack item) {
+        String s = item.getItem().getItemStackDisplayName(item);
+
+        if (item.getTagCompound() != null && item.getTagCompound().hasKey("display", 10)) {
+            NBTTagCompound nbttagcompound = item.getTagCompound().getCompoundTag("display");
+
+            if (nbttagcompound.hasKey("Name", 8)) {
+                s = nbttagcompound.getString("Name");
+            }
+        }
+
+        return s;
+    }
+
+    /**
      * Returns the Skyblock Item ID of a given Skyblock item
      *
      * @author BiscuitDevelopment
