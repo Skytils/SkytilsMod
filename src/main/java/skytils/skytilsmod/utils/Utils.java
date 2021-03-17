@@ -9,6 +9,7 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
+import java.io.*;
 import java.util.List;
 import java.util.Random;
 
@@ -110,6 +111,39 @@ public class Utils {
         shouldBypassVolume = true;
         mc.thePlayer.playSound(sound, 1, (float) pitch);
         shouldBypassVolume = false;
+    }
+
+    /**
+     * Taken from Wynntils under GNU Affero General Public License v3.0
+     * Modified to perform faster
+     * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
+     * @author Wynntils
+     * Copy a file from a location to another
+     *
+     * @param sourceFile The source file
+     * @param destFile Where it will be
+     */
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+        if (destFile == null || !destFile.exists()) {
+            destFile = new File(new File(sourceFile.getParentFile(), "mods"), "Skytils.jar");
+            sourceFile.renameTo(destFile);
+            return;
+        }
+
+        InputStream source = null;
+        OutputStream dest = null;
+        try {
+            source = new FileInputStream(sourceFile);
+            dest = new FileOutputStream(destFile);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = source.read(buffer)) > 0) {
+                dest.write(buffer, 0, length);
+            }
+        } finally {
+            source.close();
+            dest.close();
+        }
     }
 
 }

@@ -48,4 +48,25 @@ public class MathUtil {
     public static int fastFloor(double value) {
         return (int)(value + 1024.0D) - 1024;
     }
+
+    public static int ceil(float value)
+    {
+        int i = (int)value;
+        return value > (float)i ? i + 1 : i;
+    }
+
+    public static int ceil(double value)
+    {
+        int i = (int)value;
+        return value > (double)i ? i + 1 : i;
+    }
+
+    /**
+     * Returns the greatest integer less than or equal to the float argument
+     */
+    public static int floor(float value)
+    {
+        int i = (int)value;
+        return value < (float)i ? i - 1 : i;
+    }
 }

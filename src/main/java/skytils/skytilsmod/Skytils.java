@@ -62,6 +62,7 @@ public class Skytils {
     public static boolean usingDungeonRooms = false;
     public static boolean usingLabymod = false;
     public static boolean usingNEU = false;
+    public static File jarFile = null;
     private static long lastChatMessage = 0;
 
     @Mod.EventHandler
@@ -69,6 +70,7 @@ public class Skytils {
         modDir = new File(event.getModConfigurationDirectory(), "skytils");
         if (!modDir.exists()) modDir.mkdirs();
         GUIMANAGER = new GuiManager();
+        jarFile = event.getSourceFile();
     }
 
     @Mod.EventHandler
