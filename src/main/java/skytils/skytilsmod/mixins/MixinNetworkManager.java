@@ -14,6 +14,10 @@ import skytils.skytilsmod.events.ReceivePacketEvent;
 public class MixinNetworkManager {
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
-        if (MinecraftForge.EVENT_BUS.post(new ReceivePacketEvent(packet))) ci.cancel();
+        try {
+            if (MinecraftForge.EVENT_BUS.post(new ReceivePacketEvent(packet))) ci.cancel();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 }
