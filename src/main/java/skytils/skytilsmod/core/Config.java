@@ -469,7 +469,7 @@ public class Config extends Vigilant {
             category = "Mining",
             subcategory = "Quality of Life"
     )
-    public boolean onlyPickaxeAbilitiesInMines = false;
+    public boolean noPickaxeAbilityOnPrivateIsland = false;
 
     @Property(
             type = PropertyType.SWITCH,

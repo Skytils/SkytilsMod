@@ -198,7 +198,7 @@ public class WaterBoardSolver {
         int matching = 0;
 
         for (WoolColor color : WoolColor.values()) {
-            Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c -> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue).brighter();
+            Color renderColor = new Color(color.dyeColor.getMapColor().colorValue).brighter();
             if (color.isExtended()) {
                 ImmutableSet<LeverBlock> solution = solutions.get(color);
                 if (solution == null) continue;
@@ -240,11 +240,17 @@ public class WaterBoardSolver {
     }
 
     public enum WoolColor {
-        PURPLE,
-        ORANGE,
-        BLUE,
-        GREEN,
-        RED;
+        PURPLE(EnumDyeColor.PURPLE),
+        ORANGE(EnumDyeColor.ORANGE),
+        BLUE(EnumDyeColor.BLUE),
+        GREEN(EnumDyeColor.GREEN),
+        RED(EnumDyeColor.RED);
+
+        public EnumDyeColor dyeColor;
+
+        WoolColor(EnumDyeColor dyeColor) {
+            this.dyeColor = dyeColor;
+        }
 
         public boolean isExtended() {
             if (chestPos == null || roomFacing == null) return false;

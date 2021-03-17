@@ -4,7 +4,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -23,7 +22,6 @@ import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -158,8 +156,8 @@ public class MiningFeatures {
 
         if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
             if (SBInfo.getInstance().getLocation() != null && SBInfo.getInstance().getLocation().startsWith("dynamic")) {
-                if (Skytils.config.onlyPickaxeAbilitiesInMines && itemId != null && (itemId.contains("PICKAXE") || itemId.contains("DRILL"))) {
-                    event.setCanceled(event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.pos == null || mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.chest || mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.trapped_chest);
+                if (Skytils.config.noPickaxeAbilityOnPrivateIsland && itemId != null && (itemId.contains("PICKAXE") || itemId.contains("DRILL"))) {
+                    event.setCanceled(event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.pos == null || (mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.chest && mc.theWorld.getBlockState(event.pos).getBlock() != Blocks.trapped_chest));
                 }
             }
             if (Skytils.config.raffleWaypoint && inRaffle && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {

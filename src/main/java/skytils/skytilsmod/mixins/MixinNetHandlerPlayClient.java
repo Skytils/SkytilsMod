@@ -13,6 +13,10 @@ import skytils.skytilsmod.events.SendPacketEvent;
 public class MixinNetHandlerPlayClient {
     @Inject(method = "addToSendQueue", at = @At("HEAD"), cancellable = true)
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
-        if (MinecraftForge.EVENT_BUS.post(new SendPacketEvent(packet))) ci.cancel();
+        try {
+            if (MinecraftForge.EVENT_BUS.post(new SendPacketEvent(packet))) ci.cancel();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 }
