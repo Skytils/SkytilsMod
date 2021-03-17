@@ -10,6 +10,7 @@ import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.core.structure.LocationButton;
 
+import java.awt.*;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class LocationEditGui extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         onMouseMove(mouseX, mouseY);
+        this.drawGradientRect(0, 0, this.width, this.height, new Color(0,0, 0,50).getRGB(), new Color(0,0, 0,200).getRGB());
         for (GuiButton button : this.buttonList) {
             if (button instanceof LocationButton) {
                 if (((LocationButton) button).element.getToggled()) {
