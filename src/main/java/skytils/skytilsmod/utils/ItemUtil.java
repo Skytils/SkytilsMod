@@ -108,10 +108,11 @@ public class ItemUtil {
     }
 
     public static boolean hasRightClickAbility(ItemStack itemStack) {
-        return ItemUtil.getItemLore(itemStack).stream().anyMatch(line -> {
+        for (String line : ItemUtil.getItemLore(itemStack)) {
             String stripped = StringUtils.stripControlCodes(line);
-            return stripped.startsWith("Item Ability:") && stripped.endsWith("RIGHT CLICK");
-        });
+            if (stripped.startsWith("Item Ability:") && stripped.endsWith("RIGHT CLICK")) return true;
+        }
+        return false;
     }
 
     /**

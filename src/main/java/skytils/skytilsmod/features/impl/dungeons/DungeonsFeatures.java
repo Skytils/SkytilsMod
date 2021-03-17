@@ -120,13 +120,17 @@ public class DungeonsFeatures {
                     case 0:
                 }
             }
+            return;
         }
-        if (terracottaEndTime == -1) {
-            if (unformatted.contains("Sadan's Interest Level")) {
-                terracottaEndTime = (((double) System.currentTimeMillis()) / 1000f) + 105;
+        if (Objects.equals(dungeonFloor, "F6")) {
+            if (terracottaEndTime == -1) {
+                if (unformatted.contains("Sadan's Interest Level")) {
+                    terracottaEndTime = (((double) System.currentTimeMillis()) / 1000f) + 105;
+                }
+            } else if (terracottaEndTime > 0) {
+                event.setCanceled(true);
             }
-        } else if (terracottaEndTime > 0) {
-            event.setCanceled(true);
+            return;
         }
     }
     

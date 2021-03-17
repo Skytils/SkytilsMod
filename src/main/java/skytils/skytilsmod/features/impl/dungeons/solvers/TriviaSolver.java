@@ -3,6 +3,7 @@ package skytils.skytilsmod.features.impl.dungeons.solvers;
 import net.minecraft.block.BlockButtonStone;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
@@ -85,12 +86,18 @@ public class TriviaSolver {
 
         if (block.getBlock() == Blocks.stone_button) {
             if (triviaAnswer != null) {
-                EntityArmorStand answerLabel = event.world.getEntities(EntityArmorStand.class, (entity -> {
-                    if (entity == null) return false;
-                    if (!entity.hasCustomName()) return false;
+
+                EntityArmorStand answerLabel = null;
+                for (Entity e : mc.theWorld.loadedEntityList) {
+                    if (!(e instanceof EntityArmorStand)) continue;
+                    if (!e.hasCustomName()) continue;
+                    EntityArmorStand entity = (EntityArmorStand) e;
                     String name = entity.getCustomNameTag();
-                    return name.contains(triviaAnswer) && (name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ"));
-                })).stream().findFirst().orElse(null);
+                    if (name.contains(triviaAnswer) && (name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ"))) {
+                        answerLabel = entity;
+                        break;
+                    }
+                }
 
                 if (answerLabel != null) {
                     System.out.println("Found Answer Marker " + answerLabel.getCustomNameTag() + " at " + answerLabel.posX + ", " + answerLabel.posY + ", " + answerLabel.posZ);

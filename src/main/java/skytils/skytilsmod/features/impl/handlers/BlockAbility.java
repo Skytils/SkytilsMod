@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class BlockAbility {
 
@@ -31,6 +32,42 @@ public class BlockAbility {
 
     public static final HashSet<String> blockedItems = new HashSet<>();
 
+
+    private static final List<Block> interactables = Arrays.asList(
+            Blocks.acacia_door,
+            Blocks.anvil,
+            Blocks.beacon,
+            Blocks.bed,
+            Blocks.birch_door,
+            Blocks.brewing_stand,
+            Blocks.command_block,
+            Blocks.crafting_table,
+            Blocks.chest,
+            Blocks.dark_oak_door,
+            Blocks.daylight_detector,
+            Blocks.daylight_detector_inverted,
+            Blocks.dispenser,
+            Blocks.dropper,
+            Blocks.enchanting_table,
+            Blocks.ender_chest,
+            Blocks.furnace,
+            Blocks.hopper,
+            Blocks.jungle_door,
+            Blocks.lever,
+            Blocks.noteblock,
+            Blocks.powered_comparator,
+            Blocks.unpowered_comparator,
+            Blocks.powered_repeater,
+            Blocks.unpowered_repeater,
+            Blocks.standing_sign,
+            Blocks.wall_sign,
+            Blocks.trapdoor,
+            Blocks.trapped_chest,
+            Blocks.wooden_button,
+            Blocks.stone_button,
+            Blocks.oak_door,
+            Blocks.skull
+    );
 
     public BlockAbility() {
         saveFile = new File(Skytils.modDir, "blockability.json");
@@ -46,48 +83,8 @@ public class BlockAbility {
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
             if (shouldBlockAbility(item)) event.setCanceled(true);
         } else if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            ArrayList<Block> interactables = new ArrayList<>(Arrays.asList(
-                    Blocks.acacia_door,
-                    Blocks.anvil,
-                    Blocks.beacon,
-                    Blocks.bed,
-                    Blocks.birch_door,
-                    Blocks.brewing_stand,
-                    Blocks.command_block,
-                    Blocks.crafting_table,
-                    Blocks.chest,
-                    Blocks.dark_oak_door,
-                    Blocks.daylight_detector,
-                    Blocks.daylight_detector_inverted,
-                    Blocks.dispenser,
-                    Blocks.dropper,
-                    Blocks.enchanting_table,
-                    Blocks.ender_chest,
-                    Blocks.furnace,
-                    Blocks.hopper,
-                    Blocks.jungle_door,
-                    Blocks.lever,
-                    Blocks.noteblock,
-                    Blocks.powered_comparator,
-                    Blocks.unpowered_comparator,
-                    Blocks.powered_repeater,
-                    Blocks.unpowered_repeater,
-                    Blocks.standing_sign,
-                    Blocks.wall_sign,
-                    Blocks.trapdoor,
-                    Blocks.trapped_chest,
-                    Blocks.wooden_button,
-                    Blocks.stone_button,
-                    Blocks.oak_door,
-                    Blocks.skull
-            ));
-
             Block block = event.world.getBlockState(event.pos).getBlock();
-            if (Utils.inDungeons) {
-                interactables.add(Blocks.coal_block);
-                interactables.add(Blocks.stained_hardened_clay);
-            }
-            if (!interactables.contains(block)) {
+            if (!interactables.contains(block) || (Utils.inDungeons && (block == Blocks.coal_block || block == Blocks.stained_hardened_clay))) {
                 if (shouldBlockAbility(item)) event.setCanceled(true);
             }
         }
