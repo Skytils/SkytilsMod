@@ -241,10 +241,7 @@ public class MiscFeatures {
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 30 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
-                if (Skytils.config.legionCap) {
-                    players = players.stream().limit(20).collect(Collectors.toList());
-                }
-                ScreenRenderer.fontRenderer.drawString(String.valueOf(players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.legionCap && players.size() > 20 ? 20 : players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
                 GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }

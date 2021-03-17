@@ -16,6 +16,7 @@ public class FMLLoadingPlugin implements IFMLLoadingPlugin {
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.skytils.json");
         MixinEnvironment.getCurrentEnvironment().setObfuscationContext("searge");
+        MixinEnvironment.getCurrentEnvironment().setSide(MixinEnvironment.Side.CLIENT);
     }
 
     @Override

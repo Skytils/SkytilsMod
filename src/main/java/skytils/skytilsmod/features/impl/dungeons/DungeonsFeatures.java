@@ -188,8 +188,13 @@ public class DungeonsFeatures {
                     event.entity.setInvisible(false);
                 }
 
-                if (Skytils.config.showStealthyBloodMobs && event.entity instanceof EntityPlayer && Arrays.stream(WATCHER_MOBS).anyMatch(name -> event.entity.getName().trim().equals(name))) {
-                    event.entity.setInvisible(false);
+                if (Skytils.config.showStealthyBloodMobs && event.entity instanceof EntityPlayer) {
+                    for (String name : WATCHER_MOBS) {
+                        if (event.entity.getName().trim().equals(name)) {
+                            event.entity.setInvisible(false);
+                            break;
+                        }
+                    }
                 }
             }
 
