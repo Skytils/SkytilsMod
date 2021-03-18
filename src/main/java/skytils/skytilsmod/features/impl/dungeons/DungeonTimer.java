@@ -67,7 +67,7 @@ public class DungeonTimer {
             return;
         }
 
-        if (message.startsWith("§r§c[BOSS] ") && bloodClearTime != -1 && bossEntryTime == -1) {
+        if ((message.startsWith("§r§c[BOSS] ") || message.startsWith("§r§4[BOSS] ")) && bloodClearTime != -1 && bossEntryTime == -1) {
             bossEntryTime = System.currentTimeMillis();
             return;
         }
