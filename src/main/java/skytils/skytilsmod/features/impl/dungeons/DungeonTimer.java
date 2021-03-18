@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.utils.MathUtil;
 import skytils.skytilsmod.utils.NumberUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
@@ -60,7 +61,7 @@ public class DungeonTimer {
             return;
         }
 
-        if (message.startsWith("§r                       §r§c☠ §r§eDefeated §r") && bossEntryTime != -1 && bossClearTime == -1) {
+        if (message.contains("§r§c☠ §r§eDefeated §r") && bossEntryTime != -1 && bossClearTime == -1) {
             bossClearTime = System.currentTimeMillis();
             return;
         }
@@ -75,6 +76,14 @@ public class DungeonTimer {
         bossClearTime = -1;
 
         witherDoors = 0;
+    }
+
+    private static String timeFormat(double seconds) {
+        if (seconds >= 60) {
+            return MathUtil.fastFloor(seconds / 60) + "m " + Math.round(seconds % 60) + "s";
+        } else {
+            return Math.round(seconds) + "s";
+        }
     }
 
     static {
@@ -99,11 +108,13 @@ public class DungeonTimer {
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                String displayText = "\u00a7aTime: " + (dungeonStartTime == -1 ? "Not Started" : (double) ((bossClearTime == -1 ? System.currentTimeMillis() : bossClearTime) - dungeonStartTime) / 1000f) +
+                String displayText = "\u00a7aReal Time: " + (dungeonStartTime == -1 ? "Not Started" : (double) ((bossClearTime == -1 ? System.currentTimeMillis() : bossClearTime) - dungeonStartTime) / 1000f + "s") +
+                        "\n\u00a7aTime Elapsed: " + (dungeonStartTime == -1 ? "Not Started" : timeFormat((double) ((bossClearTime == -1 ? System.currentTimeMillis() : bossClearTime) - dungeonStartTime) / 1000f)) +
                         "\n\u00a77Wither Doors: " + witherDoors +
-                        "\n\u00a74Blood Open: " + (bloodOpenTime == -1 ? "Not Opened" : NumberUtil.round((double) (bloodOpenTime - dungeonStartTime) / 1000f, 1)) + "s" +
-                        "\n\u00a7cWatcher Clear: " + (bloodClearTime == -1 ? "Not Cleared" : NumberUtil.round((double) (bloodClearTime - bloodOpenTime) / 1000f, 1)) + "s" +
-                        "\n\u00a79Boss Clear: " + (bossClearTime == -1 ? "Not Cleared" : NumberUtil.round((double) (bossClearTime - bossEntryTime) / 1000f, 1)) + "s";
+                        "\n\u00a74Blood Open: " + (bloodOpenTime == -1 ? "Not Opened" : timeFormat((double) (bloodOpenTime - dungeonStartTime) / 1000f)) +
+                        "\n\u00a7cWatcher Clear: " + (bloodClearTime == -1 ? "Not Cleared" : timeFormat((double) (bloodClearTime - bloodOpenTime) / 1000f)) +
+                        "\n\u00a7bBoss Entry: " + (bossEntryTime == -1 ? "Not Entered" : timeFormat((double) (bossEntryTime - dungeonStartTime) / 1000f)) +
+                        "\n\u00a79Boss Clear: " + (bossClearTime == -1 ? "Not Cleared" : timeFormat((double) (bossClearTime - bossEntryTime) / 1000f));
                 String[] lines = displayText.split("\n");
                 for (int i = 0; i < lines.length; i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
@@ -119,10 +130,12 @@ public class DungeonTimer {
 
             boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-            String displayText = "\u00a7aTime: Not Started" +
+            String displayText = "\u00a7aReal Time: Not Started" +
+                    "\n\u00a7aTime Elapsed: Not Started" +
                     "\n\u00a77Wither Doors: 0" +
                     "\n\u00a74Blood Open: Not Opened" +
                     "\n\u00a7cWatcher Clear: Not Cleared" +
+                    "\n\u00a79Boss Entry: Not Entered" +
                     "\n\u00a79Boss Clear: Not Cleared";
             String[] lines = displayText.split("\n");
             for (int i = 0; i < lines.length; i++) {
@@ -133,7 +146,7 @@ public class DungeonTimer {
 
         @Override
         public int getHeight() {
-            return ScreenRenderer.fontRenderer.FONT_HEIGHT * 5;
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT * 7;
         }
 
         @Override
