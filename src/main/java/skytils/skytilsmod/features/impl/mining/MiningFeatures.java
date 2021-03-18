@@ -67,7 +67,7 @@ public class MiningFeatures {
 
         if (Skytils.config.powerGhastPing) {
             if (unformatted.startsWith("Find the Powder Ghast near the")) {
-                GuiManager.createTitle("\u00a7cPOWER GHAST", 20);
+                GuiManager.createTitle("\u00a7cPOWDER GHAST", 20);
             }
         }
 

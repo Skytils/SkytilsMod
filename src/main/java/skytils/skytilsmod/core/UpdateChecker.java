@@ -12,9 +12,8 @@ import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.gui.UpdateGui;
 import skytils.skytilsmod.utils.APIUtil;
-import skytils.skytilsmod.utils.Utils;
 
-import java.io.File;
+import java.io.*;
 
 public class UpdateChecker {
 
@@ -67,13 +66,46 @@ public class UpdateChecker {
                 }
 
                 File newJar = new File(new File(Skytils.modDir, "updates"), jarName);
-                Utils.copyFile(newJar, oldJar);
+                copyFile(newJar, oldJar);
                 newJar.delete();
                 System.out.println("Successfully applied Skytils update.");
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
         }));
+    }
+
+    /**
+     * Taken from Wynntils under GNU Affero General Public License v3.0
+     * Modified to perform faster
+     * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
+     * @author Wynntils
+     * Copy a file from a location to another
+     *
+     * @param sourceFile The source file
+     * @param destFile Where it will be
+     */
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+        if (destFile == null || !destFile.exists()) {
+            destFile = new File(new File(sourceFile.getParentFile(), "mods"), "Skytils.jar");
+            sourceFile.renameTo(destFile);
+            return;
+        }
+
+        InputStream source = null;
+        OutputStream dest = null;
+        try {
+            source = new FileInputStream(sourceFile);
+            dest = new FileOutputStream(destFile);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = source.read(buffer)) > 0) {
+                dest.write(buffer, 0, length);
+            }
+        } finally {
+            source.close();
+            dest.close();
+        }
     }
 
     private static class UpdateGetter implements Runnable {
