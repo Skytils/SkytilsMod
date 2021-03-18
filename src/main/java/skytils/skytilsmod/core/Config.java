@@ -94,6 +94,16 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Necron Phase Timer",
+            description = "Shows the time taken for each phase in the Necron boss fight.",
+            category = "Dungeons",
+            subcategory = "Miscellaneous"
+    )
+    public boolean necronPhaseTimer = false;
+
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Dungeon Score Estimate",
             description = "Shows an estimate of the current dungeon score.\nRequires the Dungeon Rooms mod in order to use.",
             category = "Dungeons",
