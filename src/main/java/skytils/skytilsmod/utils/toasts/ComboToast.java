@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 public class ComboToast implements IToast<ComboToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private static final Pattern comboPattern = Pattern.compile("(§r§.§l)\\+(\\d+ Kill Combo) (§r§8.+)");
+    private static final Pattern noBuffPattern = Pattern.compile("(§r§.§l)\\+(\\d+ Kill Combo)");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
     private final long maxDrawTime;
     private String length;
@@ -27,13 +28,19 @@ public class ComboToast implements IToast<ComboToast> {
         if (comboMatcher.find()) {
             this.length = comboMatcher.group(1) + comboMatcher.group(2);
             this.buff = comboMatcher.group(3);
-        }
-        if (input.contains("Magic Find")) {
-            this.buffTexture = new ResourceLocation("skytils:combo/luck.png");
-        } else if (input.contains("coins per kill")) {
-            this.buffTexture = new ResourceLocation("skytils:combo/coin.png");
-        } else if (input.contains("Combat Exp")) {
-            this.buffTexture = new ResourceLocation("skytils:combo/combat.png");
+            if (input.contains("Magic Find")) {
+                this.buffTexture = new ResourceLocation("skytils:toasts/combo/luck.png");
+            } else if (input.contains("coins per kill")) {
+                this.buffTexture = new ResourceLocation("skytils:toasts/combo/coin.png");
+            } else if (input.contains("Combat Exp")) {
+                this.buffTexture = new ResourceLocation("skytils:toasts/combo/combat.png");
+            }
+        } else {
+            this.buffTexture = null;
+            Matcher noBuffMatcher = noBuffPattern.matcher(input);
+            if (noBuffMatcher.find()) {
+                this.length = noBuffMatcher.group(1) + noBuffMatcher.group(2);
+            }
         }
     }
 
@@ -48,6 +55,7 @@ public class ComboToast implements IToast<ComboToast> {
         GuiToast.drawSubline(toastGui, delta, 0L, this.maxDrawTime, this.buffer, this.buff, false);
         RenderHelper.enableGUIStandardItemLighting();
 
+        if (this.buffTexture != null)
         RenderUtil.renderTexture(this.buffTexture, 8, 8);
 
         GlStateManager.disableLighting();

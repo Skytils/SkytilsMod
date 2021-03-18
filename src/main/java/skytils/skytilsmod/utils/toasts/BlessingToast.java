@@ -72,11 +72,11 @@ public class BlessingToast implements IToast<BlessingToast> {
     }
 
     private enum Blessing {
-        LIFE("life", "skytils:blessings/life.png", "§c§lLIFE BLESSING!"),
-        POWER("power", "skytils:blessings/power.png", "§5§lPOWER BLESSING!"),
-        STONE("stone", "skytils:blessings/stone.png", "§a§lSTONE BLESSING!"),
-        WISDOM("wisdom", "skytils:blessings/wisdom.png", "§b§lWISDOM BLESSING!"),
-        TIME("time", "skytils:blessings/time.png", "§6§lTIME BLESSING!");
+        LIFE("life", "skytils:toasts/blessings/life.png", "§c§lLIFE BLESSING!"),
+        POWER("power", "skytils:toasts/blessings/power.png", "§5§lPOWER BLESSING!"),
+        STONE("stone", "skytils:toasts/blessings/stone.png", "§a§lSTONE BLESSING!"),
+        WISDOM("wisdom", "skytils:toasts/blessings/wisdom.png", "§b§lWISDOM BLESSING!"),
+        TIME("time", "skytils:toasts/blessings/time.png", "§6§lTIME BLESSING!");
 
         private final ResourceLocation texture;
         private final String name;

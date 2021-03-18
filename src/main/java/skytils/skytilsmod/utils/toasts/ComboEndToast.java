@@ -12,7 +12,7 @@ import java.nio.FloatBuffer;
 
 public class ComboEndToast implements IToast<ComboToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
-    private static final ResourceLocation ICON = new ResourceLocation("skytils:combo/comboFail.png");
+    private static final ResourceLocation ICON = new ResourceLocation("skytils:toasts/combo/comboFail.png");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
     private final long maxDrawTime;
 

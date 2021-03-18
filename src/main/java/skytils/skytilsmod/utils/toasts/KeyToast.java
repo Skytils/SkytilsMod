@@ -42,8 +42,8 @@ public class KeyToast implements IToast<KeyToast> {
     }
 
     private enum KeyType {
-        BLOOD("blood", "skytils:keys/blood.png", "§c§lBLOOD KEY!"),
-        WITHER("wither", "skytils:keys/wither.png", "§7§lWITHER KEY!");
+        BLOOD("blood", "skytils:toasts/keys/blood.png", "§c§lBLOOD KEY!"),
+        WITHER("wither", "skytils:toasts/keys/wither.png", "§7§lWITHER KEY!");
 
         private final String name;
         private final ResourceLocation texture;
