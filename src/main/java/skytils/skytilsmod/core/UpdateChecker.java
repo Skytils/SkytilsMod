@@ -16,11 +16,6 @@ import skytils.skytilsmod.utils.Utils;
 
 import java.io.File;
 
-/**
- * Original version taken from Danker's Skyblock Mod under GPL 3.0 license. Modified by the Skytils team.
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 public class UpdateChecker {
 
     private final static Minecraft mc = Minecraft.getMinecraft();
@@ -81,9 +76,14 @@ public class UpdateChecker {
         }));
     }
 
-    static class UpdateGetter implements Runnable {
+    private static class UpdateGetter implements Runnable {
         private volatile JsonObject updateObj = null;
 
+        /**
+         * Modified version from Danker's Skyblock Mod, taken under GPL 3.0 license.
+         * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+         * @author bowser0000
+         */
         @Override
         public void run() {
             System.out.println("Checking for updates...");

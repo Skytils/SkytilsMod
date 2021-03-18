@@ -88,7 +88,7 @@ public class PetFeatures {
             if (item != null) {
                 String itemId = ItemUtil.getSkyBlockItemID(item);
                 if (itemId != null) {
-                    boolean isPetItem = itemId.contains("PET_ITEM") || itemId.contains("CARROT_CANDY");
+                    boolean isPetItem = (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY");
 
                     if (!isPetItem) {
                         List<String> lore = ItemUtil.getItemLore(item);
