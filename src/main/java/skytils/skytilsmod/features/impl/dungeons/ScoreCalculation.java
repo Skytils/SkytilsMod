@@ -185,6 +185,9 @@ public class ScoreCalculation {
         private static final Pattern secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r");
         private static final Pattern cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r");
 
+        private static final Pattern dungeonClearedPattern = Pattern.compile("Dungeon Cleared: (?<percentage>\\d+)%");
+        private static final Pattern timeElapsedPattern = Pattern.compile("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?");
+
         public ScoreCalculationElement() {
             super("Dungeon Score Estimate", new FloatPair(200, 100));
             Skytils.GUIMANAGER.registerElement(this);
@@ -257,14 +260,14 @@ public class ScoreCalculation {
                 for (String l : ScoreboardUtil.getSidebarLines()) {
                     String line = ScoreboardUtil.cleanSB(l);
                     if (line.startsWith("Dungeon Cleared:")) {
-                        Matcher matcher = Pattern.compile("Dungeon Cleared: (?<percentage>\\d+)%").matcher(line);
+                        Matcher matcher = dungeonClearedPattern.matcher(line);
                         if (matcher.find()) {
                             clearedPercentage = Integer.parseInt(matcher.group("percentage"));
                             continue;
                         }
                     }
                     if (line.startsWith("Time Elapsed:")) {
-                        Matcher matcher = Pattern.compile("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?").matcher(line);
+                        Matcher matcher = timeElapsedPattern.matcher(line);
                         if (matcher.find()) {
                             int hours;
                             int minutes;

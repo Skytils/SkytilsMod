@@ -20,6 +20,7 @@ import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.features.impl.SlayerFeatures;
 import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.dungeons.ScoreCalculation;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
@@ -99,6 +100,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
         MinecraftForge.EVENT_BUS.register(new DamageSplash());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
+        MinecraftForge.EVENT_BUS.register(new DungeonTimer());
         MinecraftForge.EVENT_BUS.register(new FarmingFeatures());
         MinecraftForge.EVENT_BUS.register(new GlintCustomizer());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());

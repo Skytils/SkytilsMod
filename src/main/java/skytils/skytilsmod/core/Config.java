@@ -85,6 +85,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Dungeon Timer",
+            description = "Shows the time taken for certain actions in dungeons.",
+            category = "Dungeons",
+            subcategory = "Miscellaneous"
+    )
+    public boolean dungeonTimer = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Dungeon Score Estimate",
             description = "Shows an estimate of the current dungeon score.\nRequires the Dungeon Rooms mod in order to use.",
             category = "Dungeons",
