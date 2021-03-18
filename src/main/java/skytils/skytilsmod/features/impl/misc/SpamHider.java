@@ -323,6 +323,24 @@ public class SpamHider {
 
             }
 
+            // Revive Stone
+            if (formatted.contains("§r§6Revive Stone") && Utils.inDungeons) {
+                switch (Skytils.config.reviveStoneHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.reviveStoneHider == 2);
+                        break;
+                    case 3:
+                        cancelChatPacket(event, false);
+                        String username = Minecraft.getMinecraft().thePlayer.getName();
+                        if (!formatted.contains(username)) return;
+                        GuiManager.toastGui.add(new ReviveStoneToast());
+                        break;
+                    default:
+                }
+
+            }
+
             // Combo
             if (unformatted.contains("Combo")) {
                 switch (Skytils.config.comboHider) {

@@ -1122,6 +1122,16 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Revive Stone Pickup Hider",
+            description = "Removes Revive Stone pickup messages from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui", "Toasts"}
+    )
+    public int reviveStoneHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Wither Key Hider",
             description = "Removes Wither Key messages from your chat.",
             category = "Spam",
