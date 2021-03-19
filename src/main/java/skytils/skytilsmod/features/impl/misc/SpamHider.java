@@ -51,6 +51,7 @@ public class SpamHider {
 
     @SubscribeEvent
     public void onActionBarDisplay(SetActionBarEvent event) {
+        if (!Utils.inSkyblock) return;
         Matcher manaUsageMatcher = Regexs.MANAUSED.pattern.matcher(event.message);
 
         if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
@@ -68,6 +69,7 @@ public class SpamHider {
 
     private enum Regexs {
 
+        BLESSINGBUFF(Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})")),
         BLESSINGGRANT(Pattern.compile("Grant.{1,2} you .* and .*\\.")),
         BLESSINGNAME(Pattern.compile("Blessing of (?<blessing>\\w+)")),
         MANAUSED(Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))")),
@@ -82,6 +84,7 @@ public class SpamHider {
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public void onChatPacket(ReceivePacketEvent event) {
+        if (!Utils.inSkyblock) return;
         if (!(event.packet instanceof S02PacketChat)) return;
         S02PacketChat packet = (S02PacketChat) event.packet;
         if (packet.getType() == 2) return;
@@ -223,7 +226,7 @@ public class SpamHider {
                             cancelChatPacket(event, false);
                             break;
                         case 2:
-                            Matcher blessingBuffMatcher = Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})").matcher(unformatted);
+                            Matcher blessingBuffMatcher = Regexs.BLESSINGBUFF.pattern.matcher(unformatted);
                             List<BlessingToast.BlessingBuff> buffs = new ArrayList<>();
 
                             while (blessingBuffMatcher.find()) {
