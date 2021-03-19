@@ -26,7 +26,19 @@ A Hypixel Skyblock Utilities mod.
  - Reparty Command Which Yields to Other Mods
  - Auto Accept Reparty
  - Soul Eater Bonus Strength
- - Spam Hider
+ - Spam Hider for
+     - Mort messages
+     - Boss messages
+     - Autopet messages
+     - Ability messages
+     - Cooldown messages
+     - Mana messages
+     - Blocks in the way messages
+     - Dungeon blessings
+     - Wither & blood key pickups
+     - Superboom TNT pickups
+     - Revive stone pickups
+     - Combo messages
 ##### Dungeons
  - Show Hidden Fels, Shadow Assassins, and blood room mobs
  - Blaze Solver Which Replaces The Skin Textures
@@ -43,6 +55,8 @@ A Hypixel Skyblock Utilities mod.
  - Giant, Sadan, and Necron HP Display
  - Better Sadan Interest timer
  - Score Calculation
+ - Dungeon Timer
+ - Necron phase timer
 #### Farming
  - Block Math Hoe recipe viewer
  - Block breaking farms
@@ -52,7 +66,8 @@ A Hypixel Skyblock Utilities mod.
  - Fetchur Solver
  - Puzzler Solver
  - Raffle Waypoint and Warning
-#### Miscellaneous
+ - Show hidden sneaky creepers
+#### Items
  - Block Useless Zombie Sword Uses
  - Prioritize Item Abilities
  - Pet Item Confirmation
@@ -63,14 +78,17 @@ A Hypixel Skyblock Utilities mod.
  - Show Enchanted Book, Potion, and Minion Tiers
  - Show Pet Candies
  - Only Collect Enchanted Items
- - Hide Witherborn Boss Bars
  - Dungeon Potion Lock
+ - Power Orb Lock
+### Miscellaneous
+ - Hide Witherborn Boss Bars
  - Hide Fire and Lightning
  - Custom Damage Splash
  - Legion and Dolphin player displays
  - Alerts for Hidden Jerry spawns
  - Relic and Rare Uber Relic waypoints
- - Power Orb Lock
+ - Stop other mods from cancelling terminal clicks
+ - Slayer miniboss spawn alert
 
 
 And more to come!
