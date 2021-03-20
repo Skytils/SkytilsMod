@@ -177,7 +177,10 @@ public class Skytils {
         ScreenRenderer.refresh();
 
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(sendMessageQueue.pollFirst());
+            String msg = sendMessageQueue.pollFirst();
+            if (msg != null) {
+                mc.thePlayer.sendChatMessage(msg);
+            }
         }
 
         if (ticks % 20 == 0) {
