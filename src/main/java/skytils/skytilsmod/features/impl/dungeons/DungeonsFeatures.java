@@ -28,8 +28,10 @@ import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -39,10 +41,7 @@ import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
-import skytils.skytilsmod.utils.NumberUtil;
-import skytils.skytilsmod.utils.RenderUtil;
-import skytils.skytilsmod.utils.ScoreboardUtil;
-import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -61,6 +60,8 @@ public class DungeonsFeatures {
 
     private static boolean isInTerracottaPhase = false;
     private static double terracottaEndTime = -1;
+
+    private static int rerollClicks = 0;
 
     private static final Pattern playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
     private static final Pattern deathOrPuzzleFail = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)");
@@ -81,7 +82,7 @@ public class DungeonsFeatures {
                     }
                 }
             }
-            if (terracottaEndTime > 0) {
+            if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
                 double timeLeft = terracottaEndTime - (((double)System.currentTimeMillis()) / 1000f);
                 if (timeLeft >= 0) {
                     BossStatus.healthScale = ((float) timeLeft) / 105;
@@ -127,7 +128,7 @@ public class DungeonsFeatures {
                 if (unformatted.contains("Sadan's Interest Level")) {
                     terracottaEndTime = (((double) System.currentTimeMillis()) / 1000f) + 105;
                 }
-            } else if (terracottaEndTime > 0) {
+            } else if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
                 event.setCanceled(true);
             }
             return;
@@ -368,6 +369,43 @@ public class DungeonsFeatures {
                     event.setCanceled(true);
                 if (sound.equals("random.eat") && pitch == 0.6984127f && volume == 1)
                     event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiOpen(GuiOpenEvent event) {
+        rerollClicks = 0;
+    }
+
+    @SubscribeEvent
+    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (!Utils.inDungeons) return;
+        if (event.container instanceof ContainerChest) {
+            ContainerChest chest = (ContainerChest) event.container;
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText();
+            if (chestName.endsWith(" Chest")) {
+                if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
+                    rerollClicks++;
+                    int neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks;
+                    if (neededClicks > 0) {
+                        event.setCanceled(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onTooltip(ItemTooltipEvent event) {
+        if (event.itemStack != null) {
+            if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && ItemUtil.getDisplayName(event.itemStack).contains("Reroll") && SBInfo.getInstance().lastOpenContainerName.endsWith(" Chest")) {
+                for (int i = 0; i < event.toolTip.size(); i++) {
+                    if (event.toolTip.get(i).contains("Click to reroll")) {
+                        int neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks;
+                        event.toolTip.set(i, "\u00a7eClick \u00a7a" + neededClicks + "\u00a7e times to reroll this chest!");
+                    }
+                }
             }
         }
     }
