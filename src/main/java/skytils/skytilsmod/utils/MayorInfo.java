@@ -37,6 +37,9 @@ public class MayorInfo {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return;
 
         if (ticks % 100 == 0) {
+            if ((System.currentTimeMillis() - lastFetchedMayorData > (24 * 60 * 60 * 1000)) || isLocal) {
+                fetchMayorData();
+            }
             if (System.currentTimeMillis() - lastCheckedElectionOver > (24 * 60 * 60 * 1000)) {
                 String elected = currentMayor;
                 for (NetworkPlayerInfo pi : TabListUtils.getTabEntries()) {

@@ -34,19 +34,6 @@ public abstract class MixinRenderItem {
 
     @Shadow protected abstract void renderModel(IBakedModel model, int color);
 
-    /**
-     * Taken from Skyblockcatia under MIT License
-     * Modified
-     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
-     * @author SteveKunG
-     */
-    @Inject(method = "renderItemIntoGUI(Lnet/minecraft/item/ItemStack;II)V", at = @At("HEAD"))
-    private void renderRarity(ItemStack itemStack, int xPosition, int yPosition, CallbackInfo info) {
-        if (Utils.inSkyblock && Skytils.config.showItemRarity) {
-            RenderUtil.renderRarity(itemStack, xPosition, yPosition);
-        }
-    }
-
     @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
     private void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
         MinecraftForge.EVENT_BUS.post(new GuiRenderItemEvent.RenderOverlayEvent.Post(fr, stack, xPosition, yPosition, text));
@@ -63,7 +50,6 @@ public abstract class MixinRenderItem {
 
     @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderEffect(Lnet/minecraft/client/resources/model/IBakedModel;)V", shift = At.Shift.BEFORE), cancellable = true)
     private void modifyGlintRendering(ItemStack stack, IBakedModel model, CallbackInfo ci) {
-
         if (Utils.inSkyblock) {
             String itemId = ItemUtil.getSkyBlockItemID(stack);
             if (GlintCustomizer.glintColors.containsKey(itemId)) {

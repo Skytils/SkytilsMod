@@ -71,6 +71,13 @@ public class ItemFeatures {
     }
 
     @SubscribeEvent
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent event) {
+        if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.getHasStack()) {
+            RenderUtil.renderRarity(event.slot.getStack(), event.slot.xDisplayPosition, event.slot.yDisplayPosition);
+        }
+    }
+
+    @SubscribeEvent
     public void onCloseWindow(GuiContainerEvent.CloseWindowEvent event) {
         if (!Utils.inSkyblock) return;
         if (mc.thePlayer.inventory.getItemStack() != null) {
