@@ -25,10 +25,7 @@ import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.AddChatMessageEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
-import skytils.skytilsmod.utils.MathUtil;
-import skytils.skytilsmod.utils.ScoreboardUtil;
-import skytils.skytilsmod.utils.TabListUtils;
-import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.*;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
@@ -213,6 +210,7 @@ public class ScoreCalculation {
                 int clearedPercentage = 0;
                 double secondsElapsed = 0;
                 int crypts = 0;
+                boolean isPaul = Objects.equals(MayorInfo.currentMayor, "Paul") && MayorInfo.mayorPerks.contains("EZPZ");
 
                 for (NetworkPlayerInfo pi : TabListUtils.getTabEntries()) {
                     try {
@@ -297,7 +295,7 @@ public class ScoreCalculation {
                 int skillScore = (100 - (2 * deaths) - (14 * (missingPuzzles + failedPuzzles)));
                 double discoveryScore = (MathUtil.clamp(Math.floor(60 * (clearedPercentage/100f)), 0,60) + (totalSecrets <= 0 ? 0 : MathUtil.clamp(Math.floor((40f*foundSecrets)/totalSecrets), 0, 40)));
                 double speedScore;
-                int bonusScore = ((mimicKilled ? 2 : 0) + Math.min(crypts, 5));
+                int bonusScore = ((mimicKilled ? 2 : 0) + Math.min(crypts, 5) + (isPaul ? 10 : 0));
 
                 double countedSeconds = Objects.equals(DungeonsFeatures.dungeonFloor, "F2") ? Math.max(0, secondsElapsed - 120) : secondsElapsed;
                 if (countedSeconds <= 1320) {
@@ -318,6 +316,9 @@ public class ScoreCalculation {
                 text.add("\u00a76Crypts:\u00a7a " + crypts);
                 if (DungeonsFeatures.dungeonFloor.equals("F6") || DungeonsFeatures.dungeonFloor.equals("F7")) {
                     text.add("\u00a76Mimic Killed:" + (ScoreCalculation.mimicKilled ? "\u00a7a ✓" : " \u00a7c X"));
+                }
+                if (isPaul) {
+                    text.add("\u00a76EZPZ: \u00a7a+10");
                 }
 
                 text.add("\u00a76Skill Score:\u00a7a " + skillScore);
