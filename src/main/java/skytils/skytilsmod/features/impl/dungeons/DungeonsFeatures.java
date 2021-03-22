@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -45,7 +44,6 @@ import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -54,20 +52,14 @@ import java.util.regex.Pattern;
 public class DungeonsFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
-
-    public static String dungeonFloor = null;
-    public static boolean hasBossSpawned = false;
-
-    private static boolean isInTerracottaPhase = false;
-    private static double terracottaEndTime = -1;
-
-    private static int rerollClicks = 0;
-
     private static final Pattern playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
     private static final Pattern deathOrPuzzleFail = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)");
-
-
     private static final String[] WATCHER_MOBS = {"Revoker", "Psycho", "Reaper", "Cannibal", "Mute", "Ooze", "Putrid", "Freak", "Leech", "Tear", "Parasite", "Flamer", "Skull", "Mr. Dead", "Vader", "Frost", "Walker", "Wandering Soul", "Bonzo", "Scarf", "Livid"};
+    public static String dungeonFloor = null;
+    public static boolean hasBossSpawned = false;
+    private static boolean isInTerracottaPhase = false;
+    private static double terracottaEndTime = -1;
+    private static int rerollClicks = 0;
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -83,7 +75,7 @@ public class DungeonsFeatures {
                 }
             }
             if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
-                double timeLeft = terracottaEndTime - (((double)System.currentTimeMillis()) / 1000f);
+                double timeLeft = terracottaEndTime - (((double) System.currentTimeMillis()) / 1000f);
                 if (timeLeft >= 0) {
                     BossStatus.healthScale = ((float) timeLeft) / 105;
                     BossStatus.statusBarTime = 100;
@@ -134,7 +126,7 @@ public class DungeonsFeatures {
             return;
         }
     }
-    
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
         if (!Utils.inSkyblock) return;
@@ -222,7 +214,7 @@ public class DungeonsFeatures {
                     if (name.contains("Terracotta "))
                         mc.theWorld.removeEntity(event.entity);
                 }
-                if (Skytils.config.hideNonStarredNametags ) {
+                if (Skytils.config.hideNonStarredNametags) {
                     String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
                     if (!name.startsWith("✯ ") && name.contains("❤"))
                         if (name.contains("Lurker") || name.contains("Dreadlord") || name.contains("Souleater") || name.contains("Zombie") || name.contains("Skeleton") || name.contains("Skeletor") || name.contains("Sniper") || name.contains("Super Archer") || name.contains("Spider") || name.contains("Fels") || name.contains("Withermancer"))
@@ -306,13 +298,14 @@ public class DungeonsFeatures {
                                 }
 
                                 double scale = 0.9f;
-                                double scaleReset = 1/scale;
+                                double scaleReset = 1 / scale;
                                 GlStateManager.disableLighting();
                                 GlStateManager.disableDepth();
                                 GlStateManager.disableBlend();
                                 GlStateManager.translate(0, 0, 1);
-                                if (shouldDrawBkg) Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
-                                fr.drawStringWithShadow(text, x, y, new Color(255, 255,255).getRGB());
+                                if (shouldDrawBkg)
+                                    Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
+                                fr.drawStringWithShadow(text, x, y, new Color(255, 255, 255).getRGB());
                                 GlStateManager.scale(scale, scale, scale);
                                 fr.drawString(dungeonClass, (float) (scaleReset * (x + 7)), (float) (scaleReset * (guiTop + slot.yDisplayPosition + 18)), new Color(255, 255, 0).getRGB(), true);
                                 GlStateManager.scale(scaleReset, scaleReset, scaleReset);
@@ -353,7 +346,7 @@ public class DungeonsFeatures {
             S45PacketTitle packet = (S45PacketTitle) event.packet;
             if (packet.getMessage() != null && mc.thePlayer != null) {
                 String unformatted = StringUtils.stripControlCodes(packet.getMessage().getUnformattedText());
-                if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.getName()) &&(unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
+                if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.getName()) && (unformatted.contains("activated a terminal!") || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))) {
                     event.setCanceled(true);
                 }
             }
