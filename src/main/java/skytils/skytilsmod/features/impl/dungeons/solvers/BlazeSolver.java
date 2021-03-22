@@ -127,16 +127,14 @@ public class BlazeSolver {
                 ShootableBlaze shootableBlaze = orderedBlazes.get(0);
                 EntityBlaze lowestBlaze = shootableBlaze.blaze;
                 if (lowestBlaze != null) {
-                    BlockPos stringPos = new BlockPos(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ);
-                    RenderUtil.draw3DString(new Vec3(stringPos), EnumChatFormatting.BOLD + "Smallest", new Color(255, 0, 0, 200), event.partialTicks);
+                    RenderUtil.draw3DString(new Vec3(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ), EnumChatFormatting.BOLD + "Smallest", new Color(255, 0, 0, 200), event.partialTicks);
                 }
             }
             if (blazeMode >= 0) {
                 ShootableBlaze shootableBlaze = orderedBlazes.get(orderedBlazes.size() - 1);
                 EntityBlaze highestBlaze = shootableBlaze.blaze;
                 if (highestBlaze != null) {
-                    BlockPos stringPos = new BlockPos(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ);
-                    RenderUtil.draw3DString(new Vec3(stringPos), EnumChatFormatting.BOLD + "Biggest", new Color(0, 255, 0, 200), event.partialTicks);
+                    RenderUtil.draw3DString(new Vec3(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ), EnumChatFormatting.BOLD + "Biggest", new Color(0, 255, 0, 200), event.partialTicks);
                 }
             }
         }

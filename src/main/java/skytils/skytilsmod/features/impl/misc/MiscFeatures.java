@@ -9,6 +9,7 @@ import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -26,6 +27,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.BossBarEvent;
@@ -42,6 +44,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MiscFeatures {
 
@@ -74,6 +77,16 @@ public class MiscFeatures {
     @SubscribeEvent
     public void onCheckRender(CheckRenderEntityEvent event) {
         if (!Utils.inSkyblock) return;
+
+        if (event.entity instanceof EntityCreeper) {
+            EntityCreeper entity = (EntityCreeper) event.entity;
+            if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.getMaxHealth() == 20 && entity.getHealth() == 20 && entity.getPowered()) {
+                if (mc.theWorld.playerEntities.stream().anyMatch(p -> p instanceof EntityOtherPlayerMP && p.getUniqueID().version() == 2 && p.getHealth() == 20 && !p.isPlayerSleeping() && p.getDistanceSqToEntity(event.entity) <= 49)) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+
         if (event.entity instanceof EntityFallingBlock) {
             EntityFallingBlock entity = (EntityFallingBlock) event.entity;
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.getBlock().getBlock() == Blocks.gold_block) {
@@ -113,6 +126,9 @@ public class MiscFeatures {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
             if (Skytils.config.disableCooldownSounds && packet.getSoundName().equals("mob.endermen.portal") && packet.getPitch() == 0 && packet.getVolume() == 8) {
                 event.setCanceled(true);
+            }
+            if (Skytils.config.slayerMinibossSpawnAlert && packet.getSoundName().equals("random.explode") && packet.getVolume() == 0.6f && packet.getPitch() == 9/7f) {
+                GuiManager.createTitle("\u00a7cMINIBOSS", 20);
             }
         }
     }
@@ -210,10 +226,22 @@ public class MiscFeatures {
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 float x = getActualX();
                 float y = getActualY();
+
+                boolean hasLegion = false;
+                for (ItemStack armor : player.inventory.armorInventory) {
+                    NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(armor);
+                    if (extraAttr != null && extraAttr.hasKey("enchantments") && extraAttr.getCompoundTag("enchantments").hasKey("ultimate_legion")) {
+                        hasLegion = true;
+                        break;
+                    }
+                }
+
+                if (!hasLegion) return;
+
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 30 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
-                ScreenRenderer.fontRenderer.drawString(String.valueOf(players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.legionCap && players.size() > 20 ? 20 : players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
                 GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }

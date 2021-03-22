@@ -13,6 +13,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.BlockChangeEvent;
+import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -30,7 +31,7 @@ public class SimonSaysSolver {
         IBlockState old = event.old;
         IBlockState state = event.update;
         if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver) {
+            if (Skytils.config.simonSaysSolver && DungeonsFeatures.dungeonFloor.equals("F7")) {
                 if (pos.getY() <= 123 && pos.getY() >= 120 && pos.getZ() >= 291 && pos.getZ() <= 294) {
                     if (pos.getX() == 310) {
                         System.out.println(String.format("Block at %s changed to %s from %s", pos, state.getBlock().getLocalizedName(), old.getBlock().getLocalizedName()));
@@ -78,7 +79,7 @@ public class SimonSaysSolver {
             double y = pos.getY() - viewerY;
             double z = pos.getZ() - viewerZ;
             GlStateManager.disableCull();
-            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), new Color(255, 0, 0), 0.5f);
+            RenderUtil.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), (clickNeeded == clickInOrder.size() - 1 ? new Color(0, 255, 0) : new Color(255, 0, 0)), 0.5f);
             GlStateManager.enableCull();
         }
     }

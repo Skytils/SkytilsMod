@@ -115,6 +115,10 @@ public class SkytilsCommand extends CommandBase {
                             MayorInfo.fetchMayorData();
                             player.addChatMessage(new ChatComponentText("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully."));
                             break;
+                        case "mayor":
+                            MayorInfo.fetchMayorData();
+                            player.addChatMessage(new ChatComponentText("Skytils reloaded the mayor data."));
+                            break;
                         default:
                             player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
                     }
@@ -135,9 +139,9 @@ public class SkytilsCommand extends CommandBase {
                             " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
                             " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
                             "§9§l➜ Color and Glint" + "\n" +
-                    	    " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)" + "\n" +
-                    	    " §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
-                    	    " §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
+                    	      " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)" + "\n" +
+                    	      " §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
+                    	      " §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
                             "§9§l➜ Miscellaneous:" + "\n" +
                             " §3/reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
                             " §3/blockability <clearall> §l➡ §bDisables the ability for the item in your hand."));

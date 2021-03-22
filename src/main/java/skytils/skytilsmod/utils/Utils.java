@@ -3,16 +3,13 @@ package skytils.skytilsmod.utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3i;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import skytils.skytilsmod.Skytils;
 
-import java.lang.reflect.Field;
+import java.io.*;
 import java.util.List;
 import java.util.Random;
 
@@ -22,6 +19,7 @@ public class Utils {
 
     public static boolean inSkyblock = false;
     public static boolean inDungeons = false;
+    public static boolean shouldBypassVolume = false;
 
     static Random random = new Random();
 
@@ -103,4 +101,16 @@ public class Utils {
         }
         return false;
     }
+
+    /**
+     * Taken from SkyblockAddons under MIT License
+     * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
+     * @author BiscuitDevelopment
+     */
+    public static void playLoudSound(String sound, double pitch) {
+        shouldBypassVolume = true;
+        mc.thePlayer.playSound(sound, 1, (float) pitch);
+        shouldBypassVolume = false;
+    }
+
 }

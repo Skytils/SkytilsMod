@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.events.SendPacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
@@ -29,6 +31,10 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class PetFeatures {
 
@@ -37,15 +43,39 @@ public class PetFeatures {
     private static long lastPetConfirmation = 0;
     private static long lastPetLockNotif = 0;
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onChatLow(ClientChatReceivedEvent event) {
-        if (!Utils.inSkyblock) return;
-        String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
+    public static String lastPet = null;
 
-        if (Skytils.config.hideAutopetMessages) {
-            if (unformatted.contains("Autopet equipped your")) {
+    private static final Pattern SUMMON_PATTERN = Pattern.compile("§r§aYou summoned your §r(?<pet>.+)§r§a!§r");
+    private static final Pattern AUTOPET_PATTERN = Pattern.compile("§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)\\] (?<pet>.+)§e! §a§lVIEW RULE§r");
+
+    @SubscribeEvent
+    public void onCheckRender(CheckRenderEntityEvent event) {
+        if (!Utils.inSkyblock) return;
+
+        if (event.entity instanceof EntityArmorStand) {
+            EntityArmorStand entity = (EntityArmorStand) event.entity;
+            if (Skytils.config.hidePetNametags && entity.getCustomNameTag().contains("§8[§7Lv") && entity.getCustomNameTag().contains("'s ")) {
                 event.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock || event.type == 2) return;
+        String message = event.message.getFormattedText();
+        if (message.startsWith("§r§aYou despawned your §r§")) {
+            lastPet = null;
+        } else if (message.startsWith("§r§aYou summoned your §r")) {
+            Matcher petMatcher = SUMMON_PATTERN.matcher(message);
+            if (petMatcher.find()) {
+                lastPet = StringUtils.stripControlCodes(petMatcher.group("pet"));
+            } else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to capture equipped pet."));
+        } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
+            Matcher autopetMatcher = AUTOPET_PATTERN.matcher(message);
+            if (autopetMatcher.find()) {
+                lastPet = StringUtils.stripControlCodes(autopetMatcher.group("pet"));
+            } else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to capture equipped pet."));
         }
     }
 
@@ -58,7 +88,20 @@ public class PetFeatures {
             if (item != null) {
                 String itemId = ItemUtil.getSkyBlockItemID(item);
                 if (itemId != null) {
-                    if (itemId.contains("PET_ITEM") || ItemUtil.getItemLore(item).stream().anyMatch(s -> s.contains("PET ITEM"))) {
+                    boolean isPetItem = (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY");
+
+                    if (!isPetItem) {
+                        List<String> lore = ItemUtil.getItemLore(item);
+                        for (int i = lore.size() - 1; i > 0; i--) {
+                            String line = lore.get(i);
+                            if (line.contains("PET ITEM")) {
+                                isPetItem = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isPetItem) {
                         if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
                             event.setCanceled(true);
                             if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
@@ -105,12 +148,13 @@ public class PetFeatures {
         public void render() {
             EntityPlayerSP player = mc.thePlayer;
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
+                if (!Objects.equals(lastPet, "Dolphin")) return;
                 float x = getActualX();
                 float y = getActualY();
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 RenderUtil.renderTexture(ICON, (int)x, (int)y);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 10 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
-                ScreenRenderer.fontRenderer.drawString(String.valueOf(players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.dolphinCap && players.size() > 5 ? 5 : players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
                 GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }

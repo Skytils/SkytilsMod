@@ -37,6 +37,7 @@ public class MinionFeatures {
 
     @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
+        if (!Utils.inSkyblock) return;
         if (event.packet instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
             if (packet.getSoundName().equals("random.chestopen") && packet.getPitch() == 1 && packet.getVolume() == 1) {

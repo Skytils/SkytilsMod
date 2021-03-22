@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
  */
 public class DamageSplash {
 
+    private static final Pattern damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?)");
+
     @SubscribeEvent
     public void renderFakeEntity(RenderWorldLastEvent e) {
         float partialTicks = ObfuscationReflectionHelper.getPrivateValue(RenderWorldLastEvent.class, e, "partialTicks");
@@ -46,7 +48,6 @@ public class DamageSplash {
         if (!entity.hasCustomName()) return;
         if (e.entity.isDead) return;
 
-        Pattern damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?)");
         String strippedName = StringUtils.stripControlCodes(entity.getCustomNameTag());
         Matcher damageMatcher = damagePattern.matcher(strippedName);
 

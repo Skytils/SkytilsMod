@@ -9,7 +9,7 @@ public class EnumUtil {
         BOTTOM_RIGHT(3),
         BOTTOM_MIDDLE(4);
 
-        private int id;
+        private final int id;
 
         AnchorPoint(int id) {
             this.id = id;

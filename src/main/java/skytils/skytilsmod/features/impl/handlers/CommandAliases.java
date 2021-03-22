@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl.misc;
+package skytils.skytilsmod.features.impl.handlers;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -45,7 +45,6 @@ public class CommandAliases {
             }
         }
         for (Map.Entry<String, JsonElement> alias : aliasesObject.entrySet()) {
-            System.out.println(String.format("Loaded alias '%s', mapped to '%s'", alias.getKey(), alias.getValue().getAsString()));
             aliases.put(alias.getKey(), alias.getValue().getAsString());
         }
     }

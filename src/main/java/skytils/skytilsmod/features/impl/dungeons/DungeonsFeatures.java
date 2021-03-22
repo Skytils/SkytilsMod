@@ -6,9 +6,16 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.BossStatus;
+import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -21,22 +28,26 @@ import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.lwjgl.opengl.GL11;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
-import skytils.skytilsmod.utils.ScoreboardUtil;
-import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.events.SendChatMessageEvent;
+import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,8 +56,18 @@ public class DungeonsFeatures {
     private static final Minecraft mc = Minecraft.getMinecraft();
 
     public static String dungeonFloor = null;
+    public static boolean hasBossSpawned = false;
 
     private static boolean isInTerracottaPhase = false;
+    private static double terracottaEndTime = -1;
+
+    private static int rerollClicks = 0;
+
+    private static final Pattern playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
+    private static final Pattern deathOrPuzzleFail = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)");
+
+
+    private static final String[] WATCHER_MOBS = {"Revoker", "Psycho", "Reaper", "Cannibal", "Mute", "Ooze", "Putrid", "Freak", "Leech", "Tear", "Parasite", "Flamer", "Skull", "Mr. Dead", "Vader", "Frost", "Walker", "Wandering Soul", "Bonzo", "Scarf", "Livid"};
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -61,6 +82,56 @@ public class DungeonsFeatures {
                     }
                 }
             }
+            if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
+                double timeLeft = terracottaEndTime - (((double)System.currentTimeMillis()) / 1000f);
+                if (timeLeft >= 0) {
+                    BossStatus.healthScale = ((float) timeLeft) / 105;
+                    BossStatus.statusBarTime = 100;
+                    BossStatus.bossName = "§r§c§lSadan's Interest: §r§6" + ((int) timeLeft) + "s";
+                    BossStatus.hasColorModifier = false;
+                } else {
+                    terracottaEndTime = -2;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onBossBarSet(BossBarEvent.Set event) {
+        if (!Utils.inDungeons) return;
+        IBossDisplayData displayData = event.displayData;
+        String unformatted = StringUtils.stripControlCodes(event.displayData.getDisplayName().getUnformattedText());
+        if (Objects.equals(dungeonFloor, "F7")) {
+            if (unformatted.contains("Necron")) {
+                switch (Skytils.config.necronHealth) {
+                    case 2:
+                        BossStatus.healthScale = displayData.getHealth() / displayData.getMaxHealth();
+                        BossStatus.statusBarTime = 100;
+                        BossStatus.bossName = displayData.getDisplayName().getFormattedText() + "§r§8 - §r§d" + String.format("%.1f", BossStatus.healthScale * 100) + "%";
+                        BossStatus.hasColorModifier = event.hasColorModifier;
+                        event.setCanceled(true);
+                        break;
+                    case 1:
+                        BossStatus.healthScale = displayData.getHealth() / displayData.getMaxHealth();
+                        BossStatus.statusBarTime = 100;
+                        BossStatus.bossName = displayData.getDisplayName().getFormattedText() + "§r§8 - §r§a" + NumberUtil.format((long) (BossStatus.healthScale * 1_000_000_000)) + "§r§8/§r§a1B§r§c❤";
+                        BossStatus.hasColorModifier = event.hasColorModifier;
+                        event.setCanceled(true);
+                        break;
+                    case 0:
+                }
+            }
+            return;
+        }
+        if (Objects.equals(dungeonFloor, "F6")) {
+            if (terracottaEndTime == -1) {
+                if (unformatted.contains("Sadan's Interest Level")) {
+                    terracottaEndTime = (((double) System.currentTimeMillis()) / 1000f) + 105;
+                }
+            } else if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
+                event.setCanceled(true);
+            }
+            return;
         }
     }
     
@@ -71,36 +142,64 @@ public class DungeonsFeatures {
 
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
-                Matcher deathFailMatcher = Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE\\] Oruo the Omniscient: .+ chose the wrong answer!)").matcher(unformatted);
+                Matcher deathFailMatcher = deathOrPuzzleFail.matcher(unformatted);
                 if (deathFailMatcher.find()) {
-                    GuiScreen.setClipboardString(unformatted);
-                    mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                    if (!unformatted.contains("disconnect")) {
+                        GuiScreen.setClipboardString(unformatted);
+                        mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                    }
+                    event.message.getChatStyle()
+                            .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("\u00a7aClick to copy to clipboard.")))
+                            .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail " + unformatted));
                 }
             }
 
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]"))
                 event.setCanceled(true);
 
-            if (unformatted.startsWith("[BOSS] Sadan") && unformatted.contains(":")) {
-                if (unformatted.contains("So you made it all the way here...and you wish to defy me? Sadan?!"))
-                    isInTerracottaPhase = true;
-                if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
-                    isInTerracottaPhase = false;
+            if (unformatted.startsWith("[BOSS]") && unformatted.contains(":")) {
+                if (!unformatted.startsWith("[BOSS] The Watcher")) {
+                    hasBossSpawned = true;
+                }
+                if (unformatted.contains("Sadan")) {
+                    if (unformatted.contains("So you made it all the way here"))
+                        isInTerracottaPhase = true;
+                    if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable."))
+                        isInTerracottaPhase = false;
+                }
             }
         }
     }
-    
+
+    @SubscribeEvent
+    public void onSendChatMessage(SendChatMessageEvent event) {
+        if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
+            mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied selected death/fail to clipboard."));
+            GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length()));
+            event.setCanceled(true);
+        }
+    }
+
     // Show hidden fels
     @SubscribeEvent
     public void onRenderLivingPre(RenderLivingEvent.Pre event) {
         if (Utils.inDungeons) {
-            if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
-                event.entity.setInvisible(false);
-            }
-
-            if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer) {
-                if (event.entity.getName().contains("Shadow Assassin")) {
+            if (event.entity.isInvisible()) {
+                if (Skytils.config.showHiddenFels && event.entity instanceof EntityEnderman) {
                     event.entity.setInvisible(false);
+                }
+
+                if (Skytils.config.showHiddenShadowAssassins && event.entity instanceof EntityPlayer && event.entity.getName().contains("Shadow Assassin")) {
+                    event.entity.setInvisible(false);
+                }
+
+                if (Skytils.config.showStealthyBloodMobs && event.entity instanceof EntityPlayer) {
+                    for (String name : WATCHER_MOBS) {
+                        if (event.entity.getName().trim().equals(name)) {
+                            event.entity.setInvisible(false);
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -118,6 +217,20 @@ public class DungeonsFeatures {
                         mc.theWorld.removeEntity(event.entity);
                     }
                 }
+                if (Skytils.config.hideTerracotaNametags) {
+                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                    if (name.contains("Terracotta "))
+                        mc.theWorld.removeEntity(event.entity);
+                }
+                if (Skytils.config.hideNonStarredNametags ) {
+                    String name = StringUtils.stripControlCodes(event.entity.getCustomNameTag());
+                    if (!name.startsWith("✯ ") && name.contains("❤"))
+                        if (name.contains("Lurker") || name.contains("Dreadlord") || name.contains("Souleater") || name.contains("Zombie") || name.contains("Skeleton") || name.contains("Skeletor") || name.contains("Sniper") || name.contains("Super Archer") || name.contains("Spider") || name.contains("Fels") || name.contains("Withermancer"))
+                            mc.theWorld.removeEntity(event.entity);
+                }
+            }
+            if (event.entity instanceof EntityBat && Skytils.config.showBatHitboxes && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible()) {
+                RenderUtil.drawOutlinedBoundingBox(event.entity.getEntityBoundingBox(), new Color(0, 255, 255, 255), 3, 1f);
             }
         }
     }
@@ -147,7 +260,6 @@ public class DungeonsFeatures {
                             ItemStack item = slot.getStack();
                             if (item.getItem() == Items.skull) {
                                 people++;
-                                String name = item.getDisplayName();
 
                                 //slot is 16x16
                                 int x = guiLeft + slot.xDisplayPosition + 8;
@@ -161,10 +273,19 @@ public class DungeonsFeatures {
                                     y += 20;
                                 }
 
-                                Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
-                                Matcher matcher = player_pattern.matcher(StringUtils.stripControlCodes(name));
+                                Matcher matcher = playerPattern.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
                                 if (!matcher.find()) continue;
-                                String text = fr.trimStringToWidth(name.substring(0, 2) + matcher.group(1), 32);
+                                String name = matcher.group(1);
+                                if (name.equals("Unknown")) continue;
+                                String dungeonClass = "";
+                                for (String l : ScoreboardUtil.getSidebarLines()) {
+                                    String line = ScoreboardUtil.cleanSB(l);
+                                    if (line.contains(name)) {
+                                        dungeonClass = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
+                                        break;
+                                    }
+                                }
+                                String text = fr.trimStringToWidth(item.getDisplayName().substring(0, 2) + name, 32);
                                 x -= fr.getStringWidth(text) / 2;
 
                                 boolean shouldDrawBkg = true;
@@ -184,12 +305,20 @@ public class DungeonsFeatures {
                                     }
                                 }
 
-                                GL11.glPushMatrix();
-                                GL11.glTranslated(0, 0, 10);
+                                double scale = 0.9f;
+                                double scaleReset = 1/scale;
+                                GlStateManager.disableLighting();
+                                GlStateManager.disableDepth();
+                                GlStateManager.disableBlend();
+                                GlStateManager.translate(0, 0, 1);
                                 if (shouldDrawBkg) Gui.drawRect(x - 2, y - 2, x + fr.getStringWidth(text) + 2, y + fr.FONT_HEIGHT + 2, new Color(47, 40, 40).getRGB());
                                 fr.drawStringWithShadow(text, x, y, new Color(255, 255,255).getRGB());
-                                GL11.glTranslated(0, 0, -10);
-                                GL11.glPopMatrix();
+                                GlStateManager.scale(scale, scale, scale);
+                                fr.drawString(dungeonClass, (float) (scaleReset * (x + 7)), (float) (scaleReset * (guiTop + slot.yDisplayPosition + 18)), new Color(255, 255, 0).getRGB(), true);
+                                GlStateManager.scale(scaleReset, scaleReset, scaleReset);
+                                GlStateManager.translate(0, 0, -1);
+                                GlStateManager.enableLighting();
+                                GlStateManager.enableDepth();
 
                             }
                         }
@@ -245,9 +374,48 @@ public class DungeonsFeatures {
     }
 
     @SubscribeEvent
+    public void onGuiOpen(GuiOpenEvent event) {
+        rerollClicks = 0;
+    }
+
+    @SubscribeEvent
+    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (!Utils.inDungeons) return;
+        if (event.container instanceof ContainerChest) {
+            ContainerChest chest = (ContainerChest) event.container;
+            String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText();
+            if (chestName.endsWith(" Chest")) {
+                if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
+                    rerollClicks++;
+                    int neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks;
+                    if (neededClicks > 0) {
+                        event.setCanceled(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onTooltip(ItemTooltipEvent event) {
+        if (event.itemStack != null) {
+            if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && ItemUtil.getDisplayName(event.itemStack).contains("Reroll") && SBInfo.getInstance().lastOpenContainerName.endsWith(" Chest")) {
+                for (int i = 0; i < event.toolTip.size(); i++) {
+                    if (event.toolTip.get(i).contains("Click to reroll")) {
+                        int neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks;
+                        event.toolTip.set(i, "\u00a7eClick \u00a7a" + neededClicks + "\u00a7e times to reroll this chest!");
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         dungeonFloor = null;
+        hasBossSpawned = false;
         isInTerracottaPhase = false;
+        terracottaEndTime = -1;
     }
 
 }

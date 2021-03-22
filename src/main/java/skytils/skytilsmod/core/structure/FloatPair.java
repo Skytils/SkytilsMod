@@ -12,10 +12,10 @@ import org.apache.commons.lang3.mutable.MutableFloat;
  * @author BiscuitDevelopment
  */
 public class FloatPair {
-    private static ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+    private static final ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
-    private MutableFloat x;
-    private MutableFloat y;
+    private final MutableFloat x;
+    private final MutableFloat y;
 
     public FloatPair(int x, int y) {
         this(x / (float) sr.getScaledHeight(), y / (float) sr.getScaledHeight());

@@ -94,13 +94,9 @@ public class IceFillSolver {
     }
 
     private boolean checkForStart(World world, BlockPos pos) {
-        if (world.getBlockState(pos).getBlock() == Blocks.air &&
-            world.getBlockState(pos.offset(roomFacing.rotateY())).getBlock() == Blocks.cobblestone_wall &&
-            world.getBlockState(pos.offset(roomFacing.rotateYCCW())).getBlock() == Blocks.cobblestone_wall) {
-            return true;
-        } else {
-            return false;
-        }
+        return world.getBlockState(pos).getBlock() == Blocks.air &&
+                world.getBlockState(pos.offset(roomFacing.rotateY())).getBlock() == Blocks.cobblestone_wall &&
+                world.getBlockState(pos.offset(roomFacing.rotateYCCW())).getBlock() == Blocks.cobblestone_wall;
     }
 
     private List<Move> generatePairs(World world, List<BlockPos> positions) {
@@ -212,7 +208,7 @@ public class IceFillSolver {
     }
 
     private class IceFillPuzzle {
-        private List<BlockPos> spaces = new ArrayList<>();
+        private final List<BlockPos> spaces = new ArrayList<>();
         private BlockPos start;
         public List<List<BlockPos>> paths = new ArrayList<>();
 
@@ -307,11 +303,7 @@ public class IceFillSolver {
             Move e = (Move) original;
             if (e.dest.equals(o.dest) && e.source.equals(o.source)) {
                 return true;
-            } else if (e.dest.equals(o.source) && e.source.equals(o.dest)) {
-                return true;
-            } else {
-                return false;
-            }
+            } else return e.dest.equals(o.source) && e.source.equals(o.dest);
         }
     }
 

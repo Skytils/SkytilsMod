@@ -10,12 +10,12 @@ import skytils.skytilsmod.utils.RenderUtil;
 
 import java.nio.FloatBuffer;
 
-public class KeyToast implements IToast<KeyToast>{
+public class KeyToast implements IToast<KeyToast> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("skytils:gui/toast.png");
     private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
-    private long maxDrawTime;
-    private KeyType key;
-    private String player;
+    private final long maxDrawTime;
+    private final KeyType key;
+    private final String player;
 
     public KeyToast(String type, String player) {
         this.key = KeyType.fromName(type);
@@ -42,8 +42,8 @@ public class KeyToast implements IToast<KeyToast>{
     }
 
     private enum KeyType {
-        BLOOD("blood", "skytils:keys/blood.png", "§c§lBLOOD KEY!"),
-        WITHER("wither", "skytils:keys/wither.png", "§7§lWITHER KEY!");
+        BLOOD("blood", "skytils:toasts/keys/blood.png", "§c§lBLOOD KEY!"),
+        WITHER("wither", "skytils:toasts/keys/wither.png", "§7§lWITHER KEY!");
 
         private final String name;
         private final ResourceLocation texture;

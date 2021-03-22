@@ -1,13 +1,14 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -18,7 +19,6 @@ import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
@@ -35,8 +35,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -46,8 +45,11 @@ public class ItemFeatures {
 
     private final static Minecraft mc = Minecraft.getMinecraft();
 
+    private static final Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
+
     @SubscribeEvent
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
+        if (!Utils.inSkyblock) return;
         if (event.gui instanceof GuiChest) {
             GuiChest gui = (GuiChest) event.gui;
             ContainerChest chest = (ContainerChest) gui.inventorySlots;
@@ -59,9 +61,38 @@ public class ItemFeatures {
                         ItemStack stack = slot.getStack();
                         if (stack == null) continue;
                         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(stack);
-                        if (extraAttr == null || !extraAttr.hasKey("baseStatBoostPercentage") || extraAttr.hasKey("dungeon_item_level")) continue;
+                        if (extraAttr == null || !extraAttr.hasKey("baseStatBoostPercentage") || extraAttr.hasKey("dungeon_item_level"))
+                            continue;
                         RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(15, 233, 233, 225).getRGB());
                     }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent event) {
+        if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.getHasStack()) {
+            RenderUtil.renderRarity(event.slot.getStack(), event.slot.xDisplayPosition, event.slot.yDisplayPosition);
+        }
+    }
+
+    @SubscribeEvent
+    public void onCloseWindow(GuiContainerEvent.CloseWindowEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (mc.thePlayer.inventory.getItemStack() != null) {
+            ItemStack item = mc.thePlayer.inventory.getItemStack();
+            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+            if (Skytils.config.protectStarredItems && extraAttr != null) {
+                if (extraAttr.hasKey("dungeon_item_level")) {
+                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
+                    for (Slot slot : event.container.inventorySlots) {
+                        if (slot.inventory != mc.thePlayer.inventory || slot.getHasStack()) continue;
+                        mc.playerController.windowClick(event.container.windowId, slot.slotNumber, 0, 0, mc.thePlayer);
+                        break;
+                    }
+                    return;
                 }
             }
         }
@@ -87,26 +118,60 @@ public class ItemFeatures {
                             item = salvageItem;
                             inSalvageGui = true;
                         }
-                        if ((item.getDisplayName().contains("✪") || extraAttr.hasKey("dungeon_item_level")) && (event.slot.inventory == mc.thePlayer.inventory || inSalvageGui)) {
+                        if (extraAttr.hasKey("dungeon_item_level") && (event.slot.inventory == mc.thePlayer.inventory || inSalvageGui)) {
                             mc.thePlayer.playSound("note.bass", 1, 0.5f);
                             mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from salvaging that item!"));
                             event.setCanceled(true);
                             return;
                         }
                     }
-                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
-                        ItemStack sellItem = inv.getStackInSlot(49);
-                        if (sellItem != null) {
-                            if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
-                                if ((item.getDisplayName().contains("✪") || extraAttr.hasKey("dungeon_item_level")) && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
-                                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
-                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
-                                    event.setCanceled(true);
-                                    return;
-                                }
+                }
+                if (Skytils.config.stopClickingNonSalvageable) {
+                    String itemId = ItemUtil.getSkyBlockItemID(item);
+                    if (chestName.startsWith("Salvage") && extraAttr != null) {
+                        if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.getDisplayName().contains("Salvage") && !item.getDisplayName().contains("Essence")) {
+                            event.setCanceled(true);
+                            if (itemId.contains("BACKPACK") && !itemId.equals("JUMBO_BACKPACK_UPGRADE"))
+                                event.setCanceled(false);
+                        }
+                    }
+                }
+                if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
+                    ItemStack sellItem = inv.getStackInSlot(49);
+                    if (sellItem != null) {
+                        if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
+                            if (extraAttr.hasKey("dungeon_item_level") && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
+                                mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
+                                event.setCanceled(true);
+                                return;
                             }
                         }
                     }
+                }
+            }
+        }
+        if (event.slotId == -999 && mc.thePlayer.inventory.getItemStack() != null) {
+            ItemStack item = mc.thePlayer.inventory.getItemStack();
+            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+            if (Skytils.config.protectStarredItems && extraAttr != null) {
+                if (extraAttr.hasKey("dungeon_item_level")) {
+                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+        }
+        if (event.clickType == 4 && event.slotId != -999 && event.slot != null && event.slot.getHasStack()) {
+            ItemStack item = event.slot.getStack();
+            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+            if (Skytils.config.protectStarredItems && extraAttr != null) {
+                if (extraAttr.hasKey("dungeon_item_level")) {
+                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from dropping that item!"));
+                    event.setCanceled(true);
+                    return;
                 }
             }
         }
@@ -114,6 +179,7 @@ public class ItemFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTooltip(ItemTooltipEvent event) {
+        if (!Utils.inSkyblock) return;
         ItemStack item = event.itemStack;
 
         if (Skytils.config.showSoulEaterBonus) {
@@ -147,105 +213,46 @@ public class ItemFeatures {
     }
 
     @SubscribeEvent
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.entityPlayer != mc.thePlayer) return;
-        ItemStack item = event.entityPlayer.getHeldItem();
-        if (item == null) return;
-
-        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
-                event.setCanceled(true);
-            }
-            if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
-                event.setCanceled(true);
-            }
-        } else if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            ArrayList<Block> interactables = new ArrayList<>(Arrays.asList(
-                    Blocks.acacia_door,
-                    Blocks.anvil,
-                    Blocks.beacon,
-                    Blocks.bed,
-                    Blocks.birch_door,
-                    Blocks.brewing_stand,
-                    Blocks.command_block,
-                    Blocks.crafting_table,
-                    Blocks.chest,
-                    Blocks.dark_oak_door,
-                    Blocks.daylight_detector,
-                    Blocks.daylight_detector_inverted,
-                    Blocks.dispenser,
-                    Blocks.dropper,
-                    Blocks.enchanting_table,
-                    Blocks.ender_chest,
-                    Blocks.furnace,
-                    Blocks.hopper,
-                    Blocks.jungle_door,
-                    Blocks.lever,
-                    Blocks.noteblock,
-                    Blocks.powered_comparator,
-                    Blocks.unpowered_comparator,
-                    Blocks.powered_repeater,
-                    Blocks.unpowered_repeater,
-                    Blocks.standing_sign,
-                    Blocks.wall_sign,
-                    Blocks.trapdoor,
-                    Blocks.trapped_chest,
-                    Blocks.wooden_button,
-                    Blocks.stone_button,
-                    Blocks.oak_door,
-                    Blocks.skull
-            ));
-
-            Block block = event.world.getBlockState(event.pos).getBlock();
-            if (Utils.inDungeons) {
-                interactables.add(Blocks.coal_block);
-                interactables.add(Blocks.stained_hardened_clay);
-            }
-            if (!interactables.contains(block)) {
-                if (Skytils.config.blockUselessZombieSword && item.getDisplayName().contains("Zombie Sword") && mc.thePlayer.getHealth() >= mc.thePlayer.getMaxHealth()) {
-                    event.setCanceled(true);
-                }
-                if (Skytils.config.blockGiantsSlam && item.getDisplayName().contains("Giant's Sword")) {
-                    event.setCanceled(true);
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
     public void onReceivePacket(ReceivePacketEvent event) {
-        if (event.packet instanceof S2APacketParticles) {
-            S2APacketParticles packet = (S2APacketParticles) event.packet;
+        if (!Utils.inSkyblock) return;
+        try {
+            if (event.packet instanceof S2APacketParticles) {
+                S2APacketParticles packet = (S2APacketParticles) event.packet;
 
-            EnumParticleTypes type = packet.getParticleType();
+                EnumParticleTypes type = packet.getParticleType();
 
-            boolean longDistance = packet.isLongDistance();
-            int count = packet.getParticleCount();
-            float speed = packet.getParticleSpeed();
-            float xOffset = packet.getXOffset();
-            float yOffset = packet.getYOffset();
-            float zOffset = packet.getZOffset();
+                boolean longDistance = packet.isLongDistance();
+                int count = packet.getParticleCount();
+                float speed = packet.getParticleSpeed();
+                float xOffset = packet.getXOffset();
+                float yOffset = packet.getYOffset();
+                float zOffset = packet.getZOffset();
 
-            double x = packet.getXCoordinate();
-            double y = packet.getYCoordinate();
-            double z = packet.getZCoordinate();
+                double x = packet.getXCoordinate();
+                double y = packet.getYCoordinate();
+                double z = packet.getZCoordinate();
 
-            BlockPos pos = new BlockPos(x, y, z);
+                Vec3 pos = new Vec3(x, y, z);
 
-            if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
-                if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    boolean flag = ImmutableList.copyOf(mc.theWorld.playerEntities).stream().anyMatch(p -> {
-                        if (pos.distanceSq(p.getPosition()) <= 11 * 11) {
-                            ItemStack item = p.getHeldItem();
-                            if (item != null) {
-                                return item.getItem() == Items.iron_sword;
+                if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
+                    if (longDistance && count == 8 && speed == 8 && xOffset == 0 && yOffset == 0 && zOffset == 0) {
+                        for (EntityPlayer player : mc.theWorld.playerEntities) {
+                            if (pos.squareDistanceTo(new Vec3(player.posX, player.posY, player.posZ)) <= 11 * 11) {
+                                ItemStack item = player.getHeldItem();
+                                if (item != null) {
+                                    String itemName = StringUtils.stripControlCodes(ItemUtil.getDisplayName(item));
+                                    if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains("Astrea") || itemName.contains("Hyperion") || itemName.contains("Valkyrie")) {
+                                        event.setCanceled(true);
+                                        break;
+                                    }
+                                }
                             }
                         }
-                        return false;
-                    });
-                    if (flag) event.setCanceled(true);
+                    }
                 }
             }
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
         }
     }
 
@@ -272,12 +279,11 @@ public class ItemFeatures {
 
         List<String> lore = ItemUtil.getItemLore(item);
 
-        if(!lore.isEmpty()) {
+        if (!lore.isEmpty()) {
             if (Skytils.config.showPetCandies && item.getItem() == Items.skull) {
-                Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
-                for(String line : lore) {
+                for (String line : lore) {
                     Matcher candyLineMatcher = candyPattern.matcher(line);
-                    if(candyLineMatcher.matches()) {
+                    if (candyLineMatcher.matches()) {
                         stackTip = String.valueOf(candyLineMatcher.group(1));
                         break;
                     }
@@ -290,7 +296,7 @@ public class ItemFeatures {
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
             GlStateManager.disableBlend();
-            event.fr.drawStringWithShadow(stackTip, (float)(event.x + 17 - event.fr.getStringWidth(stackTip)), (float)(event.y + 9), 16777215);
+            event.fr.drawStringWithShadow(stackTip, (float) (event.x + 17 - event.fr.getStringWidth(stackTip)), (float) (event.y + 9), 16777215);
             GlStateManager.enableLighting();
             GlStateManager.enableDepth();
         }
@@ -325,7 +331,7 @@ public class ItemFeatures {
 
                             GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                             mc.fontRendererObj.drawString("\u00a7cSoul Strength: \u00a7a" + bonus, x, y, 0xFFFFFF, true);
-                            GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                            GlStateManager.scale(1 / this.getScale(), 1 / this.getScale(), 1.0F);
                         }
                     }
                 }

@@ -79,9 +79,11 @@ public class BossHPDisplays {
                     if (name.contains("❤")) {
                         if (name.contains("§e﴾ §c§lSadan§r")) {
                             return true;
-                        } else if (Arrays.stream(GIANT_NAMES).anyMatch(name::contains)) {
-                            return true;
                         } else if (name.contains("Giant") && Objects.equals(DungeonsFeatures.dungeonFloor, "F7")) return true;
+
+                        for (String giant : GIANT_NAMES) {
+                            if (name.contains(giant)) return true;
+                        }
                     }
                     return false;
                 });

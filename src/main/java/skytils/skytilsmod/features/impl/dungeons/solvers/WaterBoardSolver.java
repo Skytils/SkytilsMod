@@ -1,7 +1,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers;
 
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLever;
 import net.minecraft.block.state.IBlockState;
@@ -22,7 +22,6 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,16 +29,16 @@ import java.util.Map;
 
 /**
  * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
- * @link https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+ *
  * @author bowser0000
+ * @link https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  */
-
 public class WaterBoardSolver {
 
 
     private final static Minecraft mc = Minecraft.getMinecraft();
 
-    private static final HashMap<WoolColor, ArrayList<LeverBlock>> solutions = new HashMap<>();
+    private static final HashMap<WoolColor, ImmutableSet<LeverBlock>> solutions = new HashMap<>();
     private static BlockPos chestPos = null;
     private static EnumFacing roomFacing = null;
     private static boolean prevInWaterRoom = false;
@@ -51,7 +50,8 @@ public class WaterBoardSolver {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
 
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.theWorld == null || mc.thePlayer == null) return;
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.theWorld == null || mc.thePlayer == null)
+            return;
 
         if (!Skytils.config.waterBoardSolver) return;
 
@@ -138,32 +138,32 @@ public class WaterBoardSolver {
 
                                 switch (variant) {
                                     case 0:
-                                        solutions.put(WoolColor.PURPLE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.ORANGE, Lists.newArrayList(LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.BLUE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.GREEN, Lists.newArrayList(LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.RED, Lists.newArrayList());
+                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.CLAY));
+                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                        solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.RED, ImmutableSet.of());
                                         break;
                                     case 1:
-                                        solutions.put(WoolColor.PURPLE, Lists.newArrayList(LeverBlock.COAL));
-                                        solutions.put(WoolColor.ORANGE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.BLUE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.DIAMOND, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.GREEN, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.RED, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.COAL));
+                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND, LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD));
                                         break;
                                     case 2:
-                                        solutions.put(WoolColor.PURPLE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND));
-                                        solutions.put(WoolColor.ORANGE, Lists.newArrayList(LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.BLUE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.DIAMOND));
-                                        solutions.put(WoolColor.GREEN, Lists.newArrayList());
-                                        solutions.put(WoolColor.RED, Lists.newArrayList(LeverBlock.GOLD, LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND));
+                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND));
+                                        solutions.put(WoolColor.GREEN, ImmutableSet.of());
+                                        solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD));
                                         break;
                                     case 3:
-                                        solutions.put(WoolColor.PURPLE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.ORANGE, Lists.newArrayList(LeverBlock.GOLD, LeverBlock.COAL));
-                                        solutions.put(WoolColor.BLUE, Lists.newArrayList(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.GREEN, Lists.newArrayList(LeverBlock.GOLD, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.RED, Lists.newArrayList(LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL));
+                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                        solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD));
+                                        solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.EMERALD, LeverBlock.CLAY));
                                         break;
                                     default:
                                         break;
@@ -198,9 +198,10 @@ public class WaterBoardSolver {
         int matching = 0;
 
         for (WoolColor color : WoolColor.values()) {
-            Color renderColor = new Color(Arrays.stream(EnumDyeColor.values()).filter(c-> c.name().equals(color.name())).findFirst().orElse(EnumDyeColor.WHITE).getMapColor().colorValue).brighter();
+            Color renderColor = new Color(color.dyeColor.getMapColor().colorValue).brighter();
             if (color.isExtended()) {
-                ArrayList<LeverBlock> solution = solutions.get(color);
+                ImmutableSet<LeverBlock> solution = solutions.get(color);
+                if (solution == null) continue;
                 for (Map.Entry<LeverBlock, Boolean> entry : leverStates.entrySet()) {
                     LeverBlock lever = entry.getKey();
                     boolean switched = entry.getValue();
@@ -239,11 +240,18 @@ public class WaterBoardSolver {
     }
 
     public enum WoolColor {
-        PURPLE,
-        ORANGE,
-        BLUE,
-        GREEN,
-        RED;
+        PURPLE(EnumDyeColor.PURPLE),
+        ORANGE(EnumDyeColor.ORANGE),
+        BLUE(EnumDyeColor.BLUE),
+        GREEN(EnumDyeColor.GREEN),
+        RED(EnumDyeColor.RED);
+
+        public EnumDyeColor dyeColor;
+
+        WoolColor(EnumDyeColor dyeColor) {
+            this.dyeColor = dyeColor;
+        }
+
         public boolean isExtended() {
             if (chestPos == null || roomFacing == null) return false;
             return mc.theWorld.getBlockState(chestPos.offset(roomFacing.getOpposite(), 3 + this.ordinal())).getBlock() == Blocks.wool;
@@ -268,7 +276,7 @@ public class WaterBoardSolver {
         public BlockPos getLeverPos() {
             if (chestPos == null || roomFacing == null) return null;
 
-            int shiftBy = (ordinal() < 3 ? ordinal() : ordinal() - 3) * 5;
+            int shiftBy = (ordinal() % 3) * 5;
             EnumFacing leverSide = ordinal() < 3 ? roomFacing.rotateY() : roomFacing.rotateYCCW();
             return chestPos.up(5).offset(leverSide.getOpposite(), 6).offset(roomFacing.getOpposite(), 2 + shiftBy).offset(leverSide);
         }

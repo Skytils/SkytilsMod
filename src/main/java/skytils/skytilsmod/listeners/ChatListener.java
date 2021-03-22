@@ -19,8 +19,14 @@ import java.util.regex.Pattern;
 public class ChatListener {
 
     public static Minecraft mc = Minecraft.getMinecraft();
-    static Thread rejoinThread;
-    static String lastPartyDisbander = "";
+    private static Thread rejoinThread;
+    private static String lastPartyDisbander = "";
+
+    private static final Pattern invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)");
+    private static final Pattern playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
+    private static final Pattern party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$");
+    private static final Pattern leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$");
+    private static final Pattern members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●");
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     public void onChat(ClientChatReceivedEvent event) {
@@ -36,11 +42,9 @@ public class ChatListener {
 
         if (Skytils.config.autoReparty) {
             if (unformatted.contains("has disbanded the party!")) {
-                Pattern player_pattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
-                Matcher matcher = player_pattern.matcher(unformatted);
+                Matcher matcher = playerPattern.matcher(unformatted);
                 if (matcher.find()) {
-                    String disbander = matcher.group(1);
-                    lastPartyDisbander = disbander;
+                    lastPartyDisbander = matcher.group(1);
                     System.out.println("Party disbanded by " + lastPartyDisbander);
                     rejoinThread = new Thread(() -> {
                         if (Skytils.config.autoRepartyTimeout == 0) return;
@@ -88,9 +92,6 @@ public class ChatListener {
             } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")){
                 EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 
-                Pattern party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$");
-                Pattern leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$");
-                Pattern members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●");
                 Matcher party_start = party_start_pattern.matcher(unformatted);
                 Matcher leader = leader_pattern.matcher(unformatted);
                 Matcher members = members_pattern.matcher(unformatted);
@@ -151,7 +152,6 @@ public class ChatListener {
                         return;
                 }
             } else if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                Pattern invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)");
                 Matcher invitee = invitePattern.matcher(unformatted);
                 if (invitee.find()) {
                     System.out.println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)));
@@ -179,7 +179,6 @@ public class ChatListener {
                         return;
                 }
             } else if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                Pattern invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)");
                 Matcher invitee = invitePattern.matcher(unformatted);
                 if (invitee.find()) {
                     System.out.println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)));
