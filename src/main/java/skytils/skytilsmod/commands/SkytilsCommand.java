@@ -17,6 +17,7 @@ import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
+import skytils.skytilsmod.utils.MayorInfo;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -61,7 +62,7 @@ public class SkytilsCommand extends CommandBase {
         switch (subcommand) {
             case "setkey":
                 if (args.length == 1) {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide your Hypixel API key!"));
+                    player.addChatMessage(new ChatComponentText("§c§l[ERROR] §8» §cPlease provide your Hypixel API key!"));
                     return;
                 }
                 new Thread(() -> {
@@ -69,15 +70,15 @@ public class SkytilsCommand extends CommandBase {
                     if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=" + apiKey).get("success").getAsBoolean()) {
                         Skytils.config.apiKey = apiKey;
                         Skytils.config.markDirty();
-                        player.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Updated your API key to " + apiKey));
+                        player.addChatMessage(new ChatComponentText("§a§l[SUCCESS] §8» §aYour Hypixel API key has been set to §f" + apiKey + "§a."));
                         Skytils.config.writeData();
                     } else {
-                        player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Please provide a valid Hypixel API key!"));
+                        player.addChatMessage(new ChatComponentText("§c§l[ERROR] §8» §cThe Hypixel API key you provided was §finvalid§c."));
                     }
                 }).start();
                 break;
             case "fetchur":
-                player.addChatMessage(new ChatComponentText("\u00a7aToday's Fetchur item is: \u00a72" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
+                player.addChatMessage(new ChatComponentText("§e§l[FETCHUR] §8» §eToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
                 break;
             case "griffin":
                 if (args.length == 1) {
@@ -104,11 +105,15 @@ public class SkytilsCommand extends CommandBase {
                     switch (action) {
                         case "aliases":
                             CommandAliases.reloadAliases();
-                            player.addChatMessage(new ChatComponentText("Skytils reloaded your Command Aliases."));
+                            player.addChatMessage(new ChatComponentText("§b§l[RELOAD] §8» §bSkytils command aliases have been §freloaded§b successfully."));
                             break;
                         case "data":
                             DataFetcher.reloadData();
-                            player.addChatMessage(new ChatComponentText("Skytils reloaded the repository data."));
+                            player.addChatMessage(new ChatComponentText("§b§l[RELOAD] §8» §bSkytils repository data has been §freloaded§b successfully."));
+                            break;
+                        case "mayor":
+                            MayorInfo.fetchMayorData();
+                            player.addChatMessage(new ChatComponentText("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully."));
                             break;
                         default:
                             player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
@@ -130,9 +135,9 @@ public class SkytilsCommand extends CommandBase {
                             " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
                             " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
                             "§9§l➜ Color and Glint" + "\n" +
-                    		" §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)" + "\n" +
-                    		" §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
-                    		" §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
+                    	    " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)" + "\n" +
+                    	    " §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
+                    	    " §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
                             "§9§l➜ Miscellaneous:" + "\n" +
                             " §3/reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
                             " §3/blockability <clearall> §l➡ §bDisables the ability for the item in your hand."));
@@ -147,6 +152,10 @@ public class SkytilsCommand extends CommandBase {
                 break;
             case "editlocation":
             case "editlocations":
+            case "location":
+            case "locations":
+            case "loc":
+            case "gui":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
                 break;
             default:
