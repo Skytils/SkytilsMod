@@ -23,6 +23,7 @@ import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -115,6 +116,13 @@ public class MiscFeatures {
     public void onRenderOverlayPre(RenderGameOverlayEvent.Pre event) {
         if (!Utils.inSkyblock) return;
         if (event.type == RenderGameOverlayEvent.ElementType.AIR && Skytils.config.hideAirDisplay && !Utils.inDungeons) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderBlockOverlay(RenderBlockOverlayEvent event) {
+        if (Utils.inSkyblock && Skytils.config.noFire && event.overlayType == RenderBlockOverlayEvent.OverlayType.FIRE) {
             event.setCanceled(true);
         }
     }

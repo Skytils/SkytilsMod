@@ -865,6 +865,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "No Fire",
+            description = "Removes first-person fire overlay when you are burning.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean noFire = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "No Hurtcam",
             description = "Removes the screen shake when you are hurt.",
             category = "Miscellaneous",

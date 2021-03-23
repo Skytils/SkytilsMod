@@ -141,15 +141,15 @@ public class Skytils {
         ClientCommandHandler cch = ClientCommandHandler.instance;
 
         if (!cch.getCommands().containsKey("armorcolor")) {
-            ClientCommandHandler.instance.registerCommand(new ArmorColorCommand());
+            cch.registerCommand(new ArmorColorCommand());
         }
 
         if (!cch.getCommands().containsKey("blockability")) {
-            ClientCommandHandler.instance.registerCommand(new BlockAbilityCommand());
+            cch.registerCommand(new BlockAbilityCommand());
         }
 
         if (!cch.getCommands().containsKey("glintcustomize")) {
-            ClientCommandHandler.instance.registerCommand(new GlintCustomizeCommand());
+            cch.registerCommand(new GlintCustomizeCommand());
         }
 
         if (!cch.getCommands().containsKey("reparty")) {
