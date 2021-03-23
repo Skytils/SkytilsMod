@@ -277,6 +277,7 @@ public class ItemFeatures {
         if (event.entity != mc.thePlayer) return;
         ItemStack item = event.entityPlayer.getHeldItem();
         String itemId = ItemUtil.getSkyBlockItemID(item);
+        if (itemId == null) return;
         if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (itemId.equals("FLOWER_OF_TRUTH") || itemId.equals("BAT_WAND"))) {
             event.setCanceled(true);
         }

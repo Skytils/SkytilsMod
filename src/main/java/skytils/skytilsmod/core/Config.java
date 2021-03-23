@@ -140,7 +140,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Chest Reroll Confirmation",
-            description = "Requires you to click 3 times in order to reroll a chest.",
+            description = "Requires you to click multiple times in order to reroll a chest.",
             category = "Dungeons",
             subcategory = "Quality of Life",
             max = 5
