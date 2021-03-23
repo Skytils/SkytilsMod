@@ -26,6 +26,8 @@ import java.util.Locale;
 
 public class SkytilsCommand extends CommandBase {
 
+    private static ArmorColorCommand acc = new ArmorColorCommand();
+
     @Override
     public String getCommandName() {
         return "skytils";
@@ -154,8 +156,14 @@ public class SkytilsCommand extends CommandBase {
             case "editlocations":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
                 break;
+            case "armorcolor":
+            case "armorcolour":
+            case "armourcolor":
+            case "armourcolour":
+                acc.processCommand(sender, args);
+                break;
             default:
-                player.addChatMessage(new ChatComponentText("/" + getCommandName()));
+                player.addChatMessage(new ChatComponentText("§bSkytils ➜ §cThis command doesn't exist!\n  §cUse §b/Skytils help§c for a full list of commands"));
         }
     }
 }
