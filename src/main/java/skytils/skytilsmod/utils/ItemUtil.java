@@ -181,4 +181,27 @@ public class ItemUtil {
         return null;
     }
 
+    public static boolean isPet(ItemStack item) {
+        if (item == null || !item.hasTagCompound())  {
+            return false;
+        }
+
+        NBTTagCompound display = item.getSubCompound("display", false);
+
+        if (display == null || !display.hasKey("Lore")) {
+            return false;
+        }
+
+        String name = display.getString("Name");
+
+        Matcher petRarityMatcher = PET_PATTERN.matcher(name);
+
+        if (petRarityMatcher.find()) {
+            System.out.println(name + " is a pet");
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

@@ -677,16 +677,25 @@ public class Config extends Vigilant {
             name = "Show Item Rarity",
             description = "Shows the rarity of an item in the color",
             category = "Miscellaneous",
-            subcategory = "Items"
+            subcategory = "Item Rarity"
     )
     public boolean showItemRarity = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Pet Rarity",
+            description = "Shows the rarity of a pet in the color",
+            category = "Miscellaneous",
+            subcategory = "Item Rarity"
+    )
+    public boolean showPetRarity = false;
 
     @Property(
             type = PropertyType.SLIDER,
             name = "Item Rarity Opacity",
             description = "How opaque the rarity color will be",
             category = "Miscellaneous",
-            subcategory = "Items",
+            subcategory = "Item Rarity",
             max = 100
     )
     public int itemRarityOpacity = 75;

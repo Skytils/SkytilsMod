@@ -117,10 +117,6 @@ public class SkytilsCommand extends CommandBase {
                             MayorInfo.fetchMayorData();
                             player.addChatMessage(new ChatComponentText("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully."));
                             break;
-                        case "mayor":
-                            MayorInfo.fetchMayorData();
-                            player.addChatMessage(new ChatComponentText("Skytils reloaded the mayor data."));
-                            break;
                         default:
                             player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
                     }
