@@ -34,7 +34,7 @@ public class BossHPDisplays {
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     public void onChat(ClientChatReceivedEvent event) {
-        if (!Utils.inSkyblock || event.type == 2) return;
+        if (!Utils.inDungeons || event.type == 2) return;
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
         if (unformatted.startsWith("[BOSS] Sadan")) {
             if (unformatted.contains("My giants! Unleashed!"))
@@ -70,7 +70,7 @@ public class BossHPDisplays {
         public void render() {
             EntityPlayerSP player = mc.thePlayer;
             World world = mc.theWorld;
-            if (this.getToggled() && Utils.inSkyblock && player != null && world != null && canGiantsSpawn) {
+            if (canGiantsSpawn && this.getToggled() && Utils.inSkyblock && player != null && world != null) {
                 float x = this.getActualX();
                 float y = this.getActualY();
 

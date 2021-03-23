@@ -2,10 +2,13 @@ package skytils.skytilsmod.features.impl.misc;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
@@ -18,6 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -67,6 +71,13 @@ public class ItemFeatures {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent event) {
+        if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.getHasStack()) {
+            RenderUtil.renderRarity(event.slot.getStack(), event.slot.xDisplayPosition, event.slot.yDisplayPosition);
         }
     }
 
@@ -247,6 +258,16 @@ public class ItemFeatures {
         } catch (ConcurrentModificationException e) {
             e.printStackTrace();
         }
+    }
+
+    @SubscribeEvent
+    public void onEntitySpawn(EntityJoinWorldEvent event) {
+        if (!(event.entity instanceof EntityFishHook) || !Skytils.config.hideFishingHooks) return;
+        if (((EntityFishHook) event.entity).angler instanceof EntityOtherPlayerMP) {
+            event.entity.setDead();
+            event.setCanceled(true);
+        }
+
     }
 
     @SubscribeEvent
