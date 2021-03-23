@@ -57,7 +57,7 @@ public class DungeonTimer {
             return;
         }
 
-        if (message.equals("§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r")) {
+        if (message.equals("§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r") || (message.startsWith("§r§c[BOSS] The Watcher§r§f") && bloodOpenTime == -1)) {
             bloodOpenTime = System.currentTimeMillis();
             return;
         }
