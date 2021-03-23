@@ -983,6 +983,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide fishing hooks",
+            description = "Hides fishing hooks from other players",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideFishingHooks = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Disable Cooldown Sounds",
             description = "Blocks the sound effect played while an item is on cooldown.",
             category = "Sounds",
