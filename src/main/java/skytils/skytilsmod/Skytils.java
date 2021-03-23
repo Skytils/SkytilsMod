@@ -41,7 +41,6 @@ import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
-import skytils.skytilsmod.features.impl.trackers.GhostTracker;
 
 import java.io.File;
 import java.util.ArrayDeque;
