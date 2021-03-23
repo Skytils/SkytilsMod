@@ -58,7 +58,7 @@ public class DungeonTimer {
             return;
         }
 
-        if (message.equals("§r§cYou hear the sound of something opening...§r")) {
+        if (message.equals("§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r")) {
             bloodOpenTime = System.currentTimeMillis();
             mc.thePlayer.addChatMessage(new ChatComponentText("§bBlood took " + Math.round((bloodOpenTime - dungeonStartTime) / 1000f) + " seconds to open."));
             return;
