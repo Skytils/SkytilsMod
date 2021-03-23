@@ -101,7 +101,6 @@ public class Config extends Vigilant {
     )
     public boolean necronPhaseTimer = false;
 
-
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Dungeon Score Estimate",
@@ -137,6 +136,16 @@ public class Config extends Vigilant {
             subcategory = "Score Calculation"
     )
     public boolean removePartyChatNotifFromScoreCalc = false;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Dungeon Chest Reroll Confirmation",
+            description = "Requires you to click 3 times in order to reroll a chest.",
+            category = "Dungeons",
+            subcategory = "Quality of Life",
+            max = 5
+    )
+    public int kismetRerollConfirm = 0;
 
     @Property(
             type = PropertyType.SWITCH,

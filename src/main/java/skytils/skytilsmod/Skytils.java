@@ -37,6 +37,7 @@ import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
+import skytils.skytilsmod.utils.MayorInfo;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
@@ -86,6 +87,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new ChatListener());
         MinecraftForge.EVENT_BUS.register(new DataFetcher());
         MinecraftForge.EVENT_BUS.register(GUIMANAGER);
+        MinecraftForge.EVENT_BUS.register(new MayorInfo());
         MinecraftForge.EVENT_BUS.register(SBInfo.getInstance());
         MinecraftForge.EVENT_BUS.register(new UpdateChecker());
 
@@ -177,7 +179,10 @@ public class Skytils {
         ScreenRenderer.refresh();
 
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(sendMessageQueue.pollFirst());
+            String msg = sendMessageQueue.pollFirst();
+            if (msg != null) {
+                mc.thePlayer.sendChatMessage(msg);
+            }
         }
 
         if (ticks % 20 == 0) {

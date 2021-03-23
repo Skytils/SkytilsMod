@@ -17,6 +17,7 @@ import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
+import skytils.skytilsmod.utils.MayorInfo;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -109,6 +110,10 @@ public class SkytilsCommand extends CommandBase {
                         case "data":
                             DataFetcher.reloadData();
                             player.addChatMessage(new ChatComponentText("Skytils reloaded the repository data."));
+                            break;
+                        case "mayor":
+                            MayorInfo.fetchMayorData();
+                            player.addChatMessage(new ChatComponentText("Skytils reloaded the mayor data."));
                             break;
                         default:
                             player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
