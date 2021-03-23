@@ -23,6 +23,7 @@ import net.minecraft.util.*;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
@@ -262,12 +263,23 @@ public class ItemFeatures {
 
     @SubscribeEvent
     public void onEntitySpawn(EntityJoinWorldEvent event) {
+        if (!Utils.inSkyblock) return;
         if (!(event.entity instanceof EntityFishHook) || !Skytils.config.hideFishingHooks) return;
         if (((EntityFishHook) event.entity).angler instanceof EntityOtherPlayerMP) {
             event.entity.setDead();
             event.setCanceled(true);
         }
+    }
 
+    @SubscribeEvent
+    public void onInteract(PlayerInteractEvent event) {
+        if (!Utils.inSkyblock) return;
+        if (event.entity != mc.thePlayer) return;
+        ItemStack item = event.entityPlayer.getHeldItem();
+        String itemId = ItemUtil.getSkyBlockItemID(item);
+        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (itemId.equals("FLOWER_OF_TRUTH") || itemId.equals("BAT_WAND"))) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent
