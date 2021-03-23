@@ -1247,6 +1247,26 @@ public class Config extends Vigilant {
     )
     public int manaMessages = 0;
 
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blessing Enchant Hider",
+            description = "Removes blessing enchant message from fishing.",
+            category = "Spam",
+            subcategory = "Fishing",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int blessingEnchantHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blessing Bait Hider",
+            description = "Removes blessing bait message from fishing.",
+            category = "Spam",
+            subcategory = "Fishing",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int blessingBaitHider = 0;
+
     public Config() {
         super(new File("./config/skytils/config.toml"));
         initialize();
