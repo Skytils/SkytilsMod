@@ -21,12 +21,12 @@ import java.util.regex.Pattern;
 public abstract class MixinItemStack {
     private final static Pattern starPattern = Pattern.compile("(§6✪)");
 
-    @Shadow public abstract ItemStack copy();
+    private final ItemStack that = (ItemStack) (Object) this;
 
     @Inject(method = "isItemEnchanted", at = @At("HEAD"), cancellable = true)
     private void showEnchantmentGlint(CallbackInfoReturnable<Boolean> cir) {
         if (!Utils.inSkyblock) return;
-        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(copy());
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(that);
         if (extraAttr != null) {
             String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
             if (GlintCustomizer.overrides.containsKey(itemId)) {

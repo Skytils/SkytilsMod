@@ -17,6 +17,7 @@ import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
+import skytils.skytilsmod.utils.MayorInfo;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class SkytilsCommand extends CommandBase {
+
+    private static ArmorColorCommand acc = new ArmorColorCommand();
 
     @Override
     public String getCommandName() {
@@ -110,6 +113,10 @@ public class SkytilsCommand extends CommandBase {
                             DataFetcher.reloadData();
                             player.addChatMessage(new ChatComponentText("Skytils reloaded the repository data."));
                             break;
+                        case "mayor":
+                            MayorInfo.fetchMayorData();
+                            player.addChatMessage(new ChatComponentText("Skytils reloaded the mayor data."));
+                            break;
                         default:
                             player.addChatMessage(new ChatComponentText("/skytils reload <aliases/data>"));
                     }
@@ -149,8 +156,14 @@ public class SkytilsCommand extends CommandBase {
             case "editlocations":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
                 break;
+            case "armorcolor":
+            case "armorcolour":
+            case "armourcolor":
+            case "armourcolour":
+                acc.processCommand(sender, args);
+                break;
             default:
-                player.addChatMessage(new ChatComponentText("/" + getCommandName()));
+                player.addChatMessage(new ChatComponentText("§bSkytils ➜ §cThis command doesn't exist!\n  §cUse §b/Skytils help§c for a full list of commands"));
         }
     }
 }

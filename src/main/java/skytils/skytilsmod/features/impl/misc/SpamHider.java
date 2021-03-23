@@ -8,7 +8,6 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import scala.actors.migration.pattern;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
@@ -358,6 +357,28 @@ public class SpamHider {
                             GuiManager.toastGui.add(new ComboToast(formatted));
                         }
                         cancelChatPacket(event, false);
+                        break;
+                    default:
+                }
+            }
+
+            // Blessing enchant
+            if (formatted.startsWith("§r§aYour Blessing enchant")) {
+                switch (Skytils.config.blessingEnchantHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.blessingEnchantHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Blessing bair
+            if (formatted.startsWith("§r§aYour bait got you double")) {
+                switch (Skytils.config.blessingBaitHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.blessingBaitHider == 2);
                         break;
                     default:
                 }

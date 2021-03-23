@@ -48,7 +48,7 @@ public class DungeonTimer {
             return;
         }
 
-        if (message.equals("§r§aDungeon starts in 1 second.§r") && dungeonStartTime == -1) {
+        if ((message.equals("§r§aDungeon starts in 1 second.§r") || message.equals("§r§aDungeon starts in 1 second. Get ready!§r")) && dungeonStartTime == -1) {
             dungeonStartTime = System.currentTimeMillis() + 1000;
             return;
         }
