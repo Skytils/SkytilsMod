@@ -1,6 +1,7 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -32,6 +33,7 @@ import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.features.impl.handlers.BlockAbility;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
@@ -279,7 +281,10 @@ public class ItemFeatures {
         String itemId = ItemUtil.getSkyBlockItemID(item);
         if (itemId == null) return;
         if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (itemId.equals("FLOWER_OF_TRUTH") || itemId.equals("BAT_WAND"))) {
-            event.setCanceled(true);
+            IBlockState block = mc.theWorld.getBlockState(event.pos);
+            if (!BlockAbility.interactables.contains(block.getBlock()) || (Utils.inDungeons && (block.getBlock() == Blocks.coal_block || block.getBlock() == Blocks.stained_hardened_clay))) {
+                event.setCanceled(true);
+            }
         }
     }
 

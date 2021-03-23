@@ -33,7 +33,7 @@ public class BlockAbility {
     public static final HashSet<String> blockedItems = new HashSet<>();
 
 
-    private static final List<Block> interactables = Arrays.asList(
+    public static final List<Block> interactables = Arrays.asList(
             Blocks.acacia_door,
             Blocks.anvil,
             Blocks.beacon,
