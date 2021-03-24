@@ -18,6 +18,14 @@ public class Config extends Vigilant {
     public String dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/";
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "First Launch",
+            description = "Used to see if the user is a new user of Skytils.",
+            category = "General"
+    )
+    public boolean firstLaunch = true;
+
+    @Property(
             type = PropertyType.TEXT,
             name = "Hypixel API Key",
             description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.\nSet this with /skytils setkey <key>.",
