@@ -136,7 +136,7 @@ public class MiscFeatures {
                 event.setCanceled(true);
             }
             if (Skytils.config.slayerMinibossSpawnAlert && packet.getSoundName().equals("random.explode") && packet.getVolume() == 0.6f && packet.getPitch() == 9/7f) {
-                GuiManager.createTitle("\u00a7cMINIBOSS", 20);
+                GuiManager.createTitle("§cMINIBOSS", 20);
             }
         }
     }
@@ -193,7 +193,7 @@ public class MiscFeatures {
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                String text = "\u00a7cGolem spawn in: \u00a7a" + NumberUtil.round((golemSpawnTime - System.currentTimeMillis()) / 1000d, 1) + "s";
+                String text = "§cGolem spawn in: §a" + NumberUtil.round((golemSpawnTime - System.currentTimeMillis()) / 1000d, 1) + "s";
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
                 ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                 GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
@@ -202,7 +202,7 @@ public class MiscFeatures {
 
         @Override
         public void demoRender() {
-            ScreenRenderer.fontRenderer.drawString("\u00a7cGolem spawn in: \u00a7a20.0s", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString("§cGolem spawn in: §a20.0s", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override
@@ -212,7 +212,7 @@ public class MiscFeatures {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cGolem spawn in: \u00a7a20.0s");
+            return ScreenRenderer.fontRenderer.getStringWidth("§cGolem spawn in: §a20.0s");
         }
 
         @Override

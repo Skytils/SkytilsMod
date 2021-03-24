@@ -138,10 +138,10 @@ public class DungeonsFeatures {
                 if (deathFailMatcher.find()) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted);
-                        mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied death/fail to clipboard."));
+                        mc.thePlayer.addChatMessage(new ChatComponentText("§aCopied death/fail to clipboard."));
                     }
                     event.message.getChatStyle()
-                            .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("\u00a7aClick to copy to clipboard.")))
+                            .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("§aClick to copy to clipboard.")))
                             .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail " + unformatted));
                 }
             }
@@ -166,7 +166,7 @@ public class DungeonsFeatures {
     @SubscribeEvent
     public void onSendChatMessage(SendChatMessageEvent event) {
         if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
-            mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aCopied selected death/fail to clipboard."));
+            mc.thePlayer.addChatMessage(new ChatComponentText("§aCopied selected death/fail to clipboard."));
             GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length()));
             event.setCanceled(true);
         }
@@ -396,7 +396,7 @@ public class DungeonsFeatures {
                 for (int i = 0; i < event.toolTip.size(); i++) {
                     if (event.toolTip.get(i).contains("Click to reroll")) {
                         int neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks;
-                        event.toolTip.set(i, "\u00a7eClick \u00a7a" + neededClicks + "\u00a7e times to reroll this chest!");
+                        event.toolTip.set(i, "§eClick §a" + neededClicks + "§e times to reroll this chest!");
                     }
                 }
             }

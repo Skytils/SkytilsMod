@@ -65,22 +65,22 @@ public class GlintCustomizeCommand extends CommandBase {
             if (originalMessage.contains("on")) {
                 GlintCustomizer.overrides.put(itemId, true);
                 GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aForced an enchant glint for your item."));
+                sender.addChatMessage(new ChatComponentText("§aForced an enchant glint for your item."));
                 return;
             } else if (originalMessage.contains("off")) {
                 GlintCustomizer.overrides.put(itemId, false);
                 GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aForce disabled an enchant glint for your item."));
+                sender.addChatMessage(new ChatComponentText("§aForce disabled an enchant glint for your item."));
                 return;
             } else if (originalMessage.contains("clearall")) {
                 GlintCustomizer.overrides.clear();
                 GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aRemoved all your glint overrides."));
+                sender.addChatMessage(new ChatComponentText("§aRemoved all your glint overrides."));
                 return;
             } else if (originalMessage.contains("clear")) {
                 GlintCustomizer.overrides.remove(itemId);
                 GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aCleared glint overrides for your item."));
+                sender.addChatMessage(new ChatComponentText("§aCleared glint overrides for your item."));
                 return;
             } else {
                 throw new WrongUsageException("glintcustomize override <on/off/clear/clearall>");
@@ -91,7 +91,7 @@ public class GlintCustomizeCommand extends CommandBase {
                 try {
                     GlintCustomizer.glintColors.put(itemId, Color.decode(args[2]));
                     GlintCustomizer.writeSave();
-                    sender.addChatMessage(new ChatComponentText("\u00a7aForced an enchant glint color for your item."));
+                    sender.addChatMessage(new ChatComponentText("§aForced an enchant glint color for your item."));
                 } catch (NumberFormatException e) {
                  throw new WrongUsageException("You must specify a valid hex color!");
                 }
@@ -99,12 +99,12 @@ public class GlintCustomizeCommand extends CommandBase {
             } else if (originalMessage.contains("clearall")) {
                 GlintCustomizer.glintColors.clear();
                 GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aRemoved all your custom glint colors."));
+                sender.addChatMessage(new ChatComponentText("§aRemoved all your custom glint colors."));
                 return;
             } else if (originalMessage.contains("clear")) {
                 GlintCustomizer.glintColors.remove(itemId);
                 GlintCustomizer.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aCleared the custom glint color for your item."));
+                sender.addChatMessage(new ChatComponentText("§aCleared the custom glint color for your item."));
                 return;
             } else {
                 throw new WrongUsageException("glintcustomize color <set/clearall/clear>");

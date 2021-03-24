@@ -123,7 +123,7 @@ public class BossHPDisplays {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a73\u00a7lThe Diamond Giant §a19.9M§c❤");
+            return ScreenRenderer.fontRenderer.getStringWidth("§3§lThe Diamond Giant §a19.9M§c❤");
         }
 
         @Override

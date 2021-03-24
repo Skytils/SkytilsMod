@@ -141,13 +141,13 @@ public class DungeonTimer {
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                String displayText = "\u00a7aReal Time: " + (dungeonStartTime == -1 ? "0s" : (double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - dungeonStartTime) / 1000f + "s") +
-                        "\n\u00a7aTime Elapsed: " + (dungeonStartTime == -1 ? "0s" : timeFormat((double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - dungeonStartTime) / 1000f)) +
-                        "\n\u00a77Wither Doors: " + witherDoors +
-                        "\n\u00a74Blood Open: " + (bloodOpenTime == -1 ? "0s" : timeFormat((double) (bloodOpenTime - dungeonStartTime) / 1000f)) +
-                        "\n\u00a7cWatcher Clear: " + (bloodClearTime == -1 ? "0s" : timeFormat((double) (bloodClearTime - bloodOpenTime) / 1000f)) +
-                        "\n\u00a79Boss Entry: " + (bossEntryTime == -1 ? "0s" : timeFormat((double) (bossEntryTime - dungeonStartTime) / 1000f)) +
-                        "\n\u00a7bBoss Clear: " + (bossClearTime == -1 ? "0s" : timeFormat((double) (bossClearTime - bossEntryTime) / 1000f));
+                String displayText = "§aReal Time: " + (dungeonStartTime == -1 ? "0s" : (double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - dungeonStartTime) / 1000f + "s") +
+                        "\n§aTime Elapsed: " + (dungeonStartTime == -1 ? "0s" : timeFormat((double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - dungeonStartTime) / 1000f)) +
+                        "\n§7Wither Doors: " + witherDoors +
+                        "\n§4Blood Open: " + (bloodOpenTime == -1 ? "0s" : timeFormat((double) (bloodOpenTime - dungeonStartTime) / 1000f)) +
+                        "\n§cWatcher Clear: " + (bloodClearTime == -1 ? "0s" : timeFormat((double) (bloodClearTime - bloodOpenTime) / 1000f)) +
+                        "\n§9Boss Entry: " + (bossEntryTime == -1 ? "0s" : timeFormat((double) (bossEntryTime - dungeonStartTime) / 1000f)) +
+                        "\n§bBoss Clear: " + (bossClearTime == -1 ? "0s" : timeFormat((double) (bossClearTime - bossEntryTime) / 1000f));
                 String[] lines = displayText.split("\n");
                 for (int i = 0; i < lines.length; i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
@@ -163,13 +163,13 @@ public class DungeonTimer {
 
             boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-            String displayText = "\u00a7aReal Time: 0s" +
-                    "\n\u00a7aTime Elapsed: 0s" +
-                    "\n\u00a77Wither Doors: 0" +
-                    "\n\u00a74Blood Open: 0s" +
-                    "\n\u00a7cWatcher Clear: 0s" +
-                    "\n\u00a79Boss Entry: 0s" +
-                    "\n\u00a7bBoss Clear: 0s";
+            String displayText = "§aReal Time: 0s" +
+                    "\n§aTime Elapsed: 0s" +
+                    "\n§7Wither Doors: 0" +
+                    "\n§4Blood Open: 0s" +
+                    "\n§cWatcher Clear: 0s" +
+                    "\n§9Boss Entry: 0s" +
+                    "\n§bBoss Clear: 0s";
             String[] lines = displayText.split("\n");
             for (int i = 0; i < lines.length; i++) {
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
@@ -184,7 +184,7 @@ public class DungeonTimer {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cWatcher Clear: 0s");
+            return ScreenRenderer.fontRenderer.getStringWidth("§cWatcher Clear: 0s");
         }
 
         @Override
@@ -211,10 +211,10 @@ public class DungeonTimer {
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                String displayText = "\u00a7bPhase 1: " + timeFormat((double) ((phase1ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase1ClearTime) - bossEntryTime) / 1000f) +
-                        "\n\u00a7cPhase 2: " + (phase1ClearTime == -1 ? "0s" : timeFormat((double) ((phase2ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase2ClearTime) - phase1ClearTime) / 1000f)) +
-                        "\n\u00a76Phase 3: " + (phase2ClearTime == -1 ? "0s" : timeFormat((double) ((phase3ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase3ClearTime) - phase2ClearTime) / 1000f)) +
-                        "\n\u00a74Phase 4: " + (phase3ClearTime == -1 ? "0s" : timeFormat((double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - phase3ClearTime) / 1000f));
+                String displayText = "§bPhase 1: " + timeFormat((double) ((phase1ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase1ClearTime) - bossEntryTime) / 1000f) +
+                        "\n§cPhase 2: " + (phase1ClearTime == -1 ? "0s" : timeFormat((double) ((phase2ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase2ClearTime) - phase1ClearTime) / 1000f)) +
+                        "\n§6Phase 3: " + (phase2ClearTime == -1 ? "0s" : timeFormat((double) ((phase3ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase3ClearTime) - phase2ClearTime) / 1000f)) +
+                        "\n§4Phase 4: " + (phase3ClearTime == -1 ? "0s" : timeFormat((double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - phase3ClearTime) / 1000f));
 
                 String[] lines = displayText.split("\n");
                 for (int i = 0; i < lines.length; i++) {
@@ -231,10 +231,10 @@ public class DungeonTimer {
 
             boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-            String displayText = "\u00a7bPhase 1: 0s" +
-                    "\n\u00a7cPhase 2: 0s" +
-                    "\n\u00a76Phase 3: 0s" +
-                    "\n\u00a74Phase 4: 0s";
+            String displayText = "§bPhase 1: 0s" +
+                    "\n§cPhase 2: 0s" +
+                    "\n§6Phase 3: 0s" +
+                    "\n§4Phase 4: 0s";
 
             String[] lines = displayText.split("\n");
             for (int i = 0; i < lines.length; i++) {
@@ -250,7 +250,7 @@ public class DungeonTimer {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cPhase 1: 0s");
+            return ScreenRenderer.fontRenderer.getStringWidth("§cPhase 1: 0s");
         }
 
         @Override

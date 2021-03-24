@@ -47,22 +47,22 @@ public class BlockAbilityCommand extends CommandBase {
         if (args.length == 0) {
             ItemStack item = player.getHeldItem();
             if (item == null) {
-                sender.addChatMessage(new ChatComponentText("\u00a7cYou need to hold the item with the ability that you want to block!"));
+                sender.addChatMessage(new ChatComponentText("§cYou need to hold the item with the ability that you want to block!"));
                 return;
             }
             String itemId = ItemUtil.getSkyBlockItemID(item);
             if (itemId == null || !ItemUtil.hasRightClickAbility(item)) {
-                sender.addChatMessage(new ChatComponentText("\u00a7cThat isn't a valid item!"));
+                sender.addChatMessage(new ChatComponentText("§cThat isn't a valid item!"));
                 return;
             }
             if (BlockAbility.blockedItems.contains(itemId)) {
                 BlockAbility.blockedItems.remove(itemId);
                 BlockAbility.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aRemoved the block on " + itemId + "!"));
+                sender.addChatMessage(new ChatComponentText("§aRemoved the block on " + itemId + "!"));
             } else {
                 BlockAbility.blockedItems.add(itemId);
                 BlockAbility.writeSave();
-                sender.addChatMessage(new ChatComponentText("\u00a7aYou are now blocking abilities for " + itemId + "!"));
+                sender.addChatMessage(new ChatComponentText("§aYou are now blocking abilities for " + itemId + "!"));
             }
             return;
         }
@@ -70,7 +70,7 @@ public class BlockAbilityCommand extends CommandBase {
         if (subcommand.equals("clearall")) {
             BlockAbility.blockedItems.clear();
             BlockAbility.writeSave();
-            sender.addChatMessage(new ChatComponentText("\u00a7aCleared all your custom ability blocks!"));
+            sender.addChatMessage(new ChatComponentText("§aCleared all your custom ability blocks!"));
         } else {
             player.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
         }

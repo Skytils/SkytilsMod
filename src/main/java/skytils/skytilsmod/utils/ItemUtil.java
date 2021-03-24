@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class ItemUtil {
     private static final Pattern RARITY_PATTERN = Pattern.compile("(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)");
-    private static final Pattern PET_PATTERN = Pattern.compile("\\u00a77\\[Lvl \\d+\\] (?<color>\\u00a7[0-9a-fk-or]).+");
+    private static final Pattern PET_PATTERN = Pattern.compile("§7\\[Lvl \\d+\\] (?<color>§[0-9a-fk-or]).+");
     public static final int NBT_INTEGER = 3;
     public static final int NBT_STRING = 8;
     public static final int NBT_LIST = 9;

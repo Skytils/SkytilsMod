@@ -23,7 +23,7 @@ public class MayorJerry {
             Matcher matcher = jerryType.matcher(event.message.getFormattedText());
             if (matcher.find()) {
                 String color = matcher.group(1);
-                GuiManager.createTitle("\u00a7" + color.toUpperCase() + " JERRY!", 60);
+                GuiManager.createTitle("§" + color.toUpperCase() + " JERRY!", 60);
             }
         }
     }

@@ -57,7 +57,7 @@ public class ArmorColorCommand extends CommandBase {
         if (subcommand.equals("clearall")) {
             ArmorColor.armorColors.clear();
             ArmorColor.saveColors();
-            sender.addChatMessage(new ChatComponentText("\u00a7aCleared all your custom armor colors!"));
+            sender.addChatMessage(new ChatComponentText("§aCleared all your custom armor colors!"));
         } else if (subcommand.equals("clear")) {
             if (!Utils.inSkyblock) throw new WrongUsageException("You must be in Skyblock to use this command!");
             ItemStack item = ((EntityPlayerSP) sender).getHeldItem();
@@ -70,8 +70,8 @@ public class ArmorColorCommand extends CommandBase {
             if (ArmorColor.armorColors.containsKey(uuid)) {
                 ArmorColor.armorColors.remove(uuid);
                 ArmorColor.saveColors();
-                sender.addChatMessage(new ChatComponentText("\u00a7aCleared the custom color for your " + item.getDisplayName() + "\u00a7a!"));
-            } else sender.addChatMessage(new ChatComponentText("\u00a7cThat item doesn't have a custom color!"));
+                sender.addChatMessage(new ChatComponentText("§aCleared the custom color for your " + item.getDisplayName() + "§a!"));
+            } else sender.addChatMessage(new ChatComponentText("§cThat item doesn't have a custom color!"));
         } else if (subcommand.equals("set")) {
             if (!Utils.inSkyblock) throw new WrongUsageException("You must be in Skyblock to use this command!");
             ItemStack item = ((EntityPlayerSP) sender).getHeldItem();
@@ -90,7 +90,7 @@ public class ArmorColorCommand extends CommandBase {
             }
             ArmorColor.armorColors.put(uuid, color);
             ArmorColor.saveColors();
-            sender.addChatMessage(new ChatComponentText("\u00a7aSet the color of your " + item.getDisplayName() + "\u00a7a to " + args[1] + "!"));
+            sender.addChatMessage(new ChatComponentText("§aSet the color of your " + item.getDisplayName() + "§a to " + args[1] + "!"));
         } else player.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
     }
 }

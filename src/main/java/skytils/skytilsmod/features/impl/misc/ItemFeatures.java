@@ -362,7 +362,7 @@ public class ItemFeatures {
                             float y = this.getActualY();
 
                             GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                            mc.fontRendererObj.drawString("\u00a7cSoul Strength: \u00a7a" + bonus, x, y, 0xFFFFFF, true);
+                            mc.fontRendererObj.drawString("§cSoul Strength: §a" + bonus, x, y, 0xFFFFFF, true);
                             GlStateManager.scale(1 / this.getScale(), 1 / this.getScale(), 1.0F);
                         }
                     }
@@ -372,7 +372,7 @@ public class ItemFeatures {
 
         @Override
         public void demoRender() {
-            ScreenRenderer.fontRenderer.drawString("\u00a7cSoul Strength: \u00a7a1000", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString("§cSoul Strength: §a1000", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override
@@ -382,7 +382,7 @@ public class ItemFeatures {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a7cSoul Strength: \u00a7a1000");
+            return ScreenRenderer.fontRenderer.getStringWidth("§cSoul Strength: §a1000");
         }
 
         @Override

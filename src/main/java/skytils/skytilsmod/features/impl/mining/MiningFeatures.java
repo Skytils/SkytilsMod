@@ -49,7 +49,7 @@ public class MiningFeatures {
                 if (matcher.find()) {
                     int seconds = Integer.parseInt(matcher.group("min")) * 60 + Integer.parseInt(matcher.group("sec"));
                     if (seconds <= 15) {
-                        GuiManager.createTitle("\u00a7cRaffle ending in \u00a7a" + seconds + "s", 20);
+                        GuiManager.createTitle("§cRaffle ending in §a" + seconds + "s", 20);
                     }
                     if (seconds > 1) {
                         inRaffle = true;
@@ -67,7 +67,7 @@ public class MiningFeatures {
 
         if (Skytils.config.powerGhastPing) {
             if (unformatted.startsWith("Find the Powder Ghast near the")) {
-                GuiManager.createTitle("\u00a7cPOWDER GHAST", 20);
+                GuiManager.createTitle("§cPOWDER GHAST", 20);
             }
         }
 
@@ -122,7 +122,7 @@ public class MiningFeatures {
 
         if (Skytils.config.fetchurSolver && unformatted.contains("[NPC]") && unformatted.contains("Fetchur")) {
             if (fetchurItems.size() == 0) {
-                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils did not load any solutions."));
+                mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils did not load any solutions."));
                 DataFetcher.reloadData();
                 return;
             }
@@ -138,7 +138,7 @@ public class MiningFeatures {
                 } else {
                     if (unformatted.contains("its") || unformatted.contains("theyre")) {
                         System.out.println("Missing Fetchur item: " + unformatted);
-                        mc.thePlayer.addChatMessage(new ChatComponentText(String.format("\u00a7cSkytils couldn't determine the Fetchur item. There were %s solutions loaded.", fetchurItems.size())));
+                        mc.thePlayer.addChatMessage(new ChatComponentText(String.format("§cSkytils couldn't determine the Fetchur item. There were %s solutions loaded.", fetchurItems.size())));
                     }
                 }
 
@@ -215,7 +215,7 @@ public class MiningFeatures {
         if (Skytils.config.showGhostHealth && event.entity instanceof EntityCreeper && event.entity.getMaxHealth() == 1024) {
             EntityCreeper entity = (EntityCreeper) event.entity;
             if (entity.getPowered()) {
-                String healthText = String.format("\u00a7cGhost \u00a7a%s\u00a7f/\u00a7a1M\u00a7c ❤", NumberUtil.format((long) event.entity.getHealth()));
+                String healthText = String.format("§cGhost §a%s§f/§a1M§c ❤", NumberUtil.format((long) event.entity.getHealth()));
                 RenderUtil.draw3DString(new Vec3(event.entity.posX, event.entity.posY + event.entity.getEyeHeight() + 0.5, event.entity.posZ), healthText, new Color(255, 255, 255), 1f);
             }
         }

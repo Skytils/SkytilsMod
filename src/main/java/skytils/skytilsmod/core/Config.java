@@ -39,7 +39,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Override other reparty commands",
-            description = "Uses Skytils' reparty command instead of other mods'. \n\u00a7cRequires restart to work",
+            description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to work",
             category = "General",
             subcategory = "Reparty"
     )
@@ -113,7 +113,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Score Calculation Party Assist",
-            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\n\u00a7cThis feature is use at your own risk.",
+            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\n§cThis feature is use at your own risk.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
@@ -131,7 +131,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Remove Party Chat Notification Sounds",
-            description = "Removes party chat notification sounds caused by score calculation.\n\u00a7cDo not turn this on if you do not use the Hypixel feature.",
+            description = "Removes party chat notification sounds caused by score calculation.\n§cDo not turn this on if you do not use the Hypixel feature.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
@@ -313,7 +313,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Boulder Solver",
-            description = "\u00a7b[WIP] \u00a7rShow which boxes to move on the Boulder puzzle.",
+            description = "§b[WIP] §rShow which boxes to move on the Boulder puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -322,7 +322,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Ice Fill Solver",
-            description = "\u00a7b[WIP] \u00a7rShows the path to take on the Ice Fill puzzle.",
+            description = "§b[WIP] §rShows the path to take on the Ice Fill puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -367,7 +367,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Water Board Solver",
-            description = "\u00a7b[WIP] \u00a7rDisplays which levers to flip for the Water Board puzzle.",
+            description = "§b[WIP] §rDisplays which levers to flip for the Water Board puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -412,7 +412,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Simon Says Solver",
-            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            description = "§b[WIP] §rShow which buttons to press on the Simon Says device in Floor 7.\n§cKnown bug, if a teammate clicks a button it will not register.",
             category = "Dungeons",
             subcategory = "Terminal Solvers"
     )
@@ -430,7 +430,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
-            description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
+            description = "§b[WIP] §rShows the location of burrows during the event.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -439,7 +439,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Burrow Particle Add-on",
-            description = "\u00a7b[WIP] \u00a7rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
+            description = "§b[WIP] §rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -757,7 +757,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Custom Damage Splash",
-            description = "\u00a7b[WIP] \u00a7rReplaces Skyblock damage splashes with custom rendered ones.",
+            description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
@@ -911,7 +911,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Prioritize Item Abilities",
-            description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
+            description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )

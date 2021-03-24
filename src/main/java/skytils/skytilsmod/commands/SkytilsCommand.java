@@ -123,7 +123,7 @@ public class SkytilsCommand extends CommandBase {
                 }
             case "help":
                 if (args.length == 1) {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.BLUE + "➜ Skytils Commands and Info" + "\n" +
+                    player.addChatMessage(new ChatComponentText("§9➜ Skytils Commands and Info" + "\n" +
                             " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
                             " §2§l ❣ §7§oThe current mod version is §f§o" + Skytils.VERSION + "§7§o." + "\n" +
                             "§9§l➜ Setup:" + "\n" +

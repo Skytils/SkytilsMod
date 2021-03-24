@@ -149,7 +149,7 @@ public class GriffinBurrows {
             String uuid = mc.thePlayer.getGameProfile().getId().toString().replaceAll("[\\-]", "");
             String apiKey = Skytils.config.apiKey;
             if (apiKey.length() == 0) {
-                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7c\u00a7lYour API key is required in order to use the burrow feature. \u00a7cPlease set it with /api new or /st setkey <key>"));
+                mc.thePlayer.addChatMessage(new ChatComponentText("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>"));
                 Skytils.config.showGriffinBurrows = false;
                 return;
             }
@@ -194,8 +194,8 @@ public class GriffinBurrows {
             burrows.addAll(receivedBurrows);
             particleBurrows.clear();
             if (receivedBurrows.size() == 0) {
-                if (!removedDupes) mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs."));
-                else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."));
+                if (!removedDupes) mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs."));
+                else mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."));
             } else mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size() + EnumChatFormatting.GREEN + " burrows!"));
 
         }).start();
@@ -339,7 +339,7 @@ public class GriffinBurrows {
                     break;
             }
 
-            return String.format("%s \u00a7a(Particle)", type);
+            return String.format("%s §a(Particle)", type);
         }
 
         public void drawWaypoint(float partialTicks) {
@@ -428,7 +428,7 @@ public class GriffinBurrows {
                 }
             }
 
-            return String.format("%s \u00a7bPosition: %s/4%s", type, this.chain + 1, closest != null ? " " + closest.getNameWithColor() : "");
+            return String.format("%s §bPosition: %s/4%s", type, this.chain + 1, closest != null ? " " + closest.getNameWithColor() : "");
         }
 
         public void drawWaypoint(float partialTicks) {
