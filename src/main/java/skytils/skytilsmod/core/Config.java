@@ -21,7 +21,8 @@ public class Config extends Vigilant {
             type = PropertyType.SWITCH,
             name = "First Launch",
             description = "Used to see if the user is a new user of Skytils.",
-            category = "General"
+            category = "General",
+            hidden = true
     )
     public boolean firstLaunch = true;
 

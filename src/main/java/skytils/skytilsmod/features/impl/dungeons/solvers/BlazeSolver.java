@@ -89,7 +89,7 @@ public class BlazeSolver {
                             }
                         }
                     }
-                }).start();
+                }, "Skytils-Blaze-Orientation").start();
             }
         }
 

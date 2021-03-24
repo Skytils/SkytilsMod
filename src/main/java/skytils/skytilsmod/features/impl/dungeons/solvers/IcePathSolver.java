@@ -62,7 +62,7 @@ public class IcePathSolver {
                             }
                         }
 
-                    }).start();
+                    }, "Skytils-Ice-Path-Detection").start();
                     ticks = 0;
                 }
             } else if (grid == null) {
