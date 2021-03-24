@@ -1216,16 +1216,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
-            name = "Combo Hider",
-            description = "Removes combo messages from your chat.",
-            category = "Spam",
-            subcategory = "Miscellaneous",
-            options = {"Normal", "Hidden", "Separate GUI", "Toasts"}
-    )
-    public int comboHider = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
             description = "Removes blocks in the way messages from your chat.",
             category = "Spam",
@@ -1243,6 +1233,25 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int hideCantUseAbility = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Combo Hider",
+            description = "Removes combo messages from your chat.",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI", "Toasts"}
+    )
+    public int comboHider = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Compact Building Tools",
+            description = "Compacts messages from the Block Zapper and the Builder's Wand.",
+            category = "Spam",
+            subcategory = "Miscellaneous"
+    )
+    public boolean compactBuildingTools = false;
 
     @Property(
             type = PropertyType.SELECTOR,

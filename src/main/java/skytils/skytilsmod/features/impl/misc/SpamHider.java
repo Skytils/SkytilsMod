@@ -1,6 +1,8 @@
 package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ChatLine;
+import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.util.StringUtils;
@@ -14,6 +16,7 @@ import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SetActionBarEvent;
+import skytils.skytilsmod.mixins.AccessorGuiNewChat;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
@@ -25,6 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SpamHider {
+
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     static ArrayList<SpamMessage> spamMessages = new ArrayList<>();
 
@@ -71,6 +76,7 @@ public class SpamHider {
         BLESSINGBUFF(Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})")),
         BLESSINGGRANT(Pattern.compile("Grant.{1,2} you .* and .*\\.")),
         BLESSINGNAME(Pattern.compile("Blessing of (?<blessing>\\w+)")),
+        BUILDINGTOOLS(Pattern.compile("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+\\/\\d+\\)§r)|(§r§cYou have \\(\\d+\\/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
         MANAUSED(Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))")),
         ;
 
@@ -438,6 +444,22 @@ public class SpamHider {
                     default:
                 }
             }
+
+            // Compact Building Tools
+            if (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains("place") || formatted.contains("zap"))) {
+                if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
+                    GuiNewChat chatGui = mc.ingameGUI.getChatGUI();
+                    List<ChatLine> lines = ((AccessorGuiNewChat) chatGui).getChatLines();
+                    List<ChatLine> drawnLines = ((AccessorGuiNewChat) chatGui).getDrawnChatLines();
+                    for (int i = 0; i < 100 && i < lines.size(); i++) {
+                        ChatLine line = lines.get(i);
+                        if (line.getChatComponent().getFormattedText().replaceAll("\\d", "").equals(formatted.replaceAll("\\d", ""))) {
+                            drawnLines.remove(i);
+                        }
+                    }
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
