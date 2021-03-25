@@ -1,0 +1,7 @@
+enabled: true
+restylers:
+  - "*"
+  - google-java-format:
+      enabled: true
+      include:
+        - '**/*.java'
