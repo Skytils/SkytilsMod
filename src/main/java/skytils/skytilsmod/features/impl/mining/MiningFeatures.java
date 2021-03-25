@@ -81,7 +81,7 @@ public class MiningFeatures {
         }
 
 
-        if (Skytils.config.puzzlerSolver && unformatted.contains("[NPC]") && unformatted.contains("Puzzler")) {
+        if (Skytils.config.puzzlerSolver && unformatted.startsWith("[NPC] Puzzler:")) {
             if (unformatted.contains("Nice")) {
                 puzzlerSolution = null;
                 return;
@@ -120,7 +120,7 @@ public class MiningFeatures {
             }
         }
 
-        if (Skytils.config.fetchurSolver && unformatted.contains("[NPC]") && unformatted.contains("Fetchur")) {
+        if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size() == 0) {
                 mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils did not load any solutions."));
                 DataFetcher.reloadData();
