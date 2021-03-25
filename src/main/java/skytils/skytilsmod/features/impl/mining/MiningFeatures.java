@@ -4,6 +4,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -196,7 +197,7 @@ public class MiningFeatures {
     }
 
     @SubscribeEvent
-    public void onRenderLivingPre(RenderLivingEvent.Pre event) {
+    public void onRenderLivingPre(RenderLivingEvent.Pre<EntityLivingBase> event) {
         if (!Utils.inSkyblock) return;
         if (event.entity instanceof EntityCreeper && event.entity.isInvisible()) {
             EntityCreeper entity = (EntityCreeper) event.entity;
@@ -207,12 +208,12 @@ public class MiningFeatures {
     }
 
     @SubscribeEvent
-    public void onRenderLivingPost(RenderLivingEvent.Post event) {
+    public void onRenderLivingPost(RenderLivingEvent.Specials.Pre<EntityLivingBase> event) {
         if (!Utils.inSkyblock) return;
         if (Skytils.config.showGhostHealth && event.entity instanceof EntityCreeper && event.entity.getMaxHealth() == 1024) {
             EntityCreeper entity = (EntityCreeper) event.entity;
             if (entity.getPowered()) {
-                String healthText = String.format("§cGhost §a%s§f/§a1M§c ❤", NumberUtil.format((long) event.entity.getHealth()));
+                String healthText = "§cGhost §a" + NumberUtil.format((long) event.entity.getHealth()) + "§f/§a1M§c ❤";
                 RenderUtil.draw3DString(new Vec3(event.entity.posX, event.entity.posY + event.entity.getEyeHeight() + 0.5, event.entity.posZ), healthText, new Color(255, 255, 255), 1f);
             }
         }

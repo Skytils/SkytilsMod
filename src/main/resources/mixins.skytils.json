@@ -27,6 +27,7 @@
     "MixinRenderEntityItem",
     "MixinRenderItem",
     "MixinRenderLightningBolt",
+    "MixinSlot",
     "MixinSoundManager",
     "MixinTileEntityChestRenderer",
     "MixinUtil",

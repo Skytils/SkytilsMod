@@ -26,7 +26,7 @@ public class SelectAllColorSolver {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    private static final ArrayList<Integer> shouldClick = new ArrayList<>();
+    public static final ArrayList<Integer> shouldClick = new ArrayList<>();
     private static String colorNeeded;
 
     @SubscribeEvent
