@@ -746,6 +746,16 @@ public class Config extends Vigilant {
     public boolean legionCap = true;
 
     @Property(
+            type = PropertyType.SLIDER,
+            name = "Transparent Head Layer",
+            description = "Changes the transparency of your head layer.",
+            category = "Miscellaneous",
+            subcategory = "Other",
+            max = 100
+    )
+    public int transparentHeadLayer = 100;
+
+    @Property(
             type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",

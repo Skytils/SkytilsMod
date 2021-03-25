@@ -16,6 +16,7 @@
     "MixinGuiScreen",
     "MixinItemArmor",
     "MixinItemStack",
+    "MixinLayerCustomHead",
     "MixinMinecraft",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
