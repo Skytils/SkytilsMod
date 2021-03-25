@@ -200,9 +200,6 @@ public class MiningFeatures {
         if (!Utils.inSkyblock) return;
         if (event.entity instanceof EntityCreeper && event.entity.isInvisible()) {
             EntityCreeper entity = (EntityCreeper) event.entity;
-            if (Skytils.config.showSneakyCreeper && !entity.getPowered() && event.entity.getMaxHealth() == 120) {
-                event.entity.setInvisible(false);
-            }
             if (Skytils.config.showGhosts && event.entity.getMaxHealth() == 1024 && entity.getPowered()) {
                 event.entity.setInvisible(false);
             }

@@ -20,7 +20,7 @@ public class TerminalFeatures {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public void onGUIMouseInput(GuiScreenEvent.MouseInputEvent.Pre event) {
         if (!Utils.inDungeons) return;
         // Skytils doesn't use this event, so it must be another mod that cancelled it
