@@ -1,6 +1,5 @@
 package skytils.skytilsmod.mixins;
 
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,11 +18,12 @@ import java.util.regex.Pattern;
 
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack {
+    @Shadow private NBTTagCompound stackTagCompound;
     private final static Pattern starPattern = Pattern.compile("(§6✪)");
 
     private final ItemStack that = (ItemStack) (Object) this;
 
-    @Inject(method = "isItemEnchanted", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "hasEffect", at = @At("HEAD"), cancellable = true)
     private void showEnchantmentGlint(CallbackInfoReturnable<Boolean> cir) {
         if (!Utils.inSkyblock) return;
         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(that);
@@ -34,11 +34,15 @@ public abstract class MixinItemStack {
                 return;
             }
             if (Skytils.config.enchantGlintFix) {
-                if (extraAttr != null && extraAttr.hasKey("enchantments") && !extraAttr.getCompoundTag("enchantments").getKeySet().isEmpty()) {
+                if (extraAttr.hasKey("enchantments") && !extraAttr.getCompoundTag("enchantments").getKeySet().isEmpty()) {
                     cir.setReturnValue(true);
                     return;
                 }
             }
+        }
+
+        if (stackTagCompound != null && stackTagCompound.hasKey("SkytilsForceGlint")) {
+            cir.setReturnValue(stackTagCompound.getBoolean("SkytilsForceGlint"));
         }
     }
 

@@ -27,7 +27,7 @@ public class StartsWithSequenceSolver {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    private static final ArrayList<Integer> shouldClick = new ArrayList<>();
+    public static final ArrayList<Integer> shouldClick = new ArrayList<>();
     private static String sequenceNeeded = null;
     private static final Pattern titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$");
 

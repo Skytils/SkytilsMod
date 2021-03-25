@@ -5,15 +5,21 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -49,18 +55,59 @@ public class MayorInfo {
                         break;
                     }
                 }
-                if (currentMayor != null && !currentMayor.equals(elected)) {
-                    isLocal = true;
-                    currentMayor = elected;
-                    mayorPerks.clear();
-                    fetchMayorData();
+                if (currentMayor != null) {
+                    if (!currentMayor.equals(elected)) {
+                        isLocal = true;
+                        currentMayor = elected;
+                        mayorPerks.clear();
+                    }
+                    lastCheckedElectionOver = System.currentTimeMillis();
                 }
-                lastCheckedElectionOver = System.currentTimeMillis();
             }
             ticks = 0;
         }
 
         ticks++;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock) return;
+
+        if (event.message.getUnformattedText().equals("§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]") && event.message.getSiblings().size() == 1) {
+            HoverEvent hoverEvent = event.message.getSiblings().get(0).getChatStyle().getChatHoverEvent();
+            if (hoverEvent != null && hoverEvent.getAction() == HoverEvent.Action.SHOW_TEXT) {
+                IChatComponent value = hoverEvent.getValue();
+                System.out.println(value.getUnformattedText());
+                String[] lines = value.getUnformattedText().split("\n");
+                if (lines.length < 2) return;
+                String color = "";
+                if (StringUtils.stripControlCodes(lines[0]).startsWith("Mayor ")) {
+                    color = lines[0].substring(0, 2);
+                }
+                isLocal = true;
+                currentMayor = lines[0].substring(lines[0].lastIndexOf(" ") + 1);
+                mayorPerks.clear();
+                fetchMayorData();
+                HashSet<String> perks = new HashSet<>();
+                for (int i = 1; i < lines.length; i++) {
+                    String line = lines[i];
+
+                    if (!line.contains("§") || line.indexOf("§") != line.lastIndexOf("§")) continue;
+
+                    if (color.length() > 0) {
+                        if (line.startsWith(color)) {
+                            perks.add(StringUtils.stripControlCodes(line));
+                        }
+                    } else if (!line.startsWith("§7") && !line.startsWith("§8")) {
+                        perks.add(StringUtils.stripControlCodes(line));
+                    }
+                }
+                System.out.println("Got perks from chat: " + perks);
+                mayorPerks.addAll(perks);
+                sendMayorData(currentMayor, mayorPerks);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -79,11 +126,12 @@ public class MayorInfo {
                         mayorPerks.clear();
                         fetchMayorData();
                     }
+                    String color = item.getDisplayName().substring(0, 2);
                     List<String> lore = ItemUtil.getItemLore(item);
                     if (lore.contains("§8Perks List") && lore.contains("§7The listed perks are")) {
                         HashSet<String> perks = new HashSet<>();
                         for (String line : lore) {
-                            if (line.startsWith("§d") && line.indexOf("§") == line.lastIndexOf("§")) {
+                            if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {
                                 perks.add(StringUtils.stripControlCodes(line));
                             }
                         }
@@ -100,7 +148,7 @@ public class MayorInfo {
         new Thread(() -> {
             JsonObject res = APIUtil.getJSONResponse(baseURL);
             if (res.has("name") && res.has("perks")) {
-                isLocal = false;
+                if (res.get("name").getAsString().equals(currentMayor)) isLocal = false;
                 currentMayor = res.get("name").getAsString();
                 lastFetchedMayorData = System.currentTimeMillis();
                 mayorPerks.clear();
@@ -124,14 +172,13 @@ public class MayorInfo {
                 String serverId = UUID.randomUUID().toString().replaceAll("-", "");
                 StringBuilder url = new StringBuilder(baseURL + "/new?username=" + mc.getSession().getUsername() + "&serverId=" + serverId + "&mayor=" + mayor);
                 for (String perk : perks) {
-                    url.append("&perks[]=").append(perk);
+                    url.append("&perks[]=").append(URLEncoder.encode(perk, "UTF-8"));
                 }
 
                 String commentForDecompilers = "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses.";
                 mc.getSessionService().joinServer(mc.getSession().getProfile(), mc.getSession().getToken(), serverId);
-                JsonObject res = APIUtil.getJSONResponse(url.toString());
-                System.out.println(res);
-            } catch (AuthenticationException e) {
+                System.out.println(APIUtil.getJSONResponse(url.toString()));
+            } catch (AuthenticationException | IOException e) {
                 e.printStackTrace();
             }
         }).start();
