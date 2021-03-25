@@ -137,7 +137,7 @@ public class SkytilsCommand extends CommandBase {
                             " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
                             " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
                             "§9§l➜ Color and Glint" + "\n" +
-                    		" §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)" + "\n" +
+                    		" §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)" + "\n" +
                     		" §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
                     		" §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
                             "§9§l➜ Miscellaneous:" + "\n" +
