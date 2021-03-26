@@ -167,6 +167,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Oruo Messages",
+            description = "Hides the messages from Oruo during the Trivia.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideOruoMessages = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Spirit Animal Nametags",
             description = "Removes the nametags above spirit animals on Floor 4.",
             category = "Dungeons",
