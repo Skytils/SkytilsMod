@@ -61,7 +61,7 @@ public class WaterBoardSolver {
         World world = mc.theWorld;
 
         if (ticks % 4 == 0) {
-            if (variant == 0 && (workerThread == null || !workerThread.isAlive() || workerThread.isInterrupted())) {
+            if (variant == -1 && (workerThread == null || !workerThread.isAlive() || workerThread.isInterrupted())) {
                 workerThread = new Thread(() -> {
 
                     prevInWaterRoom = inWaterRoom;
