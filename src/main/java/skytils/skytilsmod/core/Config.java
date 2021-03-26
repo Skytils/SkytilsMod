@@ -746,6 +746,15 @@ public class Config extends Vigilant {
     public boolean legionCap = true;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Placed Summoning Eye Display",
+            description = "Shows the amount of summoning eyes placed in the Dragon's Nest.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean summoningEyeDisplay = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Transparent Head Layer",
             description = "Changes the transparency of your head layer.",

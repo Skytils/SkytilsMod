@@ -1,5 +1,8 @@
 package skytils.skytilsmod.features.impl.misc;
 
+import com.google.common.collect.ImmutableSet;
+import net.minecraft.block.BlockEndPortalFrame;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -20,6 +23,7 @@ import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -35,10 +39,7 @@ import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
-import skytils.skytilsmod.utils.ItemUtil;
-import skytils.skytilsmod.utils.NumberUtil;
-import skytils.skytilsmod.utils.RenderUtil;
-import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.*;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
@@ -175,6 +176,7 @@ public class MiscFeatures {
     static {
         new GolemSpawnTimerElement();
         new LegionPlayerDisplay();
+        new PlacedSummoningEyeDisplay();
     }
 
     public static class GolemSpawnTimerElement extends GuiElement {
@@ -277,4 +279,69 @@ public class MiscFeatures {
             return Skytils.config.legionPlayerDisplay;
         }
     }
+
+    public static class PlacedSummoningEyeDisplay extends GuiElement {
+
+        private static final BlockPos[] SUMMONING_EYE_FRAMES = { new BlockPos(-669, 9, -275), new BlockPos(-669, 9, -277), new BlockPos(-670, 9, -278), new BlockPos(-672, 9, -278), new BlockPos(-673, 9, -277), new BlockPos(-673, 9, -275), new BlockPos(-672, 9, -274), new BlockPos(-670, 9, -274) };
+        private static final ResourceLocation ICON = new ResourceLocation("skytils", "icons/SUMMONING_EYE.png");
+
+        public PlacedSummoningEyeDisplay() {
+            super("Placed Summoning Eye Display", new FloatPair(50, 60));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        @Override
+        public void render() {
+            EntityPlayerSP player = mc.thePlayer;
+            if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
+                if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("combat_3")) return;
+                float x = getActualX();
+                float y = getActualY();
+
+                boolean invalid = false;
+                int placedEyes = 0;
+
+                for (BlockPos pos : SUMMONING_EYE_FRAMES) {
+                    IBlockState block = mc.theWorld.getBlockState(pos);
+                    if (block.getBlock() != Blocks.end_portal_frame) {
+                        invalid = true;
+                        break;
+                    } else if (block.getValue(BlockEndPortalFrame.EYE)) {
+                        placedEyes++;
+                    }
+                }
+
+                if (invalid) return;
+
+                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                RenderUtil.renderTexture(ICON, (int)x, (int)y);
+                ScreenRenderer.fontRenderer.drawString(placedEyes + "/8", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+            }
+        }
+
+        @Override
+        public void demoRender() {
+            float x = getActualX();
+            float y = getActualY();
+            RenderUtil.renderTexture(ICON, (int)x, (int)y);
+            ScreenRenderer.fontRenderer.drawString("6/8", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        @Override
+        public int getHeight() {
+            return 16;
+        }
+
+        @Override
+        public int getWidth() {
+            return 20 + ScreenRenderer.fontRenderer.getStringWidth("6/8");
+        }
+
+        @Override
+        public boolean getToggled() {
+            return Skytils.config.summoningEyeDisplay;
+        }
+    }
+
 }
