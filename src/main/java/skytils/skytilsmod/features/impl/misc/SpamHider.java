@@ -119,6 +119,10 @@ public class SpamHider {
                 }
             }
 
+            if (Skytils.config.hideOruoMessages && Utils.inDungeons && unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && !unformatted.contains("You should have listened") && !unformatted.contains("Yikes") && !unformatted.contains("chose the wrong answer") && !unformatted.contains("thinks the answer is") && !(unformatted.contains("answered Question #") && unformatted.endsWith("correctly!"))) {
+                cancelChatPacket(event, false);
+            }
+
             if (unformatted.contains(":")) return;
 
             //Autopet hider
