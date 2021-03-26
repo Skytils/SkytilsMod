@@ -158,7 +158,7 @@ public class ItemFeatures {
                 }
             }
         }
-        if (event.slotId == -999 && mc.thePlayer.inventory.getItemStack() != null) {
+        if (event.slotId == -999 && mc.thePlayer.inventory.getItemStack() != null && event.clickType != 5) {
             ItemStack item = mc.thePlayer.inventory.getItemStack();
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             if (Skytils.config.protectStarredItems && extraAttr != null) {
