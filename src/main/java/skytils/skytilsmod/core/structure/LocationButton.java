@@ -38,14 +38,14 @@ public class LocationButton extends GuiButton {
 
     @Override
     public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+        refreshLocations();
+        hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x2 && mouseY < this.y2;
         Color c = new Color(255,255,255,40);
         if (hovered) {
             c = new Color(255, 255, 255, 100);
         }
-        refreshLocations();
         RenderUtil.drawRect(x, y, x2, y2, c.getRGB());
         this.element.demoRender();
-        hovered = mouseX >= this.element.getActualX() && mouseY >= this.getElement().getActualY() && mouseX < this.getElement().getActualX() + this.getElement().getWidth() && mouseY < this.getElement().getActualY() + this.getElement().getHeight();
     }
 
     @Override
