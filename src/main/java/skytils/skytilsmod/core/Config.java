@@ -147,6 +147,15 @@ public class Config extends Vigilant {
     public boolean removePartyChatNotifFromScoreCalc = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Box Skeleton Masters",
+            description = "Draws the bounding box for Skeleton Masters.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean boxSkeletonMasters = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Chest Reroll Confirmation",
             description = "Requires you to click multiple times in order to reroll a chest.",

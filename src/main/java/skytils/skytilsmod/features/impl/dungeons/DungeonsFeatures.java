@@ -11,6 +11,7 @@ import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.ClickEvent;
@@ -223,6 +224,9 @@ public class DungeonsFeatures {
             }
             if (event.entity instanceof EntityBat && Skytils.config.showBatHitboxes && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible()) {
                 RenderUtil.drawOutlinedBoundingBox(event.entity.getEntityBoundingBox(), new Color(0, 255, 255, 255), 3, 1f);
+            }
+            if (event.entity instanceof EntitySkeleton && Skytils.config.boxSkeletonMasters && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible() && Objects.equals(ItemUtil.getSkyBlockItemID(event.entity.getCurrentArmor(0)), "SKELETON_MASTER_BOOTS")) {
+                RenderUtil.drawOutlinedBoundingBox(event.entity.getEntityBoundingBox(), new Color(255, 107, 11, 255), 3, 1f);
             }
         }
     }
