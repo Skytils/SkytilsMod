@@ -21,6 +21,7 @@ import skytils.skytilsmod.utils.MayorInfo;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -164,7 +165,7 @@ public class SkytilsCommand extends CommandBase {
             case "armorcolour":
             case "armourcolor":
             case "armourcolour":
-                acc.processCommand(sender, args);
+                acc.processCommand(sender, Arrays.copyOfRange(args, 1, args.length));
                 break;
             default:
                 player.addChatMessage(new ChatComponentText("§bSkytils ➜ §cThis command doesn't exist!\n  §cUse §b/Skytils help§c for a full list of commands"));
