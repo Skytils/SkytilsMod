@@ -884,15 +884,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Slayer Miniboss Spawn Alert",
-            description = "Displays a title when a slayer miniboss spawns.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean slayerMinibossSpawnAlert = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "No Fire",
             description = "Removes first-person fire overlay when you are burning.",
             category = "Miscellaneous",
@@ -908,15 +899,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean noHurtcam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Ping when in Atoned Horror Danger Zone",
-            description = "Pings when you are standing on the Atoned Horror's TNT target.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean rev5TNTPing = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -1053,6 +1035,33 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideFishingHooks = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Ping when in Atoned Horror Danger Zone",
+            description = "Pings when you are standing on the Atoned Horror's TNT target.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean rev5TNTPing = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Slayer Boss Hitbox",
+            description = "Draws a box around slayer mini-bosses.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerBossHitbox = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Slayer Miniboss Spawn Alert",
+            description = "Displays a title when a slayer miniboss spawns.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerMinibossSpawnAlert = false;
 
     @Property(
             type = PropertyType.SWITCH,

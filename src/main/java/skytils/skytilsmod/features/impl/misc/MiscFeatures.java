@@ -136,9 +136,6 @@ public class MiscFeatures {
             if (Skytils.config.disableCooldownSounds && packet.getSoundName().equals("mob.endermen.portal") && packet.getPitch() == 0 && packet.getVolume() == 8) {
                 event.setCanceled(true);
             }
-            if (Skytils.config.slayerMinibossSpawnAlert && packet.getSoundName().equals("random.explode") && packet.getVolume() == 0.6f && packet.getPitch() == 9/7f) {
-                GuiManager.createTitle("§cMINIBOSS", 20);
-            }
         }
     }
 
