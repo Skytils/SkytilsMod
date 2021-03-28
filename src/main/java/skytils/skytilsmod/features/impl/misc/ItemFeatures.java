@@ -116,8 +116,8 @@ public class ItemFeatures {
                 ItemStack item = event.slot.getStack();
                 if (item == null) return;
                 NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
-                if (Skytils.config.protectStarredItems) {
-                    if (chestName.startsWith("Salvage") && extraAttr != null) {
+                if (Skytils.config.protectStarredItems && extraAttr != null) {
+                    if (chestName.startsWith("Salvage")) {
                         boolean inSalvageGui = false;
                         if (item.getDisplayName().contains("Salvage") || item.getDisplayName().contains("Essence")) {
                             ItemStack salvageItem = inv.getStackInSlot(13);
@@ -132,6 +132,19 @@ public class ItemFeatures {
                             return;
                         }
                     }
+                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54) {
+                        ItemStack sellItem = inv.getStackInSlot(49);
+                        if (sellItem != null) {
+                            if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
+                                if (extraAttr.hasKey("dungeon_item_level") && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
+                                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
+                                    event.setCanceled(true);
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
                 if (Skytils.config.stopClickingNonSalvageable) {
                     String itemId = ItemUtil.getSkyBlockItemID(item);
@@ -140,19 +153,6 @@ public class ItemFeatures {
                             event.setCanceled(true);
                             if (itemId.contains("BACKPACK") && !itemId.equals("JUMBO_BACKPACK_UPGRADE"))
                                 event.setCanceled(false);
-                        }
-                    }
-                }
-                if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
-                    ItemStack sellItem = inv.getStackInSlot(49);
-                    if (sellItem != null) {
-                        if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
-                            if (extraAttr.hasKey("dungeon_item_level") && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
-                                mc.thePlayer.playSound("note.bass", 1, 0.5f);
-                                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
-                                event.setCanceled(true);
-                                return;
-                            }
                         }
                     }
                 }
