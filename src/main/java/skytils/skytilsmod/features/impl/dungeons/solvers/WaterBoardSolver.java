@@ -45,6 +45,8 @@ public class WaterBoardSolver {
     private static boolean inWaterRoom = false;
     private static int variant = -1;
 
+    private static Thread workerThread = null;
+
     private static int ticks = 0;
 
     @SubscribeEvent
@@ -59,125 +61,127 @@ public class WaterBoardSolver {
         World world = mc.theWorld;
 
         if (ticks % 4 == 0) {
-            new Thread(() -> {
+            if (variant == -1 && (workerThread == null || !workerThread.isAlive() || workerThread.isInterrupted())) {
+                workerThread = new Thread(() -> {
 
-                prevInWaterRoom = inWaterRoom;
-                inWaterRoom = false;
+                    prevInWaterRoom = inWaterRoom;
+                    inWaterRoom = false;
 
-                boolean foundPiston = false;
+                    boolean foundPiston = false;
 
-                for (BlockPos potentialPiston : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 13, 54)) {
-                    if (world.getBlockState(potentialPiston).getBlock() == Blocks.sticky_piston) {
-                        foundPiston = true;
-                        break;
+                    for (BlockPos potentialPiston : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 13, 54)) {
+                        if (world.getBlockState(potentialPiston).getBlock() == Blocks.sticky_piston) {
+                            foundPiston = true;
+                            break;
+                        }
                     }
-                }
 
-                if (foundPiston) {
-                    if (chestPos == null) {
-                        for (BlockPos potentialChestPos : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 25, 56)) {
-                            if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {
-                                if (world.getBlockState(potentialChestPos.down()).getBlock() == Blocks.stone && world.getBlockState(potentialChestPos.up(2)).getBlock() == Blocks.stained_glass) {
-                                    for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                                        if (world.getBlockState(potentialChestPos.offset(direction.getOpposite(), 3).down(2)).getBlock() == Blocks.sticky_piston && world.getBlockState(potentialChestPos.offset(direction, 2)).getBlock() == Blocks.stone) {
-                                            chestPos = potentialChestPos;
-                                            System.out.println("Water board chest is at " + chestPos);
-                                            roomFacing = direction;
-                                            System.out.println("Water board room is facing " + direction);
-                                            break;
+                    if (foundPiston) {
+                        if (chestPos == null) {
+                            for (BlockPos potentialChestPos : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 25, 56)) {
+                                if (world.getBlockState(potentialChestPos).getBlock() == Blocks.chest) {
+                                    if (world.getBlockState(potentialChestPos.down()).getBlock() == Blocks.stone && world.getBlockState(potentialChestPos.up(2)).getBlock() == Blocks.stained_glass) {
+                                        for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                                            if (world.getBlockState(potentialChestPos.offset(direction.getOpposite(), 3).down(2)).getBlock() == Blocks.sticky_piston && world.getBlockState(potentialChestPos.offset(direction, 2)).getBlock() == Blocks.stone) {
+                                                chestPos = potentialChestPos;
+                                                System.out.println("Water board chest is at " + chestPos);
+                                                roomFacing = direction;
+                                                System.out.println("Water board room is facing " + direction);
+                                                break;
+                                            }
                                         }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (chestPos == null) return;
+
+                        for (BlockPos blockPos : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 25, 82)) {
+                            if (world.getBlockState(blockPos).getBlock() == Blocks.piston_head) {
+                                inWaterRoom = true;
+
+                                if (!prevInWaterRoom) {
+
+                                    boolean foundGold = false;
+                                    boolean foundClay = false;
+                                    boolean foundEmerald = false;
+                                    boolean foundQuartz = false;
+                                    boolean foundDiamond = false;
+
+                                    int x = blockPos.getX();
+                                    int z = blockPos.getZ();
+
+                                    // Detect first blocks near water stream
+                                    for (BlockPos puzzleBlockPos : BlockPos.getAllInBox(new BlockPos(x + 1, 78, z + 1), new BlockPos(x - 1, 77, z - 1))) {
+                                        Block block = world.getBlockState(puzzleBlockPos).getBlock();
+                                        if (block == Blocks.gold_block) {
+                                            foundGold = true;
+                                        } else if (block == Blocks.hardened_clay) {
+                                            foundClay = true;
+                                        } else if (block == Blocks.emerald_block) {
+                                            foundEmerald = true;
+                                        } else if (block == Blocks.quartz_block) {
+                                            foundQuartz = true;
+                                        } else if (block == Blocks.diamond_block) {
+                                            foundDiamond = true;
+                                        }
+                                    }
+
+                                    if (foundGold && foundClay) {
+                                        variant = 0;
+                                    } else if (foundEmerald && foundQuartz) {
+                                        variant = 1;
+                                    } else if (foundQuartz && foundDiamond) {
+                                        variant = 2;
+                                    } else if (foundGold && foundQuartz) {
+                                        variant = 3;
+                                    }
+
+                                    switch (variant) {
+                                        case 0:
+                                            solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.CLAY));
+                                            solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD));
+                                            solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                            solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.EMERALD));
+                                            solutions.put(WoolColor.RED, ImmutableSet.of());
+                                            break;
+                                        case 1:
+                                            solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.COAL));
+                                            solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                            solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND, LeverBlock.EMERALD));
+                                            solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.EMERALD));
+                                            solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD));
+                                            break;
+                                        case 2:
+                                            solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND));
+                                            solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.EMERALD));
+                                            solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND));
+                                            solutions.put(WoolColor.GREEN, ImmutableSet.of());
+                                            solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD));
+                                            break;
+                                        case 3:
+                                            solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                            solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL));
+                                            solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                            solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD));
+                                            solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.EMERALD, LeverBlock.CLAY));
+                                            break;
+                                        default:
+                                            break;
                                     }
                                     break;
                                 }
                             }
                         }
+                    } else {
+                        variant = -1;
+                        solutions.clear();
                     }
-
-                    if (chestPos == null) return;
-
-                    for (BlockPos blockPos : Utils.getBlocksWithinRangeAtSameY(player.getPosition(), 25, 82)) {
-                        if (world.getBlockState(blockPos).getBlock() == Blocks.piston_head) {
-                            inWaterRoom = true;
-
-                            if (!prevInWaterRoom) {
-
-                                boolean foundGold = false;
-                                boolean foundClay = false;
-                                boolean foundEmerald = false;
-                                boolean foundQuartz = false;
-                                boolean foundDiamond = false;
-
-                                int x = blockPos.getX();
-                                int z = blockPos.getZ();
-
-                                // Detect first blocks near water stream
-                                for (BlockPos puzzleBlockPos : BlockPos.getAllInBox(new BlockPos(x + 1, 78, z + 1), new BlockPos(x - 1, 77, z - 1))) {
-                                    Block block = world.getBlockState(puzzleBlockPos).getBlock();
-                                    if (block == Blocks.gold_block) {
-                                        foundGold = true;
-                                    } else if (block == Blocks.hardened_clay) {
-                                        foundClay = true;
-                                    } else if (block == Blocks.emerald_block) {
-                                        foundEmerald = true;
-                                    } else if (block == Blocks.quartz_block) {
-                                        foundQuartz = true;
-                                    } else if (block == Blocks.diamond_block) {
-                                        foundDiamond = true;
-                                    }
-                                }
-
-                                if (foundGold && foundClay) {
-                                    variant = 0;
-                                } else if (foundEmerald && foundQuartz) {
-                                    variant = 1;
-                                } else if (foundQuartz && foundDiamond) {
-                                    variant = 2;
-                                } else if (foundGold && foundQuartz) {
-                                    variant = 3;
-                                }
-
-                                switch (variant) {
-                                    case 0:
-                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.RED, ImmutableSet.of());
-                                        break;
-                                    case 1:
-                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.COAL));
-                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD));
-                                        break;
-                                    case 2:
-                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND));
-                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND));
-                                        solutions.put(WoolColor.GREEN, ImmutableSet.of());
-                                        solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD));
-                                        break;
-                                    case 3:
-                                        solutions.put(WoolColor.PURPLE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.ORANGE, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL));
-                                        solutions.put(WoolColor.BLUE, ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        solutions.put(WoolColor.GREEN, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD));
-                                        solutions.put(WoolColor.RED, ImmutableSet.of(LeverBlock.GOLD, LeverBlock.DIAMOND, LeverBlock.EMERALD, LeverBlock.CLAY));
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    variant = -1;
-                    solutions.clear();
-                }
-
-            }).start();
+                }, "Skytils-Water-Board-Puzzle");
+                workerThread.start();
+            }
             ticks = 0;
         }
         ticks++;
@@ -211,11 +215,11 @@ public class WaterBoardSolver {
                             if (v == null) return 0;
                             else return ++v;
                         });
-                        RenderUtil.draw3DString(new Vec3(pos.up()).addVector(0.5, 0.5 + 0.5 * displayed, 0.5), "\u00a7l" + color.name(), renderColor, event.partialTicks);
+                        RenderUtil.draw3DString(new Vec3(pos.up()).addVector(0.5, 0.5 + 0.5 * displayed, 0.5), "§l" + color.name(), renderColor, event.partialTicks);
                     }
                 }
                 if (leverStates.entrySet().stream().allMatch(entry -> (entry.getValue() && solution.contains(entry.getKey()) || (!entry.getValue() && !solution.contains(entry.getKey()))))) {
-                    RenderUtil.draw3DString(new Vec3(chestPos.offset(roomFacing.getOpposite(), 17).up(5)).addVector(0.5, 0.5 + 0.5 * matching, 0.5), "\u00a7l" + color.name(), renderColor, event.partialTicks);
+                    RenderUtil.draw3DString(new Vec3(chestPos.offset(roomFacing.getOpposite(), 17).up(5)).addVector(0.5, 0.5 + 0.5 * matching, 0.5), "§l" + color.name(), renderColor, event.partialTicks);
                     matching++;
                 }
             }

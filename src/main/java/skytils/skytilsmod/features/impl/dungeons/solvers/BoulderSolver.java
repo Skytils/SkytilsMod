@@ -139,7 +139,7 @@ public class BoulderSolver {
                         }
                     }
                 }
-            });
+            }, "Skytils-Boulder-Puzzle");
             workerThread.start();
         }
     }

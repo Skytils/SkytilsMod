@@ -52,7 +52,7 @@ import java.util.Objects;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.1.2-pre6";
+    public static final String VERSION = "0.1.2-pre7";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -143,15 +143,15 @@ public class Skytils {
         ClientCommandHandler cch = ClientCommandHandler.instance;
 
         if (!cch.getCommands().containsKey("armorcolor")) {
-            ClientCommandHandler.instance.registerCommand(new ArmorColorCommand());
+            cch.registerCommand(new ArmorColorCommand());
         }
 
         if (!cch.getCommands().containsKey("blockability")) {
-            ClientCommandHandler.instance.registerCommand(new BlockAbilityCommand());
+            cch.registerCommand(new BlockAbilityCommand());
         }
 
         if (!cch.getCommands().containsKey("glintcustomize")) {
-            ClientCommandHandler.instance.registerCommand(new GlintCustomizeCommand());
+            cch.registerCommand(new GlintCustomizeCommand());
         }
 
         if (!cch.getCommands().containsKey("reparty")) {

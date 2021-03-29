@@ -61,7 +61,7 @@ public class IceFillSolver {
                             }
                         }
                     }
-                }).start();
+                }, "Skytils-Ice-Fill-Detection").start();
             }
 
             if ((solverThread == null || !solverThread.isAlive()) && chestPos != null) {
@@ -84,7 +84,7 @@ public class IceFillSolver {
                     if (seven.paths.size() == 0) {
                         seven.genPaths(world);
                     }
-                });
+                }, "Skytils-Ice-Fill-Solution");
                 solverThread.start();
             }
             ticks = 0;

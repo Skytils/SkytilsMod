@@ -70,12 +70,12 @@ public class PetFeatures {
             Matcher petMatcher = SUMMON_PATTERN.matcher(message);
             if (petMatcher.find()) {
                 lastPet = StringUtils.stripControlCodes(petMatcher.group("pet"));
-            } else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to capture equipped pet."));
+            } else mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils failed to capture equipped pet."));
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
             Matcher autopetMatcher = AUTOPET_PATTERN.matcher(message);
             if (autopetMatcher.find()) {
                 lastPet = StringUtils.stripControlCodes(autopetMatcher.group("pet"));
-            } else mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to capture equipped pet."));
+            } else mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils failed to capture equipped pet."));
         }
     }
 
@@ -106,7 +106,7 @@ public class PetFeatures {
                             event.setCanceled(true);
                             if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
                                 lastPetLockNotif = System.currentTimeMillis();
-                                ChatComponentText cc = new ChatComponentText("\u00a7cSkytils stopped you from using that pet item! \u00a76Click this message to disable the lock.");
+                                ChatComponentText cc = new ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.");
                                 cc.setChatStyle(cc.getChatStyle()
                                         .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/disableskytilspetitemlock"))
                                         .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to disable the pet item lock for 5 seconds.")))
@@ -126,7 +126,7 @@ public class PetFeatures {
     public void onSendChatMessage(SendChatMessageEvent event) {
         if (event.message.equals("/disableskytilspetitemlock") && !event.addToChat) {
             lastPetConfirmation = System.currentTimeMillis();
-            mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7aYou may now apply pet items for 5 seconds."));
+            mc.thePlayer.addChatMessage(new ChatComponentText("§aYou may now apply pet items for 5 seconds."));
             event.setCanceled(true);
         }
     }

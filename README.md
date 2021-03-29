@@ -39,6 +39,7 @@ A Hypixel Skyblock Utilities mod.
      - Superboom TNT pickups
      - Revive stone pickups
      - Combo messages
+     - Blessing enchant and bait messages
 ##### Dungeons
  - Show Hidden Fels, Shadow Assassins, and blood room mobs
  - Blaze Solver Which Replaces The Skin Textures
@@ -57,6 +58,7 @@ A Hypixel Skyblock Utilities mod.
  - Score Calculation
  - Dungeon Timer
  - Necron phase timer
+ - Dungeon reroll confirmation
 #### Farming
  - Block Math Hoe recipe viewer
  - Block breaking farms
@@ -80,6 +82,7 @@ A Hypixel Skyblock Utilities mod.
  - Only Collect Enchanted Items
  - Dungeon Potion Lock
  - Power Orb Lock
+ - Prevent placing spirit sceptre and flower of truth
 ### Miscellaneous
  - Hide Witherborn Boss Bars
  - Hide Fire and Lightning
@@ -89,6 +92,7 @@ A Hypixel Skyblock Utilities mod.
  - Relic and Rare Uber Relic waypoints
  - Stop other mods from cancelling terminal clicks
  - Slayer miniboss spawn alert
+ - Hide fishing hooks from other players
 
 
 And more to come!

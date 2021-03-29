@@ -6,6 +6,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -189,6 +190,15 @@ public class ChatListener {
                 event.setCanceled(true);
                 return;
             }
+        }
+
+        if (Skytils.config.firstLaunch && unformatted.equals("Welcome to Hypixel SkyBlock!")) {
+            mc.thePlayer.addChatMessage(new ChatComponentText("§bThank you for downloading Skytils!"));
+            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help");
+
+            Skytils.config.firstLaunch = false;
+            Skytils.config.markDirty();
+            Skytils.config.writeData();
         }
     }
 }

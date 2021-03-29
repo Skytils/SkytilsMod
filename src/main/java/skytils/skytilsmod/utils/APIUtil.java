@@ -59,6 +59,21 @@ public class APIUtil {
                     }
                 } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && conn.getResponseCode() == 204) {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed with reason: Player does not exist."));
+                } else if (urlString.startsWith(MayorInfo.baseURL)) {
+                    StringBuilder response = new StringBuilder();
+
+                    String line;
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+
+                    while ((line = br.readLine()) != null) {
+                        response.append(line);
+                    }
+                    System.out.println(conn.getResponseCode() + ": " + response.toString());
+                    if (response.toString().startsWith("{")) {
+                        Gson gson = new Gson();
+                        return gson.fromJson(response.toString(), JsonObject.class);
+                    }
                 } else {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + conn.getResponseCode()));
                 }

@@ -49,14 +49,13 @@ public class ScreenRenderer {
     public static void refresh() {
         mc = Minecraft.getMinecraft();
         screen = new ScaledResolution(mc);
-        if (fontRenderer == null)
+        if (fontRenderer == null) {
             try {
                 fontRenderer = new SmartFontRenderer();
-            } catch (Exception ignored) {
-
-            } finally {
-                fontRenderer.onResourceManagerReload(mc.getResourceManager());
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
+        }
         if (itemRenderer == null)
             itemRenderer = Minecraft.getMinecraft().getRenderItem();
     }

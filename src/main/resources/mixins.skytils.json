@@ -4,6 +4,7 @@
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "AccessorCommandHandler",
+    "AccessorGuiNewChat",
     "MixinBossStatus",
     "MixinChunk",
     "MixinEntityBlaze",
@@ -15,6 +16,7 @@
     "MixinGuiScreen",
     "MixinItemArmor",
     "MixinItemStack",
+    "MixinLayerCustomHead",
     "MixinMinecraft",
     "MixinModelBlaze",
     "MixinNetHandlerPlayClient",
@@ -26,6 +28,7 @@
     "MixinRenderEntityItem",
     "MixinRenderItem",
     "MixinRenderLightningBolt",
+    "MixinSlot",
     "MixinSoundManager",
     "MixinTileEntityChestRenderer",
     "MixinUtil",

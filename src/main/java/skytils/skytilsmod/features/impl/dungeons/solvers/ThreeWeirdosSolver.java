@@ -46,7 +46,7 @@ public class ThreeWeirdosSolver {
 
         if (unformatted.contains("[NPC]")) {
             if (solutions.size() == 0) {
-                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load solutions for Three Weirdos."));
+                mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils failed to load solutions for Three Weirdos."));
                 DataFetcher.reloadData();
             }
             for (String solution : Lists.newArrayList(solutions)) {

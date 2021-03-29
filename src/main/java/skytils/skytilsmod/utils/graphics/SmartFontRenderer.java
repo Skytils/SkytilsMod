@@ -6,11 +6,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.obj.OBJModel;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 import skytils.skytilsmod.utils.graphics.colors.MinecraftChatColors;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Random;
 
 /**
@@ -27,12 +30,14 @@ public class SmartFontRenderer extends FontRenderer {
     // Array of 16 CustomColors where minecraftColors[0xX] is the colour for §X
     private static final int[] minecraftColors = MinecraftChatColors.set.asInts();
 
-    public SmartFontRenderer(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn, boolean unicode) {
-        super(gameSettingsIn, location, textureManagerIn, unicode);
-    }
-
     public SmartFontRenderer() {
         super(Minecraft.getMinecraft().gameSettings, new ResourceLocation("textures/font/ascii.png"), Minecraft.getMinecraft().getTextureManager(), false);
+        this.onResourceManagerReload(Minecraft.getMinecraft().getResourceManager());
+    }
+
+    @Override
+    protected InputStream getResourceInputStream(ResourceLocation location) throws IOException {
+        return Minecraft.getMinecraft().mcDefaultResourcePack.getInputStream(location);
     }
 
     public float drawString(String text, float x, float y, CustomColor customColor, TextAlignment alignment, TextShadow shadow) {

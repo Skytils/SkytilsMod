@@ -79,7 +79,7 @@ public class CommandAliases {
                     Skytils.sendMessageQueue.add(msg);
                 } catch(IllegalFormatException ignored) {
                     if (event.addToChat) mc.ingameGUI.getChatGUI().addToSentMessages(event.message);
-                    mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cYou did not specify the correct amount of arguments for this alias!"));
+                    mc.thePlayer.addChatMessage(new ChatComponentText("§cYou did not specify the correct amount of arguments for this alias!"));
                 }
             }
         }

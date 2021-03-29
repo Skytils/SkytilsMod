@@ -11,17 +11,14 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
-import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -123,7 +120,7 @@ public class BossHPDisplays {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a73\u00a7lThe Diamond Giant §a19.9M§c❤");
+            return ScreenRenderer.fontRenderer.getStringWidth("§3§lThe Diamond Giant §a19.9M§c❤");
         }
 
         @Override

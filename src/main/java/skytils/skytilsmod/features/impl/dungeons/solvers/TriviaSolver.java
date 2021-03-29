@@ -36,9 +36,9 @@ public class TriviaSolver {
     public void onChat(ClientChatReceivedEvent event) {
         String unformatted = StringUtils.stripControlCodes(event.message.getUnformattedText());
         if (Skytils.config.triviaSolver && Utils.inDungeons) {
-            if (unformatted.contains("Oruo the Omniscient") && unformatted.contains("correctly")) triviaAnswer = null;
-            if (unformatted.contains("I am Oruo the Omniscient") && triviaSolutions.size() == 0) {
-                mc.thePlayer.addChatMessage(new ChatComponentText("\u00a7cSkytils failed to load solutions for Trivia."));
+        if (unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && unformatted.contains("answered Question #") && unformatted.endsWith("correctly!")) triviaAnswer = null;
+            if (unformatted.equals("[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know.") && triviaSolutions.size() == 0) {
+                mc.thePlayer.addChatMessage(new ChatComponentText("§cSkytils failed to load solutions for Trivia."));
                 DataFetcher.reloadData();
             }
             if (unformatted.contains("What SkyBlock year is it?")) {

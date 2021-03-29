@@ -18,6 +18,15 @@ public class Config extends Vigilant {
     public String dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/";
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "First Launch",
+            description = "Used to see if the user is a new user of Skytils.",
+            category = "General",
+            hidden = true
+    )
+    public boolean firstLaunch = true;
+
+    @Property(
             type = PropertyType.TEXT,
             name = "Hypixel API Key",
             description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.\nSet this with /skytils setkey <key>.",
@@ -39,7 +48,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Override other reparty commands",
-            description = "Uses Skytils' reparty command instead of other mods'. \n\u00a7cRequires restart to work",
+            description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to work",
             category = "General",
             subcategory = "Reparty"
     )
@@ -113,7 +122,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Score Calculation Party Assist",
-            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\n\u00a7cThis feature is use at your own risk.",
+            description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\n§cThis feature is use at your own risk.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
@@ -131,16 +140,25 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Remove Party Chat Notification Sounds",
-            description = "Removes party chat notification sounds caused by score calculation.\n\u00a7cDo not turn this on if you do not use the Hypixel feature.",
+            description = "Removes party chat notification sounds caused by score calculation.\n§cDo not turn this on if you do not use the Hypixel feature.",
             category = "Dungeons",
             subcategory = "Score Calculation"
     )
     public boolean removePartyChatNotifFromScoreCalc = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Box Skeleton Masters",
+            description = "Draws the bounding box for Skeleton Masters.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean boxSkeletonMasters = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Chest Reroll Confirmation",
-            description = "Requires you to click 3 times in order to reroll a chest.",
+            description = "Requires you to click multiple times in order to reroll a chest.",
             category = "Dungeons",
             subcategory = "Quality of Life",
             max = 5
@@ -155,6 +173,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideF4Spam = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Oruo Messages",
+            description = "Hides the messages from Oruo during the Trivia.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideOruoMessages = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -313,7 +340,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Boulder Solver",
-            description = "\u00a7b[WIP] \u00a7rShow which boxes to move on the Boulder puzzle.",
+            description = "§b[WIP] §rShow which boxes to move on the Boulder puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -322,7 +349,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Ice Fill Solver",
-            description = "\u00a7b[WIP] \u00a7rShows the path to take on the Ice Fill puzzle.",
+            description = "§b[WIP] §rShows the path to take on the Ice Fill puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -367,7 +394,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Water Board Solver",
-            description = "\u00a7b[WIP] \u00a7rDisplays which levers to flip for the Water Board puzzle.",
+            description = "§b[WIP] §rDisplays which levers to flip for the Water Board puzzle.",
             category = "Dungeons",
             subcategory = "Solvers"
     )
@@ -412,7 +439,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Simon Says Solver",
-            description = "\u00a7b[WIP] \u00a7rShow which buttons to press on the Simon Says device in Floor 7.\n\u00a7cKnown bug, if a teammate clicks a button it will not register.",
+            description = "§b[WIP] §rShow which buttons to press on the Simon Says device in Floor 7.\n§cKnown bug, if a teammate clicks a button it will not register.",
             category = "Dungeons",
             subcategory = "Terminal Solvers"
     )
@@ -430,7 +457,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
-            description = "\u00a7b[WIP] \u00a7rShows the location of burrows during the event.",
+            description = "§b[WIP] §rShows the location of burrows during the event.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -439,7 +466,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Burrow Particle Add-on",
-            description = "\u00a7b[WIP] \u00a7rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
+            description = "§b[WIP] §rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -498,15 +525,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean noPickaxeAbilityOnPrivateIsland = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Show Sneaky Creeper",
-            description = "Makes Sneaky Creepers in the Deep Caverns visible.",
-            category = "Mining",
-            subcategory = "Quality of Life"
-    )
-    public boolean showSneakyCreeper = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -629,6 +647,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Prevent Placing Weapons",
+            description = "Stops the game from trying to place the Flower of Truth and the Spirit Sceptre.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean preventPlacingWeapons = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Enchanted Book Tier",
             description = "Shows the tier of books with only 1 enchantment.",
             category = "Miscellaneous",
@@ -668,16 +695,25 @@ public class Config extends Vigilant {
             name = "Show Item Rarity",
             description = "Shows the rarity of an item in the color",
             category = "Miscellaneous",
-            subcategory = "Items"
+            subcategory = "Item Rarity"
     )
     public boolean showItemRarity = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Pet Rarity",
+            description = "Shows the rarity of a pet in the color",
+            category = "Miscellaneous",
+            subcategory = "Item Rarity"
+    )
+    public boolean showPetRarity = false;
 
     @Property(
             type = PropertyType.SLIDER,
             name = "Item Rarity Opacity",
             description = "How opaque the rarity color will be",
             category = "Miscellaneous",
-            subcategory = "Items",
+            subcategory = "Item Rarity",
             max = 100
     )
     public int itemRarityOpacity = 75;
@@ -729,6 +765,25 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Placed Summoning Eye Display",
+            description = "Shows the amount of summoning eyes placed in the Dragon's Nest.",
+            category = "Miscellaneous",
+            subcategory = "Other"
+    )
+    public boolean summoningEyeDisplay = false;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Transparent Head Layer",
+            description = "Changes the transparency of your head layer.",
+            category = "Miscellaneous",
+            subcategory = "Other",
+            max = 100
+    )
+    public int transparentHeadLayer = 100;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
@@ -739,7 +794,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Custom Damage Splash",
-            description = "\u00a7b[WIP] \u00a7rReplaces Skyblock damage splashes with custom rendered ones.",
+            description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
@@ -838,12 +893,12 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Slayer Miniboss Spawn Alert",
-            description = "Displays a title when a slayer miniboss spawns.",
+            name = "No Fire",
+            description = "Removes first-person fire overlay when you are burning.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
-    public boolean slayerMinibossSpawnAlert = false;
+    public boolean noFire = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -853,15 +908,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean noHurtcam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Ping when in Atoned Horror Danger Zone",
-            description = "Pings when you are standing on the Atoned Horror's TNT target.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean rev5TNTPing = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -884,7 +930,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Prioritize Item Abilities",
-            description = "Prioritize right click abilities over the profile viewer.\n\u00a7cThis feature is use at your own risk and may be removed later!",
+            description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
     )
@@ -998,6 +1044,33 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideFishingHooks = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Ping when in Atoned Horror Danger Zone",
+            description = "Pings when you are standing on the Atoned Horror's TNT target.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean rev5TNTPing = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Slayer Boss Hitbox",
+            description = "Draws a box around slayer mini-bosses.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerBossHitbox = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Slayer Miniboss Spawn Alert",
+            description = "Displays a title when a slayer miniboss spawns.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerMinibossSpawnAlert = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -1189,16 +1262,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
-            name = "Combo Hider",
-            description = "Removes combo messages from your chat.",
-            category = "Spam",
-            subcategory = "Miscellaneous",
-            options = {"Normal", "Hidden", "Separate GUI", "Toasts"}
-    )
-    public int comboHider = 0;
-
-    @Property(
-            type = PropertyType.SELECTOR,
             name = "Blocks in the way Hider",
             description = "Removes blocks in the way messages from your chat.",
             category = "Spam",
@@ -1216,6 +1279,25 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int hideCantUseAbility = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Combo Hider",
+            description = "Removes combo messages from your chat.",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI", "Toasts"}
+    )
+    public int comboHider = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Compact Building Tools",
+            description = "Compacts messages from the Block Zapper and the Builder's Wand.",
+            category = "Spam",
+            subcategory = "Miscellaneous"
+    )
+    public boolean compactBuildingTools = false;
 
     @Property(
             type = PropertyType.SELECTOR,

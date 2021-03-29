@@ -178,7 +178,7 @@ public class ScoreCalculation {
 
         private static final Pattern deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r");
         private static final Pattern missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7\\]§r");
-        private static final Pattern failedPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7\\] §r§f\\(§r(?<player>.+)§r§f\\)§r");
+        private static final Pattern failedPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7\\] §r§f\\((?:§r(?<player>.+))?§r§f\\)§r");
         private static final Pattern secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r");
         private static final Pattern cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r");
 
@@ -308,25 +308,25 @@ public class ScoreCalculation {
                     speedScore = (392/3f) - ((1/30f) * countedSeconds);
                 } else speedScore = 0;
 
-                text.add("\u00a76Deaths:\u00a7a " + deaths);
-                text.add("\u00a76Missing Puzzles:\u00a7a " + missingPuzzles);
-                text.add("\u00a76Failed Puzzles:\u00a7a " + failedPuzzles);
-                text.add("\u00a76Secrets Found:\u00a7a " + foundSecrets);
-                if (totalSecrets != 0) text.add("\u00a76Estimated Secret Count:\u00a7a " + totalSecrets);
-                text.add("\u00a76Crypts:\u00a7a " + crypts);
+                text.add("§6Deaths:§a " + deaths);
+                text.add("§6Missing Puzzles:§a " + missingPuzzles);
+                text.add("§6Failed Puzzles:§a " + failedPuzzles);
+                text.add("§6Secrets Found:§a " + foundSecrets);
+                if (totalSecrets != 0) text.add("§6Estimated Secret Count:§a " + totalSecrets);
+                text.add("§6Crypts:§a " + crypts);
                 if (DungeonsFeatures.dungeonFloor.equals("F6") || DungeonsFeatures.dungeonFloor.equals("F7")) {
-                    text.add("\u00a76Mimic Killed:" + (ScoreCalculation.mimicKilled ? "\u00a7a ✓" : " \u00a7c X"));
+                    text.add("§6Mimic Killed:" + (ScoreCalculation.mimicKilled ? "§a ✓" : " §c X"));
                 }
                 if (isPaul) {
-                    text.add("\u00a76EZPZ: \u00a7a+10");
+                    text.add("§6EZPZ: §a+10");
                 }
 
-                text.add("\u00a76Skill Score:\u00a7a " + skillScore);
-                if (totalSecrets != 0) text.add("\u00a76Estimated Discovery Score:\u00a7a " + (int)discoveryScore);
-                if (speedScore != 100) text.add("\u00a76Speed Score:\u00a7a " + (int)speedScore);
-                text.add("\u00a76Estimated Bonus Score:\u00a7a " + bonusScore);
-                if (totalSecrets != 0) text.add("\u00a76Estimated Total Score:\u00a7a " + (int)(skillScore + discoveryScore + speedScore + bonusScore));
-                if (!Skytils.usingDungeonRooms) text.add("\u00a7cDownload the Dungeon Rooms Mod for discovery estimate.");
+                text.add("§6Skill Score:§a " + skillScore);
+                if (totalSecrets != 0) text.add("§6Estimated Discovery Score:§a " + (int)discoveryScore);
+                if (speedScore != 100) text.add("§6Speed Score:§a " + (int)speedScore);
+                text.add("§6Estimated Bonus Score:§a " + bonusScore);
+                if (totalSecrets != 0) text.add("§6Estimated Total Score:§a " + (int)(skillScore + discoveryScore + speedScore + bonusScore));
+                if (!Skytils.usingDungeonRooms) text.add("§cDownload the Dungeon Rooms Mod for discovery estimate.");
 
                 GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 for (int i = 0; i < text.size(); i++) {
@@ -344,10 +344,10 @@ public class ScoreCalculation {
             boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
             ArrayList<String> text = new ArrayList<>();
-            text.add("\u00a76Secrets Found: 99");
-            text.add("\u00a76Estimated Secret Count: 99");
-            text.add("\u00a76Crypts: 99");
-            text.add("\u00a76Mimic Killed:\u00a7a ✓");
+            text.add("§6Secrets Found: 99");
+            text.add("§6Estimated Secret Count: 99");
+            text.add("§6Crypts: 99");
+            text.add("§6Mimic Killed:§a ✓");
 
             for (int i = 0; i < text.size(); i++) {
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
@@ -362,7 +362,7 @@ public class ScoreCalculation {
 
         @Override
         public int getWidth() {
-            return ScreenRenderer.fontRenderer.getStringWidth("\u00a76Estimated Secret Count: 99");
+            return ScreenRenderer.fontRenderer.getStringWidth("§6Estimated Secret Count: 99");
         }
 
         @Override

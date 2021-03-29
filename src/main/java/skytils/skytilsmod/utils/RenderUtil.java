@@ -419,7 +419,11 @@ public class RenderUtil {
 
     public static void renderRarity(ItemStack itemStack, int xPos, int yPos) {
         if (itemStack != null) {
-            renderRarity(xPos, yPos, ItemUtil.getRarity(itemStack));
+            if (!Skytils.config.showPetRarity && ItemUtil.isPet(itemStack)) {
+                return;
+            } else {
+                renderRarity(xPos, yPos, ItemUtil.getRarity(itemStack));
+            }
         }
     }
 
