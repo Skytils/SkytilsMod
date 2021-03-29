@@ -1,9 +1,15 @@
 package skytils.skytilsmod;
 
+import club.sk1er.mods.core.ModCore;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.command.ICommand;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -35,6 +41,8 @@ import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
+import skytils.skytilsmod.gui.OptionsGui;
+import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.MayorInfo;
@@ -198,8 +206,29 @@ public class Skytils {
 
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent event) {
-        if (event.packet.getClass() == C01PacketChatMessage.class) {
+        if (event.packet instanceof C01PacketChatMessage) {
             lastChatMessage = System.currentTimeMillis();
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderGameOverlay(RenderGameOverlayEvent event) {
+        if (mc.currentScreen instanceof OptionsGui && event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiInitPost(GuiScreenEvent.InitGuiEvent.Post event) {
+        if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu) {
+            event.buttonList.add(new GuiButton(6969420, event.gui.width - 102, event.gui.height - 22, 100, 20, "Skytils"));
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiAction(GuiScreenEvent.ActionPerformedEvent.Post event) {
+        if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu && event.button.id == 6969420) {
+            ModCore.getInstance().getGuiHandler().open(new OptionsGui());
         }
     }
 

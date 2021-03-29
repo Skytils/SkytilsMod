@@ -15,6 +15,7 @@ import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
+import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.MayorInfo;
@@ -58,7 +59,7 @@ public class SkytilsCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         EntityPlayerSP player = (EntityPlayerSP) sender;
         if (args.length == 0) {
-            ModCore.getInstance().getGuiHandler().open(Skytils.config.gui());
+            ModCore.getInstance().getGuiHandler().open(new OptionsGui());
             return;
         }
         String subcommand = args[0].toLowerCase(Locale.ENGLISH);
@@ -79,6 +80,9 @@ public class SkytilsCommand extends CommandBase {
                         player.addChatMessage(new ChatComponentText("§c§l[ERROR] §8» §cThe Hypixel API key you provided was §finvalid§c."));
                     }
                 }).start();
+                break;
+            case "config":
+                ModCore.getInstance().getGuiHandler().open(Skytils.config.gui());
                 break;
             case "fetchur":
                 player.addChatMessage(new ChatComponentText("§e§l[FETCHUR] §8» §eToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
