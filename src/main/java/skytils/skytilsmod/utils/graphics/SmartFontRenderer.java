@@ -32,7 +32,6 @@ public class SmartFontRenderer extends FontRenderer {
 
     public SmartFontRenderer() {
         super(Minecraft.getMinecraft().gameSettings, new ResourceLocation("textures/font/ascii.png"), Minecraft.getMinecraft().getTextureManager(), false);
-        this.onResourceManagerReload(Minecraft.getMinecraft().getResourceManager());
     }
 
     @Override

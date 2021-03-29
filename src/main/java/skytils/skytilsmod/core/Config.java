@@ -974,6 +974,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Trick or Treat Chest Alert",
+            description = "Displays a title when any trick or treat chest spawns near you.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean trickOrTreatChestAlert = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "View Relic Waypoints",
             description = "Shows the location of all the relics at the Spider's Den.",
             category = "Miscellaneous",

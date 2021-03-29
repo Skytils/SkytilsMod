@@ -52,8 +52,11 @@ public class ScreenRenderer {
         if (fontRenderer == null) {
             try {
                 fontRenderer = new SmartFontRenderer();
-            } catch (Throwable e) {
-                e.printStackTrace();
+            } catch (Throwable ignored) {
+            } finally {
+                if (fontRenderer != null) {
+                    fontRenderer.onResourceManagerReload(Minecraft.getMinecraft().getResourceManager());
+                }
             }
         }
         if (itemRenderer == null)
