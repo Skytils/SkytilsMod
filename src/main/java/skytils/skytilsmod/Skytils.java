@@ -1,12 +1,14 @@
 package skytils.skytilsmod;
 
 import club.sk1er.mods.core.ModCore;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.command.ICommand;
 import net.minecraft.network.play.client.C01PacketChatMessage;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -42,7 +44,6 @@ import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
 import skytils.skytilsmod.gui.OptionsGui;
-import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.MayorInfo;
@@ -51,9 +52,7 @@ import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.io.File;
-import java.util.ArrayDeque;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Mod(modid = Skytils.MODID, name = Skytils.MOD_NAME, version = Skytils.VERSION, acceptedMinecraftVersions = "[1.8.9]", clientSideOnly = true)
 public class Skytils {
@@ -221,7 +220,23 @@ public class Skytils {
     @SubscribeEvent
     public void onGuiInitPost(GuiScreenEvent.InitGuiEvent.Post event) {
         if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu) {
-            event.buttonList.add(new GuiButton(6969420, event.gui.width - 102, event.gui.height - 22, 100, 20, "Skytils"));
+            int x = event.gui.width - 105;
+            int x2 = x + 100;
+            int y = event.gui.height - 22;
+            int y2 = y + 20;
+            ArrayList<GuiButton> sorted = Lists.newArrayList(event.buttonList);
+            sorted.sort((a, b) -> b.yPosition + b.height - a.yPosition + a.height);
+            for (GuiButton button : sorted) {
+                int otherX = button.xPosition;
+                int otherX2 = button.xPosition + button.width;
+                int otherY = button.yPosition;
+                int otherY2 = button.yPosition + button.height;
+                if (otherX2 > x && otherX < x2 && otherY2 > y && otherY < y2) {
+                    y = otherY - 20 - 2;
+                    y2 = y + 20;
+                }
+            }
+            event.buttonList.add(new GuiButton(6969420, x, Math.max(0, y), 100, 20, "Skytils"));
         }
     }
 
