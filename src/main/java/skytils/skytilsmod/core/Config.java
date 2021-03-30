@@ -529,6 +529,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Dark Mode Mist",
+            description = "Replaces colors in The Mist with darker variants.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean darkModeMist = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Disable Pickaxe Ability on Private Island",
             description = "Prevents you from using pickaxe abilities on your island.",
             category = "Mining",

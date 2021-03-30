@@ -24,6 +24,7 @@ import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
+import skytils.skytilsmod.features.impl.mining.DarkModeMist;
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures;
 import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer;
@@ -109,6 +110,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new ClickInOrderSolver());
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
         MinecraftForge.EVENT_BUS.register(new DamageSplash());
+        MinecraftForge.EVENT_BUS.register(new DarkModeMist());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new DungeonTimer());
         MinecraftForge.EVENT_BUS.register(new FarmingFeatures());
