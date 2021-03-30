@@ -25,10 +25,10 @@ public class DarkModeMist {
         if (Objects.equals(SBInfo.getInstance().getLocation(), "mining_3")) {
             if (event.pos.getY() <= 76) {
                 if (state.getBlock() == Blocks.stained_glass && state.getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE) {
-                    event.state = Blocks.stained_glass.getStateFromMeta(EnumDyeColor.GRAY.getMetadata());
+                    event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY);
                 }
                 if (state.getBlock() == Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
-                    event.state = Blocks.carpet.getStateFromMeta(EnumDyeColor.GRAY.getMetadata());
+                    event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY);
                 }
             }
         }
