@@ -1,4 +1,4 @@
-package skytils.skytilsmod.features.impl;
+package skytils.skytilsmod.features.impl.misc;
 
 import net.minecraft.block.BlockHalfStoneSlab;
 import net.minecraft.block.BlockHalfWoodSlab;
@@ -23,6 +23,7 @@ import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class SlayerFeatures {
 
@@ -122,7 +123,7 @@ public class SlayerFeatures {
         if (!Utils.inSkyblock) return;
         if (event.packet instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
-            if (Skytils.config.slayerMinibossSpawnAlert && packet.getSoundName().equals("random.explode") && packet.getVolume() == 0.6f && packet.getPitch() == 9/7f) {
+            if (Skytils.config.slayerMinibossSpawnAlert && packet.getSoundName().equals("random.explode") && packet.getVolume() == 0.6f && packet.getPitch() == 9/7f && !Objects.equals(GuiManager.title, "§cMINIBOSS")) {
                 GuiManager.createTitle("§cMINIBOSS", 20);
             }
         }

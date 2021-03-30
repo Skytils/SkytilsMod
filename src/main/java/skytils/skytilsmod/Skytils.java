@@ -24,7 +24,7 @@ import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
-import skytils.skytilsmod.features.impl.SlayerFeatures;
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures;
 import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
