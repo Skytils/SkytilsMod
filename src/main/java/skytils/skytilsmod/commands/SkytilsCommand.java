@@ -132,7 +132,8 @@ public class SkytilsCommand extends CommandBase {
                             " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
                             " §2§l ❣ §7§oThe current mod version is §f§o" + Skytils.VERSION + "§7§o." + "\n" +
                             "§9§l➜ Setup:" + "\n" +
-                            " §3/skytils §l➡ §bOpens the main mod configuration GUI." + "\n" +
+                            " §3/skytils §l➡ §bOpens the main mod GUI." + "\n" +
+                            " §3/skytils config §l➡ §bOpens the configuration GUI." + "\n" +
                             " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
                             " §3/skytils help §l➡ §bShows this help menu." + "\n" +
                             " §3/skytils reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +

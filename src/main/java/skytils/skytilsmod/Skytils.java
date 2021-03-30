@@ -1,14 +1,12 @@
 package skytils.skytilsmod;
 
 import club.sk1er.mods.core.ModCore;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.command.ICommand;
 import net.minecraft.network.play.client.C01PacketChatMessage;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -52,13 +50,16 @@ import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
 
 @Mod(modid = Skytils.MODID, name = Skytils.MOD_NAME, version = Skytils.VERSION, acceptedMinecraftVersions = "[1.8.9]", clientSideOnly = true)
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.1.2-pre7";
+    public static final String VERSION = "0.1.2-pre8";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
