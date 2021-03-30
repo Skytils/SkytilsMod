@@ -574,6 +574,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Recolor Carpets",
+            description = "Changes the color of carpets in the Dwarven Mines to red.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean recolorCarpets = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Ghosts",
             description = "Makes the ghosts in The Mist visible.",
             category = "Mining",

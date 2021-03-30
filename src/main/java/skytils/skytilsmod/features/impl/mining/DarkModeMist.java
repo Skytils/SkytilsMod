@@ -1,25 +1,22 @@
 package skytils.skytilsmod.features.impl.mining;
 
 import net.minecraft.block.BlockCarpet;
-import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockStainedGlass;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.RenderBlockInWorldEvent;
 import skytils.skytilsmod.utils.SBInfo;
-import skytils.skytilsmod.utils.ScoreboardUtil;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.Objects;
 
 public class DarkModeMist {
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onGetBlockModel(RenderBlockInWorldEvent event) {
         if (!Utils.inSkyblock || !Skytils.config.darkModeMist) return;
 

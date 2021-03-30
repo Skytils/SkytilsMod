@@ -1,5 +1,6 @@
 package skytils.skytilsmod.features.impl.mining;
 
+import net.minecraft.block.BlockCarpet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -7,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -20,6 +22,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.events.BossBarEvent;
+import skytils.skytilsmod.events.RenderBlockInWorldEvent;
 import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
@@ -229,6 +232,17 @@ public class MiningFeatures {
         lastJukebox = null;
         raffleBox = null;
         inRaffle = false;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onGetBlockModel(RenderBlockInWorldEvent event) {
+        if (!Utils.inSkyblock || !Objects.equals(SBInfo.getInstance().getLocation(), "mining_3")) return;
+
+        IBlockState state = event.state;
+
+        if (Skytils.config.recolorCarpets && state.getBlock() == Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.GRAY) {
+            event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED);
+        }
     }
 
 }
