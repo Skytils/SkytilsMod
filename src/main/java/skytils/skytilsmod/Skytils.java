@@ -135,9 +135,6 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
         MinecraftForge.EVENT_BUS.register(new WaterBoardSolver());
-
-        ScreenRenderer.refresh();
-
     }
 
     @Mod.EventHandler
