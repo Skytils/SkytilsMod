@@ -177,6 +177,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Hide Damage In Boss",
+            description = "Removes damage numbers while in a boss fight. Requires the custom damage splash to be enabled.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideDamageInBoss = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Hide Floor 4 Crowd Messages",
             description = "Hides the messages from the Crowd on Floor 4.",
             category = "Dungeons",

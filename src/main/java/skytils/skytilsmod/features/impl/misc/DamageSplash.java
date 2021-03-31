@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.EntityManager;
+import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity;
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location;
 import skytils.skytilsmod.utils.Utils;
@@ -51,6 +52,8 @@ public class DamageSplash {
 
             e.setCanceled(true);
             e.entity.worldObj.removeEntity(e.entity);
+
+            if (Skytils.config.hideDamageInBoss && DungeonsFeatures.hasBossSpawned) return;
 
             String name = entity.getCustomNameTag();
             String damage = (name.startsWith("§0")) ? damageMatcher.group(1) + "☠" :
