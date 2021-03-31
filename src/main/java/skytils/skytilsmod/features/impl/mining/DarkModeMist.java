@@ -22,7 +22,7 @@ public class DarkModeMist {
 
         IBlockState state = event.state;
 
-        if (Objects.equals(SBInfo.getInstance().getLocation(), "mining_3")) {
+        if (Objects.equals(SBInfo.getInstance().getLocation(), "mining_3") && event.state != null && event.pos != null) {
             if (event.pos.getY() <= 76) {
                 if (state.getBlock() == Blocks.stained_glass && state.getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE) {
                     event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY);
