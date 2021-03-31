@@ -1,13 +1,11 @@
 package skytils.skytilsmod.features.impl.misc;
 
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -32,9 +30,7 @@ public class DamageSplash {
 
     @SubscribeEvent
     public void renderFakeEntity(RenderWorldLastEvent e) {
-        float partialTicks = ObfuscationReflectionHelper.getPrivateValue(RenderWorldLastEvent.class, e, "partialTicks");
-        RenderGlobal context = ObfuscationReflectionHelper.getPrivateValue(RenderWorldLastEvent.class, e, "context");
-        EntityManager.tickEntities(partialTicks, context);
+        EntityManager.tickEntities(e.partialTicks, e.context);
     }
 
     @SubscribeEvent

@@ -28,6 +28,8 @@ public class DamageSplashEntity extends FakeEntity {
     private static final ScreenRenderer renderer = new ScreenRenderer();
     private static final WeakHashMap<String, UUID> added = new WeakHashMap<>();
 
+    private static final Pattern SYMBOL_PATTERN = Pattern.compile("(\\d+)(.*)");
+
     String displayText;
     private float scale = 1f;
     private CustomColor color;
@@ -36,7 +38,7 @@ public class DamageSplashEntity extends FakeEntity {
     public DamageSplashEntity(String damage, Location currentLocation) {
         super(currentLocation);
 
-        Matcher symbolMatcher = Pattern.compile("(\\d+)(.*)").matcher(damage);
+        Matcher symbolMatcher = SYMBOL_PATTERN.matcher(damage);
         if (symbolMatcher.matches()) {
             String symbol = symbolMatcher.group(2);
             damage = symbolMatcher.group(1);
