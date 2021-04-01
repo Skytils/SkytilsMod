@@ -62,7 +62,7 @@ public class ItemFeatures {
             ContainerChest chest = (ContainerChest) gui.inventorySlots;
             IInventory inv = chest.getLowerChestInventory();
             String chestName = inv.getDisplayName().getUnformattedText().trim();
-            if (chestName.startsWith("Salvage")) {
+            if (chestName.startsWith("Salvage") || chestName.contains("Backpack")) {
                 if (Skytils.config.highlightSalvageableItems) {
                     for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
                         ItemStack stack = slot.getStack();
