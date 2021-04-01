@@ -6,10 +6,12 @@ import com.google.gson.JsonObject;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import scala.Int;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver;
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
+import skytils.skytilsmod.features.impl.misc.ItemFeatures;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.Utils;
@@ -44,10 +46,15 @@ public class DataFetcher {
                 RelicWaypoints.relicLocations.add(new BlockPos(coordsArr.get(0).getAsInt(), coordsArr.get(1).getAsInt(), coordsArr.get(2).getAsInt()));
             }
 
+            for (Map.Entry<String, JsonElement> sellPrice : APIUtil.getJSONResponse(dataUrl + "constants/sellprices.json").entrySet()) {
+                ItemFeatures.sellPrices.put(sellPrice.getKey(), sellPrice.getValue().getAsDouble());
+            }
+
         }).start();
     }
 
     private static void clearData() {
+        ItemFeatures.sellPrices.clear();
         MiningFeatures.fetchurItems.clear();
         RelicWaypoints.relicLocations.clear();
         ThreeWeirdosSolver.solutions.clear();

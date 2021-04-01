@@ -43,6 +43,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -53,6 +54,8 @@ public class ItemFeatures {
     private final static Minecraft mc = Minecraft.getMinecraft();
 
     private static final Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
+
+    public static final HashMap<String, Double> sellPrices = new HashMap<>();
 
     @SubscribeEvent
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
@@ -187,32 +190,40 @@ public class ItemFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTooltip(ItemTooltipEvent event) {
         if (!Utils.inSkyblock) return;
+
         ItemStack item = event.itemStack;
 
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+        String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
+
+        if (Skytils.config.showNPCSellPrice && itemId != null) {
+            if (sellPrices.containsKey(itemId)) {
+                double valuePer = sellPrices.get(itemId);
+                event.toolTip.add("§6NPC Value: §b" + (valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + valuePer + " each§7)" : ""));
+            }
+        }
+
         if (Skytils.config.showSoulEaterBonus) {
-            if (item.hasTagCompound()) {
-                NBTTagCompound tags = item.getSubCompound("ExtraAttributes", false);
-                if (tags != null) {
-                    if (tags.hasKey("ultimateSoulEaterData")) {
+            if (extraAttr != null) {
+                if (extraAttr.hasKey("ultimateSoulEaterData")) {
 
-                        int bonus = tags.getInteger("ultimateSoulEaterData");
+                    int bonus = extraAttr.getInteger("ultimateSoulEaterData");
 
-                        boolean foundStrength = false;
+                    boolean foundStrength = false;
 
-                        for (int i = 0; i < event.toolTip.size(); i++) {
-                            String line = event.toolTip.get(i);
-                            if (line.contains("§7Strength:")) {
-                                event.toolTip.add(i + 1, EnumChatFormatting.DARK_RED + " Soul Eater Bonus: " + EnumChatFormatting.GREEN + bonus);
-                                foundStrength = true;
-                                break;
-                            }
+                    for (int i = 0; i < event.toolTip.size(); i++) {
+                        String line = event.toolTip.get(i);
+                        if (line.contains("§7Strength:")) {
+                            event.toolTip.add(i + 1, "§4 Soul Eater Bonus: §a" + bonus);
+                            foundStrength = true;
+                            break;
                         }
+                    }
 
-                        if (!foundStrength) {
-                            int index = event.showAdvancedItemTooltips ? 4 : 2;
-                            event.toolTip.add(event.toolTip.size() - index, "");
-                            event.toolTip.add(event.toolTip.size() - index, EnumChatFormatting.DARK_RED + " Soul Eater Bonus: " + EnumChatFormatting.GREEN + bonus);
-                        }
+                    if (!foundStrength) {
+                        int index = event.showAdvancedItemTooltips ? 4 : 2;
+                        event.toolTip.add(event.toolTip.size() - index, "");
+                        event.toolTip.add(event.toolTip.size() - index, "§4 Soul Eater Bonus: §a" + bonus);
                     }
                 }
             }

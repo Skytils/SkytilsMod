@@ -458,7 +458,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Simon Says Solver",
-            description = "§b[WIP] §rShow which buttons to press on the Simon Says device in Floor 7.\n§cKnown bug, if a teammate clicks a button it will not register.",
+            description = "Show which buttons to press on the Simon Says device in Floor 7.\n§cIf a teammate clicks a button it will not register.",
             category = "Dungeons",
             subcategory = "Terminal Solvers"
     )
@@ -476,7 +476,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
-            description = "§b[WIP] §rShows the location of burrows during the event.",
+            description = "Shows the location of burrows during the event.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -699,6 +699,15 @@ public class Config extends Vigilant {
             subcategory = "Items"
     )
     public boolean showEnchantedBookTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show NPC Sell Price",
+            description = "Shows the NPC Sell Price on certain items.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showNPCSellPrice = false;
 
     @Property(
             type = PropertyType.SWITCH,
