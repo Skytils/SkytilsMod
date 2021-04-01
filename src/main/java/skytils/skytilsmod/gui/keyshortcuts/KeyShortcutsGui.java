@@ -42,6 +42,7 @@ public class KeyShortcutsGui extends GuiScreen {
     protected void actionPerformed(GuiButton button) {
         if (button.id < 1000) {
             KeyShortcutsList.removeShortcut(button.id);
+            buttonList.remove(button);
         }
 
         if(button.id == 9000) {
