@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
+import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
@@ -27,6 +28,7 @@ public class OptionsGui extends GuiScreen {
         buttonList.add(new CleanButton(0, width / 2 - 100, this.height / 4 + 100, 200, 20, "Config"));
         buttonList.add(new CleanButton(1, width / 2 - 100, this.height / 4 + 125, 200, 20, "Edit Aliases"));
         buttonList.add(new CleanButton(2, width / 2 - 100, this.height / 4 + 150, 200, 20, "Edit Locations"));
+        buttonList.add(new CleanButton(3, width / 2 - 100, this.height / 4 + 175, 200, 20, "Edit Shortcuts"));
     }
 
     @Override
@@ -57,6 +59,9 @@ public class OptionsGui extends GuiScreen {
                 break;
             case 2:
                 mc.displayGuiScreen(new LocationEditGui());
+                break;
+            case 3:
+                mc.displayGuiScreen(new KeyShortcutsGui());
                 break;
         }
     }

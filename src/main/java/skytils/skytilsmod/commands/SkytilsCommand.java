@@ -17,6 +17,7 @@ import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
+import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.MayorInfo;
 
@@ -165,6 +166,10 @@ public class SkytilsCommand extends CommandBase {
             case "loc":
             case "gui":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
+                break;
+            case "keyshortcuts":
+            case "shortcuts":
+                ModCore.getInstance().getGuiHandler().open(new KeyShortcutsGui());
                 break;
             case "armorcolor":
             case "armorcolour":
