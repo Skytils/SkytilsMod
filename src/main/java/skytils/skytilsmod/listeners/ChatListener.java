@@ -24,8 +24,6 @@ public class ChatListener {
     private static Thread rejoinThread;
     private static String lastPartyDisbander = "";
 
-    private boolean alreadyPranked = false;
-
     private static final Pattern invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)");
     private static final Pattern playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)");
     private static final Pattern party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$");
@@ -193,15 +191,6 @@ public class ChatListener {
                 event.setCanceled(true);
                 return;
             }
-        }
-
-        if (!alreadyPranked && ZonedDateTime.now().getMonthValue() == 4 && ZonedDateTime.now().getDayOfMonth() == 1 && unformatted.equals("Welcome to Hypixel SkyBlock!")) {
-            Skytils.sendMessageQueue.addFirst("/l");
-            Skytils.sendMessageQueue.addFirst("/l");
-            mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§c§l[WARNING] §fYou have been detected voting for §dDante§f.\n" +
-                    "§fDue to this, your §aSkyBlock§f profiles have been §4§lwiped§f.\n" +
-                    "§fDo §e§lNOT§f contact appeals, your profiles will not be restored."));
-            alreadyPranked = true;
         }
 
         if (Skytils.config.firstLaunch && unformatted.equals("Welcome to Hypixel SkyBlock!")) {
