@@ -930,6 +930,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Highlight Dungeon-Sellable Items",
+            description = "Highlights dungeon-sellable items such as training weights in Ophelia NPC or Trades menu.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean highlightDungeonSellableItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "No Fire",
             description = "Removes first-person fire overlay when you are burning.",
             category = "Miscellaneous",
@@ -1374,6 +1383,26 @@ public class Config extends Vigilant {
             options = {"Normal", "Hidden", "Separate GUI"}
     )
     public int manaMessages = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blessing Enchant Hider",
+            description = "Removes blessing enchant message from fishing.",
+            category = "Spam",
+            subcategory = "Fishing",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int blessingEnchantHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Blessing Bait Hider",
+            description = "Removes blessing bait message from fishing.",
+            category = "Spam",
+            subcategory = "Fishing",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int blessingBaitHider = 0;
 
     @Property(
             type = PropertyType.SWITCH,

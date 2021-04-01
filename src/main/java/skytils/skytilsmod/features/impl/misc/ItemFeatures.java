@@ -74,6 +74,18 @@ public class ItemFeatures {
                     }
                 }
             }
+            if (chestName.startsWith("Ophelia") ||chestName.startsWith("Trades")) {
+                if (Skytils.config.highlightDungeonSellableItems) {
+                    for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
+                        ItemStack stack = slot.getStack();
+                        if (stack == null) continue;
+                        if (stack.getDisplayName().contains("Health Potion"))
+                            RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 225, 30, 255).getRGB());
+                        else if (stack.getDisplayName().contains("Mimic Fragment") || stack.getDisplayName().contains("Training Weights") || stack.getDisplayName().contains("Journal Entry"))
+                            RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 50, 150, 255).getRGB());
+                    }
+                }
+            }
         }
     }
 
