@@ -81,7 +81,7 @@ public class ItemFeatures {
                         if (stack == null) continue;
                         if (stack.getDisplayName().contains("Health Potion"))
                             RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 225, 30, 255).getRGB());
-                        else if (stack.getDisplayName().contains("Mimic Fragment") || stack.getDisplayName().contains("Training Weights") || stack.getDisplayName().contains("Journal Entry"))
+                        else if (stack.getDisplayName().contains("Mimic Fragment") || stack.getDisplayName().contains("Training Weights") || stack.getDisplayName().contains("Journal Entry") || stack.getDisplayName().contains("Defuse Kit"))
                             RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 50, 150, 255).getRGB());
                     }
                 }
