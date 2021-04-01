@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ChatLine;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.init.Items;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
+import skytils.skytilsmod.mixins.AccessorGuiNewChat;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -78,8 +80,8 @@ public class MayorInfo {
             HoverEvent hoverEvent = event.message.getSiblings().get(0).getChatStyle().getChatHoverEvent();
             if (hoverEvent != null && hoverEvent.getAction() == HoverEvent.Action.SHOW_TEXT) {
                 IChatComponent value = hoverEvent.getValue();
-                System.out.println(value.getUnformattedText());
-                String[] lines = value.getUnformattedText().split("\n");
+                System.out.println(value.getFormattedText());
+                String[] lines = value.getFormattedText().split("\n");
                 if (lines.length < 2) return;
                 String color = "";
                 if (StringUtils.stripControlCodes(lines[0]).startsWith("Mayor ")) {
@@ -93,13 +95,13 @@ public class MayorInfo {
                 for (int i = 1; i < lines.length; i++) {
                     String line = lines[i];
 
-                    if (!line.contains("§") || line.indexOf("§") != line.lastIndexOf("§")) continue;
+                    if (!line.contains("§") || line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue;
 
                     if (color.length() > 0) {
-                        if (line.startsWith(color)) {
+                        if (line.startsWith("§r" + color)) {
                             perks.add(StringUtils.stripControlCodes(line));
                         }
-                    } else if (!line.startsWith("§7") && !line.startsWith("§8")) {
+                    } else if (!line.startsWith("§r§7") && !line.startsWith("§r§8")) {
                         perks.add(StringUtils.stripControlCodes(line));
                     }
                 }

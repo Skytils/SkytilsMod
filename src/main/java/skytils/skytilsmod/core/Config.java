@@ -18,15 +18,6 @@ public class Config extends Vigilant {
     public String dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/";
 
     @Property(
-            type = PropertyType.SWITCH,
-            name = "First Launch",
-            description = "Used to see if the user is a new user of Skytils.",
-            category = "General",
-            hidden = true
-    )
-    public boolean firstLaunch = true;
-
-    @Property(
             type = PropertyType.TEXT,
             name = "Hypixel API Key",
             description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.\nSet this with /skytils setkey <key>.",
@@ -44,6 +35,25 @@ public class Config extends Vigilant {
             options = {"Simple", "Advanced"}
     )
     public int commandAliasMode = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "First Launch",
+            description = "Used to see if the user is a new user of Skytils.",
+            category = "General",
+            subcategory = "Other",
+            hidden = true
+    )
+    public boolean firstLaunch = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Config Button on Pause",
+            description = "Adds a button to configure Skytils to the pause menu.",
+            category = "General",
+            subcategory = "Other"
+    )
+    public boolean configButtonOnPause = true;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -164,6 +174,15 @@ public class Config extends Vigilant {
             max = 5
     )
     public int kismetRerollConfirm = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Damage In Boss",
+            description = "Removes damage numbers while in a boss fight. Requires the custom damage splash to be enabled.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideDamageInBoss = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -519,6 +538,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Dark Mode Mist",
+            description = "Replaces colors in The Mist with darker variants.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean darkModeMist = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Disable Pickaxe Ability on Private Island",
             description = "Prevents you from using pickaxe abilities on your island.",
             category = "Mining",
@@ -552,6 +580,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean raffleWaypoint = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Recolor Carpets",
+            description = "Changes the color of carpets in the Dwarven Mines to red.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean recolorCarpets = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -971,6 +1008,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean stopClickingNonSalvageable = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Trick or Treat Chest Alert",
+            description = "Displays a title when any trick or treat chest spawns near you.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean trickOrTreatChestAlert = false;
 
     @Property(
             type = PropertyType.SWITCH,

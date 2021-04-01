@@ -10,6 +10,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -29,6 +30,7 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
@@ -109,6 +111,20 @@ public class MiscFeatures {
         if (event.entity instanceof EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
                 event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onJoin(EntityJoinWorldEvent event) {
+        if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return;
+        if (event.entity instanceof EntityArmorStand) {
+            EntityArmorStand entity = ((EntityArmorStand) event.entity);
+            ItemStack headSlot = entity.getCurrentArmor(3);
+            if (Skytils.config.trickOrTreatChestAlert && headSlot != null && headSlot.getItem() == Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(mc.thePlayer) < 10*10) {
+                if (Objects.equals(headSlot.getTagCompound().getCompoundTag("SkullOwner").getString("Id"), "f955b4ac-0c41-3e45-8703-016c46a8028e")) {
+                    GuiManager.createTitle("§cTrick or Treat!", 60);
+                }
             }
         }
     }

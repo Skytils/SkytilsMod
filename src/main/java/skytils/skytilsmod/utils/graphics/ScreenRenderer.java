@@ -5,6 +5,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.item.ItemStack;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 
@@ -52,8 +53,15 @@ public class ScreenRenderer {
         if (fontRenderer == null) {
             try {
                 fontRenderer = new SmartFontRenderer();
-            } catch (Throwable e) {
-                e.printStackTrace();
+            } catch (Throwable ignored) {
+            } finally {
+                if (fontRenderer != null) {
+                    if (mc.gameSettings.language != null) {
+                        fontRenderer.setUnicodeFlag(mc.isUnicode());
+                        fontRenderer.setBidiFlag(mc.getLanguageManager().isCurrentLanguageBidirectional());
+                    }
+                    ((IReloadableResourceManager)mc.getResourceManager()).registerReloadListener(fontRenderer);
+                }
             }
         }
         if (itemRenderer == null)

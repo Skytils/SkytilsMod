@@ -14,6 +14,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.util.Objects;
 
@@ -50,4 +51,10 @@ public class MixinMinecraft {
             }
         }
     }
+
+    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER))
+    private void initializeSmartFontRenderer(CallbackInfo ci) {
+        ScreenRenderer.refresh();
+    }
+
 }
