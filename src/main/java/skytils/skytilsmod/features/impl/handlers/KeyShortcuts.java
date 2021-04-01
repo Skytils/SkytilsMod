@@ -5,13 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.Utils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -62,6 +62,7 @@ public class KeyShortcuts {
 
     @SubscribeEvent
     public void onInput(InputEvent event) {
+        if (!Utils.inSkyblock) return;
         for (Map.Entry<String, Integer> shortcut : shortcuts.entrySet()) {
             String message = shortcut.getKey();
             int code = shortcut.getValue();
