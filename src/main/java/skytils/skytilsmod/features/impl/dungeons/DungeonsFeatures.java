@@ -1,12 +1,14 @@
 package skytils.skytilsmod.features.impl.dungeons;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -26,7 +28,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -37,14 +41,20 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
+import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.ReceivePacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.utils.*;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -61,6 +71,11 @@ public class DungeonsFeatures {
     private static boolean isInTerracottaPhase = false;
     private static double terracottaEndTime = -1;
     private static int rerollClicks = 0;
+    private static Entity livid = null;
+
+    static {
+        new LividGuiElement();
+    }
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -84,6 +99,36 @@ public class DungeonsFeatures {
                     BossStatus.hasColorModifier = false;
                 } else {
                     terracottaEndTime = -2;
+                }
+            }
+            if (Skytils.config.findCorrectLivid) {
+                boolean inF5 = false;
+                boolean inM5 = false;
+
+                List<String> scoreboard = ScoreboardUtil.getSidebarLines();
+                for (String s : scoreboard) {
+                    String sCleaned = ScoreboardUtil.cleanSB(s);
+                    if (sCleaned.contains("The Catacombs (F5)")) {
+                        inF5 = true;
+                        break;
+                    } else if (sCleaned.contains("The Catacombs (M5)")) {
+                        inM5 = true;
+                        break;
+                    }
+                }
+
+                if (inF5 || inM5) {
+                    List<Entity> loadedLivids = new ArrayList<>();
+                    List<Entity> entities = mc.theWorld.getLoadedEntityList();
+                    for (Entity entity : entities) {
+                        String name = entity.getName();
+                        if (name.contains("Livid") && name.length() > 5 && name.charAt(1) == name.charAt(5) && !loadedLivids.contains(entity)) {
+                            loadedLivids.add(entity);
+                        }
+                    }
+                    if (loadedLivids.size() > 8) {
+                        livid = loadedLivids.get(0);
+                    }
                 }
             }
         }
@@ -415,4 +460,54 @@ public class DungeonsFeatures {
         terracottaEndTime = -1;
     }
 
+    static class LividGuiElement extends GuiElement {
+
+        public LividGuiElement() {
+            super("Livid HP", new FloatPair(0.05f, 0.4f));
+            Skytils.GUIMANAGER.registerElement(this);
+        }
+
+        public void render() {
+            EntityPlayerSP player = mc.thePlayer;
+            World world = mc.theWorld;
+            if (this.getToggled() && Utils.inDungeons && player != null && world != null) {
+                if (livid==null) return;
+
+                ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+
+                boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
+
+                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
+                SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+                ScreenRenderer.fontRenderer.drawString(livid.getName().replace("§l", ""), leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+
+                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+            }
+        }
+
+        public void demoRender() {
+            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+
+            boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
+
+            String text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿";
+            SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+            ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+        }
+
+        @Override
+        public int getHeight() {
+            return ScreenRenderer.fontRenderer.FONT_HEIGHT;
+        }
+
+        @Override
+        public int getWidth() {
+            return ScreenRenderer.fontRenderer.getStringWidth("§r§f﴾ Livid §e6.9M§c❤ §f﴿");
+        }
+
+        @Override
+        public boolean getToggled() {
+            return Skytils.config.findCorrectLivid;
+        }
+    }
 }
