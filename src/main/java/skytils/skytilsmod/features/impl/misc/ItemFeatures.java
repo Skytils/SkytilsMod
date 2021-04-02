@@ -259,7 +259,7 @@ public class ItemFeatures {
                                 ItemStack item = player.getHeldItem();
                                 if (item != null) {
                                     String itemName = StringUtils.stripControlCodes(ItemUtil.getDisplayName(item));
-                                    if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains("Astrea") || itemName.contains("Hyperion") || itemName.contains("Valkyrie")) {
+                                    if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains("Astraea") || itemName.contains("Hyperion") || itemName.contains("Valkyrie")) {
                                         event.setCanceled(true);
                                         break;
                                     }
