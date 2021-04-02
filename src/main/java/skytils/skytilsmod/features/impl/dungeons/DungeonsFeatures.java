@@ -71,6 +71,7 @@ public class DungeonsFeatures {
     private static boolean isInTerracottaPhase = false;
     private static double terracottaEndTime = -1;
     private static int rerollClicks = 0;
+    private static boolean foundLivid = false;
     private static Entity livid = null;
 
     static {
@@ -101,7 +102,7 @@ public class DungeonsFeatures {
                     terracottaEndTime = -2;
                 }
             }
-            if (Skytils.config.findCorrectLivid) {
+            if (Skytils.config.findCorrectLivid && !foundLivid) {
                 boolean inF5 = false;
                 boolean inM5 = false;
 
@@ -128,6 +129,7 @@ public class DungeonsFeatures {
                     }
                     if (loadedLivids.size() > 8) {
                         livid = loadedLivids.get(0);
+                        foundLivid = true;
                     }
                 }
             }
@@ -458,6 +460,8 @@ public class DungeonsFeatures {
         hasBossSpawned = false;
         isInTerracottaPhase = false;
         terracottaEndTime = -1;
+        livid = null;
+        foundLivid = false;
     }
 
     static class LividGuiElement extends GuiElement {
