@@ -43,6 +43,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -53,6 +54,8 @@ public class ItemFeatures {
     private final static Minecraft mc = Minecraft.getMinecraft();
 
     private static final Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
+
+    public static final HashMap<String, Double> sellPrices = new HashMap<>();
 
     @SubscribeEvent
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
@@ -116,8 +119,8 @@ public class ItemFeatures {
                 ItemStack item = event.slot.getStack();
                 if (item == null) return;
                 NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
-                if (Skytils.config.protectStarredItems) {
-                    if (chestName.startsWith("Salvage") && extraAttr != null) {
+                if (Skytils.config.protectStarredItems && extraAttr != null) {
+                    if (chestName.startsWith("Salvage")) {
                         boolean inSalvageGui = false;
                         if (item.getDisplayName().contains("Salvage") || item.getDisplayName().contains("Essence")) {
                             ItemStack salvageItem = inv.getStackInSlot(13);
@@ -132,6 +135,19 @@ public class ItemFeatures {
                             return;
                         }
                     }
+                    if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54) {
+                        ItemStack sellItem = inv.getStackInSlot(49);
+                        if (sellItem != null) {
+                            if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
+                                if (extraAttr.hasKey("dungeon_item_level") && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
+                                    mc.thePlayer.playSound("note.bass", 1, 0.5f);
+                                    mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
+                                    event.setCanceled(true);
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
                 if (Skytils.config.stopClickingNonSalvageable) {
                     String itemId = ItemUtil.getSkyBlockItemID(item);
@@ -140,19 +156,6 @@ public class ItemFeatures {
                             event.setCanceled(true);
                             if (itemId.contains("BACKPACK") && !itemId.equals("JUMBO_BACKPACK_UPGRADE"))
                                 event.setCanceled(false);
-                        }
-                    }
-                }
-                if (!chestName.equals("Large Chest") && !chestName.contains("Auction") && inv.getSizeInventory() == 54 && extraAttr != null) {
-                    ItemStack sellItem = inv.getStackInSlot(49);
-                    if (sellItem != null) {
-                        if ((sellItem.getItem() == Item.getItemFromBlock(Blocks.hopper) && sellItem.getDisplayName().contains("Sell Item")) || ItemUtil.getItemLore(sellItem).stream().anyMatch(s -> s.contains("buyback"))) {
-                            if (extraAttr.hasKey("dungeon_item_level") && (event.slot.inventory == mc.thePlayer.inventory && event.slotId != 49)) {
-                                mc.thePlayer.playSound("note.bass", 1, 0.5f);
-                                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils has stopped you from selling that item!"));
-                                event.setCanceled(true);
-                                return;
-                            }
                         }
                     }
                 }
@@ -187,32 +190,40 @@ public class ItemFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTooltip(ItemTooltipEvent event) {
         if (!Utils.inSkyblock) return;
+
         ItemStack item = event.itemStack;
 
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+        String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
+
+        if (Skytils.config.showNPCSellPrice && itemId != null) {
+            if (sellPrices.containsKey(itemId)) {
+                double valuePer = sellPrices.get(itemId);
+                event.toolTip.add("§6NPC Value: §b" + (valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + valuePer + " each§7)" : ""));
+            }
+        }
+
         if (Skytils.config.showSoulEaterBonus) {
-            if (item.hasTagCompound()) {
-                NBTTagCompound tags = item.getSubCompound("ExtraAttributes", false);
-                if (tags != null) {
-                    if (tags.hasKey("ultimateSoulEaterData")) {
+            if (extraAttr != null) {
+                if (extraAttr.hasKey("ultimateSoulEaterData")) {
 
-                        int bonus = tags.getInteger("ultimateSoulEaterData");
+                    int bonus = extraAttr.getInteger("ultimateSoulEaterData");
 
-                        boolean foundStrength = false;
+                    boolean foundStrength = false;
 
-                        for (int i = 0; i < event.toolTip.size(); i++) {
-                            String line = event.toolTip.get(i);
-                            if (line.contains("§7Strength:")) {
-                                event.toolTip.add(i + 1, EnumChatFormatting.DARK_RED + " Soul Eater Bonus: " + EnumChatFormatting.GREEN + bonus);
-                                foundStrength = true;
-                                break;
-                            }
+                    for (int i = 0; i < event.toolTip.size(); i++) {
+                        String line = event.toolTip.get(i);
+                        if (line.contains("§7Strength:")) {
+                            event.toolTip.add(i + 1, "§4 Soul Eater Bonus: §a" + bonus);
+                            foundStrength = true;
+                            break;
                         }
+                    }
 
-                        if (!foundStrength) {
-                            int index = event.showAdvancedItemTooltips ? 4 : 2;
-                            event.toolTip.add(event.toolTip.size() - index, "");
-                            event.toolTip.add(event.toolTip.size() - index, EnumChatFormatting.DARK_RED + " Soul Eater Bonus: " + EnumChatFormatting.GREEN + bonus);
-                        }
+                    if (!foundStrength) {
+                        int index = event.showAdvancedItemTooltips ? 4 : 2;
+                        event.toolTip.add(event.toolTip.size() - index, "");
+                        event.toolTip.add(event.toolTip.size() - index, "§4 Soul Eater Bonus: §a" + bonus);
                     }
                 }
             }

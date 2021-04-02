@@ -15,7 +15,9 @@ import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.LocationEditGui;
+import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
+import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.MayorInfo;
 
@@ -58,7 +60,7 @@ public class SkytilsCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         EntityPlayerSP player = (EntityPlayerSP) sender;
         if (args.length == 0) {
-            ModCore.getInstance().getGuiHandler().open(Skytils.config.gui());
+            ModCore.getInstance().getGuiHandler().open(new OptionsGui());
             return;
         }
         String subcommand = args[0].toLowerCase(Locale.ENGLISH);
@@ -79,6 +81,9 @@ public class SkytilsCommand extends CommandBase {
                         player.addChatMessage(new ChatComponentText("§c§l[ERROR] §8» §cThe Hypixel API key you provided was §finvalid§c."));
                     }
                 }).start();
+                break;
+            case "config":
+                ModCore.getInstance().getGuiHandler().open(Skytils.config.gui());
                 break;
             case "fetchur":
                 player.addChatMessage(new ChatComponentText("§e§l[FETCHUR] §8» §eToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
@@ -128,7 +133,8 @@ public class SkytilsCommand extends CommandBase {
                             " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
                             " §2§l ❣ §7§oThe current mod version is §f§o" + Skytils.VERSION + "§7§o." + "\n" +
                             "§9§l➜ Setup:" + "\n" +
-                            " §3/skytils §l➡ §bOpens the main mod configuration GUI." + "\n" +
+                            " §3/skytils §l➡ §bOpens the main mod GUI." + "\n" +
+                            " §3/skytils config §l➡ §bOpens the configuration GUI." + "\n" +
                             " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
                             " §3/skytils help §l➡ §bShows this help menu." + "\n" +
                             " §3/skytils reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +
@@ -160,6 +166,10 @@ public class SkytilsCommand extends CommandBase {
             case "loc":
             case "gui":
                 ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
+                break;
+            case "keyshortcuts":
+            case "shortcuts":
+                ModCore.getInstance().getGuiHandler().open(new KeyShortcutsGui());
                 break;
             case "armorcolor":
             case "armorcolour":

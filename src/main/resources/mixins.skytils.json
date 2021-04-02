@@ -5,6 +5,7 @@
   "mixins": [
     "AccessorCommandHandler",
     "AccessorGuiNewChat",
+    "MixinBlockRendererDispatcher",
     "MixinBossStatus",
     "MixinChunk",
     "MixinEntityBlaze",

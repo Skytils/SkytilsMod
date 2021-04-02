@@ -7,6 +7,7 @@ import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
 import skytils.skytilsmod.gui.commandaliases.elements.ScrollingCommandAliasesList;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -52,7 +53,7 @@ public class CommandAliasesGui extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.drawDefaultBackground();
+        drawGradientRect(0, 0, this.width, this.height, new Color(117, 115, 115, 25).getRGB(), new Color(0,0, 0,200).getRGB());
         ScrollingCommandAliasesList.drawScreen(mouseX, mouseY, partialTicks);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
@@ -83,13 +84,12 @@ public class CommandAliasesGui extends GuiScreen {
     @Override
     public void onGuiClosed() {
         CommandAliases.aliases.clear();
-        CommandAliases.saveAliases();
         for(ScrollingCommandAliasesList.AliasListEntry e : ScrollingCommandAliasesList.getAliases()) {
             if(!e.getKey().isEmpty()) {
                 CommandAliases.aliases.put(e.getKey(), e.getMessage());
-                CommandAliases.saveAliases();
             }
         }
+        CommandAliases.saveAliases();
     }
 
     private void addAlias() {

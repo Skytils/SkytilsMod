@@ -22,7 +22,7 @@ public class ScrollingCommandAliasesList extends GuiScrollingList {
     public ScrollingCommandAliasesList(Minecraft mc, int width, int height, int top, int bottom, int left, int entryHeight,
                                        int screenWidth, int screenHeight) {
         super(mc, width, height, top, bottom, left, entryHeight, screenWidth, screenHeight);
-        this.aliases = new ArrayList<AliasListEntry>();
+        this.aliases = new ArrayList<>();
         this.mc = mc;
     }
 
@@ -114,7 +114,7 @@ public class ScrollingCommandAliasesList extends GuiScrollingList {
     @Override
     protected void drawGradientRect(int left, int top, int right, int bottom, int color1, int color2) { }
 
-    public class AliasListEntry {
+    public static class AliasListEntry {
 
         private final GuiTextField key;
         private final GuiTextField message;

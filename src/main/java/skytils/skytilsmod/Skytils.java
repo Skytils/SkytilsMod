@@ -1,9 +1,15 @@
 package skytils.skytilsmod;
 
+import club.sk1er.mods.core.ModCore;
+import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.command.ICommand;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -18,7 +24,6 @@ import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.SendPacketEvent;
-import skytils.skytilsmod.features.impl.SlayerFeatures;
 import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
@@ -27,14 +32,13 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.events.MayorJerry;
-import skytils.skytilsmod.features.impl.handlers.ArmorColor;
-import skytils.skytilsmod.features.impl.handlers.BlockAbility;
-import skytils.skytilsmod.features.impl.handlers.CommandAliases;
-import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
+import skytils.skytilsmod.features.impl.handlers.*;
+import skytils.skytilsmod.features.impl.mining.DarkModeMist;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
+import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.utils.MayorInfo;
@@ -44,6 +48,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,7 +56,7 @@ import java.util.Objects;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.1.2-pre7";
+    public static final String VERSION = "0.1.2-pre10";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -101,6 +106,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new ClickInOrderSolver());
         MinecraftForge.EVENT_BUS.register(new CommandAliases());
         MinecraftForge.EVENT_BUS.register(new DamageSplash());
+        MinecraftForge.EVENT_BUS.register(new DarkModeMist());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new DungeonTimer());
         MinecraftForge.EVENT_BUS.register(new FarmingFeatures());
@@ -109,6 +115,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new IceFillSolver());
         MinecraftForge.EVENT_BUS.register(new IcePathSolver());
         MinecraftForge.EVENT_BUS.register(new ItemFeatures());
+        MinecraftForge.EVENT_BUS.register(new KeyShortcuts());
         MinecraftForge.EVENT_BUS.register(new LockOrb());
         MinecraftForge.EVENT_BUS.register(new MayorJerry());
         MinecraftForge.EVENT_BUS.register(new MiningFeatures());
@@ -127,9 +134,6 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
         MinecraftForge.EVENT_BUS.register(new TriviaSolver());
         MinecraftForge.EVENT_BUS.register(new WaterBoardSolver());
-
-        ScreenRenderer.refresh();
-
     }
 
     @Mod.EventHandler
@@ -198,8 +202,45 @@ public class Skytils {
 
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent event) {
-        if (event.packet.getClass() == C01PacketChatMessage.class) {
+        if (event.packet instanceof C01PacketChatMessage) {
             lastChatMessage = System.currentTimeMillis();
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderGameOverlay(RenderGameOverlayEvent event) {
+        if (mc.currentScreen instanceof OptionsGui && event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiInitPost(GuiScreenEvent.InitGuiEvent.Post event) {
+        if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu) {
+            int x = event.gui.width - 105;
+            int x2 = x + 100;
+            int y = event.gui.height - 22;
+            int y2 = y + 20;
+            ArrayList<GuiButton> sorted = Lists.newArrayList(event.buttonList);
+            sorted.sort((a, b) -> b.yPosition + b.height - a.yPosition + a.height);
+            for (GuiButton button : sorted) {
+                int otherX = button.xPosition;
+                int otherX2 = button.xPosition + button.width;
+                int otherY = button.yPosition;
+                int otherY2 = button.yPosition + button.height;
+                if (otherX2 > x && otherX < x2 && otherY2 > y && otherY < y2) {
+                    y = otherY - 20 - 2;
+                    y2 = y + 20;
+                }
+            }
+            event.buttonList.add(new GuiButton(6969420, x, Math.max(0, y), 100, 20, "Skytils"));
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiAction(GuiScreenEvent.ActionPerformedEvent.Post event) {
+        if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu && event.button.id == 6969420) {
+            ModCore.getInstance().getGuiHandler().open(new OptionsGui());
         }
     }
 

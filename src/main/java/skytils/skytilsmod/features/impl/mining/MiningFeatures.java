@@ -1,5 +1,6 @@
 package skytils.skytilsmod.features.impl.mining;
 
+import net.minecraft.block.BlockCarpet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -7,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -20,10 +22,12 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.events.BossBarEvent;
+import skytils.skytilsmod.events.RenderBlockInWorldEvent;
 import skytils.skytilsmod.utils.*;
 
 import java.awt.*;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +36,7 @@ public class MiningFeatures {
     public static LinkedHashMap<String, String> fetchurItems = new LinkedHashMap<>();
 
     private static final Minecraft mc = Minecraft.getMinecraft();
-    private static final Pattern EVENT_PATTERN = Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:(?:ACTIVE IN (?<location>.+))|(?:RUNNING)) FOR (?<min>\\d+):(?<sec>\\d+)");
+    private static final Pattern EVENT_PATTERN = Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:(?:ACTIVE IN (?<location>.+))|(?:RUNNING)) (FOR|for) (?<min>\\d+):(?<sec>\\d+)");
 
     private static BlockPos lastJukebox = null;
     private static BlockPos puzzlerSolution = null;
@@ -45,15 +49,18 @@ public class MiningFeatures {
         if (!Utils.inSkyblock) return;
         String unformatted = StringUtils.stripControlCodes(event.displayData.getDisplayName().getUnformattedText());
         if (Skytils.config.raffleWarning) {
-            if (unformatted.startsWith("EVENT RAFFLE ACTIVE IN")) {
+            if (unformatted.contains("EVENT")) {
                 Matcher matcher = EVENT_PATTERN.matcher(unformatted);
                 if (matcher.find()) {
+                    String ev = matcher.group("event");
                     int seconds = Integer.parseInt(matcher.group("min")) * 60 + Integer.parseInt(matcher.group("sec"));
-                    if (seconds <= 15) {
-                        GuiManager.createTitle("§cRaffle ending in §a" + seconds + "s", 20);
-                    }
-                    if (seconds > 1) {
-                        inRaffle = true;
+                    if (Objects.equals(ev, "RAFFLE")) {
+                        if (seconds <= 15) {
+                            GuiManager.createTitle("§cRaffle ending in §a" + seconds + "s", 20);
+                        }
+                        if (seconds > 1) {
+                            inRaffle = true;
+                        }
                     }
                 }
             }
@@ -225,6 +232,17 @@ public class MiningFeatures {
         lastJukebox = null;
         raffleBox = null;
         inRaffle = false;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onGetBlockModel(RenderBlockInWorldEvent event) {
+        if (!Utils.inSkyblock || !Objects.equals(SBInfo.getInstance().getLocation(), "mining_3")) return;
+
+        IBlockState state = event.state;
+
+        if (Skytils.config.recolorCarpets && state.getBlock() == Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.GRAY) {
+            event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED);
+        }
     }
 
 }

@@ -18,15 +18,6 @@ public class Config extends Vigilant {
     public String dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/";
 
     @Property(
-            type = PropertyType.SWITCH,
-            name = "First Launch",
-            description = "Used to see if the user is a new user of Skytils.",
-            category = "General",
-            hidden = true
-    )
-    public boolean firstLaunch = true;
-
-    @Property(
             type = PropertyType.TEXT,
             name = "Hypixel API Key",
             description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.\nSet this with /skytils setkey <key>.",
@@ -44,6 +35,25 @@ public class Config extends Vigilant {
             options = {"Simple", "Advanced"}
     )
     public int commandAliasMode = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "First Launch",
+            description = "Used to see if the user is a new user of Skytils.",
+            category = "General",
+            subcategory = "Other",
+            hidden = true
+    )
+    public boolean firstLaunch = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Config Button on Pause",
+            description = "Adds a button to configure Skytils to the pause menu.",
+            category = "General",
+            subcategory = "Other"
+    )
+    public boolean configButtonOnPause = true;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -147,6 +157,15 @@ public class Config extends Vigilant {
     public boolean removePartyChatNotifFromScoreCalc = false;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Box Skeleton Masters",
+            description = "Draws the bounding box for Skeleton Masters.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean boxSkeletonMasters = false;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Dungeon Chest Reroll Confirmation",
             description = "Requires you to click multiple times in order to reroll a chest.",
@@ -155,6 +174,15 @@ public class Config extends Vigilant {
             max = 5
     )
     public int kismetRerollConfirm = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Hide Damage In Boss",
+            description = "Removes damage numbers while in a boss fight. Requires the custom damage splash to be enabled.",
+            category = "Dungeons",
+            subcategory = "Quality of Life"
+    )
+    public boolean hideDamageInBoss = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -430,7 +458,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Simon Says Solver",
-            description = "§b[WIP] §rShow which buttons to press on the Simon Says device in Floor 7.\n§cKnown bug, if a teammate clicks a button it will not register.",
+            description = "Show which buttons to press on the Simon Says device in Floor 7.\n§cIf a teammate clicks a button it will not register.",
             category = "Dungeons",
             subcategory = "Terminal Solvers"
     )
@@ -448,7 +476,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show Griffin Burrows",
-            description = "§b[WIP] §rShows the location of burrows during the event.",
+            description = "Shows the location of burrows during the event.",
             category = "Events",
             subcategory = "Mythological"
     )
@@ -510,6 +538,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Dark Mode Mist",
+            description = "Replaces colors in The Mist with darker variants.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean darkModeMist = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Disable Pickaxe Ability on Private Island",
             description = "Prevents you from using pickaxe abilities on your island.",
             category = "Mining",
@@ -543,6 +580,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean raffleWaypoint = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Recolor Carpets",
+            description = "Changes the color of carpets in the Dwarven Mines to red.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean recolorCarpets = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -653,6 +699,15 @@ public class Config extends Vigilant {
             subcategory = "Items"
     )
     public boolean showEnchantedBookTier = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show NPC Sell Price",
+            description = "Shows the NPC Sell Price on certain items.",
+            category = "Miscellaneous",
+            subcategory = "Items"
+    )
+    public boolean showNPCSellPrice = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -884,15 +939,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Slayer Miniboss Spawn Alert",
-            description = "Displays a title when a slayer miniboss spawns.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean slayerMinibossSpawnAlert = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "No Fire",
             description = "Removes first-person fire overlay when you are burning.",
             category = "Miscellaneous",
@@ -908,15 +954,6 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean noHurtcam = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Ping when in Atoned Horror Danger Zone",
-            description = "Pings when you are standing on the Atoned Horror's TNT target.",
-            category = "Miscellaneous",
-            subcategory = "Quality of Life"
-    )
-    public boolean rev5TNTPing = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -980,6 +1017,15 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean stopClickingNonSalvageable = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Trick or Treat Chest Alert",
+            description = "Displays a title when any trick or treat chest spawns near you.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean trickOrTreatChestAlert = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -1053,6 +1099,33 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean hideFishingHooks = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Ping when in Atoned Horror Danger Zone",
+            description = "Pings when you are standing on the Atoned Horror's TNT target.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean rev5TNTPing = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Slayer Boss Hitbox",
+            description = "Draws a box around slayer mini-bosses.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerBossHitbox = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Slayer Miniboss Spawn Alert",
+            description = "Displays a title when a slayer miniboss spawns.",
+            category = "Slayer",
+            subcategory = "Quality of Life"
+    )
+    public boolean slayerMinibossSpawnAlert = false;
 
     @Property(
             type = PropertyType.SWITCH,

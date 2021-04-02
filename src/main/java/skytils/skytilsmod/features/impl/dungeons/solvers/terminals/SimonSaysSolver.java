@@ -19,6 +19,7 @@ import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SimonSaysSolver {
 
@@ -31,7 +32,7 @@ public class SimonSaysSolver {
         IBlockState old = event.old;
         IBlockState state = event.update;
         if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver && DungeonsFeatures.dungeonFloor.equals("F7")) {
+            if (Skytils.config.simonSaysSolver && Objects.equals(DungeonsFeatures.dungeonFloor, "F7")) {
                 if (pos.getY() <= 123 && pos.getY() >= 120 && pos.getZ() >= 291 && pos.getZ() <= 294) {
                     if (pos.getX() == 310) {
                         System.out.println(String.format("Block at %s changed to %s from %s", pos, state.getBlock().getLocalizedName(), old.getBlock().getLocalizedName()));
