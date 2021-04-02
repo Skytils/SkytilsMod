@@ -30,22 +30,19 @@ public abstract class MixinSoundManager {
 
     @Redirect(method = "updateAllSounds", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z", remap = false, ordinal = 1))
     private boolean skytilsFixesMojangsGarbage(Iterator<Map.Entry<ISound, Integer>> iterator) {
-        try {
-            delayedSounds.entrySet().removeIf(entry -> {
-                if (this.playTime >= entry.getValue()) {
-                    ISound sound = entry.getKey();
+        delayedSounds.entrySet().removeIf(entry -> {
+            if (this.playTime >= entry.getValue()) {
+                ISound sound = entry.getKey();
 
-                    if (sound instanceof ITickableSound) {
-                        ((ITickableSound)sound).update();
-                    }
-
-                    this.playSound(sound);
-                    return true;
+                if (sound instanceof ITickableSound) {
+                    ((ITickableSound)sound).update();
                 }
-                return false;
-            });
-        } catch (ConcurrentModificationException ignored) {
-        }
+
+                this.playSound(sound);
+                return true;
+            }
+            return false;
+        });
         return false;
     }
 

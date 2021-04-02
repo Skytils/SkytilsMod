@@ -89,7 +89,7 @@ public class SlayerFeatures {
             EntityArmorStand entity = (EntityArmorStand) event.entity;
             if (!entity.hasCustomName()) return;
             String name = entity.getDisplayName().getUnformattedText();
-            if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.contains("§e0§f/§a") && !mc.getRenderManager().isDebugBoundingBox()) {
+            if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.endsWith("§e0§c❤") && !mc.getRenderManager().isDebugBoundingBox()) {
                 double x = entity.posX;
                 double y = entity.posY;
                 double z = entity.posZ;
