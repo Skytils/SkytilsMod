@@ -421,6 +421,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Find correct Livid",
+            description = "Shows the hp of the correct livid on F5 and M5",
+            category = "Dungeons",
+            subcategory = "Solvers"
+    )
+    public boolean findCorrectLivid = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Block Incorrect Terminal Clicks",
             description = "Blocks incorrect clicks on terminals.",
             category = "Dungeons",
