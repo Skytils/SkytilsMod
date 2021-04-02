@@ -103,22 +103,7 @@ public class DungeonsFeatures {
                 }
             }
             if (Skytils.config.findCorrectLivid && !foundLivid) {
-                boolean inF5 = false;
-                boolean inM5 = false;
-
-                List<String> scoreboard = ScoreboardUtil.getSidebarLines();
-                for (String s : scoreboard) {
-                    String sCleaned = ScoreboardUtil.cleanSB(s);
-                    if (sCleaned.contains("The Catacombs (F5)")) {
-                        inF5 = true;
-                        break;
-                    } else if (sCleaned.contains("The Catacombs (M5)")) {
-                        inM5 = true;
-                        break;
-                    }
-                }
-
-                if (inF5 || inM5) {
+                if (Objects.equals(dungeonFloor, "F5") || Objects.equals(dungeonFloor, "M5")) {
                     List<Entity> loadedLivids = new ArrayList<>();
                     List<Entity> entities = mc.theWorld.getLoadedEntityList();
                     for (Entity entity : entities) {
