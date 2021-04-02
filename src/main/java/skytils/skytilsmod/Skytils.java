@@ -42,7 +42,6 @@ import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
-import skytils.skytilsmod.features.impl.trackers.GhostTracker;
 import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
@@ -114,7 +113,6 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new DarkModeMist());
         MinecraftForge.EVENT_BUS.register(new DungeonsFeatures());
         MinecraftForge.EVENT_BUS.register(new DungeonTimer());
-        MinecraftForge.EVENT_BUS.register(new GhostTracker());
         MinecraftForge.EVENT_BUS.register(new FarmingFeatures());
         MinecraftForge.EVENT_BUS.register(new GlintCustomizer());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrows());
@@ -198,7 +196,6 @@ public class Skytils {
             if (mc.thePlayer != null) {
                 Utils.checkForSkyblock();
                 Utils.checkForDungeons();
-                Utils.checkForMist();
             }
             ticks = 0;
         }

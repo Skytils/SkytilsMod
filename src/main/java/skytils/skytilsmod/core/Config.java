@@ -1404,24 +1404,6 @@ public class Config extends Vigilant {
     )
     public int blessingBaitHider = 0;
 
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Reset Trackers on World Change",
-            description = "Resets place-specific trackers such as Ghost Tracker after swapping lobbies",
-            category = "Trackers",
-            subcategory = "Miscellaneous"
-    )
-    public boolean resetTrackers = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Ghosts Drops Tracker",
-            description = "Tracks the drops of Ghosts \n\u00a7cOnly shows while in The Mist.",
-            category = "Trackers",
-            subcategory = "Combat"
-    )
-    public boolean GhostTracker = false;
-
     public Config() {
         super(new File("./config/skytils/config.toml"));
         initialize();

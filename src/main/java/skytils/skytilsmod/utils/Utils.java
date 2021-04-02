@@ -19,7 +19,6 @@ public class Utils {
 
     public static boolean inSkyblock = false;
     public static boolean inDungeons = false;
-    public static boolean inMist = false;
     public static boolean shouldBypassVolume = false;
 
     static Random random = new Random();
@@ -75,20 +74,6 @@ public class Utils {
             }
         }
         inDungeons = false;
-    }
-
-    public static void checkForMist() {
-        if (inSkyblock) {
-            List<String> scoreboard = ScoreboardUtil.getSidebarLines();
-            for (String s : scoreboard) {
-                String sCleaned = ScoreboardUtil.cleanSB(s);
-                if (sCleaned.contains("The Mist")) {
-                    inMist = true;
-                    return;
-                }
-            }
-        }
-        inMist = false;
     }
 
     public static Slot getSlotUnderMouse(GuiContainer gui) {
