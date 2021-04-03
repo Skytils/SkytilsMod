@@ -548,7 +548,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Dark Mode Mist",
-            description = "Replaces colors in The Mist with darker variants.",
+            description = "Replaces colors in The Mist with darker variants.\n§cThis requires a chunk reload when toggled (F3+A).",
             category = "Mining",
             subcategory = "Quality of Life"
     )
@@ -593,7 +593,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Recolor Carpets",
-            description = "Changes the color of carpets in the Dwarven Mines to red.",
+            description = "Changes the color of carpets in the Dwarven Mines to red.\n§cThis requires a chunk reload when toggled (F3+A).",
             category = "Mining",
             subcategory = "Quality of Life"
     )
