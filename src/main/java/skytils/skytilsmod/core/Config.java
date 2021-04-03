@@ -57,6 +57,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Reopen Options Menu",
+            description = "Sets the menu to the Skytils options menu instead of exiting when on a Skytils config menu.",
+            category = "General",
+            subcategory = "Other"
+    )
+    public boolean reopenOptionsMenu = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Override other reparty commands",
             description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to work",
             category = "General",
