@@ -65,7 +65,7 @@ public class ItemFeatures {
             ContainerChest chest = (ContainerChest) gui.inventorySlots;
             IInventory inv = chest.getLowerChestInventory();
             String chestName = inv.getDisplayName().getUnformattedText().trim();
-            if (chestName.startsWith("Salvage")) {
+            if (chestName.startsWith("Salvage") || chestName.contains("Backpack")) {
                 if (Skytils.config.highlightSalvageableItems) {
                     for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
                         ItemStack stack = slot.getStack();
@@ -74,6 +74,18 @@ public class ItemFeatures {
                         if (extraAttr == null || !extraAttr.hasKey("baseStatBoostPercentage") || extraAttr.hasKey("dungeon_item_level"))
                             continue;
                         RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(15, 233, 233, 225).getRGB());
+                    }
+                }
+            }
+            if (chestName.startsWith("Ophelia") ||chestName.startsWith("Trades")) {
+                if (Skytils.config.highlightDungeonSellableItems) {
+                    for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
+                        ItemStack stack = slot.getStack();
+                        if (stack == null) continue;
+                        if (stack.getDisplayName().contains("Health Potion"))
+                            RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 225, 30, 255).getRGB());
+                        else if (stack.getDisplayName().contains("Mimic Fragment") || stack.getDisplayName().contains("Training Weights") || stack.getDisplayName().contains("Journal Entry") || stack.getDisplayName().contains("Defuse Kit"))
+                            RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 50, 150, 255).getRGB());
                     }
                 }
             }

@@ -67,7 +67,7 @@ public class Utils {
             List<String> scoreboard = ScoreboardUtil.getSidebarLines();
             for (String s : scoreboard) {
                 String sCleaned = ScoreboardUtil.cleanSB(s);
-                if (sCleaned.contains("The Catacombs")) {
+                if (sCleaned.contains("The Catacombs") || sCleaned.contains("Dungeon Cleared:")) {
                     inDungeons = true;
                     return;
                 }

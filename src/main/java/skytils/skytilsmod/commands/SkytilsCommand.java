@@ -133,7 +133,7 @@ public class SkytilsCommand extends CommandBase {
                             " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
                             " §2§l ❣ §7§oThe current mod version is §f§o" + Skytils.VERSION + "§7§o." + "\n" +
                             "§9§l➜ Setup:" + "\n" +
-                            " §3/skytils §l➡ §bOpens the main mod GUI." + "\n" +
+                            " §3/skytils §l➡ §bOpens the main mod GUI. §7(Alias: §f/st§7)" + "\n" +
                             " §3/skytils config §l➡ §bOpens the configuration GUI." + "\n" +
                             " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
                             " §3/skytils help §l➡ §bShows this help menu." + "\n" +
@@ -144,11 +144,11 @@ public class SkytilsCommand extends CommandBase {
                             " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
                             " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
                             "§9§l➜ Color and Glint" + "\n" +
-                    	      " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armorcolour§7)" + "\n" +
-                    	      " §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
-                    	      " §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
+                    		" §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)" + "\n" +
+                    		" §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
+                    		" §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
                             "§9§l➜ Miscellaneous:" + "\n" +
-                            " §3/reparty §l➡ §bDisbands and re-invites everyone in your party." + "\n" +
+                            " §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)" + "\n" +
                             " §3/blockability <clearall> §l➡ §bDisables the ability for the item in your hand."));
                     return;
                 }

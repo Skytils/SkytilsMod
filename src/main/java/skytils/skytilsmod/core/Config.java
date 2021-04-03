@@ -948,6 +948,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Highlight Dungeon-Sellable Items",
+            description = "Highlights dungeon-sellable items such as training weights in Ophelia NPC or Trades menu.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean highlightDungeonSellableItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "No Fire",
             description = "Removes first-person fire overlay when you are burning.",
             category = "Miscellaneous",
