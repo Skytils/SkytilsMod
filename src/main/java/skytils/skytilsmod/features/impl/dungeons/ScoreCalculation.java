@@ -46,6 +46,8 @@ public class ScoreCalculation {
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static int ticks = 0;
 
+    private static final Pattern JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}");
+
     @SubscribeEvent
     public void onAddChatMessage(AddChatMessageEvent event) {
         if (!Utils.inDungeons) return;
@@ -54,18 +56,21 @@ public class ScoreCalculation {
             if (unformatted.equals("null") || unformatted.startsWith("Dungeon Rooms: Use this command in dungeons")) {
                 event.setCanceled(true);
             }
-            if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
-                JsonObject obj = new Gson().fromJson(unformatted, JsonObject.class);
-                if (obj.has("name") && obj.has("category") && obj.has("secrets")) {
-                    String name = obj.get("name").getAsString();
-                    int secrets = obj.get("secrets").getAsInt();
-                    if (!ScoreCalculation.rooms.containsKey(name)) {
-                        ScoreCalculation.rooms.put(name, secrets);
-                        if (Skytils.config.scoreCalculationAssist) {
-                            Skytils.sendMessageQueue.add("/pc $SKYTILS-DUNGEON-SCORE-ROOM$: [" + name + "] (" + secrets + ")");
+            if (event.message.getUnformattedText().contains("{") && event.message.getUnformattedText().contains("}")) {
+                Matcher matcher = JSON_BRACKET_PATTERN.matcher(event.message.getUnformattedText());
+                if(matcher.find()) {
+                    JsonObject obj = new Gson().fromJson(unformatted, JsonObject.class);
+                    if (obj.has("name") && obj.has("category") && obj.has("secrets")) {
+                        String name = obj.get("name").getAsString();
+                        int secrets = obj.get("secrets").getAsInt();
+                        if (!ScoreCalculation.rooms.containsKey(name)) {
+                            ScoreCalculation.rooms.put(name, secrets);
+                            if (Skytils.config.scoreCalculationAssist) {
+                                Skytils.sendMessageQueue.add("/pc $SKYTILS-DUNGEON-SCORE-ROOM$: [" + name + "] (" + secrets + ")");
+                            }
                         }
+                        event.setCanceled(true);
                     }
-                    event.setCanceled(true);
                 }
             }
         } catch (Exception e) {
@@ -77,13 +82,16 @@ public class ScoreCalculation {
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
 
-        if (Utils.inDungeons && ticks % 30 == 0 && mc.thePlayer != null && mc.theWorld != null) {
-            if (!DungeonsFeatures.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
-                ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json");
+        if (ticks % 30 == 0) {
+            if (Utils.inDungeons && mc.thePlayer != null && mc.theWorld != null) {
+                if (!DungeonsFeatures.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
+                    ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json");
+                }
             }
             ticks = 0;
         }
 
+        ticks++;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

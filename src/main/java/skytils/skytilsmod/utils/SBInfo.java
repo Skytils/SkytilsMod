@@ -93,19 +93,21 @@ public class SBInfo {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     public void onChatMessage(ClientChatReceivedEvent event) {
-        Matcher matcher = JSON_BRACKET_PATTERN.matcher(event.message.getUnformattedText());
-        if(matcher.find()) {
-            try {
-                JsonObject obj = new Gson().fromJson(matcher.group(), JsonObject.class);
-                if(obj.has("server")) {
-                    if(System.currentTimeMillis() - lastManualLocRaw > 5000) event.setCanceled(true);
-                    if(obj.has("gametype") && obj.has("mode") && obj.has("map")) {
-                        locraw = obj;
-                        mode = locraw.get("mode").getAsString();
+        if (event.message.getUnformattedText().contains("{") && event.message.getUnformattedText().contains("}")) {
+            Matcher matcher = JSON_BRACKET_PATTERN.matcher(event.message.getUnformattedText());
+            if(matcher.find()) {
+                try {
+                    JsonObject obj = new Gson().fromJson(matcher.group(), JsonObject.class);
+                    if(obj.has("server")) {
+                        if(System.currentTimeMillis() - lastManualLocRaw > 5000) event.setCanceled(true);
+                        if(obj.has("gametype") && obj.has("mode") && obj.has("map")) {
+                            locraw = obj;
+                            mode = locraw.get("mode").getAsString();
+                        }
                     }
+                } catch(Exception e) {
+                    e.printStackTrace();
                 }
-            } catch(Exception e) {
-                e.printStackTrace();
             }
         }
     }
