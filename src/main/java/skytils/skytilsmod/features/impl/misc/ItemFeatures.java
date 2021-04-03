@@ -1,6 +1,5 @@
 package skytils.skytilsmod.features.impl.misc;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
@@ -8,11 +7,9 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -77,7 +74,7 @@ public class ItemFeatures {
                     }
                 }
             }
-            if (chestName.startsWith("Ophelia") ||chestName.startsWith("Trades")) {
+            if (chestName.startsWith("Ophelia") || chestName.startsWith("Trades")) {
                 if (Skytils.config.highlightDungeonSellableItems) {
                     for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
                         ItemStack stack = slot.getStack();

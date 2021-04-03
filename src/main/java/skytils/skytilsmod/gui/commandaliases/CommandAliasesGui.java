@@ -44,8 +44,10 @@ public class CommandAliasesGui extends GuiScreen {
         }
 
         if(button.id == 9000) {
-            mc.thePlayer.closeScreen();
+            if (mc.thePlayer != null) mc.thePlayer.closeScreen();
+            else mc.displayGuiScreen(null);
         }
+
         if(button.id == 9001) {
             addAlias();
         }
