@@ -322,7 +322,7 @@ public class ScoreCalculation {
                 text.add("§6Secrets Found:§a " + foundSecrets);
                 if (totalSecrets != 0) text.add("§6Estimated Secret Count:§a " + totalSecrets);
                 text.add("§6Crypts:§a " + crypts);
-                if (DungeonsFeatures.dungeonFloor.equals("F6") || DungeonsFeatures.dungeonFloor.equals("F7")) {
+                if (Utils.equalsOneOf(DungeonsFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
                     text.add("§6Mimic Killed:" + (ScoreCalculation.mimicKilled ? "§a ✓" : " §c X"));
                 }
                 if (isPaul) {

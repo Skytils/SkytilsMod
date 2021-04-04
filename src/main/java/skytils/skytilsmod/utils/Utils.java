@@ -8,9 +8,12 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class Utils {
@@ -111,6 +114,19 @@ public class Utils {
         shouldBypassVolume = true;
         mc.thePlayer.playSound(sound, 1, (float) pitch);
         shouldBypassVolume = false;
+    }
+
+    /**
+     * Checks if an object is equal to any of the other objects
+     * @param object Object to compare
+     * @param other Objects being compared
+     * @return boolean
+     */
+    public static boolean equalsOneOf(@Nullable Object object, @NotNull Object... other) {
+        for (Object obj : other) {
+            if (Objects.deepEquals(object, obj)) return true;
+        }
+        return false;
     }
 
 }

@@ -103,7 +103,7 @@ public class DungeonsFeatures {
                 }
             }
             if (Skytils.config.findCorrectLivid && !foundLivid) {
-                if (Objects.equals(dungeonFloor, "F5") || Objects.equals(dungeonFloor, "M5")) {
+                if (Utils.equalsOneOf(dungeonFloor, "F5", "M5")) {
                     List<Entity> loadedLivids = new ArrayList<>();
                     List<Entity> entities = mc.theWorld.getLoadedEntityList();
                     for (Entity entity : entities) {

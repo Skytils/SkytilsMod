@@ -3,6 +3,7 @@ package skytils.skytilsmod.features.impl.handlers;
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.graphics.colors.ColorFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -31,7 +32,7 @@ public class ArmorColor {
         try (FileReader in = new FileReader(colorFile)) {
             dataObject = gson.fromJson(in, JsonObject.class);
             for (Map.Entry<String, JsonElement> colors : dataObject.entrySet()) {
-                armorColors.put(colors.getKey(), Color.decode(colors.getValue().getAsString()));
+                armorColors.put(colors.getKey(), ColorFactory.web(colors.getValue().getAsString()));
             }
         } catch (Exception e) {
             dataObject = new JsonObject();
@@ -47,7 +48,8 @@ public class ArmorColor {
         try (FileWriter writer = new FileWriter(colorFile)) {
             JsonObject obj = new JsonObject();
             for (Map.Entry<String, Color> colors : armorColors.entrySet()) {
-                obj.addProperty(colors.getKey(), String.format("#%06X", (0xFFFFFF & colors.getValue().getRGB())));
+                Color color = colors.getValue();
+                obj.addProperty(colors.getKey(), "rgba("+color.getRed()+","+color.getBlue()+","+color.getGreen()+","+color.getAlpha()+")");
             }
             gson.toJson(obj, writer);
         } catch (Exception ex) {

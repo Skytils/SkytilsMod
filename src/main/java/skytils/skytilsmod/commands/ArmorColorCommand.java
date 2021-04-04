@@ -2,10 +2,7 @@ package skytils.skytilsmod.commands;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.*;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,6 +11,7 @@ import net.minecraft.util.ChatComponentText;
 import skytils.skytilsmod.features.impl.handlers.ArmorColor;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.colors.ColorFactory;
 
 import java.awt.*;
 import java.util.List;
@@ -84,9 +82,9 @@ public class ArmorColorCommand extends CommandBase {
             String uuid = extraAttributes.getString("uuid");
             Color color;
             try {
-                 color = Color.decode(args[1]);
-            } catch (NumberFormatException e) {
-                throw new WrongUsageException("You must specify a valid hex color!");
+                color = ColorFactory.web(args[1]);
+            } catch (IllegalArgumentException e) {
+                throw new SyntaxErrorException("Unable to get a color from inputted string.");
             }
             ArmorColor.armorColors.put(uuid, color);
             ArmorColor.saveColors();
