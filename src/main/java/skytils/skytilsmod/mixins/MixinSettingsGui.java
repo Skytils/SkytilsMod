@@ -2,7 +2,6 @@ package skytils.skytilsmod.mixins;
 
 import club.sk1er.mods.core.ModCore;
 import club.sk1er.vigilance.Vigilant;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import net.minecraft.client.gui.GuiScreen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
