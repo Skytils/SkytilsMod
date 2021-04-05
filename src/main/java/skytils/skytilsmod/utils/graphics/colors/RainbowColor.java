@@ -3,6 +3,7 @@ package skytils.skytilsmod.utils.graphics.colors;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class RainbowColor extends CustomColor {
 
@@ -96,6 +97,6 @@ public class RainbowColor extends CustomColor {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Arrays.hashCode(new float[]{ speed, offset, saturation, brightness });
     }
 }
