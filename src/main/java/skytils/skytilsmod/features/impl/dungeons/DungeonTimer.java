@@ -60,13 +60,13 @@ public class DungeonTimer {
 
         if (message.equals("§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r") || (message.startsWith("§r§c[BOSS] The Watcher§r§f") && bloodOpenTime == -1)) {
             bloodOpenTime = System.currentTimeMillis();
-            mc.thePlayer.addChatMessage(new ChatComponentText("§bBlood took " + Math.round((bloodOpenTime - dungeonStartTime) / 1000f) + " seconds to open."));
+            if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(new ChatComponentText("§bBlood took " + Math.round((bloodOpenTime - dungeonStartTime) / 1000f) + " seconds to open."));
             return;
         }
 
         if (message.equals("§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r")) {
             bloodClearTime = System.currentTimeMillis();
-            mc.thePlayer.addChatMessage(new ChatComponentText("§bWatcher took " + Math.round((bloodClearTime - bloodOpenTime) / 1000f) + " seconds to clear."));
+            if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(new ChatComponentText("§bWatcher took " + Math.round((bloodClearTime - bloodOpenTime) / 1000f) + " seconds to clear."));
             return;
         }
 
@@ -76,7 +76,7 @@ public class DungeonTimer {
         }
 
         if (message.contains("§r§c☠ §r§eDefeated §r") && bossEntryTime != -1 && bossClearTime == -1) {
-            bossClearTime = System.currentTimeMillis();
+            if (Skytils.config.dungeonTimer) bossClearTime = System.currentTimeMillis();
             mc.thePlayer.addChatMessage(new ChatComponentText("§7Wither Doors: " + witherDoors + "\n" +
                     "§cBlood took " + Math.round((bloodOpenTime - dungeonStartTime) / 1000f) + " seconds to open." + "\n" +
                     "§bWatcher took " + Math.round((bloodClearTime - bloodOpenTime) / 1000f) + " seconds to clear." + "\n" +
@@ -87,17 +87,17 @@ public class DungeonTimer {
         if (message.startsWith("§r§4[BOSS] Necron") && Objects.equals(DungeonsFeatures.dungeonFloor, "F7")) {
             if (message.endsWith("§r§cFINE! LET'S MOVE TO SOMEWHERE ELSE!!§r") && phase1ClearTime == -1) {
                 phase1ClearTime = System.currentTimeMillis();
-                mc.thePlayer.addChatMessage(new ChatComponentText("§bPhase 1 took " + Math.round((phase1ClearTime - bossEntryTime) / 1000f) + " seconds."));
+                if (Skytils.config.necronPhaseTimer) mc.thePlayer.addChatMessage(new ChatComponentText("§bPhase 1 took " + Math.round((phase1ClearTime - bossEntryTime) / 1000f) + " seconds."));
                 return;
             }
             if (message.endsWith("§r§cCRAP!! IT BROKE THE FLOOR!§r") && phase2ClearTime == -1) {
                 phase2ClearTime = System.currentTimeMillis();
-                mc.thePlayer.addChatMessage(new ChatComponentText("§bPhase 2 took " + Math.round((phase2ClearTime - phase1ClearTime) / 1000f) + " seconds."));
+                if (Skytils.config.necronPhaseTimer) mc.thePlayer.addChatMessage(new ChatComponentText("§bPhase 2 took " + Math.round((phase2ClearTime - phase1ClearTime) / 1000f) + " seconds."));
                 return;
             }
             if (message.endsWith("§r§cTHAT'S IT YOU HAVE DONE IT!§r") && phase3ClearTime == -1) {
                 phase3ClearTime = System.currentTimeMillis();
-                mc.thePlayer.addChatMessage(new ChatComponentText("§bPhase 3 took " + Math.round((phase3ClearTime - phase2ClearTime) / 1000f) + " seconds."));
+                if (Skytils.config.necronPhaseTimer) mc.thePlayer.addChatMessage(new ChatComponentText("§bPhase 3 took " + Math.round((phase3ClearTime - phase2ClearTime) / 1000f) + " seconds."));
                 return;
             }
         }
