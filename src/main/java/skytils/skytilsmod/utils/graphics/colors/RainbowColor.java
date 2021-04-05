@@ -31,15 +31,20 @@ public class RainbowColor extends CustomColor {
     }
 
     public static RainbowColor fromString(String string) {
-        if (string == null || !string.startsWith("rainbow(")) return null;
-        int first = string.indexOf(",");
-        int second = string.indexOf(",", first + 1);
-        int third = string.lastIndexOf(",");
-        int speed = Integer.parseInt(string.substring(string.indexOf("(") + 1, first));
-        int offset = Integer.parseInt(string.substring(first + 1, second));
-        float saturation = Integer.parseInt(string.substring(second + 1, third));
-        float brightness = Integer.parseInt(string.substring(third + 1, string.indexOf(")")));
-        return new RainbowColor(speed, offset, saturation, brightness);
+        if (string == null) throw new NullPointerException("Argument cannot be null!");
+        if (!string.startsWith("rainbow(") && !string.endsWith(")")) throw new IllegalArgumentException("Invalid rainbow color format");
+        try {
+            int first = string.indexOf(",");
+            int second = string.indexOf(",", first + 1);
+            int third = string.lastIndexOf(",");
+            int speed = Integer.parseInt(string.substring(string.indexOf("(") + 1, first));
+            int offset = Integer.parseInt(string.substring(first + 1, second));
+            float saturation = Float.parseFloat(string.substring(second + 1, third));
+            float brightness = Float.parseFloat(string.substring(third + 1, string.indexOf(")")));
+            return new RainbowColor(speed, offset, saturation, brightness);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Invalid rainbow string");
+        }
     }
 
     @Override

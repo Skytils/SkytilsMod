@@ -129,7 +129,7 @@ public class Utils {
      */
     public static boolean equalsOneOf(@Nullable Object object, @NotNull Object... other) {
         for (Object obj : other) {
-            if (Objects.deepEquals(object, obj)) return true;
+            if (Objects.equals(object, obj)) return true;
         }
         return false;
     }
