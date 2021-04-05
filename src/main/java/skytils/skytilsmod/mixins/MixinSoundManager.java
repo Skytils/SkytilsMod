@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ConcurrentModificationException;
@@ -28,22 +30,29 @@ public abstract class MixinSoundManager {
         if (Utils.shouldBypassVolume) cir.setReturnValue(1f);
     }
 
-    @Redirect(method = "updateAllSounds", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z", remap = false, ordinal = 1))
+    @Redirect(method = "updateAllSounds", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z", remap = false, ordinal = 2))
     private boolean skytilsFixesMojangsGarbage(Iterator<Map.Entry<ISound, Integer>> iterator) {
-        delayedSounds.entrySet().removeIf(entry -> {
-            if (this.playTime >= entry.getValue()) {
-                ISound sound = entry.getKey();
+        if (Skytils.config.soundManagerCMEFix) {
+            try {
+                delayedSounds.entrySet().removeIf(entry -> {
+                    if (this.playTime >= entry.getValue()) {
+                        ISound sound = entry.getKey();
 
-                if (sound instanceof ITickableSound) {
-                    ((ITickableSound)sound).update();
-                }
+                        if (sound instanceof ITickableSound) {
+                            ((ITickableSound)sound).update();
+                        }
 
-                this.playSound(sound);
-                return true;
+                        this.playSound(sound);
+                        return true;
+                    }
+                    return false;
+                });
+            } catch (ConcurrentModificationException e) {
+                e.printStackTrace();
             }
             return false;
-        });
-        return false;
+        }
+        return iterator.hasNext();
     }
 
 }
