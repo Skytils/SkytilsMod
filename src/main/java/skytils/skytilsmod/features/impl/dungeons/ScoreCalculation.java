@@ -23,7 +23,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.AddChatMessageEvent;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.utils.*;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
@@ -150,7 +150,7 @@ public class ScoreCalculation {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inDungeons) return;
         if (event.packet instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;

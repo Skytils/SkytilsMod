@@ -15,7 +15,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.events.SendPacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -212,7 +212,7 @@ public class BoulderSolver {
     }
 
     @SubscribeEvent
-    public void onSendPacket(SendPacketEvent event) {
+    public void onSendPacket(PacketEvent.SendEvent event) {
         if (!Utils.inDungeons) return;
         if (event.packet instanceof C08PacketPlayerBlockPlacement) {
             C08PacketPlayerBlockPlacement packet = (C08PacketPlayerBlockPlacement) event.packet;

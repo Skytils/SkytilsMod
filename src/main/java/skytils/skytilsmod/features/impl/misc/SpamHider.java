@@ -14,7 +14,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.events.SetActionBarEvent;
 import skytils.skytilsmod.mixins.AccessorGuiNewChat;
 import skytils.skytilsmod.utils.Utils;
@@ -41,10 +41,10 @@ public class SpamHider {
     private int abilityUses = 0;
     private String lastAbilityUsed = "";
 
-    private static void cancelChatPacket(ReceivePacketEvent receivePacketEvent, boolean addToSpam) {
-        if (!(receivePacketEvent.packet instanceof S02PacketChat)) return;
-        receivePacketEvent.setCanceled(true);
-        S02PacketChat packet = ((S02PacketChat) receivePacketEvent.packet);
+    private static void cancelChatPacket(PacketEvent.ReceiveEvent ReceivePacketEvent, boolean addToSpam) {
+        if (!(ReceivePacketEvent.packet instanceof S02PacketChat)) return;
+        ReceivePacketEvent.setCanceled(true);
+        S02PacketChat packet = ((S02PacketChat) ReceivePacketEvent.packet);
         if (addToSpam) newMessage(packet.getChatComponent().getFormattedText());
         MinecraftForge.EVENT_BUS.post(new ClientChatReceivedEvent(packet.getType(), packet.getChatComponent()));
     }
@@ -88,7 +88,7 @@ public class SpamHider {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    public void onChatPacket(ReceivePacketEvent event) {
+    public void onChatPacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         if (!(event.packet instanceof S02PacketChat)) return;
         S02PacketChat packet = (S02PacketChat) event.packet;

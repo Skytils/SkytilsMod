@@ -23,7 +23,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.DamageBlockEvent;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.SBInfo;
@@ -247,7 +247,7 @@ public class GriffinBurrows {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet instanceof S2APacketParticles) {
             if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("hub")) return;

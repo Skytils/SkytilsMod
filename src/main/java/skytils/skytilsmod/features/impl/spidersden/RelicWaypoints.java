@@ -17,8 +17,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
-import skytils.skytilsmod.events.ReceivePacketEvent;
-import skytils.skytilsmod.events.SendPacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
@@ -76,7 +75,7 @@ public class RelicWaypoints {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         if (event.packet instanceof S2APacketParticles) {
             S2APacketParticles packet = (S2APacketParticles) event.packet;
@@ -104,7 +103,7 @@ public class RelicWaypoints {
     }
 
     @SubscribeEvent
-    public void onSendPacket(SendPacketEvent event) {
+    public void onSendPacket(PacketEvent.SendEvent event) {
         if (!Utils.inSkyblock) return;
         if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("combat_1")) return;
         if (event.packet instanceof C08PacketPlayerBlockPlacement) {

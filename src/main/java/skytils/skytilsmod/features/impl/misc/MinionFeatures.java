@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -36,7 +36,7 @@ public class MinionFeatures {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         if (event.packet instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;

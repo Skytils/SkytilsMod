@@ -29,7 +29,7 @@ import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.features.impl.handlers.BlockAbility;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
@@ -240,7 +240,7 @@ public class ItemFeatures {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         try {
             if (event.packet instanceof S2APacketParticles) {

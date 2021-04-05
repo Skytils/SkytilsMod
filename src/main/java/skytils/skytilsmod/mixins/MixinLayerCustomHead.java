@@ -69,7 +69,7 @@ public class MixinLayerCustomHead {
                 }
                 GlStateManager.enableAlpha();
                 GlStateManager.enableBlend();
-                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);;
+                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
                 GlStateManager.color(1, 1, 1, MathUtil.clamp(Skytils.config.transparentHeadLayer / 100f, 0, 1));
             }
         }

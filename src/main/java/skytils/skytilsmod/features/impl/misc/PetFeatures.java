@@ -22,7 +22,7 @@ import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
-import skytils.skytilsmod.events.SendPacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class PetFeatures {
 
@@ -80,7 +79,7 @@ public class PetFeatures {
     }
 
     @SubscribeEvent
-    public void onSendPacket(SendPacketEvent event) {
+    public void onSendPacket(PacketEvent.SendEvent event) {
         if (!Utils.inSkyblock) return;
 
         if (Skytils.config.petItemConfirmation && (event.packet instanceof C02PacketUseEntity || event.packet instanceof C08PacketPlayerBlockPlacement)) {

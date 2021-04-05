@@ -28,7 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -45,7 +44,7 @@ import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 import skytils.skytilsmod.utils.*;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
@@ -376,7 +375,7 @@ public class DungeonsFeatures {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         if (event.packet instanceof S45PacketTitle) {
             S45PacketTitle packet = (S45PacketTitle) event.packet;

@@ -29,7 +29,7 @@ import java.util.Locale;
 
 public class SkytilsCommand extends CommandBase {
 
-    private static ArmorColorCommand acc = new ArmorColorCommand();
+    private static final ArmorColorCommand acc = new ArmorColorCommand();
 
     @Override
     public String getCommandName() {

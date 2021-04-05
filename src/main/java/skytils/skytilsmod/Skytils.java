@@ -23,7 +23,7 @@ import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.core.UpdateChecker;
-import skytils.skytilsmod.events.SendPacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.BossHPDisplays;
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
@@ -201,7 +201,7 @@ public class Skytils {
     }
 
     @SubscribeEvent
-    public void onSendPacket(SendPacketEvent event) {
+    public void onSendPacket(PacketEvent.SendEvent event) {
         if (event.packet instanceof C01PacketChatMessage) {
             lastChatMessage = System.currentTimeMillis();
         }

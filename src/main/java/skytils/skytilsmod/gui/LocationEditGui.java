@@ -1,5 +1,6 @@
 package skytils.skytilsmod.gui;
 
+import club.sk1er.mods.core.ModCore;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -103,5 +104,6 @@ public class LocationEditGui extends GuiScreen {
     @Override
     public void onGuiClosed() {
         GuiManager.saveConfig();
+        ModCore.getInstance().getGuiHandler().open(new OptionsGui());
     }
 }

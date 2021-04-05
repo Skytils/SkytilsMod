@@ -1,6 +1,5 @@
 package skytils.skytilsmod.features.impl.misc;
 
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.BlockEndPortalFrame;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -40,7 +39,7 @@ import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
-import skytils.skytilsmod.events.ReceivePacketEvent;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.*;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
@@ -48,7 +47,6 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MiscFeatures {
 
@@ -145,7 +143,7 @@ public class MiscFeatures {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(PacketEvent.ReceiveEvent event) {
         if (!Utils.inSkyblock) return;
         if (event.packet instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
