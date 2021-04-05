@@ -55,7 +55,7 @@ public class MiningFeatures {
                     String ev = matcher.group("event");
                     int seconds = Integer.parseInt(matcher.group("min")) * 60 + Integer.parseInt(matcher.group("sec"));
                     if (Objects.equals(ev, "RAFFLE")) {
-                        if (seconds <= 15 && !GuiManager.title.equals("§cRaffle ending in §a" + seconds + "s")) {
+                        if (seconds <= 15 && !Objects.equals(GuiManager.title, "§cRaffle ending in §a" + seconds + "s")) {
                             GuiManager.createTitle("§cRaffle ending in §a" + seconds + "s", 20);
                         }
                         if (seconds > 1) {
