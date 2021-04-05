@@ -184,10 +184,10 @@ public class CustomColor {
         return new CustomColor(Byte.toUnsignedInt(r) / 255f, Byte.toUnsignedInt(g) / 255f, Byte.toUnsignedInt(b) / 255f, a);
     }
 
-    /** HeyZeer0: this is = rgba(1,1,1,1) **/
+    /** this is = rgba(255,255,255,255) **/
     @Override
     public String toString() {
-        return "rgba(" + r + "," + g + "," + b + "," + a +")";
+        return "rgba(" + (int)(r*255) + "," + (int)(g*255) + "," + (int)(b*255) + "," + (int)(a*255) +")";
     }
 
     @Override
