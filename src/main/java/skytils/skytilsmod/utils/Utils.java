@@ -135,14 +135,21 @@ public class Utils {
     }
 
     public static CustomColor customColorFromString(String string) {
+        if (string == null) throw new NullPointerException("Argument cannot be null!");
         if (string.startsWith("rainbow(")) {
             return RainbowColor.fromString(string);
         }
 
-        CustomColor color = null;
+        CustomColor color;
         try {
             color = getCustomColorFromColor(ColorFactory.web(string));
-        } catch (Throwable ignored) {}
+        } catch (IllegalArgumentException e) {
+            try {
+                color = CustomColor.fromInt(Integer.parseInt(string));
+            } catch(NumberFormatException ignored) {
+                throw e;
+            }
+        }
         return color;
     }
 
