@@ -10,7 +10,12 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import skytils.skytilsmod.utils.graphics.colors.ColorFactory;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
+import skytils.skytilsmod.utils.graphics.colors.CustomColor;
+import skytils.skytilsmod.utils.graphics.colors.RainbowColor;
 
+import java.awt.*;
 import java.io.*;
 import java.util.List;
 import java.util.Objects;
@@ -127,6 +132,22 @@ public class Utils {
             if (Objects.deepEquals(object, obj)) return true;
         }
         return false;
+    }
+
+    public static CustomColor customColorFromString(String string) {
+        if (string.startsWith("rainbow(")) {
+            return RainbowColor.fromString(string);
+        }
+
+        CustomColor color = null;
+        try {
+            color = getCustomColorFromColor(ColorFactory.web(string));
+        } catch (Throwable ignored) {}
+        return color;
+    }
+
+    public static CustomColor getCustomColorFromColor(Color color) {
+        return CustomColor.fromInt(color.getRGB());
     }
 
 }

@@ -1,10 +1,7 @@
 package skytils.skytilsmod.commands;
 
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -89,11 +86,11 @@ public class GlintCustomizeCommand extends CommandBase {
             if (originalMessage.contains("set")) {
                 if (args.length != 3) throw new WrongUsageException("You must specify a valid hex color!");
                 try {
-                    GlintCustomizer.glintColors.put(itemId, Color.decode(args[2]));
+                    GlintCustomizer.glintColors.put(itemId, Utils.customColorFromString(args[2]));
                     GlintCustomizer.writeSave();
                     sender.addChatMessage(new ChatComponentText("§aForced an enchant glint color for your item."));
                 } catch (NumberFormatException e) {
-                 throw new WrongUsageException("You must specify a valid hex color!");
+                    throw new SyntaxErrorException("Unable to get a color from inputted string.");
                 }
                 return;
             } else if (originalMessage.contains("clearall")) {

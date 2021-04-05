@@ -3,6 +3,9 @@ package skytils.skytilsmod.features.impl.handlers;
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.colors.CommonColors;
+import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 
 import java.awt.*;
 import java.io.File;
@@ -18,7 +21,7 @@ public class GlintCustomizer {
     private static File saveFile;
 
     public static final HashMap<String, Boolean> overrides = new HashMap<>();
-    public static final HashMap<String, Color> glintColors = new HashMap<>();
+    public static final HashMap<String, CustomColor> glintColors = new HashMap<>();
 
 
     public GlintCustomizer() {
@@ -38,7 +41,8 @@ public class GlintCustomizer {
                     overrides.put(dataEntry.getKey(), entry.get("override").getAsBoolean());
                 }
                 if (entry.has("color")) {
-                    glintColors.put(dataEntry.getKey(), Color.decode(entry.get("color").getAsString()));
+                    CustomColor color = Utils.customColorFromString(entry.get("color").getAsString());
+                    glintColors.put(dataEntry.getKey(), color == null ? CommonColors.WHITE : color);
                 }
             }
         } catch (Exception e) {
@@ -59,13 +63,14 @@ public class GlintCustomizer {
                 child.add("override", new JsonPrimitive(override.getValue()));
                 obj.add(override.getKey(), child);
             }
-            for (Map.Entry<String, Color> color : glintColors.entrySet()) {
+            for (Map.Entry<String, CustomColor> color : glintColors.entrySet()) {
+                String stringValue = color.getValue().toString();
                 if (obj.has(color.getKey())) {
-                    obj.get(color.getKey()).getAsJsonObject().addProperty("color", String.format("#%06X", (0xFFFFFF & color.getValue().getRGB())));
+                    obj.get(color.getKey()).getAsJsonObject().addProperty("color", stringValue);
                     continue;
                 }
                 JsonObject child = new JsonObject();
-                child.add("color", new JsonPrimitive(String.format("#%06X", (0xFFFFFF & color.getValue().getRGB()))));
+                child.add("color", new JsonPrimitive(stringValue));
                 obj.add(color.getKey(), child);
             }
             gson.toJson(obj, writer);

@@ -53,7 +53,7 @@ public abstract class MixinRenderItem {
         if (Utils.inSkyblock) {
             String itemId = ItemUtil.getSkyBlockItemID(stack);
             if (GlintCustomizer.glintColors.containsKey(itemId)) {
-                int color = GlintCustomizer.glintColors.get(itemId).getRGB();
+                int color = GlintCustomizer.glintColors.get(itemId).toInt();
 
                 GlStateManager.depthMask(false);
                 GlStateManager.depthFunc(514);

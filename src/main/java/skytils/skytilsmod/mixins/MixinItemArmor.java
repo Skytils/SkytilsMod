@@ -21,7 +21,7 @@ public class MixinItemArmor {
         if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
             String uuid = extraAttributes.getString("uuid");
             if (ArmorColor.armorColors.containsKey(uuid)) {
-                cir.setReturnValue(ArmorColor.armorColors.get(uuid).getRGB());
+                cir.setReturnValue(ArmorColor.armorColors.get(uuid).toInt());
             }
         }
     }
@@ -33,7 +33,7 @@ public class MixinItemArmor {
         if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
             String uuid = extraAttributes.getString("uuid");
             if (ArmorColor.armorColors.containsKey(uuid)) {
-                cir.setReturnValue(ArmorColor.armorColors.get(uuid).getRGB());
+                cir.setReturnValue(ArmorColor.armorColors.get(uuid).toInt());
             }
         }
     }

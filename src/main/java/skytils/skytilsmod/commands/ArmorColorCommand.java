@@ -12,6 +12,7 @@ import skytils.skytilsmod.features.impl.handlers.ArmorColor;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory;
+import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 
 import java.awt.*;
 import java.util.List;
@@ -80,9 +81,9 @@ public class ArmorColorCommand extends CommandBase {
             if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw new WrongUsageException("This item does not have a UUID!");
             if (args.length != 2) throw new WrongUsageException("You must specify a valid hex color!");
             String uuid = extraAttributes.getString("uuid");
-            Color color;
+            CustomColor color;
             try {
-                color = ColorFactory.web(args[1]);
+                color = Utils.customColorFromString(args[1]);
             } catch (IllegalArgumentException e) {
                 throw new SyntaxErrorException("Unable to get a color from inputted string.");
             }
