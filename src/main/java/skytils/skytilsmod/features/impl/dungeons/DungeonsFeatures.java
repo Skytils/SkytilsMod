@@ -254,7 +254,7 @@ public class DungeonsFeatures {
                             mc.theWorld.removeEntity(event.entity);
                 }
             }
-            if (event.entity instanceof EntityBat && Skytils.config.showBatHitboxes && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible() && !hasBossSpawned) {
+            if (event.entity instanceof EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned && event.entity.getMaxHealth() == 100 && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible()) {
                 RenderUtil.drawOutlinedBoundingBox(event.entity.getEntityBoundingBox(), new Color(0, 255, 255, 255), 3, 1f);
             }
             if (event.entity instanceof EntitySkeleton && Skytils.config.boxSkeletonMasters && !mc.getRenderManager().isDebugBoundingBox() && !event.entity.isInvisible() && Objects.equals(ItemUtil.getSkyBlockItemID(event.entity.getCurrentArmor(0)), "SKELETON_MASTER_BOOTS")) {
