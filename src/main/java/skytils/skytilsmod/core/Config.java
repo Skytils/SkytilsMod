@@ -562,6 +562,14 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life"
     )
     public boolean preventBreakingFarms = false;
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Eliminate Block Breaking Prevention Messages",
+            description = "Removes messages like \"Skytils has prevented you from breaking that block!\".",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    public boolean stopFarmingMsgs = false;
 
     @Property(
             type = PropertyType.SWITCH,
