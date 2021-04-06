@@ -1,13 +1,16 @@
 package skytils.skytilsmod;
 
 import club.sk1er.mods.core.ModCore;
+import club.sk1er.vigilance.gui.SettingsGui;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.command.ICommand;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,9 +41,13 @@ import skytils.skytilsmod.features.impl.mining.MiningFeatures;
 import skytils.skytilsmod.features.impl.misc.*;
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints;
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures;
+import skytils.skytilsmod.gui.LocationEditGui;
 import skytils.skytilsmod.gui.OptionsGui;
+import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
+import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
+import skytils.skytilsmod.mixins.AccessorSettingsGui;
 import skytils.skytilsmod.utils.MayorInfo;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
@@ -241,6 +248,15 @@ public class Skytils {
     public void onGuiAction(GuiScreenEvent.ActionPerformedEvent.Post event) {
         if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu && event.button.id == 6969420) {
             ModCore.getInstance().getGuiHandler().open(new OptionsGui());
+        }
+    }
+
+    @SubscribeEvent
+    public void onGuiChange(GuiOpenEvent event) {
+        GuiScreen old = mc.currentScreen;
+        if (event.gui == null && Skytils.config.reopenOptionsMenu) {
+            boolean isSettingsGui = old instanceof CommandAliasesGui || old instanceof LocationEditGui || old instanceof KeyShortcutsGui || (old instanceof SettingsGui && ((AccessorSettingsGui) old).getConfig() instanceof Config);
+            if (isSettingsGui) event.gui = new OptionsGui();
         }
     }
 

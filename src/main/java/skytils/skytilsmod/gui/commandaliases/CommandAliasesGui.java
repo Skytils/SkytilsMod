@@ -95,7 +95,6 @@ public class CommandAliasesGui extends GuiScreen {
             }
         }
         CommandAliases.saveAliases();
-        if (Skytils.config.reopenOptionsMenu) ModCore.getInstance().getGuiHandler().open(new OptionsGui());
     }
 
     private void addAlias() {

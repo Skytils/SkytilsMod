@@ -104,6 +104,5 @@ public class LocationEditGui extends GuiScreen {
     @Override
     public void onGuiClosed() {
         GuiManager.saveConfig();
-        ModCore.getInstance().getGuiHandler().open(new OptionsGui());
     }
 }

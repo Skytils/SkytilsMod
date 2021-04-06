@@ -5,6 +5,7 @@
   "mixins": [
     "AccessorCommandHandler",
     "AccessorGuiNewChat",
+    "AccessorSettingsGui",
     "MixinBlockRendererDispatcher",
     "MixinBossStatus",
     "MixinChunk",
@@ -29,7 +30,6 @@
     "MixinRenderEntityItem",
     "MixinRenderItem",
     "MixinRenderLightningBolt",
-    "MixinSettingsGui",
     "MixinSlot",
     "MixinSoundManager",
     "MixinTileEntityChestRenderer",

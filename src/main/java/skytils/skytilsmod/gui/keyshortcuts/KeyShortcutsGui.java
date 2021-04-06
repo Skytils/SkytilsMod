@@ -103,7 +103,6 @@ public class KeyShortcutsGui extends GuiScreen {
             }
         }
         KeyShortcuts.saveShortcuts();
-        if (Skytils.config.reopenOptionsMenu) ModCore.getInstance().getGuiHandler().open(new OptionsGui());
     }
 
     private void addBlankShortcut() {
