@@ -66,7 +66,7 @@ public class FarmingFeatures {
 
             if ((heldItem.getItem() instanceof ItemHoe || heldItem.getItem() instanceof ItemAxe) && farmBlocks.contains(block)) {
                 event.setCanceled(true);
-                if (Skytils.config.stopFarmingMsgs) {
+                if (!Skytils.config.stopFarmingMsgs) {
                     if (System.currentTimeMillis() - lastNotifyBreakTime > 10000) {
                         lastNotifyBreakTime = System.currentTimeMillis();
                         p.playSound("note.bass", 1, 0.5f);
