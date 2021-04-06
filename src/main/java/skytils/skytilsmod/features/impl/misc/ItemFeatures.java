@@ -80,7 +80,7 @@ public class ItemFeatures {
             ContainerChest chest = (ContainerChest) gui.inventorySlots;
             IInventory inv = chest.getLowerChestInventory();
             String chestName = inv.getDisplayName().getUnformattedText().trim();
-            if (chestName.startsWith("Salvage") || chestName.contains("Backpack")) {
+            if (chestName.startsWith("Salvage") || chestName.endsWith("Backpack") || chestName.equals("Ophelia") || chestName.equals("Trades")) {
                 if (Skytils.config.highlightSalvageableItems) {
                     for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
                         ItemStack stack = slot.getStack();
@@ -92,7 +92,7 @@ public class ItemFeatures {
                     }
                 }
             }
-            if (chestName.startsWith("Ophelia") || chestName.startsWith("Trades")) {
+            if (chestName.equals("Ophelia") || chestName.equals("Trades")) {
                 if (Skytils.config.highlightDungeonSellableItems) {
                     for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
                         ItemStack stack = slot.getStack();
