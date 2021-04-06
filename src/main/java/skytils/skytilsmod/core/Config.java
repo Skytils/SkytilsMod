@@ -87,7 +87,8 @@ public class Config extends Vigilant {
             name = "Sound Manager CME Fix test",
             description = "yes.",
             category = "General",
-            subcategory = "Other"
+            subcategory = "Other",
+            hidden = true
     )
     public boolean soundManagerCMEFix = true;
 
