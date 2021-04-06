@@ -1,6 +1,5 @@
 package skytils.skytilsmod.gui;
 
-import club.sk1er.mods.core.ModCore;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -12,7 +11,6 @@ import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.core.structure.LocationButton;
 
 import java.awt.*;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 

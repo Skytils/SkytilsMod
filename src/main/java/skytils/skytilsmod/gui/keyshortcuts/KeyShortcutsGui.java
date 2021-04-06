@@ -1,13 +1,10 @@
 package skytils.skytilsmod.gui.keyshortcuts;
 
-import club.sk1er.mods.core.ModCore;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.settings.GameSettings;
-import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.features.impl.handlers.KeyShortcuts;
-import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
 import skytils.skytilsmod.gui.keyshortcuts.elements.KeyShortcutsList;
 

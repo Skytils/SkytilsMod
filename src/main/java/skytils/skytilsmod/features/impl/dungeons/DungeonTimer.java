@@ -76,8 +76,8 @@ public class DungeonTimer {
         }
 
         if (message.contains("§r§c☠ §r§eDefeated §r") && bossEntryTime != -1 && bossClearTime == -1) {
-            if (Skytils.config.dungeonTimer) bossClearTime = System.currentTimeMillis();
-            mc.thePlayer.addChatMessage(new ChatComponentText("§7Wither Doors: " + witherDoors + "\n" +
+            bossClearTime = System.currentTimeMillis();
+            if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(new ChatComponentText("§7Wither Doors: " + witherDoors + "\n" +
                     "§cBlood took " + Math.round((bloodOpenTime - dungeonStartTime) / 1000f) + " seconds to open." + "\n" +
                     "§bWatcher took " + Math.round((bloodClearTime - bloodOpenTime) / 1000f) + " seconds to clear." + "\n" +
                     "§9Boss entry was " + timeFormat((double) (bossEntryTime - dungeonStartTime) / 1000f) + "."));
