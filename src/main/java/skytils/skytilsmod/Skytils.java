@@ -85,7 +85,7 @@ public class Skytils {
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
-    public static File modDir;
+    public static File modDir = new File(new File(mc.mcDataDir, "config"), "skytils");
     public static GuiManager GUIMANAGER;
 
     public static int ticks = 0;
@@ -99,7 +99,6 @@ public class Skytils {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        modDir = new File(event.getModConfigurationDirectory(), "skytils");
         if (!modDir.exists()) modDir.mkdirs();
         GUIMANAGER = new GuiManager();
         jarFile = event.getSourceFile();

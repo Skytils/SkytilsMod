@@ -30,6 +30,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -89,28 +90,36 @@ public class ClickInOrderSolver {
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
         if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver) return;
-        if (event.gui instanceof GuiChest) {
-            GuiChest inventory = (GuiChest) event.gui;
-            Container containerChest = inventory.inventorySlots;
-            if (containerChest instanceof ContainerChest) {
-                List<Slot> invSlots = inventory.inventorySlots.inventorySlots;
-                int chestSize = inventory.inventorySlots.inventorySlots.size();
+        try {
+            if (event.gui instanceof GuiChest) {
+                GuiChest inventory = (GuiChest) event.gui;
+                Container containerChest = inventory.inventorySlots;
+                if (containerChest instanceof ContainerChest) {
+                    List<Slot> invSlots = inventory.inventorySlots.inventorySlots;
+                    int chestSize = inventory.inventorySlots.inventorySlots.size();
 
-                if (slotOrder.size() > neededClick) {
-                    Slot slot = invSlots.get(slotOrder.get(neededClick));
-                    if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(2, 62, 138, 255).getRGB());
-                }
+                    if (slotOrder.containsKey(neededClick)) {
+                        int needed = slotOrder.get(neededClick);
+                        Slot slot = invSlots.get(needed);
+                        if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(2, 62, 138, 255).getRGB());
+                    }
 
-                if (slotOrder.size() - 1 > neededClick) {
-                    Slot slot = invSlots.get(slotOrder.get(neededClick + 1));
-                    if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(65, 102, 245, 255).getRGB());
-                }
+                    if (slotOrder.containsKey(neededClick + 1)) {
+                        int needed = slotOrder.get(neededClick + 1);
+                        Slot slot = invSlots.get(needed);
+                        if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(65, 102, 245, 255).getRGB());
+                    }
 
-                if (slotOrder.size() - 2 > neededClick) {
-                    Slot slot = invSlots.get(slotOrder.get(neededClick + 2));
-                    if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(144, 224, 239, 255).getRGB());
+                    if (slotOrder.containsKey(neededClick + 2)) {
+                        int needed = slotOrder.get(neededClick + 2);
+                        Slot slot = invSlots.get(needed);
+                        if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(144, 224, 239, 255).getRGB());
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("Caught an Exception, check logs."));
         }
     }
 
