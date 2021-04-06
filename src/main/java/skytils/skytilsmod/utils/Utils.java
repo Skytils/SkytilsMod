@@ -116,7 +116,7 @@ public class Utils {
         return random;
     }
 
-    public static boolean isInTablist(EntityPlayer player){
+    public static boolean isInTablist(EntityPlayer player) {
         if (mc.isSingleplayer()) {
             return true;
         }
