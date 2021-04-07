@@ -26,7 +26,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
@@ -37,7 +36,7 @@ import skytils.skytilsmod.gui.OptionsGui;
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui;
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.utils.APIUtil;
-import skytils.skytilsmod.utils.MayorInfo;
+import skytils.skytilsmod.features.impl.handlers.MayorInfo;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

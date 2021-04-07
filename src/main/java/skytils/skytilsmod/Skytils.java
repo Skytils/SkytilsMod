@@ -66,7 +66,7 @@ import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.mixins.AccessorSettingsGui;
-import skytils.skytilsmod.utils.MayorInfo;
+import skytils.skytilsmod.features.impl.handlers.MayorInfo;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
@@ -123,6 +123,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new SpamHider());
 
         MinecraftForge.EVENT_BUS.register(new ArmorColor());
+        MinecraftForge.EVENT_BUS.register(new AuctionData());
         MinecraftForge.EVENT_BUS.register(new BlazeSolver());
         MinecraftForge.EVENT_BUS.register(new BlockAbility());
         MinecraftForge.EVENT_BUS.register(new BossHPDisplays());

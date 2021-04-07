@@ -1066,6 +1066,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Lowest BIN Price",
+            description = "Shows the lowest Buy It Now price for various items in Skyblock.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean showLowestBINPrice = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Stop Clicking Non-Salvageable Items",
             description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
             category = "Miscellaneous",

@@ -27,6 +27,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.features.impl.handlers.AuctionData;
+import skytils.skytilsmod.features.impl.handlers.MayorInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class APIUtil {
                     }
                 } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && conn.getResponseCode() == 204) {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed with reason: Player does not exist."));
-                } else if (urlString.startsWith(MayorInfo.baseURL)) {
+                } else if (urlString.startsWith(MayorInfo.baseURL) || urlString.equals(AuctionData.dataURL)) {
                     StringBuilder response = new StringBuilder();
 
                     String line;
@@ -87,7 +89,7 @@ public class APIUtil {
                     while ((line = br.readLine()) != null) {
                         response.append(line);
                     }
-                    System.out.println(conn.getResponseCode() + ": " + response.toString());
+
                     if (response.toString().startsWith("{")) {
                         Gson gson = new Gson();
                         return gson.fromJson(response.toString(), JsonObject.class);

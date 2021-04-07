@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.utils;
+package skytils.skytilsmod.features.impl.handlers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -37,6 +37,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.mixins.AccessorGuiNewChat;
+import skytils.skytilsmod.utils.APIUtil;
+import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.TabListUtils;
+import skytils.skytilsmod.utils.Utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -182,7 +186,7 @@ public class MayorInfo {
                     }
                 }
             }
-        }).start();
+        }, "Skytils-FetchMayor").start();
     }
 
     public static void sendMayorData(String mayor, HashSet<String> perks) {
@@ -201,7 +205,7 @@ public class MayorInfo {
             } catch (AuthenticationException | IOException e) {
                 e.printStackTrace();
             }
-        }).start();
+        }, "Skytils-SendMayor").start();
     }
 
 }

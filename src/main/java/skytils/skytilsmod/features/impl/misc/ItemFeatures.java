@@ -48,6 +48,7 @@ import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.PacketEvent;
+import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.features.impl.handlers.BlockAbility;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
@@ -57,10 +58,9 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -223,10 +223,16 @@ public class ItemFeatures {
         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
         String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
-        if (Skytils.config.showNPCSellPrice && itemId != null) {
-            if (sellPrices.containsKey(itemId)) {
+        if (itemId != null) {
+            if (Skytils.config.showLowestBINPrice && AuctionData.lowestBINs.containsKey(itemId)) {
+                // this might actually have multiple items as the price
+                double valuePer = AuctionData.lowestBINs.get(itemId);
+                event.toolTip.add("§6Lowest BIN Price: §b" + NumberFormat.getInstance().format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberFormat.getInstance().format(valuePer) + " each§7)" : ""));
+            }
+
+            if (Skytils.config.showNPCSellPrice && sellPrices.containsKey(itemId)) {
                 double valuePer = sellPrices.get(itemId);
-                event.toolTip.add("§6NPC Value: §b" + (valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + valuePer + " each§7)" : ""));
+                event.toolTip.add("§6NPC Value: §b" + NumberFormat.getInstance().format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberFormat.getInstance().format(valuePer) + " each§7)" : ""));
             }
         }
 
