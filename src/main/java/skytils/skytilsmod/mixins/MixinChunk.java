@@ -19,7 +19,10 @@
 package skytils.skytilsmod.mixins;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,11 +37,18 @@ public abstract class MixinChunk {
     @Shadow
     public abstract IBlockState getBlockState(final BlockPos pos);
 
+    @Shadow public abstract World getWorld();
+
     @Inject(method = "setBlockState", at = @At("HEAD"))
     private void onBlockChange(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {
         IBlockState old = this.getBlockState(pos);
         if (old != state) {
-            MinecraftForge.EVENT_BUS.post(new BlockChangeEvent(pos, old, state));
+            try {
+                MinecraftForge.EVENT_BUS.post(new BlockChangeEvent(pos, old, state));
+            } catch (Throwable e) {
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at BlockChangeEvent. Please report this on the Discord server."));
+                e.printStackTrace();
+            }
         }
     }
 

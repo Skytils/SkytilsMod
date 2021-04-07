@@ -18,9 +18,11 @@
 
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,7 +38,12 @@ public class MixinGuiIngame {
 
     @Inject(method = "setRecordPlaying(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSetActionBar(String message, boolean isPlaying, CallbackInfo ci) {
-        if (MinecraftForge.EVENT_BUS.post(new SetActionBarEvent(message, isPlaying))) ci.cancel();
+        try {
+            if (MinecraftForge.EVENT_BUS.post(new SetActionBarEvent(message, isPlaying))) ci.cancel();
+        } catch (Throwable e) {
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at SetActionBarEvent. Please report this on the Discord server."));
+            e.printStackTrace();
+        }
     }
 
     @Inject(method = "renderHotbarItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItemAndEffectIntoGUI(Lnet/minecraft/item/ItemStack;II)V"))

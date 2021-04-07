@@ -18,7 +18,9 @@
 
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,10 +33,16 @@ public class MixinGuiScreen {
 
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(String message, boolean addToChat, CallbackInfo ci) {
-        SendChatMessageEvent event = new SendChatMessageEvent(message, addToChat);
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            ci.cancel();
+        try {
+            SendChatMessageEvent event = new SendChatMessageEvent(message, addToChat);
+            if (MinecraftForge.EVENT_BUS.post(event)) {
+                ci.cancel();
+            }
+        } catch (Throwable e) {
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at SendChatMessageEvent. Please report this on the Discord server."));
+            e.printStackTrace();
         }
+
     }
 
 }

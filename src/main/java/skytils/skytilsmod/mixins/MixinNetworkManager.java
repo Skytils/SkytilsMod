@@ -19,8 +19,10 @@
 package skytils.skytilsmod.mixins;
 
 import io.netty.channel.ChannelHandlerContext;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,6 +37,7 @@ public class MixinNetworkManager {
         try {
             if (MinecraftForge.EVENT_BUS.post(new PacketEvent.ReceiveEvent(packet))) ci.cancel();
         } catch (Throwable e) {
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at PacketEvent.ReceiveEvent. Please report this on the Discord server."));
             e.printStackTrace();
         }
     }
