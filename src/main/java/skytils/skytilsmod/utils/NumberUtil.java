@@ -18,11 +18,15 @@
 
 package skytils.skytilsmod.utils;
 
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class NumberUtil {
+
+    public static final NumberFormat nf = NumberFormat.getInstance();
+
     private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
     static {
         suffixes.put(1_000L, "k");
