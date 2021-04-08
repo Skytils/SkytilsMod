@@ -44,8 +44,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -87,12 +86,9 @@ public class ChestProfit {
                                 String identifier = AuctionData.getIdentifier(lootSlot);
                                 if (identifier != null) {
                                     Double value = AuctionData.lowestBINs.get(identifier);
-                                    if (value != null) {
-                                        chestType.value += value;
-                                        chestType.items.put(identifier, value);
-                                    } else {
-                                        chestType.items.put(identifier, 0d);
-                                    }
+                                    if (value == null) value = 0D;
+                                    chestType.value += value;
+                                    chestType.items.add(new DungeonChestLootItem(lootSlot, identifier, value));
                                 }
                             }
                         }
@@ -109,8 +105,8 @@ public class ChestProfit {
                         double profit = chestType.value - chestType.price;
                         ScreenRenderer.fontRenderer.drawString(chestType.displayText + "§f: §" + (profit > 0 ? "a" : "c") + NumberUtil.nf.format(profit), leftAlign ? element.getActualX() : element.getActualX() + element.getWidth(), element.getActualY(), chestType.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
 
-                        for (Map.Entry<String, Double> items : chestType.items.entrySet()) {
-                            String line = items.getKey() + "§f: §a" + NumberUtil.nf.format(items.getValue());
+                        for (DungeonChestLootItem item : chestType.items) {
+                            String line = item.item.getDisplayName() + "§f: §a" + NumberUtil.nf.format(item.value);
                             ScreenRenderer.fontRenderer.drawString(line, leftAlign ? element.getActualX() : element.getActualX() + element.getWidth(), element.getActualY() + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                             drawnLines++;
                         }
@@ -150,7 +146,7 @@ public class ChestProfit {
         public CustomColor displayColor;
         public double price;
         public double value;
-        public HashMap<String, Double> items = new HashMap<>();
+        public ArrayList<DungeonChestLootItem> items = new ArrayList<>();
 
         DungeonChest(String displayText, CustomColor color) {
             this.displayText = displayText;
@@ -172,6 +168,19 @@ public class ChestProfit {
             return null;
         }
 
+    }
+
+    private static class DungeonChestLootItem {
+
+        public ItemStack item;
+        public String itemId;
+        public double value;
+
+        public DungeonChestLootItem(ItemStack item, String itemId, double value) {
+            this.item = item;
+            this.itemId = itemId;
+            this.value = value;
+        }
     }
 
     public static class DungeonChestProfitElement extends GuiElement {
