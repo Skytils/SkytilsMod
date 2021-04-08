@@ -135,7 +135,7 @@ public class MayorInfo {
     }
 
     @SubscribeEvent
-    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent event) {
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Post event) {
         if (!Utils.inSkyblock) return;
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;

@@ -22,6 +22,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -74,8 +75,10 @@ public class ItemFeatures {
     public static final HashMap<String, Double> sellPrices = new HashMap<>();
 
     @SubscribeEvent
-    public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
-        if (!Utils.inSkyblock) return;
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
+        if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.getHasStack()) {
+            RenderUtil.renderRarity(event.slot.getStack(), event.slot.xDisplayPosition, event.slot.yDisplayPosition);
+        }
         if (event.gui instanceof GuiChest) {
             GuiChest gui = (GuiChest) event.gui;
             ContainerChest chest = (ContainerChest) gui.inventorySlots;
@@ -83,35 +86,30 @@ public class ItemFeatures {
             String chestName = inv.getDisplayName().getUnformattedText().trim();
             if (chestName.startsWith("Salvage") || chestName.endsWith("Backpack") || chestName.equals("Ophelia") || chestName.equals("Trades")) {
                 if (Skytils.config.highlightSalvageableItems) {
-                    for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
-                        ItemStack stack = slot.getStack();
-                        if (stack == null) continue;
+                    if (event.slot.getHasStack()) {
+                        ItemStack stack = event.slot.getStack();
                         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(stack);
-                        if (extraAttr == null || !extraAttr.hasKey("baseStatBoostPercentage") || extraAttr.hasKey("dungeon_item_level"))
-                            continue;
-                        RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(15, 233, 233, 225).getRGB());
+                        if (extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && !extraAttr.hasKey("dungeon_item_level")) {
+                            int x = event.slot.xDisplayPosition;
+                            int y = event.slot.yDisplayPosition;
+                            Gui.drawRect(x, y, x + 16, y + 16, new Color(15, 233, 233, 225).getRGB());
+                        }
                     }
                 }
             }
             if (chestName.equals("Ophelia") || chestName.equals("Trades")) {
                 if (Skytils.config.highlightDungeonSellableItems) {
-                    for (Slot slot : mc.thePlayer.inventoryContainer.inventorySlots) {
-                        ItemStack stack = slot.getStack();
-                        if (stack == null) continue;
+                    if (event.slot.getHasStack()) {
+                        ItemStack stack = event.slot.getStack();
+                        int x = event.slot.xDisplayPosition;
+                        int y = event.slot.yDisplayPosition;
                         if (stack.getDisplayName().contains("Health Potion"))
-                            RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 225, 30, 255).getRGB());
+                            Gui.drawRect(x, y, x + 16, y + 16, new Color(255, 225, 30, 255).getRGB());
                         else if (stack.getDisplayName().contains("Mimic Fragment") || stack.getDisplayName().contains("Training Weights") || stack.getDisplayName().contains("Journal Entry") || stack.getDisplayName().contains("Defuse Kit"))
-                            RenderUtil.drawOnSlot(mc.thePlayer.inventory.getSizeInventory(), slot.xDisplayPosition, slot.yDisplayPosition + 1, new Color(255, 50, 150, 255).getRGB());
+                            Gui.drawRect(x, y, x + 16, y + 16, new Color(255, 50, 150, 255).getRGB());
                     }
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent event) {
-        if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.getHasStack()) {
-            RenderUtil.renderRarity(event.slot.getStack(), event.slot.xDisplayPosition, event.slot.yDisplayPosition);
         }
     }
 

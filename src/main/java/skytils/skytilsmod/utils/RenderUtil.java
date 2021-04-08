@@ -21,12 +21,15 @@ package skytils.skytilsmod.utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
@@ -261,25 +264,6 @@ public class RenderUtil {
         GlStateManager.disableRescaleNormal();
         GlStateManager.disableLighting();
         GlStateManager.popMatrix();
-    }
-
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    public static void drawOnSlot(int size, int xSlotPos, int ySlotPos, int color) {
-        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-        int guiLeft = (sr.getScaledWidth() - 176) / 2;
-        int guiTop = (sr.getScaledHeight() - 222) / 2;
-        int x = guiLeft + xSlotPos;
-        int y = guiTop + ySlotPos;
-        // Move down when chest isn't 6 rows
-        if (size != 90) y += (6 - (size - 36) / 9) * 9;
-
-        GL11.glTranslated(0, 0, 10);
-        Gui.drawRect(x, y, x + 16, y + 16, color);
-        GL11.glTranslated(0, 0, -10);
     }
 
     /**

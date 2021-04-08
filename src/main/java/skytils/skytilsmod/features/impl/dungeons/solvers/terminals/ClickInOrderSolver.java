@@ -21,6 +21,7 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
@@ -86,34 +87,34 @@ public class ClickInOrderSolver {
     }
 
     @SubscribeEvent
-    public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
+    public void onGuiDraw(GuiContainerEvent.DrawSlotEvent.Pre event) {
         if (!Utils.inDungeons) return;
-        if (!Skytils.config.clickInOrderTerminalSolver) return;
-        if (event.gui instanceof GuiChest) {
-            GuiChest inventory = (GuiChest) event.gui;
-            Container containerChest = inventory.inventorySlots;
-            if (containerChest instanceof ContainerChest) {
-                List<Slot> invSlots = inventory.inventorySlots.inventorySlots;
-                int chestSize = inventory.inventorySlots.inventorySlots.size();
+        if (!Skytils.config.clickInOrderTerminalSolver || slotOrder.size() == 0) return;
+        int x = event.slot.xDisplayPosition;
+        int y = event.slot.yDisplayPosition;
 
-                Integer firstSlot = slotOrder.get(neededClick);
-                Integer secondSlot = slotOrder.get(neededClick + 1);
-                Integer thirdSlot = slotOrder.get(neededClick + 2);
+        Integer firstSlot = slotOrder.get(neededClick);
+        Integer secondSlot = slotOrder.get(neededClick + 1);
+        Integer thirdSlot = slotOrder.get(neededClick + 2);
 
-                if (firstSlot != null) {
-                    Slot slot = invSlots.get(firstSlot);
-                    if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(2, 62, 138, 255).getRGB());
-                }
+        if (firstSlot != null) {
+            if (firstSlot == event.slot.slotNumber) {
+                Gui.drawRect(x, y, x + 16, y + 16, new Color(2, 62, 138, 255).getRGB());
+                return;
+            }
+        }
 
-                if (secondSlot != null) {
-                    Slot slot = invSlots.get(secondSlot);
-                    if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(65, 102, 245, 255).getRGB());
-                }
+        if (secondSlot != null) {
+            if (secondSlot == event.slot.slotNumber) {
+                Gui.drawRect(x, y, x + 16, y + 16, new Color(65, 102, 245, 255).getRGB());
+                return;
+            }
+        }
 
-                if (thirdSlot != null) {
-                    Slot slot = invSlots.get(thirdSlot);
-                    if (slot != null) RenderUtil.drawOnSlot(chestSize, slot.xDisplayPosition, slot.yDisplayPosition, new Color(144, 224, 239, 255).getRGB());
-                }
+        if (thirdSlot != null) {
+            if (thirdSlot == event.slot.slotNumber) {
+                Gui.drawRect(x, y, x + 16, y + 16, new Color(144, 224, 239, 255).getRGB());
+                return;
             }
         }
     }
