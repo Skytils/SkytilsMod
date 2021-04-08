@@ -28,13 +28,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.NumberUtil;
+import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
@@ -117,12 +120,21 @@ public class ChestProfit {
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
+        if (!Utils.inDungeons || !Skytils.config.dungeonChestProfit) return;
+        if (event.slotId == 50) {
+            DungeonChest chest = DungeonChest.getFromName(SBInfo.getInstance().lastOpenContainerName);
+            if (chest != null) {
+                chest.reset();
+            }
+        }
+    }
+
     @SubscribeEvent
     public void onWorldChange(WorldEvent.Load event) {
         for (DungeonChest chest : DungeonChest.values()) {
-            chest.price = 0;
-            chest.value = 0;
-            chest.items.clear();
+            chest.reset();
         }
     }
 
@@ -143,6 +155,12 @@ public class ChestProfit {
         DungeonChest(String displayText, CustomColor color) {
             this.displayText = displayText;
             this.displayColor = color;
+        }
+
+        public void reset() {
+            this.price = 0;
+            this.value = 0;
+            this.items.clear();
         }
 
         public static DungeonChest getFromName(String name) {

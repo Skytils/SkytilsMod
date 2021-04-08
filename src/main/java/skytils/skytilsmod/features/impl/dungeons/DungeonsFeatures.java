@@ -424,7 +424,7 @@ public class DungeonsFeatures {
         rerollClicks = 0;
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inDungeons) return;
         if (event.container instanceof ContainerChest) {
