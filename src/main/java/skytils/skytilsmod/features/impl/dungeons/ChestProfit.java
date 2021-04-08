@@ -57,6 +57,7 @@ public class ChestProfit {
     @SubscribeEvent
     public void onGUIDrawnEvent(GuiScreenEvent.DrawScreenEvent.Post event) {
         if (!Utils.inDungeons || DungeonTimer.scoreShownAt == -1) return;
+        if (!Skytils.config.dungeonChestProfit) return;
         if (event.gui instanceof GuiChest) {
             ContainerChest chest = (ContainerChest) ((GuiChest) event.gui).inventorySlots;
             IInventory inv = chest.getLowerChestInventory();
