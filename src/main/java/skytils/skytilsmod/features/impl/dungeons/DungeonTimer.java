@@ -43,19 +43,19 @@ public class DungeonTimer {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    private static long dungeonStartTime = -1;
-    private static long bloodOpenTime = -1;
-    private static long bloodClearTime = -1;
-    private static long bossEntryTime = -1;
-    private static long bossClearTime = -1;
+    public static long dungeonStartTime = -1;
+    public static long bloodOpenTime = -1;
+    public static long bloodClearTime = -1;
+    public static long bossEntryTime = -1;
+    public static long bossClearTime = -1;
 
-    private static long phase1ClearTime = -1;
-    private static long phase2ClearTime = -1;
-    private static long phase3ClearTime = -1;
+    public static long phase1ClearTime = -1;
+    public static long phase2ClearTime = -1;
+    public static long phase3ClearTime = -1;
 
-    private static int witherDoors = 0;
+    public static int witherDoors = 0;
 
-    private static long scoreShownAt = -1;
+    public static long scoreShownAt = -1;
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {

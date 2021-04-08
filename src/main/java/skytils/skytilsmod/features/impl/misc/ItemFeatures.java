@@ -229,14 +229,14 @@ public class ItemFeatures {
                 String auctionIdentifier = AuctionData.getIdentifier(item);
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
-                    double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
-                    event.toolTip.add("§6Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
+                    Double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
+                    if (valuePer != null) event.toolTip.add("§6Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
                 }
             }
 
-            if (Skytils.config.showNPCSellPrice && sellPrices.containsKey(itemId)) {
-                double valuePer = sellPrices.get(itemId);
-                event.toolTip.add("§6NPC Value: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
+            if (Skytils.config.showNPCSellPrice) {
+                Double valuePer = sellPrices.get(itemId);
+                if (valuePer != null) event.toolTip.add("§6NPC Value: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
             }
         }
 

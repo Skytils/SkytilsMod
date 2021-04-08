@@ -27,7 +27,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.NotNull;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.ItemUtil;
@@ -36,7 +35,6 @@ import skytils.skytilsmod.utils.Utils;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public class AuctionData {
 
@@ -46,9 +44,10 @@ public class AuctionData {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static String getIdentifier(@NotNull ItemStack item) {
+    public static String getIdentifier(ItemStack item) {
         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
         String id = ItemUtil.getSkyBlockItemID(extraAttr);
+        if (id == null) return null;
         switch (id) {
             case "PET":
                 if (extraAttr.hasKey("petInfo")) {
@@ -63,7 +62,7 @@ public class AuctionData {
                     NBTTagCompound enchants = extraAttr.getCompoundTag("enchantments");
                     if (!enchants.hasNoTags()) {
                         String enchant = enchants.getKeySet().iterator().next();
-                        id = "ENCHANTED_BOOK-" + enchant + "-" + enchants.getInteger(enchant);
+                        id = "ENCHANTED_BOOK-" + enchant.toUpperCase(Locale.US) + "-" + enchants.getInteger(enchant);
                     }
                 }
             break;
@@ -82,7 +81,7 @@ public class AuctionData {
         if (!reloadTimer.isStarted()) reloadTimer.start();
         if (reloadTimer.getTime() >= 60000) {
             reloadTimer.reset();
-            if (Skytils.config.showLowestBINPrice) {
+            if (Skytils.config.showLowestBINPrice || Skytils.config.dungeonChestProfit) {
                 new Thread(() -> {
                     JsonObject data = APIUtil.getJSONResponse(dataURL);
                     for (Map.Entry<String, JsonElement> items : data.entrySet()) {

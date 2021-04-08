@@ -141,6 +141,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Dungeon Chest Profit",
+            description = "Shows the estimated profit for items from chests in dungeons.",
+            category = "Dungeons",
+            subcategory = "Miscellaneous"
+    )
+    public boolean dungeonChestProfit = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Dungeon Timer",
             description = "Shows the time taken for certain actions in dungeons.",
             category = "Dungeons",
