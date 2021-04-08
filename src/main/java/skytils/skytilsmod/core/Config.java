@@ -84,16 +84,6 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Sound Manager CME Fix test",
-            description = "yes.",
-            category = "General",
-            subcategory = "Other",
-            hidden = true
-    )
-    public boolean soundManagerCMEFix = true;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Override other reparty commands",
             description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to work",
             category = "General",

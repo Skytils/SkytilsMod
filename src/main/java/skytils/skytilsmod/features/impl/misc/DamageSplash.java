@@ -53,7 +53,6 @@ public class DamageSplash {
     }
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
     public void onRenderLiving(RenderLivingEvent.Specials.Pre<EntityLivingBase> e) {
         if(!Utils.inSkyblock || !Skytils.config.customDamageSplash) return;
         Entity entity = e.entity;
