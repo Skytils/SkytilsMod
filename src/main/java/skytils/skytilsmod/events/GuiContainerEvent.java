@@ -24,13 +24,25 @@ import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
-public class GuiContainerEvent extends Event {
+public abstract class GuiContainerEvent extends Event {
 
     public GuiContainer gui;
     public Container container;
     public GuiContainerEvent(GuiContainer gui, Container container) {
         this.gui = gui;
         this.container = container;
+    }
+
+    public static class BackgroundDrawnEvent extends GuiContainerEvent {
+        public int mouseX, mouseY;
+        public float partialTicks;
+
+        public BackgroundDrawnEvent(GuiContainer gui, Container container, int mouseX, int mouseY, float partialTicks) {
+            super(gui, container);
+            this.mouseX = mouseX;
+            this.mouseY = mouseY;
+            this.partialTicks = partialTicks;
+        }
     }
 
     public static class CloseWindowEvent extends GuiContainerEvent {

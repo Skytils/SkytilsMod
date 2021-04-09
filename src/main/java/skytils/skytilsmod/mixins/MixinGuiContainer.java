@@ -49,6 +49,16 @@ public abstract class MixinGuiContainer extends GuiScreen {
         }
     }
 
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
+    private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        try {
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.BackgroundDrawnEvent(that, inventorySlots, mouseX, mouseY, partialTicks));
+        } catch (Throwable e) {
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.BackgroundDrawnEvent. Please report this on the Discord server."));
+            e.printStackTrace();
+        }
+    }
+
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(Slot slot, CallbackInfo ci) {
         try {

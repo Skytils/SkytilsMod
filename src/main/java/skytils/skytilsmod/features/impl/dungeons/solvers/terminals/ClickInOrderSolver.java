@@ -86,36 +86,30 @@ public class ClickInOrderSolver {
         slotOrder.clear();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
+    @SubscribeEvent
+    public void onBackgroundDrawn(GuiContainerEvent.BackgroundDrawnEvent event) {
         if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver || slotOrder.size() == 0) return;
-        int x = event.slot.xDisplayPosition;
-        int y = event.slot.yDisplayPosition;
+
+        List<Slot> invSlots = event.container.inventorySlots;
 
         Integer firstSlot = slotOrder.get(neededClick);
         Integer secondSlot = slotOrder.get(neededClick + 1);
         Integer thirdSlot = slotOrder.get(neededClick + 2);
 
         if (firstSlot != null) {
-            if (firstSlot == event.slot.slotNumber) {
-                Gui.drawRect(x, y, x + 16, y + 16, new Color(2, 62, 138, 255).getRGB());
-                return;
-            }
+            Slot slot = invSlots.get(firstSlot);
+            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, new Color(2, 62, 138, 255).getRGB());
         }
 
         if (secondSlot != null) {
-            if (secondSlot == event.slot.slotNumber) {
-                Gui.drawRect(x, y, x + 16, y + 16, new Color(65, 102, 245, 255).getRGB());
-                return;
-            }
+            Slot slot = invSlots.get(secondSlot);
+            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, new Color(65, 102, 245, 255).getRGB());
         }
 
         if (thirdSlot != null) {
-            if (thirdSlot == event.slot.slotNumber) {
-                Gui.drawRect(x, y, x + 16, y + 16, new Color(144, 224, 239, 255).getRGB());
-                return;
-            }
+            Slot slot = invSlots.get(thirdSlot);
+            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, new Color(144, 224, 239, 255).getRGB());
         }
     }
 
