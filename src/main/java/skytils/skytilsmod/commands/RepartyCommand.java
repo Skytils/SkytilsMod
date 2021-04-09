@@ -21,13 +21,11 @@ package skytils.skytilsmod.commands;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiNewChat;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,11 +63,11 @@ public class RepartyCommand extends CommandBase implements ICommand {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (!Utils.isOnHypixel()) throw new WrongUsageException("You must be on Hypixel to use this command.");
         if (args.length > 0 && (args[0].startsWith("fail") || args[0].equals("f"))) {
             partyThread = new Thread(() -> {
                 EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
                 GuiNewChat chat = Minecraft.getMinecraft().ingameGUI.getChatGUI();
-
 
                 try {
                     Skytils.sendMessageQueue.add("/p " + String.join(" ", repartyFailList));
@@ -104,7 +102,6 @@ public class RepartyCommand extends CommandBase implements ICommand {
 
         partyThread = new Thread(() -> {
             EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-
 
             try {
                 Skytils.sendMessageQueue.add("/pl");
