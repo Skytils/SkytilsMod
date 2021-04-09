@@ -78,7 +78,7 @@ public class ThreeWeirdosSolver {
         }
     }
 
-    @SubscribeEvent
+    //@SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!Utils.inDungeons || !Skytils.config.threeWeirdosSolver || event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
         IBlockState block = event.world.getBlockState(event.pos);

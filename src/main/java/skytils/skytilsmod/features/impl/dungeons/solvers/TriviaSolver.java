@@ -97,7 +97,7 @@ public class TriviaSolver {
         }
     }
 
-    @SubscribeEvent
+    //@SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!Utils.inDungeons || !Skytils.config.triviaSolver || (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK)) return;
         IBlockState block = event.world.getBlockState(event.pos);
