@@ -86,8 +86,8 @@ public class ClickInOrderSolver {
         slotOrder.clear();
     }
 
-    @SubscribeEvent
-    public void onGuiDraw(GuiContainerEvent.DrawSlotEvent.Pre event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
         if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver || slotOrder.size() == 0) return;
         int x = event.slot.xDisplayPosition;
@@ -119,8 +119,8 @@ public class ClickInOrderSolver {
         }
     }
 
-    @SubscribeEvent
-    public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onDrawSlotLow(GuiContainerEvent.DrawSlotEvent.Pre event) {
         if (!Utils.inDungeons) return;
         if (!Skytils.config.clickInOrderTerminalSolver) return;
         if (event.container instanceof ContainerChest) {
