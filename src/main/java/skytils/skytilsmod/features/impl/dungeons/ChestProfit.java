@@ -192,21 +192,24 @@ public class ChestProfit {
 
         @Override
         public void render() {
-            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+            if (this.getToggled() && Utils.inDungeons) {
 
-            boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
+                ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
-            GlStateManager.color(1, 1, 1, 1);
-            GlStateManager.disableLighting();
+                boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-            int drawnLines = 0;
-            for (DungeonChest chest : DungeonChest.values()) {
-                if (chest.items.size() == 0) continue;
-                double profit = chest.value - chest.price;
-                String line = chest.displayText + "§f: §" + (profit > 0 ? "a" : "c") + NumberUtil.format((long) profit);
-                SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(line, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT, chest.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
-                drawnLines++;
+                GlStateManager.color(1, 1, 1, 1);
+                GlStateManager.disableLighting();
+
+                int drawnLines = 0;
+                for (DungeonChest chest : DungeonChest.values()) {
+                    if (chest.items.size() == 0) continue;
+                    double profit = chest.value - chest.price;
+                    String line = chest.displayText + "§f: §" + (profit > 0 ? "a" : "c") + NumberUtil.format((long) profit);
+                    SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+                    ScreenRenderer.fontRenderer.drawString(line, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT, chest.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    drawnLines++;
+                }
             }
         }
 
