@@ -879,6 +879,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Custom Auction Price Input",
+            description = "Displays Skytils' own auction input GUI instead of a sign.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean betterAuctionPriceInput = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Boss Bar Fix",
             description = "Hides the Witherborn boss bars.",
             category = "Miscellaneous",
