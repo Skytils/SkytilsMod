@@ -92,7 +92,7 @@ public class BlockAbility {
         reloadSave();
     }
 
-    @SubscribeEvent
+    //@SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.entityPlayer != mc.thePlayer) return;
         ItemStack item = event.entityPlayer.getHeldItem();

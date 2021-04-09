@@ -172,7 +172,7 @@ public class Skytils {
         }
 
         if (!cch.getCommands().containsKey("blockability")) {
-            cch.registerCommand(new BlockAbilityCommand());
+            //cch.registerCommand(new BlockAbilityCommand());
         }
 
         if (!cch.getCommands().containsKey("glintcustomize")) {

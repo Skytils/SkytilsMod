@@ -319,22 +319,22 @@ public class Config extends Vigilant {
     )
     public boolean showGiantHP = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Show Hidden Fels",
             description = "Make Fels in dungeons visible.",
             category = "Dungeons",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean showHiddenFels = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Show Hidden Shadow Assassins",
             description = "Make Shadow Assassins in dungeons visible.",
             category = "Dungeons",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean showHiddenShadowAssassins = false;
 
     @Property(
@@ -356,13 +356,13 @@ public class Config extends Vigilant {
     )
     public Integer necronHealth = 0;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Show Stealthy Watcher Undeads",
             description = "Makes stealthy undeads spawned by The Watcher visible.",
             category = "Dungeons",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean showStealthyBloodMobs = false;
 
     @Property(
@@ -464,14 +464,16 @@ public class Config extends Vigilant {
     )
     public boolean findCorrectLivid = false;
 
+/*
     @Property(
             type = PropertyType.SWITCH,
             name = "Block Incorrect Terminal Clicks",
             description = "Blocks incorrect clicks on terminals.",
             category = "Dungeons",
             subcategory = "Terminal Solvers"
-    )
+    )*/
     public boolean blockIncorrectTerminalClicks = false;
+
 
     @Property(
             type = PropertyType.SWITCH,
@@ -554,13 +556,13 @@ public class Config extends Vigilant {
     )
     public boolean showBurrowFastTravel = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Block Mathematical Hoe Right Clicks",
             description = "Prevents accidentally viewing the recipe for the Mathematical Hoes.",
             category = "Farming",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean blockMathHoeClicks = false;
 
     @Property(
@@ -572,13 +574,13 @@ public class Config extends Vigilant {
     )
     public boolean hideFarmingRNGTitles = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Prevent Breaking Farms",
             description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
             category = "Farming",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean preventBreakingFarms = false;
 
     @Property(
@@ -635,22 +637,22 @@ public class Config extends Vigilant {
     )
     public boolean recolorCarpets = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Show Ghosts",
             description = "Makes the ghosts in The Mist visible.",
             category = "Mining",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean showGhosts = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Show Ghosts' Health",
             description = "Displays the health bar of ghosts in The Mist.",
             category = "Mining",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean showGhostHealth = false;
 
     @Property(
@@ -671,14 +673,16 @@ public class Config extends Vigilant {
     )
     public boolean puzzlerSolver = false;
 
+/*
     @Property(
             type = PropertyType.SWITCH,
             name = "Block Useless Zombie Sword",
             description = "Prevents you from using the Zombie Sword when at full health.",
             category = "Miscellaneous",
             subcategory = "Items"
-    )
+    )*/
     public boolean blockUselessZombieSword = false;
+
 
     @Property(
             type = PropertyType.SWITCH,
@@ -928,13 +932,13 @@ public class Config extends Vigilant {
     )
     public boolean hideAirDisplay = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Hide Creeper Veil Near NPCs",
             description = "Stops the Creeper Veil from blocking interaction with NPCs.",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean hideCreeperVeilNearNPCs = false;
 
     @Property(
@@ -1027,13 +1031,13 @@ public class Config extends Vigilant {
     )
     public boolean preventLogSpam = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Prioritize Item Abilities",
             description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean prioritizeItemAbilities = false;
 
     @Property(
@@ -1156,7 +1160,7 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Hide fishing hooks",
+            name = "Hide Fishing Hooks",
             description = "Hides fishing hooks from other players",
             category = "Miscellaneous",
             subcategory = "Quality of Life"
