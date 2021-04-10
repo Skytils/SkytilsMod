@@ -26,6 +26,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.features.impl.handlers.MayorInfo;
@@ -35,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Scanner;
 
@@ -44,61 +52,54 @@ import java.util.Scanner;
  * @author bowser0000
  */
 public class APIUtil {
+
+    public static CloseableHttpClient client = HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION).addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
+        if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache");
+        if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache");
+    }).build();
+
     public static JsonObject getJSONResponse(String urlString) {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-
         try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setUseCaches(false);
-            conn.setRequestProperty("User-Agent", "Skytils/" + Skytils.VERSION);
+            HttpGet request = new HttpGet(new URL(urlString).toURI());
+            request.setProtocolVersion(HttpVersion.HTTP_1_1);
 
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            HttpResponse response = client.execute(request);
+
+            HttpEntity entity = response.getEntity();
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent()));
                 String input;
-                StringBuilder response = new StringBuilder();
+                StringBuilder r = new StringBuilder();
 
                 while ((input = in.readLine()) != null) {
-                    response.append(input);
+                    r.append(input);
                 }
                 in.close();
 
                 Gson gson = new Gson();
 
-                return gson.fromJson(response.toString(), JsonObject.class);
+                return gson.fromJson(r.toString(), JsonObject.class);
             } else {
-                if (urlString.startsWith("https://api.hypixel.net/")) {
-                    InputStream errorStream = conn.getErrorStream();
+                if (urlString.startsWith("https://api.hypixel.net/") || urlString.startsWith(MayorInfo.baseURL) || urlString.equals(AuctionData.dataURL)) {
+                    InputStream errorStream = entity.getContent();
                     try (Scanner scanner = new Scanner(errorStream)) {
                         scanner.useDelimiter("\\Z");
                         String error = scanner.next();
 
-                        Gson gson = new Gson();
-                        return gson.fromJson(error, JsonObject.class);
+                        if (error.startsWith("{")) {
+                            Gson gson = new Gson();
+                            return gson.fromJson(error, JsonObject.class);
+                        }
                     }
-                } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && conn.getResponseCode() == 204) {
+                } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && response.getStatusLine().getStatusCode() == 204) {
                     player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed with reason: Player does not exist."));
-                } else if (urlString.startsWith(MayorInfo.baseURL) || urlString.equals(AuctionData.dataURL)) {
-                    StringBuilder response = new StringBuilder();
-
-                    String line;
-
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-
-                    while ((line = br.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    if (response.toString().startsWith("{")) {
-                        Gson gson = new Gson();
-                        return gson.fromJson(response.toString(), JsonObject.class);
-                    }
                 } else {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + conn.getResponseCode()));
+                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + response.getStatusLine().getStatusCode()));
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException | URISyntaxException ex) {
             player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "An error has occured. See logs for more details."));
             ex.printStackTrace();
         }
