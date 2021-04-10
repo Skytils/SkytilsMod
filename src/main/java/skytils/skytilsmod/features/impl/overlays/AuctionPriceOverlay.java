@@ -26,6 +26,7 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.client.C12PacketUpdateSign;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChatComponentText;
@@ -53,6 +54,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class AuctionPriceOverlay {
 
@@ -154,6 +156,55 @@ public class AuctionPriceOverlay {
         return count.length() < 2;
     }
 
+    private static double getValueOfEnchantments(ItemStack item) {
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+        if (extraAttr == null || !extraAttr.hasKey("enchantments")) return 0;
+
+        NBTTagCompound enchantments = extraAttr.getCompoundTag("enchantments");
+
+        double total = 0;
+
+        for (String enchantName : enchantments.getKeySet()) {
+            String id = "ENCHANTED_BOOK-" + enchantName.toUpperCase(Locale.US) + "-" + enchantments.getInteger(enchantName);
+            Double price = AuctionData.lowestBINs.get(id);
+            if (price == null) continue;
+
+            double npcPrice = Double.MAX_VALUE;
+            switch (id) {
+                case "ENCHANTED_BOOK-TELEKINESIS-1":
+                    npcPrice = 100;
+                    break;
+                case "ENCHANTED_BOOK-TRUE_PROTECTION-1":
+                    npcPrice = 900_000;
+                    break;
+            }
+
+            total += Math.min(npcPrice, price);
+        }
+
+        return total;
+    }
+
+    private static double getHotPotatoBookValue(ItemStack item) {
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+        if (extraAttr == null || !extraAttr.hasKey("hot_potato_count")) return 0;
+
+        int potatoCount = extraAttr.getInteger("hot_potato_count");
+
+        int hpbs = Math.min(potatoCount, 10);
+        int fpbs = potatoCount - hpbs;
+
+        Double hpbPrice = AuctionData.lowestBINs.get("HOT_POTATO_BOOK");
+        Double fpbPrice = AuctionData.lowestBINs.get("FUMING_POTATO_BOOK");
+
+        double total = 0;
+
+        if (hpbPrice != null) total += hpbs * hpbPrice;
+        if (fpbPrice != null) total += fpbs * fpbPrice;
+
+        return total;
+    }
+
     public static class AuctionPriceScreen extends GuiScreen {
 
         public CleanButton undercutButton;
@@ -193,8 +244,14 @@ public class AuctionPriceOverlay {
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
                     Double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
-                    if (valuePer != null) fr.drawString("Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * lastAuctionedStack.stackSize) + (lastAuctionedStack.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""), this.width/2f, this.height/2f-50, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
+                    if (valuePer != null) fr.drawString("Clean Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * lastAuctionedStack.stackSize) + (lastAuctionedStack.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""), this.width/2f, this.height/2f-50, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
                 }
+                double enchantValue = getValueOfEnchantments(lastAuctionedStack);
+                if (enchantValue > 0)
+                    fr.drawString("Estimated Enchantment Value: §b" + NumberUtil.nf.format(enchantValue), this.width/2f+200, this.height/2f-50, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NONE);
+                double hpbValue = getHotPotatoBookValue(lastAuctionedStack);
+                if (hpbValue > 0)
+                    fr.drawString("HPB Value: §b" + NumberUtil.nf.format(hpbValue), this.width/2f+200, this.height/2f-25, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NONE);
                 if (isUndercut()) {
                     String input = getInput();
                     fr.drawString("Listing For: " + (input == null ? "§cInvalid Value" : input), this.width/2f, this.height/2f-25, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
