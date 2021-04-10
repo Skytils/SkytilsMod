@@ -37,7 +37,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.util.*;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -51,18 +50,14 @@ import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.features.impl.handlers.BlockAbility;
-import skytils.skytilsmod.utils.ItemUtil;
-import skytils.skytilsmod.utils.NumberUtil;
-import skytils.skytilsmod.utils.RenderUtil;
-import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.*;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
-import java.text.NumberFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,6 +68,7 @@ public class ItemFeatures {
     private static final Pattern candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used");
 
     public static final HashMap<String, Double> sellPrices = new HashMap<>();
+    public static final HashMap<String, Integer> bitCosts = new HashMap<>();
 
     @SubscribeEvent
     public void onDrawSlot(GuiContainerEvent.DrawSlotEvent.Pre event) {
@@ -223,12 +219,34 @@ public class ItemFeatures {
         String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
         if (itemId != null) {
-            if (Skytils.config.showLowestBINPrice) {
+            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit) {
                 String auctionIdentifier = AuctionData.getIdentifier(item);
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
                     Double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
-                    if (valuePer != null) event.toolTip.add("§6Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
+                    if (valuePer != null) {
+                        if (Skytils.config.showLowestBINPrice) event.toolTip.add("§6Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
+
+                        if (Skytils.config.showCoinsPerBit) {
+                            int bitValue = bitCosts.getOrDefault(auctionIdentifier, -1);
+                            if (bitValue == -1 && Objects.equals(SBInfo.getInstance().lastOpenContainerName, "Community Shop")) {
+                                List<String> lore = ItemUtil.getItemLore(item);
+                                for (int i = 0; i < lore.size(); i++) {
+                                    String line = lore.get(i);
+                                    if (line.equals("§7Cost") && i + 3 < lore.size() && lore.get(i + 3).equals("§eClick to trade!")) {
+                                        String bits = lore.get(i + 1);
+                                        if (bits.startsWith("§b") && bits.endsWith(" Bits")) {
+                                            bitValue = Integer.parseInt(bits.replaceAll("[^0-9]", ""));
+                                            bitCosts.put(auctionIdentifier, bitValue);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (bitValue != -1) event.toolTip.add("§6Coin/Bit: §b" + NumberUtil.nf.format(valuePer / bitValue));
+                        }
+                    }
                 }
             }
 

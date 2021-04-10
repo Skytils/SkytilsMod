@@ -1078,6 +1078,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Show Coins per Bit",
+            description = "Shows how many coins you will get per bit spent at the Community Shop.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean showCoinsPerBit = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Show Lowest BIN Price",
             description = "Shows the lowest Buy It Now price for various items in Skyblock.",
             category = "Miscellaneous",
