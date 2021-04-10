@@ -592,13 +592,13 @@ public class Config extends Vigilant {
     )
     public boolean darkModeMist = false;
 
-    @Property(
+/*    @Property(
             type = PropertyType.SWITCH,
             name = "Disable Pickaxe Ability on Private Island",
             description = "Prevents you from using pickaxe abilities on your island.",
             category = "Mining",
             subcategory = "Quality of Life"
-    )
+    )*/
     public boolean noPickaxeAbilityOnPrivateIsland = false;
 
     @Property(
