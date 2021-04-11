@@ -239,6 +239,15 @@ public class LocationEditGui extends GuiScreen {
         }
     }
 
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+        GuiElement hovered = LocationButton.lastHoveredElement;
+        if (hovered != null) {
+            hovered.setScale(hovered.getScale() + (Mouse.getEventDWheel() / 1_000f));
+        }
+    }
+
     /**
      * Reset the dragged feature when the mouse is released.
      */
