@@ -21,25 +21,28 @@ package skytils.skytilsmod.core.structure;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.GlStateManager;
 import skytils.skytilsmod.utils.RenderUtil;
 
 import java.awt.*;
 
 public class LocationButton extends GuiButton {
-    private float x;
-    private float y;
-    private float x2;
-    private float y2;
+
+    public static GuiElement lastHoveredElement = null;
+    public float x;
+    public float y;
+    public float x2;
+    public float y2;
     private double scale;
     public GuiElement element;
 
     public LocationButton(GuiElement element) {
         super(-1, 0, 0, null);
         this.element = element;
-        this.x = this.element.getActualX() - 5;
-        this.y = this.element.getActualY() - 5;
-        this.x2 = this.x + this.element.getWidth() + 5;
-        this.y2 = this.y + this.element.getHeight() + 5;
+        this.x = this.element.getActualX() - 4;
+        this.y = this.element.getActualY() - 4;
+        this.x2 = this.x + this.element.getActualWidth() + 6;
+        this.y2 = this.y + this.element.getActualHeight() + 6;
     }
 
     public LocationButton(int buttonId, GuiElement element) {
@@ -48,10 +51,10 @@ public class LocationButton extends GuiButton {
     }
 
     private void refreshLocations() {
-        this.x = this.element.getActualX() - 2;
-        this.y = this.element.getActualY() - 2;
-        this.x2 = this.x + this.element.getWidth() + 4;
-        this.y2 = this.y + this.element.getHeight() + 4;
+        this.x = this.element.getActualX() - 4;
+        this.y = this.element.getActualY() - 4;
+        this.x2 = this.x + this.element.getActualWidth() + 6;
+        this.y2 = this.y + this.element.getActualHeight() + 6;
     }
 
     @Override
@@ -59,8 +62,13 @@ public class LocationButton extends GuiButton {
         refreshLocations();
         hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x2 && mouseY < this.y2;
         Color c = new Color(255,255,255, hovered ? 100 : 40);
-        RenderUtil.drawRect(x, y, x2, y2, c.getRGB());
+        RenderUtil.drawRect(0, 0, this.element.getWidth() + 4, this.element.getHeight() + 4, c.getRGB());
+        GlStateManager.translate(2, 2, 0);
         this.element.demoRender();
+        GlStateManager.translate(-2, -2, 0);
+        if (hovered) {
+            lastHoveredElement = element;
+        }
     }
 
     @Override

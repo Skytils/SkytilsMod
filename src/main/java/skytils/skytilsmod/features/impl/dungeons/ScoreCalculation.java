@@ -355,12 +355,10 @@ public class ScoreCalculation {
                 if (totalSecrets != 0) text.add("§6Estimated Total Score:§a " + (int)(skillScore + discoveryScore + speedScore + bonusScore));
                 if (!Skytils.usingDungeonRooms) text.add("§cDownload the Dungeon Rooms Mod for discovery estimate.");
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 for (int i = 0; i < text.size(); i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                    ScreenRenderer.fontRenderer.drawString(text.get(i), leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    ScreenRenderer.fontRenderer.drawString(text.get(i), leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                 }
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }
 
@@ -378,7 +376,7 @@ public class ScoreCalculation {
 
             for (int i = 0; i < text.size(); i++) {
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(text.get(i), leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(text.get(i), leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 

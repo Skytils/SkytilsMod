@@ -168,7 +168,6 @@ public class DungeonTimer {
 
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 String displayText = "§aReal Time: " + (dungeonStartTime == -1 ? "0s" : (double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - dungeonStartTime) / 1000f + "s") +
                         "\n§aTime Elapsed: " + (dungeonStartTime == -1 ? "0s" : timeFormat((double) ((bossClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : bossClearTime) - dungeonStartTime) / 1000f)) +
                         "\n§7Wither Doors: " + witherDoors +
@@ -179,9 +178,8 @@ public class DungeonTimer {
                 String[] lines = displayText.split("\n");
                 for (int i = 0; i < lines.length; i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                    ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                 }
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }
 
@@ -201,7 +199,7 @@ public class DungeonTimer {
             String[] lines = displayText.split("\n");
             for (int i = 0; i < lines.length; i++) {
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? 0 : getActualWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
@@ -238,7 +236,6 @@ public class DungeonTimer {
 
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 String displayText = "§bPhase 1: " + timeFormat((double) ((phase1ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase1ClearTime) - bossEntryTime) / 1000f) +
                         "\n§cPhase 2: " + (phase1ClearTime == -1 ? "0s" : timeFormat((double) ((phase2ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase2ClearTime) - phase1ClearTime) / 1000f)) +
                         "\n§6Phase 3: " + (phase2ClearTime == -1 ? "0s" : timeFormat((double) ((phase3ClearTime == -1 ? (scoreShownAt == -1 ? System.currentTimeMillis() : scoreShownAt) : phase3ClearTime) - phase2ClearTime) / 1000f)) +
@@ -247,9 +244,8 @@ public class DungeonTimer {
                 String[] lines = displayText.split("\n");
                 for (int i = 0; i < lines.length; i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                    ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                 }
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }
 
@@ -267,7 +263,7 @@ public class DungeonTimer {
             String[] lines = displayText.split("\n");
             for (int i = 0; i < lines.length; i++) {
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(lines[i], leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 

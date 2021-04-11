@@ -169,6 +169,14 @@ public class CustomColor {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
+    public int toInt(int alpha) {
+        int r = (int) (Math.min(this.r, 1f) * 255);
+        int g = (int) (Math.min(this.g, 1f) * 255);
+        int b = (int) (Math.min(this.b, 1f) * 255);
+        int a = Math.min(alpha, 255);
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
     /**
      * Construct a CustomColor from an int 0xAARRGGBB
      *

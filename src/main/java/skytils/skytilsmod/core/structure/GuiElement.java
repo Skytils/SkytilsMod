@@ -40,11 +40,7 @@ public abstract class GuiElement {
     public GuiElement(String name, float scale, FloatPair fp) {
         this.name = name;
         this.scale = scale;
-        if (GuiManager.GUIPOSITIONS.containsKey(name)) {
-            this.pos = GuiManager.GUIPOSITIONS.get(name);
-        } else {
-            this.pos = fp;
-        }
+        this.pos = GuiManager.GUIPOSITIONS.getOrDefault(name, fp);
     }
 
     public abstract void render();
@@ -85,15 +81,23 @@ public abstract class GuiElement {
 
     public float getActualX() {
         int maxX = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
-        return maxX * getPos().getX();
+        return (maxX * getPos().getX());
     }
 
     public float getActualY() {
         int maxY = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
-        return maxY * getPos().getY();
+        return (maxY * getPos().getY());
     }
 
     public abstract int getHeight();
 
     public abstract int getWidth();
+
+    public float getActualHeight() {
+        return this.getHeight() * this.getScale();
+    }
+
+    public float getActualWidth() {
+        return this.getWidth() * this.getScale();
+    }
 }
