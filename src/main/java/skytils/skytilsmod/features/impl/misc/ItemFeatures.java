@@ -218,9 +218,23 @@ public class ItemFeatures {
         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
         String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
+        boolean isSuperpairsReward = false;
+
+        if (item != null && ItemUtil.getDisplayName(item).equals("§aEnchanted Book") && mc.thePlayer.openContainer != null && SBInfo.getInstance().lastOpenContainerName.startsWith("Superpairs (")) {
+            List<String> lore = ItemUtil.getItemLore(item);
+            if (lore.size() >= 3) {
+                if (lore.get(0).equals("§8Item Reward") && lore.get(1).isEmpty()) {
+                    String line2 = StringUtils.stripControlCodes(lore.get(2));
+                    String enchantName = line2.substring(0, line2.lastIndexOf(" ")).replaceAll(" ", "_").toUpperCase();
+                    itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize;
+                    isSuperpairsReward = true;
+                }
+            }
+        }
+
         if (itemId != null) {
             if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit) {
-                String auctionIdentifier = AuctionData.getIdentifier(item);
+                String auctionIdentifier = isSuperpairsReward ? itemId : AuctionData.getIdentifier(item);
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
                     Double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
