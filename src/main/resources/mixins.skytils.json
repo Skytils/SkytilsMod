@@ -33,6 +33,7 @@
     "MixinRenderLightningBolt",
     "MixinSlot",
     "MixinSoundManager",
+    "MixinSplashProgress",
     "MixinTileEntityChestRenderer",
     "MixinUtil",
     "MixinWorld"
