@@ -223,17 +223,15 @@ public class MiscFeatures {
 
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 String text = "§cGolem spawn in: §a" + NumberUtil.round((golemSpawnTime - System.currentTimeMillis()) / 1000d, 1) + "s";
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                ScreenRenderer.fontRenderer.drawString(text, leftAlign ? 0 : getWidth(), 0, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
         @Override
         public void demoRender() {
-            ScreenRenderer.fontRenderer.drawString("§cGolem spawn in: §a20.0s", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString("§cGolem spawn in: §a20.0s", 0, 0, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override
@@ -263,9 +261,6 @@ public class MiscFeatures {
         public void render() {
             EntityPlayerSP player = mc.thePlayer;
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                float x = getActualX();
-                float y = getActualY();
-
                 boolean hasLegion = false;
                 for (ItemStack armor : player.inventory.armorInventory) {
                     NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(armor);
@@ -277,18 +272,16 @@ public class MiscFeatures {
 
                 if (!hasLegion) return;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
+                RenderUtil.renderItem(new ItemStack(Items.enchanted_book), 0, 0);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 30 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
-                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.legionCap && players.size() > 20 ? 20 : players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.legionCap && players.size() > 20 ? 20 : players.size()), 20, 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
         @Override
         public void demoRender() {
-            float x = getActualX();
-            float y = getActualY();
+            float x = 0;
+            float y = 0;
             RenderUtil.renderItem(new ItemStack(Items.enchanted_book), (int)x, (int)y);
             ScreenRenderer.fontRenderer.drawString("30", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
@@ -324,8 +317,6 @@ public class MiscFeatures {
             EntityPlayerSP player = mc.thePlayer;
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 if (SBInfo.getInstance().getLocation() == null || !SBInfo.getInstance().getLocation().equalsIgnoreCase("combat_3")) return;
-                float x = getActualX();
-                float y = getActualY();
 
                 boolean invalid = false;
                 int placedEyes = 0;
@@ -342,19 +333,15 @@ public class MiscFeatures {
 
                 if (invalid) return;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                RenderUtil.renderTexture(ICON, (int)x, (int)y);
-                ScreenRenderer.fontRenderer.drawString(placedEyes + "/8", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                RenderUtil.renderTexture(ICON, 0, 0);
+                ScreenRenderer.fontRenderer.drawString(placedEyes + "/8", 20, 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
         @Override
         public void demoRender() {
-            float x = getActualX();
-            float y = getActualY();
-            RenderUtil.renderTexture(ICON, (int)x, (int)y);
-            ScreenRenderer.fontRenderer.drawString("6/8", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+            RenderUtil.renderTexture(ICON, 0, 0);
+            ScreenRenderer.fontRenderer.drawString("6/8", 20, 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override

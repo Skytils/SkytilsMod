@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -235,12 +236,12 @@ public class GriffinBurrows {
                     if (hotbarItem == null) continue;
                     if (hotbarItem.getDisplayName().contains("Ancestral Spade")) {
                         long diff = Math.round((60_000L - GriffinBurrows.burrowRefreshTimer.getTime()) / 1000L);
-                        float x = this.getActualX();
-                        float y = this.getActualY();
 
-                        GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                        Minecraft.getMinecraft().fontRendererObj.drawString("Time until refresh: " + diff + "s", x, y, 0xFFFFFF, true);
-                        GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+                        boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
+                        SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+
+                        ScreenRenderer.fontRenderer.drawString("Time until refresh: " + diff + "s", leftAlign ? 0 : getActualWidth(), 0, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                         break;
                     }
                 }
@@ -248,7 +249,7 @@ public class GriffinBurrows {
         }
 
         public void demoRender() {
-            ScreenRenderer.fontRenderer.drawString("Time until refresh: 10s", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString("Time until refresh: 10s", 0, 0, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         public int getHeight() {

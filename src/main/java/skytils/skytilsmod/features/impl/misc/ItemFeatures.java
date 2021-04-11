@@ -440,12 +440,7 @@ public class ItemFeatures {
 
                             int bonus = extraAttr.getInteger("ultimateSoulEaterData");
 
-                            float x = this.getActualX();
-                            float y = this.getActualY();
-
-                            GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                            mc.fontRendererObj.drawString("§cSoul Strength: §a" + bonus, x, y, 0xFFFFFF, true);
-                            GlStateManager.scale(1 / this.getScale(), 1 / this.getScale(), 1.0F);
+                            mc.fontRendererObj.drawString("§cSoul Strength: §a" + bonus, 0, 0, 0xFFFFFF, true);
                         }
                     }
                 }
@@ -454,7 +449,7 @@ public class ItemFeatures {
 
         @Override
         public void demoRender() {
-            ScreenRenderer.fontRenderer.drawString("§cSoul Strength: §a1000", this.getActualX(), this.getActualY(), CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString("§cSoul Strength: §a1000", 0, 0, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override

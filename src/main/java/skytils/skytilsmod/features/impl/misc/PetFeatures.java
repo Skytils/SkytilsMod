@@ -166,20 +166,16 @@ public class PetFeatures {
             EntityPlayerSP player = mc.thePlayer;
             if (this.getToggled() && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 if (!Objects.equals(lastPet, "Dolphin")) return;
-                float x = getActualX();
-                float y = getActualY();
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
-                RenderUtil.renderTexture(ICON, (int)x, (int)y);
+                RenderUtil.renderTexture(ICON, 0, 0);
                 List<EntityPlayer> players = mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getDistanceToEntity(player) <= 10 && p.getUniqueID().version() != 2 && p != player && Utils.isInTablist(p));
-                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.dolphinCap && players.size() > 5 ? 5 : players.size()), x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
+                ScreenRenderer.fontRenderer.drawString(String.valueOf(Skytils.config.dolphinCap && players.size() > 5 ? 5 : players.size()), 20, 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
         @Override
         public void demoRender() {
-            float x = getActualX();
-            float y = getActualY();
+            float x = 0;
+            float y = 0;
             RenderUtil.renderTexture(ICON, (int)x, (int)y);
             ScreenRenderer.fontRenderer.drawString("5", x + 20, y + 5, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NORMAL);
         }

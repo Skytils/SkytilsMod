@@ -576,7 +576,7 @@ public class SpamHider {
 
                 SmartFontRenderer.TextAlignment alignment = x < sr.getScaledWidth() / 2f ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
 
-                ScreenRenderer.fontRenderer.drawString(message.message, (float) (x < sr.getScaledWidth() / 2f ? x : x + getWidth()), (float) y, CommonColors.WHITE, alignment, shadow);
+                ScreenRenderer.fontRenderer.drawString(message.message, (float) (x < sr.getScaledWidth() / 2f ? 0 : getWidth()), 0, CommonColors.WHITE, alignment, shadow);
 
                 if (message.time > 4000) {
                     spamMessages.remove(message);
@@ -603,8 +603,8 @@ public class SpamHider {
                     shadow = SmartFontRenderer.TextShadow.NORMAL;
             }
 
-            double x = this.getActualX() + ((Math.sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30));
-            double y = this.getActualY();
+            double x = ((Math.sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30));
+            double y = 0;
             ScreenRenderer.fontRenderer.drawString("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r", (float) x, (float) y, CommonColors.WHITE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, shadow);
         }
 

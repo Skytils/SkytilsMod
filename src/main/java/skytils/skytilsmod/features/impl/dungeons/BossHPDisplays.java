@@ -109,12 +109,10 @@ public class BossHPDisplays {
 
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 for (int i = 0; i < giantNames.size(); i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                    ScreenRenderer.fontRenderer.drawString(giantNames.get(i).getDisplayName().getFormattedText(), leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    ScreenRenderer.fontRenderer.drawString(giantNames.get(i).getDisplayName().getFormattedText(), leftAlign ? 0 : getActualWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                 }
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }
 
@@ -127,7 +125,7 @@ public class BossHPDisplays {
             for (int i = 0; i < GIANT_NAMES.length; i++) {
                 String text = GIANT_NAMES[i] + " §a20M§c❤";
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(text, leftAlign ? 0 : getActualWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
