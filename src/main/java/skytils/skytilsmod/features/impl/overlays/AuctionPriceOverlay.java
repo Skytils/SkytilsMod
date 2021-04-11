@@ -19,22 +19,26 @@
 package skytils.skytilsmod.features.impl.overlays;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.client.C12PacketUpdateSign;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.structure.FloatPair;
+import skytils.skytilsmod.core.structure.GuiElement;
+import skytils.skytilsmod.core.structure.LocationButton;
 import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton;
@@ -50,11 +54,13 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class AuctionPriceOverlay {
 
     private static ItemStack lastAuctionedStack;
     private static boolean undercut = false;
+    private static final GuiButton tooltipLocationButton = new GuiButton(999, 2, 2, 20, 20, "bruh");
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
@@ -150,12 +156,66 @@ public class AuctionPriceOverlay {
         return count.length() < 2;
     }
 
+    private static double getValueOfEnchantments(ItemStack item) {
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+        if (extraAttr == null || !extraAttr.hasKey("enchantments")) return 0;
+
+        NBTTagCompound enchantments = extraAttr.getCompoundTag("enchantments");
+
+        double total = 0;
+
+        for (String enchantName : enchantments.getKeySet()) {
+            String id = "ENCHANTED_BOOK-" + enchantName.toUpperCase(Locale.US) + "-" + enchantments.getInteger(enchantName);
+            Double price = AuctionData.lowestBINs.get(id);
+            if (price == null) continue;
+
+            double npcPrice = Double.MAX_VALUE;
+            switch (id) {
+                case "ENCHANTED_BOOK-TELEKINESIS-1":
+                    npcPrice = 100;
+                    break;
+                case "ENCHANTED_BOOK-TRUE_PROTECTION-1":
+                    npcPrice = 900_000;
+                    break;
+            }
+
+            total += Math.min(npcPrice, price);
+        }
+
+        return total;
+    }
+
+    private static double getHotPotatoBookValue(ItemStack item) {
+        NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+        if (extraAttr == null || !extraAttr.hasKey("hot_potato_count")) return 0;
+
+        int potatoCount = extraAttr.getInteger("hot_potato_count");
+
+        int hpbs = Math.min(potatoCount, 10);
+        int fpbs = potatoCount - hpbs;
+
+        Double hpbPrice = AuctionData.lowestBINs.get("HOT_POTATO_BOOK");
+        Double fpbPrice = AuctionData.lowestBINs.get("FUMING_POTATO_BOOK");
+
+        double total = 0;
+
+        if (hpbPrice != null) total += hpbs * hpbPrice;
+        if (fpbPrice != null) total += fpbs * fpbPrice;
+
+        return total;
+    }
+
     public static class AuctionPriceScreen extends GuiScreen {
 
         public CleanButton undercutButton;
         public GuiTextField priceField;
         public TileEntitySign sign;
         public SmartFontRenderer fr = ScreenRenderer.fontRenderer;
+
+        public boolean dragging = false;
+
+        private float xOffset = 0;
+        private float yOffset = 0;
 
         public AuctionPriceScreen(GuiEditSign oldScreen) {
             this.sign = ((AccessorGuiEditSign) oldScreen).getTileSign();
@@ -171,10 +231,12 @@ public class AuctionPriceOverlay {
             priceField.setValidator((text) -> text.toLowerCase().replaceAll("[^0-9.kmb]", "").length() == text.length());
             priceField.setFocused(true);
             buttonList.add(undercutButton = new CleanButton(0, width/2 - 100, height/2 + 25, 200, 20, !isUndercut() ? "Mode: Normal" : "Mode: Undercut"));
+            buttonList.add(tooltipLocationButton);
         }
 
         @Override
         public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+            onMouseMove(mouseX, mouseY);
             drawGradientRect(0, 0, this.width, this.height, new Color(117, 115, 115, 25).getRGB(), new Color(0,0, 0,200).getRGB());
             priceField.drawTextBox();
             if (lastAuctionedStack != null) {
@@ -182,31 +244,43 @@ public class AuctionPriceOverlay {
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
                     Double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
-                    if (valuePer != null) fr.drawString("Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * lastAuctionedStack.stackSize) + (lastAuctionedStack.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""), this.width/2f, this.height/2f-50, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
+                    if (valuePer != null) fr.drawString("Clean Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * lastAuctionedStack.stackSize) + (lastAuctionedStack.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""), this.width/2f, this.height/2f-50, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
                 }
+                double enchantValue = getValueOfEnchantments(lastAuctionedStack);
+                if (enchantValue > 0)
+                    fr.drawString("Estimated Enchantment Value: §b" + NumberUtil.nf.format(enchantValue), this.width/2f+200, this.height/2f-50, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NONE);
+                double hpbValue = getHotPotatoBookValue(lastAuctionedStack);
+                if (hpbValue > 0)
+                    fr.drawString("HPB Value: §b" + NumberUtil.nf.format(hpbValue), this.width/2f+200, this.height/2f-25, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NONE);
                 if (isUndercut()) {
                     String input = getInput();
                     fr.drawString("Listing For: " + (input == null ? "§cInvalid Value" : input), this.width/2f, this.height/2f-25, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.MIDDLE, SmartFontRenderer.TextShadow.NONE);
                 }
-                ArrayList<String> lore = Lists.newArrayList(ItemUtil.getItemLore(lastAuctionedStack));
-                if (lore.size() > 3) {
-                    lore.remove(0);
-                    lore.remove(lore.size() - 1);
-                    lore.remove(lore.size() - 1);
-                }
-                if (lore.size() > 0) {
-                    int largestLen = 0;
-                    for (String line : lore) {
-                        int len = fr.getStringWidth(line);
-                        if (len > largestLen) largestLen = len;
+                if (tooltipLocationButton.enabled) {
+                    ArrayList<String> lore = Lists.newArrayList(ItemUtil.getItemLore(lastAuctionedStack));
+                    if (lore.size() > 3) {
+                        lore.remove(0);
+                        lore.remove(lore.size() - 1);
+                        lore.remove(lore.size() - 1);
                     }
-                    fr.drawString("You're selling: " + lastAuctionedStack.stackSize + "x", this.width/2f-200-largestLen, this.height/2f-100, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NONE);
-                    drawHoveringText(lore, this.width/2-200-largestLen-10, this.height/2-70, fr);
-                    GlStateManager.disableLighting();
+                    if (lore.size() > 0) {
+                        int largestLen = 0;
+                        for (String line : lore) {
+                            int len = fr.getStringWidth(line);
+                            if (len > largestLen) largestLen = len;
+                        }
+                        int x = tooltipLocationButton.xPosition;
+                        int y = tooltipLocationButton.yPosition - 20;
+                        tooltipLocationButton.width = largestLen;
+                        tooltipLocationButton.height = lore.size() * fr.FONT_HEIGHT + 20;
+                        fr.drawString("You're selling: " + lastAuctionedStack.stackSize + "x", x, y, CommonColors.ORANGE, SmartFontRenderer.TextAlignment.LEFT_RIGHT, SmartFontRenderer.TextShadow.NONE);
+                        drawHoveringText(lore, x-10, y+30, fr);
+                        GlStateManager.disableLighting();
+                    }
                 }
             }
 
-            super.drawScreen(mouseX, mouseY, partialTicks);
+            undercutButton.drawButton(mc, mouseX, mouseY);
         }
 
         @Override
@@ -241,12 +315,33 @@ public class AuctionPriceOverlay {
         @Override
         protected void mouseReleased(int mouseX, int mouseY, int state) {
             super.mouseReleased(mouseX, mouseY, state);
+            dragging = false;
+        }
+
+        protected void onMouseMove(int mouseX, int mouseY) {
+            ScaledResolution sr = new ScaledResolution(mc);
+            float minecraftScale = sr.getScaleFactor();
+            float floatMouseX = Mouse.getX() / minecraftScale;
+            float floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale;
+            if (dragging) {
+                tooltipLocationButton.xPosition = (int) (floatMouseX - xOffset);
+                tooltipLocationButton.yPosition = (int) (floatMouseY - yOffset);
+            }
         }
 
         @Override
         protected void actionPerformed(GuiButton button) throws IOException {
             if (button.id == 0) {
                 undercut = !undercut;
+            } else if (button.id == 999) {
+                dragging = true;
+                ScaledResolution sr = new ScaledResolution(mc);
+                float minecraftScale = sr.getScaleFactor();
+                float floatMouseX = Mouse.getX() / minecraftScale;
+                float floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale;
+
+                xOffset = floatMouseX - tooltipLocationButton.xPosition;
+                yOffset = floatMouseY - tooltipLocationButton.yPosition;
             }
         }
 

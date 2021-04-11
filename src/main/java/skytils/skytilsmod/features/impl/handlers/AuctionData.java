@@ -79,7 +79,7 @@ public class AuctionData {
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START || !Utils.inSkyblock) return;
         if (!reloadTimer.isStarted()) reloadTimer.start();
-        if (reloadTimer.getTime() >= 60000) {
+        if (reloadTimer.getTime() >= 90000) {
             reloadTimer.reset();
             if (Skytils.config.showLowestBINPrice || Skytils.config.dungeonChestProfit) {
                 new Thread(() -> {

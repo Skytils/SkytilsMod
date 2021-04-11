@@ -218,15 +218,33 @@ public class ItemFeatures {
         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
         String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
+        boolean isSuperpairsReward = false;
+
+        if (item != null && mc.thePlayer.openContainer != null && SBInfo.getInstance().lastOpenContainerName.startsWith("Superpairs (")) {
+            if (StringUtils.stripControlCodes(ItemUtil.getDisplayName(item)).equals("Enchanted Book")) {
+                List<String> lore = ItemUtil.getItemLore(item);
+                if (lore.size() >= 3) {
+                    if (lore.get(0).equals("§8Item Reward") && lore.get(1).isEmpty()) {
+                        String line2 = StringUtils.stripControlCodes(lore.get(2));
+                        String enchantName = line2.substring(0, line2.lastIndexOf(" ")).replaceAll(" ", "_").toUpperCase();
+                        itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize;
+                        isSuperpairsReward = true;
+                    }
+                }
+            }
+        }
+
         if (itemId != null) {
             if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit) {
-                String auctionIdentifier = AuctionData.getIdentifier(item);
+                String auctionIdentifier = isSuperpairsReward ? itemId : AuctionData.getIdentifier(item);
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
                     Double valuePer = AuctionData.lowestBINs.get(auctionIdentifier);
                     if (valuePer != null) {
-                        if (Skytils.config.showLowestBINPrice) event.toolTip.add("§6Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * item.stackSize) + (item.stackSize > 1 ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
-
+                        if (Skytils.config.showLowestBINPrice) {
+                            String total = isSuperpairsReward ? NumberUtil.nf.format(valuePer) : NumberUtil.nf.format(valuePer * item.stackSize);
+                            event.toolTip.add("§6Lowest BIN Price: §b" + total + (item.stackSize > 1 && !isSuperpairsReward ? " §7(" + NumberUtil.nf.format(valuePer) + " each§7)" : ""));
+                        }
                         if (Skytils.config.showCoinsPerBit) {
                             int bitValue = bitCosts.getOrDefault(auctionIdentifier, -1);
                             if (bitValue == -1 && Objects.equals(SBInfo.getInstance().lastOpenContainerName, "Community Shop")) {

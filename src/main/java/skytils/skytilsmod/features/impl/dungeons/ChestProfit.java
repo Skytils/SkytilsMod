@@ -28,16 +28,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
-import skytils.skytilsmod.events.GuiContainerEvent;
 import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.NumberUtil;
-import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
@@ -66,33 +63,34 @@ public class ChestProfit {
             if (inv.getDisplayName().getUnformattedText().endsWith(" Chest")) {
                 DungeonChest chestType = DungeonChest.getFromName(inv.getDisplayName().getUnformattedText());
                 if (chestType != null) {
-                    if (chestType.items.size() == 0) {
-                        ItemStack openChest = inv.getStackInSlot(31);
-                        if (openChest != null && openChest.getDisplayName().equals("§aOpen Reward Chest")) {
+                    ItemStack openChest = inv.getStackInSlot(31);
+                    if (openChest != null && openChest.getDisplayName().equals("§aOpen Reward Chest")) {
 
-                            for (String unclean : ItemUtil.getItemLore(openChest)) {
-                                String line = StringUtils.stripControlCodes(unclean);
-                                if (line.contains("FREE")) {
-                                    chestType.price = 0;
-                                    break;
-                                } else if (line.contains(" Coins")) {
-                                    chestType.price = Double.parseDouble(line.substring(0, line.indexOf(" ")).replaceAll(",", ""));
-                                    break;
-                                }
-                            }
-
-                            for (int i = 11; i < 16; i++) {
-                                ItemStack lootSlot = inv.getStackInSlot(i);
-                                String identifier = AuctionData.getIdentifier(lootSlot);
-                                if (identifier != null) {
-                                    Double value = AuctionData.lowestBINs.get(identifier);
-                                    if (value == null) value = 0D;
-                                    chestType.value += value;
-                                    chestType.items.add(new DungeonChestLootItem(lootSlot, identifier, value));
-                                }
+                        for (String unclean : ItemUtil.getItemLore(openChest)) {
+                            String line = StringUtils.stripControlCodes(unclean);
+                            if (line.contains("FREE")) {
+                                chestType.price = 0;
+                                break;
+                            } else if (line.contains(" Coins")) {
+                                chestType.price = Double.parseDouble(line.substring(0, line.indexOf(" ")).replaceAll(",", ""));
+                                break;
                             }
                         }
-                    } else {
+
+                        chestType.value = 0;
+                        chestType.items.clear();
+                        for (int i = 11; i < 16; i++) {
+                            ItemStack lootSlot = inv.getStackInSlot(i);
+                            String identifier = AuctionData.getIdentifier(lootSlot);
+                            if (identifier != null) {
+                                Double value = AuctionData.lowestBINs.get(identifier);
+                                if (value == null) value = 0D;
+                                chestType.value += value;
+                                chestType.items.add(new DungeonChestLootItem(lootSlot, identifier, value));
+                            }
+                        }
+                    }
+                    if (chestType.items.size() > 0) {
                         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
                         boolean leftAlign = element.getActualX() < sr.getScaledWidth() / 2f;
@@ -112,17 +110,6 @@ public class ChestProfit {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
-        if (!Utils.inDungeons || !Skytils.config.dungeonChestProfit) return;
-        if (event.slotId == 50) {
-            DungeonChest chest = DungeonChest.getFromName(SBInfo.getInstance().lastOpenContainerName);
-            if (chest != null) {
-                chest.reset();
             }
         }
     }

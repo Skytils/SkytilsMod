@@ -215,7 +215,6 @@ public class ItemUtil {
         Matcher petRarityMatcher = PET_PATTERN.matcher(name);
 
         if (petRarityMatcher.find()) {
-            System.out.println(name + " is a pet");
             return true;
         } else {
             return false;
