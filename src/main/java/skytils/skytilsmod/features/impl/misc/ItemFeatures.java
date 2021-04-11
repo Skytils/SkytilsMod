@@ -220,7 +220,7 @@ public class ItemFeatures {
 
         boolean isSuperpairsReward = false;
 
-        if (item != null && mc.thePlayer.openContainer != null && SBInfo.getInstance().lastOpenContainerName.startsWith("Superpairs (")) {
+        if (item != null && mc.thePlayer.openContainer != null && org.apache.commons.lang3.StringUtils.startsWith(SBInfo.getInstance().lastOpenContainerName, "Superpairs (")) {
             if (StringUtils.stripControlCodes(ItemUtil.getDisplayName(item)).equals("Enchanted Book")) {
                 List<String> lore = ItemUtil.getItemLore(item);
                 if (lore.size() >= 3) {
