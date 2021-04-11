@@ -66,6 +66,9 @@ public class LocationButton extends GuiButton {
         GlStateManager.translate(2, 2, 0);
         this.element.demoRender();
         GlStateManager.translate(-2, -2, 0);
+        if (hovered) {
+            lastHoveredElement = element;
+        }
     }
 
     @Override
