@@ -207,7 +207,7 @@ public class ChestProfit {
                     double profit = chest.value - chest.price;
                     String line = chest.displayText + "§f: §" + (profit > 0 ? "a" : "c") + NumberUtil.format((long) profit);
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                    ScreenRenderer.fontRenderer.drawString(line, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT, chest.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    ScreenRenderer.fontRenderer.drawString(line, leftAlign ? 0 : getWidth(), drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT, chest.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
                     drawnLines++;
                 }
             }

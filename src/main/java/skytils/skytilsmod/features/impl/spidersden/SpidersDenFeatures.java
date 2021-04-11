@@ -112,12 +112,10 @@ public class SpidersDenFeatures {
 
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 for (int i = 0; i < arachneNames.size(); i++) {
                     SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                    ScreenRenderer.fontRenderer.drawString(arachneNames.get(i).getDisplayName().getFormattedText(), leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                    ScreenRenderer.fontRenderer.drawString(arachneNames.get(i).getDisplayName().getFormattedText(), leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
                 }
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }
 
@@ -129,7 +127,7 @@ public class SpidersDenFeatures {
 
             String text = "§8[§7Lv500§8] §cArachne §a17.6M§f/§a20M§c❤§r";
             SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-            ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString(text, leftAlign ? 0 : 0 + getActualWidth(), 0, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override

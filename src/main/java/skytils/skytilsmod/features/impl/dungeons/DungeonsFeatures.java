@@ -483,11 +483,9 @@ public class DungeonsFeatures {
 
                 boolean leftAlign = getActualX() < sr.getScaledWidth() / 2f;
 
-                GlStateManager.scale(this.getScale(), this.getScale(), 1.0);
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(livid.getName().replace("§l", ""), leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(livid.getName().replace("§l", ""), leftAlign ? 0 : getWidth(), 0, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
 
-                GlStateManager.scale(1/this.getScale(), 1/this.getScale(), 1.0F);
             }
         }
 

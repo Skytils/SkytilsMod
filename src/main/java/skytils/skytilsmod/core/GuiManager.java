@@ -33,6 +33,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.structure.FloatPair;
 import skytils.skytilsmod.core.structure.GuiElement;
 import skytils.skytilsmod.gui.LocationEditGui;
+import skytils.skytilsmod.utils.MathUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.toasts.GuiToast;
 
@@ -49,6 +50,9 @@ public class GuiManager {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static File positionFile;
     public static Map<String, FloatPair> GUIPOSITIONS;
+
+    private final static float GUI_SCALE_MINIMUM = 0.5F;
+    private final static float GUI_SCALE_MAXIMUM = 5;
 
     private static final Map<Integer, GuiElement> elements = new HashMap<>();
     private int counter = 0;
@@ -139,7 +143,12 @@ public class GuiManager {
             return;
         for(Map.Entry<Integer, GuiElement> e : elements.entrySet()) {
             try {
-                e.getValue().render();
+                GuiElement element = e.getValue();
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(element.getActualX(), element.getActualY(), 0);
+                GlStateManager.scale(element.getScale(), element.getScale(), 0);
+                element.render();
+                GlStateManager.popMatrix();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -243,6 +252,19 @@ public class GuiManager {
             GlStateManager.popMatrix();
             GlStateManager.popMatrix();
         }
+    }
+
+    public static float normalizeValueNoStep(float value) {
+        System.out.println(snapNearDefaultValue(value));
+        return MathUtil.clamp(snapNearDefaultValue(value), GUI_SCALE_MINIMUM, GUI_SCALE_MAXIMUM);
+    }
+
+    public static float snapNearDefaultValue(float value) {
+        if (value != 1 && value > 1-0.05 && value < 1+0.05) {
+            return 1;
+        }
+
+        return value;
     }
 
 }
