@@ -482,6 +482,39 @@ public class SpamHider {
                 }
             }
 
+            // Healer Tethers
+            if (formatted.startsWith("§r§eYou formed a tether")) {
+                switch (Skytils.config.tetherHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.tetherHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Self Orb Pickups
+            if (formatted.startsWith("§r§c◕ §r§eYou picked up a")) {
+                switch (Skytils.config.selfOrbHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.selfOrbHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Other Orb Pickups
+            if (formatted.contains("§r§epicked up your ")) {
+                switch (Skytils.config.otherOrbHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.otherOrbHider == 2);
+                        break;
+                    default:
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

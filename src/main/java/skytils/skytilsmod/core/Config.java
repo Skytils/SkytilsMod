@@ -1400,6 +1400,36 @@ public class Config extends Vigilant {
     public int witherKeyHider = 0;
 
     @Property(
+            type = PropertyType.SELECTOR,
+            name = "Tether Hider",
+            description = "Removes Healer Tether messages from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui"}
+    )
+    public int tetherHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Self Orb Pickup Hider",
+            description = "Removes Healer Orb messages that you pick up from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui"}
+    )
+    public int selfOrbHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Other Orb Pickup Hider",
+            description = "Removes Healer Orb messages that others pick up from your chat.",
+            category = "Spam",
+            subcategory = "Dungeons",
+            options = {"Normal", "Hidden", "Separate Gui"}
+    )
+    public int otherOrbHider = 0;
+
+    @Property(
             type = PropertyType.SLIDER,
             name = "Toast Time",
             description = "Number of milliseconds that toasts are displayed for.",
