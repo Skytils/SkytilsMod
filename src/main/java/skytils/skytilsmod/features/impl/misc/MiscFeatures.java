@@ -23,6 +23,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.boss.IBossDisplayData;
@@ -221,6 +222,8 @@ public class MiscFeatures {
         ContainerChest chest = (ContainerChest) event.container;
 
         if (Utils.equalsOneOf(chest.getLowerChestInventory().getName(), "Chest", "Large Chest")) return;
+        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe")) return;
+        if (GuiScreen.isCtrlKeyDown()) return;
 
         ItemStack item = event.slot.getStack();
 
