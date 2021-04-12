@@ -42,6 +42,7 @@ import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.events.BossBarEvent;
 import skytils.skytilsmod.events.RenderBlockInWorldEvent;
 import skytils.skytilsmod.utils.*;
+import skytils.skytilsmod.utils.StringUtils;
 
 import java.awt.*;
 import java.util.LinkedHashMap;
