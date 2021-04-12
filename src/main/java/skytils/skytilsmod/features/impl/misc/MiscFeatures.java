@@ -167,6 +167,19 @@ public class MiscFeatures {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
             if (Skytils.config.disableCooldownSounds && packet.getSoundName().equals("mob.endermen.portal") && packet.getPitch() == 0 && packet.getVolume() == 8) {
                 event.setCanceled(true);
+            } else if (Skytils.config.disableJerrygunSounds) {
+                switch (packet.getSoundName()) {
+                    case "mob.villager.yes":
+                        if (packet.getVolume() == 0.35f) {
+                            event.setCanceled(true);
+                        }
+                        break;
+                    case "mob.villager.haggle":
+                        if (packet.getVolume() == 0.5f) {
+                            event.setCanceled(true);
+                        }
+                        break;
+                }
             }
         }
     }
