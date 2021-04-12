@@ -79,4 +79,10 @@ public class MixinPlayerControllerMP {
             e.printStackTrace();
         }
     }
+
+    @Inject(method = "windowClick", at = @At("HEAD"), cancellable = true)
+    private void onWindowClick(int windowId, int slotId, int mouseButtonClicked, int mode, EntityPlayer playerIn, CallbackInfoReturnable<ItemStack> cir) {
+        if (mode == -69420) cir.setReturnValue(null);
+    }
+
 }
