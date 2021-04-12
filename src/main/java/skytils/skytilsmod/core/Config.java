@@ -1223,6 +1223,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Disable Jerry-chine Gun Sounds",
+            description = "Stops the villager hrmm noises that the Jerry-chine gun projectiles make",
+            category = "Sounds",
+            subcategory = "Abilities"
+    )
+    public boolean disableJerrygunSounds = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Disable Terracotta Sounds",
             description = "Prevent the game from playing the loud sounds created by the Terracotta.",
             category = "Sounds",
