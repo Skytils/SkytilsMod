@@ -51,6 +51,7 @@ import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.features.impl.handlers.AuctionData;
 import skytils.skytilsmod.features.impl.handlers.BlockAbility;
 import skytils.skytilsmod.utils.*;
+import skytils.skytilsmod.utils.StringUtils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
@@ -220,7 +221,7 @@ public class ItemFeatures {
 
         boolean isSuperpairsReward = false;
 
-        if (item != null && mc.thePlayer.openContainer != null && org.apache.commons.lang3.StringUtils.startsWith(SBInfo.getInstance().lastOpenContainerName, "Superpairs (")) {
+        if (item != null && mc.thePlayer.openContainer != null && StringUtils.startsWith(SBInfo.getInstance().lastOpenContainerName, "Superpairs (")) {
             if (StringUtils.stripControlCodes(ItemUtil.getDisplayName(item)).equals("Enchanted Book")) {
                 List<String> lore = ItemUtil.getItemLore(item);
                 if (lore.size() >= 3) {
@@ -247,7 +248,7 @@ public class ItemFeatures {
                         }
                         if (Skytils.config.showCoinsPerBit) {
                             int bitValue = bitCosts.getOrDefault(auctionIdentifier, -1);
-                            if (bitValue == -1 && Objects.equals(SBInfo.getInstance().lastOpenContainerName, "Community Shop") || org.apache.commons.lang3.StringUtils.startsWith(SBInfo.getInstance().lastOpenContainerName, "Bits Shop - ")) {
+                            if (bitValue == -1 && Objects.equals(SBInfo.getInstance().lastOpenContainerName, "Community Shop") || StringUtils.startsWith(SBInfo.getInstance().lastOpenContainerName, "Bits Shop - ")) {
                                 List<String> lore = ItemUtil.getItemLore(item);
                                 for (int i = 0; i < lore.size(); i++) {
                                     String line = lore.get(i);

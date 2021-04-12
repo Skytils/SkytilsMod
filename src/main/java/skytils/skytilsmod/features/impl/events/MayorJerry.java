@@ -18,12 +18,12 @@
 
 package skytils.skytilsmod.features.impl.events;
 
-import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
+import skytils.skytilsmod.utils.StringUtils;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.regex.Matcher;

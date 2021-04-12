@@ -21,17 +21,15 @@ package skytils.skytilsmod.features.impl.misc;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.EntityManager;
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures;
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity;
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location;
+import skytils.skytilsmod.utils.StringUtils;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.regex.Matcher;

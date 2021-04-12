@@ -28,11 +28,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.DamageBlockEvent;
 import skytils.skytilsmod.events.PacketEvent;
+import skytils.skytilsmod.utils.StringUtils;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
