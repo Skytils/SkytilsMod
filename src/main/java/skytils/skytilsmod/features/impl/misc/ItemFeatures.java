@@ -247,7 +247,7 @@ public class ItemFeatures {
                         }
                         if (Skytils.config.showCoinsPerBit) {
                             int bitValue = bitCosts.getOrDefault(auctionIdentifier, -1);
-                            if (bitValue == -1 && Objects.equals(SBInfo.getInstance().lastOpenContainerName, "Community Shop")) {
+                            if (bitValue == -1 && Objects.equals(SBInfo.getInstance().lastOpenContainerName, "Community Shop") || org.apache.commons.lang3.StringUtils.startsWith(SBInfo.getInstance().lastOpenContainerName, "Bits Shop - ")) {
                                 List<String> lore = ItemUtil.getItemLore(item);
                                 for (int i = 0; i < lore.size(); i++) {
                                     String line = lore.get(i);
