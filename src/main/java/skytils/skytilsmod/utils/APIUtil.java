@@ -47,7 +47,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Taken from Danker's Skyblock Mod under GPL 3.0 license
+ * Modified from Danker's Skyblock Mod under GPL 3.0 license
  * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  * @author bowser0000
  */
@@ -112,27 +112,31 @@ public class APIUtil {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
         try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+            HttpGet request = new HttpGet(new URL(urlString).toURI());
 
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            request.setProtocolVersion(HttpVersion.HTTP_1_1);
+
+            HttpResponse response = client.execute(request);
+
+            HttpEntity entity = response.getEntity();
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent()));
                 String input;
-                StringBuilder response = new StringBuilder();
+                StringBuilder r = new StringBuilder();
 
                 while ((input = in.readLine()) != null) {
-                    response.append(input);
+                    r.append(input);
                 }
                 in.close();
 
                 Gson gson = new Gson();
 
-                return gson.fromJson(response.toString(), JsonArray.class);
+                return gson.fromJson(r.toString(), JsonArray.class);
             } else {
-                player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + conn.getResponseCode()));
+                player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + response.getStatusLine().getStatusCode()));
             }
-        } catch (IOException ex) {
+        } catch (IOException | URISyntaxException ex) {
             player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "An error has occured. See logs for more details."));
             ex.printStackTrace();
         }
