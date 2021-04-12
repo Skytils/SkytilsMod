@@ -28,4 +28,8 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.startsWith(string, sequence);
     }
 
+    public static boolean startsWithAny(CharSequence string, CharSequence... sequences) {
+        return org.apache.commons.lang3.StringUtils.startsWithAny(string, sequences);
+    }
+
 }
