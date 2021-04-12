@@ -55,6 +55,7 @@ public class TerminalFeatures {
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inDungeons) return;
+        if (!Skytils.config.clickInOrderTerminalSolver && !Skytils.config.selectAllColorTerminalSolver && !Skytils.config.startsWithSequenceTerminalSolver && !Skytils.config.blockIncorrectTerminalClicks) return;
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
