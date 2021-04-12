@@ -113,11 +113,13 @@ public class SpamHider {
         String unformatted = StringUtils.stripControlCodes(packet.getChatComponent().getUnformattedText());
         String formatted = packet.getChatComponent().getFormattedText();
 
+        // Profile
         if (formatted.startsWith("§aYou are playing on profile:")) {
             switch (Skytils.config.profileHider) {
                 case 1:
                 case 2:
                     cancelChatPacket(event, Skytils.config.profileHider == 2);
+                    break;
                 default:
             }
         }
@@ -236,6 +238,17 @@ public class SpamHider {
                     case 1:
                     case 2:
                         cancelChatPacket(event, Skytils.config.lividHider == 2);
+                        break;
+                    default:
+                }
+            }
+
+            // Ray of Hope
+            if (formatted.startsWith("§r§7Your Ray of Hope hit")) {
+                switch (Skytils.config.hopeHider) {
+                    case 1:
+                    case 2:
+                        cancelChatPacket(event, Skytils.config.hopeHider == 2);
                         break;
                     default:
                 }
