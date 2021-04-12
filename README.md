@@ -20,17 +20,27 @@ A Hypixel Skyblock Utilities mod.
 ## Features
 ***
 #### General
- - Client Side Custom Armor Colors
+ - Client Side Custom Armor Colors (with animated rainbow)
  - Custom Command Aliases
  - Griffin Burrow Locator and Waypoints
  - Reparty Command Which Yields to Other Mods
  - Auto Accept Reparty
- - Soul Eater Bonus Strength
+ - Trick or Treat Chest Alert
+ - Custom Key Shortcuts
+ - Better Auction House Price Input
  - Spam Hider for
+     - Profile messages
      - Mort messages
      - Boss messages
+     - Oruo (Trivia puzzle) messages
      - Autopet messages
      - Ability messages
+          - Implosion
+          - Midas Staff
+          - Spirit Sceptre
+          - Giant Sword
+          - Livid Dagger
+          - Staff of the Rising Sun
      - Cooldown messages
      - Mana messages
      - Blocks in the way messages
@@ -41,7 +51,7 @@ A Hypixel Skyblock Utilities mod.
      - Combo messages
      - Blessing enchant and bait messages
 ##### Dungeons
- - Show Hidden Fels, Shadow Assassins, and blood room mobs
+ - ~~Show Hidden Fels, Shadow Assassins, and blood room mobs~~
  - Blaze Solver Which Replaces The Skin Textures
  - Boulder Puzzle Solver [WIP]
  - Simon Says Solver [WIP]
@@ -51,27 +61,32 @@ A Hypixel Skyblock Utilities mod.
  - Click in Order Terminal Solver
  - Ice Path Solver
  - Select All Color Solver
- - Stop dropping, salvaging, and selling starred dungeon items
- - Bigger bats and bat hitboxes
+ - Stop Dropping, Salvaging, and Selling Starred Dungeon Items
+ - Bigger Bat Rendering and Bat Hitbox Display
  - Giant, Sadan, and Necron HP Display
  - Better Sadan Interest timer
  - Score Calculation
  - Dungeon Timer
- - Necron phase timer
- - Dungeon reroll confirmation
+ - Necron Phase Timer
+ - Dungeon reroll Confirmation
+ - Skeleton Master Boxes
+ - Correct Livid Finder (with M5 support)
+ - Dungeon Chest Profit
 #### Farming
- - Block Math Hoe recipe viewer
- - Block breaking farms
+ - ~~Block Math Hoe Recipe Viewer~~
+ - ~~Block Breaking Farms~~
 #### Mining 
- - Show Ghosts in the Mist (Also their health)
- - Disable Pickaxe Ability on Private Island
+ - ~~Show Ghosts in the Mist (Also their health)~~
+ - ~~Disable Pickaxe Ability on Private Island~~
  - Fetchur Solver
  - Puzzler Solver
  - Raffle Waypoint and Warning
  - Show hidden sneaky creepers
+ - Dark Mode Mist
 #### Items
- - Block Useless Zombie Sword Uses
- - Prioritize Item Abilities
+ - Soul Eater Bonus Strength
+ - ~~Block Useless Zombie Sword Uses~~
+ - ~~Prioritize Item Abilities~~
  - Pet Item Confirmation
  - Hide Implosion Particles
  - Hide Midas Staff Gold Blocks
@@ -82,7 +97,13 @@ A Hypixel Skyblock Utilities mod.
  - Only Collect Enchanted Items
  - Dungeon Potion Lock
  - Power Orb Lock
- - Prevent placing spirit sceptre and flower of truth
+ - Prevent Placing Spirit Sceptre and Flower of Truth
+ - Transparent Head Layer
+ - Show NPC Sell Values
+ - ~~Hide Wither Veil Creepers Near NPCs~~
+ - ~~Customizable Block Item Ability~~
+ - Show Price of Items in the Experimentation Table
+ - Jerry-chine Gun Sound Hider
 ### Miscellaneous
  - Hide Witherborn Boss Bars
  - Hide Fire and Lightning
@@ -93,19 +114,28 @@ A Hypixel Skyblock Utilities mod.
  - Stop other mods from cancelling terminal clicks
  - Slayer miniboss spawn alert
  - Hide fishing hooks from other players
+ - Placed Summoning Eye Display
 
 
 And more to come!
 
 ## Commands
 ***
-- /skytils (/st) - Opens the main settings gui.
+- /skytils - Opens the main GUI. (Alias is /st)
+- /skytils config - Opens the GUI to edit the config.
+- /skytils help - Displays the various commands and their usages
 - /skytils setkey <apikey> - Sets your api key (will also grab it from /api new).
 - /skytils reload <aliases/data> - Forces Skytils to re-fetch your command aliases or solutions from the data repository.
+- /skytils fetchur - Displays the current Fetchur item for the day.
 - /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
-- /skytils editlocation - [WIP] Opens the location editing gui.
-- /armorcolor (/armourcolour) <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided.
+- /skytils aliases - Opens the GUI to edit command aliases.
+- /skytils editlocations (/skytils editlocation, gui, loc) - Opens the GUI to modify HUD element locations.
+- /skytils shortcuts - Opens the GUI to modify keybind shortcuts.
+- /armorcolor <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided. (can also be accessed by /skytils armorcolor)
+- ~~/blockability [clearall] - Block using the ability on the currently held item~~
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
+- /glintcustomize override <on/off/clear/clearall> - Change the visibility of enchantment glints for the item.
+- /glintcustomize color <set/clear/clearall> - Change the enchant glint color for the item.
 
 
 ### Credits to Open Source Software
