@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -211,6 +212,23 @@ public class MiscFeatures {
                 }
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onSlotClickLow(GuiContainerEvent.SlotClickEvent event) {
+        if (!Utils.inSkyblock || !Skytils.config.middleClickGUIItems) return;
+        if (event.clickedButton != 0 || event.clickType != 0 || !(event.container instanceof ContainerChest) || event.slot == null || !event.slot.getHasStack()) return;
+        ContainerChest chest = (ContainerChest) event.container;
+
+        if (Utils.equalsOneOf(chest.getLowerChestInventory().getName(), "Chest", "Large Chest")) return;
+
+        ItemStack item = event.slot.getStack();
+
+        if (ItemUtil.getSkyBlockItemID(item) == null) {
+            event.clickedButton = 2;
+            event.clickType = 0;
+        }
+
     }
 
     static {
