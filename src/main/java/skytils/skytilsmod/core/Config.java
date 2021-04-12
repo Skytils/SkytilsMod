@@ -1006,6 +1006,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Middle Click GUI Items",
+            description = "Replaces left clicks on items with no Skyblock ID with middle clicks.",
+            category = "Miscellaneous",
+            subcategory = "Quality of Life"
+    )
+    public boolean middleClickGUIItems = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "No Fire",
             description = "Removes first-person fire overlay when you are burning.",
             category = "Miscellaneous",
