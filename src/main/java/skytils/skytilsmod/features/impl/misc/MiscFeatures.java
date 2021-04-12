@@ -225,8 +225,8 @@ public class MiscFeatures {
         ItemStack item = event.slot.getStack();
 
         if (ItemUtil.getSkyBlockItemID(item) == null) {
-            event.clickedButton = 2;
-            event.clickType = 0;
+            event.setCanceled(true);
+            mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer);
         }
 
     }
