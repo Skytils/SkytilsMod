@@ -143,6 +143,7 @@ public class ClickInOrderSolver {
     @SubscribeEvent
     public void onSlotClick(GuiContainerEvent.SlotClickEvent event) {
         if (!Utils.inDungeons) return;
+        if (!Skytils.config.clickInOrderTerminalSolver) return;
         if (event.container instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) event.container;
             String chestName = chest.getLowerChestInventory().getDisplayName().getUnformattedText().trim();
