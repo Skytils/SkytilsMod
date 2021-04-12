@@ -25,7 +25,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -223,7 +222,7 @@ public class MiscFeatures {
 
         if (Utils.equalsOneOf(chest.getLowerChestInventory().getName(), "Chest", "Large Chest")) return;
         if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe")) return;
-        if (GuiScreen.isCtrlKeyDown()) return;
+        if (event.slot.inventory == mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return;
 
         ItemStack item = event.slot.getStack();
 
