@@ -1310,6 +1310,16 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Ray of Hope Hider",
+            description = "Removes Ray of Hope messages from your chat.",
+            category = "Spam",
+            subcategory = "Abilities",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int hopeHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Mana Use Hider",
             description = "Removes mana usage updates from the action bar.\nWorks best with SkyblockAddons.",
             category = "Spam",
