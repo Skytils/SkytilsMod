@@ -562,8 +562,6 @@ public class SpamHider {
                 SpamMessage message = spamMessages.get(i);
                 int messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(StringUtils.stripControlCodes(message.message));
 
-                double x = this.getActualX();
-                double y = 0;
                 if (this.getActualY() > sr.getScaledHeight() / 2f) {
                     message.height = (message.height + ((i * 10) - message.height) * (animDiv * 5));
                 } else if (this.getActualY() < sr.getScaledHeight() / 2f) {
@@ -588,12 +586,8 @@ public class SpamHider {
                 animOnOff *= -1;
                 animOnOff += 1;
 
-                if (x < sr.getScaledWidth() / 2f) {
-                    x += (-animOnOff * (messageWidth + 30));
-                } else {
-                    x += (animOnOff * (messageWidth + 30));
-                }
-                y = this.getActualY() - (message.height);
+                double x = (animOnOff * (messageWidth + 30)) * ((this.getActualX() < sr.getScaledWidth() / 2f) ? -1 : 1);
+                double y = -1 * (message.height);
 
                 SmartFontRenderer.TextShadow shadow;
                 switch (Skytils.config.spamShadow) {
@@ -609,7 +603,7 @@ public class SpamHider {
 
                 SmartFontRenderer.TextAlignment alignment = x < sr.getScaledWidth() / 2f ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
 
-                ScreenRenderer.fontRenderer.drawString(message.message, (float) (x < sr.getScaledWidth() / 2f ? 0 : getWidth()), 0, CommonColors.WHITE, alignment, shadow);
+                ScreenRenderer.fontRenderer.drawString(message.message, (float) (x < sr.getScaledWidth() / 2f ? x : x + getWidth()), (float) y, CommonColors.WHITE, alignment, shadow);
 
                 if (message.time > 4000) {
                     spamMessages.remove(message);
