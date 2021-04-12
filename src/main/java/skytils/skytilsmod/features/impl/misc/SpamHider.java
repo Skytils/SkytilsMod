@@ -667,11 +667,13 @@ public class SpamHider {
         }
 
         public boolean getToggled() {
-            return Skytils.config.implosionHider == 2 ||
+            return Skytils.config.profileHider == 2 ||
+                    Skytils.config.implosionHider == 2 ||
                     Skytils.config.midasStaffHider == 2 ||
                     Skytils.config.spiritSceptreHider == 2 ||
                     Skytils.config.giantSwordHider == 2 ||
                     Skytils.config.lividHider == 2 ||
+                    Skytils.config.hopeHider == 2 ||
                     Skytils.config.manaUseHider == 2 ||
                     Skytils.config.bloodKeyHider == 2 ||
                     Skytils.config.hideBossMessages == 2 ||
@@ -688,7 +690,10 @@ public class SpamHider {
                     Skytils.config.hideNoEnemiesNearby == 2 ||
                     Skytils.config.manaMessages == 2 ||
                     Skytils.config.blessingEnchantHider == 2 ||
-                    Skytils.config.blessingBaitHider == 2;
+                    Skytils.config.blessingBaitHider == 2 ||
+                    Skytils.config.tetherHider == 2 ||
+                    Skytils.config.selfOrbHider == 2 ||
+                    Skytils.config.otherOrbHider == 2;
         }
     }
 }
