@@ -29,9 +29,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import skytils.skytilsmod.events.GuiContainerEvent;
 
 @Mixin(GuiContainer.class)
@@ -82,26 +80,10 @@ public abstract class MixinGuiContainer extends GuiScreen {
     }
 
 
-    @ModifyArgs(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"))
-    private void onMouseClick(Args args) {
+    @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
         try {
-            Slot slot = inventorySlots.getSlot(args.get(1));
-            GuiContainerEvent.SlotClickEvent event = new GuiContainerEvent.SlotClickEvent(that, inventorySlots, slot, args.get(1), args.get(2), args.get(3));
-            if (!MinecraftForge.EVENT_BUS.post(event)) {
-                if (event.slot != slot) {
-                    args.set(1, event.slot.slotNumber);
-                } else if (event.slotId != (int)args.get(1)) {
-                    args.set(1, event.slotId);
-                }
-                if (event.clickedButton != (int)args.get(2)) {
-                    args.set(2, event.clickedButton);
-                }
-                if (event.clickType != (int)args.get(3)) {
-                    args.set(3, event.clickType);
-                }
-            } else {
-                args.set(3, -69420);
-            }
+            if (MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.SlotClickEvent(that, inventorySlots, slot, slotId, clickedButton, clickType))) ci.cancel();
         } catch (Throwable e) {
             Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.SlotClickEvent. Please report this on the Discord server."));
             e.printStackTrace();
