@@ -21,7 +21,6 @@ package skytils.skytilsmod.utils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.StringUtils;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
