@@ -1519,6 +1519,16 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SELECTOR,
+            name = "Profile Message Hider",
+            description = "Removes the \"§aYou are playing on profile: §eFruit§r\" messages from your chat.",
+            category = "Spam",
+            subcategory = "Miscellaneous",
+            options = {"Normal", "Hidden", "Separate GUI"}
+    )
+    public int profileHider = 0;
+
+    @Property(
+            type = PropertyType.SELECTOR,
             name = "Blessing Enchant Hider",
             description = "Removes blessing enchant message from fishing.",
             category = "Spam",

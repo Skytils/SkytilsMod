@@ -107,12 +107,22 @@ public class SpamHider {
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public void onChatPacket(PacketEvent.ReceiveEvent event) {
-        if (!Utils.inSkyblock) return;
         if (!(event.packet instanceof S02PacketChat)) return;
         S02PacketChat packet = (S02PacketChat) event.packet;
         if (packet.getType() == 2) return;
         String unformatted = StringUtils.stripControlCodes(packet.getChatComponent().getUnformattedText());
         String formatted = packet.getChatComponent().getFormattedText();
+
+        if (formatted.startsWith("§aYou are playing on profile:")) {
+            switch (Skytils.config.profileHider) {
+                case 1:
+                case 2:
+                    cancelChatPacket(event, Skytils.config.profileHider == 2);
+                default:
+            }
+        }
+
+        if (!Utils.inSkyblock) return;
 
         try {
             // Hide Mort Messages
