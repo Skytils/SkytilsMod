@@ -303,7 +303,7 @@ public class AuctionPriceOverlay {
                 sign.signText[0] = new ChatComponentText("Invalid Value");
             } else {
                 sign.signText[0] = new ChatComponentText(input);
-                lastEnteredInput = input;
+                lastEnteredInput = priceField.getText();
             }
         }
 
