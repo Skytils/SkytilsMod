@@ -55,32 +55,28 @@ public class SBInfo {
     private static final SBInfo INSTANCE = new SBInfo();
 
     private static final Pattern timePattern = Pattern.compile(".+(am|pm)");
-
+    private static final Pattern JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}");
     public String location = "";
     public String date = "";
     public String time = "";
     public String objective = "";
-
     public String mode = "";
-
     public Date currentTimeDate = null;
-
     public String lastOpenContainerName = null;
-
-    public static SBInfo getInstance() {
-        return INSTANCE;
-    }
-
     private long lastManualLocRaw = -1;
     private long lastLocRaw = -1;
     private long joinedWorld = -1;
     private JsonObject locraw = null;
 
+    public static SBInfo getInstance() {
+        return INSTANCE;
+    }
+
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
         if (!Utils.inSkyblock) return;
 
-        if(event.gui instanceof GuiChest) {
+        if (event.gui instanceof GuiChest) {
             GuiChest chest = (GuiChest) event.gui;
             ContainerChest container = (ContainerChest) chest.inventorySlots;
             String containerName = container.getLowerChestInventory().getDisplayName().getUnformattedText();
@@ -98,12 +94,10 @@ public class SBInfo {
         lastOpenContainerName = null;
     }
 
-    private static final Pattern JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}");
-
     @SubscribeEvent
     public void onSendChatMessage(SendChatMessageEvent event) {
         String msg = event.message;
-        if(msg.trim().startsWith("/locraw") || msg.trim().startsWith("/locraw ")) {
+        if (msg.trim().startsWith("/locraw") || msg.trim().startsWith("/locraw ")) {
             lastManualLocRaw = System.currentTimeMillis();
         }
     }
@@ -112,17 +106,17 @@ public class SBInfo {
     public void onChatMessage(ClientChatReceivedEvent event) {
         if (event.message.getUnformattedText().contains("{") && event.message.getUnformattedText().contains("}")) {
             Matcher matcher = JSON_BRACKET_PATTERN.matcher(event.message.getUnformattedText());
-            if(matcher.find()) {
+            if (matcher.find()) {
                 try {
                     JsonObject obj = new Gson().fromJson(matcher.group(), JsonObject.class);
-                    if(obj.has("server")) {
-                        if(System.currentTimeMillis() - lastManualLocRaw > 5000) event.setCanceled(true);
-                        if(obj.has("gametype") && obj.has("mode") && obj.has("map")) {
+                    if (obj.has("server")) {
+                        if (System.currentTimeMillis() - lastManualLocRaw > 5000) event.setCanceled(true);
+                        if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
                             locraw = obj;
                             mode = locraw.get("mode").getAsString();
                         }
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -130,7 +124,7 @@ public class SBInfo {
     }
 
     public String getLocation() {
-        if(mode == null) {
+        if (mode == null) {
             return null;
         }
         return mode;
@@ -138,12 +132,11 @@ public class SBInfo {
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock) return;
+        if (event.phase != TickEvent.Phase.START || Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock)
+            return;
         long currentTime = System.currentTimeMillis();
 
-        if(Minecraft.getMinecraft().thePlayer != null &&
-                Minecraft.getMinecraft().theWorld != null &&
-                locraw == null &&
+        if (locraw == null &&
                 (currentTime - joinedWorld) > 1000 &&
                 (currentTime - lastLocRaw) > 15000) {
             lastLocRaw = System.currentTimeMillis();
@@ -158,38 +151,39 @@ public class SBInfo {
             List<Score> scores = new ArrayList<>(scoreboard.getSortedScores(sidebarObjective));
 
             List<String> lines = new ArrayList<>();
-            for(int i=scores.size()-1; i>=0; i--) {
+            for (int i = scores.size() - 1; i >= 0; i--) {
                 Score score = scores.get(i);
                 ScorePlayerTeam scoreplayerteam1 = scoreboard.getPlayersTeam(score.getPlayerName());
                 String line = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score.getPlayerName());
                 line = StringUtils.stripControlCodes(line);
                 lines.add(line);
             }
-            if(lines.size() >= 5) {
+            if (lines.size() >= 5) {
                 date = StringUtils.stripControlCodes(lines.get(1)).trim();
                 //§74:40am
                 Matcher matcher = timePattern.matcher(lines.get(2));
-                if(matcher.find()) {
+                if (matcher.find()) {
                     time = StringUtils.stripControlCodes(matcher.group()).trim();
                     try {
                         String timeSpace = time.replace("am", " am").replace("pm", " pm");
                         SimpleDateFormat parseFormat = new SimpleDateFormat("hh:mm a");
                         currentTimeDate = parseFormat.parse(timeSpace);
-                    } catch (ParseException e) {}
+                    } catch (ParseException e) {
+                    }
                 }
                 location = StringUtils.stripControlCodes(lines.get(3)).replaceAll("[^A-Za-z0-9() ]", "").trim();
             }
             objective = null;
 
             boolean objTextLast = false;
-            for(String line : lines) {
-                if(objTextLast) {
+            for (String line : lines) {
+                if (objTextLast) {
                     objective = line;
                 }
 
                 objTextLast = line.equals("Objective");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
