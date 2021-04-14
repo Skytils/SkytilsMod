@@ -571,7 +571,7 @@ public class SpamHider {
          * @author Soopyboo32
          */
         public void render() {
-            long now = new Date().getTime();
+            long now = System.currentTimeMillis();
 
             long timePassed = now - lastTimeRender;
             ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());

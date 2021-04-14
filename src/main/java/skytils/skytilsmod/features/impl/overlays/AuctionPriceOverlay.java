@@ -24,7 +24,6 @@ import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.client.C12PacketUpdateSign;
@@ -56,6 +55,7 @@ import java.util.Locale;
 public class AuctionPriceOverlay {
 
     private static ItemStack lastAuctionedStack;
+    private static String lastEnteredInput = "";
     private static boolean undercut = false;
     private static final GuiButton tooltipLocationButton = new GuiButton(999, 2, 2, 20, 20, "bruh");
 
@@ -227,6 +227,9 @@ public class AuctionPriceOverlay {
             priceField.setMaxStringLength(15);
             priceField.setValidator((text) -> text.toLowerCase().replaceAll("[^0-9.kmb]", "").length() == text.length());
             priceField.setFocused(true);
+            priceField.setText(lastEnteredInput);
+            priceField.setCursorPositionEnd();
+            priceField.setSelectionPos(0);
             buttonList.add(undercutButton = new CleanButton(0, width/2 - 100, height/2 + 25, 200, 20, !isUndercut() ? "Mode: Normal" : "Mode: Undercut"));
             buttonList.add(tooltipLocationButton);
         }
@@ -299,7 +302,8 @@ public class AuctionPriceOverlay {
             if (input == null) {
                 sign.signText[0] = new ChatComponentText("Invalid Value");
             } else {
-                sign.signText[0] = new ChatComponentText(getInput());
+                sign.signText[0] = new ChatComponentText(input);
+                lastEnteredInput = priceField.getText();
             }
         }
 
