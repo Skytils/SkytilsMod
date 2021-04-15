@@ -37,6 +37,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -221,12 +222,14 @@ public class MiscFeatures {
         ContainerChest chest = (ContainerChest) event.container;
 
         if (Utils.equalsOneOf(chest.getLowerChestInventory().getName(), "Chest", "Large Chest")) return;
-        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe")) return;
+        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe", "Drill Anvil")) return;
         if (event.slot.inventory == mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return;
 
         ItemStack item = event.slot.getStack();
 
         if (ItemUtil.getSkyBlockItemID(item) == null) {
+            if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Auctions Browser") && item.getItem() == Items.arrow) return;
+            if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Reforge Item") && item.getItem() == Item.getItemFromBlock(Blocks.anvil) && item.getDisplayName().equals("§aReforge Item")) return;
             event.setCanceled(true);
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer);
         }
