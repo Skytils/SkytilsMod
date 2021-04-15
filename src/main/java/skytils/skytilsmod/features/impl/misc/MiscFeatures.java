@@ -167,7 +167,8 @@ public class MiscFeatures {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
             if (Skytils.config.disableCooldownSounds && packet.getSoundName().equals("mob.endermen.portal") && packet.getPitch() == 0 && packet.getVolume() == 8) {
                 event.setCanceled(true);
-            } else if (Skytils.config.disableJerrygunSounds) {
+            }
+            if (Skytils.config.disableJerrygunSounds) {
                 switch (packet.getSoundName()) {
                     case "mob.villager.yes":
                         if (packet.getVolume() == 0.35f) {
@@ -180,6 +181,9 @@ public class MiscFeatures {
                         }
                         break;
                 }
+            }
+            if (Skytils.config.disableTruthFlowerSounds && packet.getSoundName().equals("random.eat") && packet.getPitch() == 0.6984127f && packet.getVolume() == 1.0f) {
+                event.setCanceled(true);
             }
         }
     }
