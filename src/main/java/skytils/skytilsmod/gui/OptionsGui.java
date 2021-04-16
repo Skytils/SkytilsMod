@@ -32,6 +32,8 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class OptionsGui extends GuiScreen {
 
@@ -47,6 +49,8 @@ public class OptionsGui extends GuiScreen {
         buttonList.add(new CleanButton(1, width / 2 - 100, this.height / 4 + 125, 200, 20, "Edit Aliases"));
         buttonList.add(new CleanButton(2, width / 2 - 100, this.height / 4 + 150, 200, 20, "Edit Locations"));
         buttonList.add(new CleanButton(3, width / 2 - 100, this.height / 4 + 175, 200, 20, "Edit Shortcuts"));
+        buttonList.add(new CleanButton(4, width - width / 10 - 3, this.height - height / 20 - 3, width / 10 - 3, height / 20 - 3, "Discord"));
+        buttonList.add(new CleanButton(5, width - width / 10 - 3, this.height - 2 * height / 20 - 3, width / 10 - 3, height / 20 - 3, "Github"));
     }
 
     @Override
@@ -80,6 +84,20 @@ public class OptionsGui extends GuiScreen {
                 break;
             case 3:
                 mc.displayGuiScreen(new KeyShortcutsGui());
+                break;
+            case 4:
+                try {
+                    Desktop.getDesktop().browse(new URI("https://discord.gg/skytils"));
+                } catch (IOException | URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+                break;
+            case 5:
+                try {
+                    Desktop.getDesktop().browse(new URI("https://github.com/Skytils/SkytilsMod"));
+                } catch (IOException | URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
                 break;
         }
     }

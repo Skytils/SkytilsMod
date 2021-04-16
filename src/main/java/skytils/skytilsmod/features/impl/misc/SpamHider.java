@@ -624,9 +624,9 @@ public class SpamHider {
                         shadow = SmartFontRenderer.TextShadow.NORMAL;
                 }
 
-                SmartFontRenderer.TextAlignment alignment = x < sr.getScaledWidth() / 2f ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
+                SmartFontRenderer.TextAlignment alignment = this.getActualX() < sr.getScaledWidth() / 2f ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
 
-                ScreenRenderer.fontRenderer.drawString(message.message, (float) (x < sr.getScaledWidth() / 2f ? x : x + getWidth()), (float) y, CommonColors.WHITE, alignment, shadow);
+                ScreenRenderer.fontRenderer.drawString(message.message, (float) (this.getActualX() < sr.getScaledWidth() / 2f ? x : x + getWidth()), (float) y, CommonColors.WHITE, alignment, shadow);
 
                 if (message.time > 4000) {
                     spamMessages.remove(message);

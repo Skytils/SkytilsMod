@@ -37,6 +37,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -166,7 +167,8 @@ public class MiscFeatures {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) event.packet;
             if (Skytils.config.disableCooldownSounds && packet.getSoundName().equals("mob.endermen.portal") && packet.getPitch() == 0 && packet.getVolume() == 8) {
                 event.setCanceled(true);
-            } else if (Skytils.config.disableJerrygunSounds) {
+            }
+            if (Skytils.config.disableJerrygunSounds) {
                 switch (packet.getSoundName()) {
                     case "mob.villager.yes":
                         if (packet.getVolume() == 0.35f) {
@@ -179,6 +181,9 @@ public class MiscFeatures {
                         }
                         break;
                 }
+            }
+            if (Skytils.config.disableTruthFlowerSounds && packet.getSoundName().equals("random.eat") && packet.getPitch() == 0.6984127f && packet.getVolume() == 1.0f) {
+                event.setCanceled(true);
             }
         }
     }
@@ -221,12 +226,14 @@ public class MiscFeatures {
         ContainerChest chest = (ContainerChest) event.container;
 
         if (Utils.equalsOneOf(chest.getLowerChestInventory().getName(), "Chest", "Large Chest")) return;
-        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe")) return;
+        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe", "Drill Anvil")) return;
         if (event.slot.inventory == mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return;
 
         ItemStack item = event.slot.getStack();
 
         if (ItemUtil.getSkyBlockItemID(item) == null) {
+            if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Auctions Browser") && item.getItem() == Items.arrow) return;
+            if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Reforge Item") && item.getItem() == Item.getItemFromBlock(Blocks.anvil) && item.getDisplayName().equals("§aReforge Item")) return;
             event.setCanceled(true);
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer);
         }

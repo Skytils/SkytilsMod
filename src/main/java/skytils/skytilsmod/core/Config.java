@@ -1242,11 +1242,20 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Disable Jerry-chine Gun Sounds",
-            description = "Stops the villager hrmm noises that the Jerry-chine gun projectiles make",
+            description = "Blocks the villager hrmm noises that the Jerry-chine gun projectiles play.",
             category = "Sounds",
             subcategory = "Abilities"
     )
     public boolean disableJerrygunSounds = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Disable Flower of Truth Sounds",
+            description = "Blocks the eating noises that the Flower of Truth plays.",
+            category = "Sounds",
+            subcategory = "Abilities"
+    )
+    public boolean disableTruthFlowerSounds = false;
 
     @Property(
             type = PropertyType.SWITCH,
