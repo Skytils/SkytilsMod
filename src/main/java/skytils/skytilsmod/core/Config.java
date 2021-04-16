@@ -657,6 +657,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Skymall Reminder",
+            description = "Reminds you every Skyblock day to check your Skymall perk while in the Dwarven Mines.",
+            category = "Mining",
+            subcategory = "Quality of Life"
+    )
+    public boolean skymallReminder = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Fetchur Solver",
             description = "Tells you what item Fetchur wants.",
             category = "Mining",

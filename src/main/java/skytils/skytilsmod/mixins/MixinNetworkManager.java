@@ -41,4 +41,9 @@ public class MixinNetworkManager {
             e.printStackTrace();
         }
     }
+
+    @Inject(method = "exceptionCaught", at = @At("HEAD"))
+    private void onExceptionDisconnect(ChannelHandlerContext context, Throwable exception, CallbackInfo ci) {
+        exception.printStackTrace();
+    }
 }
