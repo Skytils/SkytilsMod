@@ -36,6 +36,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.DataFetcher;
 import skytils.skytilsmod.core.GuiManager;
@@ -242,6 +243,14 @@ public class MiningFeatures {
                 String healthText = "§cGhost §a" + NumberUtil.format((long) event.entity.getHealth()) + "§f/§a1M§c ❤";
                 RenderUtil.draw3DString(new Vec3(event.entity.posX, event.entity.posY + event.entity.getEyeHeight() + 0.5, event.entity.posZ), healthText, new Color(255, 255, 255), 1f);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return;
+        if (Skytils.config.skymallReminder && Objects.equals(SBInfo.getInstance().getLocation(), "mining_3") && Objects.equals(SBInfo.getInstance().time, "12:00 am") && !Objects.equals(GuiManager.title, "§cSKYMALL RESET")) {
+            GuiManager.createTitle("§cSKYMALL RESET", 20);
         }
     }
 
