@@ -232,7 +232,7 @@ public class MiscFeatures {
         ItemStack item = event.slot.getStack();
 
         if (ItemUtil.getSkyBlockItemID(item) == null) {
-            if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Auctions Browser") && item.getItem() == Items.arrow) return;
+            if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Auctions") && item.getItem() == Items.arrow) return;
             if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Reforge Item") && item.getItem() == Item.getItemFromBlock(Blocks.anvil) && item.getDisplayName().equals("§aReforge Item")) return;
             event.setCanceled(true);
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer);
