@@ -378,6 +378,51 @@ public class RenderUtil {
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
+     * Modified
+     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
+     * @author Moulberry
+     */
+    public static void renderWaypointText(String str, double X, double Y, double Z, float partialTicks) {
+        GlStateManager.alphaFunc(516, 0.1F);
+
+        GlStateManager.pushMatrix();
+
+        Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+        double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
+        double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
+        double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+
+        double x = X - viewerX;
+        double y = Y - viewerY - viewer.getEyeHeight();
+        double z = Z - viewerZ;
+
+        double distSq = x*x + y*y + z*z;
+        double dist = Math.sqrt(distSq);
+        if(distSq > 144) {
+            x *= 12/dist;
+            y *= 12/dist;
+            z *= 12/dist;
+        }
+        GlStateManager.translate(x, y, z);
+        GlStateManager.translate(0, viewer.getEyeHeight(), 0);
+
+        drawNametag(str);
+
+        GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate(0, -0.25f, 0);
+        GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+
+        drawNametag(EnumChatFormatting.YELLOW.toString()+Math.round(dist)+"m");
+
+        GlStateManager.popMatrix();
+
+        GlStateManager.disableLighting();
+    }
+
+    /**
+     * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
      * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
      * @author Moulberry
      */

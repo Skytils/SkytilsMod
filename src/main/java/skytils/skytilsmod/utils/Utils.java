@@ -23,11 +23,15 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
+import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory;
 import skytils.skytilsmod.utils.graphics.colors.CommonColors;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
@@ -173,6 +177,17 @@ public class Utils {
 
     public static CustomColor getCustomColorFromColor(Color color) {
         return CustomColor.fromInt(color.getRGB());
+    }
+
+    /**
+     * Cancels a chat packet and posts the chat event to the event bus if other mods need it
+     * @param ReceivePacketEvent packet to cancel
+     */
+    public static void cancelChatPacket(PacketEvent.ReceiveEvent ReceivePacketEvent) {
+        if (!(ReceivePacketEvent.packet instanceof S02PacketChat)) return;
+        ReceivePacketEvent.setCanceled(true);
+        S02PacketChat packet = ((S02PacketChat) ReceivePacketEvent.packet);
+        MinecraftForge.EVENT_BUS.post(new ClientChatReceivedEvent(packet.getType(), packet.getChatComponent()));
     }
 
 }

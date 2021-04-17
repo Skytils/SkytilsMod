@@ -157,7 +157,7 @@ public class ItemUtil {
      * Modified
      * @author BiscuitDevelopment
      * @param item the Skyblock item to check
-     * @return the rarity of the item if a valid rarity is found, {@code INVALID} if no rarity is found, {@code null} if item is {@code null}
+     * @return the rarity of the item if a valid rarity is found, {@code null} if no rarity is found, {@code null} if item is {@code null}
      */
     public static ItemRarity getRarity(ItemStack item) {
         if (item == null || !item.hasTagCompound())  {

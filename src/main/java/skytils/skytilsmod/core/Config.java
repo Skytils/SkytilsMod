@@ -556,6 +556,15 @@ public class Config extends Vigilant {
     )
     public boolean showBurrowFastTravel = false;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Shiny Orb Waypoints",
+            description = "Creates a waypoint of where your shiny orbs are",
+            category = "Events",
+            subcategory = "Technoblade"
+    )
+    public boolean shinyOrbWaypoints = false;
+
 /*    @Property(
             type = PropertyType.SWITCH,
             name = "Block Mathematical Hoe Right Clicks",

@@ -47,6 +47,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*;
 import skytils.skytilsmod.features.impl.events.GriffinBurrows;
 import skytils.skytilsmod.features.impl.events.MayorJerry;
+import skytils.skytilsmod.features.impl.events.TechnoMayor;
 import skytils.skytilsmod.features.impl.handlers.*;
 import skytils.skytilsmod.features.impl.mining.DarkModeMist;
 import skytils.skytilsmod.features.impl.mining.MiningFeatures;
@@ -151,6 +152,7 @@ public class Skytils {
         MinecraftForge.EVENT_BUS.register(new SlayerFeatures());
         MinecraftForge.EVENT_BUS.register(new SpidersDenFeatures());
         MinecraftForge.EVENT_BUS.register(new StartsWithSequenceSolver());
+        MinecraftForge.EVENT_BUS.register(new TechnoMayor());
         MinecraftForge.EVENT_BUS.register(new TeleportMazeSolver());
         MinecraftForge.EVENT_BUS.register(new TerminalFeatures());
         MinecraftForge.EVENT_BUS.register(new ThreeWeirdosSolver());
