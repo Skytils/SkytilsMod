@@ -223,6 +223,7 @@ public class AuctionPriceOverlay {
             this.buttonList.clear();
             Keyboard.enableRepeatEvents(true);
             sign.setEditable(false);
+            sign.signText[0] = new ChatComponentText(lastEnteredInput);
             priceField = new GuiTextField(0, fontRendererObj, width/2-135, height/2, 270, 20);
             priceField.setMaxStringLength(15);
             priceField.setValidator((text) -> text.toLowerCase().replaceAll("[^0-9.kmb]", "").length() == text.length());
