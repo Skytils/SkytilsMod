@@ -54,7 +54,7 @@ public class UpdateChecker {
         if (updateGetter.updateObj == null) return;
         try {
             Notifications notifs = Notifications.INSTANCE;
-            notifs.pushNotification("New Skytils Version Available", "Click here to download", () -> {
+            notifs.pushNotification("Skytils Version " + updateGetter.updateObj.get("tag_name").getAsString() + " Available", "Click here to download", () -> {
                 ModCore.getInstance().getGuiHandler().open(new UpdateGui());
                 return Unit.INSTANCE;
             });
