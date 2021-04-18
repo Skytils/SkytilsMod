@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod;
 
-import club.sk1er.mods.core.ModCore;
 import club.sk1er.vigilance.gui.SettingsGui;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
@@ -93,6 +92,8 @@ public class Skytils {
     public static File jarFile = null;
     private static long lastChatMessage = 0;
 
+    public static GuiScreen displayScreen;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         if (!modDir.exists()) modDir.mkdirs();
@@ -102,8 +103,6 @@ public class Skytils {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        ModCoreInstaller.initializeModCore(mc.mcDataDir);
-
         config.preload();
 
         ClientCommandHandler.instance.registerCommand(new SkytilsCommand());
@@ -206,6 +205,11 @@ public class Skytils {
 
         ScreenRenderer.refresh();
 
+        if (displayScreen != null) {
+            mc.displayGuiScreen(displayScreen);
+            displayScreen = null;
+        }
+
         if (mc.thePlayer != null && sendMessageQueue.size() > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
             String msg = sendMessageQueue.pollFirst();
             if (msg != null) {
@@ -264,7 +268,7 @@ public class Skytils {
     @SubscribeEvent
     public void onGuiAction(GuiScreenEvent.ActionPerformedEvent.Post event) {
         if (Skytils.config.configButtonOnPause && event.gui instanceof GuiIngameMenu && event.button.id == 6969420) {
-            ModCore.getInstance().getGuiHandler().open(new OptionsGui());
+            Skytils.displayScreen = new OptionsGui();
         }
     }
 

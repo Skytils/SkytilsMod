@@ -18,8 +18,6 @@
 
 package skytils.skytilsmod.core;
 
-import club.sk1er.mods.core.ModCore;
-import club.sk1er.mods.core.gui.notification.Notifications;
 import com.google.gson.JsonObject;
 import kotlin.Unit;
 import net.minecraft.client.Minecraft;
@@ -53,11 +51,11 @@ public class UpdateChecker {
         if (!(e.gui instanceof GuiMainMenu)) return;
         if (updateGetter.updateObj == null) return;
         try {
-            Notifications notifs = Notifications.INSTANCE;
+/*            Notifications notifs = Notifications.INSTANCE;
             notifs.pushNotification("New Skytils Version Available", "Click here to download", () -> {
-                ModCore.getInstance().getGuiHandler().open(new UpdateGui());
+                Skytils.displayScreen = new UpdateGui();
                 return Unit.INSTANCE;
-            });
+            });*/
         } catch (Exception ex) {
             ex.printStackTrace();
         }

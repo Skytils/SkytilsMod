@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.commands;
 
-import club.sk1er.mods.core.ModCore;
 import com.google.common.collect.Lists;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
@@ -77,7 +76,7 @@ public class SkytilsCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         EntityPlayerSP player = (EntityPlayerSP) sender;
         if (args.length == 0) {
-            ModCore.getInstance().getGuiHandler().open(new OptionsGui());
+            Skytils.displayScreen = new OptionsGui();
             return;
         }
         String subcommand = args[0].toLowerCase(Locale.ENGLISH);
@@ -100,7 +99,7 @@ public class SkytilsCommand extends CommandBase {
                 }).start();
                 break;
             case "config":
-                ModCore.getInstance().getGuiHandler().open(Skytils.config.gui());
+                Skytils.displayScreen = Skytils.config.gui();
                 break;
             case "fetchur":
                 player.addChatMessage(new ChatComponentText("§e§l[FETCHUR] §8» §eToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values().toArray()[(ZonedDateTime.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % MiningFeatures.fetchurItems.size()]));
@@ -174,7 +173,7 @@ public class SkytilsCommand extends CommandBase {
             case "alias":
             case "editaliases":
             case "commandaliases":
-                ModCore.getInstance().getGuiHandler().open(new CommandAliasesGui());
+                Skytils.displayScreen = new CommandAliasesGui();
                 break;
             case "editlocation":
             case "editlocations":
@@ -182,11 +181,11 @@ public class SkytilsCommand extends CommandBase {
             case "locations":
             case "loc":
             case "gui":
-                ModCore.getInstance().getGuiHandler().open(new LocationEditGui());
+                Skytils.displayScreen = new LocationEditGui();
                 break;
             case "keyshortcuts":
             case "shortcuts":
-                ModCore.getInstance().getGuiHandler().open(new KeyShortcutsGui());
+                Skytils.displayScreen = new KeyShortcutsGui();
                 break;
             case "armorcolor":
             case "armorcolour":

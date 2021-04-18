@@ -73,7 +73,6 @@ dependencies {
         exclude module: 'commons-io'
         exclude module: 'gson'
     }
-    provided files("libs/modcore.jar")
     configurations.compile.extendsFrom(configurations.packageLib)
 }
 
