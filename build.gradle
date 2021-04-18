@@ -45,11 +45,6 @@ repositories {
     maven { url "https://repo.sk1er.club/repository/maven-public/" }
 }
 
-configurations {
-    packageLib
-}
-
-
 dependencies {
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -72,9 +67,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     compile("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        exclude module: 'guava'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
+        exclude module: "guava"
+        exclude module: "commons-io"
+        exclude module: "gson"
+        exclude module: "launchwrapper"
     }
     implementation "club.sk1er:Elementa:253-10809-SNAPSHOT"
     implementation "club.sk1er:Vigilance:98-10809-SNAPSHOT"
@@ -108,8 +104,15 @@ shadowJar {
 
     relocate("club.sk1er", "club.sk1ersnapshot")
 
+    include("mixins.skytils.refmap.json")
     exclude("dummyThing")
     exclude("module-info.class")
+}
+
+reobf {
+    shadowJar {
+        classpath = sourceSets.main.compileClasspath
+    }
 }
 
 processResources {
