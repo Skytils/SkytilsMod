@@ -495,7 +495,7 @@ public class DungeonsFeatures {
 
             String text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿";
             SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-            ScreenRenderer.fontRenderer.drawString(text, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY(), CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
+            ScreenRenderer.fontRenderer.drawString(text, leftAlign ? 0 : getWidth(), 0, CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL);
         }
 
         @Override
