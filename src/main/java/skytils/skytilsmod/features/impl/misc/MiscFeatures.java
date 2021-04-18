@@ -226,7 +226,7 @@ public class MiscFeatures {
         ContainerChest chest = (ContainerChest) event.container;
 
         if (Utils.equalsOneOf(chest.getLowerChestInventory().getName(), "Chest", "Large Chest")) return;
-        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe", "Drill Anvil")) return;
+        if (StringUtils.startsWithAny(SBInfo.getInstance().lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil")) return;
         if (event.slot.inventory == mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return;
 
         ItemStack item = event.slot.getStack();
