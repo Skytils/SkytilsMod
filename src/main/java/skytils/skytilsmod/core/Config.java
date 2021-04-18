@@ -20,10 +20,13 @@ package skytils.skytilsmod.core;
 
 import club.sk1er.vigilance.Vigilant;
 import club.sk1er.vigilance.data.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.crash.CrashReport;
 
+import java.awt.*;
 import java.io.File;
 
-public class Config extends Vigilant {
+public final class Config extends Vigilant {
 
     @Property(
             type = PropertyType.TEXT,
@@ -483,6 +486,31 @@ public class Config extends Vigilant {
             subcategory = "Terminal Solvers"
     )
     public boolean clickInOrderTerminalSolver = false;
+
+    @Property(
+            type = PropertyType.COLOR,
+            name = "Click in Order First Color",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public Color clickInOrderFirst = new Color(2, 62, 138, 255);
+
+    @Property(
+            type = PropertyType.COLOR,
+            name = "Click in Order Second Color",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public Color clickInOrderSecond = new Color(65, 102, 245, 255);
+
+    @Property(
+            type = PropertyType.COLOR,
+            name = "Click in Order Third Color",
+            category = "Dungeons",
+            subcategory = "Terminal Solvers"
+    )
+    public Color clickInOrderThird = new Color(144, 224, 239, 255);
+
 
     @Property(
             type = PropertyType.SWITCH,
@@ -1585,5 +1613,15 @@ public class Config extends Vigilant {
     public Config() {
         super(new File("./config/skytils/config.toml"), "Skytils");
         initialize();
+
+        try {
+            Class<? extends Config> clazz = getClass();
+
+            addDependency(clazz.getField("clickInOrderFirst"), clazz.getField("clickInOrderTerminalSolver"));
+            addDependency(clazz.getField("clickInOrderSecond"), clazz.getField("clickInOrderTerminalSolver"));
+            addDependency(clazz.getField("clickInOrderThird"), clazz.getField("clickInOrderTerminalSolver"));
+        } catch(NoSuchFieldException e) {
+            Minecraft.getMinecraft().crashed(CrashReport.makeCrashReport(e, "Skytils failed while initializing config"));
+        }
     }
 }
