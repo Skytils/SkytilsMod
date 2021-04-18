@@ -72,8 +72,8 @@ dependencies {
         exclude module: "gson"
         exclude module: "launchwrapper"
     }
-    implementation "club.sk1er:Elementa:253-10809-SNAPSHOT"
-    implementation "club.sk1er:Vigilance:98-10809-SNAPSHOT"
+    compile "club.sk1er:Elementa:253-10809-SNAPSHOT"
+    compile "club.sk1er:Vigilance:98-10809-SNAPSHOT"
 }
 
 mixin {
@@ -101,10 +101,10 @@ jar {
 shadowJar {
     archiveName = jar.archiveName
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations = [project.configurations.compile]
 
     relocate("club.sk1er", "club.sk1ersnapshot")
 
-    include("mixins.skytils.refmap.json")
     exclude("dummyThing")
     exclude("module-info.class")
 }
