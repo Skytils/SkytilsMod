@@ -99,17 +99,17 @@ public class ClickInOrderSolver {
 
         if (firstSlot != null) {
             Slot slot = invSlots.get(firstSlot);
-            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, new Color(2, 62, 138, 255).getRGB());
+            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, Skytils.config.clickInOrderFirst.getRGB());
         }
 
         if (secondSlot != null) {
             Slot slot = invSlots.get(secondSlot);
-            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, new Color(65, 102, 245, 255).getRGB());
+            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, Skytils.config.clickInOrderSecond.getRGB());
         }
 
         if (thirdSlot != null) {
             Slot slot = invSlots.get(thirdSlot);
-            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, new Color(144, 224, 239, 255).getRGB());
+            if (slot != null) Gui.drawRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, Skytils.config.clickInOrderThird.getRGB());
         }
     }
 

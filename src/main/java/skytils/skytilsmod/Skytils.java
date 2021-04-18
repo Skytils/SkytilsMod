@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod;
 
-import club.sk1er.vigilance.Vigilance;
 import club.sk1er.vigilance.gui.SettingsGui;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
@@ -39,8 +38,14 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import skytils.skytilsmod.commands.*;
-import skytils.skytilsmod.core.*;
+import skytils.skytilsmod.commands.ArmorColorCommand;
+import skytils.skytilsmod.commands.GlintCustomizeCommand;
+import skytils.skytilsmod.commands.RepartyCommand;
+import skytils.skytilsmod.commands.SkytilsCommand;
+import skytils.skytilsmod.core.Config;
+import skytils.skytilsmod.core.DataFetcher;
+import skytils.skytilsmod.core.GuiManager;
+import skytils.skytilsmod.core.UpdateChecker;
 import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.features.impl.dungeons.*;
 import skytils.skytilsmod.features.impl.dungeons.solvers.*;
@@ -62,7 +67,6 @@ import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui;
 import skytils.skytilsmod.listeners.ChatListener;
 import skytils.skytilsmod.mixins.AccessorCommandHandler;
 import skytils.skytilsmod.mixins.AccessorSettingsGui;
-import skytils.skytilsmod.features.impl.handlers.MayorInfo;
 import skytils.skytilsmod.utils.SBInfo;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
@@ -77,7 +81,7 @@ import java.util.Objects;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.3-pre3";
+    public static final String VERSION = "1.0-pre1";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
