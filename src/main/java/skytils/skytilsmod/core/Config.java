@@ -38,7 +38,7 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.TEXT,
             name = "Hypixel API Key",
-            description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.\nSet this with /skytils setkey <key>.",
+            description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
             category = "General",
             subcategory = "API"
     )
