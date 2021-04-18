@@ -481,7 +481,7 @@ public class RenderUtil {
      */
     private static void renderRarity(int xPos, int yPos, ItemRarity rarity) {
         if (rarity != null) {
-            float alpha = Skytils.config.itemRarityOpacity / 100.0F;
+            float alpha = Skytils.config.itemRarityOpacity;
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
             GlStateManager.enableBlend();

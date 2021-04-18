@@ -44,7 +44,7 @@ public class MixinLayerCustomHead {
                 ci.cancel();
                 return;
             }
-            if (Skytils.config.transparentHeadLayer != 100)  {
+            if (Skytils.config.transparentHeadLayer != 1)  {
                 if (entity.hurtTime > 0) {
                     // See net.minecraft.client.renderer.entity.RendererLivingEntity.unsetBrightness
                     GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
@@ -88,7 +88,7 @@ public class MixinLayerCustomHead {
                 GlStateManager.enableAlpha();
                 GlStateManager.enableBlend();
                 GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-                GlStateManager.color(1, 1, 1, MathUtil.clamp(Skytils.config.transparentHeadLayer / 100f, 0, 1));
+                GlStateManager.color(1, 1, 1, Skytils.config.transparentHeadLayer);
             }
         }
     }

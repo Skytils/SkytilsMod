@@ -108,7 +108,7 @@ public class Config extends Vigilant {
             subcategory = "Reparty",
             max = 120
     )
-    public Integer autoRepartyTimeout = 60;
+    public int autoRepartyTimeout = 60;
 
     @Property(
             type = PropertyType.SELECTOR,
@@ -202,7 +202,7 @@ public class Config extends Vigilant {
     public boolean boxSkeletonMasters = false;
 
     @Property(
-            type = PropertyType.SLIDER,
+            type = PropertyType.NUMBER,
             name = "Dungeon Chest Reroll Confirmation",
             description = "Requires you to click multiple times in order to reroll a chest.",
             category = "Dungeons",
@@ -354,7 +354,7 @@ public class Config extends Vigilant {
             subcategory = "Quality of Life",
             options = {"None", "HP", "Percentage Health"}
     )
-    public Integer necronHealth = 0;
+    public int necronHealth = 0;
 
 /*    @Property(
             type = PropertyType.SWITCH,
@@ -730,14 +730,14 @@ public class Config extends Vigilant {
     public boolean hideMidasStaffGoldBlocks = false;
 
     @Property(
-            type = PropertyType.SLIDER,
+            type = PropertyType.DECIMAL_SLIDER,
             name = "Dropped Item Scale",
             description = "Change the size of dropped items.",
             category = "Miscellaneous",
             subcategory = "Items",
-            max = 500
+            maxF = 5
     )
-    public Integer itemDropScale = 100;
+    public float itemDropScale = 1;
 
     @Property(
             type = PropertyType.SLIDER,
@@ -745,9 +745,9 @@ public class Config extends Vigilant {
             description = "Change the size of heads in your inventory.",
             category = "Miscellaneous",
             subcategory = "Items",
-            max = 200
+            maxF = 2
     )
-    public Integer largerHeadScale = 100;
+    public int largerHeadScale = 100;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -822,14 +822,13 @@ public class Config extends Vigilant {
     public boolean showPetRarity = false;
 
     @Property(
-            type = PropertyType.SLIDER,
+            type = PropertyType.PERCENT_SLIDER,
             name = "Item Rarity Opacity",
             description = "How opaque the rarity color will be",
             category = "Miscellaneous",
-            subcategory = "Item Rarity",
-            max = 100
+            subcategory = "Item Rarity"
     )
-    public int itemRarityOpacity = 75;
+    public float itemRarityOpacity = 0.75f;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -886,14 +885,13 @@ public class Config extends Vigilant {
     public boolean summoningEyeDisplay = false;
 
     @Property(
-            type = PropertyType.SLIDER,
+            type = PropertyType.PERCENT_SLIDER,
             name = "Transparent Head Layer",
             description = "Changes the transparency of your head layer.",
             category = "Miscellaneous",
-            subcategory = "Other",
-            max = 100
+            subcategory = "Other"
     )
-    public int transparentHeadLayer = 100;
+    public float transparentHeadLayer = 1;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -1585,7 +1583,7 @@ public class Config extends Vigilant {
     public int blessingBaitHider = 0;
 
     public Config() {
-        super(new File("./config/skytils/config.toml"));
+        super(new File("./config/skytils/config.toml"), "Skytils");
         initialize();
     }
 }

@@ -10,11 +10,13 @@ buildscript {
         flatDir dirs: 'libs'
     }
     dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
         classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
         classpath "org.spongepowered:mixingradle:0.6-SNAPSHOT"
     }
 }
 
+apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
 
@@ -40,6 +42,7 @@ minecraft {
 repositories {
     jcenter()
     maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+    maven { url "https://repo.sk1er.club/repository/maven-public/" }
 }
 
 configurations {
@@ -68,12 +71,13 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    packageLib("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+    compile("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         exclude module: 'guava'
         exclude module: 'commons-io'
         exclude module: 'gson'
     }
-    configurations.compile.extendsFrom(configurations.packageLib)
+    implementation "club.sk1er:Elementa:253-10809-SNAPSHOT"
+    implementation "club.sk1er:Vigilance:98-10809-SNAPSHOT"
 }
 
 mixin {
@@ -95,9 +99,17 @@ jar {
             "TweakOrder": "0",
     )
 
-    from {
-        configurations.packageLib.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    enabled = false
+}
+
+shadowJar {
+    archiveName = jar.archiveName
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    relocate("club.sk1er", "club.sk1ersnapshot")
+
+    exclude("dummyThing")
+    exclude("module-info.class")
 }
 
 processResources {
@@ -122,3 +134,5 @@ processResources {
 sourceSets {
     main { output.resourcesDir = output.classesDir }
 }
+
+tasks.reobfJar.dependsOn(shadowJar)

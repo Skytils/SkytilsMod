@@ -33,7 +33,7 @@ public class MixinRenderEntityItem {
     @Inject(method = "doRender", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/GlStateManager.pushMatrix()V", shift = At.Shift.AFTER, ordinal = 1))
     private void scaleItemDrop(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
         if (!Utils.inSkyblock) return;
-        float scale = Skytils.config.itemDropScale / 100f;
+        float scale = Skytils.config.itemDropScale;
         GlStateManager.scale(scale, scale, scale);
     }
 }
