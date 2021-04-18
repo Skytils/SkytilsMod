@@ -223,7 +223,6 @@ public class AuctionPriceOverlay {
             this.buttonList.clear();
             Keyboard.enableRepeatEvents(true);
             sign.setEditable(false);
-            sign.signText[0] = new ChatComponentText(lastEnteredInput);
             priceField = new GuiTextField(0, fontRendererObj, width/2-135, height/2, 270, 20);
             priceField.setMaxStringLength(15);
             priceField.setValidator((text) -> text.toLowerCase().replaceAll("[^0-9.kmb]", "").length() == text.length());
@@ -233,6 +232,8 @@ public class AuctionPriceOverlay {
             priceField.setSelectionPos(0);
             buttonList.add(undercutButton = new CleanButton(0, width/2 - 100, height/2 + 25, 200, 20, !isUndercut() ? "Mode: Normal" : "Mode: Undercut"));
             buttonList.add(tooltipLocationButton);
+
+            sign.signText[0] = new ChatComponentText(getInput());
         }
 
         @Override
