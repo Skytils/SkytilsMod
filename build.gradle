@@ -20,7 +20,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
 
-version = "0.3-pre3"
+version = "1.0-pre1"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
