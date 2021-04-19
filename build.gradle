@@ -31,7 +31,7 @@ buildscript {
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
         classpath "com.github.Skytils:ForgeGradle:FG_2.1-SNAPSHOT:all"
-        classpath "io.github.lxgaming:mixingradle:0.6-20210206.024103-1"
+        classpath "com.github.Skytils:mixingradle:0.6-SNAPSHOT"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -169,8 +169,9 @@ processResources {
 }
 
 mixin {
+    disableRefMapWarning = true
     defaultObfuscationEnv searge
-    //add sourceSets.main, "mixins.skytils.refmap.json"
+    add sourceSets.main, "mixins.skytils.refmap.json"
 }
 
 reobf {
@@ -182,7 +183,7 @@ reobf {
 
 sourceSets {
     main {
-        ext.refMap = "mixins.skytils.refmap.json"
+        //ext.refMap = "mixins.skytils.refmap.json"
     }
 }
 
