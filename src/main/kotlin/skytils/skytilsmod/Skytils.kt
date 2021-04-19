@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod
 
+import club.sk1er.vigilance.Vigilance
 import club.sk1er.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
@@ -128,6 +129,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+        Vigilance.initialize();
 
         config.preload()
 

@@ -264,28 +264,19 @@ class ScoreCalculation {
                     if (line.startsWith("Time Elapsed:")) {
                         val matcher = timeElapsedPattern.matcher(line)
                         if (matcher.find()) {
-                            var hours: Int
-                            var minutes: Int
-                            var seconds: Int
-                            hours = try {
+                            var hours: Int = try {
                                 matcher.group("hrs").toInt()
-                            } catch (e: IllegalStateException) {
-                                0
-                            } catch (e: NumberFormatException) {
+                            } catch (e: Exception) {
                                 0
                             }
-                            minutes = try {
+                            var minutes: Int = try {
                                 matcher.group("min").toInt()
-                            } catch (e: IllegalStateException) {
-                                0
-                            } catch (e: NumberFormatException) {
+                            } catch (e: Exception) {
                                 0
                             }
-                            seconds = try {
+                            var seconds: Int = try {
                                 matcher.group("sec").toInt()
-                            } catch (e: IllegalStateException) {
-                                0
-                            } catch (e: NumberFormatException) {
+                            } catch (e: Exception) {
                                 0
                             }
                             secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
