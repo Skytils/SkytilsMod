@@ -1235,6 +1235,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Highlight Favorite Pets",
+        description = "Highlight pets marked as favorite.",
+        category = "Pets",
+        subcategory = "Quality of Life"
+    )
+    var highlightFavoritePets = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Favorite Pet Highlight Color",
+        description = "Color used to highlight the favorite pets in.",
+        category = "Pets",
+        subcategory = "Quality of Life"
+    )
+    var favoritePetColor = Color(0, 255, 0)
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Pet Item Confirmation",
         description = "Requires a confirmation before using a pet item.",
         category = "Pets",
@@ -1628,9 +1646,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
 
         ::showNextBlaze dependsOn ::blazeSolver
-
         ::clickInOrderFirst dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
+
+        ::favoritePetColor dependsOn ::highlightFavoritePets
     }
 }

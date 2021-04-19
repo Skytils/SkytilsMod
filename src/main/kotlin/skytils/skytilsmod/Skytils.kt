@@ -65,6 +65,7 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
 import skytils.skytilsmod.features.impl.handlers.*
 import skytils.skytilsmod.features.impl.misc.*
+import skytils.skytilsmod.features.impl.overlays.FavoritePetOverlay
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.mixins.AccessorCommandHandler
 import skytils.skytilsmod.mixins.AccessorSettingsGui
@@ -164,6 +165,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(DungeonsFeatures())
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())
+        MinecraftForge.EVENT_BUS.register(FavoritePetOverlay())
         MinecraftForge.EVENT_BUS.register(GlintCustomizer())
         MinecraftForge.EVENT_BUS.register(GriffinBurrows())
         MinecraftForge.EVENT_BUS.register(IceFillSolver())
@@ -237,6 +239,7 @@ class Skytils {
             ArmorColor.saveColors()
             BlockAbility.writeSave()
             CommandAliases.saveAliases()
+            FavoritePetOverlay.saveFavorites()
             GlintCustomizer.writeSave()
             KeyShortcuts.saveShortcuts()
         })
