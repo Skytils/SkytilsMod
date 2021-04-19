@@ -19,7 +19,9 @@
 package skytils.skytilsmod.mixins;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.events.SendChatMessageEvent;
 
 @Mixin(GuiScreen.class)
-public class MixinGuiScreen {
+public abstract class MixinGuiScreen extends Gui implements GuiYesNoCallback {
 
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(String message, boolean addToChat, CallbackInfo ci) {

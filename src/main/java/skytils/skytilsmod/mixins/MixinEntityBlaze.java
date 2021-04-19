@@ -19,6 +19,7 @@
 package skytils.skytilsmod.mixins;
 
 import net.minecraft.entity.monster.EntityBlaze;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +28,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(EntityBlaze.class)
-public class MixinEntityBlaze {
+public abstract class MixinEntityBlaze extends EntityMob {
+
+    public MixinEntityBlaze(World worldIn) {
+        super(worldIn);
+    }
 
     @Redirect(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDDDD[I)V"))
     private void spawnParticle(World world, EnumParticleTypes particleType, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int[] p_175688_14_) {

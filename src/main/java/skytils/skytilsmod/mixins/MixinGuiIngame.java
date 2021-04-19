@@ -19,6 +19,7 @@
 package skytils.skytilsmod.mixins;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -34,7 +35,7 @@ import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(GuiIngame.class)
-public class MixinGuiIngame {
+public abstract class MixinGuiIngame extends Gui {
 
     @Inject(method = "setRecordPlaying(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSetActionBar(String message, boolean isPlaying, CallbackInfo ci) {

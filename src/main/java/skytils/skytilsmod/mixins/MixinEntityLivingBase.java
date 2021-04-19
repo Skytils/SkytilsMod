@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.EnumParticleTypes;
@@ -31,7 +32,11 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(EntityLivingBase.class)
-public class MixinEntityLivingBase {
+public abstract class MixinEntityLivingBase extends Entity {
+
+    public MixinEntityLivingBase(World worldIn) {
+        super(worldIn);
+    }
 
     @Inject(method = "isPotionActive(Lnet/minecraft/potion/Potion;)Z", at = @At("HEAD"), cancellable = true)
     private void modifyPotionActive(Potion potion, CallbackInfoReturnable<Boolean> cir) {

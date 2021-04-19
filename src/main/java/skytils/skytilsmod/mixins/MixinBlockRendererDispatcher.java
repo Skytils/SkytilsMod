@@ -22,6 +22,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -35,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.events.RenderBlockInWorldEvent;
 
 @Mixin(BlockRendererDispatcher.class)
-public class MixinBlockRendererDispatcher {
+public abstract class MixinBlockRendererDispatcher implements IResourceManagerReloadListener {
 
     @Shadow private BlockModelShapes blockModelShapes;
 

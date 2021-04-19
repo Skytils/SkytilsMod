@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +27,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(World.class)
-public class MixinWorld {
+public abstract class MixinWorld implements IBlockAccess {
     @Redirect(method = "getSkyColorBody", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;lastLightningBolt:I"))
     private int lightningSkyColor(World world) {
         if (Skytils.config.hideLightning && Utils.inSkyblock) return 0;

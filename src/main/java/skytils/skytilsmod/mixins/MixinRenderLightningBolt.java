@@ -28,7 +28,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(RenderLightningBolt.class)
-public class MixinRenderLightningBolt {
+public abstract class MixinRenderLightningBolt {
     @Inject(method = "doRender", at = @At("HEAD"), cancellable = true)
     private void onRenderLightning(EntityLightningBolt entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
         if (Skytils.config.hideLightning && Utils.inSkyblock) {

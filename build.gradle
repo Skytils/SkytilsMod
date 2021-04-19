@@ -30,9 +30,9 @@ buildscript {
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
-        classpath "com.github.NickAcPT:ForgeGradle:FG_2.1-SNAPSHOT:all"
+        classpath "com.github.Skytils:ForgeGradle:FG_2.1-SNAPSHOT:all"
+        classpath "com.github.Skytils:MixinGradle:0.6-SNAPSHOT"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath("io.github.lxgaming:mixingradle:0.6-20210206.024103-1")
     }
 }
 
@@ -158,7 +158,7 @@ processResources {
 }
 
 mixin {
-    defaultObfuscationEnv searge
+    //defaultObfuscationEnv searge
     //add sourceSets.main, "mixins.skytils.refmap.json"
 }
 

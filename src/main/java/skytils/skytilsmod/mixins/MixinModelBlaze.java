@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBlaze;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
@@ -33,7 +34,7 @@ import static skytils.skytilsmod.features.impl.dungeons.solvers.BlazeSolver.blaz
 import static skytils.skytilsmod.features.impl.dungeons.solvers.BlazeSolver.orderedBlazes;
 
 @Mixin(ModelBlaze.class)
-public class MixinModelBlaze {
+public abstract class MixinModelBlaze extends ModelBase {
     @Inject(method = "render", at = @At(value = "HEAD"))
     private void changeBlazeColor(Entity entity, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale, CallbackInfo ci) {
         if (orderedBlazes.size() == 0) return;

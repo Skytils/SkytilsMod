@@ -21,6 +21,7 @@ package skytils.skytilsmod.mixins;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.world.World;
@@ -37,7 +38,7 @@ import skytils.skytilsmod.utils.Utils;
 import java.util.List;
 
 @Mixin(EntityRenderer.class)
-public class MixinEntityRenderer {
+public abstract class MixinEntityRenderer implements IResourceManagerReloadListener {
 
     @Shadow private Minecraft mc;
 

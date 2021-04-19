@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.events.BossBarEvent;
 
 @Mixin(BossStatus.class)
-public class MixinBossStatus {
+public abstract class MixinBossStatus {
 
     @Inject(method = "setBossStatus", at = @At("HEAD"), cancellable = true)
     private static void onSetBossStatus(IBossDisplayData displayData, boolean hasColorModifierIn, CallbackInfo ci) {

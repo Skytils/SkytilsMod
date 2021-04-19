@@ -79,7 +79,7 @@ public abstract class MixinMinecraft {
         }
     }
 
-    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER))
+    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 1))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         if (this.gameSettings.language != null) {
             ScreenRenderer.fontRenderer.setUnicodeFlag(this.isUnicode());

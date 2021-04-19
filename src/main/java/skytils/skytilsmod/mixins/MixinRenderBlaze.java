@@ -29,7 +29,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(RenderBlaze.class)
-public class MixinRenderBlaze {
+public abstract class MixinRenderBlaze {
 
     private static final ResourceLocation BLANK_BLAZE_TEXTURE = new ResourceLocation("skytils", "blankblaze.png");
 

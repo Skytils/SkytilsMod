@@ -29,7 +29,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(RenderEntityItem.class)
-public class MixinRenderEntityItem {
+public abstract class MixinRenderEntityItem {
     @Inject(method = "doRender", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/GlStateManager.pushMatrix()V", shift = At.Shift.AFTER, ordinal = 1))
     private void scaleItemDrop(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
         if (!Utils.inSkyblock) return;

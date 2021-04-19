@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,7 +31,7 @@ import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(ItemArmor.class)
-public class MixinItemArmor {
+public abstract class MixinItemArmor extends Item {
 
     @Inject(method = "getColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getTagCompound()Lnet/minecraft/nbt/NBTTagCompound;"), cancellable = true)
     private void replaceArmorColor(ItemStack stack, CallbackInfoReturnable<Integer> cir) {

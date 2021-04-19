@@ -813,23 +813,16 @@ class ScreenRenderer {
         var mc: Minecraft = Minecraft.getMinecraft()
         var screen: ScaledResolution? = null
         var isRendering = false
-        const val scale = 1.0f
-        const val rotation = 0f
-        const val isMasking = false
-        private const val scissorTest = false
-        private val drawingOrigin = Point(0, 0)
-        fun drawingOrigin(): Point {
-            return drawingOrigin
-        }
+        var scale = 1.0f
+        var rotation = 0f
+        var isMasking = false
+        private var scissorTest = false
+        private var drawingOrigin = Point(0, 0)
 
         private val transformationOrigin = Point(0, 0)
         fun transformationOrigin(x: Int, y: Int) {
             transformationOrigin.x = x
             transformationOrigin.y = y
-        }
-
-        protected fun transformationOrigin(): Point {
-            return transformationOrigin
         }
 
         private var itemRenderer: RenderItem = Minecraft.getMinecraft().renderItem
