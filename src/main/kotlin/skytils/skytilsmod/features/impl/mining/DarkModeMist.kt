@@ -38,10 +38,10 @@ class DarkModeMist {
         if (SBInfo.instance.location == "mining_3" && event.state != null && event.pos != null) {
             if ((event.pos as BlockPos).y <= 76) {
                 if ((state as IBlockState).block === Blocks.stained_glass && (state as IBlockState).getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE) {
-                    event.state = (state as IBlockState).withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
+                    event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
                 }
                 if ((state as IBlockState).block === Blocks.carpet && (state as IBlockState).getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
-                    event.state = (state as IBlockState).withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
+                    event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
                 }
             }
         }

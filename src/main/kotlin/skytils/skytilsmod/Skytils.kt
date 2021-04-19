@@ -103,10 +103,13 @@ class Skytils {
 
         @JvmField
         var usingDungeonRooms = false
+
         @JvmField
         var usingLabymod = false
+
         @JvmField
         var usingNEU = false
+
         @JvmField
         var jarFile: File? = null
         private var lastChatMessage = 0L
@@ -209,12 +212,12 @@ class Skytils {
 
             if (!cch.commands.containsKey("rp")) {
                 cch.commandSet.add(RepartyCommand())
-                cch.commandMap.put("rp", RepartyCommand())
+                cch.commandMap["rp"] = RepartyCommand()
             }
             if (config.overrideReparty) {
                 if (!cch.commands.containsKey("rp")) {
                     cch.commandSet.add(RepartyCommand())
-                    cch.commandMap.put("rp", RepartyCommand())
+                    cch.commandMap["rp"] = RepartyCommand()
                 }
                 for (entry in cch.commands.entries) {
                     if (entry.key == "reparty" || entry.key == "rp") {

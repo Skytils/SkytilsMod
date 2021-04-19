@@ -71,7 +71,7 @@ class RelicWaypoints {
     @SubscribeEvent
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.instance.location == null || !SBInfo.instance.location
+        if (!SBInfo.instance.location
                 .equals("combat_1", ignoreCase = true)
         ) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
@@ -87,7 +87,7 @@ class RelicWaypoints {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.instance.location == null || !SBInfo.instance.location
+        if (!SBInfo.instance.location
                 .equals("combat_1", ignoreCase = true)
         ) return
         val viewer = Minecraft.getMinecraft().renderViewEntity

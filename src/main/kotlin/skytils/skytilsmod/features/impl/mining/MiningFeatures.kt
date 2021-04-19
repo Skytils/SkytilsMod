@@ -166,7 +166,7 @@ class MiningFeatures {
         val item = event.entityPlayer.heldItem
         val itemId = ItemUtil.getSkyBlockItemID(item)
         if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
-            if (SBInfo.instance.location != null && SBInfo.instance.location
+            if (SBInfo.instance.location
                     .startsWith("dynamic")
             ) {
                 if (Skytils.config.noPickaxeAbilityOnPrivateIsland && itemId != null && (itemId.contains("PICKAXE") || itemId.contains(
