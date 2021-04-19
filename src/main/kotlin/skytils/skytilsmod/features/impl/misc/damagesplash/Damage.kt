@@ -27,11 +27,15 @@ import java.util.regex.Pattern
  * @author Wynntils
  */
 enum class Damage(val symbol: String, val color: CommonColors) {
-    CRITICAL("✧", CommonColors.CRITICAL), PET("♞", CommonColors.MAGENTA), WITHER("☠", CommonColors.BLACK), SKULL(
-        "✷",
-        CommonColors.GRAY
-    ),
-    TRUE("❂", CommonColors.WHITE), FIRE("火", CommonColors.ORANGE), NORMAL("", CommonColors.LIGHT_GRAY);
+    CRITICAL("✧", CommonColors.CRITICAL),
+    PET("♞", CommonColors.MAGENTA),
+    WITHER("☠", CommonColors.BLACK),
+    SKULL("✷", CommonColors.GRAY),
+    CURSE("☄", CommonColors.RED),
+    TRUE("❂", CommonColors.WHITE),
+    FIRE("火", CommonColors.ORANGE),
+    DROWN("水", CommonColors.LIGHT_BLUE),
+    NORMAL("", CommonColors.LIGHT_GRAY);
 
     companion object {
         fun fromSymbol(symbol: String): Damage? {

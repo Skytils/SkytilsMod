@@ -60,12 +60,15 @@ class DamageSplash {
             if (Skytils.config.hideDamageInBoss && DungeonsFeatures.hasBossSpawned) return
             val name = entity.customNameTag
             val damage =
-                if (name.startsWith("§0")) damageMatcher.group(1) + "☠" else if (name.startsWith("§f") && !name.contains(
-                        "§e"
-                    )
-                ) damageMatcher.group(1) + "❂" else if (name.startsWith("§6") && !name.contains("§e")) damageMatcher.group(
-                    1
-                ) + "火" else damageMatcher.group(1)
+                if (name.startsWith("§0"))
+                    damageMatcher.group(1) + "☠"
+                else if (name.startsWith("§f") && !name.contains("§e"))
+                    damageMatcher.group(1) + "❂"
+                else if (name.startsWith("§6") && !name.contains("§e"))
+                    damageMatcher.group(1) + "火"
+                else if (name.startsWith("§3"))
+                    damageMatcher.group(1) + "水"
+                else damageMatcher.group(1)
             spawnEntity(
                 DamageSplashEntity(
                     damage,
@@ -76,6 +79,6 @@ class DamageSplash {
     }
 
     companion object {
-        private val damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?)")
+        private val damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?☄?)")
     }
 }
