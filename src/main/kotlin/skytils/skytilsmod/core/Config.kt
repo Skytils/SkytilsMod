@@ -761,7 +761,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         description = "Change the size of dropped items.",
         category = "Miscellaneous",
         subcategory = "Items",
-        maxF = 5f
+        maxF = 5f,
+        decimalPlaces = 2
     )
     @JvmField
     var itemDropScale = 1f
@@ -772,7 +773,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         description = "Change the size of heads in your inventory.",
         category = "Miscellaneous",
         subcategory = "Items",
-        maxF = 2f
+        maxF = 2f,
+        decimalPlaces = 2
     )
     @JvmField
     var largerHeadScale = 1f

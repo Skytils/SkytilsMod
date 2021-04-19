@@ -65,7 +65,7 @@ public abstract class MixinRenderItem {
     private void renderItemPre(ItemStack stack, IBakedModel model, CallbackInfo ci) {
         if (!Utils.inSkyblock) return;
         if (stack.getItem() == Items.skull) {
-            double scale = Skytils.config.largerHeadScale / 100f;
+            double scale = Skytils.config.largerHeadScale;
             GlStateManager.scale(scale, scale, scale);
         }
     }
