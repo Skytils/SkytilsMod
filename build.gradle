@@ -31,7 +31,7 @@ buildscript {
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
         classpath "com.github.Skytils:ForgeGradle:FG_2.1-SNAPSHOT:all"
-        classpath("io.github.lxgaming:mixingradle:0.6-20210206.024103-1")
+        classpath "io.github.lxgaming:mixingradle:0.6-20210206.024103-1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -108,6 +108,7 @@ dependencies {
     compile ("club.sk1er:Vigilance:98-10809-SNAPSHOT")
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 jar {
