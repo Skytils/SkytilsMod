@@ -93,7 +93,6 @@ class CommandAliasesGui : GuiScreen() {
                 CommandAliases.aliases[e.key.text] = e.message.text
             }
         }
-        CommandAliases.saveAliases()
     }
 
     private fun addAlias(key: String = "", message: String = "") {

@@ -64,11 +64,9 @@ class BlockAbilityCommand : CommandBase() {
             }
             if (BlockAbility.blockedItems.contains(itemId)) {
                 BlockAbility.blockedItems.remove(itemId)
-                BlockAbility.writeSave()
                 sender.addChatMessage(ChatComponentText("§aRemoved the block on $itemId!"))
             } else {
                 BlockAbility.blockedItems.add(itemId)
-                BlockAbility.writeSave()
                 sender.addChatMessage(ChatComponentText("§aYou are now blocking abilities for $itemId!"))
             }
             return
@@ -76,7 +74,6 @@ class BlockAbilityCommand : CommandBase() {
         val subcommand = args[0].toLowerCase(Locale.ENGLISH)
         if (subcommand == "clearall") {
             BlockAbility.blockedItems.clear()
-            BlockAbility.writeSave()
             sender.addChatMessage(ChatComponentText("§aCleared all your custom ability blocks!"))
         } else {
             player.addChatMessage(ChatComponentText(getCommandUsage(sender)))

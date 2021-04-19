@@ -21,6 +21,7 @@ package skytils.skytilsmod
 import club.sk1er.vigilance.Vigilance
 import club.sk1er.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
+import com.google.gson.GsonBuilder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
@@ -85,6 +86,9 @@ class Skytils {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
         const val VERSION = "1.0-pre1"
+
+        @JvmField
+        val gson = GsonBuilder().setPrettyPrinting().create()
 
         @JvmField
         val mc: Minecraft = Minecraft.getMinecraft()
@@ -228,6 +232,14 @@ class Skytils {
                 }
             }
         }
+
+        Runtime.getRuntime().addShutdownHook(Thread {
+            ArmorColor.saveColors()
+            BlockAbility.writeSave()
+            CommandAliases.saveAliases()
+            GlintCustomizer.writeSave()
+            KeyShortcuts.saveShortcuts()
+        })
     }
 
     @SubscribeEvent

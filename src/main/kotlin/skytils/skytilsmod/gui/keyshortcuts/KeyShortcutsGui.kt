@@ -98,7 +98,6 @@ class KeyShortcutsGui : GuiScreen() {
                 KeyShortcuts.shortcuts[e.command] = e.keyCode
             }
         }
-        KeyShortcuts.saveShortcuts()
     }
 
     private fun addBlankShortcut() {

@@ -33,6 +33,7 @@ class ArmorColor {
         private val gson = GsonBuilder().setPrettyPrinting().create()
         private val mc = Minecraft.getMinecraft()
         private var colorFile = File(Skytils.modDir, "armorcolors.json")
+
         @JvmField
         val armorColors = HashMap<String, CustomColor>()
         fun reloadColors() {
