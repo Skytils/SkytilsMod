@@ -31,7 +31,7 @@ buildscript {
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
         classpath "com.github.Skytils:ForgeGradle:FG_2.1-SNAPSHOT:all"
-        classpath "com.github.Skytils:MixinGradle:0.6-SNAPSHOT"
+        classpath("io.github.lxgaming:mixingradle:0.6-20210206.024103-1")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -99,12 +99,13 @@ dependencies {
         exclude module: "commons-io"
         exclude module: "gson"
         exclude module: "launchwrapper"
+        exclude module: "log4j-core"
     }
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    compile "club.sk1er:Elementa:253-10809-SNAPSHOT"
-    compile "club.sk1er:Vigilance:98-10809-SNAPSHOT"
+    compile ("club.sk1er:Elementa:253-10809-SNAPSHOT")
+    compile ("club.sk1er:Vigilance:98-10809-SNAPSHOT")
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
@@ -158,7 +159,7 @@ processResources {
 }
 
 mixin {
-    //defaultObfuscationEnv searge
+    defaultObfuscationEnv searge
     //add sourceSets.main, "mixins.skytils.refmap.json"
 }
 

@@ -825,7 +825,10 @@ class ScreenRenderer {
             transformationOrigin.y = y
         }
 
-        private var itemRenderer: RenderItem = Minecraft.getMinecraft().renderItem
+        private val itemRenderer: RenderItem?
+            get() {
+                return Minecraft.getMinecraft().renderItem
+            }
 
         /** refresh
          * Triggered by a slower loop(client tick), refresh

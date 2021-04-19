@@ -21,7 +21,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.command.*
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
-import skytils.skytilsmod.Skytils.Companion.sendMessageQueue
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
 
 class RepartyCommand : CommandBase(), ICommand {
@@ -49,7 +49,7 @@ class RepartyCommand : CommandBase(), ICommand {
                 val player = Minecraft.getMinecraft().thePlayer
                 val chat = Minecraft.getMinecraft().ingameGUI.chatGUI
                 try {
-                    sendMessageQueue.add("/p " + java.lang.String.join(" ", repartyFailList))
+                    Skytils.sendMessageQueue.add("/p " + java.lang.String.join(" ", repartyFailList))
                     val members = java.lang.String.join(
                         """
     ${EnumChatFormatting.WHITE}
@@ -100,13 +100,13 @@ class RepartyCommand : CommandBase(), ICommand {
         partyThread = Thread {
             val player = Minecraft.getMinecraft().thePlayer
             try {
-                sendMessageQueue.add("/pl")
+                Skytils.sendMessageQueue.add("/pl")
                 gettingParty = true
                 while (gettingParty) {
                     Thread.sleep(10)
                 }
                 if (party.size == 0) return@Thread;
-                sendMessageQueue.add("/p disband")
+                Skytils.sendMessageQueue.add("/p disband")
                 disbanding = true
                 while (disbanding) {
                     Thread.sleep(10)
@@ -129,7 +129,7 @@ class RepartyCommand : CommandBase(), ICommand {
                 )
                 repartyFailList = ArrayList(party)
                 for (invitee in party) {
-                    sendMessageQueue.add("/p $invitee")
+                    Skytils.sendMessageQueue.add("/p $invitee")
                     inviting = true
                     while (inviting) {
                         Thread.sleep(10)

@@ -15,15 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package skytils.skytilsmod.features.impl.misc.damagesplash
 
-package skytils.skytilsmod.features.impl.misc.damagesplash;
-
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.entity.RenderManager;
-
-import java.util.Random;
-import java.util.UUID;
+import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.renderer.RenderGlobal
+import net.minecraft.client.renderer.entity.RenderManager
+import java.util.*
 
 /**
  * Represents a completely client-side entity
@@ -35,29 +32,39 @@ import java.util.UUID;
  * This is not attached to ANY WORLD
  * meaning that the entity will show in any world without exception.
  *
- * <b>THESE ENTITIES ARE NOT PERSISTENT</b>.
+ * **THESE ENTITIES ARE NOT PERSISTENT**.
  *
  * Taken from Wynntils under GNU Affero General Public License v3.0
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
-public class FakeEntity {
-
-    public UUID uuid = UUID.randomUUID();
-    public long livingTicks = 0;
-    public Location currentLocation;
-
-    private boolean toRemove = false;
+open class FakeEntity
+/**
+ * Creates the FakeEntity objects
+ * and updates it currently location
+ *
+ * @param currentLocation the spawn location
+ */(
+    /**
+     * Updates the current location of the entity
+     * @param currentLocation the provided location
+     */
+    var currentLocation: Location
+) {
+    /**
+     * @return A random generated identificator for the entity
+     */
+    var uUID: UUID = UUID.randomUUID()
 
     /**
-     * Creates the FakeEntity objects
-     * and updates it currently location
-     *
-     * @param currentLocation the spawn location
+     * @return The entity living ticks (how old it's)
      */
-    public FakeEntity(Location currentLocation) {
-        this.currentLocation = currentLocation;
-    }
+    var livingTicks: Long = 0
+
+    /**
+     * @return The Entity current world location
+     */
+    private var toRemove = false
 
     /**
      * Called before rendering.
@@ -65,9 +72,7 @@ public class FakeEntity {
      *
      * @param partialTicks the world partial ticks
      */
-    public void tick(float partialTicks, Random r, EntityPlayerSP player) {
-
-    }
+    open fun tick(partialTicks: Float, r: Random?, player: EntityPlayerSP?) {}
 
     /**
      * Called every world rendering tick
@@ -76,60 +81,27 @@ public class FakeEntity {
      * @param context the rendering context
      * @param render the Minecraft Render Manager
      */
-    public void render(float partialTicks, RenderGlobal context, RenderManager render) {
-
-    }
+    open fun render(partialTicks: Float, context: RenderGlobal?, render: RenderManager) {}
 
     /**
      * Marks the entity to be removed from the world.
      * If overriding this method, you should call super!
      */
-    public void remove() {
-        toRemove = true;
-    }
-
-    /**
-     * @return The Entity current world location
-     */
-    public Location getCurrentLocation() {
-        return currentLocation;
-    }
-
-    /**
-     * @return The entity living ticks (how old it's)
-     */
-    public long getLivingTicks() {
-        return livingTicks;
-    }
-
-    /**
-     * @return A random generated identificator for the entity
-     */
-    public UUID getUUID() {
-        return uuid;
+    fun remove() {
+        toRemove = true
     }
 
     /**
      * Please override this method
      * @return The entity name
      */
-    public String getName() {
-        return "DefaultFakeEntity";
-    }
+    open val name: String
+        get() = "DefaultFakeEntity"
 
     /**
      * @return if the entity will be removed in the next tick
      */
-    public boolean toRemove() {
-        return toRemove;
-    }
-
-    /**
-     * Updates the current location of the entity
-     * @param currentLocation the provided location
-     */
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
+    fun toRemove(): Boolean {
+        return toRemove
     }
 }
-

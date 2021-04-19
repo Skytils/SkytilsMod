@@ -767,7 +767,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var itemDropScale = 1f
 
     @Property(
-        type = PropertyType.SLIDER,
+        type = PropertyType.DECIMAL_SLIDER,
         name = "Larger Heads",
         description = "Change the size of heads in your inventory.",
         category = "Miscellaneous",
@@ -775,7 +775,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         maxF = 2f
     )
     @JvmField
-    var largerHeadScale = 100f
+    var largerHeadScale = 1f
 
     @Property(
         type = PropertyType.SWITCH,
