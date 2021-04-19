@@ -33,7 +33,7 @@ import java.util.regex.Pattern
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.isOnHypixel) return
+        if (!Utils.isOnHypixel || event.type == 2.toByte()) return
         val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
         if (unformatted.startsWith("Your new API key is ")) {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
