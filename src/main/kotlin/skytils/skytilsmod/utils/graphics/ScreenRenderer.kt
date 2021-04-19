@@ -808,7 +808,8 @@ class ScreenRenderer {
     }
 
     companion object {
-        lateinit var fontRenderer: SmartFontRenderer
+        @JvmField
+        var fontRenderer: SmartFontRenderer = SmartFontRenderer()
         var mc: Minecraft = Minecraft.getMinecraft()
         var screen: ScaledResolution? = null
         var isRendering = false
@@ -831,7 +832,7 @@ class ScreenRenderer {
             return transformationOrigin
         }
 
-        private var itemRenderer: RenderItem? = null
+        private var itemRenderer: RenderItem = Minecraft.getMinecraft().renderItem
 
         /** refresh
          * Triggered by a slower loop(client tick), refresh
@@ -842,21 +843,6 @@ class ScreenRenderer {
         @JvmStatic
         fun refresh() {
             screen = ScaledResolution(mc)
-            if (fontRenderer == null) {
-                try {
-                    fontRenderer = SmartFontRenderer()
-                } catch (ignored: Throwable) {
-                } finally {
-                    if (fontRenderer != null) {
-                        if (mc.gameSettings.language != null) {
-                            (fontRenderer as SmartFontRenderer).unicodeFlag = mc.isUnicode
-                            (fontRenderer as SmartFontRenderer).setBidiFlag(mc.languageManager.isCurrentLanguageBidirectional)
-                        }
-                        (mc.getResourceManager() as IReloadableResourceManager).registerReloadListener(fontRenderer)
-                    }
-                }
-            }
-            if (itemRenderer == null) itemRenderer = Minecraft.getMinecraft().renderItem
         }
     }
 }

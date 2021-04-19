@@ -22,16 +22,17 @@ buildscript {
     repositories {
         jcenter()
         maven { url "https://jitpack.io" }
-        // search through the 'libs' folder
-        flatDir dirs: 'libs'
-        flatDir dirs: "plugins"
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots"
+        }
     }
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
         classpath "com.github.NickAcPT:ForgeGradle:FG_2.1-SNAPSHOT:all"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.spongepowered:mixingradle:0.6-SNAPSHOT"
+        classpath("io.github.lxgaming:mixingradle:0.6-20210206.024103-1")
     }
 }
 
@@ -93,11 +94,15 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     compile("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        transitive = false
         exclude module: "guava"
         exclude module: "commons-io"
         exclude module: "gson"
         exclude module: "launchwrapper"
     }
+
+    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+
     compile "club.sk1er:Elementa:253-10809-SNAPSHOT"
     compile "club.sk1er:Vigilance:98-10809-SNAPSHOT"
 
@@ -133,17 +138,6 @@ shadowJar {
     exclude("module-info.class")
 }
 
-mixin {
-    add sourceSets.main, "mixins.skytils.refmap.json"
-}
-
-reobf {
-    shadowJar {
-        classpath = sourceSets.main.compileClasspath
-        mappingType = "SEARGE"
-    }
-}
-
 processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
@@ -160,6 +154,24 @@ processResources {
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+}
+
+mixin {
+    defaultObfuscationEnv searge
+    //add sourceSets.main, "mixins.skytils.refmap.json"
+}
+
+reobf {
+    shadowJar {
+        classpath = sourceSets.main.compileClasspath
+        mappingType = "SEARGE"
+    }
+}
+
+sourceSets {
+    main {
+        ext.refMap = "mixins.skytils.refmap.json"
     }
 }
 
