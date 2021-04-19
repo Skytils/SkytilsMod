@@ -53,7 +53,6 @@ public abstract class MixinSlot {
             }
             item.getTagCompound().setBoolean("SkytilsForceGlint", true);
             cir.setReturnValue(item);
-            return;
         }
     }
 

@@ -39,7 +39,7 @@ import java.util.Objects;
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
     @Shadow
-    private EntityPlayerSP thePlayer;
+    public EntityPlayerSP thePlayer;
 
     private final Minecraft that = (Minecraft) (Object) this;
 

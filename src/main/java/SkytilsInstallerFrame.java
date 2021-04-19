@@ -102,7 +102,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             SkytilsInstallerFrame frame = new SkytilsInstallerFrame();
             frame.centerFrame(frame);
-            frame.show();
+            frame.setVisible(true);
 
         } catch (Exception ex) {
             showErrorPopup(ex);

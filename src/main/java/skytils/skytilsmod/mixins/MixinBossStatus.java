@@ -24,14 +24,10 @@ import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.BossBarEvent;
-import skytils.skytilsmod.utils.NumberUtil;
-import skytils.skytilsmod.utils.Utils;
 
 @Mixin(BossStatus.class)
 public class MixinBossStatus {

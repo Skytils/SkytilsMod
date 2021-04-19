@@ -1,33 +1,59 @@
+/*
+ * Skytils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2021 Skytils
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 buildscript {
+    ext.kotlin_version = "1.4.32"
+
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "https://files.minecraftforge.net/maven"
-        }
-        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+        maven { url "https://jitpack.io" }
         // search through the 'libs' folder
         flatDir dirs: 'libs'
+        flatDir dirs: "plugins"
     }
+
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
+        classpath "com.github.NickAcPT:ForgeGradle:FG_2.1-SNAPSHOT:all"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.spongepowered:mixingradle:0.6-SNAPSHOT"
     }
 }
 
+apply plugin: "kotlin"
 apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
 
 version = "1.0-pre1"
-group = "skytils.skytilsmod"
+group = "skytils.skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 minecraft {
@@ -74,10 +100,8 @@ dependencies {
     }
     compile "club.sk1er:Elementa:253-10809-SNAPSHOT"
     compile "club.sk1er:Vigilance:98-10809-SNAPSHOT"
-}
 
-mixin {
-    add sourceSets.main, "mixins.skytils.refmap.json"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 jar {
@@ -109,9 +133,14 @@ shadowJar {
     exclude("module-info.class")
 }
 
+mixin {
+    add sourceSets.main, "mixins.skytils.refmap.json"
+}
+
 reobf {
     shadowJar {
         classpath = sourceSets.main.compileClasspath
+        mappingType = "SEARGE"
     }
 }
 
@@ -132,10 +161,6 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-}
-
-sourceSets {
-    main { output.resourcesDir = output.classesDir }
 }
 
 tasks.reobfJar.dependsOn(shadowJar)
