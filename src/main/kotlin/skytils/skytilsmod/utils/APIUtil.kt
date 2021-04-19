@@ -33,6 +33,7 @@ import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HttpContext
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import java.io.BufferedReader
@@ -56,7 +57,6 @@ object APIUtil {
             }.build()
 
     fun getJSONResponse(urlString: String): JsonObject {
-        val player: EntityPlayer = Minecraft.getMinecraft().thePlayer
         try {
             val request = HttpGet(URL(urlString).toURI())
             request.protocolVersion = HttpVersion.HTTP_1_1
@@ -84,16 +84,16 @@ object APIUtil {
                         }
                     }
                 } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && response.statusLine.statusCode == 204) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed with reason: Player does not exist."))
+                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed with reason: Player does not exist."))
                 } else {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Request failed. HTTP Error Code: " + response.statusLine.statusCode))
+                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Request failed. HTTP Error Code: " + response.statusLine.statusCode))
                 }
             }
         } catch (ex: IOException) {
-            player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
             ex.printStackTrace()
         } catch (ex: URISyntaxException) {
-            player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
             ex.printStackTrace()
         }
         return JsonObject()
@@ -101,7 +101,6 @@ object APIUtil {
 
     // Only used for UUID => Username
     fun getArrayResponse(urlString: String?): JsonArray {
-        val player: EntityPlayer = Minecraft.getMinecraft().thePlayer
         try {
             val request = HttpGet(URL(urlString).toURI())
             request.protocolVersion = HttpVersion.HTTP_1_1
@@ -118,13 +117,13 @@ object APIUtil {
                 val gson = Gson()
                 return gson.fromJson(r.toString(), JsonArray::class.java)
             } else {
-                player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Request failed. HTTP Error Code: " + response.statusLine.statusCode))
+                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Request failed. HTTP Error Code: " + response.statusLine.statusCode))
             }
         } catch (ex: IOException) {
-            player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
             ex.printStackTrace()
         } catch (ex: URISyntaxException) {
-            player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
             ex.printStackTrace()
         }
         return JsonArray()
