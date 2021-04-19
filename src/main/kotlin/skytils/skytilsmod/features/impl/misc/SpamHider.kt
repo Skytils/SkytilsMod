@@ -501,7 +501,8 @@ class SpamHider {
             val animDiv = timePassed.toDouble() / 1000.0
             lastTimeRender = now
             spamMessages.reverse()
-            for (i in spamMessages.indices) {
+            var i = 0;
+            while (i in spamMessages.indices) {
                 val message = spamMessages[i]
                 val messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(
                     stripControlCodes(
@@ -545,8 +546,10 @@ class SpamHider {
                 )
                 if (message.time > 4000) {
                     spamMessages.remove(message)
+                    i--
                 }
                 message.time += timePassed
+                i++
             }
             spamMessages.reverse()
         }
