@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.features.impl.misc
+package skytils.skytilsmod.features.impl.handlers
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -46,13 +46,13 @@ import kotlin.math.sin
 class SpamHider {
     companion object {
         private val mc = Minecraft.getMinecraft()
-        var spamMessages = ArrayList<SpamMessage?>()
+        var spamMessages = ArrayList<SpamMessage>()
         private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
             if (ReceivePacketEvent.packet !is S02PacketChat) return
             ReceivePacketEvent.isCanceled = true
-            val packet = ReceivePacketEvent.packet as S02PacketChat?
-            if (addToSpam) newMessage(packet!!.chatComponent.formattedText)
-            MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet!!.type, packet.chatComponent))
+            val packet = ReceivePacketEvent.packet as S02PacketChat
+            if (addToSpam) newMessage(packet.chatComponent.formattedText)
+            MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
         }
 
         private fun newMessage(message: String) {
@@ -73,8 +73,12 @@ class SpamHider {
         if (!Utils.inSkyblock) return
         val manaUsageMatcher = Regexs.MANAUSED.pattern.matcher(event.message)
         if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
-            event.isCanceled = true
-            val manaUsage = manaUsageMatcher.group(1)
+            val manaUsage = manaUsageMatcher.group(1) ?: return
+            var spaced = ""
+
+            for (i in manaUsage) spaced += " "
+
+            event.message = event.message.replace(manaUsage, spaced)
             if (Skytils.config.manaUseHider == 2) {
                 if (lastAbilityUsed != manaUsage || abilityUses % 3 == 0) {
                     lastAbilityUsed = manaUsage
@@ -501,12 +505,12 @@ class SpamHider {
             val animDiv = timePassed.toDouble() / 1000.0
             lastTimeRender = now
             spamMessages.reverse()
-            var i = 0;
+            var i = 0
             while (i in spamMessages.indices) {
                 val message = spamMessages[i]
                 val messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(
                     stripControlCodes(
-                        message!!.message
+                        message.message
                     )
                 )
                 if (actualY > sr.scaledHeight / 2f) {
