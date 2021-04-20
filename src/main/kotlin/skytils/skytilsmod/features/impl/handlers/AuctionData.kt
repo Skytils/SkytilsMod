@@ -37,7 +37,7 @@ class AuctionData {
         if (!reloadTimer.isStarted) reloadTimer.start()
         if (reloadTimer.time >= 90000) {
             reloadTimer.reset()
-            if (Skytils.config.showLowestBINPrice || Skytils.config.dungeonChestProfit) {
+            if (Skytils.config.fetchLowestBINPrices) {
                 Thread({
                     val data = APIUtil.getJSONResponse(dataURL)
                     for ((key, value) in data.entrySet()) {

@@ -36,6 +36,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"
 
     @Property(
+        type = PropertyType.SWITCH,
+        name = "Fetch Lowest BIN Prices",
+        description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
+        category = "General",
+        subcategory = "API"
+    )
+    var fetchLowestBINPrices = false
+
+    @Property(
         type = PropertyType.TEXT,
         name = "Hypixel API Key",
         description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
@@ -1644,6 +1653,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     init {
         initialize()
 
+        ::showLowestBINPrice dependsOn ::fetchLowestBINPrices
+        ::betterAuctionPriceInput dependsOn ::fetchLowestBINPrices
+        ::dungeonChestProfit dependsOn ::fetchLowestBINPrices
+        ::showCoinsPerBit dependsOn ::fetchLowestBINPrices
 
         ::showNextBlaze dependsOn ::blazeSolver
         ::clickInOrderFirst dependsOn ::clickInOrderTerminalSolver
