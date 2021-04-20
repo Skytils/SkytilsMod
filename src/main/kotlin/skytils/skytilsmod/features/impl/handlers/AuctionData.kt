@@ -30,29 +30,13 @@ import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class AuctionData {
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inSkyblock) return
-        if (!reloadTimer.isStarted) reloadTimer.start()
-        if (reloadTimer.time >= 90000) {
-            reloadTimer.reset()
-            if (Skytils.config.fetchLowestBINPrices) {
-                Thread({
-                    val data = APIUtil.getJSONResponse(dataURL)
-                    for ((key, value) in data.entrySet()) {
-                        lowestBINs[key] = value.asDouble
-                    }
-                }, "Skytils-FetchAuctionData").start()
-            }
-        }
-    }
 
     companion object {
         const val dataURL = "https://sbe-stole-skytils.design/api/auctions/lowestbins"
         val lowestBINs = HashMap<String, Double>()
-        val reloadTimer = StopWatch()
         private val gson = GsonBuilder().setPrettyPrinting().create()
         fun getIdentifier(item: ItemStack?): String? {
             val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
@@ -86,6 +70,14 @@ class AuctionData {
     init {
         Skytils.config.registerListener(Config::fetchLowestBINPrices) { value ->
             if (!value) lowestBINs.clear()
+        }
+        fixedRateTimer(name = "Skytils-FetchAuctionData", period = 60 * 1000) {
+            if (Skytils.config.fetchLowestBINPrices) {
+                val data = APIUtil.getJSONResponse(dataURL)
+                for ((key, value) in data.entrySet()) {
+                    lowestBINs[key] = value.asDouble
+                }
+            }
         }
     }
 
