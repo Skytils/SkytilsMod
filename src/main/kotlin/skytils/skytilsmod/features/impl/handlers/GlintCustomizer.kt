@@ -17,13 +17,11 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.io.File
 import java.io.FileReader
@@ -31,8 +29,6 @@ import java.io.FileWriter
 
 class GlintCustomizer {
     companion object {
-        private val gson = GsonBuilder().setPrettyPrinting().create()
-        private val mc = Minecraft.getMinecraft()
         private var saveFile = File(Skytils.modDir, "customizedglints.json")
 
         @JvmField
@@ -54,7 +50,7 @@ class GlintCustomizer {
                         }
                         if (entry.has("color")) {
                             val color = Utils.customColorFromString(entry["color"].asString)
-                            glintColors[key] = color ?: CommonColors.WHITE
+                            glintColors[key] = color
                         }
                     }
                 }

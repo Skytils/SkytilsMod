@@ -48,15 +48,15 @@ class Location : Point3d {
         return Location(x, y, z)
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) return true
-        return if (obj is Tuple3d) {
-            equals(obj)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        return if (other is Tuple3d) {
+            equals(other)
         } else false
     }
 
     override fun equals(other: Tuple3d): Boolean {
-        return if (other == null) false else x == other.x && y == other.y && z == other.z
+        return x == other.x && y == other.y && z == other.z
     }
 
     override fun toString(): String {

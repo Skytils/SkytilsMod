@@ -156,7 +156,7 @@ object Utils {
         if (string.startsWith("rainbow(")) {
             return fromString(string)
         }
-        val color: CustomColor = try {
+        return try {
             getCustomColorFromColor(web(string))
         } catch (e: IllegalArgumentException) {
             try {
@@ -165,7 +165,6 @@ object Utils {
                 throw e
             }
         }
-        return color
     }
 
     fun getCustomColorFromColor(color: Color): CustomColor {

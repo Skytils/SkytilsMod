@@ -88,7 +88,7 @@ class SpidersDenFeatures {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inSkyblock && player != null && world != null) {
-                if (SBInfo.instance.location == null || !SBInfo.instance.location
+                if (!SBInfo.instance.location
                         .equals("combat_1", ignoreCase = true)
                 ) return
                 val arachneNames =

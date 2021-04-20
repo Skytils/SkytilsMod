@@ -97,7 +97,6 @@ class TechnoMayor {
         val packet = event.packet as S02PacketChat
         if (packet.type.toInt() == 2) return
         val unformatted = StringUtils.stripControlCodes(packet.chatComponent.unformattedText)
-        val formatted = packet.chatComponent.formattedText
         if (unformatted == "Your Shiny Orb and associated pig expired and disappeared." || unformatted == "SHINY! The orb is charged! Click on it for loot!") {
             orbLocations.removeIf { pos: Vec3 ->
                 mc.thePlayer.position.distanceSq(

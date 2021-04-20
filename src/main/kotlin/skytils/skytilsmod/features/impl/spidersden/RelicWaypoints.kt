@@ -159,7 +159,7 @@ class RelicWaypoints {
                 FileReader(saveFile).use { `in` ->
                     dataArray = gson.fromJson(`in`, JsonArray::class.java)
                     for (serializedPosition in DataFetcher.getStringArrayFromJsonArray(dataArray as JsonArray)) {
-                        val parts = serializedPosition!!.split(",".toRegex()).toTypedArray()
+                        val parts = serializedPosition.split(",".toRegex()).toTypedArray()
                         foundRelics.add(BlockPos(parts[0].toInt(), parts[1].toInt(), parts[2].toInt()))
                     }
                 }

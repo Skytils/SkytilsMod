@@ -214,7 +214,7 @@ class GriffinBurrows {
 
     class GriffinGuiElement : GuiElement("Griffin Timer", FloatPair(100, 10)) {
         override fun render() {
-            if (SBInfo.instance.location == null || !SBInfo.instance.location
+            if (!SBInfo.instance.location
                     .equals("hub", ignoreCase = true)
             ) return
             val player = mc.thePlayer
@@ -267,7 +267,7 @@ class GriffinBurrows {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
-            if (SBInfo.instance.location == null || !SBInfo.instance.location
+            if (!SBInfo.instance.location
                     .equals("hub", ignoreCase = true)
             ) return
             val packet = event.packet as S2APacketParticles?
