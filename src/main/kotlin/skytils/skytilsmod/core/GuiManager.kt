@@ -72,7 +72,7 @@ class GuiManager {
     @SubscribeEvent
     fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
         if (Skytils.usingLabymod && Minecraft.getMinecraft().ingameGUI !is GuiIngameForge) return
-        if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE && event.type != RenderGameOverlayEvent.ElementType.JUMPBAR) return
+        if (event.type != RenderGameOverlayEvent.ElementType.TEXT) return
         if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
         for ((_, element) in Companion.elements) {
             try {
