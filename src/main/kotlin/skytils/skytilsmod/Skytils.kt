@@ -73,6 +73,7 @@ import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.io.File
+import kotlin.concurrent.fixedRateTimer
 
 @Mod(
     modid = Skytils.MODID,
@@ -235,14 +236,12 @@ class Skytils {
             }
         }
 
+        fixedRateTimer(period = 30 * 1000, name = "Skytils-Write-Data") {
+            writeData()
+        }
+
         Runtime.getRuntime().addShutdownHook(Thread {
-            ArmorColor.saveColors()
-            BlockAbility.writeSave()
-            CommandAliases.saveAliases()
-            FavoritePetOverlay.saveFavorites()
-            GlintCustomizer.writeSave()
-            KeyShortcuts.saveShortcuts()
-            RelicWaypoints.writeSave()
+            writeData()
         })
     }
 
@@ -323,6 +322,16 @@ class Skytils {
             if (old is CommandAliasesGui || old is LocationEditGui || old is KeyShortcutsGui || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) event.gui =
                 OptionsGui()
         }
+    }
+
+    fun writeData() {
+        ArmorColor.saveColors()
+        BlockAbility.writeSave()
+        CommandAliases.saveAliases()
+        FavoritePetOverlay.saveFavorites()
+        GlintCustomizer.writeSave()
+        KeyShortcuts.saveShortcuts()
+        RelicWaypoints.writeSave()
     }
 
 }
