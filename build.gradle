@@ -136,7 +136,7 @@ shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = [project.configurations.compile]
 
-    relocate("club.sk1er", "relocated.club.sk1er")
+    relocate("club.sk1er", "skytils.sk1er")
 
     exclude "dummyThing"
     exclude "**/module-info.class"
@@ -149,6 +149,7 @@ shadowJar {
     exclude "org/lwjgl/**"
     exclude "net/java/**"
     exclude "META-INF/**"
+    exclude "club/sk1er/vigilance/example"
 }
 
 processResources {
