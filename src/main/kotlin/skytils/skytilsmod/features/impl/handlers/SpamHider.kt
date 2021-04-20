@@ -31,6 +31,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SetActionBarEvent
 import skytils.skytilsmod.mixins.AccessorGuiNewChat
+import skytils.skytilsmod.utils.StringUtils
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -90,12 +91,11 @@ class SpamHider {
     }
 
     private enum class Regexs(var pattern: Pattern) {
-        BLESSINGBUFF(Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})")), BLESSINGGRANT(Pattern.compile("Grant.{1,2} you .* and .*\\.")), BLESSINGNAME(
-            Pattern.compile("Blessing of (?<blessing>\\w+)")
-        ),
-        BUILDINGTOOLS(Pattern.compile("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")), MANAUSED(
-            Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))")
-        );
+        BLESSINGBUFF(Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})")),
+        BLESSINGGRANT(Pattern.compile("Grant.{1,2} you .* and .*\\.")),
+        BLESSINGNAME(Pattern.compile("Blessing of (?<blessing>\\w+)")),
+        BUILDINGTOOLS(Pattern.compile("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
+        MANAUSED(Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -436,10 +436,7 @@ class SpamHider {
             }
 
             // Compact Building Tools
-            if (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
-                    "place"
-                ) || formatted.contains("zap"))
-            ) {
+            if (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains("place") || formatted.contains("zap"))) {
                 if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
                     val chatGui = mc.ingameGUI.chatGUI
                     val lines = (chatGui as AccessorGuiNewChat).chatLines
@@ -481,6 +478,15 @@ class SpamHider {
             if (formatted.contains("§r§epicked up your ")) {
                 when (Skytils.config.otherOrbHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.otherOrbHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
+            // Traps
+            if (StringUtils.startsWithAny(formatted, "§r§cThe Tripwire Trap", "§r§cThe Flamethrower", "§r§cThe Arrow Trap", "§r§cThe Crusher")) {
+                when (Skytils.config.trapDamageHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.trapDamageHider == 2)
                     else -> {
                     }
                 }
@@ -583,7 +589,33 @@ class SpamHider {
         override val width: Int
             get() = ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r")
         override val toggled: Boolean
-            get() = Skytils.config.profileHider == 2 || Skytils.config.implosionHider == 2 || Skytils.config.midasStaffHider == 2 || Skytils.config.spiritSceptreHider == 2 || Skytils.config.giantSwordHider == 2 || Skytils.config.lividHider == 2 || Skytils.config.hopeHider == 2 || Skytils.config.manaUseHider == 2 || Skytils.config.bloodKeyHider == 2 || Skytils.config.hideBossMessages == 2 || Skytils.config.hideDungeonCountdownAndReady == 2 || Skytils.config.hideDungeonAbilities == 2 || Skytils.config.hideMortMessages == 2 || Skytils.config.superboomHider == 2 || Skytils.config.reviveStoneHider == 2 || Skytils.config.witherKeyHider == 2 || Skytils.config.inTheWayHider == 2 || Skytils.config.hideCantUseAbility == 2 || Skytils.config.comboHider == 2 || Skytils.config.cooldownHider == 2 || Skytils.config.hideNoEnemiesNearby == 2 || Skytils.config.manaMessages == 2 || Skytils.config.blessingEnchantHider == 2 || Skytils.config.blessingBaitHider == 2 || Skytils.config.tetherHider == 2 || Skytils.config.selfOrbHider == 2 || Skytils.config.otherOrbHider == 2
+            get() = Skytils.config.profileHider == 2 ||
+                    Skytils.config.implosionHider == 2 ||
+                    Skytils.config.midasStaffHider == 2 ||
+                    Skytils.config.spiritSceptreHider == 2 ||
+                    Skytils.config.giantSwordHider == 2 ||
+                    Skytils.config.lividHider == 2 ||
+                    Skytils.config.hopeHider == 2 ||
+                    Skytils.config.manaUseHider == 2 ||
+                    Skytils.config.bloodKeyHider == 2 ||
+                    Skytils.config.hideBossMessages == 2 ||
+                    Skytils.config.hideDungeonCountdownAndReady == 2 ||
+                    Skytils.config.hideDungeonAbilities == 2 ||
+                    Skytils.config.hideMortMessages == 2 ||
+                    Skytils.config.superboomHider == 2 ||
+                    Skytils.config.reviveStoneHider == 2 ||
+                    Skytils.config.witherKeyHider == 2 ||
+                    Skytils.config.inTheWayHider == 2 ||
+                    Skytils.config.hideCantUseAbility == 2 ||
+                    Skytils.config.comboHider == 2 ||
+                    Skytils.config.cooldownHider == 2 ||
+                    Skytils.config.hideNoEnemiesNearby == 2 ||
+                    Skytils.config.manaMessages == 2 ||
+                    Skytils.config.blessingEnchantHider == 2 ||
+                    Skytils.config.blessingBaitHider == 2 ||
+                    Skytils.config.tetherHider == 2 ||
+                    Skytils.config.selfOrbHider == 2 ||
+                    Skytils.config.otherOrbHider == 2
 
         companion object {
             var lastTimeRender = Date().time

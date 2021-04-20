@@ -1542,6 +1542,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var otherOrbHider = 0
 
     @Property(
+        type = PropertyType.SELECTOR,
+        name = "Trap Damage Hider",
+        description = "Removes Trap Damage messages from your chat.",
+        category = "Spam",
+        subcategory = "Dungeons",
+        options = ["Normal", "Hidden", "Separate Gui"]
+    )
+    var trapDamageHider = 0
+
+    @Property(
         type = PropertyType.SLIDER,
         name = "Toast Time",
         description = "Number of milliseconds that toasts are displayed for.",
