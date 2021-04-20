@@ -348,6 +348,8 @@ class AuctionPriceOverlay {
                     values[1].toDouble()
                 } catch (ex: ArrayIndexOutOfBoundsException) {
                     0.0
+                } catch (ex: NumberFormatException) {
+                    0.0
                 }
                 valueMultiplier * multiplier + valueAdder
             }
