@@ -48,24 +48,24 @@ import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.features.impl.dungeons.*
+import skytils.skytilsmod.features.impl.dungeons.solvers.*
+import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.events.MayorJerry
 import skytils.skytilsmod.features.impl.events.TechnoMayor
+import skytils.skytilsmod.features.impl.handlers.*
 import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.misc.*
 import skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
+import skytils.skytilsmod.features.impl.overlays.FavoritePetOverlay
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
-import skytils.skytilsmod.features.impl.dungeons.*
-import skytils.skytilsmod.features.impl.dungeons.solvers.*
-import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
-import skytils.skytilsmod.features.impl.handlers.*
-import skytils.skytilsmod.features.impl.misc.*
-import skytils.skytilsmod.features.impl.overlays.FavoritePetOverlay
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.mixins.AccessorCommandHandler
 import skytils.skytilsmod.mixins.AccessorSettingsGui
@@ -134,7 +134,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        Vigilance.initialize();
+        Vigilance.initialize()
 
         config.preload()
 
@@ -242,6 +242,7 @@ class Skytils {
             FavoritePetOverlay.saveFavorites()
             GlintCustomizer.writeSave()
             KeyShortcuts.saveShortcuts()
+            RelicWaypoints.writeSave()
         })
     }
 
@@ -257,8 +258,7 @@ class Skytils {
         }
 
         if (mc.thePlayer != null && sendMessageQueue.size > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            val msg = sendMessageQueue.removeFirst()
-            mc.thePlayer.sendChatMessage(msg)
+            mc.thePlayer.sendChatMessage(sendMessageQueue.removeFirst())
         }
 
         if (ticks % 20 == 0) {
@@ -320,9 +320,8 @@ class Skytils {
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
         if (event.gui == null && config.reopenOptionsMenu) {
-            val isSettingsGui =
-                old is CommandAliasesGui || old is LocationEditGui || old is KeyShortcutsGui || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)
-            if (isSettingsGui) event.gui = OptionsGui()
+            if (old is CommandAliasesGui || old is LocationEditGui || old is KeyShortcutsGui || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) event.gui =
+                OptionsGui()
         }
     }
 

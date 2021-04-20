@@ -104,8 +104,10 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    compile ("club.sk1er:Elementa:253-10809-SNAPSHOT")
-    compile ("club.sk1er:Vigilance:98-10809-SNAPSHOT")
+    compile("club.sk1er:Vigilance:98-10809-SNAPSHOT") {
+        exclude module: "kotlin-stdlib-jdk8"
+        exclude module: "kotlin-reflect"
+    }
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"

@@ -79,7 +79,6 @@ class RelicWaypoints {
             if (relicLocations.contains(packet!!.position)) {
                 foundRelics.add(packet.position)
                 rareRelicLocations.remove(packet.position)
-                writeSave()
             }
         }
     }
