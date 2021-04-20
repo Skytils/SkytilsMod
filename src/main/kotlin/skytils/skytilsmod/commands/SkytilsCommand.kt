@@ -26,7 +26,6 @@ import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
-import skytils.skytilsmod.features.impl.handlers.CommandAliases
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.gui.LocationEditGui
@@ -113,10 +112,6 @@ class SkytilsCommand : CommandBase() {
                 } else {
                     val action = args[1].toLowerCase(Locale.ENGLISH)
                     when (action) {
-                        "aliases" -> {
-                            CommandAliases.reloadAliases()
-                            player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils command aliases have been §freloaded§b successfully."))
-                        }
                         "data" -> {
                             DataFetcher.reloadData()
                             player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils repository data has been §freloaded§b successfully."))
@@ -139,7 +134,7 @@ class SkytilsCommand : CommandBase() {
                                     " §3/skytils config §l➡ §bOpens the configuration GUI." + "\n" +
                                     " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
                                     " §3/skytils help §l➡ §bShows this help menu." + "\n" +
-                                    " §3/skytils reload <aliases/data> §l➡ §bForces a refresh of command aliases or solutions from the data repository." + "\n" +
+                                    " §3/skytils reload <data/mayor> §l➡ §bForces a refresh of solutions from the data repository." + "\n" +
                                     " §3/skytils editlocations §l➡ §bOpens the location editing GUI." + "\n" +
                                     " §3/skytils aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
                                     "§9§l➜ Events:" + "\n" +
