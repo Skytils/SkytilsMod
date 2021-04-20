@@ -134,7 +134,7 @@ shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = [project.configurations.compile]
 
-    relocate("club.sk1er", "club.sk1ersnapshot")
+    relocate("club.sk1er", "relocated.club.sk1er")
 
     exclude "dummyThing"
     exclude "**/module-info.class"

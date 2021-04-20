@@ -23,6 +23,7 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -161,13 +162,17 @@ class FavoritePetOverlay {
         if (event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || !event.slot.hasStack) return
         val item = event.slot.stack!!
         val petId = getPetIdFromItem(item)
-        if (favorited.contains(petId)) Gui.drawRect(
-            event.slot.xDisplayPosition,
-            event.slot.yDisplayPosition,
-            event.slot.xDisplayPosition + 16,
-            event.slot.yDisplayPosition + 16,
-            Skytils.config.favoritePetColor.rgb
-        )
+        if (favorited.contains(petId)) {
+            GlStateManager.translate(0f, 0f, 2f)
+            Gui.drawRect(
+                event.slot.xDisplayPosition,
+                event.slot.yDisplayPosition,
+                event.slot.xDisplayPosition + 16,
+                event.slot.yDisplayPosition + 16,
+                Skytils.config.favoritePetColor.rgb
+            )
+            GlStateManager.translate(0f, 0f, -2f)
+        }
     }
 
     private fun getPetIdFromItem(item: ItemStack): String {
