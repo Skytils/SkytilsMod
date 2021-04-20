@@ -435,10 +435,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         File thisFile = getThisFile();
 
         if (thisFile != null) {
-            boolean inSubFolder = false;
-            if (IN_MODS_SUBFOLDER.matcher(modsFolder.getPath()).find()) {
-                inSubFolder = true;
-            }
+            boolean inSubFolder = IN_MODS_SUBFOLDER.matcher(modsFolder.getPath()).find();
 
             File newFile = new File(modsFolder, "Skytils-"+getVersionFromMcmodInfo()+".jar");
             if (thisFile.equals(newFile)) {

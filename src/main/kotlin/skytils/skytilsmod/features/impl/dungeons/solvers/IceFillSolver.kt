@@ -309,7 +309,7 @@ class IceFillSolver {
         }
 
         init {
-            if (chestPos == null) throw NullPointerException();
+            if (chestPos == null) throw NullPointerException()
             for (pos in Utils.getBlocksWithinRangeAtSameY(chestPos!!, 25, y)) {
                 val block = world.getBlockState(pos)
                 if (world.getBlockState(pos.down()).block === Blocks.ice || world.getBlockState(pos.down()).block === Blocks.packed_ice) {

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.core;
+package skytils.skytilsmod.core
 
 import com.google.gson.Gson
 import net.minecraft.client.Minecraft

@@ -25,8 +25,7 @@ abstract class GuiElement(var name: String?, var scale: Float, fp: FloatPair?) {
     var pos: FloatPair?
 
     @JvmOverloads
-    constructor(name: String?, fp: FloatPair? = FloatPair(0, 0)) : this(name, 1.0f, fp) {
-    }
+    constructor(name: String?, fp: FloatPair? = FloatPair(0, 0)) : this(name, 1.0f, fp)
 
     abstract fun render()
     abstract fun demoRender()

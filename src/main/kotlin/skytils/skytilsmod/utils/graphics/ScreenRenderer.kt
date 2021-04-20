@@ -396,7 +396,7 @@ class ScreenRenderer {
         shadow: TextShadow? = TextShadow.NORMAL
     ): Float {
         if (!isRendering) return -1f
-        val f = fontRenderer!!.drawString(text, drawingOrigin.x + x, drawingOrigin.y + y, color, alignment, shadow)
+        val f = fontRenderer.drawString(text, drawingOrigin.x + x, drawingOrigin.y + y, color, alignment, shadow)
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         return f
     }

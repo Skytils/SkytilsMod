@@ -27,8 +27,8 @@ import javax.vecmath.Tuple3d
  * @author Wynntils
  */
 class Location : Point3d {
-    constructor(x: Double, y: Double, z: Double) : super(x, y, z) {}
-    constructor(entity: Entity) : super(entity.posX, entity.posY, entity.posZ) {}
+    constructor(x: Double, y: Double, z: Double) : super(x, y, z)
+    constructor(entity: Entity) : super(entity.posX, entity.posY, entity.posZ)
 
     fun add(x: Double, y: Double, z: Double): Location {
         this.x += x

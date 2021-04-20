@@ -29,7 +29,7 @@ import java.awt.Color
  */
 class CleanButton(buttonId: Int, x: Int, y: Int, widthIn: Int, heightIn: Int, buttonText: String?) :
     GuiButton(buttonId, x, y, widthIn, heightIn, buttonText) {
-    constructor(buttonId: Int, x: Int, y: Int, buttonText: String?) : this(buttonId, x, y, 200, 20, buttonText) {}
+    constructor(buttonId: Int, x: Int, y: Int, buttonText: String?) : this(buttonId, x, y, 200, 20, buttonText)
 
     override fun drawButton(mc: Minecraft, mouseX: Int, mouseY: Int) {
         if (visible) {

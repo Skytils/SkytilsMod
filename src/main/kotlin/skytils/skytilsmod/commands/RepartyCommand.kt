@@ -105,7 +105,7 @@ class RepartyCommand : CommandBase(), ICommand {
                 while (gettingParty) {
                     Thread.sleep(10)
                 }
-                if (party.size == 0) return@Thread;
+                if (party.size == 0) return@Thread
                 Skytils.sendMessageQueue.add("/p disband")
                 disbanding = true
                 while (disbanding) {
