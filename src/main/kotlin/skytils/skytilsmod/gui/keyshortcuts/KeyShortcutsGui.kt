@@ -21,6 +21,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
 import net.minecraft.client.settings.GameSettings
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.KeyShortcuts
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton
 import skytils.skytilsmod.gui.keyshortcuts.elements.KeyShortcutsList
@@ -98,6 +99,7 @@ class KeyShortcutsGui : GuiScreen() {
                 KeyShortcuts.shortcuts[e.command] = e.keyCode
             }
         }
+        PersistentSave.markDirty(KeyShortcuts::class)
     }
 
     private fun addBlankShortcut() {

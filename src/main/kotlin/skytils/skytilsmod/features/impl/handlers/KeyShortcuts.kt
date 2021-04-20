@@ -17,9 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -27,12 +25,13 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-class KeyShortcuts {
+class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     @SubscribeEvent
     fun onInput(event: InputEvent?) {
         if (!Utils.inSkyblock) return
@@ -51,44 +50,27 @@ class KeyShortcuts {
         }
     }
 
-    companion object {
-        private val gson = GsonBuilder().setPrettyPrinting().create()
-        private val mc = Minecraft.getMinecraft()
-        private var saveFile = File(Skytils.modDir, "keyshortcuts.json")
-        val shortcuts = HashMap<String, Int>()
-        fun reloadShortcuts() {
-            shortcuts.clear()
-            try {
-                FileReader(saveFile).use { `in` ->
-                    val data = gson.fromJson(`in`, JsonObject::class.java)
-                    for ((key, value) in data.entrySet()) {
-                        shortcuts[key] = value.asInt
-                    }
-                }
-            } catch (e: Exception) {
-                try {
-                    FileWriter(saveFile).use { writer -> gson.toJson(JsonObject(), writer) }
-                } catch (ignored: Exception) {
-                }
-            }
-        }
-
-        fun saveShortcuts() {
-            try {
-                FileWriter(saveFile).use { writer ->
-                    val obj = JsonObject()
-                    for ((key, value) in shortcuts) {
-                        obj.addProperty(key, value)
-                    }
-                    gson.toJson(obj, writer)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
+    override fun read(reader: FileReader) {
+        shortcuts.clear()
+        val data = gson.fromJson(reader, JsonObject::class.java)
+        for ((key, value) in data.entrySet()) {
+            shortcuts[key] = value.asInt
         }
     }
 
-    init {
-        reloadShortcuts()
+    override fun write(writer: FileWriter) {
+        val obj = JsonObject()
+        for ((key, value) in shortcuts) {
+            obj.addProperty(key, value)
+        }
+        gson.toJson(obj, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonObject(), writer)
+    }
+
+    companion object {
+        val shortcuts = HashMap<String, Int>()
     }
 }

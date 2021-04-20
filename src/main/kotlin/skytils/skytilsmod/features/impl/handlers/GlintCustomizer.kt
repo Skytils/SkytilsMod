@@ -20,78 +20,60 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.gson
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-class GlintCustomizer {
+class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")) {
+
+    override fun read(reader: FileReader) {
+        overrides.clear()
+        glintColors.clear()
+        for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
+            val entry = value.asJsonObject
+            if (entry.has("override")) {
+                overrides[key] = entry["override"].asBoolean
+            }
+            if (entry.has("color")) {
+                val color = Utils.customColorFromString(entry["color"].asString)
+                glintColors[key] = color
+            }
+        }
+    }
+
+    override fun write(writer: FileWriter) {
+        val obj = JsonObject()
+        for ((key, value) in overrides) {
+            val child = JsonObject()
+            child.add("override", JsonPrimitive(value))
+            obj.add(key, child)
+        }
+        for ((key, value) in glintColors) {
+            val stringValue = value.toString()
+            if (obj.has(key)) {
+                obj[key].asJsonObject.addProperty("color", stringValue)
+                continue
+            }
+            val child = JsonObject()
+            child.add("color", JsonPrimitive(stringValue))
+            obj.add(key, child)
+        }
+        gson.toJson(obj, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonObject(), writer)
+    }
+
     companion object {
-        private var saveFile = File(Skytils.modDir, "customizedglints.json")
 
         @JvmField
         val overrides = HashMap<String, Boolean>()
 
         @JvmField
         val glintColors = HashMap<String, CustomColor>()
-        fun reloadSave() {
-            overrides.clear()
-            glintColors.clear()
-            var data: JsonObject
-            try {
-                FileReader(saveFile).use { `in` ->
-                    data = gson.fromJson(`in`, JsonObject::class.java)
-                    for ((key, value) in data.entrySet()) {
-                        val entry = value.asJsonObject
-                        if (entry.has("override")) {
-                            overrides[key] = entry["override"].asBoolean
-                        }
-                        if (entry.has("color")) {
-                            val color = Utils.customColorFromString(entry["color"].asString)
-                            glintColors[key] = color
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                data = JsonObject()
-                try {
-                    FileWriter(saveFile).use { writer -> gson.toJson(data, writer) }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                }
-            }
-        }
-
-        fun writeSave() {
-            try {
-                FileWriter(saveFile).use { writer ->
-                    val obj = JsonObject()
-                    for ((key, value) in overrides) {
-                        val child = JsonObject()
-                        child.add("override", JsonPrimitive(value))
-                        obj.add(key, child)
-                    }
-                    for ((key, value) in glintColors) {
-                        val stringValue = value.toString()
-                        if (obj.has(key)) {
-                            obj[key].asJsonObject.addProperty("color", stringValue)
-                            continue
-                        }
-                        val child = JsonObject()
-                        child.add("color", JsonPrimitive(stringValue))
-                        obj.add(key, child)
-                    }
-                    gson.toJson(obj, writer)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-    }
-
-    init {
-        reloadSave()
     }
 }

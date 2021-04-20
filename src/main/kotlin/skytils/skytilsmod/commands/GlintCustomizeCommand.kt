@@ -21,6 +21,7 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.*
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
@@ -62,21 +63,25 @@ class GlintCustomizeCommand : CommandBase() {
             when {
                 originalMessage.contains("on") -> {
                     GlintCustomizer.overrides[itemId] = true
+                    PersistentSave.markDirty(GlintCustomizer::class)
                     sender.addChatMessage(ChatComponentText("§aForced an enchant glint for your item."))
                     return
                 }
                 originalMessage.contains("off") -> {
                     GlintCustomizer.overrides[itemId] = false
+                    PersistentSave.markDirty(GlintCustomizer::class)
                     sender.addChatMessage(ChatComponentText("§aForce disabled an enchant glint for your item."))
                     return
                 }
                 originalMessage.contains("clearall") -> {
                     GlintCustomizer.overrides.clear()
+                    PersistentSave.markDirty(GlintCustomizer::class)
                     sender.addChatMessage(ChatComponentText("§aRemoved all your glint overrides."))
                     return
                 }
                 originalMessage.contains("clear") -> {
                     GlintCustomizer.overrides.remove(itemId)
+                    PersistentSave.markDirty(GlintCustomizer::class)
                     sender.addChatMessage(ChatComponentText("§aCleared glint overrides for your item."))
                     return
                 }
@@ -90,6 +95,7 @@ class GlintCustomizeCommand : CommandBase() {
                     if (args.size != 3) throw WrongUsageException("You must specify a valid hex color!")
                     try {
                         GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(args[2])
+                        PersistentSave.markDirty(GlintCustomizer::class)
                         sender.addChatMessage(ChatComponentText("§aForced an enchant glint color for your item."))
                     } catch (e: NumberFormatException) {
                         throw SyntaxErrorException("Unable to get a color from inputted string.")
@@ -98,11 +104,13 @@ class GlintCustomizeCommand : CommandBase() {
                 }
                 originalMessage.contains("clearall") -> {
                     GlintCustomizer.glintColors.clear()
+                    PersistentSave.markDirty(GlintCustomizer::class)
                     sender.addChatMessage(ChatComponentText("§aRemoved all your custom glint colors."))
                     return
                 }
                 originalMessage.contains("clear") -> {
                     GlintCustomizer.glintColors.remove(itemId)
+                    PersistentSave.markDirty(GlintCustomizer::class)
                     sender.addChatMessage(ChatComponentText("§aCleared the custom glint color for your item."))
                     return
                 }

@@ -20,6 +20,8 @@ package skytils.skytilsmod.gui.commandaliases
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
+import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.features.impl.handlers.CommandAliases
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton
 import skytils.skytilsmod.gui.commandaliases.elements.ScrollingCommandAliasesList
@@ -93,6 +95,7 @@ class CommandAliasesGui : GuiScreen() {
                 CommandAliases.aliases[e.key.text] = e.message.text
             }
         }
+        PersistentSave.markDirty(CommandAliases::class)
     }
 
     private fun addAlias(key: String = "", message: String = "") {

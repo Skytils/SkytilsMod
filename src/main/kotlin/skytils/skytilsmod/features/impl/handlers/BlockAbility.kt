@@ -17,23 +17,21 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
-import java.util.*
 
-class BlockAbility {
+class BlockAbility : PersistentSave(File(Skytils.modDir, "blockability.json")) {
     //@SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.entityPlayer !== mc.thePlayer) return
@@ -67,12 +65,34 @@ class BlockAbility {
         return false
     }
 
+    override fun read(reader: FileReader) {
+        blockedItems.clear()
+        blockedItems.addAll(
+            DataFetcher.getStringArrayFromJsonArray(
+                gson.fromJson(
+                    reader,
+                    JsonArray::class.java
+                ) as JsonArray
+            ).asList()
+        )
+    }
+
+    override fun write(writer: FileWriter) {
+        val arr = JsonArray()
+        for (itemId in blockedItems) {
+            arr.add(JsonPrimitive(itemId))
+        }
+        gson.toJson(arr, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonArray(), writer)
+    }
+
+
     companion object {
-        private val gson = GsonBuilder().setPrettyPrinting().create()
-        private val mc = Minecraft.getMinecraft()
-        private var saveFile = File(Skytils.modDir, "blockability.json")
         val blockedItems = HashSet<String>()
-        val interactables = Arrays.asList(
+        val interactables = listOf(
             Blocks.acacia_door,
             Blocks.anvil,
             Blocks.beacon,
@@ -107,41 +127,5 @@ class BlockAbility {
             Blocks.oak_door,
             Blocks.skull
         )
-
-        fun reloadSave() {
-            blockedItems.clear()
-            var dataArray: JsonArray?
-            try {
-                FileReader(saveFile).use { `in` ->
-                    dataArray = gson.fromJson(`in`, JsonArray::class.java)
-                    blockedItems.addAll(DataFetcher.getStringArrayFromJsonArray(dataArray as JsonArray).asList().filterNotNull())
-                }
-            } catch (e: Exception) {
-                dataArray = JsonArray()
-                try {
-                    FileWriter(saveFile).use { writer -> gson.toJson(dataArray, writer) }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                }
-            }
-        }
-
-        fun writeSave() {
-            try {
-                FileWriter(saveFile).use { writer ->
-                    val arr = JsonArray()
-                    for (itemId in blockedItems) {
-                        arr.add(JsonPrimitive(itemId))
-                    }
-                    gson.toJson(arr, writer)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-    }
-
-    init {
-        reloadSave()
     }
 }

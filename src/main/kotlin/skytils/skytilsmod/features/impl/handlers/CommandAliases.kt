@@ -18,20 +18,20 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.google.common.collect.Lists
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.SendChatMessageEvent
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
 
-class CommandAliases {
+class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
+
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message.startsWith("/")) {
@@ -61,44 +61,27 @@ class CommandAliases {
         }
     }
 
-    companion object {
-        private val gson = GsonBuilder().setPrettyPrinting().create()
-        private val mc = Minecraft.getMinecraft()
-        private var aliasesFile = File(Skytils.modDir, "commandaliases.json")
-        val aliases = HashMap<String, String>()
-        fun reloadAliases() {
-            aliases.clear()
-            var aliasesObject: JsonObject
-            try {
-                FileReader(aliasesFile).use { `in` -> aliasesObject = gson.fromJson(`in`, JsonObject::class.java) }
-            } catch (e: Exception) {
-                aliasesObject = JsonObject()
-                try {
-                    FileWriter(aliasesFile).use { writer -> gson.toJson(aliasesObject, writer) }
-                } catch (ignored: Exception) {
-                }
-            }
-            for ((key, value) in aliasesObject.entrySet()) {
-                aliases[key] = value.asString
-            }
-        }
-
-        fun saveAliases() {
-            try {
-                FileWriter(aliasesFile).use { writer ->
-                    val obj = JsonObject()
-                    for ((key, value) in aliases) {
-                        obj.addProperty(key, value)
-                    }
-                    gson.toJson(obj, writer)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
+    override fun read(reader: FileReader) {
+        aliases.clear()
+        val obj = gson.fromJson(reader, JsonObject::class.java)
+        for ((key, value) in obj.entrySet()) {
+            aliases[key] = value.asString
         }
     }
 
-    init {
-        reloadAliases()
+    override fun write(writer: FileWriter) {
+        val obj = JsonObject()
+        for ((key, value) in aliases) {
+            obj.addProperty(key, value)
+        }
+        gson.toJson(obj, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonObject(), writer)
+    }
+
+    companion object {
+        val aliases = HashMap<String, String>()
     }
 }

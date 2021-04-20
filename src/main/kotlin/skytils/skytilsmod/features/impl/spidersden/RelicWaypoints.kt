@@ -32,6 +32,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.PacketEvent.SendEvent
 import skytils.skytilsmod.utils.RenderUtil
@@ -42,13 +43,13 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-class RelicWaypoints {
+class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_relics.json")) {
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S2APacketParticles) {
-            val packet = event.packet as S2APacketParticles?
-            val type = packet!!.particleType
+            val packet = event.packet as S2APacketParticles
+            val type = packet.particleType
             val longDistance = packet.isLongDistance
             val count = packet.particleCount
             val speed = packet.particleSpeed
@@ -79,6 +80,7 @@ class RelicWaypoints {
             if (relicLocations.contains(packet!!.position)) {
                 foundRelics.add(packet.position)
                 rareRelicLocations.remove(packet.position)
+                markDirty(this::class)
             }
         }
     }
@@ -146,49 +148,34 @@ class RelicWaypoints {
         }
     }
 
+    override fun read(reader: FileReader) {
+        foundRelics.clear()
+        for (serializedPosition in DataFetcher.getStringArrayFromJsonArray(
+            gson.fromJson(
+                reader,
+                JsonArray::class.java
+            ) as JsonArray
+        )) {
+            val parts = serializedPosition.split(",".toRegex()).toTypedArray()
+            foundRelics.add(BlockPos(parts[0].toInt(), parts[1].toInt(), parts[2].toInt()))
+        }
+    }
+
+    override fun write(writer: FileWriter) {
+        val arr = JsonArray()
+        for (found in foundRelics) {
+            arr.add(JsonPrimitive(found.x.toString() + "," + found.y + "," + found.z))
+        }
+        gson.toJson(arr, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonArray(), writer)
+    }
+
     companion object {
         val relicLocations = LinkedHashSet<BlockPos>()
         val foundRelics = HashSet<BlockPos>()
         private val rareRelicLocations = HashSet<BlockPos>()
-        private val gson = GsonBuilder().setPrettyPrinting().create()
-        private var saveFile = File(Skytils.modDir, "found_spiders_den_relics.json");
-        fun reloadSave() {
-            foundRelics.clear()
-            var dataArray: JsonArray?
-            try {
-                FileReader(saveFile).use { `in` ->
-                    dataArray = gson.fromJson(`in`, JsonArray::class.java)
-                    for (serializedPosition in DataFetcher.getStringArrayFromJsonArray(dataArray as JsonArray)) {
-                        val parts = serializedPosition.split(",".toRegex()).toTypedArray()
-                        foundRelics.add(BlockPos(parts[0].toInt(), parts[1].toInt(), parts[2].toInt()))
-                    }
-                }
-            } catch (e: Exception) {
-                dataArray = JsonArray()
-                try {
-                    FileWriter(saveFile).use { writer -> gson.toJson(dataArray, writer) }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                }
-            }
-        }
-
-        fun writeSave() {
-            try {
-                FileWriter(saveFile).use { writer ->
-                    val arr = JsonArray()
-                    for (found in foundRelics) {
-                        arr.add(JsonPrimitive(found.x.toString() + "," + found.y + "," + found.z))
-                    }
-                    gson.toJson(arr, writer)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-    }
-
-    init {
-        reloadSave()
     }
 }

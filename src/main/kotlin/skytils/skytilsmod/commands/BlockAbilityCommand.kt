@@ -23,6 +23,7 @@ import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.utils.ItemUtil
 import java.util.*
@@ -64,9 +65,11 @@ class BlockAbilityCommand : CommandBase() {
             }
             if (BlockAbility.blockedItems.contains(itemId)) {
                 BlockAbility.blockedItems.remove(itemId)
+                PersistentSave.markDirty(BlockAbility::class)
                 sender.addChatMessage(ChatComponentText("§aRemoved the block on $itemId!"))
             } else {
                 BlockAbility.blockedItems.add(itemId)
+                PersistentSave.markDirty(BlockAbility::class)
                 sender.addChatMessage(ChatComponentText("§aYou are now blocking abilities for $itemId!"))
             }
             return
@@ -74,6 +77,7 @@ class BlockAbilityCommand : CommandBase() {
         val subcommand = args[0].toLowerCase(Locale.ENGLISH)
         if (subcommand == "clearall") {
             BlockAbility.blockedItems.clear()
+            PersistentSave.markDirty(BlockAbility::class)
             sender.addChatMessage(ChatComponentText("§aCleared all your custom ability blocks!"))
         } else {
             player.addChatMessage(ChatComponentText(getCommandUsage(sender)))

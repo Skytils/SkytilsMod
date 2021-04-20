@@ -31,7 +31,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.gson
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.utils.ItemRarity
 import skytils.skytilsmod.utils.ItemUtil
@@ -42,52 +42,13 @@ import java.io.FileWriter
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class FavoritePetOverlay {
+class FavoritePetOverlay : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
 
     private var highlighting = false
     private val petNameRegex =
         Pattern.compile("^§7\\[Lvl (?<lvl>\\d{1,3})] (?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> ✦)?$")
     private val petLevelUpRegex =
         Pattern.compile("§r§aYour §r(?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> §r§6✦)? §r§alevelled up to level §r§9(?<lvl>\\d{1,3})§r§a!§r")
-
-    companion object {
-        private val favorited = HashSet<String>()
-        private var saveFile = File(Skytils.modDir, "favoritepets.json")
-
-        fun reloadSave() {
-            favorited.clear()
-            var dataObject: JsonArray
-            try {
-                FileReader(saveFile).use { `in` ->
-                    dataObject = gson.fromJson(`in`, JsonArray::class.java)
-                    for (value in dataObject) {
-                        favorited.add(value.asString)
-                    }
-                }
-            } catch (e: Exception) {
-                dataObject = JsonArray()
-                try {
-                    FileWriter(saveFile).use { writer -> gson.toJson(dataObject, writer) }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                }
-            }
-        }
-
-        fun saveFavorites() {
-            try {
-                FileWriter(saveFile).use { writer ->
-                    val arr = JsonArray()
-                    for (value in favorited) {
-                        arr.add(JsonPrimitive(value))
-                    }
-                    gson.toJson(arr, writer)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
@@ -108,6 +69,7 @@ class FavoritePetOverlay {
                     ) {
                         favorited.add(getPetIdFromMatcher(matcher))
                         favorited.remove(favorite)
+                        markDirty(FavoritePetOverlay::class)
                         break
                     }
                 }
@@ -152,6 +114,7 @@ class FavoritePetOverlay {
         val petId = getPetIdFromItem(item)
         event.isCanceled = true
         if (favorited.contains(petId)) favorited.remove(petId) else favorited.add(petId)
+        markDirty(FavoritePetOverlay::class)
     }
 
     @SubscribeEvent
@@ -189,8 +152,28 @@ class FavoritePetOverlay {
         }"
     }
 
-    init {
-        reloadSave()
+    override fun read(reader: FileReader) {
+        favorited.clear()
+        val data = gson.fromJson(reader, JsonArray::class.java)
+        for (value in data) {
+            favorited.add(value.asString)
+        }
+    }
+
+    override fun write(writer: FileWriter) {
+        val arr = JsonArray()
+        for (value in favorited) {
+            arr.add(JsonPrimitive(value))
+        }
+        gson.toJson(arr, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonArray(), writer)
+    }
+
+    companion object {
+        private val favorited = HashSet<String>()
     }
 
 }
