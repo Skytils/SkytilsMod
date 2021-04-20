@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.lang3.time.StopWatch
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.Config
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
@@ -81,4 +82,11 @@ class AuctionData {
             return id
         }
     }
+
+    init {
+        Skytils.config.registerListener(Config::fetchLowestBINPrices) { value ->
+            if (!value) lowestBINs.clear()
+        }
+    }
+
 }

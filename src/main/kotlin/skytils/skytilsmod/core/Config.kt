@@ -1653,6 +1653,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     init {
         initialize()
 
+        ::itemRarityOpacity dependsOn ::showItemRarity
+
         ::showLowestBINPrice dependsOn ::fetchLowestBINPrices
         ::betterAuctionPriceInput dependsOn ::fetchLowestBINPrices
         ::dungeonChestProfit dependsOn ::fetchLowestBINPrices
