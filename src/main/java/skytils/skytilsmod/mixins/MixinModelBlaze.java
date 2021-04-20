@@ -40,20 +40,20 @@ public abstract class MixinModelBlaze extends ModelBase {
         if (orderedBlazes.size() == 0) return;
         if (blazeMode <= 0) {
             if (entity.isEntityEqual(orderedBlazes.get(0).blaze)) {
-                Color colour = new Color(255, 0, 0, 200);
-                GlStateManager.color((float) colour.getRed() / 255, (float) colour.getGreen() / 255, (float) colour.getBlue() / 255);
+                Color color = Skytils.config.lowestBlazeColor;
+                GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
             } else if (Skytils.config.showNextBlaze && orderedBlazes.size() > 1 && entity.isEntityEqual(orderedBlazes.get(1).blaze) && blazeMode != 0) {
-                Color colour = new Color(255, 255, 0, 200);
-                GlStateManager.color((float) colour.getRed() / 255, (float) colour.getGreen() / 255, (float) colour.getBlue() / 255);
+                Color color = Skytils.config.nextBlazeColor;
+                GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
             }
         }
         if (blazeMode >= 0) {
             if (entity.isEntityEqual(orderedBlazes.get(orderedBlazes.size() - 1).blaze)) {
-                Color colour = new Color(0, 255, 0, 200);
-                GlStateManager.color((float) colour.getRed() / 255, (float) colour.getGreen() / 255, (float) colour.getBlue() / 255);
+                Color color = Skytils.config.highestBlazeColor;
+                GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
             } else if (Skytils.config.showNextBlaze && orderedBlazes.size() > 1 && entity.isEntityEqual(orderedBlazes.get(orderedBlazes.size() - 2).blaze) && blazeMode != 0) {
-                Color colour = new Color(255, 255, 0, 200);
-                GlStateManager.color((float) colour.getRed() / 255, (float) colour.getGreen() / 255, (float) colour.getBlue() / 255);
+                Color color = Skytils.config.nextBlazeColor;
+                GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
             }
         }
     }

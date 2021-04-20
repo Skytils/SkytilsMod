@@ -405,6 +405,36 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var showNextBlaze = false
 
     @Property(
+        type = PropertyType.COLOR,
+        name = "Lowest Blaze Color",
+        description = "Color used to highlight the lowest blaze in.",
+        category = "Dungeons",
+        subcategory = "Solvers"
+    )
+    @JvmField
+    var lowestBlazeColor = Color(255, 0, 0, 200)
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Highest Blaze Color",
+        description = "Color used to highlight the lowest blaze in.",
+        category = "Dungeons",
+        subcategory = "Solvers"
+    )
+    @JvmField
+    var highestBlazeColor = Color(0, 255, 0, 200)
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Next Blaze Color",
+        description = "Color used to highlight the next blaze in.",
+        category = "Dungeons",
+        subcategory = "Solvers"
+    )
+    @JvmField
+    var nextBlazeColor = Color(255, 255, 0, 200)
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Boulder Solver",
         description = "§b[WIP] §rShow which boxes to move on the Boulder puzzle.",
@@ -1671,6 +1701,9 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::showCoinsPerBit dependsOn ::fetchLowestBINPrices
 
         ::showNextBlaze dependsOn ::blazeSolver
+        ::lowestBlazeColor dependsOn ::blazeSolver
+        ::highestBlazeColor dependsOn ::blazeSolver
+        ::nextBlazeColor dependsOn ::showNextBlaze
         ::clickInOrderFirst dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
