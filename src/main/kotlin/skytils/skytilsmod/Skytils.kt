@@ -56,7 +56,6 @@ import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.*
 import skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
-import skytils.skytilsmod.features.impl.misc.FavoritePets
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
 import skytils.skytilsmod.gui.LocationEditGui

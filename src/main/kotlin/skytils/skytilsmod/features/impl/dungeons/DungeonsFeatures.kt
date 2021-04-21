@@ -48,7 +48,6 @@ import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -204,9 +203,9 @@ class DungeonsFeatures {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onDeth(event: LivingDeathEvent) {
+    fun onDeath(event: LivingDeathEvent) {
         if (!Utils.inSkyblock) return
-        if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime != -1.0 && event.entityLiving.name == "Terracotta") {
+        if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime > 0 && event.entityLiving.name == "Terracotta") {
             //for some reason this event fires twice for players
             terracottaEndTime -= 0.5
         }

@@ -88,9 +88,7 @@ class SpidersDenFeatures {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inSkyblock && player != null && world != null) {
-                if (!SBInfo.instance.location
-                        .equals("combat_1", ignoreCase = true)
-                ) return
+                if (SBInfo.instance.mode != "combat_1") return
                 val arachneNames =
                     world.getEntities(EntityArmorStand::class.java, Predicate getEntities@{ entity: EntityArmorStand? ->
                         val name = entity!!.displayName.formattedText

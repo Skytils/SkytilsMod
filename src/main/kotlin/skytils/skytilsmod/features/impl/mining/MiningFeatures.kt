@@ -184,9 +184,7 @@ class MiningFeatures {
         val item = event.entityPlayer.heldItem
         val itemId = ItemUtil.getSkyBlockItemID(item)
         if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
-            if (SBInfo.instance.location
-                    .startsWith("dynamic")
-            ) {
+            if (SBInfo.instance.mode?.startsWith("dynamic") == true) {
                 if (Skytils.config.noPickaxeAbilityOnPrivateIsland && itemId != null && (itemId.contains("PICKAXE") || itemId.contains(
                         "DRILL"
                     ))
@@ -263,7 +261,7 @@ class MiningFeatures {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (Skytils.config.skymallReminder && SBInfo.instance.location == "mining_3" && SBInfo.instance.time == "12:00 am" && GuiManager.title != "§cSKYMALL RESET"
+        if (Skytils.config.skymallReminder && SBInfo.instance.mode == "mining_3" && SBInfo.instance.time == "12:00 am" && GuiManager.title != "§cSKYMALL RESET"
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
@@ -279,7 +277,7 @@ class MiningFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
-        if (!Utils.inSkyblock || SBInfo.instance.location != "mining_3" || event.state == null) return
+        if (!Utils.inSkyblock || SBInfo.instance.mode != "mining_3" || event.state == null) return
         val state = event.state!!
         if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.GRAY) {
             event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)

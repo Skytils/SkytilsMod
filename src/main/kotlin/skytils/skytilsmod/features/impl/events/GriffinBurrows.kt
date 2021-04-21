@@ -125,8 +125,7 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
-        if (event.phase != TickEvent.Phase.START || !SBInfo.instance.location.equals("hub", ignoreCase = true)
-        ) return
+        if (event.phase != TickEvent.Phase.START || SBInfo.instance.mode != hub) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
         if (burrowRefreshTimer.time >= 60000 || shouldRefreshBurrows) {
             burrowRefreshTimer.reset()
@@ -214,9 +213,7 @@ class GriffinBurrows {
 
     class GriffinGuiElement : GuiElement("Griffin Timer", FloatPair(100, 10)) {
         override fun render() {
-            if (!SBInfo.instance.location
-                    .equals("hub", ignoreCase = true)
-            ) return
+            if (SBInfo.instance.mode != "hub") return
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null) {
                 for (i in 0..7) {
@@ -267,9 +264,7 @@ class GriffinBurrows {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
-            if (!SBInfo.instance.location
-                    .equals("hub", ignoreCase = true)
-            ) return
+            if (SBInfo.instance.mode != "hub") return
             val packet = event.packet as S2APacketParticles?
             val type = packet!!.particleType
             val longDistance = packet.isLongDistance

@@ -351,7 +351,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (SBInfo.instance.location != "combat_3") return
+                if (SBInfo.instance.mode != "combat_3") return
                 var invalid = false
                 var placedEyes = 0
                 for (pos in SUMMONING_EYE_FRAMES) {
