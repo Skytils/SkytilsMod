@@ -98,8 +98,8 @@ class AuctionPriceOverlay {
     }
 
     open class AuctionPriceScreen(oldScreen: GuiEditSign) : GuiScreen() {
-        var undercutButton: CleanButton? = null
-        var priceField: GuiTextField? = null
+        lateinit var undercutButton: CleanButton
+        lateinit var priceField: GuiTextField
         var sign: TileEntitySign = (oldScreen as AccessorGuiEditSign).tileSign
         var fr: SmartFontRenderer = ScreenRenderer.fontRenderer
         var dragging = false
@@ -110,14 +110,14 @@ class AuctionPriceOverlay {
             Keyboard.enableRepeatEvents(true)
             sign.setEditable(false)
             priceField = GuiTextField(0, fr, width / 2 - 135, height / 2, 270, 20)
-            priceField!!.maxStringLength = 15
-            priceField!!.setValidator { text: String? ->
+            priceField.maxStringLength = 15
+            priceField.setValidator { text: String? ->
                 text!!.toLowerCase().replace("[^0-9.kmb]".toRegex(), "").length == text.length
             }
-            priceField!!.isFocused = true
-            priceField!!.text = lastEnteredInput
-            priceField!!.setCursorPositionEnd()
-            priceField!!.setSelectionPos(0)
+            priceField.isFocused = true
+            priceField.text = lastEnteredInput
+            priceField.setCursorPositionEnd()
+            priceField.setSelectionPos(0)
             buttonList.add(
                 CleanButton(
                     0,
@@ -134,7 +134,7 @@ class AuctionPriceOverlay {
         override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
             onMouseMove(mouseX, mouseY)
             drawGradientRect(0, 0, width, height, Color(117, 115, 115, 25).rgb, Color(0, 0, 0, 200).rgb)
-            priceField!!.drawTextBox()
+            priceField.drawTextBox()
             if (lastAuctionedStack != null) {
                 val auctionIdentifier = AuctionData.getIdentifier(lastAuctionedStack)
                 if (auctionIdentifier != null) {
@@ -212,12 +212,12 @@ class AuctionPriceOverlay {
                     }
                 }
             }
-            undercutButton!!.drawButton(mc, mouseX, mouseY)
+            undercutButton.drawButton(mc, mouseX, mouseY)
         }
 
         override fun updateScreen() {
-            undercutButton!!.displayString = if (!isUndercut()) "Mode: Normal" else "Mode: Undercut"
-            priceField!!.updateCursorCounter()
+            undercutButton.displayString = if (!isUndercut()) "Mode: Normal" else "Mode: Undercut"
+            priceField.updateCursorCounter()
             super.updateScreen()
         }
 
@@ -228,19 +228,19 @@ class AuctionPriceOverlay {
                 mc.displayGuiScreen(null)
                 return
             }
-            priceField!!.textboxKeyTyped(typedChar, keyCode)
+            priceField.textboxKeyTyped(typedChar, keyCode)
             val input = input
             if (input == null) {
                 sign.signText[0] = ChatComponentText("Invalid Value")
             } else {
                 sign.signText[0] = ChatComponentText(input)
-                lastEnteredInput = priceField!!.text
+                lastEnteredInput = priceField.text
             }
         }
 
         @Throws(IOException::class)
         override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-            priceField!!.mouseClicked(mouseX, mouseY, mouseButton)
+            priceField.mouseClicked(mouseX, mouseY, mouseButton)
             super.mouseClicked(mouseX, mouseY, mouseButton)
         }
 
@@ -284,7 +284,7 @@ class AuctionPriceOverlay {
 
         val input: String?
             get() {
-                val input = priceField!!.text
+                val input = priceField.text
                 if (isUndercut()) {
                     val lbin = AuctionData.lowestBINs[AuctionData.getIdentifier(lastAuctionedStack)]!!
                     try {
@@ -306,7 +306,7 @@ class AuctionPriceOverlay {
                     }
                     return null
                 }
-                return input
+                return input.toLowerCase()
             }
 
     }
@@ -379,7 +379,7 @@ class AuctionPriceOverlay {
                     "ENCHANTED_BOOK-TELEKINESIS-1" -> npcPrice = 100.0
                     "ENCHANTED_BOOK-TRUE_PROTECTION-1" -> npcPrice = 900000.0
                 }
-                total += Math.min(npcPrice, price)
+                total += npcPrice.coerceAtMost(price)
             }
             return total
         }
@@ -388,7 +388,7 @@ class AuctionPriceOverlay {
             val extraAttr = ItemUtil.getExtraAttributes(item)
             if (extraAttr == null || !extraAttr.hasKey("hot_potato_count")) return 0.0
             val potatoCount = extraAttr.getInteger("hot_potato_count")
-            val hpbs = Math.min(potatoCount, 10)
+            val hpbs = potatoCount.coerceAtMost(10)
             val fpbs = potatoCount - hpbs
             val hpbPrice = AuctionData.lowestBINs["HOT_POTATO_BOOK"]
             val fpbPrice = AuctionData.lowestBINs["FUMING_POTATO_BOOK"]

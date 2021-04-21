@@ -313,11 +313,11 @@ class ItemFeatures {
 
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || mc.theWorld == null) return
         try {
             if (event.packet is S2APacketParticles) {
-                val packet = event.packet as S2APacketParticles?
-                val type = packet!!.particleType
+                val packet = event.packet as S2APacketParticles
+                val type = packet.particleType
                 val longDistance = packet.isLongDistance
                 val count = packet.particleCount
                 val speed = packet.particleSpeed
