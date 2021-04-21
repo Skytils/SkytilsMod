@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -33,6 +32,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
+import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
 
 class ClickInOrderSolver {
@@ -75,33 +75,15 @@ class ClickInOrderSolver {
         val thirdSlot = slotOrder[neededClick + 2]
         if (firstSlot != null) {
             val slot = invSlots[firstSlot]
-            if (slot != null) Gui.drawRect(
-                slot.xDisplayPosition,
-                slot.yDisplayPosition,
-                slot.xDisplayPosition + 16,
-                slot.yDisplayPosition + 16,
-                Skytils.config.clickInOrderFirst.rgb
-            )
+            if (slot != null) slot highlight Skytils.config.clickInOrderFirst
         }
         if (secondSlot != null) {
             val slot = invSlots[secondSlot]
-            if (slot != null) Gui.drawRect(
-                slot.xDisplayPosition,
-                slot.yDisplayPosition,
-                slot.xDisplayPosition + 16,
-                slot.yDisplayPosition + 16,
-                Skytils.config.clickInOrderSecond.rgb
-            )
+            if (slot != null) slot highlight Skytils.config.clickInOrderSecond
         }
         if (thirdSlot != null) {
             val slot = invSlots[thirdSlot]
-            if (slot != null) Gui.drawRect(
-                slot.xDisplayPosition,
-                slot.yDisplayPosition,
-                slot.xDisplayPosition + 16,
-                slot.yDisplayPosition + 16,
-                Skytils.config.clickInOrderThird.rgb
-            )
+            if (slot != null) slot highlight Skytils.config.clickInOrderThird
         }
     }
 

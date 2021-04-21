@@ -56,7 +56,8 @@ object Utils {
                     if (mc.thePlayer != null && mc.thePlayer.clientBrand != null) {
                         if (mc.thePlayer.clientBrand.toLowerCase().contains("hypixel")) return true
                     }
-                    if (mc.currentServerData != null) return mc.currentServerData.serverIP.toLowerCase().contains("hypixel")
+                    if (mc.currentServerData != null) return mc.currentServerData.serverIP.toLowerCase()
+                        .contains("hypixel")
                 }
                 return false
             } catch (e: Exception) {

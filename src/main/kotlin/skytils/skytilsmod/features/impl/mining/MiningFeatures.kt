@@ -19,7 +19,6 @@ package skytils.skytilsmod.features.impl.mining
 
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCreeper
@@ -45,6 +44,7 @@ import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.StringUtils
 import java.awt.Color
 import java.util.regex.Pattern
@@ -76,6 +76,7 @@ class MiningFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type.toInt() == 2) return
+        val formatted = event.message.formattedText
         val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
         if (Skytils.config.powerGhastPing) {
             if (unformatted.startsWith("Find the Powder Ghast near the")) {
@@ -83,10 +84,7 @@ class MiningFeatures {
             }
         }
         if (Skytils.config.raffleWaypoint && inRaffle) {
-            if (unformatted.startsWith("You registered") && unformatted.contains("in the raffle event!") || unformatted.startsWith(
-                    "No tickets to put in the box..."
-                )
-            ) {
+            if ((formatted.startsWith("§r§eYou registered §r§a") && formatted.endsWith("§r§ein the raffle event!§r")) || formatted == "§r§7No tickets to put in the box...§r") {
                 raffleBox = lastJukebox
             }
             if (unformatted.trim { it <= ' ' }.startsWith("RAFFLE ENDED!")) {
@@ -171,13 +169,7 @@ class MiningFeatures {
             if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
                 for (line in ItemUtil.getItemLore(item)) {
                     if (line == "§7§eClick to claim rewards!") {
-                        Gui.drawRect(
-                            event.slot.xDisplayPosition,
-                            event.slot.yDisplayPosition,
-                            event.slot.xDisplayPosition + 16,
-                            event.slot.yDisplayPosition + 16,
-                            Color(255, 0, 0).rgb
-                        )
+                        event.slot highlight Color(255, 0, 0)
                         break
                     }
                 }

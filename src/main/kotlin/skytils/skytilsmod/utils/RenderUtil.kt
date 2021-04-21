@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
@@ -535,5 +536,15 @@ object RenderUtil {
         tessellator.draw()
         GlStateManager.enableTexture2D()
         GlStateManager.disableBlend()
+    }
+
+    infix fun Slot.highlight(color: Color) {
+        Gui.drawRect(
+            this.xDisplayPosition,
+            this.yDisplayPosition,
+            this.xDisplayPosition + 16,
+            this.yDisplayPosition + 16,
+            color.rgb
+        )
     }
 }

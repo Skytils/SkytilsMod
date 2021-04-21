@@ -26,7 +26,8 @@ import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.*
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
@@ -40,20 +41,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.*
+import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.CloseWindowEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
+import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.BlockAbility
-import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import skytils.skytilsmod.utils.NumberUtil
+import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
+import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.StringUtils.startsWith
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -78,9 +83,9 @@ class ItemFeatures {
                         val stack = event.slot.stack
                         val extraAttr = getExtraAttributes(stack)
                         if (extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && !extraAttr.hasKey("dungeon_item_level")) {
-                            val x = event.slot.xDisplayPosition
-                            val y = event.slot.yDisplayPosition
-                            Gui.drawRect(x, y, x + 16, y + 16, Color(15, 233, 233, 225).rgb)
+                            GlStateManager.translate(0f, 0f, 1f)
+                            event.slot highlight Color(15, 233, 233, 225)
+                            GlStateManager.translate(0f, 0f, -1f)
                         }
                     }
                 }
@@ -91,16 +96,11 @@ class ItemFeatures {
                         val stack = event.slot.stack
                         val x = event.slot.xDisplayPosition
                         val y = event.slot.yDisplayPosition
-                        if (stack.displayName.contains("Health Potion")) Gui.drawRect(
-                            x,
-                            y,
-                            x + 16,
-                            y + 16,
-                            Color(255, 225, 30, 255).rgb
-                        ) else if (stack.displayName.contains("Mimic Fragment") || stack.displayName.contains("Training Weights") || stack.displayName.contains(
+                        if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30, 255)
+                        else if (stack.displayName.contains("Mimic Fragment") || stack.displayName.contains("Training Weights") || stack.displayName.contains(
                                 "Journal Entry"
                             ) || stack.displayName.contains("Defuse Kit")
-                        ) Gui.drawRect(x, y, x + 16, y + 16, Color(255, 50, 150, 255).rgb)
+                        ) event.slot highlight Color(255, 50, 150, 255)
                     }
                 }
             }

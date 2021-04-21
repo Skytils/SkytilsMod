@@ -35,6 +35,7 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.utils.ItemRarity
 import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.FileReader
@@ -127,13 +128,7 @@ class FavoritePetOverlay : PersistentSave(File(Skytils.modDir, "favoritepets.jso
         val petId = getPetIdFromItem(item)
         if (favorited.contains(petId)) {
             GlStateManager.translate(0f, 0f, 2f)
-            Gui.drawRect(
-                event.slot.xDisplayPosition,
-                event.slot.yDisplayPosition,
-                event.slot.xDisplayPosition + 16,
-                event.slot.yDisplayPosition + 16,
-                Skytils.config.favoritePetColor.rgb
-            )
+            event.slot highlight Skytils.config.favoritePetColor
             GlStateManager.translate(0f, 0f, -2f)
         }
     }
