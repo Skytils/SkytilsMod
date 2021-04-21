@@ -16,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.features.impl.overlays
+package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -43,7 +42,7 @@ import java.io.FileWriter
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class FavoritePetOverlay : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
+class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
 
     private var highlighting = false
     private val petNameRegex =
@@ -70,7 +69,7 @@ class FavoritePetOverlay : PersistentSave(File(Skytils.modDir, "favoritepets.jso
                     ) {
                         favorited.add(getPetIdFromMatcher(matcher))
                         favorited.remove(favorite)
-                        markDirty(FavoritePetOverlay::class)
+                        markDirty(FavoritePets::class)
                         break
                     }
                 }
@@ -115,7 +114,7 @@ class FavoritePetOverlay : PersistentSave(File(Skytils.modDir, "favoritepets.jso
         val petId = getPetIdFromItem(item)
         event.isCanceled = true
         if (favorited.contains(petId)) favorited.remove(petId) else favorited.add(petId)
-        markDirty(FavoritePetOverlay::class)
+        markDirty(FavoritePets::class)
     }
 
     @SubscribeEvent
@@ -124,7 +123,7 @@ class FavoritePetOverlay : PersistentSave(File(Skytils.modDir, "favoritepets.jso
         val chest = event.container as ContainerChest
         if (!chest.lowerChestInventory.name.endsWith(") Pets")) return
         if (event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || !event.slot.hasStack) return
-        val item = event.slot.stack!!
+        val item = event.slot.stack
         val petId = getPetIdFromItem(item)
         if (favorited.contains(petId)) {
             GlStateManager.translate(0f, 0f, 2f)

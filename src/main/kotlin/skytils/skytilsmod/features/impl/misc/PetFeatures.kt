@@ -19,10 +19,12 @@ package skytils.skytilsmod.features.impl.misc
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.ChatComponentText
@@ -34,11 +36,14 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.CheckRenderEntityEvent
+import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.PacketEvent.SendEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
+import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.isInTablist
@@ -79,6 +84,26 @@ class PetFeatures {
             if (autopetMatcher.find()) {
                 lastPet = stripControlCodes(autopetMatcher.group("pet"))
             } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
+        }
+    }
+
+    @SubscribeEvent
+    fun onDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!Utils.inSkyblock || event.container !is ContainerChest) return
+        if (Skytils.config.highlightActivePet && SBInfo.instance.lastOpenContainerName?.endsWith(") Pets") == true) {
+            loopPets@ for (i in 10..43) {
+                val slot = event.container.getSlot(i)
+                if (!slot.hasStack) continue
+                val item = slot.stack
+                for (line in getItemLore(item)) {
+                    if (line == "§7§cClick to despawn ") {
+                        GlStateManager.translate(0f, 0f, 3f)
+                        slot highlight Skytils.config.activePetColor
+                        GlStateManager.translate(0f, 0f, -3f)
+                        break@loopPets
+                    }
+                }
+            }
         }
     }
 

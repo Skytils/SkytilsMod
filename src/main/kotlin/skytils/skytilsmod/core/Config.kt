@@ -1283,6 +1283,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Highlight Active Pet",
+        description = "Highlights the current active pet.",
+        category = "Pets",
+        subcategory = "Quality of Life"
+    )
+    var highlightActivePet = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Active Pet Highlight Color",
+        description = "Color used to highlight the active pet in.",
+        category = "Pets",
+        subcategory = "Quality of Life"
+    )
+    var activePetColor = Color(0, 255, 0)
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Highlight Favorite Pets",
         description = "Highlight pets marked as favorite.",
         category = "Pets",
@@ -1297,7 +1315,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         category = "Pets",
         subcategory = "Quality of Life"
     )
-    var favoritePetColor = Color(0, 255, 0)
+    var favoritePetColor = Color(0, 255, 255)
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1717,6 +1735,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
 
+        ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
     }
 }
