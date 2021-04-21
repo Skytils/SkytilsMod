@@ -30,8 +30,8 @@ buildscript {
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
-        classpath "com.github.Skytils:ForgeGradle:FG_2.1-SNAPSHOT:all"
-        classpath "com.github.Skytils:mixingradle:0.6-SNAPSHOT"
+        classpath "com.github.Skytils:ForgeGradle:c0652e03dc:all"
+        classpath "com.github.Skytils:mixingradle:d75e32e743"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
