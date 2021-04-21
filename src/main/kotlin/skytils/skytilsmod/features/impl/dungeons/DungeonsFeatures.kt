@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -44,8 +45,10 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -188,7 +191,7 @@ class DungeonsFeatures {
             }
             return
         }
-        if (dungeonFloor == "F6") {
+        if (Utils.equalsOneOf(dungeonFloor, "F6", "M6")) {
             if (terracottaEndTime == -1.0) {
                 if (unformatted.contains("Sadan's Interest Level")) {
                     terracottaEndTime = System.currentTimeMillis().toDouble() / 1000f + 105
@@ -197,6 +200,15 @@ class DungeonsFeatures {
                 event.isCanceled = true
             }
             return
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onDeth(event: LivingDeathEvent) {
+        if (!Utils.inSkyblock) return
+        if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime != -1.0 && event.entityLiving.name == "Terracotta") {
+            //for some reason this event fires twice for players
+            terracottaEndTime -= 0.5
         }
     }
 
