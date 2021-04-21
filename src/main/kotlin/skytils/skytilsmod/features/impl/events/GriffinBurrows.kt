@@ -125,7 +125,7 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
-        if (event.phase != TickEvent.Phase.START || SBInfo.instance.mode != hub) return
+        if (event.phase != TickEvent.Phase.START || SBInfo.instance.mode != "hub") return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
         if (burrowRefreshTimer.time >= 60000 || shouldRefreshBurrows) {
             burrowRefreshTimer.reset()
