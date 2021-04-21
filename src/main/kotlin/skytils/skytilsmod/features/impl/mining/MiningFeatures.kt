@@ -19,10 +19,13 @@ package skytils.skytilsmod.features.impl.mining
 
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -39,6 +42,7 @@ import skytils.skytilsmod.core.DataFetcher.Companion.reloadData
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.events.BossBarEvent
+import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.StringUtils
@@ -156,6 +160,28 @@ class MiningFeatures {
                     }
                 }
             }.start()
+        }
+    }
+
+    @SubscribeEvent
+    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+        if (!Utils.inSkyblock || event.container !is ContainerChest) return
+        if (event.slot.hasStack && SBInfo.instance.lastOpenContainerName.equals("Commissions") && Skytils.config.highlightCompletedComissions) {
+            var item = event.slot.stack
+            if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
+                for (line in ItemUtil.getItemLore(item)) {
+                    if (line == "§7§eClick to claim rewards!") {
+                        Gui.drawRect(
+                            event.slot.xDisplayPosition,
+                            event.slot.yDisplayPosition,
+                            event.slot.xDisplayPosition + 16,
+                            event.slot.yDisplayPosition + 16,
+                            Color(255, 0, 0).rgb
+                        )
+                        break
+                    }
+                }
+            }
         }
     }
 

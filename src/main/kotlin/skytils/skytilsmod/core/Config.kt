@@ -666,6 +666,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var darkModeMist = false
 
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Highlight Completed Comissions",
+        description = "Marks completed comissions in the menu with a red background.",
+        category = "Mining",
+        subcategory = "Quality of Life"
+    )
+    var highlightCompletedComissions = false
+
     /* @Property(
    type = PropertyType.SWITCH,
    name = "Disable Pickaxe Ability on Private Island",

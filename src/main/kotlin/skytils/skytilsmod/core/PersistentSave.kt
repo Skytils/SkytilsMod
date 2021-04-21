@@ -21,7 +21,6 @@ package skytils.skytilsmod.core
 import com.google.gson.Gson
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.features.impl.handlers.ArmorColor
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
