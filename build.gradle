@@ -17,7 +17,7 @@
  */
 
 buildscript {
-    ext.kotlin_version = "1.4.32"
+    ext.kotlin_version = "1.5.0-RC"
 
     repositories {
         jcenter()
@@ -26,11 +26,12 @@ buildscript {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots"
         }
+        maven { url "https://maven.minecraftforge.net/" }
     }
 
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
-        classpath "com.github.Skytils:ForgeGradle:c0652e03dc:all"
+        classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
+        classpath "com.github.Skytils:ForgeGradle:7e687c3490"
         classpath "com.github.Skytils:mixingradle:d75e32e743"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
