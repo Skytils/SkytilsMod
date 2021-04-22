@@ -40,16 +40,31 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(RenderItem.class)
 public abstract class MixinRenderItem {
+
+    private final Minecraft mc = Minecraft.getMinecraft();
 
     @Shadow @Final private static ResourceLocation RES_ITEM_GLINT;
 
     @Shadow @Final private TextureManager textureManager;
 
     @Shadow protected abstract void renderModel(IBakedModel model, int color);
+
+    @Inject(method = "renderItemIntoGUI", at = @At("HEAD"))
+    private void renderRarity(ItemStack stack, int x, int y, CallbackInfo ci) {
+        if (Utils.inSkyblock && Skytils.config.showItemRarity) {
+            if (mc.currentScreen != null) {
+                String name = mc.currentScreen.getClass().getName();
+                if (name.equals("io.github.moulberry.notenoughupdates.auction.CustomAHGui")) {
+                    RenderUtil.renderRarity(stack, x, y);
+                }
+            }
+        }
+    }
 
     @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
     private void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
