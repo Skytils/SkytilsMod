@@ -25,6 +25,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.misc.FarmingFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
@@ -32,7 +33,7 @@ import skytils.skytilsmod.utils.Utils
 
 class DataFetcher {
     @SubscribeEvent
-    fun onTick(event: ClientTickEvent?) {
+    fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock) return
         if (System.currentTimeMillis() - lastReload > 60 * 60 * 1000) {
             lastReload = System.currentTimeMillis()
@@ -48,6 +49,10 @@ class DataFetcher {
                 val fetchurData = APIUtil.getJSONResponse(dataUrl + "solvers/fetchur.json")
                 for ((key, value) in fetchurData.entrySet()) {
                     MiningFeatures.fetchurItems[key] = value.asString
+                }
+                val hikerData = APIUtil.getJSONResponse(dataUrl + "solvers/hungryhiker.json")
+                for ((key, value) in hikerData.entrySet()) {
+                    FarmingFeatures.hungerHikerItems[key] = value.asString
                 }
                 val threeWeirdosSolutions = APIUtil.getArrayResponse(dataUrl + "solvers/threeweirdos.json")
                 for (solution in threeWeirdosSolutions) {
