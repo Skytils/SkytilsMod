@@ -507,6 +507,24 @@ class SpamHider {
                     }
                 }
             }
+
+            // Wither Essence
+            if (unformatted.contains("unlocked Wither Essence")) {
+                when (Skytils.config.witherEssenceHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
+            // Undead Essence
+            if (unformatted.contains("unlocked Undead Essence")) {
+                when (Skytils.config.undeadEssenceHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.undeadEssenceHider == 2)
+                    else -> {
+                    }
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
