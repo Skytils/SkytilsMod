@@ -1174,6 +1174,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Spider's Den Rain Timer",
+        description = "Shows the duration of rain in the Spider's Den.",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    var rainTimer = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Arachne Spawn",
         description = "Shows the location of the Arachne Altar when a fragment is placed.",
         category = "Miscellaneous",

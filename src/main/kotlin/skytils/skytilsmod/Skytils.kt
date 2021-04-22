@@ -56,6 +56,7 @@ import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.*
 import skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
+import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
 import skytils.skytilsmod.gui.LocationEditGui
@@ -183,6 +184,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
         MinecraftForge.EVENT_BUS.register(PartyListener())
         MinecraftForge.EVENT_BUS.register(PetFeatures())
+        MinecraftForge.EVENT_BUS.register(RainTimer())
         MinecraftForge.EVENT_BUS.register(RelicWaypoints())
         MinecraftForge.EVENT_BUS.register(ScoreCalculation())
         MinecraftForge.EVENT_BUS.register(SelectAllColorSolver())
