@@ -20,12 +20,13 @@ package skytils.skytilsmod.core.structure
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.utils.graphics.ScreenRenderer
 
-abstract class GuiElement(var name: String?, var scale: Float, fp: FloatPair?) {
-    var pos: FloatPair?
+abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
+    var pos: FloatPair
 
     @JvmOverloads
-    constructor(name: String?, fp: FloatPair? = FloatPair(0, 0)) : this(name, 1.0f, fp)
+    constructor(name: String, fp: FloatPair = FloatPair(0, 0)) : this(name, 1.0f, fp)
 
     abstract fun render()
     abstract fun demoRender()
@@ -59,9 +60,10 @@ abstract class GuiElement(var name: String?, var scale: Float, fp: FloatPair?) {
 
     companion object {
         private val sr = ScaledResolution(Minecraft.getMinecraft())
+        val fr = ScreenRenderer.fontRenderer
     }
 
     init {
-        pos = GuiManager.Companion.GUIPOSITIONS.getOrDefault(name, fp)
+        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, fp)!!
     }
 }

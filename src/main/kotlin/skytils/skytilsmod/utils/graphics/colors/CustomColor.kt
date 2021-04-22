@@ -200,7 +200,7 @@ open class CustomColor {
             var s = s
             var v = v
             var a = a
-            a = MathUtil.clamp(a, 0f, 1f)
+            a = a.coerceIn(0f, 1f)
             if (v <= 0) return CustomColor(0F, 0F, 0F, a)
             if (v > 1) v = 1f
             if (s <= 0) return CustomColor(v, v, v, a)

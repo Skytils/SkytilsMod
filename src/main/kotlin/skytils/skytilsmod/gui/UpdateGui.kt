@@ -30,6 +30,7 @@ import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
+import kotlin.math.floor
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -155,10 +156,10 @@ class UpdateGui : GuiScreen() {
                 val top = height / 2 - 2 - MathUtil.ceil(mc.fontRendererObj.FONT_HEIGHT / 2f)
                 val bottom = height / 2 + 2 + MathUtil.floor(mc.fontRendererObj.FONT_HEIGHT / 2f)
                 drawRect(left - 1, top - 1, right + 1, bottom + 1, -0x3f3f40)
-                val progressPoint = MathUtil.clamp(MathUtil.floor(progress * (right - left) + left), left, right)
+                val progressPoint = floor(progress * (right - left) + left).toInt().coerceIn(left, right)
                 drawRect(left, top, progressPoint, bottom, -0x34c2cb)
                 drawRect(progressPoint, top, right, bottom, -0x1)
-                val label = String.format("%d%%", MathUtil.clamp(MathUtil.floor(progress * 100), 0, 100))
+                val label = String.format("%d%%", floor(progress * 100).toInt().coerceIn(0, 100))
                 mc.fontRendererObj.drawString(
                     label,
                     (width - mc.fontRendererObj.getStringWidth(label)) / 2,

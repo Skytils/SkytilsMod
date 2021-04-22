@@ -237,7 +237,7 @@ class GuiManager {
 
         fun normalizeValueNoStep(value: Float): Float {
             println(snapNearDefaultValue(value))
-            return MathUtil.clamp(snapNearDefaultValue(value), GUI_SCALE_MINIMUM, GUI_SCALE_MAXIMUM)
+            return snapNearDefaultValue(value).coerceIn(GUI_SCALE_MINIMUM, GUI_SCALE_MAXIMUM)
         }
 
         private fun snapNearDefaultValue(value: Float): Float {

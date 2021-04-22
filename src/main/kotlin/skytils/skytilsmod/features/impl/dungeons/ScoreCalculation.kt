@@ -285,13 +285,8 @@ class ScoreCalculation {
                     }
                 }
                 val skillScore = 100 - 2 * deaths - 14 * (missingPuzzles + failedPuzzles)
-                val discoveryScore: Double = MathUtil.clamp(
-                    floor((60 * (clearedPercentage / 100f)).toDouble()),
-                    0.0,
-                    60.0
-                ) + if (totalSecrets <= 0) 0.0 else MathUtil.clamp(
-                    floor((40f * foundSecrets / totalSecrets).toDouble()), 0.0, 40.0
-                )
+                val discoveryScore: Double = floor((60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
+                ) + if (totalSecrets <= 0) 0.0 else floor((40f * foundSecrets / totalSecrets).toDouble().coerceIn(0.0, 40.0))
                 val speedScore: Double
                 val bonusScore = (if (mimicKilled) 2 else 0) + Math.min(crypts, 5) + if (isPaul) 10 else 0
                 val countedSeconds = if (DungeonsFeatures.dungeonFloor == "F2") 0.0.coerceAtLeast(secondsElapsed - 120) else secondsElapsed

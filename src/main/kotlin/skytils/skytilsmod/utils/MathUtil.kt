@@ -24,42 +24,6 @@ package skytils.skytilsmod.utils
  */
 object MathUtil {
     /**
-     * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
-     * third parameters.
-     */
-    fun clamp(num: Int, min: Int, max: Int): Int {
-        return if (num < min) {
-            min
-        } else {
-            if (num > max) max else num
-        }
-    }
-
-    fun clamp(num: Long, min: Long, max: Long): Long {
-        return if (num < min) {
-            min
-        } else {
-            if (num > max) max else num
-        }
-    }
-
-    fun clamp(num: Float, min: Float, max: Float): Float {
-        return if (num < min) {
-            min
-        } else {
-            if (num > max) max else num
-        }
-    }
-
-    fun clamp(num: Double, min: Double, max: Double): Double {
-        return if (num < min) {
-            min
-        } else {
-            if (num > max) max else num
-        }
-    }
-
-    /**
      * returns par0 cast as an int, and no greater than Integer.MAX_VALUE-1024
      */
     fun fastFloor(value: Double): Int {
