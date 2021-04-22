@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod
 
-import club.sk1er.vigilance.Vigilance
 import club.sk1er.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
 import com.google.gson.GsonBuilder
@@ -31,6 +30,7 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
@@ -69,7 +69,9 @@ import skytils.skytilsmod.mixins.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import java.awt.Desktop
 import java.io.File
+import java.net.URL
 
 
 @Mod(
@@ -125,6 +127,11 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
+        if (ForgeVersion.mcVersion != "1.8.9" || ForgeVersion.buildVersion != 2318) {
+            Desktop.getDesktop()
+                .browse(URL("https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html").toURI())
+            throw RuntimeException("Skytils can't run on this Minecraft Forge version! Please use the latest Forge build 2318 for 1.8.9.")
+        }
         if (!modDir.exists()) modDir.mkdirs()
         GUIMANAGER = GuiManager()
         jarFile = event.sourceFile
