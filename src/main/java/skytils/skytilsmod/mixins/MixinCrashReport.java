@@ -23,6 +23,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.io.FileWriter;
+import java.io.IOException;
 
 @Mixin(CrashReport.class)
 public abstract class MixinCrashReport {
@@ -31,13 +35,16 @@ public abstract class MixinCrashReport {
 
     @Shadow public abstract String getCauseStackTraceOrString();
 
-    @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/asm/transformers/BlamingTransformer;onCrash(Ljava/lang/StringBuilder;)V", remap = false))
-    private StringBuilder blameSkytils(StringBuilder stringbuilder) {
+    @Shadow private StackTraceElement[] stacktrace;
+
+    @Redirect(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 0))
+    private StringBuilder blameSkytils(StringBuilder stringBuilder, String str) {
+        stringBuilder.append(str);
         if (getCauseStackTraceOrString().contains("skytils.skytilsmod")) {
             isSkytilsCrash = true;
-            stringbuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n");
+            stringBuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n");
         }
-        return stringbuilder;
+        return stringBuilder;
     }
 
     @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", ordinal = 2, remap = false))
