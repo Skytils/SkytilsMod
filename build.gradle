@@ -104,15 +104,11 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    compile(files("./libs/Vigilance1.8.9-LOCAL.jar"))
-    compile "com.electronwill.night-config:toml:3.6.0"
-    compile ("club.sk1er:Elementa:253-10809-SNAPSHOT") {
+    compile ("club.sk1er:UniversalCraft:99-10809-SNAPSHOT") {
         exclude module: "UniversalCraft"
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
-    compile "club.sk1er:UniversalCraft:98-10809-SNAPSHOT"
-
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
