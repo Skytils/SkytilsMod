@@ -15,41 +15,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package skytils.skytilsmod.utils.toasts
 
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.init.Blocks
-import net.minecraft.item.Item
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil
+import java.util.regex.Pattern
 
-class SuperboomToast : IToast<SuperboomToast> {
+class RecombToast(val recombItem: String) : IToast<KeyToast> {
     private val buffer = GLAllocation.createDirectFloatBuffer(16)
     private val maxDrawTime: Long = Skytils.config.toastTime.toLong()
     override fun draw(toastGui: GuiToast, delta: Long): IToast.Visibility {
         toastGui.mc.textureManager.bindTexture(TEXTURE)
         GlStateManager.color(1.0f, 1.0f, 1.0f)
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0f, 0f, 160, 32, 160f, 32f)
-        toastGui.mc.fontRendererObj.drawStringWithShadow("§9Superboom TNT", 30f, 7f, 16777215)
-        GuiToast.Companion.drawSubline(toastGui, delta, 0L, maxDrawTime, buffer, "", false)
+        toastGui.mc.fontRendererObj.drawStringWithShadow("\u00a76§lAuto-Recombob Item!", 30f, 7f, 16777215)
+        GuiToast.drawSubline(toastGui, delta, 0L, maxDrawTime, buffer, "§6§k§la§r §$recombItem §r§6§k§la", false)
         RenderHelper.enableGUIStandardItemLighting()
-        RenderUtil.renderItem(superBoom, 8, 8)
+        RenderUtil.renderItem(RECOMB, 8, 8)
         GlStateManager.disableLighting()
         return if (delta >= maxDrawTime) IToast.Visibility.HIDE else IToast.Visibility.SHOW
     }
 
     companion object {
         private val TEXTURE = ResourceLocation("skytils:gui/toast.png")
-        private val superBoom = ItemStack(Item.getItemFromBlock(Blocks.tnt))
+        private val RECOMB = ItemUtil.setSkullTexture(
+            ItemStack(Items.skull, 1, 3),
+            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWRmZjhkYmJhYjE1YmZiYjExZTIzYjFmNTBiMzRlZjU0OGFkOTgzMmMwYmQ3ZjVhMTM3OTFhZGFkMDA1N2UxYiJ9fX0K",
+            "10479f18-e67f-3c86-93e2-b4df79d0457e"
+        )
+        val pattern: Pattern = Pattern.compile(" §r§([\\w ]+)§r§e")
     }
 
-    init {
-        superBoom.addEnchantment(Enchantment.unbreaking, 1)
-    }
 }

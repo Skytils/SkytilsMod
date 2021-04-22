@@ -1658,6 +1658,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var comboHider = 0
 
     @Property(
+        type = PropertyType.SELECTOR,
+        name = "Auto-Recombobulator Hider",
+        description = "Removes Auto-Recombobulator messages from your chat.",
+        category = "Spam",
+        subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI", "Toasts"]
+    )
+    var autoRecombHider = 0
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Compact Building Tools",
         description = "Compacts messages from the Block Zapper and the Builder's Wand.",

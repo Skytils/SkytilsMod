@@ -491,6 +491,22 @@ class SpamHider {
                     }
                 }
             }
+
+            // Auto-Recombobulator
+            if (unformatted.startsWith("Your Auto-Recomb")) {
+                when (Skytils.config.autoRecombHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.autoRecombHider == 2)
+                    3 -> {
+                        val matcher = RecombToast.pattern.matcher(formatted)
+                        if (matcher.find(formatted.indexOf(" "))) {
+                            GuiManager.toastGui.add(RecombToast(matcher.group(1)))
+                        }
+                        cancelChatPacket(event, false)
+                    }
+                    else -> {
+                    }
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

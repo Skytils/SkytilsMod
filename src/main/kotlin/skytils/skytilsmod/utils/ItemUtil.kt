@@ -19,6 +19,7 @@ package skytils.skytilsmod.utils
 
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
 import net.minecraftforge.common.util.Constants
 import java.util.*
 import java.util.regex.Pattern
@@ -184,5 +185,26 @@ object ItemUtil {
         val name = display.getString("Name")
         val petRarityMatcher = PET_PATTERN.matcher(name)
         return petRarityMatcher.find()
+    }
+
+    fun setSkullTexture(item: ItemStack, texture: String, SkullOwner: String): ItemStack {
+        val textureTagCompound = NBTTagCompound()
+        textureTagCompound.setString("Value", texture)
+
+        val textures = NBTTagList()
+        textures.appendTag(textureTagCompound)
+
+        val properties = NBTTagCompound()
+        properties.setTag("textures", textures)
+
+        val skullOwner = NBTTagCompound()
+        skullOwner.setString("Id", SkullOwner)
+        skullOwner.setTag("Properties", properties)
+
+        val nbtTag = NBTTagCompound()
+        nbtTag.setTag("SkullOwner", skullOwner)
+
+        item.tagCompound = nbtTag
+        return item
     }
 }
