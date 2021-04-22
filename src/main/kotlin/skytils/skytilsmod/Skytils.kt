@@ -63,12 +63,14 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.listeners.ChatListener
+import skytils.skytilsmod.listeners.PartyListener
 import skytils.skytilsmod.mixins.AccessorCommandHandler
 import skytils.skytilsmod.mixins.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.io.File
+
 
 @Mod(
     modid = Skytils.MODID,
@@ -130,8 +132,6 @@ class Skytils {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        Vigilance.initialize()
-
         config.preload()
 
         ClientCommandHandler.instance.registerCommand(SkytilsCommand())
@@ -141,6 +141,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(DataFetcher())
         MinecraftForge.EVENT_BUS.register(GUIMANAGER)
         MinecraftForge.EVENT_BUS.register(MayorInfo())
+        MinecraftForge.EVENT_BUS.register(PartyManager())
         MinecraftForge.EVENT_BUS.register(SBInfo.instance)
         MinecraftForge.EVENT_BUS.register(UpdateChecker())
 
@@ -173,6 +174,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MiningFeatures())
         MinecraftForge.EVENT_BUS.register(MinionFeatures())
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
+        MinecraftForge.EVENT_BUS.register(PartyListener())
         MinecraftForge.EVENT_BUS.register(PetFeatures())
         MinecraftForge.EVENT_BUS.register(RelicWaypoints())
         MinecraftForge.EVENT_BUS.register(ScoreCalculation())
