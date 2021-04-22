@@ -1510,12 +1510,32 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.SELECTOR,
         name = "Boss Messages Hider",
-        description = "Hides Boss Messages",
+        description = "Hides Boss Messages.",
         category = "Spam",
         subcategory = "Dungeons",
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var hideBossMessages = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Wither Essence Hider",
+        description = "Removes Wither Essence unlock messages from your chat.",
+        category = "Spam",
+        subcategory = "Dungeons",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var witherEssenceHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Undead Essence Hider",
+        description = "Removes Undead Essence unlock messages from your chat.",
+        category = "Spam",
+        subcategory = "Dungeons",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var undeadEssenceHider = 0
 
     @Property(
         type = PropertyType.SELECTOR,
