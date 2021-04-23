@@ -210,7 +210,7 @@ public class ChestProfit {
                 DungeonChest chest = DungeonChest.values()[i];
                 String line = chest.displayText + ": §a+300M";
                 SmartFontRenderer.TextAlignment alignment = leftAlign ? SmartFontRenderer.TextAlignment.LEFT_RIGHT : SmartFontRenderer.TextAlignment.RIGHT_LEFT;
-                ScreenRenderer.fontRenderer.drawString(line, leftAlign ? this.getActualX() : this.getActualX() + getWidth(), this.getActualY() + i * ScreenRenderer.fontRenderer.FONT_HEIGHT, chest.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
+                ScreenRenderer.fontRenderer.drawString(line, leftAlign ? 0 : getWidth(), i * ScreenRenderer.fontRenderer.FONT_HEIGHT, chest.displayColor, alignment, SmartFontRenderer.TextShadow.NORMAL);
             }
         }
 
