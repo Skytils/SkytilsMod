@@ -214,15 +214,11 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
     override fun read(reader: FileReader) {
         for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
-            try {
-                GUIPOSITIONS[key] = FloatPair(
-                    value.asJsonObject["x"].asFloat,
-                    value.asJsonObject["y"].asFloat
-                )
-                GUISCALES[key] = value.asJsonObject["scale"].asFloat
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-            }
+            GUIPOSITIONS[key] = FloatPair(
+                value.asJsonObject["x"].asFloat,
+                value.asJsonObject["y"].asFloat
+            )
+            GUISCALES[key] = value.asJsonObject["scale"].asFloat
         }
     }
 
