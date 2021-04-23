@@ -95,7 +95,7 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compile("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         transitive = false
         exclude module: "guava"
         exclude module: "commons-io"
@@ -106,13 +106,13 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    compile ("club.sk1er:Vigilance:99-10809-SNAPSHOT") {
+    implementation("club.sk1er:Vigilance:99-10809-SNAPSHOT") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 jar {
@@ -136,7 +136,7 @@ jar {
 shadowJar {
     archiveName = jar.archiveName
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    configurations = [project.configurations.compile]
+    configurations = [project.configurations.implementation]
 
     relocate("club.sk1er", "skytils.sk1er")
 
