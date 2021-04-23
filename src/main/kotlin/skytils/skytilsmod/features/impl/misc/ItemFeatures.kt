@@ -19,7 +19,6 @@ package skytils.skytilsmod.features.impl.misc
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.projectile.EntityFishHook
@@ -227,7 +226,7 @@ class ItemFeatures {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
                         val line2 = stripControlCodes(lore[2])
                         val enchantName =
-                            line2.substring(0, line2.lastIndexOf(" ")).replace(" ".toRegex(), "_").toUpperCase()
+                            line2.substring(0, line2.lastIndexOf(" ")).replace(" ".toRegex(), "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
                         isSuperpairsReward = true
                     }
@@ -384,14 +383,46 @@ class ItemFeatures {
         if (extraAttributes != null) {
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
                 stackTip = extraAttributes.getInteger("potion_level").toString()
-            } else if (Skytils.config.showEnchantedBookTier && item.item === Items.enchanted_book && extraAttributes.hasKey(
+            } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && item.item === Items.enchanted_book && extraAttributes.hasKey(
                     "enchantments"
                 )
             ) {
                 val enchantments = extraAttributes.getCompoundTag("enchantments")
                 val enchantmentNames = enchantments.keySet
                 if (enchantments.keySet.size == 1) {
-                    stackTip = enchantments.getInteger(enchantmentNames.iterator().next()).toString()
+                    val name = enchantmentNames.first()
+                    if (Skytils.config.showEnchantedBookAbbreviation) {
+                        var parts = name.split("_")
+                        val prefix: String = if (parts[0] == "ultimate") {
+                            "§d" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
+                        } else {
+                            if (parts.size > 1) {
+                                parts.joinToString("") { s -> s.substring(0, 1).uppercase() }
+                            } else {
+                                parts[0].substring(0, parts[0].length.coerceAtMost(3))
+                                    .replaceFirstChar { it.titlecase() } + "."
+                            }
+                        }
+                        GlStateManager.disableLighting()
+                        GlStateManager.disableDepth()
+                        GlStateManager.disableBlend()
+                        GlStateManager.pushMatrix()
+                        GlStateManager.translate(event.x.toFloat(), event.y.toFloat(), 1f)
+                        GlStateManager.scale(0.8, 0.8, 1.0)
+                        ScreenRenderer.fontRenderer.drawString(
+                            prefix,
+                            0f,
+                            0f,
+                            CommonColors.WHITE,
+                            TextAlignment.LEFT_RIGHT,
+                            TextShadow.NORMAL
+                        )
+                        GlStateManager.popMatrix()
+                        GlStateManager.enableLighting()
+                        GlStateManager.enableDepth()
+                    }
+                    if (Skytils.config.showEnchantedBookTier) stackTip =
+                        enchantments.getInteger(name.toString()).toString()
                 }
             }
         }
@@ -411,9 +442,9 @@ class ItemFeatures {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            event.fr!!.drawStringWithShadow(
+            event.fr.drawStringWithShadow(
                 stackTip,
-                (event.x + 17 - event.fr!!.getStringWidth(stackTip)).toFloat(),
+                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
                 (event.y + 9).toFloat(),
                 16777215
             )

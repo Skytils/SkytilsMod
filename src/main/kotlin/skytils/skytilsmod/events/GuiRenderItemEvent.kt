@@ -23,13 +23,13 @@ import net.minecraftforge.fml.common.eventhandler.Event
 
 open class GuiRenderItemEvent : Event() {
     open class RenderOverlayEvent(
-        var fr: FontRenderer?,
+        var fr: FontRenderer,
         var stack: ItemStack?,
         var x: Int,
         var y: Int,
         var text: String?
     ) : GuiRenderItemEvent() {
-        class Post(fr: FontRenderer?, stack: ItemStack?, xPosition: Int, yPosition: Int, text: String?) :
+        class Post(fr: FontRenderer, stack: ItemStack?, xPosition: Int, yPosition: Int, text: String?) :
             RenderOverlayEvent(fr, stack, xPosition, yPosition, text)
     }
 }

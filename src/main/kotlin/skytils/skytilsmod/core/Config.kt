@@ -838,6 +838,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Show Enchanted Book Abbreviation",
+        description = "Shows the abbreviated name of books with only 1 enchantment.",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var showEnchantedBookAbbreviation = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Enchanted Book Tier",
         description = "Shows the tier of books with only 1 enchantment.",
         category = "Miscellaneous",

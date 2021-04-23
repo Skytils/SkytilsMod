@@ -71,7 +71,7 @@ public abstract class MixinRenderItem {
         try {
             MinecraftForge.EVENT_BUS.post(new GuiRenderItemEvent.RenderOverlayEvent.Post(fr, stack, xPosition, yPosition, text));
         } catch (Throwable e) {
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at GuiRenderItemEvent.RenderOverlayEvent.Pre. Please report this on the Discord server."));
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at GuiRenderItemEvent.RenderOverlayEvent.Post. Please report this on the Discord server."));
             e.printStackTrace();
         }
     }
