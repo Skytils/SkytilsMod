@@ -170,7 +170,7 @@ public class LocationEditGui extends GuiScreen {
             float scaleX = newWidth / width;
             float scaleY = newHeight / height;
 
-            float newScale = Math.max(scaleX, scaleY);
+            float newScale = Math.max(scaleX, scaleY) > 0 ? Math.max(scaleX, scaleY) : 0.01f;
 
             locationButton.element.setScale(scaleCache + newScale);
             locationButton.drawButton(mc, mouseX, mouseY);
@@ -243,8 +243,8 @@ public class LocationEditGui extends GuiScreen {
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
         GuiElement hovered = LocationButton.lastHoveredElement;
-        if (hovered != null) {
-            hovered.setScale(hovered.getScale() + (Mouse.getEventDWheel() / 1_000f));
+        if (hovered != null && (hovered.getScale() + (Mouse.getEventDWheel() / 1_000f) > 0)) {
+            hovered.setScale( hovered.getScale() + (Mouse.getEventDWheel() / 1_000f));
         }
     }
 
