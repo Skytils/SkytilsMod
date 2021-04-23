@@ -30,12 +30,16 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.NumberUtil
+import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
+
 
 /**
  * Based off of chest profit from code by Quantizr
@@ -192,8 +196,8 @@ class ChestProfit {
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     line,
-                    if (leftAlign) actualX else actualX + width,
-                    actualY + i * ScreenRenderer.fontRenderer.FONT_HEIGHT,
+                    if (leftAlign) 0f else width.toFloat(),
+                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     chest.displayColor,
                     alignment,
                     SmartFontRenderer.TextShadow.NORMAL

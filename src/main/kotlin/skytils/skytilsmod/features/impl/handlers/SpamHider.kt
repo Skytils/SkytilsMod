@@ -528,7 +528,7 @@ class SpamHider {
             }
 
             // Undead Essence
-            if (unformatted.contains("§r§eunlocked §r§dUndead Essence §r§8x")) {
+            if (formatted.contains("§r§eunlocked §r§dUndead Essence §r§8x")) {
                 when (Skytils.config.undeadEssenceHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.undeadEssenceHider == 2)
                     else -> {

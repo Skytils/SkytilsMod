@@ -140,7 +140,7 @@ open class LocationEditGui : GuiScreen() {
             val newHeight = yOffset * 2f
             val scaleX = newWidth / width
             val scaleY = newHeight / height
-            val newScale = Math.max(scaleX, scaleY)
+            val newScale = scaleX.coerceAtLeast(scaleY).coerceAtLeast(0.01f)
             locationButton.element.scale = scaleCache + newScale
             locationButton.drawButton(mc, mouseX, mouseY)
             recalculateResizeButtons()
@@ -200,7 +200,7 @@ open class LocationEditGui : GuiScreen() {
         super.handleMouseInput()
         val hovered = LocationButton.lastHoveredElement
         if (hovered != null) {
-            hovered.scale = hovered.scale + Mouse.getEventDWheel() / 1000f
+            hovered.scale = (hovered.scale + Mouse.getEventDWheel() / 1000f).coerceAtLeast(0.01f)
         }
     }
 
