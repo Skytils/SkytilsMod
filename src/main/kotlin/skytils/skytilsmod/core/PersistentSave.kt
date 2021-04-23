@@ -20,7 +20,10 @@ package skytils.skytilsmod.core
 
 import com.google.gson.Gson
 import net.minecraft.client.Minecraft
+import net.minecraft.potion.Potion
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -40,7 +43,7 @@ abstract class PersistentSave(val saveFile: File, val interval: Long = 30_000) {
 
     abstract fun setDefault(writer: FileWriter)
 
-    fun readSave() {
+    private fun readSave() {
         try {
             FileReader(this.saveFile).use { `in` ->
                 read(`in`)
@@ -56,7 +59,7 @@ abstract class PersistentSave(val saveFile: File, val interval: Long = 30_000) {
         }
     }
 
-    fun writeSave() {
+    private fun writeSave() {
         try {
             FileWriter(this.saveFile).use { writer ->
                 write(writer)
@@ -80,7 +83,7 @@ abstract class PersistentSave(val saveFile: File, val interval: Long = 30_000) {
     init {
         SAVES.add(this)
         readSave()
-        fixedRateTimer("$this::class.simpleName-Save", period = interval) {
+        fixedRateTimer("${this::class.simpleName}-Save", period = interval) {
             if (dirty) {
                 writeSave()
             }
@@ -89,7 +92,7 @@ abstract class PersistentSave(val saveFile: File, val interval: Long = 30_000) {
             if (dirty) {
                 writeSave()
             }
-        }, "$this::class.simpleName-Save"))
+        }, "${this::class.simpleName}-Save"))
     }
 
 }
