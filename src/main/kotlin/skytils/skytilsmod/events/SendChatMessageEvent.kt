@@ -21,4 +21,4 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class SendChatMessageEvent(var message: String, var addToChat: Boolean) : Event()
+class SendChatMessageEvent(val message: String, val addToChat: Boolean) : Event()

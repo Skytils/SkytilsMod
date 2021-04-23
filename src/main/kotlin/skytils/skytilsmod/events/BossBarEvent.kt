@@ -23,5 +23,5 @@ import net.minecraftforge.fml.common.eventhandler.Event
 
 open class BossBarEvent : Event() {
     @Cancelable
-    class Set(var displayData: IBossDisplayData, var hasColorModifier: Boolean) : BossBarEvent()
+    class Set(val displayData: IBossDisplayData, val hasColorModifier: Boolean) : BossBarEvent()
 }

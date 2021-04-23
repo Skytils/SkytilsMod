@@ -24,9 +24,9 @@ import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
 class CheckRenderEntityEvent<T : Entity?>(
-    var entity: T,
-    var camera: ICamera,
-    var camX: Double,
-    var camY: Double,
-    var camZ: Double
+    val entity: T,
+    val camera: ICamera,
+    val camX: Double,
+    val camY: Double,
+    val camZ: Double
 ) : Event()

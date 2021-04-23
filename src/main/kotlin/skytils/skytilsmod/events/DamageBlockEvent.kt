@@ -23,4 +23,4 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class DamageBlockEvent(var pos: BlockPos, var facing: EnumFacing) : Event()
+class DamageBlockEvent(val pos: BlockPos, val facing: EnumFacing) : Event()

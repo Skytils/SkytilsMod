@@ -23,17 +23,17 @@ import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
 
-abstract class GuiContainerEvent(var gui: GuiContainer, var container: Container) : Event() {
+abstract class GuiContainerEvent(val gui: GuiContainer, val container: Container) : Event() {
     class BackgroundDrawnEvent(
         gui: GuiContainer,
         container: Container,
-        var mouseX: Int,
-        var mouseY: Int,
-        var partialTicks: Float
+        val mouseX: Int,
+        val mouseY: Int,
+        val partialTicks: Float
     ) : GuiContainerEvent(gui, container)
 
     class CloseWindowEvent(gui: GuiContainer, container: Container) : GuiContainerEvent(gui, container)
-    open class DrawSlotEvent(gui: GuiContainer, container: Container, var slot: Slot) :
+    open class DrawSlotEvent(gui: GuiContainer, container: Container, val slot: Slot) :
         GuiContainerEvent(gui, container) {
         @Cancelable
         class Pre(gui: GuiContainer, container: Container, slot: Slot) : DrawSlotEvent(gui, container, slot)
@@ -44,9 +44,9 @@ abstract class GuiContainerEvent(var gui: GuiContainer, var container: Container
     class SlotClickEvent(
         gui: GuiContainer,
         container: Container,
-        var slot: Slot?,
-        var slotId: Int,
-        var clickedButton: Int,
-        var clickType: Int
+        val slot: Slot?,
+        val slotId: Int,
+        val clickedButton: Int,
+        val clickType: Int
     ) : GuiContainerEvent(gui, container)
 }

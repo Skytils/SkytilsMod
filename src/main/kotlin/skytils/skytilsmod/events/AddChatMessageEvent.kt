@@ -22,4 +22,4 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class AddChatMessageEvent(var message: IChatComponent) : Event()
+class AddChatMessageEvent(val message: IChatComponent) : Event()

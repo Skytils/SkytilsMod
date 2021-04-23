@@ -21,4 +21,4 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class SetActionBarEvent(var message: String, var isPlaying: Boolean) : Event()
+class SetActionBarEvent(val message: String, val isPlaying: Boolean) : Event()
