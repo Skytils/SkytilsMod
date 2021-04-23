@@ -20,6 +20,7 @@
     "MixinGuiScreen",
     "MixinItemArmor",
     "MixinItemStack",
+    "MixinLayerCreeperCharge",
     "MixinLayerCustomHead",
     "MixinMinecraft",
     "MixinModelBlaze",

@@ -686,6 +686,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "More Visible Ghosts",
+        description = "Makes ghosts more visible in the Dwarven Mines.\nThis is allowed on the Hypixel network and can be done in Vanilla.",
+        category = "Mining",
+        subcategory = "Quality of Life"
+    )
+    @JvmField
+    var moreVisibleGhosts = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Powder Ghast Ping",
         description = "Displays a title on your screen when a Powder Ghast spawns.",
         category = "Mining",

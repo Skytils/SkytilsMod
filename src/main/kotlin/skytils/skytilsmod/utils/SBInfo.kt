@@ -158,6 +158,7 @@ class SBInfo {
     }
 
     companion object {
+        @JvmField
         val instance = SBInfo()
         private val timePattern = Pattern.compile(".+(am|pm)")
         private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
