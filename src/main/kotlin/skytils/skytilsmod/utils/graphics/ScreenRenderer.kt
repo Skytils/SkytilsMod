@@ -393,7 +393,7 @@ class ScreenRenderer {
         y: Float,
         color: CustomColor,
         alignment: TextAlignment = TextAlignment.LEFT_RIGHT,
-        shadow: TextShadow? = TextShadow.NORMAL
+        shadow: TextShadow = TextShadow.NORMAL
     ): Float {
         if (!isRendering) return -1f
         val f = fontRenderer.drawString(text, drawingOrigin.x + x, drawingOrigin.y + y, color, alignment, shadow)

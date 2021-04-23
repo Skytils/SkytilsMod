@@ -25,6 +25,7 @@ import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.core.structure.LocationButton
 import skytils.skytilsmod.core.structure.ResizeButton
@@ -217,6 +218,6 @@ open class LocationEditGui : GuiScreen() {
      * Saves the positions when the gui is closed
      */
     override fun onGuiClosed() {
-        GuiManager.saveConfig()
+        PersistentSave.markDirty(GuiManager::class)
     }
 }

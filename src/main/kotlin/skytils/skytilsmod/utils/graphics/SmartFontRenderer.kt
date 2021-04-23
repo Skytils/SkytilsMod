@@ -46,7 +46,7 @@ class SmartFontRenderer : FontRenderer(
         y: Float,
         customColor: CustomColor,
         alignment: TextAlignment,
-        shadow: TextShadow?
+        shadow: TextShadow
     ): Float {
         if (text == null) return 0f
         if (customColor === CommonColors.RAINBOW) {
@@ -89,7 +89,7 @@ class SmartFontRenderer : FontRenderer(
         x: Float,
         y: Float,
         alignment: TextAlignment,
-        shadow: TextShadow?
+        shadow: TextShadow
     ): Float {
         if (alignment == TextAlignment.MIDDLE) return drawRainbowText(
             input,
@@ -147,6 +147,7 @@ class SmartFontRenderer : FontRenderer(
                     posX = originPosX
                     posY = originPosY
                 }
+                TextShadow.NONE -> {}
             }
 
             // rendering the text
@@ -157,7 +158,7 @@ class SmartFontRenderer : FontRenderer(
         return posX
     }
 
-    private fun drawCritText(input: String, x: Float, y: Float, alignment: TextAlignment, shadow: TextShadow?): Float {
+    private fun drawCritText(input: String, x: Float, y: Float, alignment: TextAlignment, shadow: TextShadow): Float {
         if (alignment == TextAlignment.MIDDLE) return drawCritText(
             input,
             x - getStringWidth(input) / 2.0f,
@@ -211,6 +212,9 @@ class SmartFontRenderer : FontRenderer(
                     renderChar(c)
                     posX = originPosX
                     posY = originPosY
+                }
+                TextShadow.NONE -> {
+
                 }
             }
 

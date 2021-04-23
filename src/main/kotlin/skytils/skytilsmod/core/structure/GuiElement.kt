@@ -64,6 +64,7 @@ abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
     }
 
     init {
-        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, fp)!!
+        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, fp)
+        scale = GuiManager.GUISCALES.getOrDefault(name, scale)
     }
 }

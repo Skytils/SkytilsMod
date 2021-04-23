@@ -20,10 +20,7 @@ package skytils.skytilsmod.core
 
 import com.google.gson.Gson
 import net.minecraft.client.Minecraft
-import net.minecraft.potion.Potion
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter

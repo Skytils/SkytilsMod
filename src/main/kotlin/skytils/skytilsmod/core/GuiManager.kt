@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.core
 
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -31,12 +30,13 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.gui.LocationEditGui
-import skytils.skytilsmod.utils.MathUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
-import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 
-class GuiManager {
+class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     private var counter = 0
     fun registerElement(e: GuiElement): Boolean {
         return try {
@@ -177,13 +177,12 @@ class GuiManager {
     }
 
     companion object {
-        private val gson = GsonBuilder().setPrettyPrinting().create()
-        private lateinit var positionFile: File
-        lateinit var GUIPOSITIONS: MutableMap<String?, FloatPair?>
+        val GUIPOSITIONS = HashMap<String, FloatPair>()
+        val GUISCALES = HashMap<String, Float>()
         private const val GUI_SCALE_MINIMUM = 0.5f
         private const val GUI_SCALE_MAXIMUM = 5f
         private val elements: MutableMap<Int, GuiElement> = HashMap()
-        private val names: MutableMap<String?, GuiElement> = HashMap()
+        private val names: MutableMap<String, GuiElement> = HashMap()
 
         @JvmField
         var toastGui = GuiToast(Minecraft.getMinecraft())
@@ -193,40 +192,6 @@ class GuiManager {
         var subtitle: String? = null
         var titleDisplayTicks = 0
         var subtitleDisplayTicks = 0
-        fun readConfig() {
-            var file: JsonObject
-            try {
-                FileReader(positionFile).use { `in` ->
-                    file = gson.fromJson(`in`, JsonObject::class.java)
-                    for ((key, value) in file.entrySet()) {
-                        try {
-                            GUIPOSITIONS[key] = FloatPair(
-                                value.asJsonObject["x"].asJsonObject["value"].asFloat,
-                                value.asJsonObject["y"].asJsonObject["value"].asFloat
-                            )
-                        } catch (exception: Exception) {
-                            exception.printStackTrace()
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                GUIPOSITIONS = HashMap()
-                try {
-                    FileWriter(positionFile).use { writer -> gson.toJson(GUIPOSITIONS, writer) }
-                } catch (ignored: Exception) {
-                }
-            }
-        }
-
-        fun saveConfig() {
-            for ((key, value) in names) {
-                GUIPOSITIONS[key] = value.pos
-            }
-            try {
-                FileWriter(positionFile).use { writer -> gson.toJson(GUIPOSITIONS, writer) }
-            } catch (ignored: Exception) {
-            }
-        }
 
         @JvmStatic
         fun createTitle(title: String?, ticks: Int) {
@@ -247,9 +212,36 @@ class GuiManager {
         }
     }
 
-    init {
-        positionFile = File(Skytils.modDir, "guipositions.json")
-        GUIPOSITIONS = HashMap()
-        readConfig()
+    override fun read(reader: FileReader) {
+        for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
+            try {
+                GUIPOSITIONS[key] = FloatPair(
+                    value.asJsonObject["x"].asFloat,
+                    value.asJsonObject["y"].asFloat
+                )
+                GUISCALES[key] = value.asJsonObject["scale"].asFloat
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+        }
     }
+
+    override fun write(writer: FileWriter) {
+        val data = JsonObject()
+        for ((key, value) in names) {
+            GUIPOSITIONS[key] = value.pos
+            GUISCALES[key] = value.scale
+            val obj = JsonObject()
+            obj.addProperty("x", value.pos.getX())
+            obj.addProperty("y", value.pos.getY())
+            obj.addProperty("scale", value.scale)
+            data.add(key, obj)
+        }
+        gson.toJson(data, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonObject(), writer)
+    }
+
 }
