@@ -264,6 +264,7 @@ public class LocationEditGui extends GuiScreen {
      */
     @Override
     public void onGuiClosed() {
-        GuiManager.saveConfig();
+        GuiManager.saveGuiPositions();
+        GuiManager.saveGuiScales();
     }
 }

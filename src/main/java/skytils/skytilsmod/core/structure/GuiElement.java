@@ -39,7 +39,7 @@ public abstract class GuiElement {
 
     public GuiElement(String name, float scale, FloatPair fp) {
         this.name = name;
-        this.scale = scale;
+        this.scale = GuiManager.GUISCALES.getOrDefault(name, scale);
         this.pos = GuiManager.GUIPOSITIONS.getOrDefault(name, fp);
     }
 
