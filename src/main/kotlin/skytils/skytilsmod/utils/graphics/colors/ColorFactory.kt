@@ -328,7 +328,7 @@ object ColorFactory {
             )
         }
         require(colorString.isNotEmpty()) { "Invalid color specification" }
-        var color = colorString.toLowerCase(Locale.ROOT)
+        var color = colorString.lowercase()
         if (color.startsWith("#")) {
             color = color.substring(1)
         } else if (color.startsWith("0x")) {

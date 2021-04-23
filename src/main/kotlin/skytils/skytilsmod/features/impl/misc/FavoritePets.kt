@@ -60,7 +60,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
             if (matcher.find())
                 for (favorite in favorited) {
                     if (favorite == "${
-                            matcher.group("name").toUpperCase().replace(" ", "_")
+                            matcher.group("name").uppercase().replace(" ", "_")
                         }-${ItemRarity.byBaseColor(matcher.group("rarityColor"))?.rarityName}-${
                             matcher.group("lvl").toInt() - 1
                         }${
@@ -140,7 +140,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
 
     private fun getPetIdFromMatcher(matcher: Matcher): String {
         return "${
-            matcher.group("name").toUpperCase().replace(" ", "_")
+            matcher.group("name").uppercase().replace(" ", "_")
         }-${ItemRarity.byBaseColor(matcher.group("rarityColor"))?.rarityName}-${matcher.group("lvl")}${
             if (matcher.group("skinned") != null) "-SKINNED" else ""
         }"

@@ -66,7 +66,7 @@ class SkytilsCommand : CommandBase() {
             Skytils.displayScreen = OptionsGui()
             return
         }
-        when (args[0].toLowerCase(Locale.ENGLISH)) {
+        when (args[0].lowercase()) {
             "setkey" -> {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("§c§l[ERROR] §8» §cPlease provide your Hypixel API key!"))
@@ -96,7 +96,7 @@ class SkytilsCommand : CommandBase() {
             "griffin" -> if (args.size == 1) {
                 player.addChatMessage(ChatComponentText("/skytils griffin <refresh>"))
             } else {
-                when (args[1].toLowerCase(Locale.ENGLISH)) {
+                when (args[1].lowercase()) {
                     "refresh" -> {
                         GriffinBurrows.particleBurrows.removeIf { pb -> !pb.dug }
                         GriffinBurrows.burrows.clear()
@@ -110,7 +110,7 @@ class SkytilsCommand : CommandBase() {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("/skytils reload <aliases/data>"))
                 } else {
-                    val action = args[1].toLowerCase(Locale.ENGLISH)
+                    val action = args[1].lowercase()
                     when (action) {
                         "data" -> {
                             DataFetcher.reloadData()

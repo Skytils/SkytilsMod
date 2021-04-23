@@ -52,12 +52,12 @@ class AuctionData {
                     val enchants = extraAttr.getCompoundTag("enchantments")
                     if (!enchants.hasNoTags()) {
                         val enchant = enchants.keySet.iterator().next()
-                        id = "ENCHANTED_BOOK-" + enchant.toUpperCase(Locale.US) + "-" + enchants.getInteger(enchant)
+                        id = "ENCHANTED_BOOK-" + enchant.uppercase() + "-" + enchants.getInteger(enchant)
                     }
                 }
                 "POTION" -> if (extraAttr.hasKey("potion") && extraAttr.hasKey("potion_level")) {
                     id = "POTION-" + extraAttr.getString("potion")
-                        .toUpperCase(Locale.US) + "-" + extraAttr.getInteger("potion_level") + (if (extraAttr.hasKey("enhanced")) "-ENHANCED" else "") + (if (extraAttr.hasKey(
+                        .uppercase() + "-" + extraAttr.getInteger("potion_level") + (if (extraAttr.hasKey("enhanced")) "-ENHANCED" else "") + (if (extraAttr.hasKey(
                             "extended"
                         )
                     ) "-EXTENDED" else "") + if (extraAttr.hasKey("splash")) "-SPLASH" else ""

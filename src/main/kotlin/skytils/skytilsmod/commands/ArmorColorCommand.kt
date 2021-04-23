@@ -58,7 +58,7 @@ class ArmorColorCommand : CommandBase() {
             player.addChatMessage(ChatComponentText(getCommandUsage(sender)))
             return
         }
-        val subcommand = args[0].toLowerCase(Locale.ENGLISH)
+        val subcommand = args[0].lowercase()
         if (subcommand == "clearall") {
             ArmorColor.armorColors.clear()
             PersistentSave.markDirty(ArmorColor::class)

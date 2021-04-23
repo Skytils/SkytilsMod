@@ -81,7 +81,7 @@ class ColorSet<T : CustomColor?>(private val colors: Array<T>, names: Array<Stri
      */
     fun fromName(name: String?): T? {
         var name = name ?: return null
-        name = name.trim { it <= ' ' }.replace(' ', '_').replace("_", "").toUpperCase(Locale.ROOT)
+        name = name.trim { it <= ' ' }.replace(' ', '_').replace("_", "").uppercase()
         return nameMap.getOrDefault(name, null)
     }
 
@@ -157,7 +157,7 @@ class ColorSet<T : CustomColor?>(private val colors: Array<T>, names: Array<Stri
         assert(colors.size == this.names.size)
         nameMap = HashMap(colors.size)
         for (i in colors.indices) {
-            val name = names[i].trim { it <= ' ' }.replace(' ', '_').toUpperCase(Locale.ROOT)
+            val name = names[i].trim { it <= ' ' }.replace(' ', '_').uppercase()
             nameMap[name.replace("_", "")] = colors[i]
             this.names[i] = name
         }

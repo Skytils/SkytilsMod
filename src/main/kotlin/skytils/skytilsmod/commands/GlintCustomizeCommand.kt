@@ -58,7 +58,7 @@ class GlintCustomizeCommand : CommandBase() {
             throw WrongUsageException(getCommandUsage(sender))
         }
         val originalMessage = java.lang.String.join(" ", *args)
-        val subcommand = args[0].toLowerCase(Locale.ENGLISH)
+        val subcommand = args[0].lowercase()
         if (subcommand == "override") {
             when {
                 originalMessage.contains("on") -> {

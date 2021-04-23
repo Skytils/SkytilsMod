@@ -74,7 +74,7 @@ class BlockAbilityCommand : CommandBase() {
             }
             return
         }
-        val subcommand = args[0].toLowerCase(Locale.ENGLISH)
+        val subcommand = args[0].lowercase()
         if (subcommand == "clearall") {
             BlockAbility.blockedItems.clear()
             PersistentSave.markDirty(BlockAbility::class)

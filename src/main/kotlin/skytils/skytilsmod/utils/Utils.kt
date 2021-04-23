@@ -54,9 +54,9 @@ object Utils {
             try {
                 if (mc.theWorld != null && !mc.isSingleplayer) {
                     if (mc.thePlayer != null && mc.thePlayer.clientBrand != null) {
-                        if (mc.thePlayer.clientBrand.toLowerCase().contains("hypixel")) return true
+                        if (mc.thePlayer.clientBrand.lowercase().contains("hypixel")) return true
                     }
-                    if (mc.currentServerData != null) return mc.currentServerData.serverIP.toLowerCase()
+                    if (mc.currentServerData != null) return mc.currentServerData.serverIP.lowercase()
                         .contains("hypixel")
                 }
                 return false

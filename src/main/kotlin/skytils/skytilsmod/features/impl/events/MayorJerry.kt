@@ -24,6 +24,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.utils.StringUtils
 import skytils.skytilsmod.utils.Utils
+import java.util.*
 import java.util.regex.Pattern
 
 class MayorJerry {
@@ -38,7 +39,7 @@ class MayorJerry {
             val matcher = jerryType.matcher(event.message.formattedText)
             if (matcher.find()) {
                 val color = matcher.group(1)
-                createTitle("§" + color.toUpperCase() + " JERRY!", 60)
+                createTitle("§" + color.uppercase() + " JERRY!", 60)
             }
         }
     }

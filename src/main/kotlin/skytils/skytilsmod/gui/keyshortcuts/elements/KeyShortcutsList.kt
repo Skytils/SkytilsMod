@@ -55,8 +55,8 @@ class KeyShortcutsList(
                 clickedShortcut!!.keyCode = 0
             } else if (keyCode != 0) {
                 clickedShortcut!!.keyCode = keyCode
-            } else if (typedChar.toInt() > 0) {
-                clickedShortcut!!.keyCode = typedChar.toInt() + 256
+            } else if (typedChar.code > 0) {
+                clickedShortcut!!.keyCode = typedChar.code + 256
             }
             clickedShortcut = null
         } else {

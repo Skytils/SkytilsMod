@@ -35,7 +35,7 @@ object ScoreboardUtil {
         val nvString = StringUtils.stripControlCodes(scoreboard).toCharArray()
         val cleaned = StringBuilder()
         for (c in nvString) {
-            if (c.toInt() in 21..126) {
+            if (c.code in 21..126) {
                 cleaned.append(c)
             }
         }

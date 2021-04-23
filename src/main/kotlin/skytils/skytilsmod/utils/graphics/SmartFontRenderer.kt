@@ -342,8 +342,8 @@ class SmartFontRenderer : FontRenderer(
     }
 
     private fun renderChar(ch: Char, italic: Boolean = false): Float {
-        if (ch.toInt() == 160) return 4.0f // forge: display nbsp as space. MC-2595
-        return if (ch.toInt() == 32) {
+        if (ch.code == 160) return 4.0f // forge: display nbsp as space. MC-2595
+        return if (ch.code == 32) {
             4.0f
         } else {
             val i =
@@ -371,8 +371,8 @@ class SmartFontRenderer : FontRenderer(
         private val minecraftColors = MinecraftChatColors.set.asInts()
         private fun decodeCommonColor(character: Char): Int? {
             if (character in '0'..'9') return minecraftColors[character - '0']
-            if (character in 'a'..'f') return minecraftColors[character.toInt() + (10 - 'a'.toInt())]
-            return if (character in 'A'..'F') minecraftColors[character.toInt() + (10 - 'A'.toInt())] else null
+            if (character in 'a'..'f') return minecraftColors[character.code + (10 - 'a'.code)]
+            return if (character in 'A'..'F') minecraftColors[character.code + (10 - 'A'.code)] else null
         }
     }
 }

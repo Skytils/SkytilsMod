@@ -45,7 +45,7 @@ class SelectAllColorSolver {
             if (chestName.startsWith("Select all the")) {
                 var promptColor: String? = null
                 for (color in EnumDyeColor.values()) {
-                    val unlocalized = color.getName().replace("_".toRegex(), " ").toUpperCase(Locale.ENGLISH)
+                    val unlocalized = color.getName().replace("_".toRegex(), " ").uppercase()
                     if (chestName.contains(unlocalized)) {
                         promptColor = color.unlocalizedName
                         break

@@ -44,12 +44,12 @@ abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
     val actualX: Float
         get() {
             val maxX = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
-            return maxX * pos!!.getX()
+            return maxX * pos.getX()
         }
     val actualY: Float
         get() {
             val maxY = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-            return maxY * pos!!.getY()
+            return maxY * pos.getY()
         }
     abstract val height: Int
     abstract val width: Int

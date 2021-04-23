@@ -231,7 +231,7 @@ class SpamHider {
                     2 -> {
                         val blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.matcher(unformatted)
                         if (blessingTypeMatcher.find()) {
-                            lastBlessingType = blessingTypeMatcher.group("blessing").toLowerCase(Locale.ENGLISH)
+                            lastBlessingType = blessingTypeMatcher.group("blessing").lowercase()
                             cancelChatPacket(event, false)
                         }
                     }

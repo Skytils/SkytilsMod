@@ -112,7 +112,7 @@ class AuctionPriceOverlay {
             priceField = GuiTextField(0, fr, width / 2 - 135, height / 2, 270, 20)
             priceField.maxStringLength = 15
             priceField.setValidator { text: String? ->
-                text!!.toLowerCase().replace("[^0-9.kmb]".toRegex(), "").length == text.length
+                text!!.lowercase().replace("[^0-9.kmb]".toRegex(), "").length == text.length
             }
             priceField.isFocused = true
             priceField.text = lastEnteredInput
@@ -306,7 +306,7 @@ class AuctionPriceOverlay {
                     }
                     return null
                 }
-                return input.toLowerCase()
+                return input.lowercase()
             }
 
     }
@@ -331,7 +331,7 @@ class AuctionPriceOverlay {
             val lastAlphabet = value.replace("[^a-zA-Z]*$".toRegex(), "")
                 .replace(".(?!$)".toRegex(), "")
             var multiplier = 1L
-            when (lastAlphabet.toLowerCase()) {
+            when (lastAlphabet.lowercase()) {
                 "k" -> multiplier = 1000L
                 "m" -> multiplier = 1000000L
                 "b" -> multiplier = 1000000000L
@@ -372,7 +372,7 @@ class AuctionPriceOverlay {
             var total = 0.0
             for (enchantName in enchantments.keySet) {
                 val id =
-                    "ENCHANTED_BOOK-" + enchantName.toUpperCase(Locale.US) + "-" + enchantments.getInteger(enchantName)
+                    "ENCHANTED_BOOK-" + enchantName.uppercase() + "-" + enchantments.getInteger(enchantName)
                 val price = AuctionData.lowestBINs[id] ?: continue
                 var npcPrice = Double.MAX_VALUE
                 when (id) {

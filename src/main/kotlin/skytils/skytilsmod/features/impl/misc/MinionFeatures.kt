@@ -116,9 +116,9 @@ class MinionFeatures {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            event.fr!!.drawStringWithShadow(
+            event.fr.drawStringWithShadow(
                 s,
-                (event.x + 17 - event.fr!!.getStringWidth(s)).toFloat(),
+                (event.x + 17 - event.fr.getStringWidth(s)).toFloat(),
                 (event.y + 9).toFloat(),
                 16777215
             )
