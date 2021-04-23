@@ -394,7 +394,7 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookAbbreviation) {
                         var parts = name.split("_")
                         val prefix: String = if (parts[0] == "ultimate") {
-                            "§d" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
+                            "§d§l" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
                         } else {
                             if (parts.size > 1) {
                                 parts.joinToString("") { s -> s.substring(0, 1).uppercase() }

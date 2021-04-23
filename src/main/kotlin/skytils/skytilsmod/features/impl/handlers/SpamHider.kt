@@ -436,7 +436,10 @@ class SpamHider {
             }
 
             // Compact Building Tools
-            if (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains("place") || formatted.contains("zap"))) {
+            if (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
+                    "place"
+                ) || formatted.contains("zap"))
+            ) {
                 if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
                     val chatGui = mc.ingameGUI.chatGUI
                     val lines = (chatGui as AccessorGuiNewChat).chatLines
@@ -484,7 +487,14 @@ class SpamHider {
             }
 
             // Traps
-            if (StringUtils.startsWithAny(formatted, "§r§cThe Tripwire Trap", "§r§cThe Flamethrower", "§r§cThe Arrow Trap", "§r§cThe Crusher")) {
+            if (StringUtils.startsWithAny(
+                    formatted,
+                    "§r§cThe Tripwire Trap",
+                    "§r§cThe Flamethrower",
+                    "§r§cThe Arrow Trap",
+                    "§r§cThe Crusher"
+                )
+            ) {
                 when (Skytils.config.trapDamageHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.trapDamageHider == 2)
                     else -> {
@@ -509,7 +519,7 @@ class SpamHider {
             }
 
             // Wither Essence
-            if (unformatted.contains("unlocked Wither Essence")) {
+            if (formatted.contains("§r§eunlocked §r§dWither Essence §r§8x")) {
                 when (Skytils.config.witherEssenceHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceHider == 2)
                     else -> {
@@ -518,7 +528,7 @@ class SpamHider {
             }
 
             // Undead Essence
-            if (unformatted.contains("unlocked Undead Essence")) {
+            if (unformatted.contains("§r§eunlocked §r§dUndead Essence §r§8x")) {
                 when (Skytils.config.undeadEssenceHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.undeadEssenceHider == 2)
                     else -> {
