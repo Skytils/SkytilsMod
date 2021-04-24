@@ -41,7 +41,6 @@ abstract class ItemProtectStrategy {
 
         fun isAnyWorth(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
             for (strategy in STRATEGIES) {
-                if (strategy !is ItemWorthStrategy) continue
                 if (strategy.toggled() && strategy.worthProtecting(item, extraAttr, type)) {
                     return true
                 }

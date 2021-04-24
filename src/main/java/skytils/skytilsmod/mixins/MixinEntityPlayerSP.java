@@ -22,6 +22,8 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
@@ -31,7 +33,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.events.AddChatMessageEvent;
+import skytils.skytilsmod.events.ItemTossEvent;
 
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
@@ -47,6 +51,17 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             if (MinecraftForge.EVENT_BUS.post(new AddChatMessageEvent(message))) ci.cancel();
         } catch (Throwable e) {
             mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at AddChatMessageEvent. Please report this on the Discord server."));
+            e.printStackTrace();
+        }
+    }
+
+    @Inject(method = "dropOneItem", at = @At("HEAD"), cancellable = true)
+    private void onDropItem(boolean dropAll, CallbackInfoReturnable<EntityItem> cir) {
+        try {
+            ItemStack stack = inventory.getCurrentItem();
+            if (stack != null && MinecraftForge.EVENT_BUS.post(new ItemTossEvent(stack, dropAll))) cir.setReturnValue(null);
+        } catch (Throwable e) {
+            mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at PlayerDropItemEvent. Please report this on the Discord server."));
             e.printStackTrace();
         }
     }

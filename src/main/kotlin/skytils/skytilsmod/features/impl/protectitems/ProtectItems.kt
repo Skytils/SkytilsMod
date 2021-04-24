@@ -24,9 +24,9 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.ItemTossEvent
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
@@ -47,6 +47,21 @@ class ProtectItems {
                     break
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDropItem(event: ItemTossEvent) {
+        if (!Utils.inSkyblock) return
+        if (ItemProtectStrategy.isAnyWorth(
+                event.item,
+                ItemUtil.getExtraAttributes(event.item),
+                ItemProtectStrategy.ProtectType.HOTBARDROPKEY
+            )
+        ) {
+            mc.thePlayer.playSound("note.bass", 1f, 0.5f)
+            mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
+            event.isCanceled = true
         }
     }
 
