@@ -87,7 +87,7 @@ class MiscFeatures {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityCreeper) {
-            val entity = event.entity as EntityCreeper
+            val entity = event.entity
             if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.maxHealth == 20f && entity.health == 20f && entity.powered) {
                 if (mc.theWorld.playerEntities.stream().anyMatch { p: EntityPlayer ->
                         p is EntityOtherPlayerMP && p.getUniqueID()
@@ -100,13 +100,13 @@ class MiscFeatures {
             }
         }
         if (event.entity is EntityFallingBlock) {
-            val entity = event.entity as EntityFallingBlock
+            val entity = event.entity
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.block.block === Blocks.gold_block) {
                 event.isCanceled = true
             }
         }
         if (event.entity is EntityItem) {
-            val entity = event.entity as EntityItem
+            val entity = event.entity
             if (Skytils.config.hideJerryRune) {
                 val item = entity.entityItem
                 if (item.item === Items.spawn_egg && ItemMonsterPlacer.getEntityName(item) == "Villager" && item.displayName == "Spawn Villager" && entity.lifespan == 6000) {
@@ -183,7 +183,7 @@ class MiscFeatures {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val inventory = chest.lowerChestInventory
             val slot = event.slot ?: return
             val item = slot.stack
@@ -209,12 +209,12 @@ class MiscFeatures {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onSlotClickLow(event: SlotClickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.middleClickGUIItems) return
-        if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot!!.hasStack) return
-        val chest = event.container as ContainerChest
+        if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot.hasStack) return
+        val chest = event.container
         if (equalsOneOf(chest.lowerChestInventory.name, "Chest", "Large Chest")) return
         if (startsWithAny(SBInfo.instance.lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil")) return
-        if (event.slot!!.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
-        val item = event.slot!!.stack
+        if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
+        val item = event.slot.stack
         if (getSkyBlockItemID(item) == null) {
             if (startsWithAny(
                     SBInfo.instance.lastOpenContainerName,

@@ -107,10 +107,10 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!Utils.inSkyblock || !highlighting || event.container !is ContainerChest) return
-        val chest = event.container as ContainerChest
+        val chest = event.container
         if (!chest.lowerChestInventory.name.endsWith(") Pets")) return
-        if (event.slot == null || event.slotId < 10 || event.slotId > 43 || !event.slot!!.hasStack) return
-        val item = event.slot!!.stack!!
+        if (event.slot == null || event.slotId < 10 || event.slotId > 43 || !event.slot.hasStack) return
+        val item = event.slot.stack!!
         val petId = getPetIdFromItem(item)
         event.isCanceled = true
         if (favorited.contains(petId)) favorited.remove(petId) else favorited.add(petId)
@@ -120,7 +120,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
     @SubscribeEvent
     fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets || event.container !is ContainerChest) return
-        val chest = event.container as ContainerChest
+        val chest = event.container
         if (!chest.lowerChestInventory.name.endsWith(") Pets")) return
         if (event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || !event.slot.hasStack) return
         val item = event.slot.stack

@@ -105,7 +105,7 @@ class MayorInfo {
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (mayorPerks.size == 0 && (chestName == "Mayor $currentMayor" || chestName.startsWith("Mayor ") && currentMayor == null)) {
                 val slot = event.slot

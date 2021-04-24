@@ -58,7 +58,7 @@ class MinionFeatures {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val inventory = chest.lowerChestInventory
             val slot = event.slot ?: return
             val item = slot.stack

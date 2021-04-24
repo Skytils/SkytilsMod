@@ -53,12 +53,12 @@ class TerminalFeatures {
         if (!Utils.inDungeons) return
         if (!Skytils.config.clickInOrderTerminalSolver && !Skytils.config.selectAllColorTerminalSolver && !Skytils.config.startsWithSequenceTerminalSolver && !Skytils.config.blockIncorrectTerminalClicks) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {
                 event.isCanceled = true
                 if (chestName == "Correct all the panes!" && Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
-                    val item = event.slot!!.stack
+                    val item = event.slot.stack
                     if (item != null) {
                         if (!StringUtils.stripControlCodes(item.displayName).startsWith("Off")) return
                     }

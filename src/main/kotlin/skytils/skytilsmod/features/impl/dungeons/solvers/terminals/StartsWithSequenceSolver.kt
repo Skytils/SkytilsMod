@@ -81,13 +81,13 @@ class StartsWithSequenceSolver {
         if (!Utils.inDungeons) return
         if (!Skytils.config.startsWithSequenceTerminalSolver) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName.startsWith("What starts with:")) {
                 event.isCanceled = true
                 if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
                     if (shouldClick.size > 0) {
-                        if (shouldClick.stream().noneMatch { slotNum: Int -> slotNum == event.slot!!.slotNumber }) {
+                        if (shouldClick.stream().noneMatch { slotNum: Int -> slotNum == event.slot.slotNumber }) {
                             return
                         }
                     }
@@ -103,7 +103,7 @@ class StartsWithSequenceSolver {
         if (!Skytils.config.startsWithSequenceTerminalSolver) return
         if (event.container is ContainerChest) {
             val slot = event.slot
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName.startsWith("What starts with:")) {
                 if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {

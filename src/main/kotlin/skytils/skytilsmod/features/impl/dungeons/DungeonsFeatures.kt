@@ -426,7 +426,7 @@ class DungeonsFeatures {
         if (!Utils.inSkyblock) return
         val slot = event.slot
         if (event.container is ContainerChest) {
-            val cc = event.container as ContainerChest
+            val cc = event.container
             val displayName = cc.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (slot.hasStack) {
                 val item = slot.stack
@@ -475,7 +475,7 @@ class DungeonsFeatures {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (chestName.endsWith(" Chest")) {
                 if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {

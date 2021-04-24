@@ -58,7 +58,7 @@ class PetFeatures {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityArmorStand) {
-            val entity = event.entity as EntityArmorStand
+            val entity = event.entity
             if (Skytils.config.hidePetNametags && entity.customNameTag.contains("§8[§7Lv") && entity.customNameTag.contains(
                     "'s "
                 )

@@ -48,7 +48,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S2APacketParticles) {
-            val packet = event.packet as S2APacketParticles
+            val packet = event.packet
             val type = packet.particleType
             val longDistance = packet.isLongDistance
             val count = packet.particleCount

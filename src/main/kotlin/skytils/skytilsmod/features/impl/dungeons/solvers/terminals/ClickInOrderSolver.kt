@@ -94,7 +94,7 @@ class ClickInOrderSolver {
         if (event.container is ContainerChest) {
             val fr = mc.fontRendererObj
             val slot = event.slot
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName == "Click in order!") {
                 if (slot.hasStack && slot.inventory !== mc.thePlayer.inventory) {
@@ -123,7 +123,7 @@ class ClickInOrderSolver {
         if (!Utils.inDungeons) return
         if (!Skytils.config.clickInOrderTerminalSolver) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName == "Click in order!") {
                 event.isCanceled = true

@@ -83,13 +83,13 @@ class SelectAllColorSolver {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName.startsWith("Select all the")) {
                 event.isCanceled = true
                 if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
                     if (shouldClick.size > 0) {
-                        if (shouldClick.stream().noneMatch { slotNum: Int -> slotNum == event.slot!!.slotNumber }) {
+                        if (shouldClick.stream().noneMatch { slotNum: Int -> slotNum == event.slot.slotNumber }) {
                             return
                         }
                     }
@@ -105,7 +105,7 @@ class SelectAllColorSolver {
         if (!Skytils.config.selectAllColorTerminalSolver) return
         if (event.container is ContainerChest) {
             val slot = event.slot
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName.startsWith("Select all the")) {
                 if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
