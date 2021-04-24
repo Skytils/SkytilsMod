@@ -134,21 +134,23 @@ class UpdateChecker {
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases/latest"
                 )
             val latestTag = latestRelease["tag_name"].asString
-            val currentVersion = DefaultArtifactVersion(Skytils.VERSION)
-            val latestVersion = DefaultArtifactVersion(latestTag.substring(1))
-            if (latestTag.contains("pre") || Skytils.VERSION.contains("pre") && currentVersion.compareTo(latestVersion) >= 0) {
+            val currentTag = Skytils.VERSION
+
+            val currentVersion = DefaultArtifactVersion(currentTag.substringBefore("-"))
+            val latestVersion = DefaultArtifactVersion(latestTag.substringAfter("v").substringBefore("-"))
+            if (latestTag.contains("pre") || (currentTag.contains("pre") && currentVersion >= latestVersion)) {
                 var currentPre = 0.0
                 var latestPre = 0.0
-                if (Skytils.VERSION.contains("pre")) {
-                    currentPre = Skytils.VERSION.substring(Skytils.VERSION.indexOf("pre") + 3).toDouble()
+                if (currentTag.contains("pre")) {
+                    currentPre = currentTag.substringAfter("pre").toDouble()
                 }
                 if (latestTag.contains("pre")) {
-                    latestPre = latestTag.substring(latestTag.indexOf("pre") + 3).toDouble()
+                    latestPre = latestTag.substringAfter("pre").toDouble()
                 }
-                if (latestPre > currentPre || latestPre == 0.0 && currentVersion.compareTo(latestVersion) == 0) {
+                if ((latestPre > currentPre) || (latestPre == 0.0 && currentVersion.compareTo(latestVersion) == 0)) {
                     updateObj = latestRelease
                 }
-            } else if (currentVersion.compareTo(latestVersion) < 0) {
+            } else if (currentVersion < latestVersion) {
                 updateObj = latestRelease
             }
         }
