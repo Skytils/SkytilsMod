@@ -594,6 +594,15 @@ public class Config extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Click to Accept Trapper Task",
+            description = "Open chat, then click anywhere on screen to accept Trapper Task",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    public boolean acceptTrackerTask = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Dark Mode Mist",
             description = "Replaces colors in The Mist with darker variants.\n§cThis requires a chunk reload when toggled (F3+A).",
             category = "Mining",

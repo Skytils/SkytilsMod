@@ -21,6 +21,7 @@ package skytils.skytilsmod.features.impl.misc;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiChat;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemHoe;
@@ -28,7 +29,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.DamageBlockEvent;
 import skytils.skytilsmod.events.PacketEvent;
@@ -37,6 +42,7 @@ import skytils.skytilsmod.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class FarmingFeatures {
 
@@ -108,4 +114,41 @@ public class FarmingFeatures {
         }
     }
 
+    /**
+     * Modified version from Danker's Skyblock Mod, taken under GPL 3.0 license.
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+
+    static String acceptTrapperCommand = "";
+    static boolean commandSent = false;
+
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent event) {
+        String message = StringUtils.stripControlCodes(event.message.getUnformattedText());
+
+        if (!Utils.inSkyblock) return;
+
+        if (message.contains("Click an option:")) {
+            List<IChatComponent> listOfSiblings = event.message.getSiblings();
+            for (IChatComponent sibling : listOfSiblings) {
+                if (sibling.getUnformattedText().contains("[YES]")) {
+                    acceptTrapperCommand = sibling.getChatStyle().getChatClickEvent().getValue();
+                    commandSent = false;
+                }
+            }
+            if (Skytils.config.acceptTrackerTask) Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Open chat then click anywhere on screen to accept task"));
+        }
+    }
+
+    @SubscribeEvent
+    public void onMouseInputPost(GuiScreenEvent.MouseInputEvent.Post event) {
+        if (!Utils.inSkyblock) return;
+        if (Mouse.getEventButton() == 0 && event.gui instanceof GuiChat) {
+            if (Skytils.config.acceptTrackerTask && !commandSent) {
+                Minecraft.getMinecraft().thePlayer.sendChatMessage(acceptTrapperCommand);
+                commandSent = true;
+            }
+        }
+    }
 }
