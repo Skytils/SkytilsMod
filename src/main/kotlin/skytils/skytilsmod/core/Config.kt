@@ -1804,6 +1804,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
 
+        hidePropertyIf(::showGriffinBurrows) {
+            apiKey.isNullOrEmpty()
+        }
+
+        ::showGriffinCountdown dependsOn ::showGriffinBurrows
+        ::particleBurrows dependsOn ::showGriffinBurrows
+        ::showBurrowFastTravel dependsOn ::showGriffinBurrows
+
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
 
