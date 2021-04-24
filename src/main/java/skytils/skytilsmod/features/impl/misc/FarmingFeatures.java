@@ -32,13 +32,16 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.DamageBlockEvent;
 import skytils.skytilsmod.events.PacketEvent;
 import skytils.skytilsmod.utils.StringUtils;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,6 +117,53 @@ public class FarmingFeatures {
         }
     }
 
+    static double trapperStart = -1;
+    static boolean animalFound = false;
+
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!Utils.inSkyblock || !Skytils.config.trapperPing) return;
+        String message = StringUtils.stripControlCodes(event.message.getUnformattedText());
+        if (message.contains("[NPC] Trevor The Trapper: You can find your")) {
+            trapperStart = System.currentTimeMillis();
+            animalFound = false;
+        } else if (message.contains("Return to the Trapper soon to get a new animal to hunt!")) {
+            if ((System.currentTimeMillis() - trapperStart) > 60000) { //1 minute cooldown
+                Utils.playLoudSound("note.pling", 1);
+                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Trapper cooldown has already expired!"));
+                trapperStart = -1;
+            }
+            animalFound = true;
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (!Utils.inSkyblock || !Skytils.config.trapperPing) return;
+        if (trapperStart > 0) {
+            if ((System.currentTimeMillis() - trapperStart) > 60000 && animalFound) { //1 minute cooldown
+                trapperStart = -1;
+                mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Trapper cooldown has now expired!"));
+                new Thread(() -> {
+                    try {
+                        for (int i = 0; i < 5; i++) {
+                            Utils.playLoudSound("note.pling", 1);
+                            Thread.sleep(200);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onWorldChange(WorldEvent.Load event) {
+        trapperStart = -1;
+    }
+
+
     /**
      * Modified version from Danker's Skyblock Mod, taken under GPL 3.0 license.
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
@@ -124,7 +174,7 @@ public class FarmingFeatures {
     static boolean commandSent = false;
 
     @SubscribeEvent
-    public void onChat(ClientChatReceivedEvent event) {
+    public void checkChat(ClientChatReceivedEvent event) {
         String message = StringUtils.stripControlCodes(event.message.getUnformattedText());
 
         if (!Utils.inSkyblock) return;
@@ -137,7 +187,7 @@ public class FarmingFeatures {
                     commandSent = false;
                 }
             }
-            if (Skytils.config.acceptTrackerTask) Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Open chat then click anywhere on screen to accept task"));
+            if (Skytils.config.acceptTrapperTask) mc.thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Open chat then click anywhere on screen to accept task"));
         }
     }
 
@@ -145,7 +195,7 @@ public class FarmingFeatures {
     public void onMouseInputPost(GuiScreenEvent.MouseInputEvent.Post event) {
         if (!Utils.inSkyblock) return;
         if (Mouse.getEventButton() == 0 && event.gui instanceof GuiChat) {
-            if (Skytils.config.acceptTrackerTask && !commandSent) {
+            if (Skytils.config.acceptTrapperTask && !commandSent) {
                 Minecraft.getMinecraft().thePlayer.sendChatMessage(acceptTrapperCommand);
                 commandSent = true;
             }

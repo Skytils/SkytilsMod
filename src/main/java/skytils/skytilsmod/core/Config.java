@@ -595,11 +595,22 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Click to Accept Trapper Task",
-            description = "Open chat, then click anywhere on screen to accept Trapper Task",
+            description = "Open chat, then click anywhere on screen to accept Trapper Task.",
             category = "Farming",
             subcategory = "Quality of Life"
     )
-    public boolean acceptTrackerTask = true;
+
+    public boolean acceptTrapperTask = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Trapper Cooldown Alarm",
+            description = "Quickly plays five notes once the Trapper is off cooldown.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+
+    public boolean trapperPing = false;
 
     @Property(
             type = PropertyType.SWITCH,
