@@ -72,7 +72,7 @@ class ItemFeatures {
             val chest = gui.inventorySlots as ContainerChest
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
-            if (chestName.startsWith("Salvage") || chestName.endsWith("Backpack") || chestName == "Ophelia" || chestName == "Trades") {
+            if (chestName.startsWith("Salvage") || chestName.startsWith("Storage") || chestName == "Ophelia" || chestName == "Trades") {
                 if (Skytils.config.highlightSalvageableItems) {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
@@ -118,8 +118,6 @@ class ItemFeatures {
                             )
                         ) {
                             event.isCanceled = true
-                            if (itemId!!.contains("BACKPACK") && itemId != "JUMBO_BACKPACK_UPGRADE") event.isCanceled =
-                                false
                         }
                     }
                 }
