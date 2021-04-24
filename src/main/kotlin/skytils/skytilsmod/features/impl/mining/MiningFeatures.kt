@@ -37,7 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.DataFetcher.Companion.reloadData
+import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.events.BossBarEvent
@@ -128,7 +128,7 @@ class MiningFeatures {
         if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size == 0) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
-                reloadData()
+                DataFetcher.reloadData()
                 return
             }
             val solution = fetchurItems.keys.stream().filter { s: String? ->

@@ -265,8 +265,8 @@ class GriffinBurrows {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
             if (SBInfo.instance.mode != "hub") return
-            val packet = event.packet as S2APacketParticles?
-            val type = packet!!.particleType
+            val packet = event.packet
+            val type = packet.particleType
             val longDistance = packet.isLongDistance
             val count = packet.particleCount
             val speed = packet.particleSpeed
@@ -446,7 +446,7 @@ class GriffinBurrows {
     enum class FastTravelLocations(var x: Int, var y: Int, var z: Int) {
         CASTLE(-250, 130, 45), CRYPTS(-162, 60, -100), DA(91, 74, 173), HUB(-3, 70, -70);
 
-        var pos: BlockPos
+        var pos: BlockPos = BlockPos(x, y, z)
         val nameWithColor: String
             get() = when (this) {
                 CASTLE -> EnumChatFormatting.GRAY.toString() + "CASTLE"
@@ -454,9 +454,5 @@ class GriffinBurrows {
                 DA -> EnumChatFormatting.DARK_PURPLE.toString() + "DA"
                 HUB -> EnumChatFormatting.WHITE.toString() + "HUB"
             }
-
-        init {
-            pos = BlockPos(x, y, z)
-        }
     }
 }
