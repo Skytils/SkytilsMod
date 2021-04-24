@@ -33,6 +33,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "API",
         hidden = true
     )
+    @JvmField
     var dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"
 
     @Property(
@@ -1805,7 +1806,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
 
         hidePropertyIf(::showGriffinBurrows) {
-            apiKey.isNullOrEmpty()
+            apiKey.isEmpty()
         }
 
         ::showGriffinCountdown dependsOn ::showGriffinBurrows
@@ -1817,7 +1818,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")
-            protectItemBINThreshold = if (numeric.isNullOrEmpty()) "0" else numeric
+            protectItemBINThreshold = if (numeric.isEmpty()) "0" else numeric
         }
     }
 }
