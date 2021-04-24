@@ -25,11 +25,8 @@ import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -41,7 +38,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.GuiContainerEvent.CloseWindowEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
@@ -72,7 +68,7 @@ class ItemFeatures {
             renderRarity(event.slot.stack, event.slot.xDisplayPosition, event.slot.yDisplayPosition)
         }
         if (event.gui is GuiChest) {
-            val gui = event.gui as GuiChest
+            val gui = event.gui
             val chest = gui.inventorySlots as ContainerChest
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
@@ -105,68 +101,15 @@ class ItemFeatures {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: CloseWindowEvent) {
-        if (!Utils.inSkyblock) return
-        if (mc.thePlayer.inventory.itemStack != null) {
-            val item = mc.thePlayer.inventory.itemStack
-            val extraAttr = getExtraAttributes(item)
-            if (Skytils.config.protectStarredItems && extraAttr != null) {
-                if (extraAttr.hasKey("dungeon_item_level")) {
-                    mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
-                    for (slot in event.container.inventorySlots) {
-                        if (slot.inventory !== mc.thePlayer.inventory || slot.hasStack) continue
-                        mc.playerController.windowClick(event.container.windowId, slot.slotNumber, 0, 0, mc.thePlayer)
-                        break
-                    }
-                    return
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            val chest = event.container as ContainerChest
+            val chest = event.container
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
-            if (event.slot != null && event.slot!!.hasStack) {
-                var item: ItemStack = event.slot!!.stack ?: return
+            if (event.slot != null && event.slot.hasStack) {
+                val item: ItemStack = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
-                if (Skytils.config.protectStarredItems && extraAttr != null) {
-                    if (chestName.startsWith("Salvage")) {
-                        var inSalvageGui = false
-                        if (item.displayName.contains("Salvage") || item.displayName.contains("Essence")) {
-                            val salvageItem = inv.getStackInSlot(13) ?: return
-                            item = salvageItem
-                            inSalvageGui = true
-                        }
-                        if (extraAttr.hasKey("dungeon_item_level") && (event.slot!!.inventory === mc.thePlayer.inventory || inSalvageGui)) {
-                            mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                            mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from salvaging that item!"))
-                            event.isCanceled = true
-                            return
-                        }
-                    }
-                    if (chestName != "Large Chest" && !chestName.contains("Auction") && inv.sizeInventory == 54) {
-                        val sellItem = inv.getStackInSlot(49)
-                        if (sellItem != null) {
-                            if (sellItem.item === Item.getItemFromBlock(Blocks.hopper) && sellItem.displayName.contains(
-                                    "Sell Item"
-                                ) || getItemLore(sellItem).stream().anyMatch { s: String -> s.contains("buyback") }
-                            ) {
-                                if (extraAttr.hasKey("dungeon_item_level") && event.slot!!.inventory === mc.thePlayer.inventory && event.slotId != 49) {
-                                    mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from selling that item!"))
-                                    event.isCanceled = true
-                                    return
-                                }
-                            }
-                        }
-                    }
-                }
                 if (Skytils.config.stopClickingNonSalvageable) {
                     val itemId = getSkyBlockItemID(item)
                     if (chestName.startsWith("Salvage") && extraAttr != null) {
@@ -179,30 +122,6 @@ class ItemFeatures {
                                 false
                         }
                     }
-                }
-            }
-        }
-        if (event.slotId == -999 && mc.thePlayer.inventory.itemStack != null && event.clickType != 5) {
-            val item = mc.thePlayer.inventory.itemStack
-            val extraAttr = getExtraAttributes(item)
-            if (Skytils.config.protectStarredItems && extraAttr != null) {
-                if (extraAttr.hasKey("dungeon_item_level")) {
-                    mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
-                    event.isCanceled = true
-                    return
-                }
-            }
-        }
-        if (event.clickType == 4 && event.slotId != -999 && event.slot != null && event.slot!!.hasStack) {
-            val item = event.slot!!.stack
-            val extraAttr = getExtraAttributes(item)
-            if (Skytils.config.protectStarredItems && extraAttr != null) {
-                if (extraAttr.hasKey("dungeon_item_level")) {
-                    mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
-                    event.isCanceled = true
-                    return
                 }
             }
         }
@@ -313,7 +232,7 @@ class ItemFeatures {
         if (!Utils.inSkyblock || mc.theWorld == null) return
         try {
             if (event.packet is S2APacketParticles) {
-                val packet = event.packet as S2APacketParticles
+                val packet = event.packet
                 val type = packet.particleType
                 val longDistance = packet.isLongDistance
                 val count = packet.particleCount

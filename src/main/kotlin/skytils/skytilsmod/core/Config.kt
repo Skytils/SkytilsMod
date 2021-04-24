@@ -1080,6 +1080,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Hide Fishing Hooks",
+        description = "Hides fishing hooks from other players",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    var hideFishingHooks = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Hide Jerry Rune",
         description = "Prevents the game from rendering the items spawned by the Jerry rune.",
         category = "Miscellaneous",
@@ -1181,6 +1190,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
    )*/
     @JvmField
     var prioritizeItemAbilities = false
+
+    // TODO get Sk1er LLC to make a number text box
+    @Property(
+        type = PropertyType.TEXT,
+        name = "Protect Items Above Value",
+        description = "Prevents you from dropping, salvaging, or selling items worth more than this value. Based on Lowest BIN price.",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    var protectItemBINThreshold = "0"
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1353,15 +1372,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "Quality of Life"
     )
     var petItemConfirmation = false
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "Hide Fishing Hooks",
-        description = "Hides fishing hooks from other players",
-        category = "Miscellaneous",
-        subcategory = "Quality of Life"
-    )
-    var hideFishingHooks = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1784,6 +1794,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::betterAuctionPriceInput dependsOn ::fetchLowestBINPrices
         ::dungeonChestProfit dependsOn ::fetchLowestBINPrices
         ::showCoinsPerBit dependsOn ::fetchLowestBINPrices
+        ::protectItemBINThreshold dependsOn ::fetchLowestBINPrices
 
         ::showNextBlaze dependsOn ::blazeSolver
         ::lowestBlazeColor dependsOn ::blazeSolver
@@ -1795,5 +1806,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
+
+        registerListener(::protectItemBINThreshold) {
+            val numeric = it.replace(Regex("[^0-9]"), "")
+            protectItemBINThreshold = if (numeric.isNullOrEmpty()) "0" else numeric
+        }
     }
 }
