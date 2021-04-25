@@ -49,7 +49,7 @@ import java.util.regex.Pattern
 class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers"), "mythological.json")) {
 
     private val rareDugDrop: Pattern = Pattern.compile("^RARE DROP! You dug out a (.+)!$")
-    private val mythCreatureDug = Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger)! You dug out (?:a )?(.+)!$")
+    private val mythCreatureDug = Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
 
     @Suppress("UNUSED")
     enum class BurrowDrop(
@@ -60,12 +60,12 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         var droppedTimes: Long = 0L
     ) {
         REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
+        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
         COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
         PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC),
         COG("CROWN_OF_GREED", "Crown of Greed", ItemRarity.LEGENDARY, true),
         STICK("DAEDALUS_STICK", "Daedalus Stick", ItemRarity.LEGENDARY, true),
         SHELMET("DWARF_TURTLE_SHELMET", "Dwarf Turtle Shelmet", ItemRarity.RARE),
-        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
         FEATHER("GRIFFIN_FEATHER", "Griffin Feather", ItemRarity.RARE, isChat = true),
         RELIC("MINOS_RELIC", "Minos Relic", ItemRarity.EPIC),
         WASHED("WASHED_UP_SOUVENIR", "Washed-up Souvenir", ItemRarity.LEGENDARY, true);
@@ -125,7 +125,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                 } else if (unformatted.contains("! You dug out ")) {
                     val matcher = mythCreatureDug.matcher(unformatted)
                     if (matcher.matches()) {
-                        (BurrowMob.getFromName(matcher.group(1)) ?: return).dugTimes++;
+                        (BurrowMob.getFromName(matcher.group(1)) ?: return).dugTimes++
                         markDirty(this::class)
                     }
                 } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
