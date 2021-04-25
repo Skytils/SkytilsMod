@@ -37,11 +37,11 @@ class MayorInfo {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (ticks % 100 == 0) {
+        if (ticks % (60*20) == 0) {
             if (System.currentTimeMillis() - lastFetchedMayorData > 24 * 60 * 60 * 1000 || isLocal) {
                 fetchMayorData()
             }
-            if (System.currentTimeMillis() - lastCheckedElectionOver > 24 * 60 * 60 * 1000) {
+            if (System.currentTimeMillis() - lastCheckedElectionOver > 60 * 60 * 1000) {
                 var elected = currentMayor
                 for (pi in TabListUtils.tabEntries) {
                     val name = mc.ingameGUI.tabList.getPlayerName(pi)
@@ -107,7 +107,7 @@ class MayorInfo {
         if (event.container is ContainerChest) {
             val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (mayorPerks.size == 0 && (chestName == "Mayor $currentMayor" || chestName.startsWith("Mayor ") && currentMayor == null)) {
+            if ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith("Mayor ") && (currentMayor == null || isLocal))) {
                 val slot = event.slot
                 val item = slot.stack
                 if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || currentMayor == null && item.displayName.contains(
@@ -144,8 +144,9 @@ class MayorInfo {
         var isLocal = true
         private val mc = Minecraft.getMinecraft()
         private var ticks = 0
-        private var lastCheckedElectionOver: Long = 0
-        private var lastFetchedMayorData: Long = 0
+        private var lastCheckedElectionOver = 0L
+        private var lastFetchedMayorData = 0L
+        private var lastSentData = 0L
         const val baseURL = "https://sbe-stole-skytils.design/api/mayor"
         fun fetchMayorData() {
             Thread({
@@ -165,6 +166,7 @@ class MayorInfo {
 
         fun sendMayorData(mayor: String?, perks: HashSet<String>) {
             if (mayor == null || perks.size == 0) return
+            if (lastSentData - System.currentTimeMillis() < 300_000) lastSentData = System.currentTimeMillis()
             Thread({
                 try {
                     val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
