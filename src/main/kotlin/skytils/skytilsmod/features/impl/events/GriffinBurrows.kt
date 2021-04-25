@@ -26,6 +26,7 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -125,7 +126,7 @@ class GriffinBurrows {
         val player = mc.thePlayer
         if (event.phase != TickEvent.Phase.START || SBInfo.instance.mode != "hub") return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
-        if (burrowRefreshTimer.time >= 60000 || shouldRefreshBurrows) {
+        if (burrowRefreshTimer.time >= 90_000 || shouldRefreshBurrows) {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             if (Skytils.config.showGriffinBurrows && Utils.inSkyblock && player != null) {
@@ -185,6 +186,26 @@ class GriffinBurrows {
     }
 
     @SubscribeEvent
+    fun onInteract(event: PlayerInteractEvent) {
+        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
+        if (mc.theWorld == null || mc.thePlayer == null) return
+        val blockState = mc.theWorld.getBlockState(event.pos)
+        val item = mc.thePlayer.heldItem
+        if (Utils.inSkyblock) {
+            if (Skytils.config.showGriffinBurrows && item != null) {
+                if (item.displayName.contains("Ancestral Spade") && blockState.block === Blocks.grass) {
+                    if (burrows.any { burrow: Burrow -> burrow.blockPos == event.pos }) {
+                        lastDugBurrow = event.pos
+                    }
+                    if (particleBurrows.any { pb: ParticleBurrow? -> pb!!.blockPos == event.pos }) {
+                        lastDugParticleBurrow = event.pos
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.showGriffinBurrows && burrows.size > 0) {
             for (burrow in burrows.toTypedArray()) {
@@ -213,7 +234,7 @@ class GriffinBurrows {
                 for (i in 0..7) {
                     val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
                     if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        val diff = ((60000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
+                        val diff = ((90_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
                         val sr = ScaledResolution(Minecraft.getMinecraft())
                         val leftAlign = actualX < sr.scaledWidth / 2f
                         val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -283,7 +304,7 @@ class GriffinBurrows {
                 type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
             if (longDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
                 if (burrows.none { b: Burrow -> b.blockPos == pos } && dugBurrows.none { b: BlockPos? -> b == pos }) {
-                    var burrow = particleBurrows.find { b: ParticleBurrow? -> b!!.blockPos == pos }
+                    var burrow = particleBurrows.find { b: ParticleBurrow -> b.blockPos == pos }
                     if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
                     if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
                     for (existingBurrow in burrows) {
