@@ -135,6 +135,7 @@ class Skytils {
             throw RuntimeException("Skytils can't run on this Minecraft Forge version! Please use the latest Forge build 2318 for 1.8.9.")
         }
         if (!modDir.exists()) modDir.mkdirs()
+        File(modDir, "trackers").mkdirs()
         GUIMANAGER = GuiManager()
         jarFile = event.sourceFile
     }

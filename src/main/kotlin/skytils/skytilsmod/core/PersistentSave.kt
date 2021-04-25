@@ -47,7 +47,6 @@ abstract class PersistentSave(val saveFile: File, val interval: Long = 30_000) {
             }
         } catch (e: Exception) {
             try {
-                this.saveFile.mkdirs()
                 FileWriter(this.saveFile).use { writer ->
                     setDefault(writer)
                 }

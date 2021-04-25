@@ -155,6 +155,10 @@ shadowJar {
     exclude "META-INF/maven/**"
     exclude "META-INF/versions/**"
     exclude "META-INF/com.android.tools/**"
+
+    exclude '**/*.kotlin_metadata'
+    exclude '**/*.kotlin_module'
+    exclude '**/*.kotlin_builtins'
 }
 
 processResources {

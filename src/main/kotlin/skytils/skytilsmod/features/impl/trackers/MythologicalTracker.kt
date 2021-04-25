@@ -19,18 +19,25 @@
 package skytils.skytilsmod.features.impl.trackers
 
 import com.google.gson.JsonObject
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.core.structure.FloatPair
+import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.ItemRarity
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.StringUtils
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -43,8 +50,6 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     private val rareDugDrop: Pattern = Pattern.compile("^RARE DROP! You dug out a (.+)!$")
     private val mythCreatureDug = Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger)! You dug out (?:a )?(.+)!$")
-
-    var burrowsDug = 0L
 
     @Suppress("UNUSED")
     enum class BurrowDrop(
@@ -104,7 +109,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
-        if (!Utils.inSkyblock || !Skytils.config.trackMythEvent) return
+        if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
         when (event.packet) {
             is S02PacketChat -> {
                 if (event.packet.type == 2.toByte()) return
@@ -123,7 +128,10 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                         (BurrowMob.getFromName(matcher.group(1)) ?: return).dugTimes++;
                         markDirty(this::class)
                     }
-                } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith("You finished the Griffin burrow chain! (4"))) {
+                } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
+                        "You finished the Griffin burrow chain! (4"
+                    ))
+                ) {
                     burrowsDug++
                     markDirty(this::class)
                 }
@@ -184,21 +192,85 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
     }
 
     override fun setDefault(writer: FileWriter) {
-        val obj = JsonObject()
-
-        obj.addProperty("dug", burrowsDug)
-
-        val itemObj = JsonObject()
-        for (item in BurrowDrop.values()) {
-            itemObj.addProperty(item.itemId, item.droppedTimes)
-        }
-        obj.add("items", itemObj)
-
-        val mobObj = JsonObject()
-        for (mob in BurrowMob.values()) {
-            itemObj.addProperty(mob.modId, mob.dugTimes)
-        }
-        obj.add("mobs", mobObj)
-        gson.toJson(obj, writer)
+        write(writer)
     }
+
+    companion object {
+        var burrowsDug = 0L
+
+        init {
+            MythologicalTrackerElement()
+        }
+    }
+
+    class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock) {
+                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                val alignment =
+                    if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+
+                ScreenRenderer.fontRenderer.drawString(
+                    "Burrows Dug§f: $burrowsDug",
+                    if (leftAlign) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.YELLOW,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+                var drawnLines = 1
+                for (mob in BurrowMob.values()) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${mob.mobName}§f: ${mob.dugTimes}",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.CYAN,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
+                }
+                for (item in BurrowDrop.values()) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.CYAN,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val alignment =
+                if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Mythological Tracker",
+                if (leftAlign) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Mythological Tracker")
+
+        override val toggled: Boolean
+            get() = Skytils.config.trackMythEvent
+
+        init {
+            Skytils.GUIMANAGER.registerElement(this)
+        }
+    }
+
 }
