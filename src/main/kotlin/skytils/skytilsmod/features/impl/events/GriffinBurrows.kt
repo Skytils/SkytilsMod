@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.events
 
-import com.google.common.collect.ImmutableList
 import com.google.gson.JsonElement
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -191,13 +190,11 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.showGriffinBurrows && burrows.size > 0) {
-            val burrows: List<Burrow> = ImmutableList.copyOf(burrows)
-            for (burrow in burrows) {
+            for (burrow in burrows.toTypedArray()) {
                 burrow.drawWaypoint(event.partialTicks)
             }
-            val particleBurrows: List<ParticleBurrow?> = ImmutableList.copyOf(particleBurrows)
-            for (pb in particleBurrows) {
-                if (pb!!.hasEnchant && pb.hasFootstep && pb.type != -1) {
+            for (pb in particleBurrows.toTypedArray()) {
+                if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
                     pb.drawWaypoint(event.partialTicks)
                 }
             }
@@ -402,14 +399,13 @@ class GriffinBurrows {
                     2, 3 -> type = EnumChatFormatting.GOLD.toString() + "Treasure"
                 }
                 var closest: FastTravelLocations? = null
-                if (Skytils.config.showBurrowFastTravel) {
-                    var distance = mc.thePlayer.position.distanceSq(blockPos)
-                    for (warp in FastTravelLocations.values()) {
-                        val warpDistance = blockPos.distanceSq(warp.pos)
-                        if (warpDistance < distance) {
-                            distance = warpDistance
-                            closest = warp
-                        }
+                var distance = mc.thePlayer.position.distanceSq(blockPos)
+                for (warp in FastTravelLocations.values()) {
+                    if (!warp.toggled) continue
+                    val warpDistance = blockPos.distanceSq(warp.pos)
+                    if (warpDistance < distance) {
+                        distance = warpDistance
+                        closest = warp
                     }
                 }
                 return String.format(
@@ -443,10 +439,23 @@ class GriffinBurrows {
         }
     }
 
-    enum class FastTravelLocations(var x: Int, var y: Int, var z: Int) {
-        CASTLE(-250, 130, 45), CRYPTS(-162, 60, -100), DA(91, 74, 173), HUB(-3, 70, -70);
+    enum class FastTravelLocations(val pos: BlockPos) {
+        CASTLE(BlockPos(-250, 130, 45)), CRYPTS(
+            BlockPos(-162, 60, -100)
+        ),
+        DA(BlockPos(91, 74, 173)), HUB(
+            BlockPos(-3, 70, -70)
+        );
 
-        var pos: BlockPos = BlockPos(x, y, z)
+        val toggled: Boolean
+            get() {
+                if (this == CASTLE) return Skytils.config.burrowCastleFastTravel
+                if (this == CRYPTS) return Skytils.config.burrowCryptsFastTravel
+                if (this == DA) return Skytils.config.burrowDarkAuctionFastTravel
+                if (this == HUB) return Skytils.config.burrowHubFastTravel
+                return false
+            }
+
         val nameWithColor: String
             get() = when (this) {
                 CASTLE -> EnumChatFormatting.GRAY.toString() + "CASTLE"

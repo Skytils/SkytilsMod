@@ -60,6 +60,7 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
+import skytils.skytilsmod.features.impl.trackers.MythologicalTracker
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
@@ -180,6 +181,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MiningFeatures())
         MinecraftForge.EVENT_BUS.register(MinionFeatures())
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
+        MinecraftForge.EVENT_BUS.register(MythologicalTracker())
         MinecraftForge.EVENT_BUS.register(PetFeatures())
         MinecraftForge.EVENT_BUS.register(ProtectItems())
         MinecraftForge.EVENT_BUS.register(RainTimer())

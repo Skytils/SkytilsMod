@@ -613,14 +613,60 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var showGriffinCountdown = false
 
+
     @Property(
-        type = PropertyType.SWITCH,
-        name = "Show Fast-Travel Addon",
-        description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Castle",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Castle warp.",
         category = "Events",
         subcategory = "Mythological"
     )
-    var showBurrowFastTravel = false
+    var burrowCastleFastTravel = false
+
+    @Property(
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Crypts",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Crypts warp.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var burrowCryptsFastTravel = false
+
+    @Property(
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Dark Auction",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the DA warp.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var burrowDarkAuctionFastTravel = false
+
+    @Property(
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Hub",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Hub warp.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var burrowHubFastTravel = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Broadcast Rare Drop Notifications",
+        description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var broadcastMythCreatureDrop = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Track Mythological Creature Drops",
+        description = "Tracks and saves drops from Mythological Creatures.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var trackMythCreatureDrops = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1811,7 +1857,11 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
         ::showGriffinCountdown dependsOn ::showGriffinBurrows
         ::particleBurrows dependsOn ::showGriffinBurrows
-        ::showBurrowFastTravel dependsOn ::showGriffinBurrows
+
+        ::burrowCastleFastTravel dependsOn ::showGriffinBurrows
+        ::burrowCryptsFastTravel dependsOn ::showGriffinBurrows
+        ::burrowDarkAuctionFastTravel dependsOn ::showGriffinBurrows
+        ::burrowHubFastTravel dependsOn ::showGriffinBurrows
 
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
