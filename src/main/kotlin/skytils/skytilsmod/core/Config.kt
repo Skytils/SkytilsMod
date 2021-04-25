@@ -695,6 +695,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var hideFarmingRNGTitles = false
 
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Hungry Hiker Solver",
+        description = "Tells you what item the Hungry Hiker wants.",
+        category = "Mining",
+        subcategory = "Solvers"
+    )
+    var hungryHikerSolver = false
+
     /* @Property(
    type = PropertyType.SWITCH,
    name = "Prevent Breaking Farms",

@@ -95,7 +95,7 @@ class FarmingFeatures {
         val formatted = event.message.formattedText
         val unformatted = stripControlCodes(event.message.unformattedText)
 
-        if (Skytils.config.fetchurSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
+        if (Skytils.config.hungryHikerSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
             if (hungerHikerItems.size == 0) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
                 DataFetcher.reloadData()
