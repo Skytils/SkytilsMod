@@ -253,7 +253,7 @@ class WaterBoardSolver {
                         )
                     }
                 }
-                if (leverStates.entries.stream().allMatch { (key, value) ->
+                if (leverStates.entries.all { (key, value) ->
                         value && solution.contains(key) || !value && !solution.contains(
                             key
                         )

@@ -52,7 +52,7 @@ import kotlin.math.roundToInt
 class GriffinBurrows {
     companion object {
         var burrows = ArrayList<Burrow>()
-        var dugBurrows = ArrayList<BlockPos?>()
+        var dugBurrows = ArrayList<BlockPos>()
         var lastDugBurrow: BlockPos? = null
         var particleBurrows = ArrayList<ParticleBurrow>()
         var lastDugParticleBurrow: BlockPos? = null
@@ -95,15 +95,14 @@ class GriffinBurrows {
                     val burrow = Burrow(x, y, z, type, tier, chain)
                     receivedBurrows.add(burrow)
                 })
-                dugBurrows.removeIf { dug: BlockPos? ->
-                    receivedBurrows.stream().noneMatch { burrow: Burrow -> burrow.blockPos == dug }
+                dugBurrows.removeIf { dug: BlockPos ->
+                    receivedBurrows.none { burrow: Burrow -> burrow.blockPos == dug }
                 }
                 particleBurrows.removeIf { pb: ParticleBurrow? ->
-                    receivedBurrows.stream().anyMatch { rb: Burrow -> rb.blockPos == pb!!.blockPos }
+                    receivedBurrows.any { rb: Burrow -> rb.blockPos == pb!!.blockPos }
                 }
                 val removedDupes = receivedBurrows.removeIf { burrow: Burrow ->
-                    dugBurrows.contains(burrow.blockPos) || particleBurrows.stream()
-                        .anyMatch { pb: ParticleBurrow? -> pb!!.dug && pb.blockPos == burrow.blockPos }
+                    dugBurrows.contains(burrow.blockPos) || particleBurrows.any { pb: ParticleBurrow -> pb.dug && pb.blockPos == burrow.blockPos }
                 }
                 burrows.clear()
                 burrows.addAll(receivedBurrows)
@@ -149,17 +148,16 @@ class GriffinBurrows {
                     )
         ) {
             if (lastDugBurrow != null) {
-                dugBurrows.add(lastDugBurrow)
+                dugBurrows.add(lastDugBurrow!!)
                 burrows.removeIf { burrow: Burrow -> burrow.blockPos == lastDugBurrow }
                 lastDugBurrow = null
             }
             if (lastDugParticleBurrow != null) {
                 val particleBurrow =
-                    particleBurrows.stream().filter { pb: ParticleBurrow? -> pb!!.blockPos == lastDugParticleBurrow }
-                        .findFirst().orElse(null)
+                    particleBurrows.find { pb: ParticleBurrow? -> pb!!.blockPos == lastDugParticleBurrow }
                 if (particleBurrow != null) {
                     particleBurrow.dug = true
-                    dugBurrows.add(lastDugParticleBurrow)
+                    dugBurrows.add(lastDugParticleBurrow!!)
                     particleBurrows.remove(particleBurrow)
                     lastDugParticleBurrow = null
                 }
@@ -175,10 +173,10 @@ class GriffinBurrows {
         if (Utils.inSkyblock) {
             if (Skytils.config.showGriffinBurrows && item != null) {
                 if (item.displayName.contains("Ancestral Spade") && blockState.block === Blocks.grass) {
-                    if (burrows.stream().anyMatch { burrow: Burrow -> burrow.blockPos == event.pos }) {
+                    if (burrows.any { burrow: Burrow -> burrow.blockPos == event.pos }) {
                         lastDugBurrow = event.pos
                     }
-                    if (particleBurrows.stream().anyMatch { pb: ParticleBurrow? -> pb!!.blockPos == event.pos }) {
+                    if (particleBurrows.any { pb: ParticleBurrow? -> pb!!.blockPos == event.pos }) {
                         lastDugParticleBurrow = event.pos
                     }
                 }
@@ -284,15 +282,14 @@ class GriffinBurrows {
             val treasureFilter =
                 type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
             if (longDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
-                if (burrows.stream().noneMatch { b: Burrow -> b.blockPos == pos } && dugBurrows.stream()
-                        .noneMatch { b: BlockPos? -> b == pos }) {
-                    val burrow = particleBurrows.stream().filter { b: ParticleBurrow? -> b!!.blockPos == pos }
-                        .findFirst().orElse(ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1))
+                if (burrows.none { b: Burrow -> b.blockPos == pos } && dugBurrows.none { b: BlockPos? -> b == pos }) {
+                    var burrow = particleBurrows.find { b: ParticleBurrow? -> b!!.blockPos == pos }
+                    if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
                     if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
                     for (existingBurrow in burrows) {
                         if (existingBurrow.blockPos.distanceSq(x, y, z) < 4) return
                     }
-                    if (!burrow!!.hasFootstep && footstepFilter) {
+                    if (!burrow.hasFootstep && footstepFilter) {
                         burrow.hasFootstep = true
                     } else if (!burrow.hasEnchant && enchantFilter) {
                         burrow.hasEnchant = true

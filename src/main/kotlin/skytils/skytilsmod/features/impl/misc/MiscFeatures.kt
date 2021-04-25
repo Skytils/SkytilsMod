@@ -89,7 +89,7 @@ class MiscFeatures {
         if (event.entity is EntityCreeper) {
             val entity = event.entity
             if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.maxHealth == 20f && entity.health == 20f && entity.powered) {
-                if (mc.theWorld.playerEntities.stream().anyMatch { p: EntityPlayer ->
+                if (mc.theWorld.playerEntities.any { p: EntityPlayer ->
                         p is EntityOtherPlayerMP && p.getUniqueID()
                             .version() == 2 && p.getHealth() == 20f && !p.isPlayerSleeping() && p.getDistanceSqToEntity(
                             event.entity

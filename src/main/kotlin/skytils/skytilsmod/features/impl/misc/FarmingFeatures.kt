@@ -93,7 +93,7 @@ class FarmingFeatures {
         if (!Utils.inSkyblock) return
 
         val formatted = event.message.formattedText
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = stripControlCodes(event.message.unformattedText)
 
         if (Skytils.config.fetchurSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
             if (hungerHikerItems.size == 0) {
@@ -101,11 +101,11 @@ class FarmingFeatures {
                 DataFetcher.reloadData()
                 return
             }
-            val solution = hungerHikerItems.keys.stream().filter { s: String ->
+            val solution = hungerHikerItems.getOrDefault(hungerHikerItems.keys.find { s: String ->
                 unformatted.contains(
                     s
                 )
-            }.findFirst().map { key: String -> hungerHikerItems[key] }.orElse(null)
+            }, null)
             Thread {
                 try {
                     Thread.sleep(200)

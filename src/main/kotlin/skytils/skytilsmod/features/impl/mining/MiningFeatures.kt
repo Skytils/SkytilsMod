@@ -100,9 +100,7 @@ class MiningFeatures {
                     "▲"
                 ) && !unformatted.contains("◀") && !unformatted.contains("▼")
             ) return
-            if (ScoreboardUtil.sidebarLines.stream()
-                    .anyMatch { line: String? -> ScoreboardUtil.cleanSB(line).contains("Dwarven Mines") }
-            ) {
+            if (SBInfo.instance.mode == "mining_3") {
                 puzzlerSolution = BlockPos(181, 195, 135)
                 val msg = unformatted.substring(15).trim { it <= ' ' }
                 val matcher = Pattern.compile("([▶▲◀▼]+)").matcher(unformatted)
@@ -131,11 +129,11 @@ class MiningFeatures {
                 DataFetcher.reloadData()
                 return
             }
-            val solution = fetchurItems.keys.stream().filter { s: String? ->
+            val solution = fetchurItems.getOrDefault(fetchurItems.keys.find { s: String ->
                 unformatted.contains(
-                    s!!
+                    s
                 )
-            }.findFirst().map { key: String -> fetchurItems[key] }.orElse(null)
+            }, null)
             Thread {
                 try {
                     Thread.sleep(2500)

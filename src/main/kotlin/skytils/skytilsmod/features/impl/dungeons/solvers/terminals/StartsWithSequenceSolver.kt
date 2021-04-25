@@ -87,7 +87,7 @@ class StartsWithSequenceSolver {
                 event.isCanceled = true
                 if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
                     if (shouldClick.size > 0) {
-                        if (shouldClick.stream().noneMatch { slotNum: Int -> slotNum == event.slot.slotNumber }) {
+                        if (shouldClick.none { slotNum: Int -> slotNum == event.slot.slotNumber }) {
                             return
                         }
                     }

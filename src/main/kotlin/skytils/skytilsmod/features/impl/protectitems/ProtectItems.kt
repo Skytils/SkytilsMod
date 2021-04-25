@@ -100,7 +100,7 @@ class ProtectItems {
                     if (sellItem != null) {
                         if (sellItem.item === Item.getItemFromBlock(Blocks.hopper) && sellItem.displayName.contains(
                                 "Sell Item"
-                            ) || ItemUtil.getItemLore(sellItem).stream().anyMatch { s: String -> s.contains("buyback") }
+                            ) || ItemUtil.getItemLore(sellItem).any { s: String -> s.contains("buyback") }
                         ) {
                             if (event.slotId != 49 && event.slot.inventory === mc.thePlayer.inventory && ItemProtectStrategy.isAnyWorth(
                                     item,
