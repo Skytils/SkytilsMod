@@ -661,12 +661,12 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
-        name = "Track Mythological Creature Drops",
+        name = "Track Mythological Creatures",
         description = "Tracks and saves drops from Mythological Creatures.",
         category = "Events",
         subcategory = "Mythological"
     )
-    var trackMythCreatureDrops = false
+    var trackMythEvent = false
 
     @Property(
         type = PropertyType.SWITCH,
