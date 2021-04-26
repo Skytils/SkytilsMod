@@ -23,12 +23,15 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.events.RenderHUDEvent
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
@@ -73,6 +76,19 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
         if (Skytils.usingLabymod && Minecraft.getMinecraft().ingameGUI !is GuiIngameForge) return
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
+    }
+
+    // LabyMod Support
+    @SubscribeEvent
+    fun renderPlayerInfoLabyMod(event: RenderGameOverlayEvent) {
+        if (!Skytils.usingLabymod) return
+        if (event.type != null) return
+        MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onRenderHUD(event: RenderHUDEvent) {
         if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
         for ((_, element) in Companion.elements) {
             try {
@@ -85,23 +101,7 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
                 ex.printStackTrace()
             }
         }
-        renderTitles(event.resolution)
-    }
-
-    // LabyMod Support
-    @SubscribeEvent
-    fun renderPlayerInfoLabyMod(event: RenderGameOverlayEvent) {
-        if (!Skytils.usingLabymod) return
-        if (event.type != null) return
-        if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
-        for ((_, value) in Companion.elements) {
-            try {
-                value.render()
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-        renderTitles(event.resolution)
+        renderTitles(event.event.resolution)
     }
 
     @SubscribeEvent

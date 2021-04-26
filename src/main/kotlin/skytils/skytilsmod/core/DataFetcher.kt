@@ -22,8 +22,9 @@ import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
+import skytils.skytilsmod.features.impl.farming.FarmingFeatures
+import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
-import skytils.skytilsmod.features.impl.misc.FarmingFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
@@ -44,6 +45,11 @@ object DataFetcher {
             val threeWeirdosSolutions = APIUtil.getArrayResponse(dataUrl + "solvers/threeweirdos.json")
             for (solution in threeWeirdosSolutions) {
                 ThreeWeirdosSolver.solutions.add(solution.asString)
+            }
+            val treasureData = APIUtil.getJSONResponse(dataUrl + "solvers/treasurehunter.json")
+            for ((key, value) in treasureData.entrySet()) {
+                val parts = value.asString.split(",").map { it.toDouble() }
+                TreasureHunter.treasureHunterLocations[key] = BlockPos(parts[0], parts[1], parts[2])
             }
             val triviaData = APIUtil.getJSONResponse(dataUrl + "solvers/oruotrivia.json")
             for ((key, value) in triviaData.entrySet()) {

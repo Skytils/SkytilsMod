@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.features.impl.misc
+package skytils.skytilsmod.features.impl.farming
 
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -30,8 +30,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.features.impl.mining.MiningFeatures
-import skytils.skytilsmod.utils.StringUtils
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import java.util.*
@@ -90,13 +88,13 @@ class FarmingFeatures {
 
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
 
         val formatted = event.message.formattedText
         val unformatted = stripControlCodes(event.message.unformattedText)
 
         if (Skytils.config.hungryHikerSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
-            if (hungerHikerItems.size == 0) {
+            if (hungerHikerItems.isEmpty()) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
                 DataFetcher.reloadData()
                 return

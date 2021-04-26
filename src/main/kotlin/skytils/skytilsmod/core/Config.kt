@@ -699,10 +699,19 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         type = PropertyType.SWITCH,
         name = "Hungry Hiker Solver",
         description = "Tells you what item the Hungry Hiker wants.",
-        category = "Mining",
+        category = "Farming",
         subcategory = "Solvers"
     )
     var hungryHikerSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Treasure Hunter Solver",
+        description = "Tells you where the Treasure Hunter's treasure is.",
+        category = "Farming",
+        subcategory = "Solvers"
+    )
+    var treasureHunterSolver = false
 
     /* @Property(
    type = PropertyType.SWITCH,

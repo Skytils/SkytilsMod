@@ -160,7 +160,7 @@ class MayorInfo {
                     mayorPerks.clear()
                     val perks = res["perks"].asJsonArray
                     for (i in 0 until perks.size()) {
-                        mayorPerks.add(perks[i].asString)
+                        mayorPerks.add(perks[i].asJsonObject.get("name").asString)
                     }
                 }
             }, "Skytils-FetchMayor").start()
