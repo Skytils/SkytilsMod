@@ -207,13 +207,17 @@ class GriffinBurrows {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (Skytils.config.showGriffinBurrows && burrows.size > 0) {
-            for (burrow in burrows.toTypedArray()) {
-                burrow.drawWaypoint(event.partialTicks)
+        if (Skytils.config.showGriffinBurrows) {
+            if (burrows.isNotEmpty()) {
+                for (burrow in burrows.toTypedArray()) {
+                    burrow.drawWaypoint(event.partialTicks)
+                }
             }
-            for (pb in particleBurrows.toTypedArray()) {
-                if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
-                    pb.drawWaypoint(event.partialTicks)
+            if (Skytils.config.particleBurrows && particleBurrows.isNotEmpty()) {
+                for (pb in particleBurrows.toTypedArray()) {
+                    if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
+                        pb.drawWaypoint(event.partialTicks)
+                    }
                 }
             }
         }
@@ -303,13 +307,13 @@ class GriffinBurrows {
             val treasureFilter =
                 type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
             if (longDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
-                if (burrows.none { b: Burrow -> b.blockPos == pos } && dugBurrows.none { b: BlockPos? -> b == pos }) {
-                    var burrow = particleBurrows.find { b: ParticleBurrow -> b.blockPos == pos }
-                    if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
-                    if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
+                if (burrows.none { b: Burrow -> b.blockPos == pos } && dugBurrows.none { b: BlockPos -> b == pos }) {
                     for (existingBurrow in burrows) {
                         if (existingBurrow.blockPos.distanceSq(x, y, z) < 4) return
                     }
+                    var burrow = particleBurrows.find { b: ParticleBurrow -> b.blockPos == pos }
+                    if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+                    if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
                     if (!burrow.hasFootstep && footstepFilter) {
                         burrow.hasFootstep = true
                     } else if (!burrow.hasEnchant && enchantFilter) {
