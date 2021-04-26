@@ -72,7 +72,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
     @SubscribeEvent
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.instance.mode != "combat_1") return
+        if (SBInfo.instance.mode != SBInfo.SkyblockIslands.SPIDERDEN.mode) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
             val packet = event.packet as C08PacketPlayerBlockPlacement?
             if (relicLocations.contains(packet!!.position)) {
@@ -86,7 +86,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.instance.mode != "combat_1") return
+        if (SBInfo.instance.mode != SBInfo.SkyblockIslands.SPIDERDEN.mode) return
         val viewer = Minecraft.getMinecraft().renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
         val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks

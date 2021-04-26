@@ -35,7 +35,7 @@ class DarkModeMist {
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
         if (!Utils.inSkyblock || !Skytils.config.darkModeMist) return
         val state = event.state
-        if (SBInfo.instance.mode == "mining_3" && event.state != null && event.pos != null) {
+        if (SBInfo.instance.mode == SBInfo.SkyblockIslands.DWARVENMINES.mode && event.state != null && event.pos != null) {
             if ((event.pos as BlockPos).y <= 76) {
                 if ((state as IBlockState).block === Blocks.stained_glass && (state as IBlockState).getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE) {
                     event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)

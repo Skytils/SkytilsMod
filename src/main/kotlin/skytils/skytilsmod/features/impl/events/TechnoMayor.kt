@@ -66,7 +66,7 @@ class TechnoMayor {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.instance.mode != "hub" && SBInfo.instance.mode != "farming_1") return
+        if (SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode && SBInfo.instance.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
         val viewer = Minecraft.getMinecraft().renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
