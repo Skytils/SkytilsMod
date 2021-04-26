@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.DataFetcher.Companion.reloadData
+import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.Utils
 import kotlin.math.floor
 
@@ -54,7 +54,7 @@ class ThreeWeirdosSolver {
         if (unformatted.contains("[NPC]")) {
             if (solutions.size == 0) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to load solutions for Three Weirdos."))
-                reloadData()
+                DataFetcher.reloadData()
             }
             for (solution in Lists.newArrayList(solutions)) {
                 if (unformatted.contains(solution!!)) {

@@ -204,8 +204,7 @@ class ScoreCalculation {
                 var missingPuzzles = 0
                 var failedPuzzles = 0
                 var foundSecrets = 0
-                val totalSecrets = rooms.values.stream().mapToInt { obj: Int -> obj }
-                    .sum()
+                val totalSecrets = rooms.values.sum()
                 var clearedPercentage = 0
                 var secondsElapsed = 0.0
                 var crypts = 0

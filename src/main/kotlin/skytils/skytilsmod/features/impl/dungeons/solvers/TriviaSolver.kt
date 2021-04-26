@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.DataFetcher.Companion.reloadData
+import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.Utils
 import kotlin.math.floor
 
@@ -50,7 +50,7 @@ class TriviaSolver {
             ) triviaAnswer = null
             if (unformatted == "[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know." && triviaSolutions.size == 0) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to load solutions for Trivia."))
-                reloadData()
+                DataFetcher.reloadData()
             }
             if (unformatted.contains("What SkyBlock year is it?")) {
                 val currentTime = System.currentTimeMillis() / 1000.0

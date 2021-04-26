@@ -43,7 +43,9 @@ import skytils.skytilsmod.commands.ArmorColorCommand
 import skytils.skytilsmod.commands.GlintCustomizeCommand
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.commands.SkytilsCommand
-import skytils.skytilsmod.core.*
+import skytils.skytilsmod.core.Config
+import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.*
@@ -51,6 +53,8 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.events.MayorJerry
 import skytils.skytilsmod.features.impl.events.TechnoMayor
+import skytils.skytilsmod.features.impl.farming.FarmingFeatures
+import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.handlers.*
 import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -60,6 +64,7 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
+import skytils.skytilsmod.features.impl.trackers.MythologicalTracker
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
@@ -134,6 +139,7 @@ class Skytils {
             throw RuntimeException("Skytils can't run on this Minecraft Forge version! Please use the latest Forge build 2318 for 1.8.9.")
         }
         if (!modDir.exists()) modDir.mkdirs()
+        File(modDir, "trackers").mkdirs()
         GUIMANAGER = GuiManager()
         jarFile = event.sourceFile
     }
@@ -146,7 +152,6 @@ class Skytils {
 
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
-        MinecraftForge.EVENT_BUS.register(DataFetcher())
         MinecraftForge.EVENT_BUS.register(GUIMANAGER)
         MinecraftForge.EVENT_BUS.register(MayorInfo())
         MinecraftForge.EVENT_BUS.register(SBInfo.instance)
@@ -181,6 +186,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MiningFeatures())
         MinecraftForge.EVENT_BUS.register(MinionFeatures())
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
+        MinecraftForge.EVENT_BUS.register(MythologicalTracker())
         MinecraftForge.EVENT_BUS.register(PetFeatures())
         MinecraftForge.EVENT_BUS.register(ProtectItems())
         MinecraftForge.EVENT_BUS.register(RainTimer())
@@ -195,6 +201,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(TeleportMazeSolver())
         MinecraftForge.EVENT_BUS.register(TerminalFeatures())
         MinecraftForge.EVENT_BUS.register(ThreeWeirdosSolver())
+        MinecraftForge.EVENT_BUS.register(TreasureHunter())
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
         MinecraftForge.EVENT_BUS.register(WaterBoardSolver())
     }

@@ -28,15 +28,16 @@ import skytils.skytilsmod.utils.SBInfo
 class ItemWorthStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
         val id = AuctionData.getIdentifier(item) ?: return false
-        val value = AuctionData.lowestBINs.getOrDefault(id, -1.0)
+        if (AuctionData.lowestBINs.size == 0) return true
+        val value = AuctionData.lowestBINs.getOrDefault(id, 0.0)
         val threshold = Skytils.config.protectItemBINThreshold.toInt()
         when (type) {
             ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
-                return value == -1.0 || value >= threshold
+                return value >= threshold
             }
             ProtectType.HOTBARDROPKEY -> {
                 if (SBInfo.instance.mode != "dungeon") {
-                    return value == -1.0 || value >= threshold
+                    return value >= threshold
                 }
             }
         }

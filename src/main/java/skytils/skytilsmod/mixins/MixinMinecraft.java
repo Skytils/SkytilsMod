@@ -26,6 +26,11 @@ import net.minecraft.client.resources.LanguageManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,10 +38,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
+import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Objects;
 
 @Mixin(Minecraft.class)
@@ -50,6 +63,7 @@ public abstract class MixinMinecraft {
 
     @Shadow private LanguageManager mcLanguageManager;
     @Shadow private IReloadableResourceManager mcResourceManager;
+    @Shadow @Final public File mcDataDir;
     private final Minecraft that = (Minecraft) (Object) this;
 
     /**
@@ -86,5 +100,23 @@ public abstract class MixinMinecraft {
             ScreenRenderer.fontRenderer.setBidiFlag(this.mcLanguageManager.isCurrentLanguageBidirectional());
         }
         this.mcResourceManager.registerReloadListener(ScreenRenderer.fontRenderer);
+    }
+
+    @Inject(method = "run", at = @At("HEAD"))
+    private void preRun(CallbackInfo ci) {
+        File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
+        if (!file.exists()) {
+            try {
+                HttpGet request = new HttpGet(new URL("https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/files/vigilance.toml").toURI());
+                request.setProtocolVersion(HttpVersion.HTTP_1_1);
+                HttpResponse response = APIUtil.INSTANCE.getClient().execute(request);
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    file.createNewFile();
+                    response.getEntity().writeTo(new FileOutputStream(file));
+                }
+            } catch (URISyntaxException | IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -68,7 +68,7 @@ public abstract class MixinItemStack {
     private String modifyDisplayName(String s) {
         if (!Utils.inSkyblock) return s;
         try {
-            if (Skytils.config.compactStars) {
+            if (Skytils.config.compactStars && s.contains("✪")) {
                 Matcher starMatcher = starPattern.matcher(s);
                 if (starMatcher.find()) {
                     int count = 0;
@@ -80,7 +80,7 @@ public abstract class MixinItemStack {
                     s = s.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
                 }
             }
-        } catch(Exception e) { }
+        } catch(Exception ignored) { }
         return s;
     }
 }

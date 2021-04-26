@@ -53,6 +53,7 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
             ItemStack itemstack = this.getCurrentArmor(entitylivingbaseIn, armorSlot);
             String itemId = ItemUtil.getSkyBlockItemID(itemstack);
             if (GlintCustomizer.glintColors.containsKey(itemId)) {
+                ci.cancel();
                 CustomColor color = GlintCustomizer.glintColors.get(itemId);
 
                 float f = (float)entitylivingbaseIn.ticksExisted + partialTicks;
@@ -89,7 +90,6 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
                 GlStateManager.depthFunc(515);
                 GlStateManager.disableBlend();
             }
-            ci.cancel();
         }
     }
 }

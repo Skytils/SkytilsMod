@@ -31,7 +31,7 @@ buildscript {
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
-        classpath "com.github.Skytils:ForgeGradle:7e687c3490"
+        classpath "com.github.Skytils:ForgeGradle:581a86dcbe"
         classpath "com.github.Skytils:mixingradle:d75e32e743"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -149,8 +149,16 @@ shadowJar {
     exclude "com/jcraft/**"
     exclude "org/lwjgl/**"
     exclude "net/java/**"
-    exclude "META-INF/**"
     exclude "club/sk1er/vigilance/example"
+
+    exclude "META-INF/proguard/**"
+    exclude "META-INF/maven/**"
+    exclude "META-INF/versions/**"
+    exclude "META-INF/com.android.tools/**"
+
+    exclude '**/*.kotlin_metadata'
+    exclude '**/*.kotlin_module'
+    exclude '**/*.kotlin_builtins'
 }
 
 processResources {

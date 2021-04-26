@@ -37,7 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.DataFetcher.Companion.reloadData
+import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.events.BossBarEvent
@@ -100,9 +100,7 @@ class MiningFeatures {
                     "▲"
                 ) && !unformatted.contains("◀") && !unformatted.contains("▼")
             ) return
-            if (ScoreboardUtil.sidebarLines.stream()
-                    .anyMatch { line: String? -> ScoreboardUtil.cleanSB(line).contains("Dwarven Mines") }
-            ) {
+            if (SBInfo.instance.mode == "mining_3") {
                 puzzlerSolution = BlockPos(181, 195, 135)
                 val msg = unformatted.substring(15).trim { it <= ' ' }
                 val matcher = Pattern.compile("([▶▲◀▼]+)").matcher(unformatted)
@@ -128,14 +126,14 @@ class MiningFeatures {
         if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size == 0) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
-                reloadData()
+                DataFetcher.reloadData()
                 return
             }
-            val solution = fetchurItems.keys.stream().filter { s: String? ->
+            val solution = fetchurItems.getOrDefault(fetchurItems.keys.find { s: String ->
                 unformatted.contains(
-                    s!!
+                    s
                 )
-            }.findFirst().map { key: String -> fetchurItems[key] }.orElse(null)
+            }, null)
             Thread {
                 try {
                     Thread.sleep(2500)

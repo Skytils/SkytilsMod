@@ -61,6 +61,6 @@ abstract class ItemProtectStrategy {
         SALVAGE,
         CLICKOUTOFWINDOW,
         DROPKEYININVENTORY,
-        HOTBARDROPKEY // TODO make this actually hooked
+        HOTBARDROPKEY
     }
 }

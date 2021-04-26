@@ -49,7 +49,7 @@ class SlayerFeatures {
         if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
         if (ticks % 4 == 0) {
             if (Skytils.config.rev5TNTPing) {
-                if (sidebarLines.stream().anyMatch { l: String? -> cleanSB(l).contains("Slay the boss!") }) {
+                if (sidebarLines.any { l: String -> cleanSB(l).contains("Slay the boss!") }) {
                     var under: BlockPos? = null
                     if (mc.thePlayer.onGround) {
                         under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)

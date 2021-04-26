@@ -57,7 +57,7 @@ class LockOrb {
     private enum class PowerOrbs(var orbName: String, var radius: Double, var itemId: String) {
         RADIANT("§aRadiant", 18.0, "RADIANT_POWER_ORB"), MANAFLUX(
             "§9Mana Flux",
-            18.9,
+            18.0,
             "MANA_FLUX_POWER_ORB"
         ),
         OVERFLUX("§5Overflux", 18.0, "OVERFLUX_POWER_ORB"), PLASMAFLUX("§d§lPlasmaflux", 20.0, "PLASMAFLUX_POWER_ORB");

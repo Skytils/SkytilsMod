@@ -50,12 +50,10 @@ object ScoreboardUtil {
             val scoreboard = Minecraft.getMinecraft().theWorld.scoreboard ?: return lines
             val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return lines
             var scores = scoreboard.getSortedScores(objective)
-            val list = scores.stream()
-                .filter { input: Score? ->
-                    input != null && input.playerName != null && !input.playerName
-                        .startsWith("#")
-                }
-                .collect(Collectors.toList())
+            val list = scores.filter { input: Score? ->
+                input != null && input.playerName != null && !input.playerName
+                    .startsWith("#")
+            }
             scores = if (list.size > 15) {
                 Lists.newArrayList(Iterables.skip(list, scores.size - 15))
             } else {

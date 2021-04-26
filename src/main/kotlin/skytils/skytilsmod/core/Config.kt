@@ -33,6 +33,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "API",
         hidden = true
     )
+    @JvmField
     var dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"
 
     @Property(
@@ -612,14 +613,60 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var showGriffinCountdown = false
 
+
     @Property(
-        type = PropertyType.SWITCH,
-        name = "Show Fast-Travel Addon",
-        description = "Shows the closest travel scroll to the burrow.\nRequires MVP+ rank and the travel scroll unlocked.",
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Castle",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Castle warp.",
         category = "Events",
         subcategory = "Mythological"
     )
-    var showBurrowFastTravel = false
+    var burrowCastleFastTravel = false
+
+    @Property(
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Crypts",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Crypts warp.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var burrowCryptsFastTravel = false
+
+    @Property(
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Dark Auction",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the DA warp.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var burrowDarkAuctionFastTravel = false
+
+    @Property(
+        type = PropertyType.CHECKBOX,
+        name = "Show Fast-Travel: Hub",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Hub warp.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var burrowHubFastTravel = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Broadcast Rare Drop Notifications",
+        description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var broadcastMythCreatureDrop = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Track Mythological Creatures",
+        description = "Tracks and saves drops from Mythological Creatures.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var trackMythEvent = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -647,6 +694,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "Quality of Life"
     )
     var hideFarmingRNGTitles = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Hungry Hiker Solver",
+        description = "Tells you what item the Hungry Hiker wants.",
+        category = "Farming",
+        subcategory = "Solvers"
+    )
+    var hungryHikerSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Treasure Hunter Solver",
+        description = "Tells you where the Treasure Hunter's treasure is.",
+        category = "Farming",
+        subcategory = "Solvers"
+    )
+    var treasureHunterSolver = false
 
     /* @Property(
    type = PropertyType.SWITCH,
@@ -1821,12 +1886,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
 
+        hidePropertyIf(::showGriffinBurrows) {
+            apiKey.isEmpty()
+        }
+
+        ::showGriffinCountdown dependsOn ::showGriffinBurrows
+        ::particleBurrows dependsOn ::showGriffinBurrows
+
+        ::burrowCastleFastTravel dependsOn ::showGriffinBurrows
+        ::burrowCryptsFastTravel dependsOn ::showGriffinBurrows
+        ::burrowDarkAuctionFastTravel dependsOn ::showGriffinBurrows
+        ::burrowHubFastTravel dependsOn ::showGriffinBurrows
+
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
 
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")
-            protectItemBINThreshold = if (numeric.isNullOrEmpty()) "0" else numeric
+            protectItemBINThreshold = if (numeric.isEmpty()) "0" else numeric
         }
     }
 }
