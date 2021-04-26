@@ -39,7 +39,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 /**
- * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
+ * Adapted from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
  * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
  *
  * @author Moulberry
@@ -162,5 +162,20 @@ class SBInfo {
         val instance = SBInfo()
         private val timePattern = Pattern.compile(".+(am|pm)")
         private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
+    }
+
+    enum class SkyblockIslands(val mode: String) {
+        BLAZINGFORTRESS("combat_2"),
+        DEEPERCAVERNS("mining_2"),
+        DUNGEON("dungeon"),
+        DUNGEONHUB("dungeon_hub"),
+        DWARVENMINES("mining_3"),
+        FARMINGISLANDS("farming_1"),
+        GOLDMINE("mining_1"),
+        HUB("hub"),
+        THEEND("combat_3"),
+        THEPARK("foraging_1"),
+        PRIVATEISLAND("dynamic"),
+        SPIDERDEN("combat_1")
     }
 }

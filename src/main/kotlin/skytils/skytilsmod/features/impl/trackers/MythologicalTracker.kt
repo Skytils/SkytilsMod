@@ -185,7 +185,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
         val mobObj = JsonObject()
         for (mob in BurrowMob.values()) {
-            itemObj.addProperty(mob.modId, mob.dugTimes)
+            mobObj.addProperty(mob.modId, mob.dugTimes)
         }
         obj.add("mobs", mobObj)
         gson.toJson(obj, writer)

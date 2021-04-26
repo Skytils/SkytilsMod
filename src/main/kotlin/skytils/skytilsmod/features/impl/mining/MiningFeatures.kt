@@ -100,7 +100,7 @@ class MiningFeatures {
                     "▲"
                 ) && !unformatted.contains("◀") && !unformatted.contains("▼")
             ) return
-            if (SBInfo.instance.mode == "mining_3") {
+            if (SBInfo.instance.mode == SBInfo.SkyblockIslands.DWARVENMINES.mode) {
                 puzzlerSolution = BlockPos(181, 195, 135)
                 val msg = unformatted.substring(15).trim { it <= ' ' }
                 val matcher = Pattern.compile("([▶▲◀▼]+)").matcher(unformatted)
@@ -259,7 +259,7 @@ class MiningFeatures {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (Skytils.config.skymallReminder && SBInfo.instance.mode == "mining_3" && SBInfo.instance.time == "12:00 am" && GuiManager.title != "§cSKYMALL RESET"
+        if (Skytils.config.skymallReminder && SBInfo.instance.mode == SBInfo.SkyblockIslands.DWARVENMINES.mode && SBInfo.instance.time == "12:00 am" && GuiManager.title != "§cSKYMALL RESET"
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
@@ -275,7 +275,7 @@ class MiningFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
-        if (!Utils.inSkyblock || SBInfo.instance.mode != "mining_3" || event.state == null) return
+        if (!Utils.inSkyblock || SBInfo.instance.mode != SBInfo.SkyblockIslands.DWARVENMINES.mode || event.state == null) return
         val state = event.state!!
         if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.GRAY) {
             event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)

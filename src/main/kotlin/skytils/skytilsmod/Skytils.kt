@@ -20,6 +20,7 @@ package skytils.skytilsmod
 
 import club.sk1er.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -95,7 +96,7 @@ class Skytils {
         const val VERSION = "1.0-pre1"
 
         @JvmField
-        val gson = GsonBuilder().setPrettyPrinting().create()
+        val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
         @JvmField
         val mc: Minecraft = Minecraft.getMinecraft()
@@ -308,7 +309,7 @@ class Skytils {
                     y2 = y + 20
                 }
             }
-            event.buttonList.add(GuiButton(6969420, x, Math.max(0, y), 100, 20, "Skytils"))
+            event.buttonList.add(GuiButton(6969420, x, 0.coerceAtLeast(y), 100, 20, "Skytils"))
         }
     }
 
