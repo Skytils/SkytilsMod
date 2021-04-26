@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.farming
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemAxe
 import net.minecraft.item.ItemHoe
@@ -25,7 +26,11 @@ import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.events.DamageBlockEvent
@@ -93,6 +98,32 @@ class FarmingFeatures {
         val formatted = event.message.formattedText
         val unformatted = stripControlCodes(event.message.unformattedText)
 
+        if (Skytils.config.acceptTrapperTask) {
+            if (formatted.contains("§a§l[YES]")) {
+                val listOfSiblings = event.message.siblings
+                for (sibling in listOfSiblings) {
+                    if (sibling.unformattedText.contains("[YES]")) {
+                        acceptTrapperCommand = sibling.chatStyle.chatClickEvent.value
+                        commandSent = false
+                    }
+                }
+                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to accept task"))
+            }
+        }
+        if (Skytils.config.trapperPing) {
+            if (unformatted.startsWith("[NPC] Trevor The Trapper: You can find your")) {
+                trapperStart = System.currentTimeMillis().toDouble()
+                animalFound = false
+            } else if (unformatted.startsWith("Return to the Trapper soon to get a new animal to hunt!")) {
+                if (trapperStart > 0 && System.currentTimeMillis() - trapperStart > 60000) { //1 minute cooldown
+                    Utils.playLoudSound("note.pling", 1.0)
+                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Trapper cooldown has already expired!"))
+                    trapperStart = -1.0
+                }
+                animalFound = true
+            }
+        }
+
         if (Skytils.config.hungryHikerSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
             if (hungerHikerItems.isEmpty()) {
                 mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
@@ -143,8 +174,49 @@ class FarmingFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!Utils.inSkyblock || !Skytils.config.trapperPing) return
+        if (trapperStart > 0) {
+            if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
+                trapperStart = -1.0
+                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Trapper cooldown has now expired!"))
+                Thread {
+                    try {
+                        for (i in 0..4) {
+                            Utils.playLoudSound("note.pling", 1.0)
+                            Thread.sleep(200)
+                        }
+                    } catch (e: InterruptedException) {
+                        e.printStackTrace()
+                    }
+                }.start()
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        trapperStart = -1.0
+    }
+
+    @SubscribeEvent
+    fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
+        if (!Utils.inSkyblock) return
+        if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
+            if (Skytils.config.acceptTrapperTask && !commandSent) {
+                Minecraft.getMinecraft().thePlayer.sendChatMessage(acceptTrapperCommand)
+                commandSent = true
+            }
+        }
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
         var hungerHikerItems = LinkedHashMap<String, String>()
+        var trapperStart = -1.0
+        var animalFound = false
+        var acceptTrapperCommand = ""
+        var commandSent = false
     }
 }

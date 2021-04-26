@@ -158,7 +158,6 @@ shadowJar {
 
     exclude '**/*.kotlin_metadata'
     exclude '**/*.kotlin_module'
-    exclude '**/*.kotlin_builtins'
 }
 
 processResources {

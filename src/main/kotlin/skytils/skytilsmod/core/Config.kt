@@ -723,6 +723,23 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var preventBreakingFarms = false
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Click to Accept Trapper Task",
+            description = "Open chat, then click anywhere on screen to accept Trapper Task.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    var acceptTrapperTask = true
+
+    @Property(type = PropertyType.SWITCH,
+            name = "Trapper Cooldown Alarm",
+            description = "Quickly plays five notes once the Trapper is off cooldown.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    var trapperPing = false
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.\n§cThis requires a chunk reload when toggled (F3+A).",
