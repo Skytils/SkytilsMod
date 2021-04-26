@@ -87,21 +87,17 @@ class PetFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (Skytils.config.highlightActivePet && SBInfo.instance.lastOpenContainerName?.endsWith(") Pets") == true) {
-            loopPets@ for (i in 10..43) {
-                val slot = event.container.getSlot(i)
-                if (!slot.hasStack) continue
-                val item = slot.stack
-                for (line in getItemLore(item)) {
-                    if (line == "§7§cClick to despawn ") {
-                        GlStateManager.translate(0f, 0f, 3f)
-                        slot highlight Skytils.config.activePetColor
-                        GlStateManager.translate(0f, 0f, -3f)
-                        break@loopPets
-                    }
+        if (Skytils.config.highlightActivePet && SBInfo.instance.lastOpenContainerName?.endsWith(") Pets") == true && event.slot.hasStack && event.slot.slotNumber in 10..43) {
+            val item = event.slot.stack
+            for (line in getItemLore(item)) {
+                if (line == "§7§cClick to despawn ") {
+                    GlStateManager.translate(0f, 0f, 3f)
+                    event.slot highlight Skytils.config.activePetColor
+                    GlStateManager.translate(0f, 0f, -3f)
+                    break
                 }
             }
         }
