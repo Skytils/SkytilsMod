@@ -31,7 +31,6 @@
     "MixinPlayerControllerMP",
     "MixinRender",
     "MixinRenderBat",
-    "MixinRenderBlaze",
     "MixinRenderEntityItem",
     "MixinRenderItem",
     "MixinRenderLightningBolt",

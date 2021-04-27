@@ -22,11 +22,14 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBlaze;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.Utils;
 
 import java.awt.*;
 
@@ -35,9 +38,14 @@ import static skytils.skytilsmod.features.impl.dungeons.solvers.BlazeSolver.orde
 
 @Mixin(ModelBlaze.class)
 public abstract class MixinModelBlaze extends ModelBase {
+
+    private boolean disabledTexture2D = false;
+
     @Inject(method = "render", at = @At(value = "HEAD"))
     private void changeBlazeColor(Entity entity, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale, CallbackInfo ci) {
         if (orderedBlazes.size() == 0) return;
+        disabledTexture2D = GL11.glIsEnabled(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableTexture2D();
         if (blazeMode <= 0) {
             if (entity.isEntityEqual(orderedBlazes.get(0).blaze)) {
                 Color color = Skytils.config.lowestBlazeColor;
@@ -55,6 +63,14 @@ public abstract class MixinModelBlaze extends ModelBase {
                 Color color = Skytils.config.nextBlazeColor;
                 GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
             }
+        }
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void renderPost(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale, CallbackInfo ci) {
+        if (disabledTexture2D) {
+            disabledTexture2D = false;
+            GlStateManager.enableTexture2D();
         }
     }
 }
