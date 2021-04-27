@@ -20,6 +20,7 @@ package skytils.skytilsmod.core
 import club.sk1er.vigilance.Vigilant
 import club.sk1er.vigilance.data.Property
 import club.sk1er.vigilance.data.PropertyType
+import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 import java.io.File
 
@@ -798,7 +799,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.SWITCH,
         name = "Dark Mode Mist",
-        description = "Replaces colors in The Mist with darker variants.\n§cThis requires a chunk reload when toggled (F3+A).",
+        description = "Replaces colors in The Mist with darker variants.",
         category = "Mining",
         subcategory = "Quality of Life"
     )
@@ -862,7 +863,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.SWITCH,
         name = "Recolor Carpets",
-        description = "Changes the color of carpets in the Dwarven Mines to red.\n§cThis requires a chunk reload when toggled (F3+A).",
+        description = "Changes the color of carpets in the Dwarven Mines to red.",
         category = "Mining",
         subcategory = "Quality of Life"
     )
@@ -1952,6 +1953,23 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")
             protectItemBINThreshold = if (numeric.isEmpty()) "0" else numeric
+        }
+
+        // asbyth cool code
+        registerListener(::darkModeMist) { mc.renderGlobal.loadRenderers() }
+        registerListener(::recolorCarpets) { mc.renderGlobal.loadRenderers() }
+
+        if (this.largerHeadScale > 2) {
+            this.largerHeadScale /= 100
+            markDirty()
+        }
+        if (this.itemDropScale > 5) {
+            this.itemDropScale /= 100f
+            markDirty()
+        }
+        if (this.itemRarityOpacity > 1) {
+            this.itemRarityOpacity /= 100f
+            markDirty()
         }
     }
 }
