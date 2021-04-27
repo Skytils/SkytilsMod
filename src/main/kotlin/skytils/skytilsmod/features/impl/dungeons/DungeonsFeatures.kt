@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.Gui
@@ -39,7 +40,10 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S45PacketTitle
+import net.minecraft.potion.Potion
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -104,6 +108,30 @@ class DungeonsFeatures {
         private var rerollClicks = 0
         private var foundLivid = false
         private var livid: Entity? = null
+        private val blockLividThread: Thread = Thread({
+            while(mc.thePlayer.isPotionActive(Potion.blindness)) {
+                Thread.sleep(10)
+            }
+            val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
+            var a: EnumChatFormatting = EnumChatFormatting.RED
+            when (state.getValue(BlockStainedGlass.COLOR).name.lowercase()) {
+                "white" -> a = EnumChatFormatting.WHITE
+                "pink" -> a = EnumChatFormatting.LIGHT_PURPLE
+                "red" -> a = EnumChatFormatting.RED
+                "silver" -> a = EnumChatFormatting.GRAY
+                "green" -> a = EnumChatFormatting.DARK_GREEN
+                "lime" -> a = EnumChatFormatting.GREEN
+                "blue" -> a = EnumChatFormatting.BLUE
+                "purple" -> a = EnumChatFormatting.DARK_PURPLE
+                "yellow" -> a = EnumChatFormatting.YELLOW
+            }
+            for (entity in mc.theWorld.getLoadedEntityList()) {
+                if (entity.name.startsWith("$a﴾ $a§lLivid")) {
+                    livid = entity
+                    foundLivid = true
+                }
+            }
+        }, "Skytils-Block-Livid-Finder")
 
         init {
             LividGuiElement()
@@ -137,20 +165,29 @@ class DungeonsFeatures {
             }
             if (Skytils.config.findCorrectLivid && !foundLivid) {
                 if (Utils.equalsOneOf(dungeonFloor, "F5", "M5")) {
-                    val loadedLivids: MutableList<Entity> = ArrayList()
-                    val entities = mc.theWorld.getLoadedEntityList()
-                    for (entity in entities) {
-                        val name = entity.name
-                        if (name.contains("Livid") && name.length > 5 && name[1] == name[5] && !loadedLivids.contains(
-                                entity
-                            )
-                        ) {
-                            loadedLivids.add(entity)
+                    when (Skytils.config.lividFinderType) {
+                        1 -> {
+                            val loadedLivids: MutableList<Entity> = ArrayList()
+                            val entities = mc.theWorld.getLoadedEntityList()
+                            for (entity in entities) {
+                                val name = entity.name
+                                if (name.contains("Livid") && name.length > 5 && name[1] == name[5] && !loadedLivids.contains(
+                                        entity
+                                    )
+                                ) {
+                                    loadedLivids.add(entity)
+                                }
+                            }
+                            if (loadedLivids.size > 8) {
+                                livid = loadedLivids[0]
+                                foundLivid = true
+                            }
                         }
-                    }
-                    if (loadedLivids.size > 8) {
-                        livid = loadedLivids[0]
-                        foundLivid = true
+                        0 -> {
+                            if(hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && !blockLividThread.isAlive) {
+                                blockLividThread.start()
+                            }
+                        }
                     }
                 }
             }

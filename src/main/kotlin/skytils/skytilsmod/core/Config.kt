@@ -507,6 +507,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var findCorrectLivid = false
 
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Type of Livid Finder",
+        category = "Dungeons",
+        subcategory = "Solvers",
+        options = ["Block", "Entity"]
+    )
+    var lividFinderType = 0
+
     /*
    @Property(
    type = PropertyType.SWITCH,
@@ -1868,6 +1877,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::clickInOrderFirst dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
+        ::lividFinderType dependsOn ::findCorrectLivid
 
         hidePropertyIf(::showGriffinBurrows) {
             apiKey.isEmpty()
