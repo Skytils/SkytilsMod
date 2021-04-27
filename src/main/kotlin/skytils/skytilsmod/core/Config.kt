@@ -598,7 +598,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.SWITCH,
         name = "Burrow Particle Add-on",
-        description = "§b[WIP] §rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
+        description = "Uses particles in addition to the API in order to locate burrows.\nThis feature will help find burrows when the API isn't working.",
         category = "Events",
         subcategory = "Mythological"
     )
@@ -658,6 +658,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "Mythological"
     )
     var broadcastMythCreatureDrop = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Display Gaia Construct Hits",
+        description = "Tracks the amount of times a Gaia Construct has been hit.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var trackGaiaHits = false
 
     @Property(
         type = PropertyType.SWITCH,

@@ -115,14 +115,14 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(mc.thePlayer) < 10 * 10) {
+        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(mc.thePlayer) < 5.5 * 5.5) {
             if (event.entity.name == "Minos Champion") {
                 lastMinosChamp = 0L
                 BurrowMob.MINO.dugTimes++
             } else if (event.entity.name == "Minos Inquisitor") {
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
-                mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils:§eActually, you dug up a §2Minos Inquisitor§e!"))
+                mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!"))
             }
         }
     }

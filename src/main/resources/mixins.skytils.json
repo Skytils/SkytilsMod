@@ -6,6 +6,7 @@
     "AccessorCommandHandler",
     "AccessorGuiEditSign",
     "AccessorGuiNewChat",
+    "AccessorMinecraft",
     "AccessorSettingsGui",
     "MixinBlockRendererDispatcher",
     "MixinBossStatus",
