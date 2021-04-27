@@ -660,6 +660,33 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var burrowHubFastTravel = false
 
     @Property(
+        type = PropertyType.COLOR,
+        name = "Empty/Start Burrow Color",
+        description = "Color used to highlight the Griffin Burrows in.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var emptyBurrowColor = Color(173, 216, 230)
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Mob Burrow Color",
+        description = "Color used to highlight the Griffin Burrows in.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var mobBurrowColor = Color(173, 216, 230)
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Treasure Burrow Color",
+        description = "Color used to highlight the Griffin Burrows in.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var treasureBurrowColor = Color(173, 216, 230)
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Broadcast Rare Drop Notifications",
         description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
@@ -686,13 +713,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var trackMythEvent = false
 
-    @Property(
+    /*    @Property(
         type = PropertyType.SWITCH,
         name = "Trick or Treat Chest Alert",
         description = "Displays a title when any trick or treat chest spawns near you.",
         category = "Events",
         subcategory = "Spooky"
-    )
+        TODO Make this actually work
+    )*/
     var trickOrTreatChestAlert = false
 
     @Property(
@@ -750,19 +778,20 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     var preventBreakingFarms = false
 
     @Property(
-            type = PropertyType.SWITCH,
-            name = "Click to Accept Trapper Task",
-            description = "Open chat, then click anywhere on screen to accept Trapper Task.",
-            category = "Farming",
-            subcategory = "Quality of Life"
+        type = PropertyType.SWITCH,
+        name = "Click to Accept Trapper Task",
+        description = "Open chat, then click anywhere on screen to accept Trapper Task.",
+        category = "Farming",
+        subcategory = "Quality of Life"
     )
     var acceptTrapperTask = true
 
-    @Property(type = PropertyType.SWITCH,
-            name = "Trapper Cooldown Alarm",
-            description = "Quickly plays five notes once the Trapper is off cooldown.",
-            category = "Farming",
-            subcategory = "Quality of Life"
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Trapper Cooldown Alarm",
+        description = "Quickly plays five notes once the Trapper is off cooldown.",
+        category = "Farming",
+        subcategory = "Quality of Life"
     )
     var trapperPing = false
 
@@ -1911,6 +1940,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
         ::showGriffinCountdown dependsOn ::showGriffinBurrows
         ::particleBurrows dependsOn ::showGriffinBurrows
+
+        ::emptyBurrowColor dependsOn ::showGriffinBurrows
+        ::mobBurrowColor dependsOn ::showGriffinBurrows
+        ::treasureBurrowColor dependsOn ::showGriffinBurrows
 
         ::burrowCastleFastTravel dependsOn ::showGriffinBurrows
         ::burrowCryptsFastTravel dependsOn ::showGriffinBurrows

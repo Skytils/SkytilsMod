@@ -364,6 +364,15 @@ class GriffinBurrows {
                 }
                 return String.format("%s §a(Particle)", type)
             }
+        private val color: Color
+            get() {
+                return when (this.type) {
+                    0 -> Skytils.config.emptyBurrowColor
+                    1 -> Skytils.config.mobBurrowColor
+                    2 -> Skytils.config.treasureBurrowColor
+                    else -> Color.WHITE
+                }
+            }
 
         fun drawWaypoint(partialTicks: Float) {
             val viewer = Minecraft.getMinecraft().renderViewEntity
@@ -377,9 +386,9 @@ class GriffinBurrows {
             val distSq = x * x + y * y + z * z
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(2, 250, 39), 1f)
+            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 1f)
             GlStateManager.disableTexture2D()
-            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, Color(2, 250, 39).rgb, 1.0f, partialTicks)
+            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
             RenderUtil.renderWaypointText(waypointText, blockPos.up(5), partialTicks)
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()
@@ -437,6 +446,16 @@ class GriffinBurrows {
                 )
             }
 
+        private val color: Color
+            get() {
+                return when (this.type) {
+                    0 -> Skytils.config.emptyBurrowColor
+                    1 -> Skytils.config.mobBurrowColor
+                    2, 3 -> Skytils.config.treasureBurrowColor
+                    else -> Color.WHITE
+                }
+            }
+
         fun drawWaypoint(partialTicks: Float) {
             val viewer = Minecraft.getMinecraft().renderViewEntity
             val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
@@ -449,9 +468,9 @@ class GriffinBurrows {
             val distSq = x * x + y * y + z * z
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(173, 216, 230), 1f)
+            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 1f)
             GlStateManager.disableTexture2D()
-            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, Color(173, 216, 230).rgb, 1.0f, partialTicks)
+            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
             RenderUtil.renderWaypointText(waypointText, blockPos.up(5), partialTicks)
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()
