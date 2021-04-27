@@ -135,7 +135,15 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
-        if (ForgeVersion.mcVersion != "1.8.9" || ForgeVersion.buildVersion != 2318) {
+        // Must use reflection otherwise the "constant" value will be inlined by compiler
+        val forgeVersion = try {
+            ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
+        } catch (e: Exception) {
+            e.printStackTrace()
+            2318
+        }
+        // Asbyth's forge fork uses version 0
+        if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
             Desktop.getDesktop()
                 .browse(URL("https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html").toURI())
             throw RuntimeException("Skytils can't run on this Minecraft Forge version! Please use the latest Forge build 2318 for 1.8.9.")
