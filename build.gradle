@@ -42,7 +42,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.mixin"
 
-version = "1.0-pre1"
+version = "1.0-pre1.1"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
@@ -196,7 +196,7 @@ sourceSets {
     }
 }
 
-
+// asbyth cool process resources
 task moveResources {
     doLast {
         ant.move file: "${buildDir}/resources/main",
