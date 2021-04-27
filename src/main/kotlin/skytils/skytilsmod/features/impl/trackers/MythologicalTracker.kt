@@ -65,6 +65,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         var droppedTimes: Long = 0L
     ) {
         REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
+
         // this does have a chat message but it's just Enchanted Book
         CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
         COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
@@ -115,7 +116,10 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(mc.thePlayer) < 5.5 * 5.5) {
+        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(
+                mc.thePlayer
+            ) < 5.5 * 5.5
+        ) {
             if (event.entity.name == "Minos Champion") {
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
@@ -140,7 +144,10 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                         (BurrowDrop.getFromName(matcher.group(1)) ?: return).droppedTimes++
                         markDirty(this::class)
                     }
-                } else if (Skytils.config.trackMythEvent && unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(" coins!")) {
+                } else if (Skytils.config.trackMythEvent && unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(
+                        " coins!"
+                    )
+                ) {
                     BurrowDrop.COINS.droppedTimes += unformatted.replace(Regex("[^\\d]"), "").toLong()
                 } else if (Skytils.config.trackMythEvent && unformatted.contains("! You dug out ")) {
                     val matcher = mythCreatureDug.matcher(unformatted)

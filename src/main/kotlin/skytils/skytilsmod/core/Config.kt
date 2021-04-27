@@ -686,13 +686,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     )
     var trackMythEvent = false
 
-    @Property(
+/*    @Property(
         type = PropertyType.SWITCH,
         name = "Trick or Treat Chest Alert",
         description = "Displays a title when any trick or treat chest spawns near you.",
         category = "Events",
         subcategory = "Spooky"
-    )
+        TODO Make this actually work
+    )*/
     var trickOrTreatChestAlert = false
 
     @Property(
