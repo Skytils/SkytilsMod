@@ -598,7 +598,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.SWITCH,
         name = "Show Griffin Burrows",
-        description = "Shows the location of burrows during the event.",
+        description = "Shows the location of burrows during the event.\n§cThis feature requires your API key to be set in general settings.",
         category = "Events",
         subcategory = "Mythological"
     )
@@ -1933,10 +1933,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
         ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
         ::lividFinderType dependsOn ::findCorrectLivid
-
-        hidePropertyIf(::showGriffinBurrows) {
-            apiKey.isEmpty()
-        }
 
         ::showGriffinCountdown dependsOn ::showGriffinBurrows
         ::particleBurrows dependsOn ::showGriffinBurrows
