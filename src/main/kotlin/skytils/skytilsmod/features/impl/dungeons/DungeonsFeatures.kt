@@ -108,7 +108,7 @@ class DungeonsFeatures {
         private var rerollClicks = 0
         private var foundLivid = false
         private var livid: Entity? = null
-        private var blockLividThread: Thread? = null
+        private var blockLividThread: Thread? = Thread()
 
         init {
             LividGuiElement()
