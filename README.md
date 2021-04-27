@@ -23,9 +23,11 @@ A Hypixel Skyblock Utilities mod.
  - Client Side Custom Armor Colors (with animated rainbow)
  - Custom Command Aliases
  - Griffin Burrow Locator and Waypoints
+ - Track Mythological Event drops
+ - Track Gaia Construct Hits
  - Reparty Command Which Yields to Other Mods
  - Auto Accept Reparty
- - Trick or Treat Chest Alert
+ - ~~Trick or Treat Chest Alert~~
  - Custom Key Shortcuts
  - Better Auction House Price Input
  - Spam Hider for
@@ -50,6 +52,7 @@ A Hypixel Skyblock Utilities mod.
      - Revive stone pickups
      - Combo messages
      - Blessing enchant and bait messages
+     - Wither and Undead Essence unlock messages
 ##### Dungeons
  - ~~Show Hidden Fels, Shadow Assassins, and blood room mobs~~
  - Blaze Solver Which Replaces The Skin Textures
@@ -64,7 +67,7 @@ A Hypixel Skyblock Utilities mod.
  - Stop Dropping, Salvaging, and Selling Starred Dungeon Items
  - Bigger Bat Rendering and Bat Hitbox Display
  - Giant, Sadan, and Necron HP Display
- - Better Sadan Interest timer
+ - Better Sadan Interest Timer (Terracotta Phase)
  - Score Calculation
  - Dungeon Timer
  - Necron Phase Timer
@@ -75,6 +78,8 @@ A Hypixel Skyblock Utilities mod.
 #### Farming
  - ~~Block Math Hoe Recipe Viewer~~
  - ~~Block Breaking Farms~~
+ - Hungry Hiker solver
+ - Treasure Hunter Solver
 #### Mining 
  - ~~Show Ghosts in the Mist (Also their health)~~
  - ~~Disable Pickaxe Ability on Private Island~~
@@ -83,11 +88,15 @@ A Hypixel Skyblock Utilities mod.
  - Raffle Waypoint and Warning
  - Show hidden sneaky creepers
  - Dark Mode Mist
+ - More Visible Ghosts
+ - Recolor Carpets
+ - Highlight Completed Comissions
 #### Items
  - Soul Eater Bonus Strength
  - ~~Block Useless Zombie Sword Uses~~
  - ~~Prioritize Item Abilities~~
  - Pet Item Confirmation
+ - Highlight Active & Favorite Pets
  - Hide Implosion Particles
  - Hide Midas Staff Gold Blocks
  - Big Item Drops
@@ -104,6 +113,7 @@ A Hypixel Skyblock Utilities mod.
  - ~~Customizable Block Item Ability~~
  - Show Price of Items in the Experimentation Table
  - Jerry-chine Gun Sound Hider
+ - Show Enchanted Book Abbreviation
 ### Miscellaneous
  - Hide Witherborn Boss Bars
  - Hide Fire and Lightning
@@ -115,6 +125,8 @@ A Hypixel Skyblock Utilities mod.
  - Slayer miniboss spawn alert
  - Hide fishing hooks from other players
  - Placed Summoning Eye Display
+ - Spider's Den Rain Timer
+ - Stop Dropping Valuable Items (customizable BIN value)
 
 
 And more to come!
