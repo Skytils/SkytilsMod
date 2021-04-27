@@ -62,6 +62,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         val itemName: String,
         val rarity: ItemRarity,
         val isChat: Boolean = false,
+        val mobDrop: Boolean = false,
         var droppedTimes: Long = 0L
     ) {
         REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
@@ -71,7 +72,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
         PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC),
         COG("CROWN_OF_GREED", "Crown of Greed", ItemRarity.LEGENDARY, true),
-        STICK("DAEDALUS_STICK", "Daedalus Stick", ItemRarity.LEGENDARY, true),
+        STICK("DAEDALUS_STICK", "Daedalus Stick", ItemRarity.LEGENDARY, mobDrop = true),
         SHELMET("DWARF_TURTLE_SHELMET", "Dwarf Turtle Shelmet", ItemRarity.RARE),
         FEATHER("GRIFFIN_FEATHER", "Griffin Feather", ItemRarity.RARE, isChat = true),
         RELIC("MINOS_RELIC", "Minos Relic", ItemRarity.EPIC),
@@ -136,20 +137,20 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
         when (event.packet) {
             is S02PacketChat -> {
-                if (event.packet.type == 2.toByte()) return
+                if (event.packet.type == 2.toByte() || !Skytils.config.trackMythEvent) return
                 val unformatted = StringUtils.stripControlCodes(event.packet.chatComponent.unformattedText)
-                if (Skytils.config.trackMythEvent && unformatted.startsWith("RARE DROP! You dug out a ")) {
+                if (unformatted.startsWith("RARE DROP! You dug out a ")) {
                     val matcher = rareDugDrop.matcher(unformatted)
                     if (matcher.matches()) {
                         (BurrowDrop.getFromName(matcher.group(1)) ?: return).droppedTimes++
                         markDirty(this::class)
                     }
-                } else if (Skytils.config.trackMythEvent && unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(
+                } else if (unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(
                         " coins!"
                     )
                 ) {
                     BurrowDrop.COINS.droppedTimes += unformatted.replace(Regex("[^\\d]"), "").toLong()
-                } else if (Skytils.config.trackMythEvent && unformatted.contains("! You dug out ")) {
+                } else if (unformatted.contains("! You dug out ")) {
                     val matcher = mythCreatureDug.matcher(unformatted)
                     if (matcher.matches()) {
                         var mob = BurrowMob.getFromName(matcher.group(1)) ?: return
@@ -161,19 +162,27 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                             markDirty(this::class)
                         }
                     }
-                } else if (Skytils.config.trackMythEvent && unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
+                } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
                         "You finished the Griffin burrow chain! (4"
                     ))
                 ) {
                     burrowsDug++
                     markDirty(this::class)
+                } else if (unformatted.startsWith("RARE DROP! ")) {
+                    for (drop in BurrowDrop.values()) {
+                        if (!drop.mobDrop) continue
+                        if (unformatted.startsWith("RARE DROP! ${drop.itemName}")) {
+                            drop.droppedTimes++
+                            break
+                        }
+                    }
                 }
             }
             is S2FPacketSetSlot -> {
                 val item = event.packet.func_149174_e() ?: return
                 if (event.packet.func_149175_c() != 0 || mc.thePlayer.ticksExisted <= 1) return
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
-                if (drop.isChat) return
+                if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
                 if (!extraAttr.hasKey("timestamp")) return
                 val time = ZonedDateTime.from(
