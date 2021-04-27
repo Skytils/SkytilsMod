@@ -238,24 +238,14 @@ class Skytils {
                 cch.registerCommand(GlintCustomizeCommand())
             }
 
-            if (!cch.commands.containsKey("reparty")) {
-                cch.registerCommand(RepartyCommand())
+            if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
+                cch.commandSet.add(RepartyCommand())
+                cch.commandMap["reparty"] = RepartyCommand()
             }
 
-            if (!cch.commands.containsKey("rp")) {
+            if (config.overrideReparty || !cch.commands.containsKey("rp")) {
                 cch.commandSet.add(RepartyCommand())
                 cch.commandMap["rp"] = RepartyCommand()
-            }
-            if (config.overrideReparty) {
-                if (!cch.commands.containsKey("rp")) {
-                    cch.commandSet.add(RepartyCommand())
-                    cch.commandMap["rp"] = RepartyCommand()
-                }
-                for (entry in cch.commands.entries) {
-                    if (entry.key == "reparty" || entry.key == "rp") {
-                        entry.setValue(RepartyCommand())
-                    }
-                }
             }
         }
     }
