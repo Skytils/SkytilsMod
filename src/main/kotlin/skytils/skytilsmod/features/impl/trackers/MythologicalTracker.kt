@@ -20,10 +20,12 @@ package skytils.skytilsmod.features.impl.trackers
 
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
@@ -49,7 +51,10 @@ import java.util.regex.Pattern
 class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers"), "mythological.json")) {
 
     private val rareDugDrop: Pattern = Pattern.compile("^RARE DROP! You dug out a (.+)!$")
-    private val mythCreatureDug = Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
+    private val mythCreatureDug =
+        Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
+
+    private var lastMinosChamp = 0L
 
     @Suppress("UNUSED")
     enum class BurrowDrop(
@@ -60,6 +65,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         var droppedTimes: Long = 0L
     ) {
         REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
+        // this does have a chat message but it's just Enchanted Book
         CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
         COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
         PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC),
@@ -89,12 +95,12 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         var dugTimes: Long = 0L,
     ) {
 
-        HUNTER("Minos Hunter", "MINOS_HUNTER"),
-        LYNX("Siamese Lynxes", "SIAMESE_LYNXES", plural = true),
-        MINO("Minotaur", "MINOTAUR"),
         GAIA("Gaia Construct", "GAIA_CONSTRUCT"),
         CHAMP("Minos Champion", "MINOS_CHAMPION"),
-        INQUIS("Minos Inquisitor", "MINOS_INQUISITOR");
+        HUNTER("Minos Hunter", "MINOS_HUNTER"),
+        INQUIS("Minos Inquisitor", "MINOS_INQUISITOR"),
+        MINO("Minotaur", "MINOTAUR"),
+        LYNX("Siamese Lynxes", "SIAMESE_LYNXES", plural = true);
 
         companion object {
             fun getFromId(id: String?): BurrowMob? {
@@ -108,27 +114,47 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
     }
 
     @SubscribeEvent
+    fun onJoinWorld(event: EntityJoinWorldEvent) {
+        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(mc.thePlayer) < 10 * 10) {
+            if (event.entity.name == "Minos Champion") {
+                lastMinosChamp = 0L
+                BurrowMob.MINO.dugTimes++
+            } else if (event.entity.name == "Minos Inquisitor") {
+                lastMinosChamp = 0L
+                BurrowMob.INQUIS.dugTimes++
+                mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils:§eActually, you dug up a §2Minos Inquisitor§e!"))
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
         when (event.packet) {
             is S02PacketChat -> {
                 if (event.packet.type == 2.toByte()) return
                 val unformatted = StringUtils.stripControlCodes(event.packet.chatComponent.unformattedText)
-                if (unformatted.startsWith("RARE DROP! You dug out a ")) {
+                if (Skytils.config.trackMythEvent && unformatted.startsWith("RARE DROP! You dug out a ")) {
                     val matcher = rareDugDrop.matcher(unformatted)
                     if (matcher.matches()) {
                         (BurrowDrop.getFromName(matcher.group(1)) ?: return).droppedTimes++
                         markDirty(this::class)
                     }
-                } else if (unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(" coins!")) {
+                } else if (Skytils.config.trackMythEvent && unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(" coins!")) {
                     BurrowDrop.COINS.droppedTimes += unformatted.replace(Regex("[^\\d]"), "").toLong()
-                } else if (unformatted.contains("! You dug out ")) {
+                } else if (Skytils.config.trackMythEvent && unformatted.contains("! You dug out ")) {
                     val matcher = mythCreatureDug.matcher(unformatted)
                     if (matcher.matches()) {
-                        (BurrowMob.getFromName(matcher.group(1)) ?: return).dugTimes++
-                        markDirty(this::class)
+                        var mob = BurrowMob.getFromName(matcher.group(1)) ?: return
+                        //for some reason, minos inquisitors say minos champion in the chat
+                        if (mob == BurrowMob.CHAMP) {
+                            lastMinosChamp = System.currentTimeMillis()
+                        } else {
+                            mob.dugTimes++
+                            markDirty(this::class)
+                        }
                     }
-                } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
+                } else if (Skytils.config.trackMythEvent && unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
                         "You finished the Griffin burrow chain! (4"
                     ))
                 ) {

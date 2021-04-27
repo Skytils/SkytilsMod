@@ -126,7 +126,7 @@ class GriffinBurrows {
         val player = mc.thePlayer
         if (event.phase != TickEvent.Phase.START || SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
-        if (burrowRefreshTimer.time >= 90_000 || shouldRefreshBurrows) {
+        if (burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows) {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             if (Skytils.config.showGriffinBurrows && Utils.inSkyblock && player != null) {
@@ -238,7 +238,7 @@ class GriffinBurrows {
                 for (i in 0..7) {
                     val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
                     if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        val diff = ((90_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
+                        val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
                         val sr = ScaledResolution(Minecraft.getMinecraft())
                         val leftAlign = actualX < sr.scaledWidth / 2f
                         val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
