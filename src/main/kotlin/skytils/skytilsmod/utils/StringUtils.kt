@@ -32,4 +32,15 @@ object StringUtils {
     fun startsWithAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
         return org.apache.commons.lang3.StringUtils.startsWithAny(string, *sequences)
     }
+
+    @JvmStatic
+    fun containsAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
+        if (string == null) return false
+        for(sequence in sequences) {
+            if (sequence?.let { string!!.contains(it) } == true) {
+                return true
+            }
+        }
+        return false
+    }
 }

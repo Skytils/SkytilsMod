@@ -212,7 +212,7 @@ class MiscFeatures {
         if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot.hasStack) return
         val chest = event.container
         if (equalsOneOf(chest.lowerChestInventory.name, "Chest", "Large Chest")) return
-        if (startsWithAny(SBInfo.instance.lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil")) return
+        if (startsWithAny(SBInfo.instance.lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
         if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
         val item = event.slot.stack
         if (getSkyBlockItemID(item) == null) {
