@@ -21,16 +21,17 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiMainMenu
 import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.utils.APIUtil
 import java.io.*
 
 class UpdateChecker {
     companion object {
-        private val mc = Minecraft.getMinecraft()
-        private val updateGetter = UpdateGetter()
+        val updateGetter = UpdateGetter()
         val updateDownloadURL: String
             get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject["browser_download_url"].asString
 
@@ -103,11 +104,12 @@ class UpdateChecker {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiOpen(e: GuiOpenEvent) {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
         try {
+            Skytils.displayScreen = RequestUpdateGui()
 /*            Notifications notifs = Notifications.INSTANCE;
             notifs.pushNotification("New Skytils Version Available", "Click here to download", () -> {
                 Skytils.displayScreen = new UpdateGui();
@@ -118,15 +120,10 @@ class UpdateChecker {
         }
     }
 
-    private class UpdateGetter : Runnable {
+    class UpdateGetter : Runnable {
         @Volatile
         var updateObj: JsonObject? = null
 
-        /**
-         * Modified version from Danker's Skyblock Mod, taken under GPL 3.0 license.
-         * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-         * @author bowser0000
-         */
         override fun run() {
             println("Checking for updates...")
             val latestRelease =

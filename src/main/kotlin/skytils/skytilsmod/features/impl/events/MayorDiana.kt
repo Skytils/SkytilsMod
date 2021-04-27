@@ -22,11 +22,8 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.event.entity.living.LivingHurtEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -87,7 +84,8 @@ class MayorDiana {
         }
     }
 
-    fun onLoad(event: WorldEvent.Load) {
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
         gaiaConstructHits.clear()
     }
 }
