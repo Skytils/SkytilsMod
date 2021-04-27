@@ -70,11 +70,18 @@ class MayorDiana {
                 if (event.entity is EntityIronGolem) {
                     val golem = event.entity as EntityIronGolem
                     if (gaiaConstructHits.containsKey(golem)) {
+                        val percentageHp = golem.health / golem.maxHealth
+                        val neededHits = when {
+                            percentageHp <= (1f / 3f) -> 7
+                            percentageHp <= (2f / 3f) -> 6
+                            else -> 5
+                        }
+                        val hits = gaiaConstructHits.getOrDefault(event.entity, 0);
                         GlStateManager.disableDepth()
                         RenderUtil.draw3DString(
                             Vec3(event.entity.posX, event.entity.posY + 2, event.entity.posZ),
-                            "Hits: ${gaiaConstructHits.getOrDefault(event.entity, 0)}",
-                            Color.RED,
+                            "Hits: $hits / $neededHits",
+                            if (hits < neededHits) Color.RED else Color.GREEN,
                             (mc as AccessorMinecraft).timer.renderPartialTicks
                         )
                         GlStateManager.enableDepth()

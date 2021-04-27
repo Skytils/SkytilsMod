@@ -118,7 +118,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(mc.thePlayer) < 5.5 * 5.5) {
             if (event.entity.name == "Minos Champion") {
                 lastMinosChamp = 0L
-                BurrowMob.MINO.dugTimes++
+                BurrowMob.CHAMP.dugTimes++
             } else if (event.entity.name == "Minos Inquisitor") {
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++

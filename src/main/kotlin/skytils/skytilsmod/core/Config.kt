@@ -679,6 +679,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Trick or Treat Chest Alert",
+        description = "Displays a title when any trick or treat chest spawns near you.",
+        category = "Events",
+        subcategory = "Spooky"
+    )
+    var trickOrTreatChestAlert = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Shiny Orb Waypoints",
         description = "Creates a waypoint of where your shiny orbs are",
         category = "Events",
@@ -1354,15 +1363,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "Quality of Life"
     )
     var stopClickingNonSalvageable = false
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "Trick or Treat Chest Alert",
-        description = "Displays a title when any trick or treat chest spawns near you.",
-        category = "Miscellaneous",
-        subcategory = "Quality of Life"
-    )
-    var trickOrTreatChestAlert = false
 
     @Property(
         type = PropertyType.SWITCH,
