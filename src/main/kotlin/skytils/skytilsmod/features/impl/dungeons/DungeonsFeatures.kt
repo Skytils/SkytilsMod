@@ -108,30 +108,7 @@ class DungeonsFeatures {
         private var rerollClicks = 0
         private var foundLivid = false
         private var livid: Entity? = null
-        private val blockLividThread: Thread = Thread({
-            while(mc.thePlayer.isPotionActive(Potion.blindness)) {
-                Thread.sleep(10)
-            }
-            val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
-            var a: EnumChatFormatting = EnumChatFormatting.RED
-            when (state.getValue(BlockStainedGlass.COLOR).name.lowercase()) {
-                "white" -> a = EnumChatFormatting.WHITE
-                "pink" -> a = EnumChatFormatting.LIGHT_PURPLE
-                "red" -> a = EnumChatFormatting.RED
-                "silver" -> a = EnumChatFormatting.GRAY
-                "green" -> a = EnumChatFormatting.DARK_GREEN
-                "lime" -> a = EnumChatFormatting.GREEN
-                "blue" -> a = EnumChatFormatting.BLUE
-                "purple" -> a = EnumChatFormatting.DARK_PURPLE
-                "yellow" -> a = EnumChatFormatting.YELLOW
-            }
-            for (entity in mc.theWorld.getLoadedEntityList()) {
-                if (entity.name.startsWith("$a﴾ $a§lLivid")) {
-                    livid = entity
-                    foundLivid = true
-                }
-            }
-        }, "Skytils-Block-Livid-Finder")
+        private var blockLividThread: Thread? = null
 
         init {
             LividGuiElement()
@@ -184,8 +161,32 @@ class DungeonsFeatures {
                             }
                         }
                         0 -> {
-                            if(hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && !blockLividThread.isAlive) {
-                                blockLividThread.start()
+                            if(hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && !blockLividThread!!.isAlive) {
+                                blockLividThread = Thread({
+                                    while(mc.thePlayer.isPotionActive(Potion.blindness)) {
+                                        Thread.sleep(10)
+                                    }
+                                    val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
+                                    var a: EnumChatFormatting = EnumChatFormatting.RED
+                                    when (state.getValue(BlockStainedGlass.COLOR).name.lowercase()) {
+                                        "white" -> a = EnumChatFormatting.WHITE
+                                        "pink" -> a = EnumChatFormatting.LIGHT_PURPLE
+                                        "red" -> a = EnumChatFormatting.RED
+                                        "silver" -> a = EnumChatFormatting.GRAY
+                                        "green" -> a = EnumChatFormatting.DARK_GREEN
+                                        "lime" -> a = EnumChatFormatting.GREEN
+                                        "blue" -> a = EnumChatFormatting.BLUE
+                                        "purple" -> a = EnumChatFormatting.DARK_PURPLE
+                                        "yellow" -> a = EnumChatFormatting.YELLOW
+                                    }
+                                    for (entity in mc.theWorld.getLoadedEntityList()) {
+                                        if (entity.name.startsWith("$a﴾ $a§lLivid")) {
+                                            livid = entity
+                                            foundLivid = true
+                                        }
+                                    }
+                                }, "Skytils-Block-Livid-Finder")
+                                blockLividThread!!.start()
                             }
                         }
                     }
