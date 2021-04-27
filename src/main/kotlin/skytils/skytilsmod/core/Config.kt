@@ -607,7 +607,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.SWITCH,
         name = "Burrow Particle Add-on",
-        description = "§b[WIP] §rAdd-on for Show Griffin Burrows. Uses particles in addition to the API.\nIt's recommended you only use this feature when the API is not working.",
+        description = "Uses particles in addition to the API in order to locate burrows.\nThis feature will help find burrows when the API isn't working.",
         category = "Events",
         subcategory = "Mythological"
     )
@@ -670,12 +670,30 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Display Gaia Construct Hits",
+        description = "Tracks the amount of times a Gaia Construct has been hit.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var trackGaiaHits = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Track Mythological Creatures",
         description = "Tracks and saves drops from Mythological Creatures.",
         category = "Events",
         subcategory = "Mythological"
     )
     var trackMythEvent = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Trick or Treat Chest Alert",
+        description = "Displays a title when any trick or treat chest spawns near you.",
+        category = "Events",
+        subcategory = "Spooky"
+    )
+    var trickOrTreatChestAlert = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -730,6 +748,23 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
    subcategory = "Quality of Life"
    )*/
     var preventBreakingFarms = false
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Click to Accept Trapper Task",
+            description = "Open chat, then click anywhere on screen to accept Trapper Task.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    var acceptTrapperTask = true
+
+    @Property(type = PropertyType.SWITCH,
+            name = "Trapper Cooldown Alarm",
+            description = "Quickly plays five notes once the Trapper is off cooldown.",
+            category = "Farming",
+            subcategory = "Quality of Life"
+    )
+    var trapperPing = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1337,15 +1372,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "Quality of Life"
     )
     var stopClickingNonSalvageable = false
-
-    @Property(
-        type = PropertyType.SWITCH,
-        name = "Trick or Treat Chest Alert",
-        description = "Displays a title when any trick or treat chest spawns near you.",
-        category = "Miscellaneous",
-        subcategory = "Quality of Life"
-    )
-    var trickOrTreatChestAlert = false
 
     @Property(
         type = PropertyType.SWITCH,

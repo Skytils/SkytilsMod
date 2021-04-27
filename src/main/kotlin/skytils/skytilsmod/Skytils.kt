@@ -52,6 +52,7 @@ import skytils.skytilsmod.features.impl.dungeons.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
+import skytils.skytilsmod.features.impl.events.MayorDiana
 import skytils.skytilsmod.features.impl.events.MayorJerry
 import skytils.skytilsmod.features.impl.events.TechnoMayor
 import skytils.skytilsmod.features.impl.farming.FarmingFeatures
@@ -183,6 +184,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(ItemFeatures())
         MinecraftForge.EVENT_BUS.register(KeyShortcuts())
         MinecraftForge.EVENT_BUS.register(LockOrb())
+        MinecraftForge.EVENT_BUS.register(MayorDiana())
         MinecraftForge.EVENT_BUS.register(MayorJerry())
         MinecraftForge.EVENT_BUS.register(MiningFeatures())
         MinecraftForge.EVENT_BUS.register(MinionFeatures())

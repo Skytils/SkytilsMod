@@ -183,7 +183,6 @@ class UpdateGui : GuiScreen() {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         private val DOTS = arrayOf(".", "..", "...", "...", "...")
         private const val DOT_TIME = 200 // ms between "." -> ".." -> "..."
     }

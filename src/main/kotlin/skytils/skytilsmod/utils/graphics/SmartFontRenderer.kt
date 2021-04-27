@@ -44,9 +44,9 @@ class SmartFontRenderer : FontRenderer(
         text: String?,
         x: Float,
         y: Float,
-        customColor: CustomColor,
-        alignment: TextAlignment,
-        shadow: TextShadow
+        customColor: CustomColor = CommonColors.WHITE,
+        alignment: TextAlignment = TextAlignment.LEFT_RIGHT,
+        shadow: TextShadow = TextShadow.NONE
     ): Float {
         if (text == null) return 0f
         if (customColor === CommonColors.RAINBOW) {
