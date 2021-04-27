@@ -4,6 +4,7 @@
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "AccessorCommandHandler",
+    "AccessorGuiContainer",
     "AccessorGuiEditSign",
     "AccessorGuiNewChat",
     "AccessorMinecraft",
