@@ -40,19 +40,17 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 
 
-/**
- * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 class CreeperSolver {
     private val colors = CommonColors.set.copySet()
-    private var drawCreeperLines = false
-    private var creeperLocation = Vec3(0.0, 0.0, 0.0)
     private var solutionPairs: MutableList<Pair<BlockPos, BlockPos>> = ArrayList()
     private var ticks = 0
     private var creeper: EntityCreeper? = null
 
+    /**
+     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
@@ -166,6 +164,11 @@ class CreeperSolver {
         solutionPairs.clear()
     }
 
+    /**
+     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     private fun getNearbyBlock(pos: BlockPos?, vararg blockTypes: Block): BlockPos? {
         if (pos == null) return null
         val pos1 = BlockPos(pos.x - 2, pos.y - 3, pos.z - 2)
@@ -184,6 +187,11 @@ class CreeperSolver {
         return closestBlock
     }
 
+    /**
+     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     private fun getFirstBlockPosAfterVectors(
         pos1: Vec3,
         pos2: Vec3,
