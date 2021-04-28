@@ -293,19 +293,42 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "Mythological Tracker",
+                "Burrows Dug§f: 1000",
                 if (leftAlign) 0f else width.toFloat(),
                 0f,
-                CommonColors.WHITE,
+                CommonColors.YELLOW,
                 alignment,
                 SmartFontRenderer.TextShadow.NORMAL
             )
+            var drawnLines = 1
+            for (mob in BurrowMob.values()) {
+                ScreenRenderer.fontRenderer.drawString(
+                    "${mob.mobName}§f: 100",
+                    if (leftAlign) 0f else width.toFloat(),
+                    (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                    CommonColors.CYAN,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+                drawnLines++
+            }
+            for (item in BurrowDrop.values()) {
+                ScreenRenderer.fontRenderer.drawString(
+                    "${item.rarity.baseColor}${item.itemName}§f: §r100",
+                    if (leftAlign) 0f else width.toFloat(),
+                    (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                    CommonColors.CYAN,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+                drawnLines++
+            }
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 17
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Mythological Tracker")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Crochet Tiger Plushie: 100")
 
         override val toggled: Boolean
             get() = Skytils.config.trackMythEvent
