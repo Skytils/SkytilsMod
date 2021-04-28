@@ -373,8 +373,8 @@ class SpamHider {
 
             // Blessing bair
             if (formatted.startsWith("§r§aYour bait got you double")) {
-                when (Skytils.config.blessingBaitHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.blessingBaitHider == 2)
+                when (Skytils.config.blessedBaitHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.blessedBaitHider == 2)
                     else -> {
                     }
                 }
@@ -656,7 +656,7 @@ class SpamHider {
                     Skytils.config.hideNoEnemiesNearby == 2 ||
                     Skytils.config.manaMessages == 2 ||
                     Skytils.config.blessingEnchantHider == 2 ||
-                    Skytils.config.blessingBaitHider == 2 ||
+                    Skytils.config.blessedBaitHider == 2 ||
                     Skytils.config.tetherHider == 2 ||
                     Skytils.config.selfOrbHider == 2 ||
                     Skytils.config.otherOrbHider == 2

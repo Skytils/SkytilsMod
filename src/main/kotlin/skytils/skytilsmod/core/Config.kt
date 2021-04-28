@@ -1916,13 +1916,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SELECTOR,
-        name = "Blessing Bait Hider",
-        description = "Removes blessing bait message from fishing.",
+        name = "Blessed Bait Hider",
+        description = "Removes blessed bait message from fishing.",
         category = "Spam",
         subcategory = "Fishing",
         options = ["Normal", "Hidden", "Separate GUI"]
     )
-    var blessingBaitHider = 0
+    var blessedBaitHider = 0
 
     init {
         initialize()
