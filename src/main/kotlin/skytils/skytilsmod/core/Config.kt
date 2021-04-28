@@ -428,7 +428,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
     @Property(
         type = PropertyType.COLOR,
         name = "Highest Blaze Color",
-        description = "Color used to highlight the lowest blaze in.",
+        description = "Color used to highlight the highest blaze in.",
         category = "Dungeons",
         subcategory = "Solvers"
     )
@@ -453,6 +453,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         subcategory = "Solvers"
     )
     var boulderSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Creeper Beams Solver",
+        description = "Shows pairs on the Creeper Beams puzzle.",
+        category = "Dungeons",
+        subcategory = "Solvers"
+    )
+    var creeperBeamsSolver = false
+
 
     @Property(
         type = PropertyType.SWITCH,

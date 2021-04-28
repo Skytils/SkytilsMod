@@ -165,6 +165,7 @@ class BlazeSolver {
     companion object {
         @JvmField
         var orderedBlazes = ArrayList<ShootableBlaze>()
+
         @JvmField
         var blazeMode = 0
         var blazeChest: BlockPos? = null

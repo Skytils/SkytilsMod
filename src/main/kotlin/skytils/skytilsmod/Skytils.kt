@@ -178,6 +178,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(BoulderSolver())
         MinecraftForge.EVENT_BUS.register(ChestProfit())
         MinecraftForge.EVENT_BUS.register(ClickInOrderSolver())
+        MinecraftForge.EVENT_BUS.register(CreeperSolver())
         MinecraftForge.EVENT_BUS.register(CommandAliases())
         MinecraftForge.EVENT_BUS.register(DamageSplash())
         MinecraftForge.EVENT_BUS.register(DarkModeMist())
