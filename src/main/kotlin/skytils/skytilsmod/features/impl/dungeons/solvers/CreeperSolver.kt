@@ -65,12 +65,8 @@ class CreeperSolver {
                 if (this.creeper == null) {
                     // Find creepers nearby
                     val creeperScan = AxisAlignedBB(x - 14, y - 8, z - 13, x + 14, y + 8, z + 13) // 28x16x26 cube
-                    val creepers = world.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan)
-                    for (creeper in creepers) {
-                        if (!creeper.isInvisible && creeper.maxHealth == 20f && creeper.health == 20f && creeper.name == "Creeper") {
-                            this.creeper = creeper
-                            break
-                        }
+                    this.creeper = world.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan).find {
+                        !it.isInvisible && it.maxHealth == 20f && it.health == 20f && it.name == "Creeper"
                     }
                 } else {
                     val creeper = this.creeper!!
@@ -121,13 +117,13 @@ class CreeperSolver {
             val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
             val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
             val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
-            var drawn = 0
             GlStateManager.disableCull()
-            for ((one, two) in solutionPairs) {
+            for (i in solutionPairs.indices) {
+                val (one, two) = solutionPairs[i]
                 if (mc.theWorld.getBlockState(one).block == Blocks.prismarine && mc.theWorld.getBlockState(two).block == Blocks.prismarine) {
                     continue
                 }
-                val color = Color(colors[drawn % colors.size].toInt())
+                val color = Color(colors[i % colors.size].toInt())
                 val first = Vec3(one).addVector(-viewerX, -viewerY, -viewerZ)
                 val second = Vec3(two).addVector(-viewerX, -viewerY, -viewerZ)
                 val aabb1 = AxisAlignedBB(
@@ -152,7 +148,6 @@ class CreeperSolver {
                 RenderUtil.drawFilledBoundingBox(
                     aabb2.expand(0.01, 0.01, 0.01), color, 0.5f
                 )
-                drawn++
             }
             GlStateManager.enableCull()
         }
