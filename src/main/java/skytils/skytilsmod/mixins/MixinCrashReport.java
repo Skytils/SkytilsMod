@@ -39,7 +39,8 @@ public abstract class MixinCrashReport {
     @Redirect(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 0))
     private StringBuilder blameSkytils(StringBuilder stringBuilder, String str) {
         stringBuilder.append(str);
-        if (getCauseStackTraceOrString().contains("skytils.skytilsmod")) {
+        String cause = getCauseStackTraceOrString();
+        if (cause.contains("skytils.skytilsmod") && !cause.contains("use the latest Forge")) {
             isSkytilsCrash = true;
             stringBuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n");
         }

@@ -134,7 +134,7 @@ jar {
 }
 
 shadowJar {
-    archiveName = jar.archiveName
+    archiveFileName = jar.archiveFileName
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     relocate("club.sk1er", "skytils.sk1er")
