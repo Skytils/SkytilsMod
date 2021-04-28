@@ -387,7 +387,13 @@ class GriffinBurrows {
             RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 1f)
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
-            RenderUtil.renderWaypointText(waypointText, blockPos.x + 0.5, blockPos.y + 5.0, blockPos.z + 0.5, partialTicks)
+            RenderUtil.renderWaypointText(
+                waypointText,
+                blockPos.x + 0.5,
+                blockPos.y + 5.0,
+                blockPos.z + 0.5,
+                partialTicks
+            )
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()
             GlStateManager.enableDepth()
