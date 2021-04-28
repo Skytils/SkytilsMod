@@ -43,7 +43,6 @@ import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.potion.Potion
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -64,6 +63,7 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.mixins.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -161,25 +161,14 @@ class DungeonsFeatures {
                             }
                         }
                         0 -> {
-                            if(hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && !blockLividThread!!.isAlive) {
+                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && blockLividThread?.isAlive != true) {
                                 blockLividThread = Thread({
-                                    while(mc.thePlayer.isPotionActive(Potion.blindness)) {
+                                    while (mc.thePlayer.isPotionActive(Potion.blindness)) {
                                         Thread.sleep(10)
                                     }
                                     val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
-                                    var a: EnumChatFormatting = EnumChatFormatting.RED
-                                    when (state.getValue(BlockStainedGlass.COLOR).name.lowercase()) {
-                                        "white" -> a = EnumChatFormatting.WHITE
-                                        "pink" -> a = EnumChatFormatting.LIGHT_PURPLE
-                                        "red" -> a = EnumChatFormatting.RED
-                                        "silver" -> a = EnumChatFormatting.GRAY
-                                        "green" -> a = EnumChatFormatting.DARK_GREEN
-                                        "lime" -> a = EnumChatFormatting.GREEN
-                                        "blue" -> a = EnumChatFormatting.BLUE
-                                        "purple" -> a = EnumChatFormatting.DARK_PURPLE
-                                        "yellow" -> a = EnumChatFormatting.YELLOW
-                                    }
-                                    for (entity in mc.theWorld.getLoadedEntityList()) {
+                                    val a = (state.getValue(BlockStainedGlass.COLOR) as AccessorEnumDyeColor).chatColor
+                                    for (entity in mc.theWorld.loadedEntityList) {
                                         if (entity.name.startsWith("$a﴾ $a§lLivid")) {
                                             livid = entity
                                             foundLivid = true

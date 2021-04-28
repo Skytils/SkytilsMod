@@ -277,7 +277,12 @@ class MiningFeatures {
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
         if (!Utils.inSkyblock || SBInfo.instance.mode != SBInfo.SkyblockIslands.DWARVENMINES.mode || event.state == null) return
         val state = event.state!!
-        if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(state.getValue(BlockCarpet.COLOR), EnumDyeColor.GRAY, EnumDyeColor.CYAN)) {
+        if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
+                state.getValue(
+                    BlockCarpet.COLOR
+                ), EnumDyeColor.GRAY, EnumDyeColor.CYAN
+            )
+        ) {
             event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
         }
     }
