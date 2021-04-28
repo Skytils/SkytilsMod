@@ -124,19 +124,17 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
-        if (event.phase != TickEvent.Phase.START || SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode) return
+        if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
-        if (burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows) {
+        if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
-            if (Skytils.config.showGriffinBurrows && Utils.inSkyblock && player != null) {
-                for (i in 0..7) {
-                    val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
-                    if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        player.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
-                        refreshBurrows()
-                        break
-                    }
+            for (i in 0..7) {
+                val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
+                if (hotbarItem.displayName.contains("Ancestral Spade")) {
+                    player.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
+                    refreshBurrows()
+                    break
                 }
             }
         }
@@ -224,7 +222,7 @@ class GriffinBurrows {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         burrows.clear()
         particleBurrows.clear()
         shouldRefreshBurrows = true
