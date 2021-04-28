@@ -151,6 +151,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Dungeon Map",
+        description = "Displays the vanilla map on your screen using vanilla rendering code.",
+        category = "Dungeons",
+        subcategory = "Miscellaneous"
+    )
+    var dungeonTrashMap = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Dungeon Timer",
         description = "Shows the time taken for certain actions in dungeons.",
         category = "Dungeons",
