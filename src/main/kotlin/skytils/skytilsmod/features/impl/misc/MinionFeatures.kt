@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.misc
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -47,7 +48,7 @@ class MinionFeatures {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet as S29PacketSoundEffect?
+            val packet = event.packet as S29PacketSoundEffect
             if (packet!!.soundName == "random.chestopen" && packet.pitch == 1f && packet.volume == 1f) {
                 blockUnenchanted = false
             }
@@ -64,12 +65,12 @@ class MinionFeatures {
             val item = slot.stack
             val inventoryName = inventory.displayName.unformattedText
             if (Skytils.config.onlyCollectEnchantedItems && inventoryName.contains("Minion") && item != null) {
-                if (!item.isItemEnchanted) {
+                if (!item.isItemEnchanted && item.item != Items.skull) {
                     if (inventoryName == "Minion Chest") {
                         if (!blockUnenchanted) {
                             for (i in 0 until inventory.sizeInventory) {
                                 val stack = inventory.getStackInSlot(i) ?: continue
-                                if (stack.isItemEnchanted) {
+                                if (stack.isItemEnchanted || stack.item == Items.skull) {
                                     blockUnenchanted = true
                                     break
                                 }

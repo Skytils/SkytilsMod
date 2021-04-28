@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.features.impl.dungeons
 
-import club.sk1er.elementa.state.map
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
@@ -27,11 +26,9 @@ import net.minecraft.world.storage.MapData
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.awt.Color
