@@ -384,7 +384,7 @@ class GriffinBurrows {
             val distSq = x * x + y * y + z * z
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 1f)
+            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 0.1f + 0.005f * distSq.toFloat())
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
             RenderUtil.renderWaypointText(
@@ -472,13 +472,15 @@ class GriffinBurrows {
             val distSq = x * x + y * y + z * z
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 1f)
+            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), this.color, 0.1f + 0.005f * distSq.toFloat())
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
-            RenderUtil.renderWaypointText(waypointText,
+            RenderUtil.renderWaypointText(
+                waypointText,
                 blockPos.x + 0.5,
                 blockPos.y + 5.0,
-                blockPos.z + 0.5, partialTicks)
+                blockPos.z + 0.5, partialTicks
+            )
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()
             GlStateManager.enableDepth()
