@@ -113,7 +113,7 @@ open class LocationEditGui : GuiScreen() {
         val minecraftScale = sr.scaleFactor.toFloat()
         val floatMouseX = Mouse.getX() / minecraftScale
         val floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale
-        if (resizing) {
+        if (resizing) { //TODO Fix the rescaling by changing it on corner
             val locationButton = locationButtons[dragging] ?: return
             val scale = scaleCache
             val scaledX1 = locationButton.x * scale
