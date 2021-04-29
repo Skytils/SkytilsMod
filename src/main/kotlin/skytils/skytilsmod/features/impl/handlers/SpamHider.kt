@@ -101,8 +101,8 @@ class SpamHider {
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     fun onChatPacket(event: ReceiveEvent) {
         if (event.packet !is S02PacketChat) return
-        val packet = event.packet as S02PacketChat?
-        if (packet!!.type.toInt() == 2) return
+        val packet = event.packet
+        if (packet.type.toInt() == 2) return
         val unformatted = stripControlCodes(packet.chatComponent.unformattedText)
         val formatted = packet.chatComponent.formattedText
 

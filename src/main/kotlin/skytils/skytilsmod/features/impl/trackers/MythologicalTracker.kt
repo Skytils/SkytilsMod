@@ -121,9 +121,11 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             ) < 5.5 * 5.5
         ) {
             if (event.entity.name == "Minos Champion") {
+                println("Dug is: Minos Champion")
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
             } else if (event.entity.name == "Minos Inquisitor") {
+                println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
                 mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!"))

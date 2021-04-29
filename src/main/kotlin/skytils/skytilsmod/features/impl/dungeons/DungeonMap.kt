@@ -45,7 +45,7 @@ class DungeonMap {
     class TrashDungeonMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
 
         override fun render() {
-            if (SBInfo.instance.mode != SBInfo.SkyblockIslands.DUNGEON.mode || mc.thePlayer == null || mc.theWorld == null || !toggled) return
+            if (!toggled || SBInfo.instance.mode != SBInfo.SkyblockIslands.DUNGEON.mode || mc.thePlayer == null || mc.theWorld == null) return
             if (DungeonsFeatures.hasBossSpawned) return
             readMapData()
             if (mapData == null) return

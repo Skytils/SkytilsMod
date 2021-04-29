@@ -166,8 +166,8 @@ class FarmingFeatures {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S45PacketTitle) {
-            val packet = event.packet as S45PacketTitle?
-            if (packet!!.message != null) {
+            val packet = event.packet
+            if (packet.message != null) {
                 val unformatted = stripControlCodes(packet.message.unformattedText)
                 if (Skytils.config.hideFarmingRNGTitles && unformatted.contains("DROP!")) {
                     event.isCanceled = true

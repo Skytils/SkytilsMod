@@ -165,11 +165,10 @@ class MiningFeatures {
         if (event.slot.hasStack && SBInfo.instance.lastOpenContainerName.equals("Commissions") && Skytils.config.highlightCompletedComissions) {
             var item = event.slot.stack
             if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
-                for (line in ItemUtil.getItemLore(item)) {
-                    if (line == "§7§eClick to claim rewards!") {
-                        event.slot highlight Color(255, 0, 0)
-                        break
-                    }
+                if (ItemUtil.getItemLore(item).any {
+                        it == "§7§eClick to claim rewards!"
+                    }) {
+                    event.slot highlight Color(255, 0, 0)
                 }
             }
         }

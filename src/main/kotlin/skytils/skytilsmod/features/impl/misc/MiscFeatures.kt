@@ -159,12 +159,12 @@ class MiscFeatures {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet as S29PacketSoundEffect?
-            if (Skytils.config.disableCooldownSounds && packet!!.soundName == "mob.endermen.portal" && packet.pitch == 0f && packet.volume == 8f) {
+            val packet = event.packet
+            if (Skytils.config.disableCooldownSounds && packet.soundName == "mob.endermen.portal" && packet.pitch == 0f && packet.volume == 8f) {
                 event.isCanceled = true
             }
             if (Skytils.config.disableJerrygunSounds) {
-                when (packet!!.soundName) {
+                when (packet.soundName) {
                     "mob.villager.yes" -> if (packet.volume == 0.35f) {
                         event.isCanceled = true
                     }
@@ -173,7 +173,7 @@ class MiscFeatures {
                     }
                 }
             }
-            if (Skytils.config.disableTruthFlowerSounds && packet!!.soundName == "random.eat" && packet.pitch == 0.6984127f && packet.volume == 1.0f) {
+            if (Skytils.config.disableTruthFlowerSounds && packet.soundName == "random.eat" && packet.pitch == 0.6984127f && packet.volume == 1.0f) {
                 event.isCanceled = true
             }
         }

@@ -470,8 +470,8 @@ class DungeonsFeatures {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S45PacketTitle) {
-            val packet = event.packet as S45PacketTitle?
-            if (packet!!.message != null && mc.thePlayer != null) {
+            val packet = event.packet
+            if (packet.message != null && mc.thePlayer != null) {
                 val unformatted = StringUtils.stripControlCodes(packet.message.unformattedText)
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.name) && (unformatted.contains(
                         "activated a terminal!"

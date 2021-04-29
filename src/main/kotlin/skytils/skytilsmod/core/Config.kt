@@ -18,13 +18,12 @@
 package skytils.skytilsmod.core
 
 import club.sk1er.vigilance.Vigilant
-import club.sk1er.vigilance.data.Property
-import club.sk1er.vigilance.data.PropertyType
+import club.sk1er.vigilance.data.*
 import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 import java.io.File
 
-class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
+class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting()) {
 
     @Property(
         type = PropertyType.TEXT,
@@ -1991,6 +1990,18 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         if (this.itemRarityOpacity > 1) {
             this.itemRarityOpacity /= 100f
             markDirty()
+        }
+    }
+
+    class ConfigSorting : SortingBehavior() {
+        override fun getCategoryComparator(): Comparator<in Category> {
+            return Comparator { o1, o2 ->
+                if (o1.name == "General") return@Comparator -1
+                if (o2.name == "General") return@Comparator 1
+                else compareValuesBy(o1, o2) {
+                    it.name
+                }
+            }
         }
     }
 }
