@@ -90,8 +90,8 @@ class BoulderSolver {
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inDungeons) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
-            val packet = event.packet as C08PacketPlayerBlockPlacement?
-            if (packet!!.position != null && packet.position == boulderChest) {
+            val packet = event.packet as C08PacketPlayerBlockPlacement
+            if (packet.position != null && packet.position == boulderChest) {
                 roomVariant = -2
             }
         }

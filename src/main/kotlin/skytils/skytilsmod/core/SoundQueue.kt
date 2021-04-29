@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.core
 
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -26,8 +25,7 @@ import skytils.skytilsmod.utils.Utils
 import java.util.concurrent.ConcurrentLinkedQueue
 
 object SoundQueue {
-    @JvmField
-    val soundQueue = ConcurrentLinkedQueue<QueuedSound>()
+    private val soundQueue = ConcurrentLinkedQueue<QueuedSound>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -42,6 +40,10 @@ object SoundQueue {
                 soundQueue.remove(sound)
             }
         }
+    }
+
+    fun addToQueue(queuedSound: QueuedSound) {
+        soundQueue.add(queuedSound)
     }
 
     class QueuedSound(

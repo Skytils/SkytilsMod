@@ -184,7 +184,7 @@ class FarmingFeatures {
                 trapperStart = -1.0
                 mc.thePlayer.addChatMessage(ChatComponentText("§dSkytils: Trapper cooldown has now expired!"))
                 for (i in 0..4) {
-                    SoundQueue.soundQueue.add(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
+                    SoundQueue.addToQueue(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
                 }
             }
         }

@@ -153,8 +153,8 @@ class ScoreCalculation {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inDungeons) return
         if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet as S29PacketSoundEffect?
-            val sound = packet!!.soundName
+            val packet = event.packet
+            val sound = packet.soundName
             val pitch = packet.pitch
             val volume = packet.volume
             if (Skytils.config.removePartyChatNotifFromScoreCalc && sound == "random.orb" && pitch == 1f && volume == 1f) {

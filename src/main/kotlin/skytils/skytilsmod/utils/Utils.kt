@@ -179,7 +179,7 @@ object Utils {
     fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent) {
         if (ReceivePacketEvent.packet !is S02PacketChat) return
         ReceivePacketEvent.isCanceled = true
-        val packet = ReceivePacketEvent.packet as S02PacketChat?
-        MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet!!.type, packet.chatComponent))
+        val packet = ReceivePacketEvent.packet
+        MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
     }
 }

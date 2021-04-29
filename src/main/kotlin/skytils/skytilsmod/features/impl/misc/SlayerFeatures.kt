@@ -144,8 +144,8 @@ class SlayerFeatures {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet as S29PacketSoundEffect?
-            if (Skytils.config.slayerMinibossSpawnAlert && packet!!.soundName == "random.explode" && packet.volume == 0.6f && packet.pitch == 9 / 7f && GuiManager.title != "§cMINIBOSS") {
+            val packet = event.packet
+            if (Skytils.config.slayerMinibossSpawnAlert && packet.soundName == "random.explode" && packet.volume == 0.6f && packet.pitch == 9 / 7f && GuiManager.title != "§cMINIBOSS") {
                 createTitle("§cMINIBOSS", 20)
             }
         }
