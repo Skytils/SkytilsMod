@@ -30,7 +30,7 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.util.*
 
-class ArmorColorCommand : CommandBase() {
+object ArmorColorCommand : CommandBase() {
     override fun getCommandName(): String {
         return "armorcolor"
     }

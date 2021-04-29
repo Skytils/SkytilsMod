@@ -159,8 +159,6 @@ class Skytils {
     fun init(event: FMLInitializationEvent) {
         config.preload()
 
-        ClientCommandHandler.instance.registerCommand(SkytilsCommand())
-
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
         MinecraftForge.EVENT_BUS.register(GUIMANAGER)
@@ -230,26 +228,28 @@ class Skytils {
         val cch = ClientCommandHandler.instance
 
         if (cch is AccessorCommandHandler) {
+            cch.registerCommand(SkytilsCommand)
+
             if (!cch.commands.containsKey("armorcolor")) {
-                cch.registerCommand(ArmorColorCommand())
+                cch.registerCommand(ArmorColorCommand)
             }
 
             if (!cch.commands.containsKey("blockability")) {
-                //cch.registerCommand(BlockAbilityCommand());
+                //cch.registerCommand(BlockAbilityCommand);
             }
 
             if (!cch.commands.containsKey("glintcustomize")) {
-                cch.registerCommand(GlintCustomizeCommand())
+                cch.registerCommand(GlintCustomizeCommand)
             }
 
             if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
-                cch.commandSet.add(RepartyCommand())
-                cch.commandMap["reparty"] = RepartyCommand()
+                cch.commandSet.add(RepartyCommand)
+                cch.commandMap["reparty"] = RepartyCommand
             }
 
             if (config.overrideReparty || !cch.commands.containsKey("rp")) {
-                cch.commandSet.add(RepartyCommand())
-                cch.commandMap["rp"] = RepartyCommand()
+                cch.commandSet.add(RepartyCommand)
+                cch.commandMap["rp"] = RepartyCommand
             }
         }
     }

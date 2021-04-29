@@ -24,7 +24,32 @@ import net.minecraft.util.EnumChatFormatting
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
 
-class RepartyCommand : CommandBase(), ICommand {
+object RepartyCommand : CommandBase(), ICommand {
+
+    @JvmField
+    var gettingParty = false
+
+    @JvmField
+    var Delimiter = 0
+
+    @JvmField
+    var disbanding = false
+
+    @JvmField
+    var inviting = false
+
+    @JvmField
+    var failInviting = false
+
+    @JvmField
+    var party: MutableList<String> = ArrayList()
+
+    @JvmField
+    var repartyFailList: MutableList<String> = ArrayList()
+
+    @JvmField
+    var partyThread: Thread? = null
+
     override fun getCommandName(): String {
         return "reparty"
     }
@@ -44,7 +69,7 @@ class RepartyCommand : CommandBase(), ICommand {
     @Throws(CommandException::class)
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.isOnHypixel) throw WrongUsageException("You must be on Hypixel to use this command.")
-        if (args.size > 0 && (args[0].startsWith("fail") || args[0] == "f")) {
+        if (args.isNotEmpty() && (args[0].startsWith("fail") || args[0] == "f")) {
             partyThread = Thread {
                 val player = Minecraft.getMinecraft().thePlayer
                 val chat = Minecraft.getMinecraft().ingameGUI.chatGUI
@@ -162,24 +187,5 @@ class RepartyCommand : CommandBase(), ICommand {
             }
         }
         partyThread!!.start()
-    }
-
-    companion object {
-        @JvmField
-        var gettingParty = false
-        @JvmField
-        var Delimiter = 0
-        @JvmField
-        var disbanding = false
-        @JvmField
-        var inviting = false
-        @JvmField
-        var failInviting = false
-        @JvmField
-        var party: MutableList<String> = ArrayList()
-        @JvmField
-        var repartyFailList: MutableList<String> = ArrayList()
-        @JvmField
-        var partyThread: Thread? = null
     }
 }

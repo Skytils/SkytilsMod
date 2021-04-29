@@ -28,7 +28,7 @@ import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.utils.ItemUtil
 import java.util.*
 
-class BlockAbilityCommand : CommandBase() {
+object BlockAbilityCommand : CommandBase() {
     override fun getCommandName(): String {
         return "blockability"
     }

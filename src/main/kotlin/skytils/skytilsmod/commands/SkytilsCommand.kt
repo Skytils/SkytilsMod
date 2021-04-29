@@ -35,9 +35,8 @@ import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.APIUtil
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 
-class SkytilsCommand : CommandBase() {
+object SkytilsCommand : CommandBase() {
 
     override fun getCommandName(): String {
         return "skytils"
@@ -110,8 +109,7 @@ class SkytilsCommand : CommandBase() {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("/skytils reload <aliases/data>"))
                 } else {
-                    val action = args[1].lowercase()
-                    when (action) {
+                    when (args[1].lowercase()) {
                         "data" -> {
                             DataFetcher.reloadData()
                             player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils repository data has been §freloaded§b successfully."))
@@ -164,15 +162,11 @@ class SkytilsCommand : CommandBase() {
             "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
                 LocationEditGui()
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
-            "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> acc.processCommand(
+            "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> ArmorColorCommand.processCommand(
                 sender,
                 args.copyOfRange(1, args.size)
             )
             else -> player.addChatMessage(ChatComponentText("§bSkytils ➜ §cThis command doesn't exist!\n §cUse §b/Skytils help§c for a full list of commands"))
         }
-    }
-
-    companion object {
-        private val acc = ArmorColorCommand()
     }
 }
