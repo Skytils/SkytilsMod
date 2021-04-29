@@ -29,14 +29,12 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.utils.ItemRarity
-import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.StringUtils
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -47,6 +45,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
+import kotlin.math.pow
 
 class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers"), "mythological.json")) {
 
@@ -153,7 +152,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                 } else if (unformatted.contains("! You dug out ")) {
                     val matcher = mythCreatureDug.matcher(unformatted)
                     if (matcher.matches()) {
-                        var mob = BurrowMob.getFromName(matcher.group(1)) ?: return
+                        val mob = BurrowMob.getFromName(matcher.group(1)) ?: return
                         //for some reason, minos inquisitors say minos champion in the chat
                         if (mob == BurrowMob.CHAMP) {
                             lastMinosChamp = System.currentTimeMillis()
@@ -194,6 +193,38 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
                 if (Skytils.config.broadcastMythCreatureDrop) {
                     mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"))
+
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(-9.0 / 12).toFloat(),
+                            isLoud = true
+                        )
+                    )
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(-2.0 / 12).toFloat(),
+                            ticks = 4,
+                            isLoud = true
+                        )
+                    )
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(1.0 / 12).toFloat(),
+                            ticks = 8,
+                            isLoud = true
+                        )
+                    )
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(3.0 / 12).toFloat(),
+                            ticks = 12,
+                            isLoud = true
+                        )
+                    )
                 }
                 if (Skytils.config.trackMythEvent) {
                     drop.droppedTimes++
@@ -247,7 +278,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock) {
+            if (toggled && Utils.inSkyblock && SBInfo.instance.mode.equals("hub")) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
