@@ -35,7 +35,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         hidden = true
     )
     @JvmField
-    var dataURL = "https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"
+    var dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1977,6 +1977,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils") {
         // asbyth cool code
         registerListener(::darkModeMist) { mc.renderGlobal.loadRenderers() }
         registerListener(::recolorCarpets) { mc.renderGlobal.loadRenderers() }
+
+        this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
         if (this.largerHeadScale > 2) {
             this.largerHeadScale /= 100

@@ -107,7 +107,7 @@ public abstract class MixinMinecraft {
         File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
         if (!file.exists()) {
             try {
-                HttpGet request = new HttpGet(new URL("https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/files/vigilance.toml").toURI());
+                HttpGet request = new HttpGet(new URL(Skytils.config.dataURL + "files/vigilance.toml").toURI());
                 request.setProtocolVersion(HttpVersion.HTTP_1_1);
                 HttpResponse response = APIUtil.INSTANCE.getClient().execute(request);
                 if (response.getStatusLine().getStatusCode() == 200) {

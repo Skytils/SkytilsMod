@@ -24,6 +24,10 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.Utils
 import java.util.concurrent.ConcurrentLinkedQueue
 
+/**
+ * Hopefully thread safe way to queue sounds with a delay
+ * @author My-Name-Is-Jeff
+ */
 object SoundQueue {
     private val soundQueue = ConcurrentLinkedQueue<QueuedSound>()
 
@@ -42,10 +46,21 @@ object SoundQueue {
         }
     }
 
+    /**
+     * Add a sound to the SoundQueue
+     */
     fun addToQueue(queuedSound: QueuedSound) {
         soundQueue.add(queuedSound)
     }
 
+    /**
+     * Represents a sound in the queue
+     * @param sound the name of the sound to play
+     * @param pitch the pitch of the sound to play
+     * @param volume the volume of the sound to play
+     * @param ticks the amount of ticks to delay the sound by
+     * @param isLoud whether or not the sound should bypass the user's volume settings
+     */
     class QueuedSound(
         val sound: String,
         val pitch: Float,
