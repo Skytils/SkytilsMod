@@ -23,6 +23,8 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.ItemMap
 import net.minecraft.world.storage.MapData
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -34,9 +36,13 @@ import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.awt.Color
 
 class DungeonMap {
-    class TrashDungeonMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
 
-        var mapData: MapData? = null
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        mapData = null
+    }
+
+    class TrashDungeonMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
 
         override fun render() {
             if (SBInfo.instance.mode != SBInfo.SkyblockIslands.DUNGEON.mode || mc.thePlayer == null || mc.theWorld == null || !toggled) return
@@ -74,7 +80,7 @@ class DungeonMap {
         private fun readMapData() {
             val mapItem = mc.thePlayer.inventory.getStackInSlot(8)
             if (mapItem == null || mapItem.item !is ItemMap) return
-            this.mapData = Items.filled_map.getMapData(mapItem, mc.theWorld)
+            mapData = Items.filled_map.getMapData(mapItem, mc.theWorld)
         }
 
         override val toggled: Boolean
@@ -91,5 +97,9 @@ class DungeonMap {
 
     init {
         TrashDungeonMap()
+    }
+
+    companion object {
+        var mapData: MapData? = null
     }
 }

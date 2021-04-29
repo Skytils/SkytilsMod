@@ -37,7 +37,7 @@ object StringUtils {
     fun containsAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
         if (string == null) return false
         for(sequence in sequences) {
-            if (sequence?.let { string!!.contains(it) } == true) {
+            if (sequence?.let { string.contains(it) } == true) {
                 return true
             }
         }

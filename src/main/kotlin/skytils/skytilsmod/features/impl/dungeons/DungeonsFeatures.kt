@@ -482,9 +482,9 @@ class DungeonsFeatures {
             }
         }
         if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet as S29PacketSoundEffect?
+            val packet = event.packet
             if (Skytils.config.disableTerracottaSounds && isInTerracottaPhase) {
-                val sound = packet!!.soundName
+                val sound = packet.soundName
                 val pitch = packet.pitch
                 val volume = packet.volume
                 if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.isCanceled = true

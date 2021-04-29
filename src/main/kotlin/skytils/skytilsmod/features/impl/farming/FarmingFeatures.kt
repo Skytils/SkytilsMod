@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
@@ -176,7 +177,7 @@ class FarmingFeatures {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inSkyblock || !Skytils.config.trapperPing) return
+        if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
         if (trapperStart > 0) {
             if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
                 trapperStart = -1.0
@@ -205,14 +206,13 @@ class FarmingFeatures {
         if (!Utils.inSkyblock) return
         if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
             if (Skytils.config.acceptTrapperTask && !commandSent) {
-                Minecraft.getMinecraft().thePlayer.sendChatMessage(acceptTrapperCommand)
+                Skytils.sendMessageQueue.add(acceptTrapperCommand)
                 commandSent = true
             }
         }
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         var hungerHikerItems = LinkedHashMap<String, String>()
         var trapperStart = -1.0
         var animalFound = false

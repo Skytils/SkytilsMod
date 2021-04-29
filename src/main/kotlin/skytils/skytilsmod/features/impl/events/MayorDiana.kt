@@ -60,7 +60,7 @@ class MayorDiana {
                         for (entity in mc.theWorld.loadedEntityList) {
                             if (entity is EntityIronGolem && entity.isEntityAlive && entity.getDistanceSq(pos) <= 2 * 2) {
                                 gaiaConstructHits.compute(entity) { _: EntityIronGolem, i: Int? -> if (i == null) 1 else i + 1 }
-                                break;
+                                break
                             }
                         }
                     }
@@ -76,7 +76,7 @@ class MayorDiana {
                             percentageHp <= (2f / 3f) -> 6
                             else -> 5
                         }
-                        val hits = gaiaConstructHits.getOrDefault(event.entity, 0);
+                        val hits = gaiaConstructHits.getOrDefault(event.entity, 0)
                         GlStateManager.disableDepth()
                         RenderUtil.draw3DString(
                             Vec3(event.entity.posX, event.entity.posY + 2, event.entity.posZ),

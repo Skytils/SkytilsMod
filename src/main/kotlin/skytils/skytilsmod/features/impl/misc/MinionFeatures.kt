@@ -48,8 +48,8 @@ class MinionFeatures {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet as S29PacketSoundEffect
-            if (packet!!.soundName == "random.chestopen" && packet.pitch == 1f && packet.volume == 1f) {
+            val packet = event.packet
+            if (packet.soundName == "random.chestopen" && packet.pitch == 1f && packet.volume == 1f) {
                 blockUnenchanted = false
             }
         }
