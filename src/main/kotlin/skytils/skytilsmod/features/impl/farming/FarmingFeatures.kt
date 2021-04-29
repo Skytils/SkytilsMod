@@ -34,6 +34,7 @@ import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
@@ -181,17 +182,10 @@ class FarmingFeatures {
         if (trapperStart > 0) {
             if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
                 trapperStart = -1.0
-                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Trapper cooldown has now expired!"))
-                Thread {
-                    try {
-                        for (i in 0..4) {
-                            Utils.playLoudSound("note.pling", 1.0)
-                            Thread.sleep(200)
-                        }
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    }
-                }.start()
+                mc.thePlayer.addChatMessage(ChatComponentText("§dSkytils: Trapper cooldown has now expired!"))
+                for (i in 0..4) {
+                    SoundQueue.soundQueue.add(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
+                }
             }
         }
     }

@@ -46,6 +46,7 @@ import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.commands.SkytilsCommand
 import skytils.skytilsmod.core.Config
 import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
@@ -165,6 +166,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(GUIMANAGER)
         MinecraftForge.EVENT_BUS.register(MayorInfo())
         MinecraftForge.EVENT_BUS.register(SBInfo.instance)
+        MinecraftForge.EVENT_BUS.register(SoundQueue)
         MinecraftForge.EVENT_BUS.register(UpdateChecker())
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
