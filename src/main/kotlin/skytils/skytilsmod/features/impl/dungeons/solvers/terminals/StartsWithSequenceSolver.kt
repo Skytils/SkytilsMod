@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import com.google.common.collect.ImmutableList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -62,11 +61,9 @@ class StartsWithSequenceSolver {
                         }
                     }
                 } else {
-                    for (slotNum in ImmutableList.copyOf(shouldClick)) {
-                        val slot = chest.getSlot(slotNum)
-                        if (slot.hasStack && slot.stack.isItemEnchanted) {
-                            shouldClick.remove(slotNum as Int)
-                        }
+                    shouldClick.removeIf {
+                        val slot = chest.getSlot(it)
+                        return@removeIf slot.hasStack && slot.stack.isItemEnchanted
                     }
                 }
             } else {

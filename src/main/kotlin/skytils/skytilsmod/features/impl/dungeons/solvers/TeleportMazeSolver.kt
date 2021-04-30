@@ -71,10 +71,8 @@ class TeleportMazeSolver {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.teleportMazeSolver) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
         for (pos in steppedPads) {
             val x = pos.x - viewerX
             val y = pos.y - viewerY

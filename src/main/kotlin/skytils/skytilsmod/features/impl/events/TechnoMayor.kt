@@ -34,10 +34,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 
 class TechnoMayor {
@@ -68,10 +65,8 @@ class TechnoMayor {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SBInfo.SkyblockIslands.HUB.mode && SBInfo.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         for (orb in ImmutableList.copyOf(orbLocations)) {
             val x = orb.xCoord - viewerX
             val y = orb.yCoord - viewerY

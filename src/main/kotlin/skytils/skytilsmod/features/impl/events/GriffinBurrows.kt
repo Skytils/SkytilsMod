@@ -373,10 +373,7 @@ class GriffinBurrows {
             }
 
         fun drawWaypoint(partialTicks: Float) {
-            val viewer = Minecraft.getMinecraft().renderViewEntity
-            val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-            val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-            val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
             val x = pos.x - viewerX
             val y = pos.y - viewerY
@@ -465,10 +462,7 @@ class GriffinBurrows {
             }
 
         fun drawWaypoint(partialTicks: Float) {
-            val viewer = Minecraft.getMinecraft().renderViewEntity
-            val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-            val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-            val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
             val x = pos.x - viewerX
             val y = pos.y - viewerY

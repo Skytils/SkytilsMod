@@ -113,10 +113,7 @@ class CreeperSolver {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonsFeatures.hasBossSpawned && !creeper!!.isDead) {
-            val viewer = Minecraft.getMinecraft().renderViewEntity
-            val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-            val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-            val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
             GlStateManager.disableCull()
             for (i in solutionPairs.indices) {
                 val (one, two) = solutionPairs[i]

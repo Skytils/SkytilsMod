@@ -51,10 +51,7 @@ class BoulderSolver {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Skytils.config.boulderSolver) return
         if (boulderChest == null) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         if (roomVariant >= 0) {
             val steps = variantSteps[roomVariant]
             for (step in steps) {
@@ -90,7 +87,7 @@ class BoulderSolver {
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inDungeons) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
-            val packet = event.packet as C08PacketPlayerBlockPlacement
+            val packet = event.packet
             if (packet.position != null && packet.position == boulderChest) {
                 roomVariant = -2
             }

@@ -87,10 +87,8 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SBInfo.SkyblockIslands.SPIDERDEN.mode) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
         if (Skytils.config.relicWaypoints) {
             for (relic in ImmutableSet.copyOf(relicLocations)) {
                 if (foundRelics.contains(relic)) continue

@@ -64,10 +64,8 @@ class ShootTheTargetSolver {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Skytils.config.shootTheTargetSolver || shot.isEmpty()) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
 
         for (pos in shot) {
             val x = pos.x - viewerX

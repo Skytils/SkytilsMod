@@ -71,10 +71,8 @@ class TreasureHunter {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
         val pos = treasureLocation!!
         val x = pos.x - viewerX
         val y = pos.y - viewerY

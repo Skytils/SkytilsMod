@@ -538,6 +538,14 @@ object RenderUtil {
         GlStateManager.disableBlend()
     }
 
+    fun getViewerPos(partialTicks: Float): Triple<Double, Double, Double> {
+        val viewer = Minecraft.getMinecraft().renderViewEntity
+        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
+        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+        return Triple(viewerX, viewerY, viewerZ)
+    }
+
     infix fun Slot.highlight(color: Color) {
         Gui.drawRect(
             this.xDisplayPosition,
