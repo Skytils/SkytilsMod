@@ -37,7 +37,7 @@ class SuperboomToast : IToast<SuperboomToast> {
         GlStateManager.color(1.0f, 1.0f, 1.0f)
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0f, 0f, 160, 32, 160f, 32f)
         toastGui.mc.fontRendererObj.drawStringWithShadow("§9Superboom TNT", 30f, 7f, 16777215)
-        GuiToast.Companion.drawSubline(toastGui, delta, 0L, maxDrawTime, buffer, "", false)
+        GuiToast.drawSubline(toastGui, delta, 0L, maxDrawTime, buffer, "", false)
         RenderHelper.enableGUIStandardItemLighting()
         RenderUtil.renderItem(superBoom, 8, 8)
         GlStateManager.disableLighting()

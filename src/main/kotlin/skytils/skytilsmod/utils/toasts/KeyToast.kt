@@ -41,7 +41,7 @@ class KeyToast(type: String, private val player: String) : IToast<KeyToast> {
         return if (delta >= maxDrawTime) IToast.Visibility.HIDE else IToast.Visibility.SHOW
     }
 
-    private enum class KeyType(val keyName: String, resourceLocation: String, formattedName: String) {
+    private enum class KeyType(val keyName: String, resourceLocation: String, val formattedName: String) {
         BLOOD("blood", "skytils:toasts/keys/blood.png", "§c§lBLOOD KEY!"), WITHER(
             "wither",
             "skytils:toasts/keys/wither.png",
@@ -49,7 +49,6 @@ class KeyToast(type: String, private val player: String) : IToast<KeyToast> {
         );
 
         val texture: ResourceLocation = ResourceLocation(resourceLocation)
-        val formattedName: String = formattedName
 
         companion object {
             fun fromName(name: String): KeyType? {

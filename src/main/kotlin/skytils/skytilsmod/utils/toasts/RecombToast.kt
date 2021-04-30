@@ -30,7 +30,7 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil
 import java.util.regex.Pattern
 
-class RecombToast(val recombItem: String) : IToast<KeyToast> {
+class RecombToast(private val recombItem: String) : IToast<KeyToast> {
     private val buffer = GLAllocation.createDirectFloatBuffer(16)
     private val maxDrawTime: Long = Skytils.config.toastTime.toLong()
     override fun draw(toastGui: GuiToast, delta: Long): IToast.Visibility {
