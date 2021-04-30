@@ -118,7 +118,7 @@ class MiningFeatures {
                             else -> println("Invalid Puzzler character: $c")
                         }
                     }
-                    println("Puzzler Solution: " + puzzlerSolution)
+                    println("Puzzler Solution: $puzzlerSolution")
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Mine the block highlighted in " + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "RED" + EnumChatFormatting.GREEN + "!"))
                 }
             }
@@ -260,7 +260,6 @@ class MiningFeatures {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
         if (Skytils.config.skymallReminder && SBInfo.mode == SBInfo.SkyblockIslands.DWARVENMINES.mode && SBInfo.time == "12:00am" && GuiManager.title != "§cSKYMALL RESET"
         ) {
-            println(SBInfo.time)
             createTitle("§cSKYMALL RESET", 20)
         }
     }

@@ -598,6 +598,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Shoot the Target Solver",
+        description = "Shows all the shot blocks on the device in Floor 7.",
+        category = "Dungeons",
+        subcategory = "Terminal Solvers"
+    )
+    var shootTheTargetSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Simon Says Solver",
         description = "Show which buttons to press on the Simon Says device in Floor 7.\n§cIf a teammate clicks a button it will not register.",
         category = "Dungeons",

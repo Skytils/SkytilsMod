@@ -134,16 +134,16 @@ class DungeonTimer {
 
     companion object {
         private val mc = Minecraft.getMinecraft()
-        var dungeonStartTime: Long = -1
-        var bloodOpenTime: Long = -1
-        var bloodClearTime: Long = -1
-        var bossEntryTime: Long = -1
-        var bossClearTime: Long = -1
-        var phase1ClearTime: Long = -1
-        var phase2ClearTime: Long = -1
-        var phase3ClearTime: Long = -1
+        var dungeonStartTime = -1L
+        var bloodOpenTime = -1L
+        var bloodClearTime = -1L
+        var bossEntryTime = -1L
+        var bossClearTime = -1L
+        var phase1ClearTime = -1L
+        var phase2ClearTime = -1L
+        var phase3ClearTime = -1L
         var witherDoors = 0
-        var scoreShownAt: Long = -1
+        var scoreShownAt = -1L
 
         init {
             DungeonTimerElement()
