@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.gui
 
+import club.sk1er.vigilance.VigilanceConfig
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -45,9 +46,10 @@ class OptionsGui : GuiScreen() {
         buttonList.add(CleanButton(1, width / 2 - 100, height / 4 + 125, 200, 20, "Edit Aliases"))
         buttonList.add(CleanButton(2, width / 2 - 100, height / 4 + 150, 200, 20, "Edit Locations"))
         buttonList.add(CleanButton(3, width / 2 - 100, height / 4 + 175, 200, 20, "Edit Shortcuts"))
+        buttonList.add(CleanButton(4, width / 2 - 100, height / 4 + 200, 200, 20, "Edit Vigilance"))
         buttonList.add(
             CleanButton(
-                4,
+                5,
                 width - width / 10 - 3,
                 height - height / 20 - 3,
                 width / 10 - 3,
@@ -57,7 +59,7 @@ class OptionsGui : GuiScreen() {
         )
         buttonList.add(
             CleanButton(
-                5,
+                6,
                 width - width / 10 - 3,
                 height - 2 * height / 20 - 3,
                 width / 10 - 3,
@@ -94,14 +96,15 @@ class OptionsGui : GuiScreen() {
             1 -> mc.displayGuiScreen(CommandAliasesGui())
             2 -> mc.displayGuiScreen(LocationEditGui())
             3 -> mc.displayGuiScreen(KeyShortcutsGui())
-            4 -> try {
+            4 -> mc.displayGuiScreen(VigilanceConfig.gui())
+            5 -> try {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
             } catch (ex: IOException) {
                 ex.printStackTrace()
             } catch (ex: URISyntaxException) {
                 ex.printStackTrace()
             }
-            5 -> try {
+            6 -> try {
                 Desktop.getDesktop().browse(URI("https://github.com/Skytils/SkytilsMod"))
             } catch (ex: IOException) {
                 ex.printStackTrace()
