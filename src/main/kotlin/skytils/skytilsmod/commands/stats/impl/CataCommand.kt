@@ -79,7 +79,7 @@ object CataCommand : StatCommand() {
 
         for (i in 0..highestFloor) {
             completionsHoverString
-                .append("§b")
+                .append("§2§l●§a ")
                 .append(if (i == 0) "Entrance: " else "Floor $i: ")
                 .append("§e")
                 .append(completionObj[i.toString()].asInt)
@@ -87,7 +87,7 @@ object CataCommand : StatCommand() {
         }
 
         val completions =
-            ChatComponentText(" §bFloor Completions: §7(Hover)\n")
+            ChatComponentText(" §aFloor Completions: §7(Hover)\n")
 
         completions.chatStyle.chatHoverEvent = HoverEvent(
             HoverEvent.Action.SHOW_TEXT,
@@ -99,14 +99,14 @@ object CataCommand : StatCommand() {
 
         for (i in 0..highestFloor) {
             fastestSHoverString
-                .append("§b")
+                .append("§2§l●§a ")
                 .append(if (i == 0) "Entrance: " else "Floor $i: ")
                 .append("§e")
                 .append(if (fastestSTimes.has(i.toString())) timeFormat(fastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
                 .append(if (i < highestFloor) "\n" else "")
         }
 
-        val fastestS = ChatComponentText(" §bFastest §6S §bCompletions: §7(Hover)\n")
+        val fastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
         fastestS.chatStyle.chatHoverEvent = HoverEvent(
             HoverEvent.Action.SHOW_TEXT,
             ChatComponentText(fastestSHoverString.toString())
@@ -117,27 +117,29 @@ object CataCommand : StatCommand() {
 
         for (i in 0..highestFloor) {
             fastestSPlusHoverString
-                .append("§b")
+                .append("§2§●§a ")
                 .append(if (i == 0) "Entrance: " else "Floor $i: ")
                 .append("§e")
                 .append(if (fastestSPlusTimes.has(i.toString())) timeFormat(fastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
                 .append(if (i < highestFloor) "\n" else "")
         }
 
-        val fastestSPlus = ChatComponentText(" §bFastest §6S+ §bCompletions: §7(Hover)\n\n")
+        val fastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
         fastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
             HoverEvent.Action.SHOW_TEXT,
             ChatComponentText(fastestSPlusHoverString.toString())
         )
 
-        val component = ChatComponentText("§c§m--------------------------\n")
-            .appendText(" §bData For: §a${username}\n")
-            .appendText(" §d☠ Cata Level: §e${nf.format(cataLevel)}\n\n")
-            .appendText(" §6☣ Archer Level: §e${nf.format(archLevel)}\n")
-            .appendText(" §c⚔ Berserk Level: §e${nf.format(bersLevel)}\n")
-            .appendText(" §a❤ Healer Level: §e${nf.format(healerLevel)}\n")
-            .appendText(" §b✎ Mage Level: §e${nf.format(mageLevel)}\n")
-            .appendText(" §7❈ Tank Level: §e${nf.format(tankLevel)}\n\n")
+        val component = ChatComponentText("§a➜ Catacombs Statistics Viewer\n")
+            .appendText("§2§l ❣ §7§oYou are looking at data from §f§o${username}§7§o.\n\n")
+            .appendText("§a§l➜ Catacombs Levels:\n")
+            .appendText("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
+            .appendText("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
+            .appendText("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n")
+            .appendText("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n")
+            .appendText("§b ✎ Mage Level: §l➡ §e${nf.format(mageLevel)}\n")
+            .appendText("§7 ❈ Tank Level: §l➡ §e${nf.format(tankLevel)}\n\n")
+            .appendText("§a§l➜ Floor Completions:\n")
             .appendSibling(completions)
             .appendSibling(fastestS)
             .appendSibling(fastestSPlus)
@@ -150,7 +152,7 @@ object CataCommand : StatCommand() {
 
             for (i in 1..highestFloor) {
                 completionsHoverString
-                    .append("§b")
+                    .append("§2§●§a ")
                     .append("Floor $i: ")
                     .append("§e")
                     .append(if (completionObj.has(i.toString())) completionObj[i.toString()].asInt else "§cDNF")
@@ -158,7 +160,7 @@ object CataCommand : StatCommand() {
             }
 
             val completions =
-                ChatComponentText(" §bFloor Completions: §7(Hover)\n")
+                ChatComponentText(" §aFloor Completions: §7(Hover)\n")
 
             completions.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
@@ -170,14 +172,14 @@ object CataCommand : StatCommand() {
 
             for (i in 1..highestFloor) {
                 fastestSHoverString
-                    .append("§b")
+                    .append("§2§●§a ")
                     .append("Floor $i: ")
                     .append("§e")
                     .append(if (fastestSTimes.has(i.toString())) timeFormat(fastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
                     .append(if (i < highestFloor) "\n" else "")
             }
 
-            val fastestS = ChatComponentText(" §bFastest §6S §bCompletions: §7(Hover)\n")
+            val fastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
             fastestS.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
                 ChatComponentText(fastestSHoverString.toString())
@@ -188,20 +190,20 @@ object CataCommand : StatCommand() {
 
             for (i in 1..highestFloor) {
                 fastestSPlusHoverString
-                    .append("§b")
+                    .append("§2§●§a ")
                     .append("Floor $i: ")
                     .append("§e")
                     .append(if (fastestSPlusTimes.has(i.toString())) timeFormat(fastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
                     .append(if (i < highestFloor) "\n" else "")
             }
 
-            val fastestSPlus = ChatComponentText(" §bFastest §6S+ §bCompletions: §7(Hover)\n\n")
+            val fastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
             fastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
                 ChatComponentText(fastestSPlusHoverString.toString())
             )
             component
-                .appendText(" §4--Master Mode--\n")
+                .appendText("§a§l➜ Master Mode:\n")
                 .appendSibling(completions)
                 .appendSibling(fastestS)
                 .appendSibling(fastestSPlus)
@@ -209,8 +211,8 @@ object CataCommand : StatCommand() {
 
         printMessage(
             component
-                .appendText(" §aTotal Secrets Found: §e${nf.format(secrets)}\n")
-                .appendText("§c§m--------------------------")
+                .appendText("§a§l➜ Secrets:\n")
+                .appendText(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
         )
     }
 
