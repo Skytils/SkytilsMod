@@ -32,6 +32,8 @@ import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
 import java.awt.Color
 import java.util.*
+import kotlin.math.floor
+import kotlin.math.roundToInt
 
 object Utils {
     private val mc = Minecraft.getMinecraft()
@@ -181,5 +183,13 @@ object Utils {
         ReceivePacketEvent.isCanceled = true
         val packet = ReceivePacketEvent.packet
         MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
+    }
+
+    fun timeFormat(seconds: Double): String {
+        return if (seconds >= 60) {
+            floor(seconds / 60).toInt().toString() + "m " + (seconds % 60).roundToInt() + "s"
+        } else {
+            seconds.roundToInt().toString() + "s"
+        }
     }
 }

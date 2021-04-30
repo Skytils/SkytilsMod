@@ -43,11 +43,6 @@ import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 
-/**
- * Modified from Danker's Skyblock Mod under GPL 3.0 license
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 object APIUtil {
     var client: CloseableHttpClient =
         HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION)
@@ -56,6 +51,11 @@ object APIUtil {
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
             }.build()
 
+    /**
+     * Modified from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     fun getJSONResponse(urlString: String): JsonObject {
         try {
             val request = HttpGet(URL(urlString).toURI())
@@ -73,7 +73,14 @@ object APIUtil {
                 val gson = Gson()
                 return gson.fromJson(r.toString(), JsonObject::class.java)
             } else {
-                if (urlString.startsWith("https://api.hypixel.net/") || urlString.startsWith(MayorInfo.baseURL) || urlString == AuctionData.dataURL) {
+                if (StringUtils.startsWithAny(
+                        urlString,
+                        "https://api.ashcon.app/mojang/v2/user/",
+                        "https://api.hypixel.net/",
+                        MayorInfo.baseURL,
+                        AuctionData.dataURL
+                    )
+                ) {
                     val errorStream = entity.content
                     Scanner(errorStream).use { scanner ->
                         scanner.useDelimiter("\\Z")
@@ -83,10 +90,6 @@ object APIUtil {
                             return gson.fromJson(error, JsonObject::class.java)
                         }
                     }
-                } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && response.statusLine.statusCode == 204) {
-                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed with reason: Player does not exist."))
-                } else {
-                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Request failed. HTTP Error Code: " + response.statusLine.statusCode))
                 }
             }
         } catch (ex: IOException) {
@@ -99,8 +102,12 @@ object APIUtil {
         return JsonObject()
     }
 
-    // Only used for UUID => Username
-    fun getArrayResponse(urlString: String?): JsonArray {
+    /**
+     * Modified from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    fun getArrayResponse(urlString: String): JsonArray {
         try {
             val request = HttpGet(URL(urlString).toURI())
             request.protocolVersion = HttpVersion.HTTP_1_1
@@ -117,41 +124,46 @@ object APIUtil {
                 val gson = Gson()
                 return gson.fromJson(r.toString(), JsonArray::class.java)
             } else {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Request failed. HTTP Error Code: " + response.statusLine.statusCode))
+                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest failed. HTTP Error Code: ${response.statusLine.statusCode}"))
             }
         } catch (ex: IOException) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured. See logs for more details."))
             ex.printStackTrace()
         } catch (ex: URISyntaxException) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured. See logs for more details."))
             ex.printStackTrace()
         }
         return JsonArray()
     }
 
-    fun getUUID(username: String): String {
-        val uuidResponse = getJSONResponse("https://api.mojang.com/users/profiles/minecraft/$username")
-        return uuidResponse["id"].asString
+    fun getUUID(username: String): String? {
+        val uuidResponse = getJSONResponse("https://api.ashcon.app/mojang/v2/user/$username")
+        if (uuidResponse.has("error")) {
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cFailed with error: ${uuidResponse["reason"].asString}"))
+            return null
+        }
+        return uuidResponse["uuid"].asString.replace("-", "")
     }
 
+    /**
+     * Modified from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     fun getLatestProfileID(UUID: String, key: String): String? {
         val player: EntityPlayer = Minecraft.getMinecraft().thePlayer
 
-        // Get profiles
-        println("Fetching profiles...")
         val profilesResponse = getJSONResponse("https://api.hypixel.net/skyblock/profiles?uuid=$UUID&key=$key")
         if (!profilesResponse["success"].asBoolean) {
             val reason = profilesResponse["cause"].asString
-            player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed with reason: " + reason))
+            player.addChatMessage(ChatComponentText("§cFailed with reason: $reason"))
             return null
         }
         if (profilesResponse["profiles"].isJsonNull) {
-            player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "This player doesn't appear to have played SkyBlock."))
+            player.addChatMessage(ChatComponentText("§cThis player doesn't appear to have played SkyBlock."))
             return null
         }
 
-        // Loop through profiles to find latest
-        println("Looping through profiles...")
         var latestProfile = ""
         var latestSave: Long = 0
         val profilesArray = profilesResponse["profiles"].asJsonArray

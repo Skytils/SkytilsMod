@@ -29,6 +29,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.Utils.timeFormat
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -143,13 +144,6 @@ class DungeonTimer {
         var phase3ClearTime: Long = -1
         var witherDoors = 0
         var scoreShownAt: Long = -1
-        private fun timeFormat(seconds: Double): String {
-            return if (seconds >= 60) {
-                MathUtil.fastFloor(seconds / 60).toString() + "m " + (seconds % 60).roundToInt() + "s"
-            } else {
-                seconds.roundToInt().toString() + "s"
-            }
-        }
 
         init {
             DungeonTimerElement()

@@ -44,6 +44,7 @@ import skytils.skytilsmod.commands.ArmorColorCommand
 import skytils.skytilsmod.commands.GlintCustomizeCommand
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.commands.SkytilsCommand
+import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.core.Config
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.SoundQueue
@@ -229,6 +230,8 @@ class Skytils {
 
         if (cch is AccessorCommandHandler) {
             cch.registerCommand(SkytilsCommand)
+
+            cch.registerCommand(CataCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)

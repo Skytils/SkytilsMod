@@ -28,34 +28,40 @@ import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.SkillUtils
 import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
     private fun loadData() {
         val dataUrl: String = Skytils.config.dataURL
         Thread {
-            val fetchurData = APIUtil.getJSONResponse(dataUrl + "solvers/fetchur.json")
+            val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
             for ((key, value) in fetchurData.entrySet()) {
                 MiningFeatures.fetchurItems[key] = value.asString
             }
-            val hikerData = APIUtil.getJSONResponse(dataUrl + "solvers/hungryhiker.json")
+            val hikerData = APIUtil.getJSONResponse("${dataUrl}solvers/hungryhiker.json")
             for ((key, value) in hikerData.entrySet()) {
                 FarmingFeatures.hungerHikerItems[key] = value.asString
             }
-            val threeWeirdosSolutions = APIUtil.getArrayResponse(dataUrl + "solvers/threeweirdos.json")
+            val levelingData = APIUtil.getJSONResponse("${dataUrl}constants/levelingxp.json")
+            for ((key, value) in levelingData.get("dungeoneering_xp").asJsonObject.entrySet()) {
+                SkillUtils.dungeoneeringXp[key.toInt()] = value.asLong
+            }
+
+            val threeWeirdosSolutions = APIUtil.getArrayResponse("${dataUrl}solvers/threeweirdos.json")
             for (solution in threeWeirdosSolutions) {
                 ThreeWeirdosSolver.solutions.add(solution.asString)
             }
-            val treasureData = APIUtil.getJSONResponse(dataUrl + "solvers/treasurehunter.json")
+            val treasureData = APIUtil.getJSONResponse("${dataUrl}solvers/treasurehunter.json")
             for ((key, value) in treasureData.entrySet()) {
                 val parts = value.asString.split(",").map { it.toDouble() }
                 TreasureHunter.treasureHunterLocations[key] = BlockPos(parts[0], parts[1], parts[2])
             }
-            val triviaData = APIUtil.getJSONResponse(dataUrl + "solvers/oruotrivia.json")
+            val triviaData = APIUtil.getJSONResponse("${dataUrl}solvers/oruotrivia.json")
             for ((key, value) in triviaData.entrySet()) {
                 TriviaSolver.triviaSolutions[key] = getStringArrayFromJsonArray(value.asJsonArray)
             }
-            val relicData = APIUtil.getArrayResponse(dataUrl + "constants/relics.json")
+            val relicData = APIUtil.getArrayResponse("${dataUrl}constants/relics.json")
             for (i in 0 until relicData.size()) {
                 val coordsArr = relicData[i].asJsonArray
                 RelicWaypoints.relicLocations.add(
@@ -66,7 +72,7 @@ object DataFetcher {
                     )
                 )
             }
-            for ((key, value) in APIUtil.getJSONResponse(dataUrl + "constants/sellprices.json").entrySet()) {
+            for ((key, value) in APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").entrySet()) {
                 ItemFeatures.sellPrices[key] = value.asDouble
             }
         }.start()
@@ -76,6 +82,7 @@ object DataFetcher {
         ItemFeatures.sellPrices.clear()
         MiningFeatures.fetchurItems.clear()
         RelicWaypoints.relicLocations.clear()
+        SkillUtils.dungeoneeringXp.clone()
         ThreeWeirdosSolver.solutions.clear()
         TriviaSolver.triviaSolutions.clear()
     }
