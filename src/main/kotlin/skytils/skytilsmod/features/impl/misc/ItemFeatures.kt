@@ -133,7 +133,7 @@ class ItemFeatures {
         var itemId = getSkyBlockItemID(extraAttr)
         var isSuperpairsReward = false
         if (item != null && mc.thePlayer.openContainer != null && startsWith(
-                SBInfo.instance.lastOpenContainerName,
+                SBInfo.lastOpenContainerName,
                 "Superpairs ("
             )
         ) {
@@ -170,8 +170,8 @@ class ItemFeatures {
                         }
                         if (Skytils.config.showCoinsPerBit) {
                             var bitValue = bitCosts.getOrDefault(auctionIdentifier, -1)
-                            if (bitValue == -1 && SBInfo.instance.lastOpenContainerName == "Community Shop" || startsWith(
-                                    SBInfo.instance.lastOpenContainerName,
+                            if (bitValue == -1 && SBInfo.lastOpenContainerName == "Community Shop" || startsWith(
+                                    SBInfo.lastOpenContainerName,
                                     "Bits Shop - "
                                 )
                             ) {

@@ -36,7 +36,7 @@ class ItemWorthStrategy : ItemProtectStrategy() {
                 return value >= threshold
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (SBInfo.instance.mode != SBInfo.SkyblockIslands.DUNGEON.mode) {
+                if (SBInfo.mode != SBInfo.SkyblockIslands.DUNGEON.mode) {
                     return value >= threshold
                 }
             }

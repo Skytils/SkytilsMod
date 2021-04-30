@@ -44,7 +44,11 @@ import java.util.regex.Pattern
  *
  * @author Moulberry
  */
-class SBInfo {
+object SBInfo {
+
+    private val timePattern = Pattern.compile(".+(am|pm)")
+    private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
+
     var location = ""
     var date = ""
     var time = ""
@@ -129,9 +133,9 @@ class SBInfo {
                 lines.add(line)
             }
             if (lines.size >= 5) {
-                date = StringUtils.stripControlCodes(lines[1]).trim { it <= ' ' }
+                date = StringUtils.stripControlCodes(lines[2]).trim { it <= ' ' }
                 //§74:40am
-                val matcher = timePattern.matcher(lines[2])
+                val matcher = timePattern.matcher(lines[3])
                 if (matcher.find()) {
                     time = StringUtils.stripControlCodes(matcher.group()).trim { it <= ' ' }
                     try {
@@ -142,7 +146,7 @@ class SBInfo {
                     }
                 }
                 location =
-                    StringUtils.stripControlCodes(lines[3]).replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
+                    StringUtils.stripControlCodes(lines[4]).replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
             }
             objective = null
             var objTextLast = false
@@ -155,13 +159,6 @@ class SBInfo {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    companion object {
-        @JvmField
-        val instance = SBInfo()
-        private val timePattern = Pattern.compile(".+(am|pm)")
-        private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
     }
 
     enum class SkyblockIslands(val mode: String) {

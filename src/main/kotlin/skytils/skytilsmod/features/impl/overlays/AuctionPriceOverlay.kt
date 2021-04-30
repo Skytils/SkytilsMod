@@ -55,7 +55,7 @@ class AuctionPriceOverlay {
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiEditSign && Utils.equalsOneOf(
-                SBInfo.instance.lastOpenContainerName,
+                SBInfo.lastOpenContainerName,
                 "Create Auction",
                 "Create BIN Auction"
             )
@@ -72,7 +72,7 @@ class AuctionPriceOverlay {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiChest) {
             if (Utils.equalsOneOf(
-                    SBInfo.instance.lastOpenContainerName,
+                    SBInfo.lastOpenContainerName,
                     "Create Auction",
                     "Create BIN Auction"
                 ) && event.slotId == 31
@@ -85,7 +85,7 @@ class AuctionPriceOverlay {
                 }
             }
             if (Utils.equalsOneOf(
-                    SBInfo.instance.lastOpenContainerName,
+                    SBInfo.lastOpenContainerName,
                     "Confirm Auction",
                     "Confirm BIN Auction"
                 )

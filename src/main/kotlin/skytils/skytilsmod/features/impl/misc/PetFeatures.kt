@@ -90,7 +90,7 @@ class PetFeatures {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (Skytils.config.highlightActivePet && (SBInfo.instance.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.instance.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
+        if (Skytils.config.highlightActivePet && (SBInfo.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
             val item = event.slot.stack
             for (line in getItemLore(item)) {
                 if (line == "§7§cClick to despawn ") {

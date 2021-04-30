@@ -70,7 +70,7 @@ class TreasureHunter {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Utils.inSkyblock || treasureLocation == null || SBInfo.instance.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
+        if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
         val viewer = Minecraft.getMinecraft().renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
         val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks

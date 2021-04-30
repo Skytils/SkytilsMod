@@ -520,7 +520,7 @@ class DungeonsFeatures {
     fun onTooltip(event: ItemTooltipEvent) {
         if (event.itemStack != null) {
             if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && ItemUtil.getDisplayName(event.itemStack)
-                    .contains("Reroll") && SBInfo.instance.lastOpenContainerName?.endsWith(" Chest") == true
+                    .contains("Reroll") && SBInfo.lastOpenContainerName?.endsWith(" Chest") == true
             ) {
                 for (i in event.toolTip.indices) {
                     if (event.toolTip[i].contains("Click to reroll")) {

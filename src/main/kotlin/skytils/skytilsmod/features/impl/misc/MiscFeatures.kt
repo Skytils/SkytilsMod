@@ -212,17 +212,17 @@ class MiscFeatures {
         if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot.hasStack) return
         val chest = event.container
         if (equalsOneOf(chest.lowerChestInventory.name, "Chest", "Large Chest")) return
-        if (startsWithAny(SBInfo.instance.lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
+        if (startsWithAny(SBInfo.lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
         if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
         val item = event.slot.stack
         if (getSkyBlockItemID(item) == null) {
             if (startsWithAny(
-                    SBInfo.instance.lastOpenContainerName,
+                    SBInfo.lastOpenContainerName,
                     "Auctions"
                 ) && item.item === Items.arrow
             ) return
             if (startsWithAny(
-                    SBInfo.instance.lastOpenContainerName,
+                    SBInfo.lastOpenContainerName,
                     "Reforge Item"
                 ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
             ) return
@@ -351,7 +351,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (SBInfo.instance.mode != SBInfo.SkyblockIslands.THEEND.mode) return
+                if (SBInfo.mode != SBInfo.SkyblockIslands.THEEND.mode) return
                 var invalid = false
                 var placedEyes = 0
                 for (pos in SUMMONING_EYE_FRAMES) {

@@ -280,7 +280,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock && SBInfo.instance.mode.equals("hub")) {
+            if (toggled && Utils.inSkyblock && SBInfo.mode.equals("hub")) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =

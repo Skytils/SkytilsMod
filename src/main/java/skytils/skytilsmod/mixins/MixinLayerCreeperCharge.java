@@ -38,7 +38,7 @@ public abstract class MixinLayerCreeperCharge implements LayerRenderer<EntityCre
 
     @ModifyArg(method = "doRenderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderCreeper;bindTexture(Lnet/minecraft/util/ResourceLocation;)V"))
     private ResourceLocation modifyChargedCreeperLayer(ResourceLocation res) {
-        if (Utils.inSkyblock && Skytils.config.moreVisibleGhosts && Objects.equals(SBInfo.instance.getMode(), "mining_3")) {
+        if (Utils.inSkyblock && Skytils.config.moreVisibleGhosts && Objects.equals(SBInfo.INSTANCE.getMode(), "mining_3")) {
             res = VISIBLE_CREEPER_ARMOR;
         }
         return res;

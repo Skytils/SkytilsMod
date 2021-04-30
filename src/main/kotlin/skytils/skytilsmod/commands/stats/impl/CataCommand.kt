@@ -35,10 +35,6 @@ object CataCommand : StatCommand() {
         return "skytilscata"
     }
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        super.processCommand(sender, args)
-    }
-
     override fun displayStats(username: String, uuid: String, profileData: JsonObject) {
         val playerURL = "https://api.hypixel.net/player?uuid=$uuid&key=$key"
         val playerResponse: JsonObject = APIUtil.getJSONResponse(playerURL)
