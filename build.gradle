@@ -20,7 +20,8 @@ buildscript {
     ext.kotlin_version = "1.5.0-RC"
 
     repositories {
-        jcenter()
+        gradlePluginPortal()
+        mavenCentral()
         maven { url "https://jitpack.io" }
         maven {
             name = "sonatype"
@@ -69,7 +70,6 @@ minecraft {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven { url "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url "https://repo.sk1er.club/repository/maven-public/" }

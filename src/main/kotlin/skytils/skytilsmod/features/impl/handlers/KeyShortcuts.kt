@@ -33,7 +33,7 @@ import java.io.FileWriter
 
 class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     @SubscribeEvent
-    fun onInput(event: InputEvent?) {
+    fun onInput(event: InputEvent) {
         if (!Utils.inSkyblock) return
         for ((message, code) in shortcuts) {
             if (code == 0) continue
