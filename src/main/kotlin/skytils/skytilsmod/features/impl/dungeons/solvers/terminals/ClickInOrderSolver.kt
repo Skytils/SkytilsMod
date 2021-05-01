@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
@@ -73,6 +74,9 @@ class ClickInOrderSolver {
         val firstSlot = slotOrder[neededClick]
         val secondSlot = slotOrder[neededClick + 1]
         val thirdSlot = slotOrder[neededClick + 2]
+        val lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
+        GlStateManager.disableLighting()
+        GlStateManager.color(1f, 1f, 1f, 1f)
         if (firstSlot != null) {
             val slot = invSlots[firstSlot]
             if (slot != null) slot highlight Skytils.config.clickInOrderFirst
@@ -85,6 +89,7 @@ class ClickInOrderSolver {
             val slot = invSlots[thirdSlot]
             if (slot != null) slot highlight Skytils.config.clickInOrderThird
         }
+        if (lightingState) GlStateManager.enableLighting()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
