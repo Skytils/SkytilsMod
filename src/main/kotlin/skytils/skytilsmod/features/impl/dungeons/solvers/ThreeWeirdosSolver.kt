@@ -85,7 +85,7 @@ class ThreeWeirdosSolver {
                     if (entity == null) return@getEntities false
                     if (!entity.hasCustomName()) return@getEntities false
                     entity.customNameTag.contains("CLICK")
-                }.stream().findFirst().orElse(null)
+                }.firstOrNull()
                 if (clickLabel != null) {
                     if (clickLabel.getDistanceSq(event.pos) <= 5) {
                         println("Chest was too close to NPC; Chest Pos: " + event.pos.x + ", " + event.pos.y + ", " + event.pos.z + " NPC Pos: " + clickLabel.posX + ", " + clickLabel.posY + ", " + clickLabel.posZ)
@@ -100,7 +100,7 @@ class ThreeWeirdosSolver {
                         if (entity == null) return@getEntities false
                         if (!entity.hasCustomName()) return@getEntities false
                         entity.customNameTag.contains(riddleNPC!!)
-                    }.stream().findFirst().orElse(null)
+                    }.firstOrNull()
                     if (riddleLabel != null) {
                         println("Found Riddle NPC " + riddleLabel.customNameTag + " at " + riddleLabel.posX + ", " + riddleLabel.posY + ", " + riddleLabel.posY)
                         val actualPos = BlockPos(floor(riddleLabel.posX), 69.0, floor(riddleLabel.posZ))
@@ -133,7 +133,7 @@ class ThreeWeirdosSolver {
                 if (entity == null) return@getEntities false
                 if (!entity.hasCustomName()) return@getEntities false
                 entity.customNameTag.contains(riddleNPC!!)
-            }.stream().findFirst().orElse(null)
+            }.firstOrNull()
             if (riddleLabel != null) {
                 println("Chest Finder: Found Riddle NPC " + riddleLabel.customNameTag + " at " + riddleLabel.position)
                 val npcPos = riddleLabel.position

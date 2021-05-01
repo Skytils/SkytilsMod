@@ -51,23 +51,12 @@ enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting,
     VERY_SPECIAL("VERY SPECIAL", EnumChatFormatting.RED, Color(170, 0, 0));
 
     companion object {
-        private val VALUES: Array<ItemRarity> =
-            Arrays.stream(values()).sorted(Comparator.comparingInt { obj: ItemRarity -> obj.ordinal })
-                .toArray { size: Int -> arrayOfNulls(size) }
+        private val VALUES = values().sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()
 
-        fun byBaseColor(color: String): ItemRarity? {
-            for (rarity in values()) {
-                if (rarity.baseColor.toString() == color) {
-                    return rarity
-                }
-            }
-            return null
-        }
+        fun byBaseColor(color: String) = values().find { rarity -> rarity.baseColor.toString() == color }
 
         init {
-            for (rarity in values()) {
-                VALUES[rarity.ordinal] = rarity
-            }
+            values().forEach { rarity -> VALUES[rarity.ordinal] = rarity }
         }
     }
 

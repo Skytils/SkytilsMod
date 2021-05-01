@@ -49,7 +49,7 @@ object EntityManager {
      * This method is THREAD SAFE.
      */
     fun clearEntities() {
-        entityList.forEach(Consumer { obj: FakeEntity -> obj.remove() })
+        entityList.forEach { it.remove() }
     }
 
     /**

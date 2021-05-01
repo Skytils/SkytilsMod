@@ -92,7 +92,7 @@ class BlockAbility : PersistentSave(File(Skytils.modDir, "blockability.json")) {
 
     companion object {
         val blockedItems = HashSet<String>()
-        val interactables = listOf(
+        val interactables = setOf(
             Blocks.acacia_door,
             Blocks.anvil,
             Blocks.beacon,
