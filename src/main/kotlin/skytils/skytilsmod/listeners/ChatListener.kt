@@ -17,20 +17,133 @@
  */
 package skytils.skytilsmod.listeners
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.RepartyCommand
+import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.mixins.AccessorGuiNewChat
 import skytils.skytilsmod.utils.StringUtils
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class ChatListener {
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        if (event.packet !is S02PacketChat) return
+        val packet = event.packet
+        if (packet.type.toInt() == 2) return
+        val unformatted = StringUtils.stripControlCodes(packet.chatComponent.unformattedText)
+        val formatted = packet.chatComponent.formattedText
+
+        if (awaitingDelimiter && formatted.startsWith("§9§m---")) {
+            cancelChatPacket(event)
+            awaitingDelimiter = false
+            println("found delimiter after waiting")
+            return
+        }
+        // Reparty command
+        // Getting party
+        if (RepartyCommand.gettingParty) {
+            if (unformatted.contains("-----")) {
+                when (RepartyCommand.Delimiter) {
+                    0 -> {
+                        println("Get Party Delimiter Cancelled")
+                        RepartyCommand.Delimiter++
+                        cancelChatPacket(event)
+                        return
+                    }
+                    1 -> {
+                        println("Done querying party")
+                        RepartyCommand.gettingParty = false
+                        RepartyCommand.Delimiter = 0
+                        cancelChatPacket(event)
+                        return
+                    }
+                }
+            } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")) {
+                val player = Minecraft.getMinecraft().thePlayer
+                val partyStart = party_start_pattern.matcher(unformatted)
+                val leader = leader_pattern.matcher(unformatted)
+                val members = members_pattern.matcher(unformatted)
+                if (partyStart.matches() && partyStart.group(1).toInt() == 1) {
+                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You cannot reparty yourself."))
+                    RepartyCommand.partyThread!!.interrupt()
+                } else if (leader.matches() && leader.group(1) != player.name) {
+                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You are not party leader."))
+                    RepartyCommand.partyThread!!.interrupt()
+                } else {
+                    while (members.find()) {
+                        val partyMember = members.group(1)
+                        if (partyMember != player.name) {
+                            RepartyCommand.party.add(partyMember)
+                            println(partyMember)
+                        }
+                    }
+                }
+                cancelChatPacket(event)
+                return
+            }
+        }
+        // Disbanding party
+        if (RepartyCommand.disbanding) {
+            if (unformatted.endsWith("has disbanded the party!")) {
+                cancelDelimiters()
+                cancelChatPacket(event)
+                println("party disbanded")
+                RepartyCommand.disbanding = false
+                return
+            }
+        }
+        // Inviting
+        if (RepartyCommand.inviting) {
+            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
+                val invitee = invitePattern.matcher(unformatted)
+                if (invitee.find()) {
+                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
+                }
+                cancelDelimiters()
+                cancelChatPacket(event)
+                RepartyCommand.inviting = false
+                return
+            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
+                cancelDelimiters()
+                cancelChatPacket(event)
+                return
+            }
+        }
+        // Fail Inviting
+        if (RepartyCommand.failInviting) {
+            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
+                val invitee = invitePattern.matcher(unformatted)
+                if (invitee.find()) {
+                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
+                }
+                cancelDelimiters()
+                cancelChatPacket(event)
+                RepartyCommand.inviting = false
+                return
+            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
+                cancelDelimiters()
+                cancelChatPacket(event)
+                return
+            }
+        }
+    }
+
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
@@ -71,131 +184,6 @@ class ChatListener {
                 }
             }
         }
-
-        // Reparty command
-        // Getting party
-        if (RepartyCommand.gettingParty) {
-            if (unformatted.contains("-----")) {
-                when (RepartyCommand.Delimiter) {
-                    0 -> {
-                        println("Get Party Delimiter Cancelled")
-                        RepartyCommand.Delimiter++
-                        event.isCanceled = true
-                        return
-                    }
-                    1 -> {
-                        println("Done querying party")
-                        RepartyCommand.gettingParty = false
-                        RepartyCommand.Delimiter = 0
-                        event.isCanceled = true
-                        return
-                    }
-                }
-            } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")) {
-                val player = Minecraft.getMinecraft().thePlayer
-                val partyStart = party_start_pattern.matcher(unformatted)
-                val leader = leader_pattern.matcher(unformatted)
-                val members = members_pattern.matcher(unformatted)
-                if (partyStart.matches() && partyStart.group(1).toInt() == 1) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You cannot reparty yourself."))
-                    RepartyCommand.partyThread!!.interrupt()
-                } else if (leader.matches() && leader.group(1) != player.name) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You are not party leader."))
-                    RepartyCommand.partyThread!!.interrupt()
-                } else {
-                    while (members.find()) {
-                        val partyMember = members.group(1)
-                        if (partyMember != player.name) {
-                            RepartyCommand.party.add(partyMember)
-                            println(partyMember)
-                        }
-                    }
-                }
-                event.isCanceled = true
-                return
-            }
-        }
-        // Disbanding party
-        if (RepartyCommand.disbanding) {
-            if (unformatted.contains("-----")) {
-                when (RepartyCommand.Delimiter) {
-                    0 -> {
-                        println("Disband Delimiter Cancelled")
-                        RepartyCommand.Delimiter++
-                        event.isCanceled = true
-                        return
-                    }
-                    1 -> {
-                        println("Done disbanding")
-                        RepartyCommand.disbanding = false
-                        RepartyCommand.Delimiter = 0
-                        event.isCanceled = true
-                        return
-                    }
-                }
-            } else if (unformatted.endsWith("has disbanded the party!")) {
-                event.isCanceled = true
-                return
-            }
-        }
-        // Inviting
-        if (RepartyCommand.inviting) {
-            if (unformatted.contains("-----")) {
-                when (RepartyCommand.Delimiter) {
-                    1 -> {
-                        event.isCanceled = true
-                        RepartyCommand.Delimiter = 0
-                        println("Player Invited!")
-                        RepartyCommand.inviting = false
-                        return
-                    }
-                    0 -> {
-                        RepartyCommand.Delimiter++
-                        event.isCanceled = true
-                        return
-                    }
-                }
-            } else if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                val invitee = invitePattern.matcher(unformatted)
-                if (invitee.find()) {
-                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
-                }
-                event.isCanceled = true
-                return
-            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                event.isCanceled = true
-                return
-            }
-        }
-        // Fail Inviting
-        if (RepartyCommand.failInviting) {
-            if (unformatted.contains("-----")) {
-                when (RepartyCommand.Delimiter) {
-                    1 -> {
-                        event.isCanceled = true
-                        RepartyCommand.Delimiter = 0
-                        println("Player Invited!")
-                        RepartyCommand.inviting = false
-                        return
-                    }
-                    0 -> {
-                        RepartyCommand.Delimiter++
-                        event.isCanceled = true
-                        return
-                    }
-                }
-            } else if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                val invitee = invitePattern.matcher(unformatted)
-                if (invitee.find()) {
-                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
-                }
-                event.isCanceled = true
-                return
-            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                event.isCanceled = true
-                return
-            }
-        }
         if (Skytils.config.firstLaunch && unformatted == "Welcome to Hypixel SkyBlock!") {
             mc.thePlayer.addChatMessage(ChatComponentText("§bThank you for downloading Skytils!"))
             ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
@@ -214,5 +202,31 @@ class ChatListener {
         private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
         private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
         private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
+        private fun cancelChatPacket(ReceivePacketEvent: PacketEvent.ReceiveEvent) {
+            if (ReceivePacketEvent.packet !is S02PacketChat) return
+            ReceivePacketEvent.isCanceled = true
+            val packet = ReceivePacketEvent.packet
+            MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
+        }
+
+        private var awaitingDelimiter = false
+
+        @OptIn(ExperimentalTime::class)
+        private fun cancelDelimiters() {
+            awaitingDelimiter = true
+            CoroutineScope(Dispatchers.Default).launch {
+                val chatGui = Minecraft.getMinecraft().ingameGUI.chatGUI
+                val lines = (chatGui as AccessorGuiNewChat).chatLines
+                val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
+                var i = 0
+                delay(Duration.microseconds(100))
+                while (!StringUtils.stripControlCodes(lines[i].chatComponent.unformattedText)
+                        .startsWith("---") && i < 10 && i < lines.size
+                ) {
+                    i++
+                }
+                drawnLines.removeAt(i)
+            }
+        }
     }
 }
