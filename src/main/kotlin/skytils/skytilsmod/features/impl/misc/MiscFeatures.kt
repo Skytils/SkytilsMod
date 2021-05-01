@@ -31,9 +31,12 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.*
+import net.minecraft.item.Item
+import net.minecraft.item.ItemMonsterPlacer
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.*
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -44,23 +47,29 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.*
+import skytils.skytilsmod.events.BossBarEvent
+import skytils.skytilsmod.events.CheckRenderEntityEvent
+import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.NumberUtil.round
+import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
+import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.StringUtils.startsWithAny
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.equalsOneOf
 import skytils.skytilsmod.utils.Utils.isInTablist
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.awt.Color
 
 class MiscFeatures {
     @SubscribeEvent
@@ -117,6 +126,21 @@ class MiscFeatures {
         if (event.entity is EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
                 event.isCanceled = true
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+        if (!Utils.inSkyblock || event.container !is ContainerChest) return
+        if (Skytils.config.highlightDisabledPotionEffects && event.slot.hasStack && SBInfo.lastOpenContainerName?.startsWith("Toggle Potion Effects") == true) {
+            var item = event.slot.stack
+            if (item.item == Items.potionitem) {
+                if (ItemUtil.getItemLore(item).any {
+                        it == "§7Currently: §cDISABLED"
+                    }) {
+                    event.slot highlight Color(0, 0, 0, 80)
+                }
             }
         }
     }

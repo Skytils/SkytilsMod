@@ -21,6 +21,7 @@
     "MixinEntityRenderer",
     "MixinGuiContainer",
     "MixinGuiIngame",
+    "MixinInventoryEffectRenderer",
     "MixinGuiScreen",
     "MixinItemArmor",
     "MixinItemStack",

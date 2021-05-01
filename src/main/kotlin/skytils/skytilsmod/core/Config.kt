@@ -1284,6 +1284,25 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Hide Potion Effects in Inventory",
+        description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    @JvmField
+    var hidePotionEffects = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Highlight Disabled Potion Effects",
+        description = "Marks disabled potion effects in the toggle menu.",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    var highlightDisabledPotionEffects = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Highlight Salvageable Items",
         description = "Highlights items that can be salvaged.",
         category = "Miscellaneous",
