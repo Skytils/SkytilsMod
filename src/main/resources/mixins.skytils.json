@@ -1,5 +1,6 @@
 {
   "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.7",
   "package": "skytils.skytilsmod.mixins",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [

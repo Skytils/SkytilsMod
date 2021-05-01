@@ -32,7 +32,7 @@ buildscript {
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
-        classpath "com.github.Skytils:ForgeGradle:86b23926f3"
+        classpath "com.github.Skytils:ForgeGradle:60d43318d3"
         classpath "com.github.Skytils:mixingradle:d75e32e743"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -207,7 +207,8 @@ task moveResources {
     }
 }
 
-moveResources.dependsOn processResources
-classes.dependsOn moveResources
+tasks.moveResources.dependsOn processResources
+tasks.classes.dependsOn moveResources
+//end asbyth cool resource fix
 
 tasks.reobfJar.dependsOn(shadowJar)
