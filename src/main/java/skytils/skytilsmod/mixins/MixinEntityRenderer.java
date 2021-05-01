@@ -47,15 +47,18 @@ public abstract class MixinEntityRenderer implements IResourceManagerReloadListe
         if (Utils.inSkyblock) {
             if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs) {
                 List<EntityOtherPlayerMP> npcs = this.mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getUniqueID().version() == 2 && p.getHealth() == 20 && !p.isPlayerSleeping());
-                entityList.removeIf(e -> {
-                    if (e instanceof EntityCreeper && e.isInvisible()) {
-                        EntityCreeper entity = (EntityCreeper) e;
-                        if (entity.getMaxHealth() == 20 && entity.getHealth() == 20 && entity.getPowered()) {
-                            return npcs.stream().anyMatch(npc -> npc.getDistanceSqToEntity(entity) <= 7 * 7);
+                for (Entity entity : entityList) {
+                    if (entity instanceof EntityCreeper && entity.isInvisible()) {
+                        final EntityCreeper creeper = (EntityCreeper) entity;
+                        if (creeper.getMaxHealth() == 20 && creeper.getHealth() == 20 && creeper.getPowered()) {
+                            for (EntityOtherPlayerMP npc : npcs) {
+                                if (npc.getDistanceSqToEntity(entity) <= 49) {
+                                    entityList.remove(creeper);
+                                }
+                            }
                         }
                     }
-                    return false;
-                });
+                }
             }
         }
         return entityList;

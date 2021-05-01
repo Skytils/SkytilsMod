@@ -85,7 +85,7 @@ class GriffinBurrows {
                 }
                 val burrowArray = playerObject["griffin"].asJsonObject["burrows"].asJsonArray
                 val receivedBurrows = ArrayList<Burrow>()
-                burrowArray.forEach(Consumer { jsonElement: JsonElement ->
+                burrowArray.forEach { jsonElement: JsonElement ->
                     val burrowObject = jsonElement.asJsonObject
                     val x = burrowObject["x"].asInt
                     val y = burrowObject["y"].asInt
@@ -95,7 +95,7 @@ class GriffinBurrows {
                     val chain = burrowObject["chain"].asInt
                     val burrow = Burrow(x, y, z, type, tier, chain)
                     receivedBurrows.add(burrow)
-                })
+                }
                 dugBurrows.removeIf { dug: BlockPos ->
                     receivedBurrows.none { burrow: Burrow -> burrow.blockPos == dug }
                 }
