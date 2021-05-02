@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.base.Predicate
 import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
@@ -159,6 +158,7 @@ class ThreeWeirdosSolver {
         var solutions = ArrayList<String>()
         private val mc = Minecraft.getMinecraft()
         var riddleNPC: String? = null
+
         @JvmField
         var riddleChest: BlockPos? = null
     }

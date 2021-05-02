@@ -29,7 +29,7 @@ import skytils.skytilsmod.core.EntityManager.tickEntities
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern
 
@@ -52,7 +52,7 @@ class DamageSplash {
         if (e.entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (e.entity.isDead) return
-        val strippedName = stripControlCodes(entity.customNameTag)
+        val strippedName = entity.customNameTag.stripControlCodes()
         val damageMatcher = damagePattern.matcher(strippedName)
         if (damageMatcher.matches()) {
             e.isCanceled = true

@@ -28,7 +28,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.utils.TabListUtils
+import skytils.skytilsmod.utils.Utils
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
@@ -37,7 +41,7 @@ class MayorInfo {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (ticks % (60*20) == 0) {
+        if (ticks % (60 * 20) == 0) {
             if (System.currentTimeMillis() - lastFetchedMayorData > 24 * 60 * 60 * 1000 || isLocal) {
                 fetchMayorData()
             }
@@ -75,7 +79,7 @@ class MayorInfo {
                 val lines = value.formattedText.split("\n".toRegex()).toTypedArray()
                 if (lines.size < 2) return
                 var color = ""
-                if (StringUtils.stripControlCodes(lines[0]).startsWith("Mayor ")) {
+                if (lines[0].stripControlCodes().startsWith("Mayor ")) {
                     color = lines[0].substring(0, 2)
                 }
                 isLocal = true
@@ -88,10 +92,10 @@ class MayorInfo {
                     if (!line.contains("§") || line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
                     if (color.isNotEmpty()) {
                         if (line.startsWith("§r$color")) {
-                            perks.add(StringUtils.stripControlCodes(line))
+                            perks.add(line.stripControlCodes())
                         }
                     } else if (!line.startsWith("§r§7") && !line.startsWith("§r§8")) {
-                        perks.add(StringUtils.stripControlCodes(line))
+                        perks.add(line.stripControlCodes())
                     }
                 }
                 println("Got perks from chat: $perks")
@@ -109,7 +113,8 @@ class MayorInfo {
             val chestName = chest.lowerChestInventory.displayName.unformattedText
             if ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith("Mayor ") && (currentMayor == null || !chestName.contains(
                     currentMayor!!
-                )))) {
+                )))
+            ) {
                 val slot = event.slot
                 val item = slot.stack
                 if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || currentMayor == null && item.displayName.contains(
@@ -128,7 +133,7 @@ class MayorInfo {
                         val perks = HashSet<String>()
                         for (line in lore) {
                             if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {
-                                perks.add(StringUtils.stripControlCodes(line))
+                                perks.add(line.stripControlCodes())
                             }
                         }
                         println("Got Perks: $perks")

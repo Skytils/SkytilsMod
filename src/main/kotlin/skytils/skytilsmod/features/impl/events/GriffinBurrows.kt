@@ -47,7 +47,6 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
-import java.util.function.Consumer
 import kotlin.math.roundToInt
 
 class GriffinBurrows {
@@ -124,7 +123,7 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
-        if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.mode != SBInfo.SkyblockIslands.HUB.mode) return
+        if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
         if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
@@ -144,7 +143,7 @@ class GriffinBurrows {
     fun onChat(event: ClientChatReceivedEvent) {
         val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
         if (Skytils.config.showGriffinBurrows && (unformatted == "You died!" || unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted == "You finished the Griffin burrow chain! (4/4)"
-                    )
+                )
         ) {
             if (lastDugBurrow != null) {
                 dugBurrows.add(lastDugBurrow!!)
@@ -230,7 +229,7 @@ class GriffinBurrows {
 
     class GriffinGuiElement : GuiElement("Griffin Timer", FloatPair(100, 10)) {
         override fun render() {
-            if (SBInfo.mode != SBInfo.SkyblockIslands.HUB.mode) return
+            if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null) {
                 for (i in 0..7) {
@@ -273,7 +272,7 @@ class GriffinBurrows {
             get() = Skytils.config.showGriffinBurrows && Skytils.config.showGriffinCountdown
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 
@@ -281,7 +280,7 @@ class GriffinBurrows {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
-            if (SBInfo.mode != SBInfo.SkyblockIslands.HUB.mode) return
+            if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
             val packet = event.packet
             val type = packet.particleType
             val longDistance = packet.isLongDistance
@@ -338,7 +337,7 @@ class GriffinBurrows {
         type: Int
     ) {
         var type = -1
-        var timestamp: Long
+        private var timestamp: Long
         var dug = false
 
         constructor(vec3: Vec3i, hasFootstep: Boolean, hasEnchant: Boolean, type: Int) : this(
@@ -420,7 +419,7 @@ class GriffinBurrows {
         /**
          * This variable appears to hold what order the burrow is in the chain
          */
-        var chain: Int
+        private var chain: Int
     ) {
         val blockPos: BlockPos
             get() = BlockPos(x, y, z)

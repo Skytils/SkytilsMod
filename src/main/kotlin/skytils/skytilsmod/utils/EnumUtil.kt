@@ -22,32 +22,23 @@ class EnumUtil {
         TOP_LEFT(0), TOP_RIGHT(1), BOTTOM_LEFT(2), BOTTOM_RIGHT(3), BOTTOM_MIDDLE(4);
 
         fun getX(maxX: Int): Int {
-            var x = 0
-            when (this) {
-                TOP_RIGHT, BOTTOM_RIGHT -> x = maxX
-                BOTTOM_MIDDLE -> x = maxX / 2
+            return when (this) {
+                TOP_RIGHT, BOTTOM_RIGHT -> maxX
+                BOTTOM_MIDDLE -> maxX / 2
+                else -> 0
             }
-            return x
         }
 
         fun getY(maxY: Int): Int {
-            var y = 0
-            when (this) {
-                BOTTOM_LEFT, BOTTOM_RIGHT, BOTTOM_MIDDLE -> y = maxY
+            return when (this) {
+                BOTTOM_LEFT, BOTTOM_RIGHT, BOTTOM_MIDDLE -> maxY
+                else -> 0
             }
-            return y
         }
 
         companion object {
             // Accessed by reflection...
-            fun fromId(id: Int): AnchorPoint? {
-                for (feature in values()) {
-                    if (feature.id == id) {
-                        return feature
-                    }
-                }
-                return null
-            }
+            fun fromId(id: Int): AnchorPoint? = values().find { it.id == id }
         }
     }
 }

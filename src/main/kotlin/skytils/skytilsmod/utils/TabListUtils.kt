@@ -26,16 +26,16 @@ import net.minecraft.world.WorldSettings
 object TabListUtils {
     private val playerInfoOrdering: Ordering<NetworkPlayerInfo> = object : Ordering<NetworkPlayerInfo>() {
         override fun compare(p_compare_1_: NetworkPlayerInfo?, p_compare_2_: NetworkPlayerInfo?): Int {
-            val scoreplayerteam = p_compare_1_?.playerTeam
-            val scoreplayerteam1 = p_compare_2_?.playerTeam
+            val scorePlayerTeam = p_compare_1_?.playerTeam
+            val scorePlayerTeam1 = p_compare_2_?.playerTeam
             if (p_compare_1_ != null) {
                 if (p_compare_2_ != null) {
                     return ComparisonChain.start().compareTrueFirst(
                         p_compare_1_.gameType != WorldSettings.GameType.SPECTATOR,
                         p_compare_2_.gameType != WorldSettings.GameType.SPECTATOR
                     ).compare(
-                        if (scoreplayerteam != null) scoreplayerteam.registeredName else "",
-                        if (scoreplayerteam1 != null) scoreplayerteam1.registeredName else ""
+                        if (scorePlayerTeam != null) scorePlayerTeam.registeredName else "",
+                        if (scorePlayerTeam1 != null) scorePlayerTeam1.registeredName else ""
                     ).compare(p_compare_1_.gameProfile.name, p_compare_2_.gameProfile.name).result()
                 }
                 return 0

@@ -19,7 +19,6 @@
 package skytils.skytilsmod.utils
 
 object SkillUtils {
-
     val dungeoneeringXp = LinkedHashMap<Int, Long>()
 
     fun calcDungeonsClassLevelWithProgress(experience: Double): Double {
@@ -29,7 +28,7 @@ object SkillUtils {
         for (toRemove in dungeoneeringXp.values) {
             xp -= toRemove.toDouble()
             if (xp < 0) {
-                return level + (1 - (xp * -1) / toRemove);
+                return level + (1 - (xp * -1) / toRemove)
             }
             level++
         }

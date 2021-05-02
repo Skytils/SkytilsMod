@@ -45,7 +45,7 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -53,7 +53,7 @@ class MiningFeatures {
     @SubscribeEvent
     fun onBossBar(event: BossBarEvent.Set) {
         if (!Utils.inSkyblock) return
-        val unformatted = StringUtils.stripControlCodes(event.displayData.displayName.unformattedText)
+        val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
         if (Skytils.config.raffleWarning) {
             if (unformatted.contains("EVENT")) {
                 val matcher = EVENT_PATTERN.matcher(unformatted)
@@ -77,7 +77,7 @@ class MiningFeatures {
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type.toInt() == 2) return
         val formatted = event.message.formattedText
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.powerGhastPing) {
             if (unformatted.startsWith("Find the Powder Ghast near the")) {
                 createTitle("§cPOWDER GHAST", 20)
@@ -100,7 +100,7 @@ class MiningFeatures {
                     "▲"
                 ) && !unformatted.contains("◀") && !unformatted.contains("▼")
             ) return
-            if (SBInfo.mode == SBInfo.SkyblockIslands.DWARVENMINES.mode) {
+            if (SBInfo.mode == SBInfo.SkyblockIsland.DwarvenMines.mode) {
                 puzzlerSolution = BlockPos(181, 195, 135)
                 val msg = unformatted.substring(15).trim { it <= ' ' }
                 val matcher = Pattern.compile("([▶▲◀▼]+)").matcher(unformatted)
@@ -163,7 +163,7 @@ class MiningFeatures {
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
         if (event.slot.hasStack && SBInfo.lastOpenContainerName.equals("Commissions") && Skytils.config.highlightCompletedComissions) {
-            var item = event.slot.stack
+            val item = event.slot.stack
             if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
                 if (ItemUtil.getItemLore(item).any {
                         it == "§7§eClick to claim rewards!"
@@ -256,7 +256,7 @@ class MiningFeatures {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (Skytils.config.skymallReminder && SBInfo.mode == SBInfo.SkyblockIslands.DWARVENMINES.mode && SBInfo.time == "12:00am" && GuiManager.title != "§cSKYMALL RESET"
+        if (Skytils.config.skymallReminder && SBInfo.mode == SBInfo.SkyblockIsland.DwarvenMines.mode && SBInfo.time == "12:00am" && GuiManager.title != "§cSKYMALL RESET"
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
@@ -272,7 +272,7 @@ class MiningFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
-        if (!Utils.inSkyblock || SBInfo.mode != SBInfo.SkyblockIslands.DWARVENMINES.mode || event.state == null) return
+        if (!Utils.inSkyblock || SBInfo.mode != SBInfo.SkyblockIsland.DwarvenMines.mode || event.state == null) return
         val state = event.state!!
         if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
                 state.getValue(

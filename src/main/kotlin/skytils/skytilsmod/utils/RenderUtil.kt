@@ -147,21 +147,21 @@ object RenderUtil {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.disableTexture2D()
         val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
+        val worldRenderer = tessellator.worldRenderer
         GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
 
         //vertical
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
         tessellator.draw()
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
         tessellator.draw()
         GlStateManager.color(
             c.red / 255f * 0.8f,
@@ -171,17 +171,17 @@ object RenderUtil {
         )
 
         //x
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
         tessellator.draw()
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
         tessellator.draw()
         GlStateManager.color(
             c.red / 255f * 0.9f,
@@ -190,17 +190,17 @@ object RenderUtil {
             c.alpha / 255f * alphaMultiplier
         )
         //z
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
         tessellator.draw()
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldrenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
+        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
         tessellator.draw()
         GlStateManager.enableTexture2D()
         GlStateManager.disableBlend()
@@ -420,8 +420,8 @@ object RenderUtil {
      * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
      * @author Moulberry
      */
-    fun drawNametag(str: String?) {
-        val fontrenderer = Minecraft.getMinecraft().fontRendererObj
+    private fun drawNametag(str: String?) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         val f = 1.6f
         val f1 = 0.016666668f * f
         GlStateManager.pushMatrix()
@@ -437,7 +437,7 @@ object RenderUtil {
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
         val i = 0
-        val j = fontrenderer.getStringWidth(str) / 2
+        val j = fontRenderer.getStringWidth(str) / 2
         GlStateManager.disableTexture2D()
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
         worldrenderer.pos((-j - 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
@@ -446,9 +446,9 @@ object RenderUtil {
         worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
         tessellator.draw()
         GlStateManager.enableTexture2D()
-        fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127)
+        fontRenderer.drawString(str, -fontRenderer.getStringWidth(str) / 2, i, 553648127)
         GlStateManager.depthMask(true)
-        fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, -1)
+        fontRenderer.drawString(str, -fontRenderer.getStringWidth(str) / 2, i, -1)
         GlStateManager.enableDepth()
         GlStateManager.enableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
@@ -504,19 +504,19 @@ object RenderUtil {
      * Draws a solid color rectangle with the specified coordinates and color (ARGB format). Args: x1, y1, x2, y2, color
      */
     fun drawRect(left: Double, top: Double, right: Double, bottom: Double, color: Int) {
-        var left = left
-        var top = top
-        var right = right
-        var bottom = bottom
-        if (left < right) {
-            val i = left
-            left = right
-            right = i
+        var leftModifiable = left
+        var topModifiable = top
+        var rightModifiable = right
+        var bottomModifiable = bottom
+        if (leftModifiable < rightModifiable) {
+            val i = leftModifiable
+            leftModifiable = rightModifiable
+            rightModifiable = i
         }
-        if (top < bottom) {
-            val j = top
-            top = bottom
-            bottom = j
+        if (topModifiable < bottomModifiable) {
+            val j = topModifiable
+            topModifiable = bottomModifiable
+            bottomModifiable = j
         }
         val f3 = (color shr 24 and 255).toFloat() / 255.0f
         val f = (color shr 16 and 255).toFloat() / 255.0f
@@ -524,15 +524,15 @@ object RenderUtil {
         val f2 = (color and 255).toFloat() / 255.0f
         GlStateManager.color(f, f1, f2, f3)
         val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
+        val worldRenderer = tessellator.worldRenderer
         GlStateManager.enableBlend()
         GlStateManager.disableTexture2D()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION)
-        worldrenderer.pos(left, bottom, 0.0).endVertex()
-        worldrenderer.pos(right, bottom, 0.0).endVertex()
-        worldrenderer.pos(right, top, 0.0).endVertex()
-        worldrenderer.pos(left, top, 0.0).endVertex()
+        worldRenderer.begin(7, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(leftModifiable, bottomModifiable, 0.0).endVertex()
+        worldRenderer.pos(rightModifiable, bottomModifiable, 0.0).endVertex()
+        worldRenderer.pos(rightModifiable, topModifiable, 0.0).endVertex()
+        worldRenderer.pos(leftModifiable, topModifiable, 0.0).endVertex()
         tessellator.draw()
         GlStateManager.enableTexture2D()
         GlStateManager.disableBlend()

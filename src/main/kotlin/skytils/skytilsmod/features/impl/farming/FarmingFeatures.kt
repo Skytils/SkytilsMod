@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemAxe
@@ -37,9 +36,8 @@ import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
-import java.util.*
 
 class FarmingFeatures {
     private var lastNotifyBreakTime: Long = 0
@@ -98,7 +96,7 @@ class FarmingFeatures {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
 
         val formatted = event.message.formattedText
-        val unformatted = stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
 
         if (Skytils.config.acceptTrapperTask) {
             if (formatted.contains("§a§l[YES]")) {
@@ -168,7 +166,7 @@ class FarmingFeatures {
         if (event.packet is S45PacketTitle) {
             val packet = event.packet
             if (packet.message != null) {
-                val unformatted = stripControlCodes(packet.message.unformattedText)
+                val unformatted = packet.message.unformattedText.stripControlCodes()
                 if (Skytils.config.hideFarmingRNGTitles && unformatted.contains("DROP!")) {
                     event.isCanceled = true
                 }

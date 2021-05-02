@@ -244,7 +244,7 @@ class WaterBoardSolver {
                     if (switched && !solution.contains(lever) || !switched && solution.contains(lever)) {
                         val pos = lever.leverPos
                         val displayed =
-                            renderTimes.compute(lever) { k: LeverBlock?, v: Int? -> if (v == null) return@compute 0 else return@compute v.inc() }
+                            renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> if (v == null) return@compute 0 else return@compute v.inc() }
                         RenderUtil.draw3DString(
                             Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
                             "§l" + color.name,

@@ -19,7 +19,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import net.minecraft.block.BlockPressurePlateWeighted
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB

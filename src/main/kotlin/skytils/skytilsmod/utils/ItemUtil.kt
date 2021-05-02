@@ -21,12 +21,12 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraftforge.common.util.Constants
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.*
-import java.util.regex.Pattern
 
 object ItemUtil {
-    private val RARITY_PATTERN = Pattern.compile("(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)")
-    private val PET_PATTERN = Pattern.compile("§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+")
+    private val RARITY_PATTERN = "(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)".toRegex()
+    private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
     private const val NBT_INTEGER = 3
     private const val NBT_STRING = 8
     private const val NBT_LIST = 9
@@ -42,9 +42,9 @@ object ItemUtil {
     fun getDisplayName(item: ItemStack): String {
         var s = item.item.getItemStackDisplayName(item)
         if (item.tagCompound != null && item.tagCompound.hasKey("display", 10)) {
-            val nbttagcompound = item.tagCompound.getCompoundTag("display")
-            if (nbttagcompound.hasKey("Name", 8)) {
-                s = nbttagcompound.getString("Name")
+            val nbtTagCompound = item.tagCompound.getCompoundTag("display")
+            if (nbtTagCompound.hasKey("Name", 8)) {
+                s = nbtTagCompound.getString("Name")
             }
         }
         return s
@@ -93,7 +93,7 @@ object ItemUtil {
     fun getSkyBlockItemID(extraAttributes: NBTTagCompound?): String? {
         if (extraAttributes != null) {
             val itemId = extraAttributes.getString("id")
-            if (itemId != "") {
+            if (itemId.isNotEmpty()) {
                 return itemId
             }
         }
@@ -128,7 +128,7 @@ object ItemUtil {
     @JvmStatic
     fun hasRightClickAbility(itemStack: ItemStack): Boolean {
         for (line in getItemLore(itemStack)) {
-            val stripped = StringUtils.stripControlCodes(line)
+            val stripped = line.stripControlCodes()
             if (stripped.startsWith("Item Ability:") && stripped.endsWith("RIGHT CLICK")) return true
         }
         return false
@@ -155,17 +155,17 @@ object ItemUtil {
         // Determine the item's rarity
         for (i in 0 until lore.tagCount()) {
             val currentLine = lore.getStringTagAt(i)
-            val rarityMatcher = RARITY_PATTERN.matcher(currentLine)
-            val petRarityMatcher = PET_PATTERN.matcher(name)
-            if (rarityMatcher.find()) {
-                val rarity = rarityMatcher.group("rarity")
+            val rarityMatcher = RARITY_PATTERN.find(currentLine)
+            val petRarityMatcher = PET_PATTERN.find(name)
+            if (rarityMatcher != null) {
+                val rarity = rarityMatcher.groupValues.firstOrNull { it == "rarity" } ?: continue
                 for (itemRarity in ItemRarity.values()) {
                     if (rarity.startsWith(itemRarity.rarityName)) {
                         return itemRarity
                     }
                 }
-            } else if (petRarityMatcher.find()) {
-                val color = petRarityMatcher.group("color")
+            } else if (petRarityMatcher != null) {
+                val color = petRarityMatcher.groupValues.firstOrNull { it == "color" } ?: continue
                 return ItemRarity.byBaseColor(color)
             }
         }
@@ -183,8 +183,8 @@ object ItemUtil {
             return false
         }
         val name = display.getString("Name")
-        val petRarityMatcher = PET_PATTERN.matcher(name)
-        return petRarityMatcher.find()
+
+        return PET_PATTERN.matches(name)
     }
 
     fun setSkullTexture(item: ItemStack, texture: String, SkullOwner: String): ItemStack {

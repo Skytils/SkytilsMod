@@ -17,15 +17,14 @@
  */
 package skytils.skytilsmod.utils
 
-import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import org.apache.http.HttpRequest
-import org.apache.http.HttpRequestInterceptor
 import org.apache.http.HttpResponse
 import org.apache.http.HttpVersion
 import org.apache.http.client.methods.HttpGet
@@ -36,17 +35,18 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
 import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 
+
 object APIUtil {
-    var client: CloseableHttpClient =
+    private val parser = JsonParser()
+
+    val client: CloseableHttpClient =
         HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION)
-            .addInterceptorFirst { request: HttpRequest, context: HttpContext? ->
+            .addInterceptorFirst { request: HttpRequest, _: HttpContext? ->
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
             }.build()
@@ -63,15 +63,7 @@ object APIUtil {
             val response: HttpResponse = client.execute(request)
             val entity = response.entity
             if (response.statusLine.statusCode == 200) {
-                val `in` = BufferedReader(InputStreamReader(entity.content))
-                var input: String?
-                val r = StringBuilder()
-                while (`in`.readLine().also { input = it } != null) {
-                    r.append(input)
-                }
-                `in`.close()
-                val gson = Gson()
-                return gson.fromJson(r.toString(), JsonObject::class.java)
+                return parser.parse(entity.content.bufferedReader()).asJsonObject
             } else {
                 if (StringUtils.startsWithAny(
                         urlString,
@@ -86,8 +78,7 @@ object APIUtil {
                         scanner.useDelimiter("\\Z")
                         val error = scanner.next()
                         if (error.startsWith("{")) {
-                            val gson = Gson()
-                            return gson.fromJson(error, JsonObject::class.java)
+                            return parser.parse(errorStream.bufferedReader()).asJsonObject
                         }
                     }
                 }
@@ -114,15 +105,7 @@ object APIUtil {
             val response: HttpResponse = client.execute(request)
             val entity = response.entity
             if (response.statusLine.statusCode == 200) {
-                val `in` = BufferedReader(InputStreamReader(entity.content))
-                var input: String?
-                val r = StringBuilder()
-                while (`in`.readLine().also { input = it } != null) {
-                    r.append(input)
-                }
-                `in`.close()
-                val gson = Gson()
-                return gson.fromJson(r.toString(), JsonArray::class.java)
+                return parser.parse(entity.content.bufferedReader()).asJsonArray
             } else {
                 mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest failed. HTTP Error Code: ${response.statusLine.statusCode}"))
             }

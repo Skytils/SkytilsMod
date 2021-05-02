@@ -18,7 +18,10 @@
 package skytils.skytilsmod.commands
 
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.*
+import net.minecraft.command.CommandBase
+import net.minecraft.command.ICommandSender
+import net.minecraft.command.SyntaxErrorException
+import net.minecraft.command.WrongUsageException
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
@@ -47,7 +50,7 @@ object GlintCustomizeCommand : CommandBase() {
         return emptyList()
     }
 
-    @Throws(CommandException::class)
+
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
         val player = sender as EntityPlayerSP

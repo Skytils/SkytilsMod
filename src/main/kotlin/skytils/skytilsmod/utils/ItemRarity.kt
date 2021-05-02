@@ -19,7 +19,6 @@ package skytils.skytilsmod.utils
 
 import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
-import java.util.*
 
 /**
  * Taken from Skyblockcatia under MIT License

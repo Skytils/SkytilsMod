@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.commands
+package skytils.skytilsmod.commands.stats
 
 import com.google.gson.JsonObject
 import net.minecraft.command.CommandBase
-import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
@@ -41,7 +40,7 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
         return 0
     }
 
-    @Throws(CommandException::class)
+
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (needApiKey && key.isEmpty()) {
             printMessage("§cYou must have an API key set to use this command!")

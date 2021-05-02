@@ -18,7 +18,10 @@
 package skytils.skytilsmod.commands
 
 import net.minecraft.client.Minecraft
-import net.minecraft.command.*
+import net.minecraft.command.CommandBase
+import net.minecraft.command.ICommand
+import net.minecraft.command.ICommandSender
+import net.minecraft.command.WrongUsageException
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import skytils.skytilsmod.Skytils
@@ -66,13 +69,12 @@ object RepartyCommand : CommandBase(), ICommand {
         return 0
     }
 
-    @Throws(CommandException::class)
+
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.isOnHypixel) throw WrongUsageException("You must be on Hypixel to use this command.")
         if (args.isNotEmpty() && (args[0].startsWith("fail") || args[0] == "f")) {
             partyThread = Thread {
                 val player = Minecraft.getMinecraft().thePlayer
-                val chat = Minecraft.getMinecraft().ingameGUI.chatGUI
                 try {
                     Skytils.sendMessageQueue.add("/p " + java.lang.String.join(" ", repartyFailList))
                     val members = java.lang.String.join(

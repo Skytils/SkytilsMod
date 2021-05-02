@@ -34,7 +34,10 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 
 class TechnoMayor {
@@ -63,7 +66,7 @@ class TechnoMayor {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIslands.HUB.mode && SBInfo.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
+        if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode && SBInfo.mode != SBInfo.SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
@@ -89,7 +92,7 @@ class TechnoMayor {
         if (event.packet !is S02PacketChat) return
         val packet = event.packet
         if (packet.type.toInt() == 2) return
-        val unformatted = StringUtils.stripControlCodes(packet.chatComponent.unformattedText)
+        val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         if (unformatted == "Your Shiny Orb and associated pig expired and disappeared." || unformatted == "SHINY! The orb is charged! Click on it for loot!") {
             orbLocations.removeIf { pos: Vec3 ->
                 mc.thePlayer.position.distanceSq(

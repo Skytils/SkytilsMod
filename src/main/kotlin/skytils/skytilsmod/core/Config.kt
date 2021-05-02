@@ -18,12 +18,15 @@
 package skytils.skytilsmod.core
 
 import club.sk1er.vigilance.Vigilant
-import club.sk1er.vigilance.data.*
+import club.sk1er.vigilance.data.Category
+import club.sk1er.vigilance.data.Property
+import club.sk1er.vigilance.data.PropertyType
+import club.sk1er.vigilance.data.SortingBehavior
 import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 import java.io.File
 
-class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting()) {
+class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
     @Property(
         type = PropertyType.TEXT,
@@ -33,7 +36,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "API",
         hidden = true
     )
-    @JvmField
+
     var dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
     @Property(
@@ -1971,8 +1974,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var blessedBaitHider = 0
 
     init {
-        initialize()
-
         ::itemRarityOpacity dependsOn ::showItemRarity
 
         ::showLowestBINPrice dependsOn ::fetchLowestBINPrices
@@ -2007,7 +2008,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")
-            protectItemBINThreshold = if (numeric.isEmpty()) "0" else numeric
+            protectItemBINThreshold = numeric.ifEmpty { "0" }
         }
 
         // asbyth cool code
@@ -2028,9 +2029,11 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
             this.itemRarityOpacity /= 100f
             markDirty()
         }
+
+        initialize()
     }
 
-    class ConfigSorting : SortingBehavior() {
+    private object ConfigSorting : SortingBehavior() {
         override fun getCategoryComparator(): Comparator<in Category> {
             return Comparator { o1, o2 ->
                 if (o1.name == "General") return@Comparator -1

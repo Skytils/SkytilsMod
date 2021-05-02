@@ -40,7 +40,7 @@ class LocationButton : GuiButton {
         y2 = y + this.element.actualHeight + 6
     }
 
-    constructor(buttonId: Int, element: GuiElement) : super(-1, 0, 0, null) {
+    constructor(buttonId: Int, element: GuiElement) : super(buttonId, 0, 0, null) {
         this.element = element
     }
 

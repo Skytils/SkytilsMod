@@ -33,10 +33,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.utils.stripControlCodes
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.regex.Pattern
 
 /**
  * Adapted from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -46,8 +46,8 @@ import java.util.regex.Pattern
  */
 object SBInfo {
 
-    private val timePattern = Pattern.compile(".+(am|pm)")
-    private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
+    private val timePattern = ".+(am|pm)".toRegex()
+    private val JSON_BRACKET_PATTERN = "\\{.+}".toRegex()
 
     var location = ""
     var date = ""
@@ -94,20 +94,18 @@ object SBInfo {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatMessage(event: ClientChatReceivedEvent) {
         if (event.message.unformattedText.contains("{") && event.message.unformattedText.contains("}")) {
-            val matcher = JSON_BRACKET_PATTERN.matcher(event.message.unformattedText)
-            if (matcher.find()) {
-                try {
-                    val obj = Gson().fromJson(matcher.group(), JsonObject::class.java)
-                    if (obj.has("server")) {
-                        if (System.currentTimeMillis() - lastManualLocRaw > 5000) event.isCanceled = true
-                        if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
-                            locraw = obj
-                            mode = locraw!!["mode"].asString
-                        }
+            val pattern = JSON_BRACKET_PATTERN.find(event.message.unformattedText) ?: return
+            try {
+                val obj = Gson().fromJson(pattern.groupValues[0], JsonObject::class.java)
+                if (obj.has("server")) {
+                    if (System.currentTimeMillis() - lastManualLocRaw > 5000) event.isCanceled = true
+                    if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
+                        locraw = obj
+                        mode = locraw!!["mode"].asString
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -127,17 +125,17 @@ object SBInfo {
             val lines: MutableList<String> = ArrayList()
             for (i in scores.indices.reversed()) {
                 val score = scores[i]
-                val scoreplayerteam1 = scoreboard.getPlayersTeam(score.playerName)
-                var line = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score.playerName)
-                line = StringUtils.stripControlCodes(line)
+                val scorePlayerTeamOne = scoreboard.getPlayersTeam(score.playerName)
+                var line = ScorePlayerTeam.formatPlayerName(scorePlayerTeamOne, score.playerName)
+                line = line.stripControlCodes()
                 lines.add(line)
             }
             if (lines.size >= 5) {
-                date = StringUtils.stripControlCodes(lines[2]).trim { it <= ' ' }
+                date = lines[2].stripControlCodes().trim { it <= ' ' }
                 //§74:40am
-                val matcher = timePattern.matcher(lines[3])
-                if (matcher.find()) {
-                    time = StringUtils.stripControlCodes(matcher.group()).trim { it <= ' ' }
+                val matcher = timePattern.find(lines[3])
+                if (matcher != null) {
+                    time = matcher.groupValues[0].stripControlCodes().trim { it <= ' ' }
                     try {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
                         val parseFormat = SimpleDateFormat("hh:mm a")
@@ -146,7 +144,7 @@ object SBInfo {
                     }
                 }
                 location =
-                    StringUtils.stripControlCodes(lines[4]).replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
+                    lines[4].stripControlCodes().replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
             }
             objective = null
             var objTextLast = false
@@ -161,18 +159,18 @@ object SBInfo {
         }
     }
 
-    enum class SkyblockIslands(val mode: String) {
-        BLAZINGFORTRESS("combat_2"),
-        DEEPERCAVERNS("mining_2"),
-        DUNGEON("dungeon"),
-        DUNGEONHUB("dungeon_hub"),
-        DWARVENMINES("mining_3"),
-        FARMINGISLANDS("farming_1"),
-        GOLDMINE("mining_1"),
-        HUB("hub"),
-        THEEND("combat_3"),
-        THEPARK("foraging_1"),
-        PRIVATEISLAND("dynamic"),
-        SPIDERDEN("combat_1")
+    sealed class SkyblockIsland(val mode: String) {
+        object BlazingFortress : SkyblockIsland("combat_2")
+        object DeeperCaverns : SkyblockIsland("mining_2")
+        object Dungeon : SkyblockIsland("dungeon")
+        object DungeonHub : SkyblockIsland("dungeon_hub")
+        object DwarvenMines : SkyblockIsland("mining_3")
+        object FarmingIsland : SkyblockIsland("farming_1")
+        object GoldMine : SkyblockIsland("mining_1")
+        object Hub : SkyblockIsland("hub")
+        object TheEnd : SkyblockIsland("combat_3")
+        object ThePark : SkyblockIsland("foraging_1")
+        object PrivateIsland : SkyblockIsland("dynamic")
+        object SpiderDen : SkyblockIsland("combat_1")
     }
 }

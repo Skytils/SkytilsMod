@@ -34,7 +34,11 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.ItemRarity
+import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -139,7 +143,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         when (event.packet) {
             is S02PacketChat -> {
                 if (event.packet.type == 2.toByte() || !Skytils.config.trackMythEvent) return
-                val unformatted = StringUtils.stripControlCodes(event.packet.chatComponent.unformattedText)
+                val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
                 if (unformatted.startsWith("RARE DROP! You dug out a ")) {
                     val matcher = rareDugDrop.matcher(unformatted)
                     if (matcher.matches()) {
@@ -367,7 +371,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             get() = Skytils.config.trackMythEvent
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 

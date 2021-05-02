@@ -61,7 +61,7 @@ import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.StringUtils.startsWithAny
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.equalsOneOf
 import skytils.skytilsmod.utils.Utils.isInTablist
@@ -76,7 +76,7 @@ class MiscFeatures {
     fun onBossBarSet(event: BossBarEvent.Set) {
         val displayData = event.displayData
         if (Utils.inSkyblock) {
-            if (Skytils.config.bossBarFix && stripControlCodes(displayData.displayName.unformattedText) == "Wither") {
+            if (Skytils.config.bossBarFix && displayData.displayName.unformattedText.stripControlCodes() == "Wither") {
                 event.isCanceled = true
                 return
             }
@@ -86,7 +86,7 @@ class MiscFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
-        val unformatted = stripControlCodes(event.message.unformattedText).trim { it <= ' ' }
+        val unformatted = event.message.unformattedText.stripControlCodes().trim { it <= ' ' }
         if (unformatted == "The ground begins to shake as an Endstone Protector rises from below!") {
             golemSpawnTime = System.currentTimeMillis() + 20000
         }
@@ -133,8 +133,11 @@ class MiscFeatures {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (Skytils.config.highlightDisabledPotionEffects && event.slot.hasStack && SBInfo.lastOpenContainerName?.startsWith("Toggle Potion Effects") == true) {
-            var item = event.slot.stack
+        if (Skytils.config.highlightDisabledPotionEffects && event.slot.hasStack && SBInfo.lastOpenContainerName?.startsWith(
+                "Toggle Potion Effects"
+            ) == true
+        ) {
+            val item = event.slot.stack
             if (item.item == Items.potionitem) {
                 if (ItemUtil.getItemLore(item).any {
                         it == "§7Currently: §cDISABLED"
@@ -306,7 +309,7 @@ class MiscFeatures {
             get() = Skytils.config.golemSpawnTimer
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 
@@ -367,7 +370,7 @@ class MiscFeatures {
             get() = Skytils.config.legionPlayerDisplay
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 
@@ -375,7 +378,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (SBInfo.mode != SBInfo.SkyblockIslands.THEEND.mode) return
+                if (SBInfo.mode != SBInfo.SkyblockIsland.TheEnd.mode) return
                 var invalid = false
                 var placedEyes = 0
                 for (pos in SUMMONING_EYE_FRAMES) {
@@ -435,7 +438,7 @@ class MiscFeatures {
         }
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

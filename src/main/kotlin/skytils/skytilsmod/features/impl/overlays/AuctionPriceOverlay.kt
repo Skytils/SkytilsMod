@@ -47,8 +47,6 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
-import java.io.IOException
-import java.util.*
 
 class AuctionPriceOverlay {
     @SubscribeEvent
@@ -132,7 +130,7 @@ class AuctionPriceOverlay {
         }
 
         override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-            onMouseMove(mouseX, mouseY)
+            onMouseMove()
             drawGradientRect(0, 0, width, height, Color(117, 115, 115, 25).rgb, Color(0, 0, 0, 200).rgb)
             priceField.drawTextBox()
             if (lastAuctionedStack != null) {
@@ -221,7 +219,7 @@ class AuctionPriceOverlay {
             super.updateScreen()
         }
 
-        @Throws(IOException::class)
+
         override fun keyTyped(typedChar: Char, keyCode: Int) {
             if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
                 sign.markDirty()
@@ -238,7 +236,7 @@ class AuctionPriceOverlay {
             }
         }
 
-        @Throws(IOException::class)
+
         override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
             priceField.mouseClicked(mouseX, mouseY, mouseButton)
             super.mouseClicked(mouseX, mouseY, mouseButton)
@@ -249,7 +247,7 @@ class AuctionPriceOverlay {
             dragging = false
         }
 
-        private fun onMouseMove(mouseX: Int, mouseY: Int) {
+        private fun onMouseMove() {
             val sr = ScaledResolution(mc)
             val minecraftScale = sr.scaleFactor.toFloat()
             val floatMouseX = Mouse.getX() / minecraftScale
@@ -260,7 +258,7 @@ class AuctionPriceOverlay {
             }
         }
 
-        @Throws(IOException::class)
+
         override fun actionPerformed(button: GuiButton) {
             if (button.id == 0) {
                 undercut = !undercut

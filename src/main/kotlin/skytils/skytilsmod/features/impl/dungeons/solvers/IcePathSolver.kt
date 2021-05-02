@@ -39,6 +39,7 @@ import java.util.*
 
 class IcePathSolver {
     private var ticks = 0
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return

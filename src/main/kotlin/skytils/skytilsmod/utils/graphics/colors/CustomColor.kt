@@ -20,7 +20,6 @@ package skytils.skytilsmod.utils.graphics.colors
 import net.minecraft.client.renderer.GlStateManager
 import org.apache.commons.codec.digest.DigestUtils
 import skytils.skytilsmod.utils.MathUtil
-import java.util.*
 
 /** CustomColor
  * will represent color or complex colors
@@ -41,7 +40,7 @@ open class CustomColor {
 
     // The BLUE  value of the color(0.0f -> 1.0f)
     var a // The ALPHA value of the color(0.0f -> 1.0f)
-            = 0f
+        = 0f
 
     @JvmOverloads
     constructor(r: Float, g: Float, b: Float, a: Float = 1.0f) {
@@ -197,26 +196,26 @@ open class CustomColor {
         }
 
         fun fromHSV(h: Float, s: Float, v: Float, a: Float): CustomColor {
-            var s = s
-            var v = v
-            var a = a
-            a = a.coerceIn(0f, 1f)
-            if (v <= 0) return CustomColor(0F, 0F, 0F, a)
-            if (v > 1) v = 1f
-            if (s <= 0) return CustomColor(v, v, v, a)
-            if (s > 1) s = 1f
+            var s1 = s
+            var v4 = v
+            var a1 = a
+            a1 = a1.coerceIn(0f, 1f)
+            if (v4 <= 0) return CustomColor(0F, 0F, 0F, a1)
+            if (v4 > 1) v4 = 1f
+            if (s1 <= 0) return CustomColor(v4, v4, v4, a1)
+            if (s1 > 1) s1 = 1f
             val vh = (h % 1 + 1) * 6 % 6
             val vi = MathUtil.fastFloor(vh.toDouble())
-            val v1 = v * (1 - s)
-            val v2 = v * (1 - s * (vh - vi))
-            val v3 = v * (1 - s * (1 - (vh - vi)))
+            val v1 = v4 * (1 - s1)
+            val v2 = v4 * (1 - s1 * (vh - vi))
+            val v3 = v4 * (1 - s1 * (1 - (vh - vi)))
             return when (vi) {
-                0 -> CustomColor(v, v3, v1, a)
-                1 -> CustomColor(v2, v, v1, a)
-                2 -> CustomColor(v1, v, v3, a)
-                3 -> CustomColor(v1, v2, v, a)
-                4 -> CustomColor(v3, v1, v, a)
-                else -> CustomColor(v, v1, v2, a)
+                0 -> CustomColor(v4, v3, v1, a1)
+                1 -> CustomColor(v2, v4, v1, a1)
+                2 -> CustomColor(v1, v4, v3, a1)
+                3 -> CustomColor(v1, v2, v4, a1)
+                4 -> CustomColor(v3, v1, v4, a1)
+                else -> CustomColor(v4, v1, v2, a1)
             }
         }
 

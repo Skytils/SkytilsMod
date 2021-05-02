@@ -104,14 +104,13 @@ class Skytils {
         @JvmField
         val mc: Minecraft = Minecraft.getMinecraft()
 
-        @JvmField
-        val config = Config()
+        lateinit var config: Config
 
         @JvmField
         val modDir = File(File(mc.mcDataDir, "config"), "skytils")
 
         @JvmStatic
-        lateinit var GUIMANAGER: GuiManager
+        lateinit var guiManager: GuiManager
         var ticks = 0
 
         @JvmField
@@ -152,17 +151,18 @@ class Skytils {
         }
         if (!modDir.exists()) modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
-        GUIMANAGER = GuiManager()
+        guiManager = GuiManager()
         jarFile = event.sourceFile
     }
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+        config = Config()
         config.preload()
 
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
-        MinecraftForge.EVENT_BUS.register(GUIMANAGER)
+        MinecraftForge.EVENT_BUS.register(guiManager)
         MinecraftForge.EVENT_BUS.register(MayorInfo())
         MinecraftForge.EVENT_BUS.register(SBInfo)
         MinecraftForge.EVENT_BUS.register(SoundQueue)
@@ -301,17 +301,17 @@ class Skytils {
     @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
         if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
-            var x = event.gui.width - 105
-            var x2 = x + 100
+            val x = event.gui.width - 105
+            val x2 = x + 100
             var y = event.gui.height - 22
             var y2 = y + 20
             val sorted = Lists.newArrayList(event.buttonList)
             sorted.sortWith { a, b -> b.yPosition + b.height - a.yPosition + a.height }
             for (button in sorted) {
-                var otherX = button.xPosition
-                var otherX2 = button.xPosition + button.width
-                var otherY = button.yPosition
-                var otherY2 = button.yPosition + button.height
+                val otherX = button.xPosition
+                val otherX2 = button.xPosition + button.width
+                val otherY = button.yPosition
+                val otherY2 = button.yPosition + button.height
                 if (otherX2 > x && otherX < x2 && otherY2 > y && otherY < y2) {
                     y = otherY - 20 - 2
                     y2 = y + 20

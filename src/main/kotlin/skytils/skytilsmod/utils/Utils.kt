@@ -170,9 +170,8 @@ object Utils {
         }
     }
 
-    fun getCustomColorFromColor(color: Color): CustomColor {
-        return CustomColor.fromInt(color.rgb)
-    }
+    private fun getCustomColorFromColor(color: Color) = CustomColor.fromInt(color.rgb)
+
 
     /**
      * Cancels a chat packet and posts the chat event to the event bus if other mods need it

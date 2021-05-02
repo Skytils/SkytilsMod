@@ -16,32 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-buildscript {
-    ext.kotlin_version = "1.5.0-RC"
-
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        maven { url "https://jitpack.io" }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots"
-        }
-        maven { url "https://maven.minecraftforge.net/" }
-    }
-
-    dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
-        classpath "com.github.Skytils:ForgeGradle:FG_2.1-SNAPSHOT"
-        classpath "com.github.Skytils:mixingradle:d75e32e743"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+plugins {
+    id "net.minecraftforge.gradle.forge" version "8f14deb"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "org.jetbrains.kotlin.jvm" version "1.5.0"
+    id "org.spongepowered.mixin" version "d75e32e743"
 }
 
-apply plugin: "kotlin"
-apply plugin: "com.github.johnrengelman.shadow"
-apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: "org.spongepowered.mixin"
+ext.kotlin_version = "1.5.0-RC"
 
 version = "1.0-pre2"
 group = "skytils.skytilsmod"
@@ -65,6 +47,7 @@ minecraft {
     runDir = "run"
     mappings = "stable_22"
     makeObfSourceJar = false
+    gitVersion = false
     clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.FMLLoadingPlugin"
     clientRunArgs += "--mixin mixins.skytils.json"
 }
@@ -76,26 +59,6 @@ repositories {
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile "com.mod-buildcraft:buildcraft:6.0.8:dev"  // adds buildcraft to the dev env
-    //compile "com.googlecode.efficient-java-matrix-library:ejml:0.24" // adds ejml to the dev env
-
-    // the "provided" configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided "com.mod-buildcraft:buildcraft:6.0.8:dev"
-
-    // the deobf configurations:  "deobfCompile" and "deobfProvided" are the same as the normal compile and provided,
-    // except that these dependencies get remapped to your current MCP mappings
-    //deobfCompile "com.mod-buildcraft:buildcraft:6.0.8:dev"
-    //deobfProvided "com.mod-buildcraft:buildcraft:6.0.8:dev"
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         transitive = false
         exclude module: "guava"
@@ -119,9 +82,6 @@ dependencies {
 }
 
 jar {
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
     manifest.attributes(
             "Main-Class": "SkytilsInstallerFrame",
             "FMLCorePlugin": "skytils.skytilsmod.tweaker.FMLLoadingPlugin",
@@ -196,7 +156,7 @@ reobf {
 
 sourceSets {
     main {
-        //ext.refMap = "mixins.skytils.refmap.json"
+        ext.refMap = "mixins.skytils.refmap.json"
     }
 }
 

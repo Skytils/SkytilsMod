@@ -44,7 +44,7 @@ import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.isInTablist
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -77,12 +77,12 @@ class PetFeatures {
         } else if (message.startsWith("§r§aYou summoned your §r")) {
             val petMatcher = SUMMON_PATTERN.matcher(message)
             if (petMatcher.find()) {
-                lastPet = stripControlCodes(petMatcher.group("pet"))
+                lastPet = petMatcher.group("pet").stripControlCodes()
             } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
             val autopetMatcher = AUTOPET_PATTERN.matcher(message)
             if (autopetMatcher.find()) {
-                lastPet = stripControlCodes(autopetMatcher.group("pet"))
+                lastPet = autopetMatcher.group("pet").stripControlCodes()
             } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
         }
     }
@@ -228,7 +228,7 @@ class PetFeatures {
         }
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }
