@@ -1068,6 +1068,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Radioactive Bonus",
+        description = "Shows the current Critical Damage bonus from Tarantula helmet",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var showRadioactiveBonus = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Item Rarity",
         description = "Shows the rarity of an item in the color",
         category = "Miscellaneous",

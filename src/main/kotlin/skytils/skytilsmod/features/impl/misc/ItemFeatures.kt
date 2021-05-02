@@ -53,6 +53,7 @@ import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.StringUtils.startsWith
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.TabListUtils
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -220,6 +221,17 @@ class ItemFeatures {
                         event.toolTip.add(event.toolTip.size - index, "")
                         event.toolTip.add(event.toolTip.size - index, "§4 Soul Eater Bonus: §a$bonus")
                     }
+                }
+            }
+        }
+        if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
+            val name = Skytils.mc.ingameGUI.tabList.getPlayerName(TabListUtils.tabEntries[68])
+            val bonus = (name.substringAfter("❁").removeSuffix("§r").toInt().coerceAtMost(1000) / 10).toString()
+            for (i in event.toolTip.indices) {
+                val line = event.toolTip[i]
+                if (line.contains("§7Crit Damage:")) {
+                    event.toolTip.add(i + 1, "§8Radioactive Bonus: §c+${bonus}%")
+                    break
                 }
             }
         }
