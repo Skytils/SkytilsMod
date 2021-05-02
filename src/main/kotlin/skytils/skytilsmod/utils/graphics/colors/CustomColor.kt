@@ -20,7 +20,6 @@ package skytils.skytilsmod.utils.graphics.colors
 import net.minecraft.client.renderer.GlStateManager
 import org.apache.commons.codec.digest.DigestUtils
 import skytils.skytilsmod.utils.MathUtil
-import java.util.*
 
 /** CustomColor
  * will represent color or complex colors
@@ -41,7 +40,7 @@ open class CustomColor {
 
     // The BLUE  value of the color(0.0f -> 1.0f)
     var a // The ALPHA value of the color(0.0f -> 1.0f)
-            = 0f
+        = 0f
 
     @JvmOverloads
     constructor(r: Float, g: Float, b: Float, a: Float = 1.0f) {

@@ -126,6 +126,7 @@ class StartsWithSequenceSolver {
 
     companion object {
         private val mc = Minecraft.getMinecraft()
+
         @JvmField
         val shouldClick = ArrayList<Int>()
         private var sequenceNeeded: String? = null

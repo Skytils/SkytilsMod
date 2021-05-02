@@ -20,7 +20,6 @@ package skytils.skytilsmod.gui
 import club.sk1er.vigilance.VigilanceConfig
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui

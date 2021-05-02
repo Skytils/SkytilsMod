@@ -632,32 +632,32 @@ class SpamHider {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r")
         override val toggled: Boolean
             get() = Skytils.config.profileHider == 2 ||
-                    Skytils.config.implosionHider == 2 ||
-                    Skytils.config.midasStaffHider == 2 ||
-                    Skytils.config.spiritSceptreHider == 2 ||
-                    Skytils.config.giantSwordHider == 2 ||
-                    Skytils.config.lividHider == 2 ||
-                    Skytils.config.hopeHider == 2 ||
-                    Skytils.config.manaUseHider == 2 ||
-                    Skytils.config.bloodKeyHider == 2 ||
-                    Skytils.config.hideBossMessages == 2 ||
-                    Skytils.config.hideDungeonCountdownAndReady == 2 ||
-                    Skytils.config.hideDungeonAbilities == 2 ||
-                    Skytils.config.hideMortMessages == 2 ||
-                    Skytils.config.superboomHider == 2 ||
-                    Skytils.config.reviveStoneHider == 2 ||
-                    Skytils.config.witherKeyHider == 2 ||
-                    Skytils.config.inTheWayHider == 2 ||
-                    Skytils.config.hideCantUseAbility == 2 ||
-                    Skytils.config.comboHider == 2 ||
-                    Skytils.config.cooldownHider == 2 ||
-                    Skytils.config.hideNoEnemiesNearby == 2 ||
-                    Skytils.config.manaMessages == 2 ||
-                    Skytils.config.blessingEnchantHider == 2 ||
-                    Skytils.config.blessedBaitHider == 2 ||
-                    Skytils.config.tetherHider == 2 ||
-                    Skytils.config.selfOrbHider == 2 ||
-                    Skytils.config.otherOrbHider == 2
+                Skytils.config.implosionHider == 2 ||
+                Skytils.config.midasStaffHider == 2 ||
+                Skytils.config.spiritSceptreHider == 2 ||
+                Skytils.config.giantSwordHider == 2 ||
+                Skytils.config.lividHider == 2 ||
+                Skytils.config.hopeHider == 2 ||
+                Skytils.config.manaUseHider == 2 ||
+                Skytils.config.bloodKeyHider == 2 ||
+                Skytils.config.hideBossMessages == 2 ||
+                Skytils.config.hideDungeonCountdownAndReady == 2 ||
+                Skytils.config.hideDungeonAbilities == 2 ||
+                Skytils.config.hideMortMessages == 2 ||
+                Skytils.config.superboomHider == 2 ||
+                Skytils.config.reviveStoneHider == 2 ||
+                Skytils.config.witherKeyHider == 2 ||
+                Skytils.config.inTheWayHider == 2 ||
+                Skytils.config.hideCantUseAbility == 2 ||
+                Skytils.config.comboHider == 2 ||
+                Skytils.config.cooldownHider == 2 ||
+                Skytils.config.hideNoEnemiesNearby == 2 ||
+                Skytils.config.manaMessages == 2 ||
+                Skytils.config.blessingEnchantHider == 2 ||
+                Skytils.config.blessedBaitHider == 2 ||
+                Skytils.config.tetherHider == 2 ||
+                Skytils.config.selfOrbHider == 2 ||
+                Skytils.config.otherOrbHider == 2
 
         companion object {
             var lastTimeRender = Date().time

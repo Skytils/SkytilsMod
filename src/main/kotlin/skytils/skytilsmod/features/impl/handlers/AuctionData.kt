@@ -20,16 +20,10 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import org.apache.commons.lang3.time.StopWatch
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.Config
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.Utils
-import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
 class AuctionData {

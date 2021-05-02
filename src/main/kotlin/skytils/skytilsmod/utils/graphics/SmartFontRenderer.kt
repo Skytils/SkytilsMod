@@ -147,7 +147,8 @@ class SmartFontRenderer : FontRenderer(
                     posX = originPosX
                     posY = originPosY
                 }
-                TextShadow.NONE -> {}
+                TextShadow.NONE -> {
+                }
             }
 
             // rendering the text

@@ -19,10 +19,9 @@
 package skytils.skytilsmod.commands.stats.impl
 
 import com.google.gson.JsonObject
-import net.minecraft.command.ICommandSender
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import skytils.skytilsmod.commands.StatCommand
+import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils

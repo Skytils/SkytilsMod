@@ -164,17 +164,17 @@ class DungeonTimer {
      """.trimIndent() + (if (dungeonStartTime == -1L) "0s" else timeFormat(
                     ((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime).toDouble() / 1000f
                 )) +
-                        "\n§7Wither Doors: " + witherDoors +
-                        "\n§4Blood Open: " + (if (bloodOpenTime == -1L) "0s" else timeFormat(
+                    "\n§7Wither Doors: " + witherDoors +
+                    "\n§4Blood Open: " + (if (bloodOpenTime == -1L) "0s" else timeFormat(
                     (bloodOpenTime - dungeonStartTime).toDouble() / 1000f
                 )) +
-                        "\n§cWatcher Clear: " + (if (bloodClearTime == -1L) "0s" else timeFormat(
+                    "\n§cWatcher Clear: " + (if (bloodClearTime == -1L) "0s" else timeFormat(
                     (bloodClearTime - bloodOpenTime).toDouble() / 1000f
                 )) +
-                        "\n§9Boss Entry: " + (if (bossEntryTime == -1L) "0s" else timeFormat(
+                    "\n§9Boss Entry: " + (if (bossEntryTime == -1L) "0s" else timeFormat(
                     (bossEntryTime - dungeonStartTime).toDouble() / 1000f
                 )) +
-                        "\n§bBoss Clear: " + if (bossClearTime == -1L) "0s" else timeFormat(
+                    "\n§bBoss Clear: " + if (bossClearTime == -1L) "0s" else timeFormat(
                     (bossClearTime - bossEntryTime).toDouble() / 1000f
                 )
                 val lines = displayText.split("\n".toRegex()).toTypedArray()
@@ -247,7 +247,7 @@ class DungeonTimer {
                     "\n§6Phase 3: " + (if (phase2ClearTime == -1L) "0s" else timeFormat(
                     ((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime).toDouble() / 1000f
                 )) +
-                        "\n§4Phase 4: " + if (phase3ClearTime == -1L) "0s" else timeFormat(
+                    "\n§4Phase 4: " + if (phase3ClearTime == -1L) "0s" else timeFormat(
                     ((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase3ClearTime).toDouble() / 1000f
                 )
                 val lines = displayText.split("\n".toRegex()).toTypedArray()

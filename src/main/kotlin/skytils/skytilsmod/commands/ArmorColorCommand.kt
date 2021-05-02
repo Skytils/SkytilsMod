@@ -19,7 +19,10 @@ package skytils.skytilsmod.commands
 
 import com.google.common.collect.Lists
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.*
+import net.minecraft.command.CommandBase
+import net.minecraft.command.ICommandSender
+import net.minecraft.command.SyntaxErrorException
+import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
@@ -28,7 +31,6 @@ import skytils.skytilsmod.features.impl.handlers.ArmorColor
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import java.util.*
 
 object ArmorColorCommand : CommandBase() {
     override fun getCommandName(): String {
@@ -51,7 +53,7 @@ object ArmorColorCommand : CommandBase() {
         return emptyList()
     }
 
-    
+
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val player = sender as EntityPlayerSP
         if (args.isEmpty()) {

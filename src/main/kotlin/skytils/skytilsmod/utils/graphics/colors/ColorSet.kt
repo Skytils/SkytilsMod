@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.utils.graphics.colors
 
-import java.util.*
-
 /**
  * Represents an ordered set of colors
  *

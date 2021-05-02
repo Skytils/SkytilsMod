@@ -21,12 +21,10 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.features.impl.handlers.CommandAliases
 import skytils.skytilsmod.gui.commandaliases.elements.CleanButton
 import skytils.skytilsmod.gui.commandaliases.elements.ScrollingCommandAliasesList
 import java.awt.Color
-import java.io.IOException
 
 /**
  * Taken from ChatShortcuts under MIT License
@@ -67,7 +65,7 @@ class CommandAliasesGui : GuiScreen() {
         super.drawScreen(mouseX, mouseY, partialTicks)
     }
 
-    
+
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         super.keyTyped(typedChar, keyCode)
         scrollingCommandAliasesList!!.keyTyped(typedChar, keyCode)
@@ -78,7 +76,7 @@ class CommandAliasesGui : GuiScreen() {
         scrollingCommandAliasesList!!.updateScreen()
     }
 
-    
+
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
         super.mouseClicked(mouseX, mouseY, mouseButton)
         scrollingCommandAliasesList!!.mouseClicked(mouseX, mouseY, mouseButton)

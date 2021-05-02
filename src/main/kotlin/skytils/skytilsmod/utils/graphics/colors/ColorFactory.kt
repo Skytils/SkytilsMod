@@ -78,7 +78,7 @@ object ColorFactory {
      * @param saturation the saturation, `0.0 to 1.0`
      * @param brightness the brightness, `0.0 to 1.0`
      * @return the `Color`
-     * 
+     *
      * out of range
      */
     @JvmOverloads
@@ -203,8 +203,8 @@ object ColorFactory {
      * @param opacity the opacity component in range from 0.0 (transparent)
      * to 1.0 (opaque)
      * @return the RGB color specified with the colorString
-     * 
-     * 
+     *
+     *
      * an unsupported color name or contains an illegal numeric value
      */
     /**
@@ -304,8 +304,8 @@ object ColorFactory {
      * @param colorString the name or numeric representation of the color
      * in one of the supported formats
      * @return an RGB color
-     * 
-     * 
+     *
+     *
      * an unsupported color name or contains an illegal numeric value
      */
     @JvmOverloads
@@ -458,8 +458,8 @@ object ColorFactory {
      * of the string representation is the same as in [.web].
      *
      * @param value the string to convert
-     * 
-     * 
+     *
+     *
      * an unsupported color name or illegal hexadecimal value
      * @return a `Color` object holding the value represented
      * by the string argument

@@ -41,7 +41,7 @@ class MayorInfo {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (ticks % (60*20) == 0) {
+        if (ticks % (60 * 20) == 0) {
             if (System.currentTimeMillis() - lastFetchedMayorData > 24 * 60 * 60 * 1000 || isLocal) {
                 fetchMayorData()
             }
@@ -113,7 +113,8 @@ class MayorInfo {
             val chestName = chest.lowerChestInventory.displayName.unformattedText
             if ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith("Mayor ") && (currentMayor == null || !chestName.contains(
                     currentMayor!!
-                )))) {
+                )))
+            ) {
                 val slot = event.slot
                 val item = slot.stack
                 if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || currentMayor == null && item.displayName.contains(

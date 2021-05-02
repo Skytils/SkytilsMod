@@ -34,7 +34,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.lang.NullPointerException
 
 class IceFillSolver {
     @SubscribeEvent

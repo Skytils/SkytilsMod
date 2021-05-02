@@ -219,7 +219,7 @@ class AuctionPriceOverlay {
             super.updateScreen()
         }
 
-        
+
         override fun keyTyped(typedChar: Char, keyCode: Int) {
             if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
                 sign.markDirty()
@@ -236,7 +236,7 @@ class AuctionPriceOverlay {
             }
         }
 
-        
+
         override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
             priceField.mouseClicked(mouseX, mouseY, mouseButton)
             super.mouseClicked(mouseX, mouseY, mouseButton)
@@ -258,7 +258,7 @@ class AuctionPriceOverlay {
             }
         }
 
-        
+
         override fun actionPerformed(button: GuiButton) {
             if (button.id == 0) {
                 undercut = !undercut

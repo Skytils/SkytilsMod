@@ -31,7 +31,6 @@ import skytils.skytilsmod.core.structure.LocationButton
 import skytils.skytilsmod.core.structure.ResizeButton
 import skytils.skytilsmod.core.structure.ResizeButton.Corner
 import java.awt.Color
-import java.io.IOException
 
 open class LocationEditGui : GuiScreen() {
     private var xOffset = 0f
@@ -194,7 +193,7 @@ open class LocationEditGui : GuiScreen() {
         }
     }
 
-    
+
     override fun handleMouseInput() {
         super.handleMouseInput()
         val hovered = LocationButton.lastHoveredElement

@@ -47,9 +47,9 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.CheckRenderEntityEvent
+import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.ItemUtil
@@ -133,7 +133,10 @@ class MiscFeatures {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (Skytils.config.highlightDisabledPotionEffects && event.slot.hasStack && SBInfo.lastOpenContainerName?.startsWith("Toggle Potion Effects") == true) {
+        if (Skytils.config.highlightDisabledPotionEffects && event.slot.hasStack && SBInfo.lastOpenContainerName?.startsWith(
+                "Toggle Potion Effects"
+            ) == true
+        ) {
             val item = event.slot.stack
             if (item.item == Items.potionitem) {
                 if (ItemUtil.getItemLore(item).any {

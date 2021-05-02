@@ -21,7 +21,6 @@ import com.google.gson.JsonObject
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.io.File
 import java.io.FileReader
