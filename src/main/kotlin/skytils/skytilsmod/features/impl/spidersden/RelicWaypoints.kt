@@ -18,10 +18,8 @@
 package skytils.skytilsmod.features.impl.spidersden
 
 import com.google.common.collect.ImmutableSet
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S2APacketParticles
@@ -72,7 +70,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
     @SubscribeEvent
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIslands.SPIDERDEN.mode) return
+        if (SBInfo.mode != SBInfo.SkyblockIsland.SpiderDen.mode) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
             val packet = event.packet as C08PacketPlayerBlockPlacement?
             if (relicLocations.contains(packet!!.position)) {
@@ -86,7 +84,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIslands.SPIDERDEN.mode) return
+        if (SBInfo.mode != SBInfo.SkyblockIsland.SpiderDen.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         if (Skytils.config.relicWaypoints) {

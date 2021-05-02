@@ -76,7 +76,7 @@ class RainTimer {
             get() = fr.getStringWidth("99:99")
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
 
     }

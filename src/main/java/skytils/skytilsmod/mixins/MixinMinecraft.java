@@ -107,14 +107,17 @@ public abstract class MixinMinecraft {
         File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
         if (!file.exists()) {
             try {
-                HttpGet request = new HttpGet(new URL(Skytils.config.dataURL + "files/vigilance.toml").toURI());
+                HttpGet request = new HttpGet(new URL(Skytils.config.getDataURL() + "files/vigilance.toml").toURI());
                 request.setProtocolVersion(HttpVersion.HTTP_1_1);
                 HttpResponse response = APIUtil.INSTANCE.getClient().execute(request);
                 if (response.getStatusLine().getStatusCode() == 200) {
-                    file.createNewFile();
-                    response.getEntity().writeTo(new FileOutputStream(file));
+                    if (file.createNewFile()) {
+                        response.getEntity().writeTo(new FileOutputStream(file));
+                    } else {
+                        throw new IllegalStateException("Failed to create file");
+                    }
                 }
-            } catch (URISyntaxException | IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

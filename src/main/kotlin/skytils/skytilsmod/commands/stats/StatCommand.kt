@@ -41,7 +41,7 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
         return 0
     }
 
-    @Throws(CommandException::class)
+    
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (needApiKey && key.isEmpty()) {
             printMessage("§cYou must have an API key set to use this command!")

@@ -47,7 +47,7 @@ open class LocationEditGui : GuiScreen() {
 
     override fun initGui() {
         super.initGui()
-        for ((_, value) in Skytils.GUIMANAGER.elements) {
+        for ((_, value) in Skytils.guiManager.elements) {
             val lb = LocationButton(value)
             buttonList.add(lb)
             locationButtons[value] = lb
@@ -145,7 +145,6 @@ open class LocationEditGui : GuiScreen() {
             locationButton.drawButton(mc, mouseX, mouseY)
             recalculateResizeButtons()
         } else if (dragging != null) {
-            val lb = locationButtons[dragging] ?: return
             val x = (floatMouseX - xOffset) / sr.scaledWidth.toFloat()
             val y = (floatMouseY - yOffset) / sr.scaledHeight.toFloat()
             dragging!!.setPos(x, y)
@@ -195,7 +194,7 @@ open class LocationEditGui : GuiScreen() {
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun handleMouseInput() {
         super.handleMouseInput()
         val hovered = LocationButton.lastHoveredElement

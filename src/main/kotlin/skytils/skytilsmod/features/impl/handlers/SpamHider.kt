@@ -103,7 +103,7 @@ class SpamHider {
         if (event.packet !is S02PacketChat) return
         val packet = event.packet
         if (packet.type.toInt() == 2) return
-        val unformatted = stripControlCodes(packet.chatComponent.unformattedText)
+        val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         val formatted = packet.chatComponent.formattedText
 
         // Profile
@@ -559,9 +559,7 @@ class SpamHider {
             while (i in spamMessages.indices) {
                 val message = spamMessages[i]
                 val messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(
-                    stripControlCodes(
-                        message.message
-                    )
+                    message.message.stripControlCodes()
                 )
                 if (actualY > sr.scaledHeight / 2f) {
                     message.height = message.height + (i * 10 - message.height) * (animDiv * 5)
@@ -610,7 +608,7 @@ class SpamHider {
 
         override fun demoRender() {
             val messageWidth =
-                Minecraft.getMinecraft().fontRendererObj.getStringWidth(stripControlCodes("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r"))
+                Minecraft.getMinecraft().fontRendererObj.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r".stripControlCodes())
             val shadow: TextShadow = when (Skytils.config.spamShadow) {
                 1 -> TextShadow.NONE
                 2 -> TextShadow.OUTLINE
@@ -666,7 +664,7 @@ class SpamHider {
         }
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

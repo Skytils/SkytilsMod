@@ -18,7 +18,6 @@
 package skytils.skytilsmod.core
 
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiMainMenu
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -40,7 +39,7 @@ class UpdateChecker {
             return sUrl[sUrl.size - 1]
         }
 
-        fun scheduleCopyUpdateAtShutdown(jarName: String?) {
+        fun scheduleCopyUpdateAtShutdown(jarName: String) {
             Runtime.getRuntime().addShutdownHook(Thread {
                 try {
                     println("Attempting to apply Skytils update.")
@@ -69,19 +68,19 @@ class UpdateChecker {
          * @param sourceFile The source file
          * @param destFile Where it will be
          */
-        @Throws(IOException::class)
-        fun copyFile(sourceFile: File, destFile: File?) {
-            var destFile = destFile
-            if (destFile == null || !destFile.exists()) {
-                destFile = File(File(sourceFile.parentFile, "mods"), "Skytils.jar")
-                sourceFile.renameTo(destFile)
+
+        private fun copyFile(sourceFile: File, destFile: File?) {
+            var destFileModifiable = destFile
+            if (destFileModifiable == null || !destFileModifiable.exists()) {
+                destFileModifiable = File(File(sourceFile.parentFile, "mods"), "Skytils.jar")
+                sourceFile.renameTo(destFileModifiable)
                 return
             }
             var source: InputStream? = null
             var dest: OutputStream? = null
             try {
                 source = FileInputStream(sourceFile)
-                dest = FileOutputStream(destFile)
+                dest = FileOutputStream(destFileModifiable)
                 val buffer = ByteArray(1024)
                 var length: Int
                 while (source.read(buffer).also { length = it } > 0) {

@@ -40,7 +40,10 @@ import skytils.skytilsmod.events.AddChatMessageEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.ScoreboardUtil
+import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.TabListUtils
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -53,7 +56,7 @@ class ScoreCalculation {
     fun onAddChatMessage(event: AddChatMessageEvent) {
         if (!Utils.inDungeons) return
         try {
-            val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+            val unformatted = event.message.unformattedText.stripControlCodes()
             if (unformatted == "null" || unformatted.startsWith("Dungeon Rooms: Use this command in dungeons")) {
                 event.isCanceled = true
             }
@@ -84,7 +87,7 @@ class ScoreCalculation {
         if (event.phase != TickEvent.Phase.START) return
         if (ticks % 30 == 0) {
             if (Utils.inDungeons && mc.thePlayer != null && mc.theWorld != null) {
-                if (!DungeonsFeatures.Companion.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
+                if (!DungeonsFeatures.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
                     ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
                 }
             }
@@ -96,7 +99,7 @@ class ScoreCalculation {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChatReceived(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || mc.thePlayer == null) return
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
         try {
             if (Skytils.config.scoreCalculationReceiveAssist) {
                 if (unformatted.startsWith("Party > ")) {
@@ -178,8 +181,8 @@ class ScoreCalculation {
     }
 
     companion object {
-        val partyAssistSecretsPattern =
-            Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")
+        val partyAssistSecretsPattern: Pattern =
+            Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
         var rooms = HashMap<String, Int>()
         var mimicKilled = false
         private val mc = Minecraft.getMinecraft()
@@ -263,21 +266,9 @@ class ScoreCalculation {
                     if (line.startsWith("Time Elapsed:")) {
                         val matcher = timeElapsedPattern.matcher(line)
                         if (matcher.find()) {
-                            var hours: Int = try {
-                                matcher.group("hrs").toInt()
-                            } catch (e: Exception) {
-                                0
-                            }
-                            var minutes: Int = try {
-                                matcher.group("min").toInt()
-                            } catch (e: Exception) {
-                                0
-                            }
-                            var seconds: Int = try {
-                                matcher.group("sec").toInt()
-                            } catch (e: Exception) {
-                                0
-                            }
+                            val hours: Int = runCatching { matcher.group("hrs").toInt() }.getOrDefault(0)
+                            val minutes: Int = runCatching { matcher.group("min").toInt() }.getOrDefault(0)
+                            val seconds: Int = runCatching { matcher.group("sec").toInt() }.getOrDefault(0)
                             secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
                             continue
                         }
@@ -287,7 +278,7 @@ class ScoreCalculation {
                 val discoveryScore: Double = floor((60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
                 ) + if (totalSecrets <= 0) 0.0 else floor((40f * foundSecrets / totalSecrets).toDouble().coerceIn(0.0, 40.0))
                 val speedScore: Double
-                val bonusScore = (if (mimicKilled) 2 else 0) + Math.min(crypts, 5) + if (isPaul) 10 else 0
+                val bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
                 val countedSeconds = if (DungeonsFeatures.dungeonFloor == "F2") 0.0.coerceAtLeast(secondsElapsed - 120) else secondsElapsed
                 speedScore = if (countedSeconds <= 1320) {
                     100.0
@@ -361,9 +352,9 @@ class ScoreCalculation {
 
         companion object {
             private val deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
-            private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7\\]§r")
+            private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
             private val failedPuzzlePattern =
-                Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7\\] §r§f\\((?:§r(?<player>.+))?§r§f\\)§r")
+                Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f\\((?:§r(?<player>.+))?§r§f\\)§r")
             private val secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
             private val cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r")
             private val dungeonClearedPattern = Pattern.compile("Dungeon Cleared: (?<percentage>\\d+)%")
@@ -372,7 +363,7 @@ class ScoreCalculation {
         }
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

@@ -112,7 +112,6 @@ class ItemFeatures {
                 val item: ItemStack = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
-                    val itemId = getSkyBlockItemID(item)
                     if (chestName.startsWith("Salvage") && extraAttr != null) {
                         if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
@@ -138,11 +137,11 @@ class ItemFeatures {
                 "Superpairs ("
             )
         ) {
-            if (stripControlCodes(getDisplayName(item)) == "Enchanted Book") {
+            if (getDisplayName(item).stripControlCodes() == "Enchanted Book") {
                 val lore = getItemLore(item)
                 if (lore.size >= 3) {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
-                        val line2 = stripControlCodes(lore[2])
+                        val line2 = lore[2].stripControlCodes()
                         val enchantName =
                             line2.substring(0, line2.lastIndexOf(" ")).replace(" ".toRegex(), "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
@@ -260,7 +259,7 @@ class ItemFeatures {
                             if (pos.squareDistanceTo(Vec3(player.posX, player.posY, player.posZ)) <= 11 * 11) {
                                 val item = player.heldItem
                                 if (item != null) {
-                                    val itemName = stripControlCodes(getDisplayName(item))
+                                    val itemName = getDisplayName(item).stripControlCodes()
                                     if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains(
                                             "Astraea"
                                         ) || itemName.contains("Hyperion") || itemName.contains("Valkyrie")
@@ -321,7 +320,7 @@ class ItemFeatures {
                 if (enchantments.keySet.size == 1) {
                     val name = enchantmentNames.first()
                     if (Skytils.config.showEnchantedBookAbbreviation) {
-                        var parts = name.split("_")
+                        val parts = name.split("_")
                         val prefix: String = if (parts[0] == "ultimate") {
                             "§d§l" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
                         } else {
@@ -429,7 +428,7 @@ class ItemFeatures {
             get() = Skytils.config.showSoulEaterBonus
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

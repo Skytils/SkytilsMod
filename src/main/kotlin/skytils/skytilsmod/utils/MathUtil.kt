@@ -26,9 +26,7 @@ object MathUtil {
     /**
      * returns par0 cast as an int, and no greater than Integer.MAX_VALUE-1024
      */
-    fun fastFloor(value: Double): Int {
-        return (value + 1024.0).toInt() - 1024
-    }
+    fun fastFloor(value: Double) = (value + 1024.0).toInt() - 1024
 
     fun ceil(value: Float): Int {
         val i = value.toInt()

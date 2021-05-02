@@ -36,9 +36,7 @@ import java.net.URI
 import java.net.URISyntaxException
 
 class OptionsGui : GuiScreen() {
-    override fun doesGuiPauseGame(): Boolean {
-        return false
-    }
+    override fun doesGuiPauseGame() = false
 
     override fun initGui() {
         super.initGui()
@@ -70,7 +68,6 @@ class OptionsGui : GuiScreen() {
     }
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val sr = ScaledResolution(mc)
         val fr = ScreenRenderer.fontRenderer
         drawGradientRect(0, 0, width, height, Color(117, 115, 115, 25).rgb, Color(0, 0, 0, 200).rgb)
         val scale = 12.5f
@@ -89,7 +86,6 @@ class OptionsGui : GuiScreen() {
         }
     }
 
-    @Throws(IOException::class)
     override fun actionPerformed(button: GuiButton) {
         when (button.id) {
             0 -> mc.displayGuiScreen(Skytils.config.gui())

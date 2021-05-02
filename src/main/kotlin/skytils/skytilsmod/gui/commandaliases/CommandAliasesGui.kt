@@ -67,7 +67,7 @@ class CommandAliasesGui : GuiScreen() {
         super.drawScreen(mouseX, mouseY, partialTicks)
     }
 
-    @Throws(IOException::class)
+    
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         super.keyTyped(typedChar, keyCode)
         scrollingCommandAliasesList!!.keyTyped(typedChar, keyCode)
@@ -78,7 +78,7 @@ class CommandAliasesGui : GuiScreen() {
         scrollingCommandAliasesList!!.updateScreen()
     }
 
-    @Throws(IOException::class)
+    
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
         super.mouseClicked(mouseX, mouseY, mouseButton)
         scrollingCommandAliasesList!!.mouseClicked(mouseX, mouseY, mouseButton)

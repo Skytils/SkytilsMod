@@ -18,11 +18,10 @@
 package skytils.skytilsmod.utils
 
 import com.google.common.collect.Iterables
-import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
-import java.util.stream.Collectors
+import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 
 /**
  * Taken from Danker's Skyblock Mod under GPL 3.0 license
@@ -32,7 +31,7 @@ import java.util.stream.Collectors
 object ScoreboardUtil {
     @JvmStatic
     fun cleanSB(scoreboard: String?): String {
-        val nvString = StringUtils.stripControlCodes(scoreboard).toCharArray()
+        val nvString = scoreboard.stripControlCodes().toCharArray()
         val cleaned = StringBuilder()
         for (c in nvString) {
             if (c.code in 21..126) {
@@ -55,7 +54,7 @@ object ScoreboardUtil {
                     .startsWith("#")
             }
             scores = if (list.size > 15) {
-                Lists.newArrayList(Iterables.skip(list, scores.size - 15))
+                Iterables.skip(list, scores.size - 15).toList()
             } else {
                 list
             }

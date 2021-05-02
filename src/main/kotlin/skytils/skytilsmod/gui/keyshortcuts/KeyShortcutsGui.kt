@@ -66,7 +66,7 @@ class KeyShortcutsGui : GuiScreen() {
         super.drawScreen(mouseX, mouseY, partialTicks)
     }
 
-    @Throws(IOException::class)
+    
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         if (keyShortcutsList!!.clickedShortcut == null) super.keyTyped(typedChar, keyCode)
         keyShortcutsList!!.keyTyped(typedChar, keyCode)
@@ -77,7 +77,7 @@ class KeyShortcutsGui : GuiScreen() {
         keyShortcutsList!!.updateScreen()
     }
 
-    @Throws(IOException::class)
+    
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
         super.mouseClicked(mouseX, mouseY, mouseButton)
         keyShortcutsList!!.mouseClicked(mouseX, mouseY, mouseButton)

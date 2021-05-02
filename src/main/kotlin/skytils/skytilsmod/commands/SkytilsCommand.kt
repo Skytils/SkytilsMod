@@ -58,7 +58,6 @@ object SkytilsCommand : CommandBase() {
         return emptyList()
     }
 
-    @Throws(CommandException::class)
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val player = sender as EntityPlayerSP
         if (args.isEmpty()) {

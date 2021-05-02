@@ -52,7 +52,7 @@ class DamageSplash {
         if (e.entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (e.entity.isDead) return
-        val strippedName = stripControlCodes(entity.customNameTag)
+        val strippedName = entity.customNameTag.stripControlCodes()
         val damageMatcher = damagePattern.matcher(strippedName)
         if (damageMatcher.matches()) {
             e.isCanceled = true

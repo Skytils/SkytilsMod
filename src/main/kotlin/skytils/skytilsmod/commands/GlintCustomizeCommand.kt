@@ -47,7 +47,7 @@ object GlintCustomizeCommand : CommandBase() {
         return emptyList()
     }
 
-    @Throws(CommandException::class)
+    
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
         val player = sender as EntityPlayerSP

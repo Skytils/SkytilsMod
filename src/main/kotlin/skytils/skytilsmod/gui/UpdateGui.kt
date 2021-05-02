@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.gui
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.EnumChatFormatting
@@ -30,6 +29,7 @@ import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
+import kotlin.concurrent.thread
 import kotlin.math.floor
 
 /**
@@ -53,8 +53,8 @@ class UpdateGui : GuiScreen() {
             val directory = File(Skytils.modDir, "updates")
             val url = UpdateChecker.updateDownloadURL
             val jarName = UpdateChecker.getJarNameFromUrl(url)
-            Thread({
-                downloadUpdate(url, directory, jarName)
+            thread(name = "Skytils-update-downloader-thread") {
+                downloadUpdate(url, directory)
                 if (!failed) {
                     UpdateChecker.scheduleCopyUpdateAtShutdown(jarName)
                     if (restartNow) {
@@ -63,7 +63,7 @@ class UpdateGui : GuiScreen() {
                     complete = true
                     updateText()
                 }
-            }, "Skytils-update-downloader-thread").start()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -73,7 +73,7 @@ class UpdateGui : GuiScreen() {
         backButton!!.displayString = if (failed || complete) "Back" else "Cancel"
     }
 
-    private fun downloadUpdate(url: String, directory: File, jarName: String) {
+    private fun downloadUpdate(url: String, directory: File) {
         try {
             val st = URL(url).openConnection() as HttpURLConnection
             st.setRequestProperty(

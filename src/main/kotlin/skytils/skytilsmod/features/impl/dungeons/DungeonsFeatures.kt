@@ -65,6 +65,7 @@ import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.mixins.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -188,7 +189,7 @@ class DungeonsFeatures {
     fun onBossBarSet(event: BossBarEvent.Set) {
         if (!Utils.inDungeons) return
         val displayData = event.displayData
-        val unformatted = StringUtils.stripControlCodes(event.displayData.displayName.unformattedText)
+        val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
         if (dungeonFloor == "F7") {
             if (unformatted.contains("Necron")) {
                 when (Skytils.config.necronHealth) {
@@ -241,7 +242,7 @@ class DungeonsFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
                 val deathFailMatcher = deathOrPuzzleFail.matcher(unformatted)
@@ -308,23 +309,23 @@ class DungeonsFeatures {
             }
             if (event.entity is EntityArmorStand && event.entity.hasCustomName()) {
                 if (Skytils.config.hideWitherMinerNametags) {
-                    val name = StringUtils.stripControlCodes(event.entity.customNameTag)
+                    val name = event.entity.customNameTag.stripControlCodes()
                     if (name.contains("Wither Miner") || name.contains("Wither Guard") || name.contains("Apostle")) {
                         mc.theWorld.removeEntity(event.entity)
                     }
                 }
                 if (Skytils.config.hideF4Nametags) {
-                    val name = StringUtils.stripControlCodes(event.entity.customNameTag)
+                    val name = event.entity.customNameTag.stripControlCodes()
                     if (name.contains("Spirit") && !name.contains("Spirit Bear")) {
                         mc.theWorld.removeEntity(event.entity)
                     }
                 }
                 if (Skytils.config.hideTerracotaNametags) {
-                    val name = StringUtils.stripControlCodes(event.entity.customNameTag)
+                    val name = event.entity.customNameTag.stripControlCodes()
                     if (name.contains("Terracotta ")) mc.theWorld.removeEntity(event.entity)
                 }
                 if (Skytils.config.hideNonStarredNametags) {
-                    val name = StringUtils.stripControlCodes(event.entity.customNameTag)
+                    val name = event.entity.customNameTag.stripControlCodes()
                     if (!name.startsWith("✯ ") && name.contains("❤")) if (name.contains("Lurker") || name.contains("Dreadlord") || name.contains(
                             "Souleater"
                         ) || name.contains("Zombie") || name.contains("Skeleton") || name.contains("Skeletor") || name.contains(
@@ -381,7 +382,7 @@ class DungeonsFeatures {
                                 } else {
                                     y += 20
                                 }
-                                val matcher = playerPattern.matcher(StringUtils.stripControlCodes(item.displayName))
+                                val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
                                 if (!matcher.find()) continue
                                 val name = matcher.group(1)
                                 if (name == "Unknown") continue
@@ -472,7 +473,7 @@ class DungeonsFeatures {
         if (event.packet is S45PacketTitle) {
             val packet = event.packet
             if (packet.message != null && mc.thePlayer != null) {
-                val unformatted = StringUtils.stripControlCodes(packet.message.unformattedText)
+                val unformatted = packet.message.unformattedText.stripControlCodes()
                 if (Skytils.config.hideTerminalCompletionTitles && Utils.inDungeons && !unformatted.contains(mc.thePlayer.name) && (unformatted.contains(
                         "activated a terminal!"
                     ) || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))
@@ -586,7 +587,7 @@ class DungeonsFeatures {
             get() = Skytils.config.findCorrectLivid
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

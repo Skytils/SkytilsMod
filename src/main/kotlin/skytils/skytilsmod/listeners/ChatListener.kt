@@ -17,10 +17,7 @@
  */
 package skytils.skytilsmod.listeners
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ChatComponentText
@@ -34,19 +31,19 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.mixins.AccessorGuiNewChat
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
-import java.util.regex.Pattern
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class ChatListener {
+    private val rejoinCoroutine = CoroutineScope(Dispatchers.Default + CoroutineName("Rejoin Coroutine"))
+
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (event.packet !is S02PacketChat) return
         val packet = event.packet
         if (packet.type.toInt() == 2) return
-        val unformatted = StringUtils.stripControlCodes(packet.chatComponent.unformattedText)
+        val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         val formatted = packet.chatComponent.formattedText
 
         if (awaitingDelimiter && formatted.startsWith("§9§m---")) {
@@ -76,21 +73,20 @@ class ChatListener {
                 }
             } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")) {
                 val player = Minecraft.getMinecraft().thePlayer
-                val partyStart = party_start_pattern.matcher(unformatted)
-                val leader = leader_pattern.matcher(unformatted)
-                val members = members_pattern.matcher(unformatted)
-                if (partyStart.matches() && partyStart.group(1).toInt() == 1) {
+                val partyStart = party_start_pattern.find(unformatted)
+                val leader = leader_pattern.find(unformatted)
+                val members = members_pattern.find(unformatted)
+                if (partyStart != null && partyStart.groupValues[1].toInt() == 1) {
                     player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You cannot reparty yourself."))
                     RepartyCommand.partyThread!!.interrupt()
-                } else if (leader.matches() && leader.group(1) != player.name) {
+                } else if (leader != null && leader.groupValues[1] != player.name) {
                     player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You are not party leader."))
                     RepartyCommand.partyThread!!.interrupt()
                 } else {
-                    while (members.find()) {
-                        val partyMember = members.group(1)
+                    while (members != null) {
+                        val partyMember = members.groupValues[1]
                         if (partyMember != player.name) {
                             RepartyCommand.party.add(partyMember)
-                            println(partyMember)
                         }
                     }
                 }
@@ -110,36 +106,39 @@ class ChatListener {
         }
         // Inviting
         if (RepartyCommand.inviting) {
-            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                val invitee = invitePattern.matcher(unformatted)
-                if (invitee.find()) {
-                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
+            with(unformatted) {
+                when {
+                    endsWith(" to the party! They have 60 seconds to accept.") -> {
+                        val invitee = invitePattern.find(unformatted)
+                        if (invitee != null) {
+                            println("" + invitee.groupValues[1] + ": " + RepartyCommand.repartyFailList.remove(invitee.groupValues[1]))
+                        }
+                        cancelDelimiters()
+                        cancelChatPacket(event)
+                        RepartyCommand.inviting = false
+                    }
+
+                    contains("Couldn't find a player") || contains("You cannot invite that player") -> {
+                        cancelDelimiters()
+                        cancelChatPacket(event)
+                    }
+
+                    // Fail inviting
+                    RepartyCommand.failInviting && endsWith(" to the party! They have 60 seconds to accept.") -> {
+                        val invitee = invitePattern.find(unformatted)
+                        if (invitee != null) {
+                            println("" + invitee.groupValues[1] + ": " + RepartyCommand.repartyFailList.remove(invitee.groupValues[1]))
+                        }
+                        cancelDelimiters()
+                        cancelChatPacket(event)
+                        RepartyCommand.inviting = false
+                    }
+
+                    RepartyCommand.failInviting && contains("Couldn't find a player") || contains("You cannot invite that player") -> {
+                        cancelDelimiters()
+                        cancelChatPacket(event)
+                    }
                 }
-                cancelDelimiters()
-                cancelChatPacket(event)
-                RepartyCommand.inviting = false
-                return
-            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                cancelDelimiters()
-                cancelChatPacket(event)
-                return
-            }
-        }
-        // Fail Inviting
-        if (RepartyCommand.failInviting) {
-            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                val invitee = invitePattern.matcher(unformatted)
-                if (invitee.find()) {
-                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
-                }
-                cancelDelimiters()
-                cancelChatPacket(event)
-                RepartyCommand.inviting = false
-                return
-            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                cancelDelimiters()
-                cancelChatPacket(event)
-                return
             }
         }
     }
@@ -147,7 +146,7 @@ class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.startsWith("Your new API key is ")) {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
             Skytils.config.apiKey = apiKey
@@ -156,21 +155,20 @@ class ChatListener {
         }
         if (Skytils.config.autoReparty) {
             if (unformatted.contains("has disbanded the party!")) {
-                val matcher = playerPattern.matcher(unformatted)
-                if (matcher.find()) {
-                    lastPartyDisbander = matcher.group(1)
+                val matcher = playerPattern.find(unformatted)
+                if (matcher != null) {
+                    lastPartyDisbander = matcher.groupValues[1]
                     println("Party disbanded by $lastPartyDisbander")
-                    rejoinThread = Thread {
-                        if (Skytils.config.autoRepartyTimeout == 0) return@Thread
+                    rejoinCoroutine.launch {
+                        if (Skytils.config.autoRepartyTimeout == 0) return@launch
                         try {
                             println("waiting for timeout")
-                            Thread.sleep((Skytils.config.autoRepartyTimeout * 1000).toLong())
+                            delay((Skytils.config.autoRepartyTimeout * 1000).toLong())
                             lastPartyDisbander = ""
                             println("cleared last party disbander")
                         } catch (e: Exception) {
                         }
                     }
-                    rejoinThread!!.start()
                     return
                 }
             }
@@ -194,14 +192,15 @@ class ChatListener {
     }
 
     companion object {
-        var mc = Minecraft.getMinecraft()
+        var mc: Minecraft = Minecraft.getMinecraft()
         private var rejoinThread: Thread? = null
         private var lastPartyDisbander = ""
-        private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
-        private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
-        private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
-        private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
-        private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
+        private val invitePattern = "(?:\\[.+?] )?\\w+ invited (?:\\[.+?] )?(\\w+)".toRegex()
+        private val playerPattern = "(?:\\[.+?] )?(\\w+)".toRegex()
+        private val party_start_pattern = "^Party Members \\((\\d+)\\)$".toRegex()
+        private val leader_pattern = "^Party Leader: (?:\\[.+?] )?(\\w+) ●$".toRegex()
+        private val members_pattern = " (?:\\[.+?] )?(\\w+) ●".toRegex()
+
         private fun cancelChatPacket(ReceivePacketEvent: PacketEvent.ReceiveEvent) {
             if (ReceivePacketEvent.packet !is S02PacketChat) return
             ReceivePacketEvent.isCanceled = true
@@ -219,8 +218,8 @@ class ChatListener {
                 val lines = (chatGui as AccessorGuiNewChat).chatLines
                 val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
                 var i = 0
-                delay(Duration.microseconds(100))
-                while (!StringUtils.stripControlCodes(lines[i].chatComponent.unformattedText)
+                delay(100)
+                while (lines[i].chatComponent.unformattedText.stripControlCodes()
                         .startsWith("---") && i < 10 && i < lines.size
                 ) {
                     i++

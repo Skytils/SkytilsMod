@@ -17,20 +17,20 @@
  */
 package skytils.skytilsmod.utils
 
+import net.minecraft.util.StringUtils as MinecraftStringUtils
+import org.apache.commons.lang3.StringUtils as ApacheStringUtils
+
 object StringUtils {
-    @JvmStatic
-    fun stripControlCodes(string: String?): String {
-        return net.minecraft.util.StringUtils.stripControlCodes(string)
-    }
+    fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
 
     @JvmStatic
     fun startsWith(string: CharSequence?, sequence: CharSequence?): Boolean {
-        return org.apache.commons.lang3.StringUtils.startsWith(string, sequence)
+        return ApacheStringUtils.startsWith(string, sequence)
     }
 
     @JvmStatic
     fun startsWithAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
-        return org.apache.commons.lang3.StringUtils.startsWithAny(string, *sequences)
+        return ApacheStringUtils.startsWithAny(string, *sequences)
     }
 
     @JvmStatic

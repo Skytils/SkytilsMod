@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.timeFormat
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -227,7 +227,7 @@ class DungeonTimer {
             get() = Skytils.config.dungeonTimer
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 
@@ -235,7 +235,7 @@ class DungeonTimer {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
-            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonsFeatures.Companion.dungeonFloor == "F7") {
+            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonsFeatures.dungeonFloor == "F7") {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val displayText = """
@@ -244,7 +244,7 @@ class DungeonTimer {
      """.trimIndent() + (if (phase1ClearTime == -1L) "0s" else timeFormat(
                     ((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime).toDouble() / 1000f
                 )) +
-                        "\n§6Phase 3: " + (if (phase2ClearTime == -1L) "0s" else timeFormat(
+                    "\n§6Phase 3: " + (if (phase2ClearTime == -1L) "0s" else timeFormat(
                     ((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime).toDouble() / 1000f
                 )) +
                         "\n§4Phase 4: " + if (phase3ClearTime == -1L) "0s" else timeFormat(
@@ -297,7 +297,7 @@ class DungeonTimer {
             get() = Skytils.config.necronPhaseTimer
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

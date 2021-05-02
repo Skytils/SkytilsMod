@@ -80,17 +80,21 @@ class MinionFeatures {
                     } else {
                         val minionType = inventory.getStackInSlot(4)
                         if (minionType != null) {
-                            if (stripControlCodes(minionType.displayName).contains("Minion")) {
+                            if (minionType.displayName.stripControlCodes().contains("Minion")) {
                                 if (!blockUnenchanted) {
                                     val firstUpgrade = inventory.getStackInSlot(37)
                                     val secondUpgrade = inventory.getStackInSlot(46)
                                     if (firstUpgrade != null) {
-                                        if (stripControlCodes(firstUpgrade.displayName).contains("Super Compactor 3000")) {
+                                        if (firstUpgrade.displayName.stripControlCodes()
+                                                .contains("Super Compactor 3000")
+                                        ) {
                                             blockUnenchanted = true
                                         }
                                     }
                                     if (secondUpgrade != null) {
-                                        if (stripControlCodes(secondUpgrade.displayName).contains("Super Compactor 3000")) {
+                                        if (secondUpgrade.displayName.stripControlCodes()
+                                                .contains("Super Compactor 3000")
+                                        ) {
                                             blockUnenchanted = true
                                         }
                                     }
