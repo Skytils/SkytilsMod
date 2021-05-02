@@ -20,8 +20,9 @@ package skytils.skytilsmod.utils
 import net.minecraft.util.StringUtils as MinecraftStringUtils
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
+fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
+
 object StringUtils {
-    fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
 
     @JvmStatic
     fun startsWithAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {

@@ -386,7 +386,7 @@ object ColorFactory {
         color: String, roff: Int,
         hasAlpha: Boolean, a: Double
     ): Color {
-        var a = a
+        var a1 = a
         try {
             val rend = color.indexOf(',', roff)
             val gend = if (rend < 0) -1 else color.indexOf(',', rend + 1)
@@ -397,9 +397,9 @@ object ColorFactory {
                 val g = parseComponent(color, rend + 1, gend, PARSE_COMPONENT)
                 val b = parseComponent(color, gend + 1, bend, PARSE_COMPONENT)
                 if (hasAlpha) {
-                    a *= parseComponent(color, bend + 1, aend, PARSE_ALPHA)
+                    a1 *= parseComponent(color, bend + 1, aend, PARSE_ALPHA)
                 }
-                return Color(r.toFloat(), g.toFloat(), b.toFloat(), a.toFloat())
+                return Color(r.toFloat(), g.toFloat(), b.toFloat(), a1.toFloat())
             }
         } catch (nfe: NumberFormatException) {
         }
@@ -435,16 +435,16 @@ object ColorFactory {
     private const val PARSE_ANGLE = 2 // clamped to [0,360]
     private const val PARSE_ALPHA = 3 // clamped to [0.0,1.0]
     private fun parseComponent(color: String, off: Int, end: Int, type: Int): Double {
-        var color = color
-        var type = type
-        color = color.substring(off, end).trim { it <= ' ' }
-        if (color.endsWith("%")) {
-            require(type <= PARSE_PERCENT) { "Invalid color specification" }
-            type = PARSE_PERCENT
-            color = color.substring(0, color.length - 1).trim { it <= ' ' }
-        } else require(type != PARSE_PERCENT) { "Invalid color specification" }
-        val c = if (type == PARSE_COMPONENT) color.toInt().toDouble() else color.toDouble()
-        when (type) {
+        var color1 = color
+        var type1 = type
+        color1 = color1.substring(off, end).trim { it <= ' ' }
+        if (color1.endsWith("%")) {
+            require(type1 <= PARSE_PERCENT) { "Invalid color specification" }
+            type1 = PARSE_PERCENT
+            color1 = color1.substring(0, color1.length - 1).trim { it <= ' ' }
+        } else require(type1 != PARSE_PERCENT) { "Invalid color specification" }
+        val c = if (type1 == PARSE_COMPONENT) color1.toInt().toDouble() else color1.toDouble()
+        when (type1) {
             PARSE_ALPHA -> return if (c < 0.0) 0.0 else if (c > 1.0) 1.0 else c
             PARSE_PERCENT -> return if (c <= 0.0) 0.0 else if (c >= 100.0) 1.0 else c / 100.0
             PARSE_COMPONENT -> return if (c <= 0.0) 0.0 else if (c >= 255.0) 1.0 else c / 255.0
@@ -1371,9 +1371,9 @@ object ColorFactory {
     val YELLOWGREEN = Color(0.6039216f, 0.8039216f, 0.19607843f)
     fun HSBtoRGB(hue: Double, saturation: Double, brightness: Double): DoubleArray {
         // normalize the hue
-        var hue = hue
-        val normalizedHue = (hue % 360 + 360) % 360
-        hue = normalizedHue / 360
+        var hue1 = hue
+        val normalizedHue = (hue1 % 360 + 360) % 360
+        hue1 = normalizedHue / 360
         var r = 0.0
         var g = 0.0
         var b = 0.0
@@ -1382,7 +1382,7 @@ object ColorFactory {
             g = b
             r = g
         } else {
-            val h = (hue - floor(hue)) * 6.0
+            val h = (hue1 - floor(hue1)) * 6.0
             val f = h - floor(h)
             val p = brightness * (1.0 - saturation)
             val q = brightness * (1.0 - saturation * f)

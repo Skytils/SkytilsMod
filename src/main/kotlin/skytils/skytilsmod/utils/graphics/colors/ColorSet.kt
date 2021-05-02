@@ -77,11 +77,12 @@ class ColorSet<T : CustomColor?>(private val colors: Array<T>, names: Array<Stri
     /**
      * Return the colour in the set corresponding to the name given
      */
-    fun fromName(name: String?): T? {
-        var name = name ?: return null
-        name = name.trim { it <= ' ' }.replace(' ', '_').replace("_", "").uppercase()
-        return nameMap.getOrDefault(name, null)
+    private fun fromName(name: String?) = name.takeIf { it != null }?.let {
+        nameMap.getOrDefault(
+            name?.trim { it <= ' ' }?.replace(' ', '_')?.replace("_", "")?.uppercase(), null
+        )
     }
+
 
     /**
      * Returns the canonical name for a common colour (All caps, space -> underscore, will be a field name).

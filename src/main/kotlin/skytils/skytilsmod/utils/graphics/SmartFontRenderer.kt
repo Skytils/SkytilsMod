@@ -228,7 +228,7 @@ class SmartFontRenderer : FontRenderer(
     }
 
     private fun drawChars(text: String, color: Int, shadow: TextShadow?): Float {
-        var color = color
+        var color1 = color
         if (text.isEmpty()) return (-CHAR_SPACING).toFloat()
         var textLength = 0f
         var obfuscated = false
@@ -272,8 +272,8 @@ class SmartFontRenderer : FontRenderer(
                 }
                 if (detectedColor != null) {
                     detectedColor = detectedColor and 0xFFFFFF
-                    detectedColor = detectedColor or (color and -0x1000000)
-                    color = detectedColor
+                    detectedColor = detectedColor or (color1 and -0x1000000)
+                    color1 = detectedColor
                 }
                 index++
                 continue
@@ -294,7 +294,7 @@ class SmartFontRenderer : FontRenderer(
             val x = posX
             val y = posY
             val offset = if (unicodeFlag) 0.5f else 1f
-            val alpha = (color shr 24 and 0xFF) / 255f
+            val alpha = (color1 shr 24 and 0xFF) / 255f
             setColor(0f, 0f, 0f, alpha)
             when (shadow) {
                 TextShadow.OUTLINE -> {
@@ -327,9 +327,9 @@ class SmartFontRenderer : FontRenderer(
             }
             posX = x
             posY = y
-            val red = (color shr 16 and 0xFF) / 255f
-            val green = (color shr 8 and 0xFF) / 255f
-            val blue = (color and 0xFF) / 255f
+            val red = (color1 shr 16 and 0xFF) / 255f
+            val green = (color1 shr 8 and 0xFF) / 255f
+            val blue = (color1 and 0xFF) / 255f
             // Alpha calculated for shadow
             setColor(red, green, blue, alpha)
             var charLength = renderChar(character, italic)

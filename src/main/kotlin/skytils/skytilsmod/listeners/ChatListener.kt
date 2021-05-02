@@ -31,8 +31,9 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.mixins.AccessorGuiNewChat
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class ChatListener {
@@ -218,7 +219,7 @@ class ChatListener {
                 val lines = (chatGui as AccessorGuiNewChat).chatLines
                 val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
                 var i = 0
-                delay(100)
+                delay(Duration.microseconds(100))
                 while (lines[i].chatComponent.unformattedText.stripControlCodes()
                         .startsWith("---") && i < 10 && i < lines.size
                 ) {
