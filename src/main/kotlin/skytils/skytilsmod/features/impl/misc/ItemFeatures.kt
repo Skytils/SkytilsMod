@@ -51,7 +51,6 @@ import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils.startsWith
 import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.TabListUtils
 import skytils.skytilsmod.utils.Utils
@@ -132,10 +131,9 @@ class ItemFeatures {
         val extraAttr = getExtraAttributes(item)
         var itemId = getSkyBlockItemID(extraAttr)
         var isSuperpairsReward = false
-        if (item != null && mc.thePlayer.openContainer != null && startsWith(
-                SBInfo.lastOpenContainerName,
+        if (item != null && mc.thePlayer.openContainer != null && SBInfo.lastOpenContainerName?.startsWith(
                 "Superpairs ("
-            )
+            ) == true
         ) {
             if (getDisplayName(item).stripControlCodes() == "Enchanted Book") {
                 val lore = getItemLore(item)
@@ -170,10 +168,9 @@ class ItemFeatures {
                         }
                         if (Skytils.config.showCoinsPerBit) {
                             var bitValue = bitCosts.getOrDefault(auctionIdentifier, -1)
-                            if (bitValue == -1 && SBInfo.lastOpenContainerName == "Community Shop" || startsWith(
-                                    SBInfo.lastOpenContainerName,
+                            if (bitValue == -1 && SBInfo.lastOpenContainerName == "Community Shop" || SBInfo.lastOpenContainerName?.startsWith(
                                     "Bits Shop - "
-                                )
+                                ) == true
                             ) {
                                 val lore = getItemLore(item!!)
                                 for (i in lore.indices) {

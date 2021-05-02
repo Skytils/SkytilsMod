@@ -24,11 +24,6 @@ object StringUtils {
     fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
 
     @JvmStatic
-    fun startsWith(string: CharSequence?, sequence: CharSequence?): Boolean {
-        return ApacheStringUtils.startsWith(string, sequence)
-    }
-
-    @JvmStatic
     fun startsWithAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
         return ApacheStringUtils.startsWithAny(string, *sequences)
     }
