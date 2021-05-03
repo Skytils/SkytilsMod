@@ -103,18 +103,16 @@ class AlignmentTaskSolver {
                                     }
                                 }
                             }
-                        } else {
-                            if (solutionSets.isEmpty()) {
-                                val startPositions = grid.filter { it.type == SpaceType.STARTER }
-                                val endPositions = grid.filter { it.type == SpaceType.END }.map { it.coords }
-                                val layout = layout
-                                for (start in startPositions) {
-                                    val pointMap = solve(layout, start.coords.x, start.coords.y, endPositions)
-                                    val moveSet = convertPointMapToMoves(pointMap)
-                                    solutionSets.add(moveSet)
-                                    for (move in moveSet) {
-                                        directionSet[move.point] = move.directionNum
-                                    }
+                        } else if (solutionSets.isEmpty()) {
+                            val startPositions = grid.filter { it.type == SpaceType.STARTER }
+                            val endPositions = grid.filter { it.type == SpaceType.END }.map { it.coords }
+                            val layout = layout
+                            for (start in startPositions) {
+                                val pointMap = solve(layout, start.coords.x, start.coords.y, endPositions)
+                                val moveSet = convertPointMapToMoves(pointMap)
+                                solutionSets.add(moveSet)
+                                for (move in moveSet) {
+                                    directionSet[move.point] = move.directionNum
                                 }
                             }
                         }
@@ -207,26 +205,26 @@ class AlignmentTaskSolver {
      * @author ofekp
      */
     private fun solve(
-        iceCave: Array<IntArray>,
+        grid: Array<IntArray>,
         startX: Int,
         startY: Int,
         endPositions: List<Point>
     ): ArrayList<Point> {
         val startPoint = Point(startX, startY)
         val queue = LinkedList<Point>()
-        val iceCaveColors = Array(
-            iceCave.size
-        ) { arrayOfNulls<Point>(iceCave[0].size) }
+        val gridCopy = Array(
+            grid.size
+        ) { arrayOfNulls<Point>(grid[0].size) }
         queue.addLast(Point(startX, startY))
-        iceCaveColors[startY][startX] = startPoint
+        gridCopy[startY][startX] = startPoint
         while (queue.size != 0) {
             val currPos = queue.pollFirst()!!
             // traverse adjacent nodes while sliding on the ice
             for (dir in EnumFacing.HORIZONTALS) {
-                val nextPos = move(iceCave, iceCaveColors, currPos, dir)
+                val nextPos = move(grid, gridCopy, currPos, dir)
                 if (nextPos != null) {
                     queue.addLast(nextPos)
-                    iceCaveColors[nextPos.getY().toInt()][nextPos.getX().toInt()] = Point(
+                    gridCopy[nextPos.getY().toInt()][nextPos.getX().toInt()] = Point(
                         currPos.getX().toInt(), currPos.getY().toInt()
                     )
                     if (endPositions.contains(Point(nextPos.x, nextPos.y))) {
@@ -238,7 +236,7 @@ class AlignmentTaskSolver {
                         steps.add(currPos)
                         while (tmp !== startPoint) {
                             count++
-                            tmp = iceCaveColors[tmp.getY().toInt()][tmp.getX().toInt()]!!
+                            tmp = gridCopy[tmp.getY().toInt()][tmp.getX().toInt()]!!
                             steps.add(tmp)
                         }
                         return steps
@@ -256,8 +254,8 @@ class AlignmentTaskSolver {
      * @author ofekp
      */
     private fun move(
-        iceCave: Array<IntArray>,
-        iceCaveColors: Array<Array<Point?>>,
+        grid: Array<IntArray>,
+        gridCopy: Array<Array<Point?>>,
         currPos: Point,
         dir: EnumFacing
     ): Point? {
@@ -266,10 +264,10 @@ class AlignmentTaskSolver {
         val diffX = dir.directionVec.x
         val diffY = dir.directionVec.z
         val i =
-            if (x + diffX >= 0 && x + diffX < iceCave[0].size && y + diffY >= 0 && y + diffY < iceCave.size && iceCave[y + diffY][x + diffX] != 1) {
+            if (x + diffX >= 0 && x + diffX < grid[0].size && y + diffY >= 0 && y + diffY < grid.size && grid[y + diffY][x + diffX] != 1) {
                 1
             } else 0
-        return if (iceCaveColors[y + i * diffY][x + i * diffX] != null) {
+        return if (gridCopy[y + i * diffY][x + i * diffX] != null) {
             // we've already seen this point
             null
         } else Point(x + i * diffX, y + i * diffY)

@@ -383,7 +383,7 @@ class GriffinBurrows {
             RenderUtil.drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
                 this.color,
-                0.1f + 0.005f * distSq.toFloat()
+                (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
@@ -472,7 +472,7 @@ class GriffinBurrows {
             RenderUtil.drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
                 this.color,
-                0.1f + 0.005f * distSq.toFloat()
+                (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
