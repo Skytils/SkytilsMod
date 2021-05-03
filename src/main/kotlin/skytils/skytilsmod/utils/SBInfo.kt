@@ -161,7 +161,7 @@ object SBInfo {
 
     sealed class SkyblockIsland(val mode: String) {
         object BlazingFortress : SkyblockIsland("combat_2")
-        object DeeperCaverns : SkyblockIsland("mining_2")
+        object DeepCaverns : SkyblockIsland("mining_2")
         object Dungeon : SkyblockIsland("dungeon")
         object DungeonHub : SkyblockIsland("dungeon_hub")
         object DwarvenMines : SkyblockIsland("mining_3")

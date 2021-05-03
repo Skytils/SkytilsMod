@@ -31,6 +31,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
@@ -115,6 +116,9 @@ class CreeperSolver {
         if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonsFeatures.hasBossSpawned && !creeper!!.isDead) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
             GlStateManager.disableCull()
+            val blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND)
+            GlStateManager.enableBlend()
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
             for (i in solutionPairs.indices) {
                 val (one, two) = solutionPairs[i]
                 if (mc.theWorld.getBlockState(one).block == Blocks.prismarine && mc.theWorld.getBlockState(two).block == Blocks.prismarine) {
@@ -146,6 +150,7 @@ class CreeperSolver {
                     aabb2.expand(0.01, 0.01, 0.01), color, 0.5f
                 )
             }
+            if (!blendEnabled) GlStateManager.disableBlend()
             GlStateManager.enableCull()
         }
     }

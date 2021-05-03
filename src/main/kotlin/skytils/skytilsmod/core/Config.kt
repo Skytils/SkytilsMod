@@ -601,6 +601,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Item Frame Alignment Solver",
+        description = "Shows the amount of clicks needed on the device in Floor 7.",
+        category = "Dungeons",
+        subcategory = "Terminal Solvers"
+    )
+    var alignmentTerminalSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Shoot the Target Solver",
         description = "Shows all the shot blocks on the device in Floor 7.",
         category = "Dungeons",

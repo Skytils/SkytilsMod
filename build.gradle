@@ -103,6 +103,8 @@ shadowJar {
     relocate("club.sk1er", "skytils.sk1er")
     relocate("kotlinx.coroutines", "skytils.kotlinx.coroutines")
 
+    exclude "LICENSE.txt"
+    exclude "pack.mcmeta"
     exclude "dummyThing"
     exclude "**/module-info.class"
     exclude "*.so"
