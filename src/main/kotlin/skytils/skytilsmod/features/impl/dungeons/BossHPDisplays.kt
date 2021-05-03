@@ -35,6 +35,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.util.regex.Pattern
 
 class BossHPDisplays {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -64,6 +65,84 @@ class BossHPDisplays {
 
         init {
             GiantHPElement()
+            GuardianRespawnTimer()
+        }
+    }
+
+    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", FloatPair(200, 30)) {
+        private val guardianNameRegex = Pattern.compile("§c(Healthy|Reinforced|Chaos|Laser) Guardian §e0§c❤")
+        private val timerRegex = Pattern.compile("§c ☠ §7 (.+?) §c ☠ §7")
+
+        override fun render() {
+            if (toggled && DungeonsFeatures.hasBossSpawned && Utils.equalsOneOf(
+                    DungeonsFeatures.dungeonFloor,
+                    "M3",
+                    "F3"
+                ) && mc.theWorld != null
+            ) {
+                val respawnTimers = HashMap<String, String>()
+                for (entity in mc.theWorld.loadedEntityList) {
+                    if (respawnTimers.size >= 4) break
+                    if (entity !is EntityArmorStand) continue
+                    val name = entity.customNameTag
+                    if (name.startsWith("§c ☠ §7 ") && name.endsWith(" §c ☠ §7")) {
+                        val nameTag = mc.theWorld.getEntitiesWithinAABB(
+                            EntityArmorStand::class.java,
+                            entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
+                        ).find {
+                            it.customNameTag.endsWith(" Guardian §e0§c❤")
+                        } ?: continue
+                        val matcher = guardianNameRegex.matcher(nameTag.customNameTag)
+                        if (matcher.find()) {
+                            val timeMatcher = timerRegex.matcher(name)
+                            if (timeMatcher.find()) {
+                                respawnTimers[matcher.group(1)] = timeMatcher.group(1)
+                            }
+                        }
+                    }
+                }
+                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                var i = 0
+                for ((name, timer) in respawnTimers.entries) {
+                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    ScreenRenderer.fontRenderer.drawString(
+                        "$name: $timer",
+                        if (leftAlign) 0f else actualWidth,
+                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.WHITE,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    i++
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Guardian Respawn Timer Here",
+                if (leftAlign) 0f else actualWidth,
+                (0 * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                CommonColors.WHITE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Guardian Respawn Timer Here")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showGuardianRespawnTimer
+
+        init {
+            Skytils.guiManager.registerElement(this)
         }
     }
 

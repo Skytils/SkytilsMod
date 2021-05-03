@@ -342,6 +342,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var showGiantHP = false
 
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Show Guardian Respawn Timer",
+        description = "Shows the respawn timer for the Guardians in Floor 3.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var showGuardianRespawnTimer = false
+
     /* @Property(
    type = PropertyType.SWITCH,
    name = "Show Hidden Fels",
