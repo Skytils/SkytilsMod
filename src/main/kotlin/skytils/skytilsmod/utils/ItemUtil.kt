@@ -158,14 +158,14 @@ object ItemUtil {
             val rarityMatcher = RARITY_PATTERN.find(currentLine)
             val petRarityMatcher = PET_PATTERN.find(name)
             if (rarityMatcher != null) {
-                val rarity = rarityMatcher.groupValues.firstOrNull { it == "rarity" } ?: continue
+                val rarity = rarityMatcher.groupValues.getOrNull(3) ?: continue
                 for (itemRarity in ItemRarity.values()) {
                     if (rarity.startsWith(itemRarity.rarityName)) {
                         return itemRarity
                     }
                 }
             } else if (petRarityMatcher != null) {
-                val color = petRarityMatcher.groupValues.firstOrNull { it == "color" } ?: continue
+                val color = petRarityMatcher.groupValues.getOrNull(1) ?: continue
                 return ItemRarity.byBaseColor(color)
             }
         }
