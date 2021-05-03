@@ -170,6 +170,7 @@ class Skytils {
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
 
+        MinecraftForge.EVENT_BUS.register(AlignmentTaskSolver())
         MinecraftForge.EVENT_BUS.register(ArmorColor())
         MinecraftForge.EVENT_BUS.register(AuctionData())
         MinecraftForge.EVENT_BUS.register(AuctionPriceOverlay())
@@ -215,7 +216,6 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(TechnoMayor())
         MinecraftForge.EVENT_BUS.register(TeleportMazeSolver())
         MinecraftForge.EVENT_BUS.register(TerminalFeatures())
-        MinecraftForge.EVENT_BUS.register(ThatArrowTurningThingSolver())
         MinecraftForge.EVENT_BUS.register(ThreeWeirdosSolver())
         MinecraftForge.EVENT_BUS.register(TreasureHunter())
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
