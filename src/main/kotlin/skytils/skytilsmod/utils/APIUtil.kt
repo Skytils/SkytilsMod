@@ -35,6 +35,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import skytils.skytilsmod.utils.Utils.readTextAndClose
 import java.io.IOException
 import java.net.URISyntaxException
 import java.net.URL
@@ -44,26 +45,22 @@ import java.util.*
 object APIUtil {
     private val parser = JsonParser()
 
-    val client: CloseableHttpClient =
+    val builder =
         HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION)
             .addInterceptorFirst { request: HttpRequest, _: HttpContext? ->
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
-            }.build()
+            }
 
-    /**
-     * Modified from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
     fun getJSONResponse(urlString: String): JsonObject {
+        val client = builder.build()
         try {
             val request = HttpGet(URL(urlString).toURI())
             request.protocolVersion = HttpVersion.HTTP_1_1
             val response: HttpResponse = client.execute(request)
             val entity = response.entity
             if (response.statusLine.statusCode == 200) {
-                return parser.parse(entity.content.bufferedReader()).asJsonObject
+                return parser.parse(entity.content.readTextAndClose()).asJsonObject
             } else {
                 if (StringUtils.startsWithAny(
                         urlString,
@@ -78,34 +75,32 @@ object APIUtil {
                         scanner.useDelimiter("\\Z")
                         val error = scanner.next()
                         if (error.startsWith("{")) {
-                            return parser.parse(errorStream.bufferedReader()).asJsonObject
+                            return parser.parse(errorStream.readTextAndClose()).asJsonObject
                         }
                     }
                 }
             }
         } catch (ex: IOException) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
             ex.printStackTrace()
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
         } catch (ex: URISyntaxException) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
             ex.printStackTrace()
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+        } finally {
+            client.close()
         }
         return JsonObject()
     }
 
-    /**
-     * Modified from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
     fun getArrayResponse(urlString: String): JsonArray {
+        val client = builder.build()
         try {
             val request = HttpGet(URL(urlString).toURI())
             request.protocolVersion = HttpVersion.HTTP_1_1
             val response: HttpResponse = client.execute(request)
             val entity = response.entity
             if (response.statusLine.statusCode == 200) {
-                return parser.parse(entity.content.bufferedReader()).asJsonArray
+                return parser.parse(entity.content.readTextAndClose()).asJsonArray
             } else {
                 mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest failed. HTTP Error Code: ${response.statusLine.statusCode}"))
             }
@@ -115,6 +110,8 @@ object APIUtil {
         } catch (ex: URISyntaxException) {
             mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured. See logs for more details."))
             ex.printStackTrace()
+        } finally {
+            client.close()
         }
         return JsonArray()
     }

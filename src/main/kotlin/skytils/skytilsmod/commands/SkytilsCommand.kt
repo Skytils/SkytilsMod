@@ -86,7 +86,7 @@ object SkytilsCommand : CommandBase() {
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
                     "§e§l[FETCHUR] §8» §eToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()
-                        [(ZonedDateTime.now(ZoneId.of("America/New_York"))
+                            [(ZonedDateTime.now(ZoneId.of("America/New_York"))
                         .dayOfMonth - 1) % MiningFeatures.fetchurItems.size]
                 )
             )
@@ -123,26 +123,26 @@ object SkytilsCommand : CommandBase() {
                     player.addChatMessage(
                         ChatComponentText(
                             ("§9➜ Skytils Commands and Info" + "\n" +
-                                " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
-                                " §2§l ❣ §7§oThe current mod version is §f§o" + Skytils.VERSION + "§7§o." + "\n" +
-                                "§9§l➜ Setup:" + "\n" +
-                                " §3/skytils §l➡ §bOpens the main mod GUI. §7(Alias: §f/st§7)" + "\n" +
-                                " §3/skytils config §l➡ §bOpens the configuration GUI." + "\n" +
-                                " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
-                                " §3/skytils help §l➡ §bShows this help menu." + "\n" +
-                                " §3/skytils reload <data/mayor> §l➡ §bForces a refresh of solutions from the data repository." + "\n" +
-                                " §3/skytils editlocations §l➡ §bOpens the location editing GUI." + "\n" +
-                                " §3/skytils aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
-                                "§9§l➜ Events:" + "\n" +
-                                " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
-                                " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
-                                "§9§l➜ Color and Glint" + "\n" +
-                                " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)" + "\n" +
-                                " §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
-                                " §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
-                                "§9§l➜ Miscellaneous:" + "\n" +
-                                " §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)" + "\n" +
-                                " §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics.")
+                                    " §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly." + "\n" +
+                                    " §2§l ❣ §7§oThe current mod version is §f§o" + Skytils.VERSION + "§7§o." + "\n" +
+                                    "§9§l➜ Setup:" + "\n" +
+                                    " §3/skytils §l➡ §bOpens the main mod GUI. §7(Alias: §f/st§7)" + "\n" +
+                                    " §3/skytils config §l➡ §bOpens the configuration GUI." + "\n" +
+                                    " §3/skytils setkey §l➡ §bSets your Hypixel API key." + "\n" +
+                                    " §3/skytils help §l➡ §bShows this help menu." + "\n" +
+                                    " §3/skytils reload <data/mayor> §l➡ §bForces a refresh of solutions from the data repository." + "\n" +
+                                    " §3/skytils editlocations §l➡ §bOpens the location editing GUI." + "\n" +
+                                    " §3/skytils aliases §l➡ §bOpens the command alias editing GUI." + "\n" +
+                                    "§9§l➜ Events:" + "\n" +
+                                    " §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯" + "\n" +
+                                    " §3/skytils fetchur §l➡ §bShows the item that Fetchur wants." + "\n" +
+                                    "§9§l➜ Color and Glint" + "\n" +
+                                    " §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)" + "\n" +
+                                    " §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item." + "\n" +
+                                    " §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item." + "\n" +
+                                    "§9§l➜ Miscellaneous:" + "\n" +
+                                    " §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)" + "\n" +
+                                    " §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics.")
                         )
                     )
                     return

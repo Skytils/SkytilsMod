@@ -29,7 +29,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -106,10 +108,11 @@ public abstract class MixinMinecraft {
     private void preRun(CallbackInfo ci) {
         File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
         if (!file.exists()) {
+            CloseableHttpClient client = APIUtil.INSTANCE.getBuilder().build();
             try {
                 HttpGet request = new HttpGet(new URL(Skytils.config.getDataURL() + "files/vigilance.toml").toURI());
                 request.setProtocolVersion(HttpVersion.HTTP_1_1);
-                HttpResponse response = APIUtil.INSTANCE.getClient().execute(request);
+                HttpResponse response = client.execute(request);
                 if (response.getStatusLine().getStatusCode() == 200) {
                     if (file.createNewFile()) {
                         response.getEntity().writeTo(new FileOutputStream(file));
@@ -119,6 +122,12 @@ public abstract class MixinMinecraft {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -31,6 +31,8 @@ import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
 import java.awt.Color
+import java.io.InputStream
+import java.nio.charset.Charset
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -190,5 +192,9 @@ object Utils {
         } else {
             seconds.roundToInt().toString() + "s"
         }
+    }
+
+    fun InputStream.readTextAndClose(charset: Charset = Charsets.UTF_8): String {
+        return this.bufferedReader(charset).use { it.readText() }
     }
 }
