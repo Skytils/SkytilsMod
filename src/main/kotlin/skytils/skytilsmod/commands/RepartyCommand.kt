@@ -86,10 +86,10 @@ object RepartyCommand : CommandBase(), ICommand {
                     player.addChatMessage(
                         ChatComponentText(
                             """
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
 ${EnumChatFormatting.GREEN}Partying:${EnumChatFormatting.WHITE}
 - ${EnumChatFormatting.YELLOW}$members
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
     """.trimIndent()
                         )
                     )
@@ -107,10 +107,10 @@ ${EnumChatFormatting.BLUE}-----------------------------
                         player.addChatMessage(
                             ChatComponentText(
                                 """
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
 ${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
 - ${EnumChatFormatting.RED}$repartyFails
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
     """.trimIndent()
                             )
                         )
@@ -147,10 +147,10 @@ ${EnumChatFormatting.BLUE}-----------------------------
                 player.addChatMessage(
                     ChatComponentText(
                         """
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
 ${EnumChatFormatting.GREEN}Repartying:${EnumChatFormatting.WHITE}
 - ${EnumChatFormatting.YELLOW}$members
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
     """.trimIndent()
                     )
                 )
@@ -176,10 +176,10 @@ ${EnumChatFormatting.BLUE}-----------------------------
                     player.addChatMessage(
                         ChatComponentText(
                             """
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
 ${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
 - ${EnumChatFormatting.RED}$repartyFails
-${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
     """.trimIndent()
                         )
                     )
