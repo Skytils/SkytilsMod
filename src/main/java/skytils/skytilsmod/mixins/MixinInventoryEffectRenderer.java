@@ -27,7 +27,7 @@ import skytils.skytilsmod.utils.Utils;
 
 @Mixin(InventoryEffectRenderer.class)
 public abstract class MixinInventoryEffectRenderer extends MixinGuiContainer {
-    @ModifyVariable(method = "updateActivePotionEffects", at = @At("STORE"), ordinal = 0, require = 1)
+    @ModifyVariable(method = "updateActivePotionEffects", at = @At("STORE"), ordinal = 0)
     private boolean noDisplayPotionEffects(boolean bool) {
         if (Skytils.config.hidePotionEffects && Utils.inSkyblock) return false;
         return bool;
