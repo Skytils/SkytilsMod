@@ -325,6 +325,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                             )
                             drawnLines++
                         }
+                        break
                     }
                 }
             }
