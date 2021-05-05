@@ -75,7 +75,7 @@ object APIUtil {
                         scanner.useDelimiter("\\Z")
                         val error = scanner.next()
                         if (error.startsWith("{")) {
-                            return parser.parse(errorStream.readTextAndClose()).asJsonObject
+                            return parser.parse(error).asJsonObject
                         }
                     }
                 }

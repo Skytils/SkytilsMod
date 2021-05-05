@@ -54,14 +54,12 @@ class MayorInfo {
                         break
                     }
                 }
-                if (currentMayor != null) {
-                    if (currentMayor != elected) {
-                        isLocal = true
-                        currentMayor = elected
-                        mayorPerks.clear()
-                    }
-                    lastCheckedElectionOver = System.currentTimeMillis()
+                if (currentMayor != elected) {
+                    isLocal = true
+                    currentMayor = elected
+                    mayorPerks.clear()
                 }
+                lastCheckedElectionOver = System.currentTimeMillis()
             }
             ticks = 0
         }
@@ -160,12 +158,14 @@ class MayorInfo {
                 val res = APIUtil.getJSONResponse(baseURL)
                 if (res.has("name") && res.has("perks")) {
                     if (res["name"].asString == currentMayor) isLocal = false
-                    currentMayor = res["name"].asString
-                    lastFetchedMayorData = System.currentTimeMillis()
-                    mayorPerks.clear()
-                    val perks = res["perks"].asJsonArray
-                    for (i in 0 until perks.size()) {
-                        mayorPerks.add(perks[i].asJsonObject.get("name").asString)
+                    if (!isLocal) {
+                        currentMayor = res["name"].asString
+                        lastFetchedMayorData = System.currentTimeMillis()
+                        mayorPerks.clear()
+                        val perks = res["perks"].asJsonArray
+                        for (i in 0 until perks.size()) {
+                            mayorPerks.add(perks[i].asJsonObject.get("name").asString)
+                        }
                     }
                 }
             }, "Skytils-FetchMayor").start()
@@ -173,7 +173,7 @@ class MayorInfo {
 
         fun sendMayorData(mayor: String?, perks: HashSet<String>) {
             if (mayor == null || perks.size == 0) return
-            if (lastSentData - System.currentTimeMillis() < 300_000) lastSentData = System.currentTimeMillis()
+            if (lastSentData - System.currentTimeMillis() < 300000) lastSentData = System.currentTimeMillis()
             Thread({
                 try {
                     val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
