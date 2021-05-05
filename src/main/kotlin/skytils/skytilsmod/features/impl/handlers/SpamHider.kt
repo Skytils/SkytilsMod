@@ -535,6 +535,15 @@ class SpamHider {
                     }
                 }
             }
+
+            // Healing (Zombie sword & Werewolf)
+            if (formatted.startsWith("§r§a§l") && formatted.contains("healed")) {
+                when (Skytils.config.healingHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.healingHider == 2)
+                    else -> {
+                    }
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

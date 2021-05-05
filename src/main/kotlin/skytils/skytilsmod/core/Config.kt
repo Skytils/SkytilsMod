@@ -1724,6 +1724,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR,
+        name = "Healing Message Hider",
+        description = "Removes Zombie Sword and Werewolf healing messages from your chat.",
+        category = "Spam",
+        subcategory = "Abilities",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var healingHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
         name = "Blessing Hider",
         description = "Removes blessing messages from your chat.",
         category = "Spam",
