@@ -77,6 +77,13 @@ class ChatListener {
             }
         }
 
+        // Await delimiter
+        if (awaitingDelimiter && unformatted.startsWith("---")) {
+            event.isCanceled = true
+            awaitingDelimiter = false
+            return
+        }
+
         // Reparty command
         // Getting party
         if (RepartyCommand.gettingParty) {
@@ -150,13 +157,14 @@ class ChatListener {
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
                 }
-                cancelDelimiters()
+                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
+                awaitingDelimiter = true
                 event.isCanceled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                cancelDelimiters()
+                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
                 event.isCanceled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
@@ -170,12 +178,12 @@ class ChatListener {
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
                 }
-                cancelDelimiters()
+                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
                 event.isCanceled = true
                 RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                cancelDelimiters()
+                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
                 event.isCanceled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
@@ -200,29 +208,6 @@ class ChatListener {
         private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
         private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
         private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
-        private val delimiterThreadPool = Executors.newFixedThreadPool(5)
-
-        private fun cancelDelimiters() {
-            val chatGui = Minecraft.getMinecraft().ingameGUI.chatGUI
-            val lines = (chatGui as AccessorGuiNewChat).chatLines
-            val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
-            delimiterThreadPool.submit {
-                Thread.sleep(100)
-                var i = 0
-                while (lines[i].chatComponent.formattedText.startsWith("§9§m---") && i < 10 && i < lines.size
-                ) {
-                    i++
-                }
-                println(drawnLines[i].chatComponent.unformattedText)
-                drawnLines.removeAt(i-2)
-                i = 0
-                while (lines[i].chatComponent.formattedText.startsWith("§9§m---") && i < 10 && i < lines.size
-                ) {
-                    i++
-                }
-                println(drawnLines[i].chatComponent.unformattedText)
-                drawnLines.removeAt(i - 2)
-            }
-        }
+        private var awaitingDelimiter = false
     }
 }
