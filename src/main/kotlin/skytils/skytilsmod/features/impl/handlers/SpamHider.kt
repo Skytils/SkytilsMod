@@ -666,7 +666,12 @@ class SpamHider {
                 Skytils.config.blessedBaitHider == 2 ||
                 Skytils.config.tetherHider == 2 ||
                 Skytils.config.selfOrbHider == 2 ||
-                Skytils.config.otherOrbHider == 2
+                Skytils.config.otherOrbHider == 2 ||
+                Skytils.config.trapDamageHider == 2 ||
+                Skytils.config.autoRecombHider == 2 ||
+                Skytils.config.witherEssenceHider == 2 ||
+                Skytils.config.undeadEssenceHider == 2 ||
+                Skytils.config.healingHider == 2
 
         companion object {
             var lastTimeRender = Date().time
