@@ -86,10 +86,10 @@ object RepartyCommand : CommandBase(), ICommand {
                     player.addChatMessage(
                         ChatComponentText(
                             """
-    ${EnumChatFormatting.BLUE}-----------------------------
-    ${EnumChatFormatting.GREEN}Partying:${EnumChatFormatting.WHITE}
-    - ${EnumChatFormatting.YELLOW}$members
-    ${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.GREEN}Partying:${EnumChatFormatting.WHITE}
+- ${EnumChatFormatting.YELLOW}$members
+${EnumChatFormatting.BLUE}-----------------------------
     """.trimIndent()
                         )
                     )
@@ -107,10 +107,10 @@ object RepartyCommand : CommandBase(), ICommand {
                         player.addChatMessage(
                             ChatComponentText(
                                 """
-    ${EnumChatFormatting.BLUE}-----------------------------
-    ${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
-    - ${EnumChatFormatting.RED}$repartyFails
-    ${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
+- ${EnumChatFormatting.RED}$repartyFails
+${EnumChatFormatting.BLUE}-----------------------------
     """.trimIndent()
                             )
                         )
@@ -147,10 +147,10 @@ object RepartyCommand : CommandBase(), ICommand {
                 player.addChatMessage(
                     ChatComponentText(
                         """
-    ${EnumChatFormatting.BLUE}-----------------------------
-    ${EnumChatFormatting.GREEN}Repartying:${EnumChatFormatting.WHITE}
-    - ${EnumChatFormatting.YELLOW}$members
-    ${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.GREEN}Repartying:${EnumChatFormatting.WHITE}
+- ${EnumChatFormatting.YELLOW}$members
+${EnumChatFormatting.BLUE}-----------------------------
     """.trimIndent()
                     )
                 )
@@ -176,10 +176,10 @@ object RepartyCommand : CommandBase(), ICommand {
                     player.addChatMessage(
                         ChatComponentText(
                             """
-    ${EnumChatFormatting.BLUE}-----------------------------
-    ${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
-    - ${EnumChatFormatting.RED}$repartyFails
-    ${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.BLUE}-----------------------------
+${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
+- ${EnumChatFormatting.RED}$repartyFails
+${EnumChatFormatting.BLUE}-----------------------------
     """.trimIndent()
                         )
                     )
