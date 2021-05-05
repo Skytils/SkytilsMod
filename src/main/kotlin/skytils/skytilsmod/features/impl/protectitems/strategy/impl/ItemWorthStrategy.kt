@@ -45,6 +45,10 @@ class ItemWorthStrategy : ItemProtectStrategy() {
     }
 
     override fun toggled(): Boolean {
-        return Skytils.config.protectItemBINThreshold.toInt() > 0
+        return try {
+            Skytils.config.protectItemBINThreshold.toInt() > 0
+        } catch (e: NumberFormatException) {
+            false
+        }
     }
 }

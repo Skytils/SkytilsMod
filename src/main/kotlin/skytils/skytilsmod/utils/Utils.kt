@@ -194,7 +194,5 @@ object Utils {
         }
     }
 
-    fun InputStream.readTextAndClose(charset: Charset = Charsets.UTF_8): String {
-        return this.bufferedReader(charset).use { it.readText() }
-    }
+    fun InputStream.readTextAndClose(charset: Charset = Charsets.UTF_8): String = this.bufferedReader(charset).use { it.readText() }
 }
