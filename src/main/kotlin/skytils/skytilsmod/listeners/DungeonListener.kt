@@ -42,8 +42,9 @@ object DungeonListener {
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
-                    if (team.isEmpty() && event.packet.chatComponent.formattedText.startsWith("§r§aDungeon starts in 1 second.")) {
-                        TickTask(30) {
+                    if (event.packet.chatComponent.formattedText.startsWith("§r§aDungeon starts in 1 second.")) {
+                        team.clear()
+                        TickTask(40) {
                             getMembers()
                         }
                     }

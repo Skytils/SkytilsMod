@@ -558,6 +558,51 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var blockIncorrectTerminalClicks = false
 
     @Property(
+        type = PropertyType.COLOR,
+        name = "Boxed Tanks",
+        description = "Shows the bounding box of all tanks through walls.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedTanks = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Boxed Tank Color",
+        description = "Choose the color of the tanks in the bounding box",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedTankColor = Color(0, 255, 0)
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Tank Protection Range Display",
+        description = "Shows the range in which players will be protected by a tank.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var showTankRadius = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Tank Range Wall",
+        description = "Shows the range as a wall instead of a circle.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var showTankRadiusWall = true
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Tank Range Wall Color",
+        description = "The color to display the Tank Range as.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var tankRadiusDisplayColor = Color(100, 255, 0, 50)
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Click in Order Solver",
         description = "Shows the items to click on the Click in Order terminal.",
@@ -2033,6 +2078,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
+
+        ::showTankRadiusWall dependsOn ::showTankRadius
+        ::tankRadiusDisplayColor dependsOn ::showTankRadius
+        ::boxedTankColor dependsOn ::boxedTanks
 
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")

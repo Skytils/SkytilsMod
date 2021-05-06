@@ -24,12 +24,14 @@ import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -538,6 +540,71 @@ object RenderUtil {
         GlStateManager.disableBlend()
     }
 
+    /**
+     * Taken from SkyblockAddons under MIT License
+     * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
+     * @author BiscuitDevelopment
+     *
+     */
+    fun drawCylinderInWorld(x: Double, y: Double, z: Double, radius: Float, height: Float, partialTicks: Float) {
+        var x1 = x
+        var y1 = y
+        var z1 = z
+        val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
+        val viewX =
+            renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * partialTicks.toDouble()
+        val viewY =
+            renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * partialTicks.toDouble()
+        val viewZ =
+            renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * partialTicks.toDouble()
+        x1 -= viewX
+        y1 -= viewY
+        z1 -= viewZ
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        worldrenderer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION)
+        var currentAngle = 0f
+        val angleStep = 0.1f
+        while (currentAngle < 2 * Math.PI) {
+            val xOffset = radius * cos(currentAngle.toDouble()).toFloat()
+            val zOffset = radius * sin(currentAngle.toDouble()).toFloat()
+            worldrenderer.pos(x1 + xOffset, y1 + height, z1 + zOffset).endVertex()
+            worldrenderer.pos(x1 + xOffset, y1 + 0, z1 + zOffset).endVertex()
+            currentAngle += angleStep
+        }
+        worldrenderer.pos(x1 + radius, y1 + height, z1).endVertex()
+        worldrenderer.pos(x1 + radius, y1 + 0.0, z1).endVertex()
+        tessellator.draw()
+    }
+
+    // totally not modified Autumn Client's TargetStrafe
+    fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
+        var il = 0.0
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        while (il < 0.05) {
+            GlStateManager.pushMatrix()
+            GlStateManager.disableTexture2D()
+            GL11.glLineWidth(2F)
+            worldrenderer.begin(1, DefaultVertexFormats.POSITION)
+            val x: Double =
+                entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - mc.renderManager.viewerPosX
+            val y: Double =
+                entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - mc.renderManager.viewerPosY
+            val z: Double =
+                entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - mc.renderManager.viewerPosZ
+            val pix2 = Math.PI * 2.0
+            for (i in 0..90) {
+                color.bindColor()
+                worldrenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
+            }
+            tessellator.draw()
+            GlStateManager.enableTexture2D()
+            GlStateManager.popMatrix()
+            il += 0.0006
+        }
+    }
+
     fun getViewerPos(partialTicks: Float): Triple<Double, Double, Double> {
         val viewer = Minecraft.getMinecraft().renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
@@ -556,3 +623,5 @@ object RenderUtil {
         )
     }
 }
+
+fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)

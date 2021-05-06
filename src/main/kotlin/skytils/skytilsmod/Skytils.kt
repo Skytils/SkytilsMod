@@ -215,6 +215,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SlayerFeatures())
         MinecraftForge.EVENT_BUS.register(SpidersDenFeatures())
         MinecraftForge.EVENT_BUS.register(StartsWithSequenceSolver())
+        MinecraftForge.EVENT_BUS.register(TankDisplayStuff())
         MinecraftForge.EVENT_BUS.register(TechnoMayor())
         MinecraftForge.EVENT_BUS.register(TeleportMazeSolver())
         MinecraftForge.EVENT_BUS.register(TerminalFeatures())
