@@ -40,10 +40,7 @@ import skytils.skytilsmod.events.AddChatMessageEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
-import skytils.skytilsmod.utils.ScoreboardUtil
-import skytils.skytilsmod.utils.stripControlCodes
-import skytils.skytilsmod.utils.TabListUtils
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -214,7 +211,7 @@ class ScoreCalculation {
                 val isPaul = MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")
                 for (pi in TabListUtils.tabEntries) {
                     try {
-                        val name = mc.ingameGUI.tabList.getPlayerName(pi)
+                        val name = pi.getText()
                         if (name.contains("Deaths:")) {
                             val matcher = deathsTabPattern.matcher(name)
                             if (matcher.find()) {

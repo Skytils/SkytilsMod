@@ -28,11 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.stripControlCodes
-import skytils.skytilsmod.utils.TabListUtils
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
@@ -48,7 +44,7 @@ class MayorInfo {
             if (System.currentTimeMillis() - lastCheckedElectionOver > 60 * 60 * 1000) {
                 var elected = currentMayor
                 for (pi in TabListUtils.tabEntries) {
-                    val name = mc.ingameGUI.tabList.getPlayerName(pi)
+                    val name = pi.getText()
                     if (name.startsWith("§r §r§fWinner: §r§a")) {
                         elected = name.substring(19, name.length - 2)
                         break

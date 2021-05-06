@@ -23,6 +23,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.world.WorldSettings
 
+fun NetworkPlayerInfo.getText(): String = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(this)
+
 object TabListUtils {
     private val playerInfoOrdering: Ordering<NetworkPlayerInfo> = object : Ordering<NetworkPlayerInfo>() {
         override fun compare(p_compare_1_: NetworkPlayerInfo?, p_compare_2_: NetworkPlayerInfo?): Int {

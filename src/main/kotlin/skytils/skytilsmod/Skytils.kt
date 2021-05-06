@@ -74,6 +74,7 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.listeners.ChatListener
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.AccessorCommandHandler
 import skytils.skytilsmod.mixins.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
@@ -162,6 +163,7 @@ class Skytils {
 
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
+        MinecraftForge.EVENT_BUS.register(DungeonListener)
         MinecraftForge.EVENT_BUS.register(guiManager)
         MinecraftForge.EVENT_BUS.register(MayorInfo())
         MinecraftForge.EVENT_BUS.register(SBInfo)
