@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.listeners
 
-import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
@@ -30,10 +29,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.mixins.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.stripControlCodes
-import java.util.concurrent.Executors
 import java.util.regex.Pattern
-import kotlin.time.Duration
 
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
