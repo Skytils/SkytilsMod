@@ -277,7 +277,7 @@ class MiningFeatures {
         if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
                 state.getValue(
                     BlockCarpet.COLOR
-                ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE
+                ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
             )
         ) {
             event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
