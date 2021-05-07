@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -84,7 +85,7 @@ class TankDisplayStuff {
                             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
                             GlStateManager.popMatrix()
                         }
-                        if (Skytils.config.boxedTanks) {
+                        if (Skytils.config.boxedTanks && (player.player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
                             GlStateManager.disableDepth()
                             RenderUtil.drawOutlinedBoundingBox(
                                 player.player.entityBoundingBox,
@@ -95,7 +96,7 @@ class TankDisplayStuff {
                             GlStateManager.enableDepth()
                         }
                     }
-                    if (Skytils.config.boxedProtectedTeammates) {
+                    if (Skytils.config.boxedProtectedTeammates && (player.player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
                         if (DungeonListener.team.any {
                                 it.dungeonClass == DungeonListener.DungeonClass.TANK && it != player && it.player.health > 0 && it.player.getDistanceToEntity(
                                     player.player
