@@ -105,7 +105,7 @@ class TankDisplayStuff {
                             GlStateManager.disableDepth()
                             RenderUtil.drawOutlinedBoundingBox(
                                 player.player.entityBoundingBox,
-                                Skytils.config.boxedTankColor,
+                                Skytils.config.boxedProtectedTeammatesColor,
                                 2f,
                                 1f
                             )
