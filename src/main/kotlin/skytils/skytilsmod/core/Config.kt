@@ -577,6 +577,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Box Protected Teammates",
+        description = "Shows the bounding box of protected teammates through walls.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedProtectedTeammates = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Protected Teammate Box Color",
+        description = "Choose the color of the teammates in the bounding box",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedProtectedTeammatesColor = Color(255, 0, 0)
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Tank Protection Range Display",
         description = "Shows the range in which players will be protected by a tank.",
         category = "Dungeons",
@@ -2084,6 +2102,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         ::showTankRadiusWall dependsOn ::showTankRadius
         ::tankRadiusDisplayColor dependsOn ::showTankRadius
         ::boxedTankColor dependsOn ::boxedTanks
+        ::boxedProtectedTeammatesColor dependsOn ::boxedProtectedTeammates
 
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")
