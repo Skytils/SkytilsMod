@@ -558,7 +558,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var blockIncorrectTerminalClicks = false
 
     @Property(
-        type = PropertyType.COLOR,
+        type = PropertyType.SWITCH,
         name = "Boxed Tanks",
         description = "Shows the bounding box of all tanks through walls.",
         category = "Dungeons",
@@ -2047,6 +2047,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var blessedBaitHider = 0
 
     init {
+        initialize()
+
         ::itemRarityOpacity dependsOn ::showItemRarity
 
         ::showLowestBINPrice dependsOn ::fetchLowestBINPrices
@@ -2106,8 +2108,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
             this.itemRarityOpacity /= 100f
             markDirty()
         }
-
-        initialize()
     }
 
     private object ConfigSorting : SortingBehavior() {
