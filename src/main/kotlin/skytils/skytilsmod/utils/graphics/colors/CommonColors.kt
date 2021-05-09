@@ -29,7 +29,6 @@ class CommonColors : SetBase {
     private constructor() : super(-10f, -10f, -10f, 1f)
 
     companion object {
-        @JvmField
         val BLACK = CommonColors(0x000000)
         val RED = CommonColors(0xff0000)
         val GREEN = CommonColors(0x00ff00)
@@ -38,27 +37,15 @@ class CommonColors : SetBase {
         val BROWN = CommonColors(0x563100)
         val PURPLE = CommonColors(0xb200ff)
         val CYAN = CommonColors(0x438e82)
-
-        @JvmField
         val LIGHT_GRAY = CommonColors(0xadadad)
-
-        @JvmField
         val GRAY = CommonColors(0x636363)
         val PINK = CommonColors(0xffb7b7)
         val LIGHT_GREEN = CommonColors(0x49ff59)
         val LIGHT_BLUE = CommonColors(0x00e9ff)
-
-        @JvmField
         val MAGENTA = CommonColors(0xff0083)
-
-        @JvmField
         val ORANGE = CommonColors(0xff9000)
-
-        @JvmField
         val WHITE = CommonColors(0xffffff)
         val RAINBOW = CommonColors()
-
-        @JvmField
         val CRITICAL = CommonColors()
         private val colors = arrayOf(
             BLACK, RED, GREEN, BLUE,
