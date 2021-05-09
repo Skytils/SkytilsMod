@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
+import net.minecraft.block.Block
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemAxe
@@ -179,7 +180,7 @@ class FarmingFeatures {
         var animalFound = false
         var acceptTrapperCommand = ""
         var commandSent = false
-        val farmBlocks = listOf(
+        val farmBlocks = setOf<Block>(
             Blocks.dirt,
             Blocks.farmland,
             Blocks.carpet,
