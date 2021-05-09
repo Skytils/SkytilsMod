@@ -143,10 +143,10 @@ object CataCommand : StatCommand() {
             val completionObj1 = masterCataData["tier_completions"].asJsonObject
             val highestFloor1 = masterCataData["highest_tier_completed"].asInt
 
-            val completionsHoverString1 = StringBuilder()
+            val masterCompletionsHoverString = StringBuilder()
 
             for (i in 1..highestFloor1) {
-                completionsHoverString1
+                masterCompletionsHoverString
                     .append("§2§●§a ")
                     .append("Floor $i: ")
                     .append("§e")
@@ -154,12 +154,12 @@ object CataCommand : StatCommand() {
                     .append(if (i < highestFloor1) "\n" else "")
             }
 
-            val completions =
+            val masterCompletions =
                 ChatComponentText(" §aFloor Completions: §7(Hover)\n")
 
-            completions.chatStyle.chatHoverEvent = HoverEvent(
+            masterCompletions.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText(completionsHoverString1.toString())
+                ChatComponentText(masterCompletionsHoverString.toString())
             )
 
             val fastestSTimes1 = masterCataData["fastest_time_s"].asJsonObject

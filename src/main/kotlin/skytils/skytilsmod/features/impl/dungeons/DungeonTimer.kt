@@ -158,26 +158,15 @@ class DungeonTimer {
             if (toggled && Utils.inDungeons && player != null && world != null) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
-                val displayText = """
-     §aReal Time: ${if (dungeonStartTime == -1L) "0s" else (((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime).toDouble() / 1000f).toString() + "s"}
-     §aTime Elapsed: 
-     """.trimIndent() + (if (dungeonStartTime == -1L) "0s" else timeFormat(
-                    ((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime).toDouble() / 1000f
-                )) +
-                    "\n§7Wither Doors: " + witherDoors +
-                    "\n§4Blood Open: " + (if (bloodOpenTime == -1L) "0s" else timeFormat(
-                    (bloodOpenTime - dungeonStartTime).toDouble() / 1000f
-                )) +
-                    "\n§cWatcher Clear: " + (if (bloodClearTime == -1L) "0s" else timeFormat(
-                    (bloodClearTime - bloodOpenTime).toDouble() / 1000f
-                )) +
-                    "\n§9Boss Entry: " + (if (bossEntryTime == -1L) "0s" else timeFormat(
-                    (bossEntryTime - dungeonStartTime).toDouble() / 1000f
-                )) +
-                    "\n§bBoss Clear: " + if (bossClearTime == -1L) "0s" else timeFormat(
-                    (bossClearTime - bossEntryTime).toDouble() / 1000f
-                )
-                val lines = displayText.split("\n".toRegex()).toTypedArray()
+                val lines = """
+                    §aReal Time: ${if (dungeonStartTime == -1L) "0s" else (((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime).toDouble() / 1000f).toString() + "s"}
+                    §aTime Elapsed: ${if (dungeonStartTime == -1L) "0s" else timeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime).toDouble() / 1000f)}
+                    §7Wither Doors: $witherDoors
+                    §4Blood Open: ${if (bloodOpenTime == -1L) "0s" else timeFormat((bloodOpenTime - dungeonStartTime).toDouble() / 1000f)}
+                    §cWatcher Clear: ${if (bloodClearTime == -1L) "0s" else timeFormat((bloodClearTime - bloodOpenTime).toDouble() / 1000f)}
+                    §9Boss Entry: ${if (bossEntryTime == -1L) "0s" else timeFormat((bossEntryTime - dungeonStartTime).toDouble() / 1000f)}
+                    §bBoss Clear: ${if (bossClearTime == -1L) "0s" else timeFormat((bossClearTime - bossEntryTime).toDouble() / 1000f)}
+                    """.trimIndent().split("\n".toRegex()).toTypedArray()
                 for (i in lines.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                     ScreenRenderer.fontRenderer.drawString(
@@ -238,19 +227,12 @@ class DungeonTimer {
             if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonsFeatures.dungeonFloor == "F7") {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
-                val displayText = """
-     §bPhase 1: ${timeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime).toDouble() / 1000f)}
-     §cPhase 2: 
-     """.trimIndent() + (if (phase1ClearTime == -1L) "0s" else timeFormat(
-                    ((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime).toDouble() / 1000f
-                )) +
-                    "\n§6Phase 3: " + (if (phase2ClearTime == -1L) "0s" else timeFormat(
-                    ((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime).toDouble() / 1000f
-                )) +
-                    "\n§4Phase 4: " + if (phase3ClearTime == -1L) "0s" else timeFormat(
-                    ((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase3ClearTime).toDouble() / 1000f
-                )
-                val lines = displayText.split("\n".toRegex()).toTypedArray()
+                val lines = """
+                    §bPhase 1: ${timeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime).toDouble() / 1000f)}
+                    §cPhase 2: ${if (phase1ClearTime == -1L) "0s" else timeFormat(((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime).toDouble() / 1000f)}
+                    §6Phase 3: ${if (phase2ClearTime == -1L) "0s" else timeFormat(((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime).toDouble() / 1000f)}
+                    §4Phase 4: ${if (phase3ClearTime == -1L) "0s" else timeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase3ClearTime).toDouble() / 1000f)}
+                    """.trimIndent().split("\n".toRegex()).toTypedArray()
                 for (i in lines.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                     ScreenRenderer.fontRenderer.drawString(

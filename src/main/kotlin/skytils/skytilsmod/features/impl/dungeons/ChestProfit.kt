@@ -79,7 +79,7 @@ class ChestProfit {
                                 var value = AuctionData.lowestBINs[identifier]
                                 if (value == null) value = 0.0
                                 chestType.value += value
-                                chestType.items.add(DungeonChestLootItem(lootSlot, identifier, value))
+                                chestType.items.add(DungeonChestLootItem(lootSlot, value))
                             }
                         }
                     }
@@ -158,7 +158,7 @@ class ChestProfit {
         }
     }
 
-    private class DungeonChestLootItem(var item: ItemStack, var itemId: String, var value: Double)
+    private class DungeonChestLootItem(var item: ItemStack, var value: Double)
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {

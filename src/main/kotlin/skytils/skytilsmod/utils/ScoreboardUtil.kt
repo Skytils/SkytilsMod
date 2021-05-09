@@ -21,7 +21,6 @@ import com.google.common.collect.Iterables
 import net.minecraft.client.Minecraft
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
-import skytils.skytilsmod.utils.stripControlCodes
 
 /**
  * Taken from Danker's Skyblock Mod under GPL 3.0 license

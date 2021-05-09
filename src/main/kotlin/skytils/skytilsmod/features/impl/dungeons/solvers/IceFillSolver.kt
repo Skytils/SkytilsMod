@@ -218,37 +218,6 @@ class IceFillSolver {
         seven = null
     }
 
-    private fun getVec3RelativeToGrid7(row: Int, column: Int): Vec3? {
-        return if (chestPos == null || roomFacing == null) null else Vec3(
-            chestPos!!
-                .offset(roomFacing!!.opposite, 4)
-                .down(3)
-                .offset(roomFacing!!.rotateYCCW(), 3)
-                .offset(roomFacing!!.rotateY(), row)
-                .offset(roomFacing!!.opposite, column)
-        )
-    }
-
-    private fun getVec3RelativeToGrid5(row: Int, column: Int): Vec3? {
-        return if (chestPos == null || roomFacing == null) null else Vec3(
-            BlockPos(getVec3RelativeToGrid7(1, 6))
-                .offset(roomFacing!!.opposite, 3)
-                .down()
-                .offset(roomFacing!!.rotateY(), row)
-                .offset(roomFacing!!.opposite, column)
-        )
-    }
-
-    private fun getVec3RelativeToGrid3(row: Int, column: Int): Vec3? {
-        return if (chestPos == null || roomFacing == null) null else Vec3(
-            BlockPos(getVec3RelativeToGrid5(1, 4))
-                .offset(roomFacing!!.opposite, 3)
-                .down()
-                .offset(roomFacing!!.rotateY(), row)
-                .offset(roomFacing!!.opposite, column)
-        )
-    }
-
     private inner class IceFillPuzzle(world: World, y: Int) {
         private val spaces: MutableList<BlockPos> = ArrayList()
         private var start: BlockPos? = null

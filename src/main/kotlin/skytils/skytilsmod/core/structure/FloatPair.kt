@@ -33,8 +33,8 @@ class FloatPair(x: Float, y: Float) {
     private val y: MutableFloat = MutableFloat(y)
 
     constructor(x: Int, y: Int) : this(
-        x / sr.scaledHeight.toFloat(), y / sr.scaledHeight
-            .toFloat()
+        x / sr.scaledHeight.toFloat(),
+        y / sr.scaledHeight.toFloat()
     )
 
     fun getX(): Float {

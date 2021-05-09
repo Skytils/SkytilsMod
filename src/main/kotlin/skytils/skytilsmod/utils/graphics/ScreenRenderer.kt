@@ -800,7 +800,7 @@ class ScreenRenderer {
             `is`,
             x + drawingOrigin.x,
             y + drawingOrigin.y,
-            if (text.isEmpty()) if (count) Integer.toString(`is`.stackSize) else null else text
+            text.ifEmpty { if (count) `is`.stackSize.toString() else null }
         )
         itemRenderer!!.zLevel = 0.0f
         RenderHelper.disableStandardItemLighting()
@@ -810,7 +810,7 @@ class ScreenRenderer {
         @JvmField
         var fontRenderer: SmartFontRenderer = SmartFontRenderer()
         var mc: Minecraft = Minecraft.getMinecraft()
-        var screen: ScaledResolution? = null
+        private var screen: ScaledResolution? = null
         var isRendering = false
         var scale = 1.0f
         var rotation = 0f

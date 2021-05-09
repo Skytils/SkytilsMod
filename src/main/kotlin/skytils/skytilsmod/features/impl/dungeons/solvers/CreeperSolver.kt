@@ -97,9 +97,7 @@ class CreeperSolver {
                                                 it.first,
                                                 it.second
                                             ) || Utils.equalsOneOf(endBlock, it.first, it.second)
-                                        }) {
-                                        solutionPairs.add(Pair(blockPos, endBlock))
-                                    }
+                                        }) solutionPairs.add(Pair(blockPos, endBlock))
                                 }
                             }
                         }

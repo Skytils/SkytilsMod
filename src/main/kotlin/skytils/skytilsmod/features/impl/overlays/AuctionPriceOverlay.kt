@@ -96,11 +96,11 @@ class AuctionPriceOverlay {
     }
 
     open class AuctionPriceScreen(oldScreen: GuiEditSign) : GuiScreen() {
-        lateinit var undercutButton: CleanButton
-        lateinit var priceField: GuiTextField
-        var sign: TileEntitySign = (oldScreen as AccessorGuiEditSign).tileSign
+        private lateinit var undercutButton: CleanButton
+        private lateinit var priceField: GuiTextField
+        private var sign: TileEntitySign = (oldScreen as AccessorGuiEditSign).tileSign
         var fr: SmartFontRenderer = ScreenRenderer.fontRenderer
-        var dragging = false
+        private var dragging = false
         private var xOffset = 0f
         private var yOffset = 0f
         override fun initGui() {

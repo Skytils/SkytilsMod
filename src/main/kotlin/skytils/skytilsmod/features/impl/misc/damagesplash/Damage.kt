@@ -44,13 +44,5 @@ enum class Damage(val symbol: String, val color: CommonColors) {
             }
             return null
         }
-
-        fun compileDamagePattern(): Pattern {
-            val damageTypes = StringBuilder()
-            for (type in values()) {
-                damageTypes.append(type.symbol)
-            }
-            return Pattern.compile("-(.*?) ([$damageTypes])")
-        }
     }
 }

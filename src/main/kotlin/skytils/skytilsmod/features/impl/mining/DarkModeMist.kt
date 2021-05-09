@@ -37,9 +37,8 @@ class DarkModeMist {
         val state = event.state
         if (SBInfo.mode == SBInfo.SkyblockIsland.DwarvenMines.mode && event.state != null && event.pos != null) {
             if ((event.pos as BlockPos).y <= 76) {
-                if ((state as IBlockState).block === Blocks.stained_glass && (state as IBlockState).getValue(
-                        BlockStainedGlass.COLOR
-                    ) == EnumDyeColor.WHITE
+                if ((state as IBlockState).block === Blocks.stained_glass &&
+                    (state as IBlockState).getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE
                 ) {
                     event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
                 }

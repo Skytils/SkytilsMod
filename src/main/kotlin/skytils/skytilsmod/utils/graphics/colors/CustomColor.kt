@@ -30,17 +30,18 @@ import skytils.skytilsmod.utils.MathUtil
  * @author Wynntils
  */
 open class CustomColor {
+    // The RED   value of the color(0.0f -> 1.0f)
     var r = 0f
 
-    // The RED   value of the color(0.0f -> 1.0f)
+    // The GREEN value of the color(0.0f -> 1.0f)
     var g = 0f
 
-    // The GREEN value of the color(0.0f -> 1.0f)
+    // The BLUE  value of the color(0.0f -> 1.0f)
     var b = 0f
 
-    // The BLUE  value of the color(0.0f -> 1.0f)
-    var a // The ALPHA value of the color(0.0f -> 1.0f)
-        = 0f
+    // The ALPHA value of the color(0.0f -> 1.0f)
+    var a = 0f
+
 
     @JvmOverloads
     constructor(r: Float, g: Float, b: Float, a: Float = 1.0f) {
