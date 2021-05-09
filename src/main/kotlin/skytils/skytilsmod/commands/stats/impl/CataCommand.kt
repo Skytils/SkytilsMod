@@ -108,7 +108,7 @@ object CataCommand : StatCommand() {
         val fastestSPlusTimes = cataData["fastest_time_s_plus"].asJsonObject
         val fastestSPlusHoverString = buildString {
             for (i in 0..highestFloor) {
-                append("§2§●§a ")
+                append("§2§l●§a ")
                 append(if (i == 0) "Entrance: " else "Floor $i: ")
                 append("§e")
                 append(if (fastestSPlusTimes.has(i.toString())) timeFormat(fastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
@@ -142,7 +142,7 @@ object CataCommand : StatCommand() {
 
             val masterCompletionsHoverString = buildString {
                 for (i in 1..highestMasterFloor) {
-                    append("§2§●§a ")
+                    append("§2§l●§a ")
                     append("Floor $i: ")
                     append("§e")
                     append(if (masterCompletionObj.has(i.toString())) masterCompletionObj[i.toString()].asInt else "§cDNF")
@@ -158,44 +158,44 @@ object CataCommand : StatCommand() {
                 ChatComponentText(masterCompletionsHoverString)
             )
 
-            val fastestSTimes1 = masterCataData["fastest_time_s"].asJsonObject
+            val masterFastestSTimes = masterCataData["fastest_time_s"].asJsonObject
             val fastestSHoverString1 = buildString {
                 for (i in 1..highestMasterFloor) {
-                    append("§2§●§a ")
+                    append("§2§l●§a ")
                     append("Floor $i: ")
                     append("§e")
-                    append(if (fastestSTimes1.has(i.toString())) timeFormat(fastestSTimes1[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
+                    append(if (masterFastestSTimes.has(i.toString())) timeFormat(masterFastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
                     append(if (i < highestMasterFloor) "\n" else "")
                 }
             }
 
-            val fastestS1 = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
-            fastestS1.chatStyle.chatHoverEvent = HoverEvent(
+            val masterFastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
+            masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
                 ChatComponentText(fastestSHoverString1)
             )
 
-            val fastestSPlusTimes1 = masterCataData["fastest_time_s_plus"].asJsonObject
+            val masterFastestSPlusTimes = masterCataData["fastest_time_s_plus"].asJsonObject
             val fastestSPlusHoverString1 = buildString {
                 for (i in 1..highestMasterFloor) {
-                    append("§2§●§a ")
+                    append("§2§l●§a ")
                     append("Floor $i: ")
                     append("§e")
-                    append(if (fastestSPlusTimes1.has(i.toString())) timeFormat(fastestSPlusTimes1[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
+                    append(if (masterFastestSPlusTimes.has(i.toString())) timeFormat(masterFastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
                     append(if (i < highestMasterFloor) "\n" else "")
                 }
             }
 
-            val fastestSPlus1 = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
-            fastestSPlus1.chatStyle.chatHoverEvent = HoverEvent(
+            val masterFastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
+            masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
                 ChatComponentText(fastestSPlusHoverString1)
             )
             component
                 .appendText("§a§l➜ Master Mode:\n")
-                .appendSibling(completions)
-                .appendSibling(fastestS1)
-                .appendSibling(fastestSPlus1)
+                .appendSibling(masterCompletions)
+                .appendSibling(masterFastestS)
+                .appendSibling(masterFastestSPlus)
         }
 
         printMessage(
