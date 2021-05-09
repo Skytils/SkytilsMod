@@ -185,7 +185,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             }
             is S2FPacketSetSlot -> {
                 val item = event.packet.func_149174_e() ?: return
-                if (event.packet.func_149175_c() != 0 || mc.thePlayer.ticksExisted <= 1) return
+                if (event.packet.func_149175_c() != 0 || mc.thePlayer == null || mc.thePlayer.ticksExisted <= 1) return
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
                 if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return

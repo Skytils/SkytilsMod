@@ -19,8 +19,10 @@ package skytils.skytilsmod.utils
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -48,6 +50,12 @@ object Utils {
 
     @JvmField
     var shouldBypassVolume = false
+
+    @JvmField
+    var lastRenderedSkullStack: ItemStack? = null
+
+    @JvmField
+    var lastRenderedSkullEntity: EntityLivingBase? = null
 
     @JvmStatic
     var random = Random()

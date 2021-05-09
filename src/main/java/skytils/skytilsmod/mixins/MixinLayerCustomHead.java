@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.layers.LayerCustomHead;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -97,6 +98,15 @@ public abstract class MixinLayerCustomHead implements LayerRenderer<EntityLiving
     @Inject(method = "doRenderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;popMatrix()V"))
     private void renderCustomHeadLayerPost(EntityLivingBase entity, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale, CallbackInfo ci) {
         GlStateManager.disableBlend();
+    }
+
+    @Inject(method = "doRenderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/tileentity/TileEntitySkullRenderer;renderSkull(FFFLnet/minecraft/util/EnumFacing;FILcom/mojang/authlib/GameProfile;I)V"), cancellable = true)
+    private void renderGlintOnSkull(EntityLivingBase entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale, CallbackInfo ci) {
+        ItemStack itemStack = entitylivingbaseIn.getCurrentArmor(3);
+        if (Utils.inSkyblock && Skytils.config.enchantGlintFix && itemStack.hasEffect()) {
+            Utils.lastRenderedSkullStack = itemStack;
+            Utils.lastRenderedSkullEntity = entitylivingbaseIn;
+        }
     }
 
 }

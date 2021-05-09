@@ -22,8 +22,8 @@
     "MixinEntityRenderer",
     "MixinGuiContainer",
     "MixinGuiIngame",
-    "MixinInventoryEffectRenderer",
     "MixinGuiScreen",
+    "MixinInventoryEffectRenderer",
     "MixinItemArmor",
     "MixinItemStack",
     "MixinLayerArmorBase",
@@ -43,6 +43,7 @@
     "MixinSoundManager",
     "MixinSplashProgress",
     "MixinTileEntityChestRenderer",
+    "MixinTileEntitySkullRenderer",
     "MixinUtil",
     "MixinWorld"
   ],
