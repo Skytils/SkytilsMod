@@ -136,7 +136,7 @@ object CataCommand : StatCommand() {
             .appendSibling(fastestS)
             .appendSibling(fastestSPlus)
 
-        if (masterCataData.get("tier_completions").asJsonObject.entrySet().size != 0) {
+        if (masterCataData.has("tier_completions")) {
             val masterCompletionObj = masterCataData["tier_completions"].asJsonObject
             val highestMasterFloor = masterCataData["highest_tier_completed"].asInt
 
