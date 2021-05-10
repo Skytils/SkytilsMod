@@ -102,7 +102,7 @@ class UpdateGui : GuiScreen() {
             var total: Long = 0
             var count: Int
             while (fis.read(data).also { count = it } != -1) {
-                if (mc.currentScreen !== this@UpdateGui) {
+                if (mc.currentScreen != this@UpdateGui) {
                     // Cancelled
                     fos.close()
                     fis.close()

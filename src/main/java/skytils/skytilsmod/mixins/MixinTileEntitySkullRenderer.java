@@ -19,7 +19,6 @@
 package skytils.skytilsmod.mixins;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelSkeletonHead;
 import net.minecraft.client.renderer.GlStateManager;

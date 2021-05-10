@@ -33,11 +33,14 @@ import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
 import java.awt.Color
+import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
+
 
 object Utils {
     private val mc = Minecraft.getMinecraft()
@@ -204,4 +207,19 @@ object Utils {
 
     fun InputStream.readTextAndClose(charset: Charset = Charsets.UTF_8): String =
         this.bufferedReader(charset).use { it.readText() }
+
+    /**
+     * @link https://stackoverflow.com/a/47925649
+     */
+    @Throws(IOException::class)
+    fun getJavaRuntime(): String {
+        val os = System.getProperty("os.name")
+        val java = "${System.getProperty("java.home")}${File.separator}bin${File.separator}${
+            if (os != null && os.lowercase().startsWith("windows")) "java.exe" else "java"
+        }"
+        if (!File(java).isFile) {
+            throw IOException("Unable to find suitable java runtime at $java")
+        }
+        return java
+    }
 }
