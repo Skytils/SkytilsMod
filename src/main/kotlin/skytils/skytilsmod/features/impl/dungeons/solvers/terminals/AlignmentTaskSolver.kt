@@ -56,7 +56,6 @@ class AlignmentTaskSolver {
 
     private val grid = LinkedHashSet<MazeSpace>()
 
-    private val solutionSets = ArrayList<ArrayList<GridMove>>()
     private val directionSet = HashMap<Point, Int>()
 
     private var ticks = 0
@@ -103,16 +102,15 @@ class AlignmentTaskSolver {
                                     }
                                 }
                             }
-                        } else if (solutionSets.isEmpty()) {
+                        } else if (directionSet.isEmpty()) {
                             val startPositions = grid.filter { it.type == SpaceType.STARTER }
                             val endPositions = grid.filter { it.type == SpaceType.END }.map { it.coords }
                             val layout = layout
                             for (start in startPositions) {
                                 val pointMap = solve(layout, start.coords.x, start.coords.y, endPositions)
                                 val moveSet = convertPointMapToMoves(pointMap)
-                                solutionSets.add(moveSet)
                                 for (move in moveSet) {
-                                    directionSet[move.point] = move.directionNum
+                                    directionSet.putIfAbsent(move.point, move.directionNum)
                                 }
                             }
                         }
@@ -123,7 +121,6 @@ class AlignmentTaskSolver {
             }
             is WorldEvent.Load -> {
                 grid.clear()
-                solutionSets.clear()
                 directionSet.clear()
             }
             is RenderWorldLastEvent -> {
@@ -198,6 +195,8 @@ class AlignmentTaskSolver {
         return Vec3(topLeft.down().north(row).down(column))
     }
 
+    val directions = EnumFacing.HORIZONTALS.reversed()
+
     /**
      * This code was modified into returning an ArrayList and was taken under CC BY-SA 4.0
      *
@@ -220,7 +219,7 @@ class AlignmentTaskSolver {
         while (queue.size != 0) {
             val currPos = queue.pollFirst()!!
             // traverse adjacent nodes while sliding on the ice
-            for (dir in EnumFacing.HORIZONTALS) {
+            for (dir in directions) {
                 val nextPos = move(grid, gridCopy, currPos, dir)
                 if (nextPos != null) {
                     queue.addLast(nextPos)
