@@ -2127,6 +2127,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
             this.itemRarityOpacity /= 100f
             markDirty()
         }
+        if (this.transparentHeadLayer > 1) {
+            this.transparentHeadLayer /= 100f
+            markDirty()
+        }
     }
 
     private object ConfigSorting : SortingBehavior() {
