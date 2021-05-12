@@ -104,13 +104,16 @@ class AlignmentTaskSolver {
                             }
                         } else if (directionSet.isEmpty()) {
                             val startPositions = grid.filter { it.type == SpaceType.STARTER }
-                            val endPositions = grid.filter { it.type == SpaceType.END }.map { it.coords }
+                            val endPositions = grid.filter { it.type == SpaceType.END }
                             val layout = layout
                             for (start in startPositions) {
-                                val pointMap = solve(layout, start.coords.x, start.coords.y, endPositions)
-                                val moveSet = convertPointMapToMoves(pointMap)
-                                for (move in moveSet) {
-                                    directionSet.putIfAbsent(move.point, move.directionNum)
+                                for (endPosition in endPositions) {
+                                    val pointMap = solve(layout, start.coords, endPosition.coords)
+                                    if (pointMap.size == 0) continue
+                                    val moveSet = convertPointMapToMoves(pointMap)
+                                    for (move in moveSet) {
+                                        directionSet[move.point] = move.directionNum
+                                    }
                                 }
                             }
                         }
@@ -195,7 +198,7 @@ class AlignmentTaskSolver {
         return Vec3(topLeft.down().north(row).down(column))
     }
 
-    val directions = EnumFacing.HORIZONTALS.reversed()
+    private val directions = EnumFacing.HORIZONTALS.reversed()
 
     /**
      * This code was modified into returning an ArrayList and was taken under CC BY-SA 4.0
@@ -205,17 +208,15 @@ class AlignmentTaskSolver {
      */
     private fun solve(
         grid: Array<IntArray>,
-        startX: Int,
-        startY: Int,
-        endPositions: List<Point>
+        start: Point,
+        end: Point
     ): ArrayList<Point> {
-        val startPoint = Point(startX, startY)
         val queue = LinkedList<Point>()
         val gridCopy = Array(
             grid.size
         ) { arrayOfNulls<Point>(grid[0].size) }
-        queue.addLast(Point(startX, startY))
-        gridCopy[startY][startX] = startPoint
+        queue.addLast(start)
+        gridCopy[start.y][start.x] = start
         while (queue.size != 0) {
             val currPos = queue.pollFirst()!!
             // traverse adjacent nodes while sliding on the ice
@@ -226,14 +227,14 @@ class AlignmentTaskSolver {
                     gridCopy[nextPos.getY().toInt()][nextPos.getX().toInt()] = Point(
                         currPos.getX().toInt(), currPos.getY().toInt()
                     )
-                    if (endPositions.contains(Point(nextPos.x, nextPos.y))) {
+                    if (end == Point(nextPos.x, nextPos.y)) {
                         val steps = ArrayList<Point>()
                         // we found the end point
                         var tmp = currPos // if we start from nextPos we will count one too many edges
                         var count = 0
                         steps.add(nextPos)
                         steps.add(currPos)
-                        while (tmp !== startPoint) {
+                        while (tmp !== start) {
                             count++
                             tmp = gridCopy[tmp.getY().toInt()][tmp.getX().toInt()]!!
                             steps.add(tmp)
