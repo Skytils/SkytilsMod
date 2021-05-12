@@ -20,27 +20,35 @@ package skytils.skytilsmod.listeners
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.utils.NumberUtil.addSuffix
 import skytils.skytilsmod.utils.TabListUtils
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.getText
+import skytils.skytilsmod.utils.stripControlCodes
 
 object DungeonListener {
 
     val team = HashSet<DungeonTeammate>()
+    val deads = HashSet<DungeonTeammate>()
+
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
         Regex("§r§.(?<name>\\w+?) §r§f\\(§r§d(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)§r§f\\)§r")
 
+    private var ticks = 0
+
     @SubscribeEvent
     fun onEvent(event: Event) {
         if (!Utils.inDungeons) return
-        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates) return
+        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates && !Skytils.config.dungeonDeathCounter) return
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
@@ -48,6 +56,48 @@ object DungeonListener {
                         team.clear()
                         TickTask(40) {
                             getMembers()
+                        }
+                    } else if (Skytils.config.dungeonDeathCounter && event.packet.chatComponent.unformattedText.stripControlCodes()
+                            .trim() == "> EXTRA STATS <"
+                    ) {
+                        TickTask(6) {
+                            mc.ingameGUI.chatGUI.printChatMessage(
+                                ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
+                                    team.sortedByDescending { it.deaths }.filter { it.deaths > 0 }.joinToString(
+                                        separator = "\n"
+                                    ) {
+                                        "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                                    }
+                                }"
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            is TickEvent.ClientTickEvent -> {
+                if (event.phase != TickEvent.Phase.START) return
+                if (ticks % 2 == 0) {
+                    val tabEntries = TabListUtils.tabEntries
+                    for (teammate in team) {
+                        if (tabEntries.size <= teammate.tabEntryIndex) continue
+                        val entry = tabEntries[teammate.tabEntryIndex].getText()
+                        if (entry.contains(teammate.playerName)) continue
+                        teammate.player = mc.theWorld.playerEntities.find {
+                            it.name == teammate.playerName && it.uniqueID.version() == 4
+                        }
+                        teammate.dead = entry.contains("§r§f(§r§cDEAD§r§f)§r")
+                        if (teammate.dead) {
+                            if (deads.add(teammate)) {
+                                teammate.deaths++
+                                if (Skytils.config.dungeonDeathCounter) {
+                                    TickTask(1) {
+                                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§bThis is ${teammate.playerName}'s ${teammate.deaths.addSuffix()} death."))
+                                    }
+                                }
+                            }
+                        } else {
+                            deads.remove(teammate)
                         }
                     }
                 }
@@ -81,19 +131,25 @@ object DungeonListener {
                     matcher.groups["name"]!!.value,
                     DungeonClass.getClassFromName(
                         matcher.groups["class"]!!.value
-                    ), matcher.groups["lvl"]!!.value
+                    ), matcher.groups["lvl"]!!.value,
+                    pos
                 )
             )
         }
     }
 
-    class DungeonTeammate(val playerName: String, val dungeonClass: DungeonClass, val classLevel: String) {
-        val player: EntityPlayer?
-            get() {
-                return mc.theWorld.playerEntities.find {
-                    it.name == playerName && it.uniqueID.version() == 4
-                }
-            }
+    class DungeonTeammate(
+        val playerName: String,
+        val dungeonClass: DungeonClass,
+        val classLevel: String,
+        val tabEntryIndex: Int
+    ) {
+        var player: EntityPlayer? = null
+        var dead = false
+        var deaths = 0
+
+
+        fun canRender() = player != null && player!!.health > 0 && !dead
     }
 
     sealed class DungeonClass {

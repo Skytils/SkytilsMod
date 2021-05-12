@@ -39,7 +39,7 @@ class TankDisplayStuff {
             is RenderWorldLastEvent -> {
                 for (teammate in DungeonListener.team) {
                     val player = teammate.player ?: continue
-                    if (player.health <= 0) continue
+                    if (!teammate.canRender()) continue
                     if (teammate.dungeonClass == DungeonListener.DungeonClass.TANK) {
                         if (Skytils.config.showTankRadius) {
                             // not sba healing circle wall code
@@ -101,10 +101,9 @@ class TankDisplayStuff {
                     }
                     if (Skytils.config.boxedProtectedTeammates && (player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
                         if (DungeonListener.team.any {
-                                val itPlayer = it.player
-                                itPlayer != null && it.dungeonClass == DungeonListener.DungeonClass.TANK && it != teammate && itPlayer.health > 0 && itPlayer.getDistanceToEntity(
+                                it.canRender() && it.dungeonClass == DungeonListener.DungeonClass.TANK && it != teammate && it.player?.getDistanceToEntity(
                                     player
-                                ) <= 30
+                                )!! <= 30
                             }) {
                             GlStateManager.disableCull()
                             GlStateManager.disableDepth()

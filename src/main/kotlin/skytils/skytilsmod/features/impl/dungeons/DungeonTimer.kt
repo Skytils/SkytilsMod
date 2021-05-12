@@ -26,6 +26,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.Utils
@@ -77,14 +78,18 @@ class DungeonTimer {
         }
         if (message.contains("§r§c☠ §r§eDefeated §r") && bossEntryTime != -1L && bossClearTime == -1L) {
             bossClearTime = System.currentTimeMillis()
-            if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(
-                ChatComponentText(
-                    """§7Wither Doors: $witherDoors
+            if (Skytils.config.dungeonTimer) {
+                TickTask(5) {
+                    mc.ingameGUI.chatGUI.printChatMessage(
+                        ChatComponentText(
+                            """§7Wither Doors: $witherDoors
 §cBlood took ${((bloodOpenTime - dungeonStartTime) / 1000f).roundToInt()} seconds to open.
 §bWatcher took ${((bloodClearTime - bloodOpenTime) / 1000f).roundToInt()} seconds to clear.
 §9Boss entry was ${timeFormat((bossEntryTime - dungeonStartTime).toDouble() / 1000f)}."""
-                )
-            )
+                        )
+                    )
+                }
+            }
             return
         }
         if (message.startsWith("§r§4[BOSS] Necron") && DungeonsFeatures.dungeonFloor == "F7") {

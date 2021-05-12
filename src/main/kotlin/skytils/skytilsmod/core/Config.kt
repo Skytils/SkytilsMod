@@ -144,6 +144,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Death Counter",
+        description = "Counts the amount of times each member of your team has died in a dungeon.",
+        category = "Dungeons",
+        subcategory = "Miscellaneous"
+    )
+    var dungeonDeathCounter = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Dungeon Chest Profit",
         description = "Shows the estimated profit for items from chests in dungeons.",
         category = "Dungeons",

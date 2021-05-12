@@ -61,4 +61,15 @@ object NumberUtil {
         val scale = 10.0.pow(precision.toDouble()).toInt()
         return (value * scale).roundToInt().toDouble() / scale
     }
+
+    fun Number.addSuffix(): String {
+        val long = this.toLong()
+        if (long in 11..13) return "${this}th"
+        return when (long % 10) {
+            1L -> "${this}st"
+            2L -> "${this}nd"
+            3L -> "${this}rd"
+            else -> "${this}th"
+        }
+    }
 }
