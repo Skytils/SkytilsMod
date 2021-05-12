@@ -70,7 +70,7 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("club.sk1er:Vigilance:102-10809-SNAPSHOT") {
+    implementation("club.sk1er:Vigilance:104-10809-SNAPSHOT") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
