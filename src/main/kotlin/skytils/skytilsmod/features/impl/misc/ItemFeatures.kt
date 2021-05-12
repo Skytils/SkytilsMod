@@ -345,6 +345,8 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookTier) stackTip =
                         enchantments.getInteger(name.toString()).toString()
                 }
+            } else if (Skytils.config.showDungeonItemLevel && extraAttributes.hasKey("dungeon_item_level")) {
+                stackTip = extraAttributes.getInteger("dungeon_item_level").toString()
             }
         }
         val lore = getItemLore(item)

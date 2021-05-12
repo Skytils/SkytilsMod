@@ -1116,6 +1116,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Show Dungeon Item Level",
+        description = "Shows the amount of stars on dungeon items as the stack size.",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var showDungeonItemLevel = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Enchanted Book Abbreviation",
         description = "Shows the abbreviated name of books with only 1 enchantment.",
         category = "Miscellaneous",
