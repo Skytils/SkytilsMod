@@ -144,6 +144,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Auto-Reparty on Dungeon Ending",
+        description = "Runs the reparty command when your dungeon ends.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var autoRepartyOnDungeonEnd = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Death Counter",
         description = "Counts the amount of times each member of your team has died in a dungeon.",
         category = "Dungeons",

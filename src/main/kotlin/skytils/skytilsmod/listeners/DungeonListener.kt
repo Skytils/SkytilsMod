@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.utils.NumberUtil.addSuffix
@@ -57,20 +58,25 @@ object DungeonListener {
                         TickTask(40) {
                             getMembers()
                         }
-                    } else if (Skytils.config.dungeonDeathCounter && event.packet.chatComponent.unformattedText.stripControlCodes()
+                    } else if (event.packet.chatComponent.unformattedText.stripControlCodes()
                             .trim() == "> EXTRA STATS <"
                     ) {
-                        TickTask(6) {
-                            mc.ingameGUI.chatGUI.printChatMessage(
-                                ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
-                                    team.sortedByDescending { it.deaths }.filter { it.deaths > 0 }.joinToString(
-                                        separator = "\n"
-                                    ) {
-                                        "  §c☠ ${it.playerName}:§r ${it.deaths}"
-                                    }
-                                }"
+                        if (Skytils.config.dungeonDeathCounter) {
+                            TickTask(6) {
+                                mc.ingameGUI.chatGUI.printChatMessage(
+                                    ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
+                                        team.sortedByDescending { it.deaths }.filter { it.deaths > 0 }.joinToString(
+                                            separator = "\n"
+                                        ) {
+                                            "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                                        }
+                                    }"
+                                    )
                                 )
-                            )
+                            }
+                        }
+                        if (Skytils.config.autoRepartyOnDungeonEnd) {
+                            RepartyCommand.processCommand(mc.thePlayer, emptyArray())
                         }
                     }
                 }
