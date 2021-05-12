@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
@@ -39,6 +40,7 @@ object DungeonListener {
     @SubscribeEvent
     fun onEvent(event: Event) {
         if (!Utils.inDungeons) return
+        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates) return
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
@@ -54,7 +56,7 @@ object DungeonListener {
     }
 
     private fun getMembers() {
-        if (team.isNotEmpty()) return
+        if (team.isNotEmpty() || !Utils.inDungeons) return
         val tabEntries = TabListUtils.tabEntries
 
         if (tabEntries.isEmpty() || !tabEntries[0].getText().contains("§r§b§lParty §r§f(")) {
@@ -69,10 +71,14 @@ object DungeonListener {
         for (i in 0 until partyCount!!) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].getText()
-            val matcher = classPattern.find(text) ?: continue
+            val matcher = classPattern.find(text)
+            if (matcher == null) {
+                println("Skipping over entry $text due to it not matching")
+                continue
+            }
             team.add(
                 DungeonTeammate(
-                    mc.theWorld.getPlayerEntityByName(matcher.groups["name"]!!.value),
+                    matcher.groups["name"]!!.value,
                     DungeonClass.getClassFromName(
                         matcher.groups["class"]!!.value
                     ), matcher.groups["lvl"]!!.value
@@ -81,7 +87,14 @@ object DungeonListener {
         }
     }
 
-    class DungeonTeammate(val player: EntityPlayer, val dungeonClass: DungeonClass, val classLevel: String)
+    class DungeonTeammate(val playerName: String, val dungeonClass: DungeonClass, val classLevel: String) {
+        val player: EntityPlayer?
+            get() {
+                return mc.theWorld.playerEntities.find {
+                    it.name == playerName && it.uniqueID.version() == 4
+                }
+            }
+    }
 
     sealed class DungeonClass {
         object ARCHER : DungeonClass()

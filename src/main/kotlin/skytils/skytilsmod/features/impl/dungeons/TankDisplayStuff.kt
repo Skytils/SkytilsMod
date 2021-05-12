@@ -37,9 +37,10 @@ class TankDisplayStuff {
         if (!Utils.inDungeons) return
         when (event) {
             is RenderWorldLastEvent -> {
-                for (player in DungeonListener.team) {
-                    if (player.player.health <= 0) continue
-                    if (player.dungeonClass == DungeonListener.DungeonClass.TANK) {
+                for (teammate in DungeonListener.team) {
+                    val player = teammate.player ?: continue
+                    if (player.health <= 0) continue
+                    if (teammate.dungeonClass == DungeonListener.DungeonClass.TANK) {
                         if (Skytils.config.showTankRadius) {
                             // not sba healing circle wall code
                             GlStateManager.pushMatrix()
@@ -58,9 +59,9 @@ class TankDisplayStuff {
                             if (Skytils.config.showTankRadiusWall) {
                                 Skytils.config.tankRadiusDisplayColor.bindColor()
                                 RenderUtil.drawCylinderInWorld(
-                                    player.player.posX,
-                                    player.player.posY - 30,
-                                    player.player.posZ,
+                                    player.posX,
+                                    player.posY - 30,
+                                    player.posZ,
                                     30f,
                                     60f,
                                     event.partialTicks
@@ -68,7 +69,7 @@ class TankDisplayStuff {
                             } else {
                                 GlStateManager.disableDepth()
                                 RenderUtil.drawCircle(
-                                    player.player,
+                                    player,
                                     event.partialTicks,
                                     30.0,
                                     Skytils.config.tankRadiusDisplayColor
@@ -85,31 +86,36 @@ class TankDisplayStuff {
                             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
                             GlStateManager.popMatrix()
                         }
-                        if (Skytils.config.boxedTanks && (player.player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
+                        if (Skytils.config.boxedTanks && (teammate.player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
+                            GlStateManager.disableCull()
                             GlStateManager.disableDepth()
                             RenderUtil.drawOutlinedBoundingBox(
-                                player.player.entityBoundingBox,
+                                player.entityBoundingBox,
                                 Skytils.config.boxedTankColor,
                                 2f,
                                 1f
                             )
                             GlStateManager.enableDepth()
+                            GlStateManager.enableCull()
                         }
                     }
-                    if (Skytils.config.boxedProtectedTeammates && (player.player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
+                    if (Skytils.config.boxedProtectedTeammates && (player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
                         if (DungeonListener.team.any {
-                                it.dungeonClass == DungeonListener.DungeonClass.TANK && it != player && it.player.health > 0 && it.player.getDistanceToEntity(
-                                    player.player
+                                val itPlayer = it.player
+                                itPlayer != null && it.dungeonClass == DungeonListener.DungeonClass.TANK && it != teammate && itPlayer.health > 0 && itPlayer.getDistanceToEntity(
+                                    player
                                 ) <= 30
                             }) {
+                            GlStateManager.disableCull()
                             GlStateManager.disableDepth()
                             RenderUtil.drawOutlinedBoundingBox(
-                                player.player.entityBoundingBox,
+                                player.entityBoundingBox,
                                 Skytils.config.boxedProtectedTeammatesColor,
                                 2f,
                                 1f
                             )
                             GlStateManager.enableDepth()
+                            GlStateManager.enableCull()
                         }
                     }
                 }
