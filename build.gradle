@@ -48,7 +48,7 @@ minecraft {
     mappings = "stable_22"
     makeObfSourceJar = false
     gitVersion = false
-    clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.FMLLoadingPlugin"
+    clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin"
     clientRunArgs += "--mixin mixins.skytils.json"
 }
 
@@ -84,7 +84,7 @@ dependencies {
 jar {
     manifest.attributes(
             "Main-Class": "SkytilsInstallerFrame",
-            "FMLCorePlugin": "skytils.skytilsmod.tweaker.FMLLoadingPlugin",
+            "FMLCorePlugin": "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
             "FMLCorePluginContainsFMLMod": true,
             "ForceLoadAsMod": true,
             "MixinConfigs": "mixins.skytils.json",
