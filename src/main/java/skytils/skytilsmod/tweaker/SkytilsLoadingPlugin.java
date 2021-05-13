@@ -3,15 +3,13 @@ package skytils.skytilsmod.tweaker;
 import kotlin.KotlinVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
@@ -67,10 +65,9 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
         Icon icon = null;
         try {
-            try (InputStream is = SkytilsLoadingPlugin.class.getResourceAsStream("/assets/skytils/sychicpet.gif")) {
-                if (is != null) {
-                    icon = new ImageIcon(ImageIO.read(is).getScaledInstance(50, 50, BufferedImage.SCALE_SMOOTH));
-                }
+            URL url = SkytilsLoadingPlugin.class.getResource("/assets/skytils/sychicpet.gif");
+            if (url != null) {
+                icon = new ImageIcon(Toolkit.getDefaultToolkit().createImage(url).getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             }
         } catch (Exception e) {
             e.printStackTrace();
