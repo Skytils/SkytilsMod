@@ -19,11 +19,11 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     private static final String errorMessage =
         "<html><p>" +
         "Skytils has detected a mod with an older version of Kotlin.<br>" +
-        "In order to resolve this conflict you must make skytils be<br>" +
+        "In order to resolve this conflict you must make Skytils be<br>" +
         "above this mod alphabetically in your mods folder.<br>" +
-        "You can do this by renaming your skytils jar to !Skytils.jar.<br>" +
+        "You can do this by renaming your Skytils jar to !Skytils.jar.<br>" +
         "If you have already done this and are still getting this error,<br>" +
-        "ask for support in the discord." +
+        "ask for support in the Discord." +
         "</p></html>";
 
     public SkytilsLoadingPlugin() {
@@ -76,7 +76,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             e.printStackTrace();
         }
 
-        JButton discordLink = new JButton("Join the discord");
+        JButton discordLink = new JButton("Join the Discord");
         discordLink.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event) {

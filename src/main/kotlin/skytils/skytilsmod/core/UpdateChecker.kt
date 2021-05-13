@@ -56,7 +56,7 @@ object UpdateChecker {
                 println("Copying updated jar to mods.")
                 val newJar = File(File(Skytils.modDir, "updates"), jarName)
                 println("Copying to mod folder")
-                val newLocation = File(File(mc.mcDataDir, "mods"), jarName)
+                val newLocation = File(oldJar.parent, "${if (oldJar.name.startsWith("!")) "!" else ""}${jarName}")
                 newLocation.createNewFile()
                 copyFile(newJar, newLocation)
                 newJar.delete()
