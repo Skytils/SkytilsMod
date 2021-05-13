@@ -33,6 +33,7 @@ import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils
 import java.io.*
 import java.net.URL
+import kotlin.concurrent.thread
 
 object UpdateChecker {
     val updateGetter = UpdateGetter()
@@ -40,8 +41,7 @@ object UpdateChecker {
         get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject["browser_download_url"].asString
 
     fun getJarNameFromUrl(url: String): String {
-        val sUrl = url.split("/".toRegex()).toTypedArray()
-        return sUrl[sUrl.size - 1]
+        return url.split(Regex("/")).last()
     }
 
     fun scheduleCopyUpdateAtShutdown(jarName: String) {
@@ -138,10 +138,8 @@ object UpdateChecker {
     }
 
     init {
-        val thread = Thread(updateGetter)
-        thread.start()
         try {
-            thread.join()
+            thread(block = updateGetter::run).join()
         } catch (ex: InterruptedException) {
             ex.printStackTrace()
         }
@@ -151,16 +149,7 @@ object UpdateChecker {
     fun onGuiOpen(e: GuiOpenEvent) {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
-        try {
-            Skytils.displayScreen = RequestUpdateGui()
-            /*            Notifications notifs = Notifications.INSTANCE;
-            notifs.pushNotification("New Skytils Version Available", "Click here to download", () -> {
-                Skytils.displayScreen = new UpdateGui();
-                return Unit.INSTANCE;
-            });*/
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
+        Skytils.displayScreen = RequestUpdateGui()
     }
 
     class UpdateGetter : Runnable {
