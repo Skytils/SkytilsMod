@@ -86,9 +86,9 @@ class ItemFeatures {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
                         if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30, 255)
-                        else if (stack.displayName.contains("Mimic Fragment") || stack.displayName.contains("Training Weights") || stack.displayName.contains(
-                                "Journal Entry"
-                            ) || stack.displayName.contains("Defuse Kit")
+                        else if (StringUtils.containsAny(stack.displayName, "Defuse Kit", "Lever", "Torch", 
+                                                         "Stone", "Tripwire Hook", "Journal Entry", 
+                                                         "Training Weights", "Mimic Fragment")
                         ) event.slot highlight Color(255, 50, 150, 255)
                     }
                 }
