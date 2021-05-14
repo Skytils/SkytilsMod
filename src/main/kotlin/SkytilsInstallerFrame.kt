@@ -431,7 +431,7 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
 
             val newFile = File(modsFolder, "Skytils-${getVersionFromMcmodInfo()}.jar")
             if (thisFile == newFile) {
-                showErrorMessage("You are opening this file from where the file should be installed... there's nothing to be done!")
+                showErrorMessage("You are opening this file from where it should be installed... there's nothing to be done!")
                 return
             }
 
@@ -456,7 +456,7 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
             if (deletingFailure) return
 
             if (thisFile.isDirectory) {
-                showErrorMessage("This file is a directory... Are we in a development environment?")
+                showErrorMessage("This file is a directory... are we in a development environment?")
                 return
             }
 
@@ -467,7 +467,7 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
                 return
             }
 
-            showMessage("Skytils has been successfully installed into your mods folder.")
+            showMessage("Skytils has been successfully installed to your mods folder.")
             dispose()
             exitProcess(0)
         }
