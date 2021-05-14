@@ -61,8 +61,7 @@ object APIUtil {
             if (response.statusLine.statusCode == 200) {
                 return parser.parse(entity.content.readTextAndClose()).asJsonObject
             } else {
-                if (StringUtils.startsWithAny(
-                        urlString,
+                if (urlString.startsWithAny(
                         "https://api.ashcon.app/mojang/v2/user/",
                         "https://api.hypixel.net/",
                         MayorInfo.baseURL,

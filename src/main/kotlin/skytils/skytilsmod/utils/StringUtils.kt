@@ -22,21 +22,8 @@ import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
 fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
 
-object StringUtils {
-
-    @JvmStatic
-    fun startsWithAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
-        return ApacheStringUtils.startsWithAny(string, *sequences)
-    }
-
-    @JvmStatic
-    fun containsAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
-        if (string == null) return false
-        for (sequence in sequences) {
-            if (sequence?.let { string.contains(it) } == true) {
-                return true
-            }
-        }
-        return false
-    }
+fun String?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
+fun String?.containsAny(vararg sequences: CharSequence?): Boolean {
+    if (this == null) return false
+    return sequences.any { it != null && this.contains(it) }
 }

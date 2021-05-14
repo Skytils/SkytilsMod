@@ -477,7 +477,7 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
         if (files == null) return false
 
         for (file in files) {
-            if (!file.isDirectory && file.path.endsWith(".jar")) {
+            if (!file.isDirectory && file.extension == "jar") {
                 try {
                     val jarFile = JarFile(file)
                     val mcModInfo = jarFile.getEntry("mcmod.info")

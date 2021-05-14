@@ -38,6 +38,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
 import java.util.*
@@ -487,8 +488,7 @@ class SpamHider {
             }
 
             // Traps
-            if (StringUtils.startsWithAny(
-                    formatted,
+            if (formatted.startsWithAny(
                     "§r§cThe Tripwire Trap",
                     "§r§cThe Flamethrower",
                     "§r§cThe Arrow Trap",
