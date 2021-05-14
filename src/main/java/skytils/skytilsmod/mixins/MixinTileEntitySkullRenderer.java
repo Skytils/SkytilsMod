@@ -19,6 +19,7 @@
 package skytils.skytilsmod.mixins;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelSkeletonHead;
 import net.minecraft.client.renderer.GlStateManager;
@@ -67,7 +68,7 @@ public abstract class MixinTileEntitySkullRenderer extends TileEntitySpecialRend
     }
 
     private void renderGlint(EntityLivingBase entity, ModelBase model, float rotation, CustomColor color) {
-        float partialTicks = ((AccessorMinecraft)mc).getTimer().renderPartialTicks;
+        float partialTicks = ((AccessorMinecraft) mc).getTimer().renderPartialTicks;
         float f = (float)entity.ticksExisted + partialTicks;
         mc.getTextureManager().bindTexture(ENCHANTED_ITEM_GLINT_RES);
         GlStateManager.enableBlend();

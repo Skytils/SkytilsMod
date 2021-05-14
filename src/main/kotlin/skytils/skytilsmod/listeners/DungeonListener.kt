@@ -49,12 +49,13 @@ object DungeonListener {
     @SubscribeEvent
     fun onEvent(event: Event) {
         if (!Utils.inDungeons) return
-        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates && !Skytils.config.dungeonDeathCounter) return
+        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates && !Skytils.config.dungeonDeathCounter && !Skytils.config.autoRepartyOnDungeonEnd) return
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
                     if (event.packet.chatComponent.formattedText.startsWith("§r§aDungeon starts in 1 second.")) {
                         team.clear()
+                        deads.clear()
                         TickTask(40) {
                             getMembers()
                         }
@@ -84,11 +85,12 @@ object DungeonListener {
             is TickEvent.ClientTickEvent -> {
                 if (event.phase != TickEvent.Phase.START) return
                 if (ticks % 2 == 0) {
+                    ticks = 0
                     val tabEntries = TabListUtils.tabEntries
                     for (teammate in team) {
                         if (tabEntries.size <= teammate.tabEntryIndex) continue
                         val entry = tabEntries[teammate.tabEntryIndex].getText()
-                        if (entry.contains(teammate.playerName)) continue
+                        if (!entry.contains(teammate.playerName)) continue
                         teammate.player = mc.theWorld.playerEntities.find {
                             it.name == teammate.playerName && it.uniqueID.version() == 4
                         }
@@ -107,6 +109,7 @@ object DungeonListener {
                         }
                     }
                 }
+                ticks++
             }
         }
     }
@@ -132,12 +135,16 @@ object DungeonListener {
                 println("Skipping over entry $text due to it not matching")
                 continue
             }
+            val name = matcher.groups["name"]!!.value
+            val dungeonClass = matcher.groups["class"]!!.value
+            val classLevel = matcher.groups["lvl"]!!.value
+            println("Parsed teammate $name, they are a $dungeonClass $classLevel")
             team.add(
                 DungeonTeammate(
-                    matcher.groups["name"]!!.value,
+                    name,
                     DungeonClass.getClassFromName(
-                        matcher.groups["class"]!!.value
-                    ), matcher.groups["lvl"]!!.value,
+                        dungeonClass
+                    ), classLevel,
                     pos
                 )
             )
