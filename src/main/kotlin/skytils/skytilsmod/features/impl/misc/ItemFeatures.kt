@@ -88,9 +88,7 @@ class ItemFeatures {
                         if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30, 255)
                         else if (stack.displayName.contains("Mimic Fragment") || stack.displayName.contains("Training Weights") || stack.displayName.contains(
                                 "Journal Entry"
-                            ) || stack.displayName.contains("Defuse Kit") || stack.displayName.contains("Lever") || 
-                            stack.displayName.contains("Torch") || stack.displayName.contains("Stone") ||
-                            stack.displayName.contains("Button") || stack.displayName.contains("Tripwire Hook")
+                            ) || StringUtils.containsAny(stack.displayName, "Defuse Kit", "Lever", "Torch", "Stone", "Button", "Tripwire Hook")
                         ) event.slot highlight Color(255, 50, 150, 255)
                     }
                 }
