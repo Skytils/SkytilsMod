@@ -2,6 +2,9 @@ package skytils.skytilsmod.tweaker;
 
 import kotlin.KotlinVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.spongepowered.asm.launch.MixinBootstrap;
+import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.mixin.Mixins;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +28,8 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "</p></html>";
 
     public SkytilsLoadingPlugin() {
+        MixinBootstrap.init();
+        Mixins.addConfiguration("mixins.skytils.json");
         if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
             showMessage(errorMessage);
             exit();

@@ -727,6 +727,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Hidden Jerry Timer",
+        description = "Displays a timer from when you last discovered a Hidden Jerry.",
+        category = "Events",
+        subcategory = "Mayor Jerry"
+    )
+    var hiddenJerryTimer = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Griffin Burrows",
         description = "Shows the location of burrows during the event.\n§cThis feature requires your API key to be set in general settings.",
         category = "Events",

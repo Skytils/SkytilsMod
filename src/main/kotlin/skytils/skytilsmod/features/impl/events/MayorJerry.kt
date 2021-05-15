@@ -17,33 +17,93 @@
  */
 package skytils.skytilsmod.features.impl.events
 
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
-import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.core.structure.FloatPair
+import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.Utils
-import java.util.regex.Pattern
+import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 
 class MayorJerry {
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
         val unformatted = event.message.unformattedText.stripControlCodes()
-        if (Skytils.config.hiddenJerryAlert && unformatted.contains("☺") && unformatted.contains("Jerry") && !unformatted.contains(
+        val formatted = event.message.formattedText
+        if (formatted.startsWith("§b ☺ §e") && unformatted.contains("Jerry") && !unformatted.contains(
                 "Jerry Box"
             )
         ) {
-            val matcher = jerryType.matcher(event.message.formattedText)
-            if (matcher.find()) {
-                val color = matcher.group(1)
-                createTitle("§" + color.uppercase() + " JERRY!", 60)
+            val match = jerryType.find(formatted)
+            if (match != null) {
+                lastJerry = System.currentTimeMillis()
+                val color = match.groups[1]!!.value
+                if (Skytils.config.hiddenJerryAlert) {
+                    createTitle("§" + color.uppercase() + " JERRY!", 60)
+                }
             }
         }
     }
 
     companion object {
-        private val jerryType = Pattern.compile("(\\w+)(?=\\s+Jerry)")
+        private val jerryType = Regex("(\\w+)(?=\\s+Jerry)")
+        var lastJerry = -1L
+
+        init {
+            JerryTimerGuiElement()
+        }
+    }
+
+    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", FloatPair(10, 10)) {
+        private val villagerEgg = ItemStack(Items.spawn_egg, 1, 120)
+
+        override fun render() {
+            if (Utils.inSkyblock && toggled && lastJerry != -1L) {
+                renderItem(villagerEgg, 0, 0)
+                val elapsed = (System.currentTimeMillis() - lastJerry) / 1000L
+                ScreenRenderer.fontRenderer.drawString(
+                    "${elapsed / 60}:${"%02d".format(elapsed % 60)}",
+                    20f,
+                    5f,
+                    CommonColors.ORANGE,
+                    SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            renderItem(villagerEgg, 0, 0)
+            ScreenRenderer.fontRenderer.drawString(
+                "0:30",
+                20f,
+                5f,
+                CommonColors.ORANGE,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = 16
+        override val width: Int
+            get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("0:30")
+
+        override val toggled: Boolean
+            get() = Skytils.config.hiddenJerryTimer
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
     }
 }

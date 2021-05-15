@@ -102,7 +102,7 @@ object DungeonListener {
                                     teammate.deaths++
                                     if (Skytils.config.dungeonDeathCounter) {
                                         TickTask(1) {
-                                            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§bThis is ${teammate.playerName}'s ${teammate.deaths.addSuffix()} death."))
+                                            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${team.sumOf { it.deaths }}§b total deaths."))
                                         }
                                     }
                                 }
