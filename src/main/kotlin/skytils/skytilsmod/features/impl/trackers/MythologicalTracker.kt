@@ -271,7 +271,6 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
     }
 
     override fun setDefault(writer: FileWriter) {
-        write(writer)
     }
 
     companion object {

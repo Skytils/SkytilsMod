@@ -26,6 +26,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.features.impl.trackers.MayorJerryTracker
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -48,6 +49,7 @@ class MayorJerry {
             if (match != null) {
                 lastJerry = System.currentTimeMillis()
                 val color = match.groups[1]!!.value
+                MayorJerryTracker.onJerry("§$color Jerry")
                 if (Skytils.config.hiddenJerryAlert) {
                     createTitle("§" + color.uppercase() + " JERRY!", 60)
                 }

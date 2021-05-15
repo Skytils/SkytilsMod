@@ -68,6 +68,7 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
+import skytils.skytilsmod.features.impl.trackers.MayorJerryTracker
 import skytils.skytilsmod.features.impl.trackers.MythologicalTracker
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
@@ -202,6 +203,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(LockOrb())
         MinecraftForge.EVENT_BUS.register(MayorDiana())
         MinecraftForge.EVENT_BUS.register(MayorJerry())
+        MinecraftForge.EVENT_BUS.register(MayorJerryTracker)
         MinecraftForge.EVENT_BUS.register(MiningFeatures())
         MinecraftForge.EVENT_BUS.register(MinionFeatures())
         MinecraftForge.EVENT_BUS.register(MiscFeatures())

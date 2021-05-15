@@ -49,6 +49,7 @@ minecraft {
     makeObfSourceJar = false
     gitVersion = false
     clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin"
+    clientRunArgs += "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
     clientRunArgs += "--mixin mixins.skytils.json"
 }
 
