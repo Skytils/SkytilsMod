@@ -29,6 +29,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.NumberUtil.addSuffix
 import skytils.skytilsmod.utils.TabListUtils
 import skytils.skytilsmod.utils.Utils
@@ -86,26 +87,28 @@ object DungeonListener {
                 if (event.phase != TickEvent.Phase.START) return
                 if (ticks % 2 == 0) {
                     ticks = 0
-                    val tabEntries = TabListUtils.tabEntries
-                    for (teammate in team) {
-                        if (tabEntries.size <= teammate.tabEntryIndex) continue
-                        val entry = tabEntries[teammate.tabEntryIndex].getText()
-                        if (!entry.contains(teammate.playerName)) continue
-                        teammate.player = mc.theWorld.playerEntities.find {
-                            it.name == teammate.playerName && it.uniqueID.version() == 4
-                        }
-                        teammate.dead = entry.contains("§r§f(§r§cDEAD§r§f)§r")
-                        if (teammate.dead) {
-                            if (deads.add(teammate)) {
-                                teammate.deaths++
-                                if (Skytils.config.dungeonDeathCounter) {
-                                    TickTask(1) {
-                                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§bThis is ${teammate.playerName}'s ${teammate.deaths.addSuffix()} death."))
+                    if (DungeonTimer.scoreShownAt != -1L) {
+                        val tabEntries = TabListUtils.tabEntries
+                        for (teammate in team) {
+                            if (tabEntries.size <= teammate.tabEntryIndex) continue
+                            val entry = tabEntries[teammate.tabEntryIndex].getText()
+                            if (!entry.contains(teammate.playerName)) continue
+                            teammate.player = mc.theWorld.playerEntities.find {
+                                it.name == teammate.playerName && it.uniqueID.version() == 4
+                            }
+                            teammate.dead = entry.contains("§r§f(§r§cDEAD§r§f)§r")
+                            if (teammate.dead) {
+                                if (deads.add(teammate)) {
+                                    teammate.deaths++
+                                    if (Skytils.config.dungeonDeathCounter) {
+                                        TickTask(1) {
+                                            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§bThis is ${teammate.playerName}'s ${teammate.deaths.addSuffix()} death."))
+                                        }
                                     }
                                 }
+                            } else {
+                                deads.remove(teammate)
                             }
-                        } else {
-                            deads.remove(teammate)
                         }
                     }
                 }
