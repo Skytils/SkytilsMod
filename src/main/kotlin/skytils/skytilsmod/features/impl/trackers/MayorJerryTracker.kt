@@ -137,7 +137,7 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
         obj.add("jerry", jerryObj)
         val boxLoot = JsonObject()
         for (loot in JerryBoxDrops.values()) {
-            jerryObj.addProperty(loot.dropName, loot.droppedAmount)
+            boxLoot.addProperty(loot.dropName, loot.droppedAmount)
         }
         obj.add("drops", boxLoot)
         gson.toJson(obj, writer)
