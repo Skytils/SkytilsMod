@@ -87,7 +87,7 @@ object DungeonListener {
                 if (event.phase != TickEvent.Phase.START) return
                 if (ticks % 2 == 0) {
                     ticks = 0
-                    if (DungeonTimer.scoreShownAt != -1L) {
+                    if (DungeonTimer.scoreShownAt == -1L) {
                         val tabEntries = TabListUtils.tabEntries
                         for (teammate in team) {
                             if (tabEntries.size <= teammate.tabEntryIndex) continue
