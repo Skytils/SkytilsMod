@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 
 /**
@@ -101,7 +102,7 @@ class BlazeSolver {
                     if (entity is EntityArmorStand && entity.getName().contains("Blaze") && entity.getName()
                             .contains("/")
                     ) {
-                        val blazeName = StringUtils.stripControlCodes(entity.getName())
+                        val blazeName = entity.getName().stripControlCodes()
                         try {
                             val health = blazeName.substring(blazeName.indexOf("/") + 1, blazeName.length - 1).toInt()
                             val aabb = AxisAlignedBB(

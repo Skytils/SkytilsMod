@@ -31,13 +31,13 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SetActionBarEvent
 import skytils.skytilsmod.mixins.AccessorGuiNewChat
-import skytils.skytilsmod.utils.StringUtils
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
 import java.util.*
@@ -487,8 +487,7 @@ class SpamHider {
             }
 
             // Traps
-            if (StringUtils.startsWithAny(
-                    formatted,
+            if (formatted.startsWithAny(
                     "§r§cThe Tripwire Trap",
                     "§r§cThe Flamethrower",
                     "§r§cThe Arrow Trap",

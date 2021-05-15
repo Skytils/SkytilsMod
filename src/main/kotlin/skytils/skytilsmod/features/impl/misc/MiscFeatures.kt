@@ -52,17 +52,13 @@ import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.NumberUtil.round
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils.startsWithAny
-import skytils.skytilsmod.utils.stripControlCodes
-import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.equalsOneOf
 import skytils.skytilsmod.utils.Utils.isInTablist
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -243,17 +239,15 @@ class MiscFeatures {
         if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot.hasStack) return
         val chest = event.container
         if (equalsOneOf(chest.lowerChestInventory.name, "Chest", "Large Chest")) return
-        if (startsWithAny(SBInfo.lastOpenContainerName, "Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
+        if (SBInfo.lastOpenContainerName.startsWithAny("Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
         if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
         val item = event.slot.stack
         if (getSkyBlockItemID(item) == null) {
-            if (startsWithAny(
-                    SBInfo.lastOpenContainerName,
+            if (SBInfo.lastOpenContainerName.startsWithAny(
                     "Auctions"
                 ) && item.item === Items.arrow
             ) return
-            if (startsWithAny(
-                    SBInfo.lastOpenContainerName,
+            if (SBInfo.lastOpenContainerName.startsWithAny(
                     "Reforge Item"
                 ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
             ) return
