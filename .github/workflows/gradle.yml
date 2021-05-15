@@ -1,0 +1,30 @@
+name: build-ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Java setup
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Build
+        run: chmod +x gradlew; ./gradlew setupCiWorkspace && ./gradlew build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-artifacts
+          path: build/libs
