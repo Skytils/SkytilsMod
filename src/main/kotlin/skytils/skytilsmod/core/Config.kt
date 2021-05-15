@@ -736,8 +736,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
-        name = "Track Hidden Jerries",
-        description = "Tracks the amount of each type of Jerry that you've found.",
+        name = "Track Mayor Jerry Items",
+        description = "Tracks the amount of each type of Jerry that you've found, as well as drops obtained from Jerry Boxes.",
         category = "Events",
         subcategory = "Mayor Jerry"
     )

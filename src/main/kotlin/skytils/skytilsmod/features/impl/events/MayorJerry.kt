@@ -39,6 +39,7 @@ class MayorJerry {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
+        if (!Skytils.config.hiddenJerryTimer && !Skytils.config.hiddenJerryAlert && !Skytils.config.trackHiddenJerry) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         val formatted = event.message.formattedText
         if (formatted.startsWith("§b ☺ §e") && unformatted.contains("Jerry") && !unformatted.contains(

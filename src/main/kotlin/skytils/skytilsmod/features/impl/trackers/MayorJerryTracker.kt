@@ -21,6 +21,9 @@ package skytils.skytilsmod.features.impl.trackers
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
@@ -29,6 +32,7 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -53,15 +57,73 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
         }
     }
 
+    @Suppress("UNUSED")
+    enum class JerryBoxDrops(val dropName: String, val colorCode: String, var droppedAmount: Long = 0L) {
+        COINS("Coins", "6"),
+        FARMINGXP("Farming XP", "b"),
+        FORAGINGXP("Foraging XP", "b"),
+        MININGXP("Mining XP", "b"),
+        JERRYCANDY("Jerry Candy", "a"),
+        JERRYRUNE("Jerry Rune", "f"),
+        JERRYTALI("Green Jerry Talisman", "a"),
+        JERRYSTONE("Jerry Stone", "9"),
+        JERRYCHINE("Jerry-chine Gun", "5"),
+        JERRYGLASSES("Jerry 3D Glasses", "6");
+
+        companion object {
+            fun getFromName(str: String): JerryBoxDrops? {
+                return values().find { it.dropName == str }
+            }
+        }
+    }
+
     fun onJerry(type: String) {
         if (!Skytils.config.trackHiddenJerry) return
         HiddenJerry.getFromString(type)!!.discoveredTimes++
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onChat(event: ClientChatReceivedEvent) {
+        if (!Skytils.config.trackHiddenJerry) return
+        val formatted = event.message.formattedText
+        val unformatted = event.message.unformattedText.stripControlCodes()
+        if (!formatted.startsWith("§r§b ☺ ")) return
+        if (formatted.startsWith("§r§b ☺ §r§eYou claimed ") && formatted.endsWith("§efrom the Jerry Box!§r")) {
+            if (formatted.contains("coins")) {
+                JerryBoxDrops.COINS.droppedAmount += unformatted.replace(Regex("[^0-9]"), "").toLong()
+            } else if (formatted.contains("XP")) {
+                val xpType = with(formatted) {
+                    when {
+                        contains("Farming XP") -> JerryBoxDrops.FARMINGXP
+                        contains("Foraging XP") -> JerryBoxDrops.FORAGINGXP
+                        contains("Mining XP") -> JerryBoxDrops.MININGXP
+                        else -> null
+                    }
+                }
+                if (xpType != null) {
+                    xpType.droppedAmount += unformatted.replace(Regex("[^0-9]"), "").toLong()
+                }
+            } else {
+                (JerryBoxDrops.values().find {
+                    formatted.contains(it.dropName)
+                } ?: return).droppedAmount++
+            }
+            return
+        }
+        if (formatted.endsWith("§r§ein a Jerry Box!§r") && formatted.contains(mc.thePlayer.name)) {
+            (JerryBoxDrops.values().find {
+                formatted.contains(it.dropName)
+            } ?: return).droppedAmount++
+        }
     }
 
     override fun read(reader: FileReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for (entry in obj.get("jerry").asJsonObject.entrySet()) {
             (HiddenJerry.getFromType(entry.key) ?: continue).discoveredTimes = entry.value.asLong
+        }
+        for (entry in obj.get("drops").asJsonObject.entrySet()) {
+            (JerryBoxDrops.getFromName(entry.key) ?: continue).droppedAmount = entry.value.asLong
         }
     }
 
@@ -73,6 +135,11 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
             jerryObj.addProperty(jerry.type, jerry.discoveredTimes)
         }
         obj.add("jerry", jerryObj)
+        val boxLoot = JsonObject()
+        for (loot in JerryBoxDrops.values()) {
+            jerryObj.addProperty(loot.dropName, loot.droppedAmount)
+        }
+        obj.add("drops", boxLoot)
         gson.toJson(obj, writer)
     }
 
@@ -94,6 +161,17 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
                 for (jerry in HiddenJerry.values()) {
                     ScreenRenderer.fontRenderer.drawString(
                         "§${jerry.colorCode}${jerry.type}§f: ${jerry.discoveredTimes}",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.WHITE,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
+                }
+                for (drop in JerryBoxDrops.values()) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§${drop.colorCode}${drop.dropName}§f: ${drop.droppedAmount}",
                         if (leftAlign) 0f else width.toFloat(),
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.WHITE,
