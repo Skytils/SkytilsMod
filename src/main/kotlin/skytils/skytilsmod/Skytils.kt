@@ -98,7 +98,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0-pre5"
+        const val VERSION = "1.0-pre6"
 
         @JvmField
         val gson: Gson = GsonBuilder().setPrettyPrinting().create()
