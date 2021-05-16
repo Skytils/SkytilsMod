@@ -208,7 +208,7 @@ class ScoreCalculation {
                 var clearedPercentage = 0
                 var secondsElapsed = 0.0
                 var crypts = 0
-                val isPaul = MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")
+                val isPaul = (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryPerks.contains("EZPZ")
                 for (pi in TabListUtils.tabEntries) {
                     try {
                         val name = pi.getText()

@@ -58,10 +58,14 @@ public abstract class MixinTileEntitySkullRenderer extends TileEntitySpecialRend
         if (Utils.lastRenderedSkullStack != null && Utils.lastRenderedSkullEntity != null) {
             ModelBase model = type == 2 || type == 3 ? this.humanoidHead : this.skeletonHead;
             String itemId = ItemUtil.getSkyBlockItemID(Utils.lastRenderedSkullStack);
+            GlStateManager.pushMatrix();
+            GlStateManager.pushAttrib();
             if (GlintCustomizer.glintColors.containsKey(itemId)) {
                 CustomColor color = GlintCustomizer.glintColors.get(itemId);
                 renderGlint(Utils.lastRenderedSkullEntity, model, rotation, color);
             } else renderGlint(Utils.lastRenderedSkullEntity, model, rotation,null);
+            GlStateManager.popAttrib();
+            GlStateManager.popMatrix();
             Utils.lastRenderedSkullStack = null;
             Utils.lastRenderedSkullEntity = null;
         }

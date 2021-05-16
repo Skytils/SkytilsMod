@@ -168,7 +168,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(ChatListener())
         MinecraftForge.EVENT_BUS.register(DungeonListener)
         MinecraftForge.EVENT_BUS.register(guiManager)
-        MinecraftForge.EVENT_BUS.register(MayorInfo())
+        MinecraftForge.EVENT_BUS.register(MayorInfo)
         MinecraftForge.EVENT_BUS.register(SBInfo)
         MinecraftForge.EVENT_BUS.register(SoundQueue)
         MinecraftForge.EVENT_BUS.register(UpdateChecker)

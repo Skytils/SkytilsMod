@@ -114,6 +114,7 @@ object SkytilsCommand : CommandBase() {
                         }
                         "mayor" -> {
                             MayorInfo.fetchMayorData()
+                            MayorInfo.fetchJerryData()
                             player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully."))
                         }
                         else -> player.addChatMessage(ChatComponentText("/skytils reload <aliases/data>"))
