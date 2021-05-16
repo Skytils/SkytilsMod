@@ -122,12 +122,13 @@ class MayorJerry {
     class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", FloatPair(10, 10)) {
         private val villagerEgg = ItemStack(Items.spawn_egg, 1, 120)
 
+        @OptIn(ExperimentalTime::class)
         override fun render() {
             if (Utils.inSkyblock && toggled && lastJerry != -1L) {
                 renderItem(villagerEgg, 0, 0)
-                val elapsed = (System.currentTimeMillis() - lastJerry) / 1000L
+                val elapsed = Duration.milliseconds(System.currentTimeMillis() - lastJerry)
                 ScreenRenderer.fontRenderer.drawString(
-                    "${elapsed / 60}:${"%02d".format(elapsed % 60)}",
+                    elapsed.toComponents { minutes, seconds, _ -> "${minutes}:${"%02d".format(seconds)}" },
                     20f,
                     5f,
                     CommonColors.ORANGE,

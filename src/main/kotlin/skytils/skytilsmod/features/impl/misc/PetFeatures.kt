@@ -112,7 +112,9 @@ class PetFeatures {
                 val itemId = getSkyBlockItemID(item)
                 if (itemId != null) {
                     var isPetItem =
-                        itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP") || itemId.endsWith("CARROT_CANDY")
+                        (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY") || itemId.startsWith(
+                            "PET_SKIN_"
+                        )
                     if (!isPetItem) {
                         val lore = getItemLore(item)
                         for (i in lore.size - 1 downTo 1) {
