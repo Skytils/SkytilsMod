@@ -32,6 +32,7 @@ import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.mixins.AccessorMinecraft
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -612,6 +613,8 @@ object RenderUtil {
         val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
         return Triple(viewerX, viewerY, viewerZ)
     }
+
+    fun getPartialTicks() = (mc as AccessorMinecraft).timer.renderPartialTicks
 
     infix fun Slot.highlight(color: Color) {
         Gui.drawRect(
