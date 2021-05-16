@@ -73,12 +73,8 @@ class FarmingFeatures {
         if (Skytils.config.acceptTrapperTask) {
             if (formatted.contains("§a§l[YES]")) {
                 val listOfSiblings = event.message.siblings
-                for (sibling in listOfSiblings) {
-                    if (sibling.unformattedText.contains("[YES]")) {
-                        acceptTrapperCommand = sibling.chatStyle.chatClickEvent.value
-                        commandSent = false
-                    }
-                }
+                acceptTrapperCommand =
+                    listOfSiblings.find { it.unformattedText.contains("[YES]") }?.chatStyle?.chatClickEvent?.value ?: ""
                 mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to accept task"))
             }
         }
@@ -167,9 +163,9 @@ class FarmingFeatures {
     fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
         if (!Utils.inSkyblock) return
         if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
-            if (Skytils.config.acceptTrapperTask && !commandSent) {
+            if (Skytils.config.acceptTrapperTask && acceptTrapperCommand.isBlank()) {
                 Skytils.sendMessageQueue.add(acceptTrapperCommand)
-                commandSent = true
+                acceptTrapperCommand = ""
             }
         }
     }
@@ -179,7 +175,6 @@ class FarmingFeatures {
         var trapperStart = -1.0
         var animalFound = false
         var acceptTrapperCommand = ""
-        var commandSent = false
         val farmBlocks = setOf<Block>(
             Blocks.dirt,
             Blocks.farmland,
