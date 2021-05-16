@@ -158,4 +158,101 @@ object APIUtil {
         }
         return latestProfile
     }
+
+
+    fun getRankFromResponse(obj: JsonObject): String {
+        val rank = try {
+            obj["rank"].asString
+        } catch (ex: Throwable) {
+            null
+        }
+        val packageRank = try {
+            obj["packageRank"].asString
+        } catch (ex: Throwable) {
+            null
+        }
+        val newPackageRank = try {
+            obj["newPackageRank"].asString
+        } catch (ex: Throwable) {
+            null
+        }
+        val monthlyPackageRank = try {
+            obj["monthlyPackageRank"].asString
+        } catch (ex: Throwable) {
+            null
+        }
+        val newRank = getPlayerRank(
+            rank,
+            packageRank,
+            newPackageRank,
+            monthlyPackageRank
+        )
+        val rankPlusColor = try {
+            obj["rankPlusColor"].asString
+        } catch (ex: Throwable) {
+            "RED"
+        }
+        val newRankPlusColor =
+            EnumChatFormatting.getValueByName(rankPlusColor.lowercase().replace(Regex("[^a-z]"), ""))
+                .toString()
+        val prefix = try {
+            obj["prefix"].asString
+        } catch (ex: Throwable) {
+            null
+        }
+        val monthlyRankColor = try {
+            obj["monthlyRankColor"].asString
+        } catch (ex: Throwable) {
+            "GOLD"
+        }
+        val rankPlusPlusColor =
+            EnumChatFormatting.getValueByName(monthlyRankColor.lowercase().replace(Regex("[^a-z]"), ""))
+                .toString()
+        return getFormattedRank(newRank, newRankPlusColor, prefix, rankPlusPlusColor)
+    }
+
+    // Kotlin-ified SlothPixel functions, MIT LICENSE https://github.com/slothpixel/core/blob/master/LICENSE
+    fun getPlayerRank(
+        rank: String?,
+        packageRank: String?,
+        newPackageRank: String?,
+        monthlyPackageRank: String?
+    ): String? {
+        var playerRank: String?
+        playerRank = if (rank == "NORMAL") {
+            newPackageRank ?: packageRank
+        } else {
+            rank ?: newPackageRank ?: packageRank
+        }
+
+        if (playerRank == "MVP_PLUS" && monthlyPackageRank == "SUPERSTAR") {
+            playerRank = "MVP_PLUS_PLUS"
+        }
+
+        if (rank == "NONE") {
+            playerRank = null
+        }
+
+        return playerRank
+    }
+
+    fun getFormattedRank(rankCode: String?, plusColor: String?, prefix: String?, plusPlusColor: String?): String {
+        if (prefix != null) {
+            return prefix
+        }
+        return when (rankCode) {
+            "VIP" -> "§a[VIP]"
+            "VIP_PLUS" -> "§a[VIP§6+§a]"
+            "MVP" -> "§b[MVP]"
+            "MVP_PLUS" -> "§b[MVP${plusColor}+§b]"
+            "MVP_PLUS_PLUS" -> "${plusPlusColor}[MVP${plusColor}++${plusPlusColor}]"
+            "HELPER" -> "§9[HELPER]"
+            "MODERATOR" -> "§2[MOD]"
+            "GAME_MASTER" -> "§2[GM]"
+            "ADMIN" -> "§c[ADMIN]"
+            "YOUTUBER" -> "§c[§fYOUTUBE§c]"
+            else -> "§7"
+        }
+    }
+    // end
 }

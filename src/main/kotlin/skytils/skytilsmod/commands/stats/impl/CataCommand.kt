@@ -123,7 +123,7 @@ object CataCommand : StatCommand() {
         )
 
         val component = ChatComponentText("§a➜ Catacombs Statistics Viewer\n")
-            .appendText("§2§l ❣ §7§oYou are looking at data from §f§o${username}§7§o.\n\n")
+            .appendText("§2§l ❣ §7§oYou are looking at data for ${APIUtil.getRankFromResponse(playerResponse["player"].asJsonObject)} ${playerResponse["player"].asJsonObject["displayname"].asString}§7§o.\n\n")
             .appendText("§a§l➜ Catacombs Levels:\n")
             .appendText("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
             .appendText("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
