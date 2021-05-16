@@ -26,7 +26,9 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.utils.*
 import java.io.IOException
@@ -58,7 +60,12 @@ object MayorInfo {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
         if (ticks % (60 * 20) == 0) {
-            if (System.currentTimeMillis() > newJerryPerks) {
+            if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {
+                if (jerryMayor != null && Skytils.config.displayJerryPerks) {
+                    SoundQueue.addToQueue("random.orb", 0.8f, 1f, 1, true)
+                    SoundQueue.addToQueue("random.orb", 0.8f, 1f, 2, true)
+                    SoundQueue.addToQueue("random.orb", 0.8f, 1f, 3, true)
+                }
                 jerryMayor = null
                 fetchJerryData()
             }

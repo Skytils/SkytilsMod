@@ -54,6 +54,19 @@ object SoundQueue {
     }
 
     /**
+     * Add a sound to the SoundQueue
+     */
+    fun addToQueue(
+        sound: String,
+        pitch: Float,
+        volume: Float = 1f,
+        ticks: Int = 0,
+        isLoud: Boolean = false
+    ) {
+        soundQueue.add(QueuedSound(sound, pitch, volume, ticks, isLoud))
+    }
+
+    /**
      * Represents a sound in the queue
      * @param sound the name of the sound to play
      * @param pitch the pitch of the sound to play
