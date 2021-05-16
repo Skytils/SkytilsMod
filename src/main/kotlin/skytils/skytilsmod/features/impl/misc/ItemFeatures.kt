@@ -75,7 +75,7 @@ class ItemFeatures {
                         val extraAttr = getExtraAttributes(stack)
                         if (extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && !extraAttr.hasKey("dungeon_item_level")) {
                             GlStateManager.translate(0f, 0f, 1f)
-                            event.slot highlight Color(15, 233, 233, 225)
+                            event.slot highlight Color(15, 233, 233)
                             GlStateManager.translate(0f, 0f, -1f)
                         }
                     }
@@ -85,13 +85,22 @@ class ItemFeatures {
                 if (Skytils.config.highlightDungeonSellableItems) {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
-                        if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30, 255)
+                        if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30)
                         else if (stack.displayName.containsAny(
                                 "Defuse Kit", "Lever", "Torch",
                                 "Stone", "Tripwire Hook", "Journal Entry",
                                 "Training Weights", "Mimic Fragment"
                             )
-                        ) event.slot highlight Color(255, 50, 150, 255)
+                        ) event.slot highlight Color(255, 50, 150, 255) else {
+                            val itemId = AuctionData.getIdentifier(stack) ?: ""
+                            if ((itemId.startsWith("ENCHANTED_BOOK-") && itemId.containsAny(
+                                    "FEATHER_FALLING",
+                                    "BANK",
+                                    "NO_PAIN_NO_GAIN",
+                                    "INFINITE_QUIVER"
+                                )) || itemId == "ENCHANTED_BOOK"
+                            ) event.slot highlight Color(50, 50, 255)
+                        }
                     }
                 }
             }
