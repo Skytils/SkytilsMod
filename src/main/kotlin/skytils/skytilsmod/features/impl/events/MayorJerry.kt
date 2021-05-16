@@ -128,7 +128,13 @@ class MayorJerry {
                 renderItem(villagerEgg, 0, 0)
                 val elapsed = Duration.milliseconds(System.currentTimeMillis() - lastJerry)
                 ScreenRenderer.fontRenderer.drawString(
-                    elapsed.toComponents { minutes, seconds, _ -> "${minutes}:${"%02d".format(seconds)}" },
+                    elapsed.toComponents { minutes, seconds, _ ->
+                        "${if (minutes >= 6) "§a" else ""}${minutes}:${
+                            "%02d".format(
+                                seconds
+                            )
+                        }"
+                    },
                     20f,
                     5f,
                     CommonColors.ORANGE,
