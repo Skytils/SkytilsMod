@@ -298,7 +298,13 @@ class ItemFeatures {
         if (event.entity !== mc.thePlayer) return
         val item = event.entityPlayer.heldItem
         val itemId = getSkyBlockItemID(item) ?: return
-        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (itemId == "FLOWER_OF_TRUTH" || itemId == "BAT_WAND")) {
+        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (Utils.equalsOneOf(
+                itemId,
+                "FLOWER_OF_TRUTH",
+                "BAT_WAND",
+                "WEIRD_TUBA"
+            ))
+        ) {
             val block = mc.theWorld.getBlockState(event.pos)
             if (!BlockAbility.interactables.contains(block.block) || Utils.inDungeons && (block.block === Blocks.coal_block || block.block === Blocks.stained_hardened_clay)) {
                 event.isCanceled = true

@@ -1134,7 +1134,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.SWITCH,
         name = "Prevent Placing Weapons",
-        description = "Stops the game from trying to place the Flower of Truth and the Spirit Sceptre.",
+        description = "Stops the game from trying to place the Flower of Truth, Spirit Sceptre, and Weird Tuba items.",
         category = "Miscellaneous",
         subcategory = "Items"
     )
