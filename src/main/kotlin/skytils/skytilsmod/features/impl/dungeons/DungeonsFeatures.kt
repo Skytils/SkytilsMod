@@ -23,7 +23,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
@@ -46,7 +45,6 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -63,9 +61,9 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -350,100 +348,82 @@ class DungeonsFeatures {
 
     // Spirit leap names
     @SubscribeEvent
-    fun onGuiDrawPost(event: DrawScreenEvent.Post) {
-        if (!Utils.inSkyblock) return
-        if (event.gui is GuiChest) {
-            val inventory = event.gui as GuiChest
-            val containerChest = inventory.inventorySlots
-            if (containerChest is ContainerChest) {
-                val sr = ScaledResolution(mc)
-                val fr = mc.fontRendererObj
-                val guiLeft = (sr.scaledWidth - 176) / 2
-                val guiTop = (sr.scaledHeight - 222) / 2
-                val invSlots = inventory.inventorySlots.inventorySlots
-                val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
-                val chestSize = inventory.inventorySlots.inventorySlots.size
-                if (Utils.inDungeons && (Skytils.config.spiritLeapNames && displayName == "Spirit Leap" || Skytils.config.reviveStoneNames && displayName == "Revive A Teammate")) {
-                    var people = 0
-                    for (slot in invSlots) {
-                        if (slot.inventory === mc.thePlayer.inventory) continue
-                        if (slot.hasStack) {
-                            val item = slot.stack
-                            if (item.item === Items.skull) {
-                                people++
+    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!Utils.inDungeons) return
+        if (event.container is ContainerChest) {
+            val containerChest = event.container
+            val fr = ScreenRenderer.fontRenderer
+            val invSlots = containerChest.inventorySlots
+            val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap" || Skytils.config.reviveStoneNames && displayName == "Revive A Teammate") {
+                var people = 0
+                for (slot in invSlots) {
+                    if (slot.inventory == mc.thePlayer.inventory) continue
+                    if (!slot.hasStack || slot.stack.item != Items.skull) continue
+                     val item = slot.stack
+                    people++
 
-                                //slot is 16x16
-                                var x = guiLeft + slot.xDisplayPosition + 8
-                                var y = guiTop + slot.yDisplayPosition
-                                // Move down when chest isn't 6 rows
-                                if (chestSize != 90) y += (6 - (chestSize - 36) / 9) * 9
-                                if (people % 2 != 0) {
-                                    y -= 15
-                                } else {
-                                    y += 20
-                                }
-                                val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
-                                if (!matcher.find()) continue
-                                val name = matcher.group(1)
-                                if (name == "Unknown") continue
-                                var dungeonClass = ""
-                                for (l in ScoreboardUtil.sidebarLines) {
-                                    val line = ScoreboardUtil.cleanSB(l)
-                                    if (line.contains(name)) {
-                                        dungeonClass = line.substring(line.indexOf("[") + 1, line.indexOf("]"))
-                                        break
-                                    }
-                                }
-                                val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
-                                x -= fr.getStringWidth(text) / 2
-                                var shouldDrawBkg = true
-                                if (Skytils.usingNEU && displayName != "Revive A Teammate") {
-                                    try {
-                                        val neuClass =
-                                            Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
-                                        val neuInstance = neuClass.getDeclaredField("INSTANCE")
-                                        val neu = neuInstance[null]
-                                        val neuConfig = neuClass.getDeclaredField("config")
-                                        val config = neuConfig[neu]
-                                        val improvedSBMenu = config.javaClass.getDeclaredField("improvedSBMenu")
-                                        val improvedSBMenuS = improvedSBMenu[config]
-                                        val enableSbMenus = improvedSBMenuS.javaClass.getDeclaredField("enableSbMenus")
-                                        val customGuiEnabled = enableSbMenus.getBoolean(improvedSBMenuS)
-                                        if (customGuiEnabled) shouldDrawBkg = false
-                                    } catch (ignored: ClassNotFoundException) {
-                                    } catch (ignored: NoSuchFieldException) {
-                                    } catch (ignored: IllegalAccessException) {
-                                    }
-                                }
-                                val scale = 0.9
-                                val scaleReset = 1 / scale
-                                GlStateManager.disableLighting()
-                                GlStateManager.disableDepth()
-                                GlStateManager.disableBlend()
-                                GlStateManager.translate(0f, 0f, 1f)
-                                if (shouldDrawBkg) Gui.drawRect(
-                                    x - 2,
-                                    y - 2,
-                                    x + fr.getStringWidth(text) + 2,
-                                    y + fr.FONT_HEIGHT + 2,
-                                    Color(47, 40, 40).rgb
-                                )
-                                fr.drawStringWithShadow(text, x.toFloat(), y.toFloat(), Color(255, 255, 255).rgb)
-                                GlStateManager.scale(scale, scale, scale)
-                                fr.drawString(
-                                    dungeonClass,
-                                    (scaleReset * (x + 7)).toFloat(),
-                                    (scaleReset * (guiTop + slot.yDisplayPosition + 18)).toFloat(),
-                                    Color(255, 255, 0).rgb,
-                                    true
-                                )
-                                GlStateManager.scale(scaleReset, scaleReset, scaleReset)
-                                GlStateManager.translate(0f, 0f, -1f)
-                                GlStateManager.enableLighting()
-                                GlStateManager.enableDepth()
-                            }
+                    //slot is 16x16
+                    val x = slot.xDisplayPosition
+                    val y = slot.yDisplayPosition + if (people % 2 != 0) -15 else 20
+                    val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
+                    if (!matcher.find()) continue
+                    val name = matcher.group(1)
+                    if (name == "Unknown") continue
+                    val dungeonClass = (DungeonListener.team.find { it.playerName == name }
+                        ?: continue).dungeonClass.className.first().uppercase()
+                    val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
+                    var shouldDrawBkg = true
+                    if (Skytils.usingNEU && displayName != "Revive A Teammate") {
+                        try {
+                            val neuClass =
+                                Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
+                            val neuInstance = neuClass.getDeclaredField("INSTANCE")
+                            val neu = neuInstance[null]
+                            val neuConfig = neuClass.getDeclaredField("config")
+                            val config = neuConfig[neu]
+                            val improvedSBMenu = config.javaClass.getDeclaredField("improvedSBMenu")
+                            val improvedSBMenuS = improvedSBMenu[config]
+                            val enableSbMenus = improvedSBMenuS.javaClass.getDeclaredField("enableSbMenus")
+                            val customGuiEnabled = enableSbMenus.getBoolean(improvedSBMenuS)
+                            if (customGuiEnabled) shouldDrawBkg = false
+                        } catch (ignored: ClassNotFoundException) {
+                        } catch (ignored: NoSuchFieldException) {
+                        } catch (ignored: IllegalAccessException) {
                         }
                     }
+                    val scale = 0.9
+                    val scaleReset = 1 / scale
+                    GlStateManager.pushMatrix()
+                    GlStateManager.pushAttrib()
+                    GlStateManager.disableLighting()
+                    GlStateManager.disableDepth()
+                    GlStateManager.disableBlend()
+                    GlStateManager.translate(0f, 0f, 1f)
+                    if (shouldDrawBkg) Gui.drawRect(
+                        x - 2 - fr.getStringWidth(text) / 2,
+                        y - 2,
+                        x + fr.getStringWidth(text) / 2 + 2,
+                        y + fr.FONT_HEIGHT + 2,
+                        Color(47, 40, 40).rgb
+                    )
+                    fr.drawString(
+                        text,
+                        x.toFloat(),
+                        y.toFloat(),
+                        alignment = TextAlignment.MIDDLE,
+                        shadow = SmartFontRenderer.TextShadow.OUTLINE
+                    )
+                    GlStateManager.scale(scale, scale, 1.0)
+                    fr.drawString(
+                        dungeonClass,
+                        (scaleReset * x).toFloat(),
+                        (scaleReset * slot.yDisplayPosition).toFloat(),
+                        Color(255, 255, 0).rgb,
+                        true
+                    )
+                    GlStateManager.popAttrib()
+                    GlStateManager.popMatrix()
                 }
             }
         }

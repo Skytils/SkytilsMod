@@ -50,7 +50,7 @@ object DungeonListener {
     @SubscribeEvent
     fun onEvent(event: Event) {
         if (!Utils.inDungeons) return
-        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates && !Skytils.config.dungeonDeathCounter && !Skytils.config.autoRepartyOnDungeonEnd) return
+        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates && !Skytils.config.dungeonDeathCounter && !Skytils.config.autoRepartyOnDungeonEnd && !Skytils.config.spiritLeapNames) return
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
@@ -168,23 +168,16 @@ object DungeonListener {
         fun canRender() = player != null && player!!.health > 0 && !dead
     }
 
-    sealed class DungeonClass {
-        object ARCHER : DungeonClass()
-        object BERSERK : DungeonClass()
-        object MAGE : DungeonClass()
-        object HEALER : DungeonClass()
-        object TANK : DungeonClass()
+    enum class DungeonClass(val className: String) {
+        ARCHER("Archer"),
+        BERSERK("Berserk"),
+        MAGE("Mage"),
+        HEALER("Healer"),
+        TANK("Tank");
 
         companion object {
             fun getClassFromName(name: String): DungeonClass {
-                return when (name.lowercase()) {
-                    "archer" -> ARCHER
-                    "berserk" -> BERSERK
-                    "mage" -> MAGE
-                    "healer" -> HEALER
-                    "tank" -> TANK
-                    else -> MAGE
-                }
+                return values().find { it.className.lowercase() == name.lowercase() } ?: MAGE
             }
         }
     }
