@@ -26,6 +26,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.trackers.MayorJerryTracker
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.Utils
@@ -33,6 +34,8 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.stripControlCodes
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class MayorJerry {
 
@@ -63,7 +66,56 @@ class MayorJerry {
         var lastJerry = -1L
 
         init {
+            JerryPerkGuiElement()
             JerryTimerGuiElement()
+        }
+    }
+
+    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", FloatPair(10, 10)) {
+        @OptIn(ExperimentalTime::class)
+        override fun render() {
+            if (Utils.inSkyblock && toggled) {
+                if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
+                    ScreenRenderer.fontRenderer.drawString("Visit Jerry!", 0f, 0f, CommonColors.RED)
+                } else {
+                    val timeUntilNext = Duration.milliseconds(MayorInfo.newJerryPerks - System.currentTimeMillis())
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${MayorInfo.jerryMayor!!.name}: ${
+                            timeUntilNext.toComponents { hours, minutes, _, _ ->
+                                "${hours}h${minutes}m"
+                            }
+                        }",
+                        0f,
+                        0f,
+                        CommonColors.ORANGE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                }
+            }
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "Paul (0:30)",
+                0f,
+                0f,
+                CommonColors.ORANGE,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Paul (0:30)")
+
+        override val toggled: Boolean
+            get() = Skytils.config.displayJerryPerks
+
+        init {
+            Skytils.guiManager.registerElement(this)
         }
     }
 

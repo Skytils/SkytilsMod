@@ -36,7 +36,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "API",
         hidden = true
     )
-
     var dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
     @Property(
@@ -715,6 +714,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Terminal Solvers"
     )
     var simonSaysSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Display Jerry Perks",
+        description = "Displays the perks for Jerry.\nYou must visit Jerry in order for the display to function correctly.",
+        category = "Events",
+        subcategory = "Mayor Jerry"
+    )
+    var displayJerryPerks = false
 
     @Property(
         type = PropertyType.SWITCH,

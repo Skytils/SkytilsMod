@@ -31,6 +31,7 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.utils.*
 import java.io.IOException
 import java.net.URLEncoder
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.concurrent.thread
 import kotlin.time.Duration
@@ -144,7 +145,9 @@ object MayorInfo {
                 val matcher = jerryNextPerkRegex.find(endingIn) ?: return
                 val timeLeft =
                     Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
-                newJerryPerks = System.currentTimeMillis() + timeLeft.inWholeMilliseconds
+                newJerryPerks =
+                    (ZonedDateTime.now().withSecond(0).withNano(0)
+                        .toEpochSecond() * 1000) + timeLeft.inWholeMilliseconds
                 jerryMayor = mayor
                 println("Jerry has ${mayor.name}'s perks ($perks) and is ending in $newJerryPerks ($${endingIn.stripControlCodes()})")
                 sendJerryData(mayor, newJerryPerks)
@@ -208,7 +211,7 @@ object MayorInfo {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
                 val url =
                     "$baseURL/new?username=${mc.session.username}&serverId=${serverId}&mayor=${mayor}${
-                        perks.joinToString {
+                        perks.joinToString(separator = "") {
                             "&perks[]=${
                                 URLEncoder.encode(
                                     it,
