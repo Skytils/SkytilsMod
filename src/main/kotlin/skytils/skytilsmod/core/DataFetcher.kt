@@ -24,6 +24,9 @@ import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import skytils.skytilsmod.features.impl.farming.TreasureHunter
+import skytils.skytilsmod.features.impl.handlers.Mayor
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import skytils.skytilsmod.features.impl.handlers.MayorPerk
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
@@ -47,7 +50,21 @@ object DataFetcher {
             for ((key, value) in levelingData.get("dungeoneering_xp").asJsonObject.entrySet()) {
                 SkillUtils.dungeoneeringXp[key.toInt()] = value.asLong
             }
-
+            val mayorData = APIUtil.getArrayResponse("${dataUrl}constants/mayors.json")
+            for (m in mayorData) {
+                val mayorObj = m.asJsonObject
+                MayorInfo.mayorData.add(
+                    Mayor(
+                        mayorObj["name"].asString,
+                        mayorObj["role"].asString,
+                        mayorObj["perks"].asJsonArray.map {
+                            val obj = it.asJsonObject
+                            MayorPerk(obj["name"].asString, obj["description"].asString)
+                        },
+                        mayorObj["special"].asBoolean
+                    )
+                )
+            }
             val threeWeirdosSolutions = APIUtil.getArrayResponse("${dataUrl}solvers/threeweirdos.json")
             for (solution in threeWeirdosSolutions) {
                 ThreeWeirdosSolver.solutions.add(solution.asString)
@@ -80,6 +97,7 @@ object DataFetcher {
 
     private fun clearData() {
         ItemFeatures.sellPrices.clear()
+        MayorInfo.mayorData.clear()
         MiningFeatures.fetchurItems.clear()
         RelicWaypoints.relicLocations.clear()
         SkillUtils.dungeoneeringXp.clone()
