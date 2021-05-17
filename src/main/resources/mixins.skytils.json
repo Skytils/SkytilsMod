@@ -43,6 +43,7 @@
     "MixinSoundManager",
     "MixinSplashProgress",
     "MixinTileEntityChestRenderer",
+    "MixinTileEntityItemStackRenderer",
     "MixinTileEntitySkullRenderer",
     "MixinUtil",
     "MixinWorld"
