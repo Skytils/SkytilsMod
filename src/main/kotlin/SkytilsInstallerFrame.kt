@@ -475,7 +475,6 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
 
     private fun findSkytilsAndDelete(files: Array<File>?): Boolean {
         if (files == null) return false
-
         for (file in files) {
             if (!file.isDirectory && file.extension == "jar") {
                 try {
@@ -620,7 +619,7 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
             val bufferedReader = BufferedReader(InputStreamReader(inputStream))
             while ((bufferedReader.readLine().also { version = it }) != null) {
                 if (version.contains("\"modid\": \"")) {
-                    version = version.split(Pattern.quote("\"modid\": \""))[1]
+                    version = version.split("\"modid\": \"")[1]
                     version = version.substring(0, version.length - 2)
                     break
                 }
