@@ -143,7 +143,7 @@ class FarmingFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
-        if (trapperStart > 0) {
+        if (trapperStart > 0 && mc.thePlayer != null) {
             if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
                 trapperStart = -1.0
                 mc.thePlayer.addChatMessage(ChatComponentText("§dSkytils: Trapper cooldown has now expired!"))

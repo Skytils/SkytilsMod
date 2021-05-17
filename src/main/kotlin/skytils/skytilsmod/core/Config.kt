@@ -2166,7 +2166,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         registerListener(::darkModeMist) { mc.renderGlobal.loadRenderers() }
         registerListener(::recolorCarpets) { mc.renderGlobal.loadRenderers() }
 
-        this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data/"
+        this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
         if (this.largerHeadScale > 2) {
             this.largerHeadScale /= 100
