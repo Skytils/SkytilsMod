@@ -17,7 +17,7 @@
  */
 
 plugins {
-    id "net.minecraftforge.gradle.forge" version "8f14deb"
+    id "net.minecraftforge.gradle.forge" version "b13624"
     id "com.github.johnrengelman.shadow" version "6.1.0"
     id "org.jetbrains.kotlin.jvm" version "1.5.0"
     id "org.spongepowered.mixin" version "d5f9873d60"
@@ -167,7 +167,7 @@ sourceSets {
 task moveResources {
     doLast {
         ant.move file: "${buildDir}/resources/main",
-                todir: "${buildDir}/classes/java"
+                todir: "${buildDir}/classes/kotlin"
     }
 }
 
