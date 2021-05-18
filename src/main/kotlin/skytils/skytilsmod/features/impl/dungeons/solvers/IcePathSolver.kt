@@ -61,7 +61,7 @@ class IcePathSolver {
                                 val playerZ = mc.thePlayer.posZ.toInt()
                                 val xRange = playerX - 25..playerX + 25
                                 val zRange = playerZ - 25..playerZ + 25
-                                if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                                if (te.pos.y == 67 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                                 ) {
                                     val pos = te.pos
                                     if (mc.theWorld.getBlockState(pos.down()).block == Blocks.packed_ice && mc.theWorld.getBlockState(
@@ -82,25 +82,27 @@ class IcePathSolver {
                                 }
                             }
                         }
-                    } else if (grid == null) {
-                        grid = layout
-                        silverfishPos = getGridPointFromPos(Companion.silverfish!!.position)
-                        steps.clear()
-                        if (silverfishPos != null) {
-                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
-                        }
                     }
                 }
             }
             ticks = 0
         }
-        if (silverfish != null && grid != null) {
-            val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
-            if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
-                silverfishPos = silverfishGridPos
+        if (silverfishChestPos != null && roomFacing != null) {
+            if (grid == null) {
+                grid = layout
+                silverfishPos = getGridPointFromPos(silverfish!!.position)
+                steps.clear()
                 if (silverfishPos != null) {
-                    steps.clear()
                     steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                }
+            } else if (silverfish != null) {
+                val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
+                if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
+                    silverfishPos = silverfishGridPos
+                    if (silverfishPos != null) {
+                        steps.clear()
+                        steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                    }
                 }
             }
         }
