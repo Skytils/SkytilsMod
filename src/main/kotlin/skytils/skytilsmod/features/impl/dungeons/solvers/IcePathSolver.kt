@@ -82,13 +82,13 @@ class IcePathSolver {
                                 }
                             }
                         }
-                    }
-                } else if (grid == null) {
-                    grid = layout
-                    silverfishPos = getGridPointFromPos(Companion.silverfish!!.position)
-                    steps.clear()
-                    if (silverfishPos != null) {
-                        steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                    } else if (grid == null) {
+                        grid = layout
+                        silverfishPos = getGridPointFromPos(Companion.silverfish!!.position)
+                        steps.clear()
+                        if (silverfishPos != null) {
+                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                        }
                     }
                 }
             }
