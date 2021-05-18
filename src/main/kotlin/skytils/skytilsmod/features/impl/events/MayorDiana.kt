@@ -94,13 +94,13 @@ class MayorDiana {
                 val entity = event.entity
                 if (Skytils.config.removeLeftOverBleeds && mc.theWorld != null && entity is EntityArmorStand && entity.hasCustomName() && entity.displayName.formattedText.startsWith(
                         "§c☣ §fBleeds: §c"
-                    ) && entity.ticksExisted >= 5
+                    ) && entity.ticksExisted >= 20
                 ) {
                     val aabb = entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
                     if (mc.theWorld.loadedEntityList.none {
                             it.displayName.formattedText.endsWith("§c❤") && it.displayName.formattedText.contains(
                                 "Minotaur §"
-                            ) && it.collisionBoundingBox.intersectsWith(aabb)
+                            ) && it.entityBoundingBox.intersectsWith(aabb)
                         }) {
                         event.isCanceled = true
                         mc.theWorld.removeEntity(entity)
