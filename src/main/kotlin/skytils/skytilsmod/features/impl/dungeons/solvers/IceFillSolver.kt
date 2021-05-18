@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
@@ -34,6 +35,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
+import kotlin.concurrent.thread
 
 class IceFillSolver {
     @SubscribeEvent
@@ -43,42 +45,43 @@ class IceFillSolver {
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
             if (chestPos == null || roomFacing == null) {
-                Thread({
-                    findChest@ for (pos in Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.position, 25, 75)) {
-                        val block = world.getBlockState(pos)
-                        if (block.block === Blocks.chest && world.getBlockState(pos.down()).block === Blocks.stone) {
-                            for (direction in EnumFacing.HORIZONTALS) {
-                                if (world.getBlockState(pos.offset(direction)).block === Blocks.cobblestone && world.getBlockState(
-                                        pos.offset(direction.opposite, 2)
-                                    ).block === Blocks.iron_bars && world.getBlockState(
-                                        pos.offset(
-                                            direction.rotateY(),
-                                            2
+                thread(name = "Skytils-Ice-Fill-Detection") {
+                    findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                        if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && mc.thePlayer.getDistanceSq(
+                                te.pos
+                            ) < 25 * 25
+                        ) {
+                            val pos = te.pos
+                            if (world.getBlockState(pos.down()).block == Blocks.stone) {
+                                for (direction in EnumFacing.HORIZONTALS) {
+                                    if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
+                                            pos.offset(direction.opposite, 2)
+                                        ).block == Blocks.iron_bars && world.getBlockState(
+                                            pos.offset(
+                                                direction.rotateY(),
+                                                2
+                                            )
+                                        ).block == Blocks.torch && world.getBlockState(
+                                            pos.offset(
+                                                direction.rotateYCCW(),
+                                                2
+                                            )
+                                        ).block == Blocks.torch && world.getBlockState(
+                                            pos.offset(direction.opposite).down(2)
+                                        ).block == Blocks.stone_brick_stairs
+                                    ) {
+                                        chestPos = pos
+                                        roomFacing = direction
+                                        println(
+                                            "Ice fill chest is at $chestPos and is facing $roomFacing"
                                         )
-                                    ).block === Blocks.torch && world.getBlockState(
-                                        pos.offset(
-                                            direction.rotateYCCW(),
-                                            2
-                                        )
-                                    ).block === Blocks.torch && world.getBlockState(
-                                        pos.offset(direction.opposite).down(2)
-                                    ).block === Blocks.stone_brick_stairs
-                                ) {
-                                    chestPos = pos
-                                    roomFacing = direction
-                                    println(
-                                        String.format(
-                                            "Ice fill chest is at %s and is facing %s",
-                                            chestPos,
-                                            roomFacing
-                                        )
-                                    )
-                                    break@findChest
+                                        break@findChest
+                                    }
                                 }
                             }
                         }
                     }
-                }, "Skytils-Ice-Fill-Detection").start()
+                }
             }
             if ((solverThread == null || !solverThread!!.isAlive) && chestPos != null) {
                 solverThread = Thread({
@@ -257,20 +260,23 @@ class IceFillSolver {
 
                 // Check if every move starting from position `v` leads
                 // to a solution or not
-                for (w in g.adjList[v]!!) {
-                    // process only unvisited vertices as the Hamiltonian
-                    // path visit each vertex exactly once
-                    if (visited[w] == null || !visited[w]!!) {
-                        visited[w] = true
-                        path.add(w)
+                val check = g.adjList[v]
+                if (check != null) {
+                    for (w in check) {
+                        // process only unvisited vertices as the Hamiltonian
+                        // path visit each vertex exactly once
+                        if (visited[w] == null || !visited[w]!!) {
+                            visited[w] = true
+                            path.add(w)
 
-                        // check if adding vertex `w` to the path leads
-                        // to the solution or not
-                        getPaths(g, w, visited, path, N)
+                            // check if adding vertex `w` to the path leads
+                            // to the solution or not
+                            getPaths(g, w, visited, path, N)
 
-                        // backtrack
-                        visited[w] = false
-                        path.removeAt(path.size - 1)
+                            // backtrack
+                            visited[w] = false
+                            path.removeAt(path.size - 1)
+                        }
                     }
                 }
             }
@@ -327,7 +333,7 @@ class IceFillSolver {
      * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
      */
     private inner class Graph constructor(moves: List<Move>, world: World) {
-        var adjList: MutableMap<BlockPos?, List<BlockPos>> = HashMap()
+        var adjList: MutableMap<BlockPos, List<BlockPos>> = HashMap()
 
         init {
             for (move in moves) {

@@ -23,6 +23,7 @@ import net.minecraft.block.BlockLever
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
@@ -50,22 +51,21 @@ class WaterBoardSolver {
         if (!Skytils.config.waterBoardSolver) return
         val player = mc.thePlayer
         val world: World = mc.theWorld
-        if (ticks % 4 == 0) {
+        if (ticks % 20 == 0) {
             if (variant == -1 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
                 workerThread = Thread({
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
-                    var foundPiston = false
-                    for (potentialPiston in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54)) {
-                        if (world.getBlockState(potentialPiston).block === Blocks.sticky_piston) {
-                            foundPiston = true
-                            break
-                        }
-                    }
-                    if (foundPiston) {
-                        if (chestPos == null) {
-                            for (potentialChestPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 56)) {
-                                if (world.getBlockState(potentialChestPos).block === Blocks.chest) {
+                    if (Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54).any {
+                            world.getBlockState(it).block === Blocks.sticky_piston
+                        }) {
+                        if (chestPos == null || roomFacing == null) {
+                            findChest@ for (te in world.loadedTileEntityList) {
+                                if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && player.getDistanceSq(
+                                        te.pos
+                                    ) < 25 * 25
+                                ) {
+                                    val potentialChestPos = te.pos
                                     if (world.getBlockState(potentialChestPos.down()).block === Blocks.stone && world.getBlockState(
                                             potentialChestPos.up(2)
                                         ).block === Blocks.stained_glass
@@ -78,13 +78,12 @@ class WaterBoardSolver {
                                                 ).block === Blocks.stone
                                             ) {
                                                 chestPos = potentialChestPos
-                                                println("Water board chest is at $chestPos")
                                                 roomFacing = direction
+                                                println("Water board chest is at $chestPos")
                                                 println("Water board room is facing $direction")
-                                                break
+                                                break@findChest
                                             }
                                         }
-                                        break
                                     }
                                 }
                             }

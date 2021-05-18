@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
@@ -36,6 +37,7 @@ import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.awt.Point
 import java.util.*
+import kotlin.concurrent.thread
 
 class IcePathSolver {
     private var ticks = 0
@@ -44,37 +46,38 @@ class IcePathSolver {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
         if (!Skytils.config.icePathSolver) return
-        val silverfish = mc.theWorld.getEntities(
-            EntitySilverfish::class.java
-        ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceToEntity(s) < 20 }
-        if (silverfish.size > 0) {
-            Companion.silverfish = silverfish[0]
-            if (silverfishChestPos == null || roomFacing == null) {
-                if (ticks % 20 == 0) {
-                    Thread({
-                        findChest@ for (pos in Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.position, 25, 67)) {
-                            val block = mc.theWorld.getBlockState(pos)
-                            if (block.block === Blocks.chest && mc.theWorld.getBlockState(pos.down()).block === Blocks.packed_ice && mc.theWorld.getBlockState(
-                                    pos.up(2)
-                                ).block === Blocks.hopper
+        if (ticks % 20 == 0) {
+            val silverfish = mc.theWorld.getEntities(
+                EntitySilverfish::class.java
+            ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceToEntity(s) < 20 }
+            if (silverfish.size > 0) {
+                Companion.silverfish = silverfish[0]
+                if (silverfishChestPos == null || roomFacing == null) {
+                    thread(name = "Skytils-Ice-Path-Detection") {
+                        findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                            if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && mc.thePlayer.getDistanceSq(
+                                    te.pos
+                                ) < 25 * 25
                             ) {
-                                for (direction in EnumFacing.HORIZONTALS) {
-                                    if (mc.theWorld.getBlockState(pos.offset(direction)).block === Blocks.stonebrick) {
-                                        silverfishChestPos = pos
-                                        roomFacing = direction
-                                        println(
-                                            String.format(
-                                                "Silverfish chest is at %s and is facing %s",
-                                                silverfishChestPos,
-                                                roomFacing
+                                val pos = te.pos
+                                if (mc.theWorld.getBlockState(pos.down()).block == Blocks.packed_ice && mc.theWorld.getBlockState(
+                                        pos.up(2)
+                                    ).block == Blocks.hopper
+                                ) {
+                                    for (direction in EnumFacing.HORIZONTALS) {
+                                        if (mc.theWorld.getBlockState(pos.offset(direction)).block == Blocks.stonebrick) {
+                                            silverfishChestPos = pos
+                                            roomFacing = direction
+                                            println(
+                                                "Silverfish chest is at $silverfishChestPos and is facing $roomFacing",
                                             )
-                                        )
-                                        break@findChest
+                                            break@findChest
+                                        }
                                     }
                                 }
                             }
                         }
-                    }, "Skytils-Ice-Path-Detection").start()
+                    }
                     ticks = 0
                 }
             } else if (grid == null) {
@@ -85,10 +88,11 @@ class IcePathSolver {
                     steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
                 }
             }
+            ticks = 0
         }
-        if (Companion.silverfish != null && grid != null) {
-            val silverfishGridPos = getGridPointFromPos(Companion.silverfish!!.position)
-            if (Companion.silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
+        if (silverfish != null && grid != null) {
+            val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
+            if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
                 silverfishPos = silverfishGridPos
                 if (silverfishPos != null) {
                     steps.clear()
