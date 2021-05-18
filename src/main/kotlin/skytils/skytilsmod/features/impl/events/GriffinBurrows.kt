@@ -48,10 +48,10 @@ import kotlin.math.roundToInt
 
 class GriffinBurrows {
     companion object {
-        var burrows = ArrayList<Burrow>()
-        var dugBurrows = ArrayList<BlockPos>()
+        var burrows = arrayListOf<Burrow>()
+        var dugBurrows = arrayListOf<BlockPos>()
         var lastDugBurrow: BlockPos? = null
-        var particleBurrows = ArrayList<ParticleBurrow>()
+        var particleBurrows = arrayListOf<ParticleBurrow>()
         var lastDugParticleBurrow: BlockPos? = null
         var burrowRefreshTimer = StopWatch()
         var shouldRefreshBurrows = false
@@ -206,12 +206,14 @@ class GriffinBurrows {
         if (Skytils.config.showGriffinBurrows) {
             if (burrows.isNotEmpty()) {
                 for (burrow in burrows.toTypedArray()) {
-                    burrow.drawWaypoint(event.partialTicks)
+                    if (burrow != null) {
+                        burrow.drawWaypoint(event.partialTicks)
+                    }
                 }
             }
             if (Skytils.config.particleBurrows && particleBurrows.isNotEmpty()) {
                 for (pb in particleBurrows.toTypedArray()) {
-                    if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
+                    if (pb != null && pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
                         pb.drawWaypoint(event.partialTicks)
                     }
                 }
