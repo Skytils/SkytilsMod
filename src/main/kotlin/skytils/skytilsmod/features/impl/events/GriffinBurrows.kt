@@ -358,7 +358,7 @@ class GriffinBurrows {
                     1 -> type = EnumChatFormatting.RED.toString() + "Mob"
                     2 -> type = EnumChatFormatting.GOLD.toString() + "Treasure"
                 }
-                return String.format("%s §a(Particle)", type)
+                return "$type §a(Particle)"
             }
         private val color: Color
             get() {
@@ -441,12 +441,9 @@ class GriffinBurrows {
                         closest = warp
                     }
                 }
-                return String.format(
-                    "%s §bPosition: %s/4%s",
-                    type,
-                    chain + 1,
-                    if (closest != null) " " + closest.nameWithColor else ""
-                )
+                return "$type §bPosition: ${chain + 1}/4${
+                    if (closest != null) " ${closest.nameWithColor}" else ""
+                }"
             }
 
         private val color: Color

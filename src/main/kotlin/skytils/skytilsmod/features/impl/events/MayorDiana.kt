@@ -45,17 +45,17 @@ class MayorDiana {
 
     @SubscribeEvent
     fun onEvent(event: Event) {
-        if (!Utils.inSkyblock || !Skytils.config.trackGaiaHits) return
+        if (!Utils.inSkyblock) return
         when (event) {
             is TickEvent.ClientTickEvent -> {
-                if (event.phase == TickEvent.Phase.START) for (golem in gaiaConstructHits.keys) {
+                if (event.phase == TickEvent.Phase.START && Skytils.config.trackGaiaHits) for (golem in gaiaConstructHits.keys) {
                     if (golem.hurtTime == 10) {
                         gaiaConstructHits[golem] = 0
                     }
                 }
             }
             is PacketEvent.ReceiveEvent -> {
-                if (event.packet is S29PacketSoundEffect) {
+                if (Skytils.config.trackGaiaHits && event.packet is S29PacketSoundEffect) {
                     if (event.packet.volume == 0f) return
                     if (event.packet.volume == 0.8f && event.packet.soundName == "random.anvil_land") {
                         val pos = BlockPos(event.packet.x, event.packet.y, event.packet.z)

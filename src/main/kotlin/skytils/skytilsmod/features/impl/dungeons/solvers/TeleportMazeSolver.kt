@@ -37,10 +37,10 @@ class TeleportMazeSolver {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons) return
-        if (mc.thePlayer == null || mc.theWorld == null) return
+        if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.posY < 68) return
         val groundBlock = BlockPos(mc.thePlayer.posX, 69.0, mc.thePlayer.posZ)
         val state = mc.theWorld.getBlockState(groundBlock)
-        if (state.block === Blocks.stone_slab) {
+        if (state.block == Blocks.stone_slab) {
             if (lastTpPos != null) {
                 var inNewCell = false
                 for (routeTrace in BlockPos.getAllInBox(lastTpPos, groundBlock)) {

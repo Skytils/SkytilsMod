@@ -43,14 +43,7 @@ class SimonSaysSolver {
             if (Skytils.config.simonSaysSolver && DungeonsFeatures.dungeonFloor == "F7" && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L) {
                 if (pos.y in 120..123 && pos.z >= 291 && pos.z <= 294) {
                     if (pos.x == 310) {
-                        println(
-                            String.format(
-                                "Block at %s changed to %s from %s",
-                                pos,
-                                state.block.localizedName,
-                                old.block.localizedName
-                            )
-                        )
+                        println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
                         if (state.block === Blocks.sea_lantern) {
                             if (!clickInOrder.contains(pos)) {
                                 clickInOrder.add(pos)
