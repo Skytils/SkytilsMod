@@ -62,9 +62,11 @@ class WaterBoardSolver {
                         }) {
                         if (chestPos == null || roomFacing == null) {
                             findChest@ for (te in world.loadedTileEntityList) {
-                                if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && player.getDistanceSq(
-                                        te.pos
-                                    ) < 25 * 25
+                                val playerX = mc.thePlayer.posX.toInt()
+                                val playerZ = mc.thePlayer.posZ.toInt()
+                                val xRange = playerX - 25..playerX + 25
+                                val zRange = playerZ - 25..playerZ + 25
+                                if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                                 ) {
                                     val potentialChestPos = te.pos
                                     if (world.getBlockState(potentialChestPos.down()).block === Blocks.stone && world.getBlockState(

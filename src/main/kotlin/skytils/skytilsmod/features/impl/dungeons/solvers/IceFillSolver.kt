@@ -48,9 +48,11 @@ class IceFillSolver {
             if (DungeonListener.missingPuzzles.contains("Ice Fill") && (chestPos == null || roomFacing == null)) {
                 thread(name = "Skytils-Ice-Fill-Detection") {
                     findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                        if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && mc.thePlayer.getDistanceSq(
-                                te.pos
-                            ) < 25 * 25
+                        val playerX = mc.thePlayer.posX.toInt()
+                        val playerZ = mc.thePlayer.posZ.toInt()
+                        val xRange = playerX - 25..playerX + 25
+                        val zRange = playerZ - 25..playerZ + 25
+                        if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                         ) {
                             val pos = te.pos
                             if (world.getBlockState(pos.down()).block == Blocks.stone) {

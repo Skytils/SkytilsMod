@@ -120,7 +120,7 @@ class ThreeWeirdosSolver {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent?) {
+    fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || riddleNPC == null) return
         if (riddleChest == null) {
             val riddleLabel = mc.theWorld.getEntities(

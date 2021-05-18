@@ -61,7 +61,7 @@ class ClickInOrderSolver {
     }
 
     @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent?) {
+    fun onGuiOpen(event: GuiOpenEvent) {
         neededClick = 0
         slotOrder.clear()
     }

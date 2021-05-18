@@ -22,7 +22,10 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -43,7 +46,7 @@ class BlazeSolver {
     private var ticks = 0
 
     @SubscribeEvent
-    fun onTick(event: ClientTickEvent?) {
+    fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
         val world = mc.theWorld
         if (!Utils.inDungeons || world == null || player == null) return
@@ -59,12 +62,14 @@ class BlazeSolver {
                     } else if (blazes.size > 0) {
                         val diffY = 5 * (10 - blazes.size)
                         val blaze = blazes[0]
+                        val blazeX = blaze.posX.toInt()
+                        val blazeZ = blaze.posZ.toInt()
+                        val xRange = blazeX - 13..blazeX + 13
+                        val zRange = blazeZ - 13..blazeZ + 13
                         findChest@ for (te in world.loadedTileEntityList) {
                             val y1 = 70 + diffY
                             val y2 = 69 - diffY
-                            if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && blaze.getDistanceSq(
-                                    te.pos
-                                ) < 13 * 13
+                            if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                             ) {
                                 val pos = te.pos
                                 if (world.getBlockState(te.pos.up()).block == Blocks.iron_bars) {
@@ -102,7 +107,7 @@ class BlazeSolver {
         if (ticks % 4 == 0) {
             if (Skytils.config.blazeSolver) {
                 orderedBlazes.clear()
-                if (DungeonListener.missingPuzzles.contains("Higher or Lower")) {
+                if (DungeonListener.missingPuzzles.contains("Higher Or Lower")) {
                     for (entity in world.getLoadedEntityList()) {
                         if (entity is EntityArmorStand && entity.getName().contains("Blaze") && entity.getName()
                                 .contains("/")

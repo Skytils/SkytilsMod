@@ -360,7 +360,7 @@ class DungeonsFeatures {
                 for (slot in invSlots) {
                     if (slot.inventory == mc.thePlayer.inventory) continue
                     if (!slot.hasStack || slot.stack.item != Items.skull) continue
-                     val item = slot.stack
+                    val item = slot.stack
                     people++
 
                     //slot is 16x16
@@ -475,7 +475,7 @@ class DungeonsFeatures {
     }
 
     @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent?) {
+    fun onGuiOpen(event: GuiOpenEvent) {
         rerollClicks = 0
     }
 
