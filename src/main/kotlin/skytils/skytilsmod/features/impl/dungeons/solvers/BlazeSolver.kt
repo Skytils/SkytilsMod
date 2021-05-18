@@ -116,14 +116,21 @@ class BlazeSolver {
                             val blazes = mc.theWorld.getEntitiesWithinAABB(
                                 EntityBlaze::class.java, aabb
                             )
-                            if (blazes.size == 0) continue
+                            if (blazes.isEmpty()) continue
                             orderedBlazes.add(ShootableBlaze(blazes[0], health))
                         } catch (ex: NumberFormatException) {
                             ex.printStackTrace()
                         }
                     }
                 }
-                orderedBlazes.sortWith(Comparator.comparingInt { blaze: ShootableBlaze -> blaze.health })
+                orderedBlazes.sortWith { blaze1, blaze2 ->
+                    val compare = blaze1.health.compareTo(blaze2.health)
+                    if (compare == 0 && !impossible) {
+                        impossible = true
+                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§c[§f§lWARNING§c]Skytils detected two blazes with the exact same amount of health!"))
+                    }
+                    return@sortWith compare
+                }
             }
         }
         ticks++
@@ -137,7 +144,7 @@ class BlazeSolver {
                 val lowestBlaze = shootableBlaze.blaze
                 RenderUtil.draw3DString(
                     Vec3(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ),
-                    EnumChatFormatting.BOLD.toString() + "Smallest",
+                    "§lSmallest",
                     Color(255, 0, 0, 200),
                     event.partialTicks
                 )
@@ -147,7 +154,7 @@ class BlazeSolver {
                 val highestBlaze = shootableBlaze.blaze
                 RenderUtil.draw3DString(
                     Vec3(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ),
-                    EnumChatFormatting.BOLD.toString() + "Biggest",
+                    "§lBiggest",
                     Color(0, 255, 0, 200),
                     event.partialTicks
                 )
@@ -160,6 +167,7 @@ class BlazeSolver {
         orderedBlazes.clear()
         blazeMode = 0
         blazeChest = null
+        impossible = false
     }
 
     class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
@@ -170,6 +178,7 @@ class BlazeSolver {
         @JvmField
         var blazeMode = 0
         var blazeChest: BlockPos? = null
+        var impossible = false
         private val mc = Minecraft.getMinecraft()
     }
 }
