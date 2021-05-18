@@ -153,14 +153,14 @@ class ChatListener {
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
                 }
-                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
+                tryRemoveLineAtIndex(1)
                 awaitingDelimiter = true
                 event.isCanceled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
+                tryRemoveLineAtIndex(1)
                 event.isCanceled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
@@ -174,12 +174,12 @@ class ChatListener {
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
                 }
-                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
+                tryRemoveLineAtIndex(1)
                 event.isCanceled = true
                 RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
-                (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines.removeAt(1)
+                tryRemoveLineAtIndex(1)
                 event.isCanceled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
@@ -192,6 +192,13 @@ class ChatListener {
             Skytils.config.firstLaunch = false
             Skytils.config.markDirty()
             Skytils.config.writeData()
+        }
+    }
+
+    fun tryRemoveLineAtIndex(index: Int) {
+        val lines = (mc.ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines
+        if (lines.size > index) {
+            lines.removeAt(index)
         }
     }
 
