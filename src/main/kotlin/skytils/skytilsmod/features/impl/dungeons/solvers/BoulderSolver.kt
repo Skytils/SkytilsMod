@@ -21,7 +21,7 @@ import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.*
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.PacketEvent.SendEvent
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -49,7 +49,7 @@ class BoulderSolver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Skytils.config.boulderSolver) return
+        if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
         if (boulderChest == null) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         if (roomVariant >= 0) {
@@ -84,17 +84,6 @@ class BoulderSolver {
     }
 
     @SubscribeEvent
-    fun onSendPacket(event: SendEvent) {
-        if (!Utils.inDungeons) return
-        if (event.packet is C08PacketPlayerBlockPlacement) {
-            val packet = event.packet
-            if (packet.position != null && packet.position == boulderChest) {
-                roomVariant = -2
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load?) {
         reset()
     }
@@ -119,7 +108,7 @@ class BoulderSolver {
         private var ticks = 0
         private var workerThread: Thread? = null
         fun update() {
-            if (!Skytils.config.boulderSolver) return
+            if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (Utils.inDungeons && world != null && player != null && roomVariant != -2 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
@@ -146,23 +135,25 @@ class BoulderSolver {
                     }
                     if (!foundBirch || !foundBarrier) return@Thread
                     if (boulderChest == null || boulderFacing == null) {
-                        for (potentialChestPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 66)) {
-                            if (boulderChest != null && boulderFacing != null) break
-                            if (world.getBlockState(potentialChestPos).block === Blocks.chest) {
-                                if (world.getBlockState(potentialChestPos.down()).block === Blocks.stonebrick && world.getBlockState(
+                        findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                            if (te.pos.y == 66 && te is TileEntityChest && te.numPlayersUsing == 0 && mc.thePlayer.getDistanceSq(
+                                    te.pos
+                                ) < 25 * 25
+                            ) {
+                                val potentialChestPos = te.pos
+                                if (world.getBlockState(potentialChestPos.down()).block == Blocks.stonebrick && world.getBlockState(
                                         potentialChestPos.up(3)
-                                    ).block === Blocks.barrier
+                                    ).block == Blocks.barrier
                                 ) {
                                     boulderChest = potentialChestPos
                                     println("Boulder chest is at $boulderChest")
                                     for (direction in EnumFacing.HORIZONTALS) {
-                                        if (world.getBlockState(potentialChestPos.offset(direction)).block === Blocks.stained_hardened_clay) {
+                                        if (world.getBlockState(potentialChestPos.offset(direction)).block == Blocks.stained_hardened_clay) {
                                             boulderFacing = direction
                                             println("Boulder room is facing $direction")
-                                            break
+                                            break@findChest
                                         }
                                     }
-                                    break
                                 }
                             }
                         }

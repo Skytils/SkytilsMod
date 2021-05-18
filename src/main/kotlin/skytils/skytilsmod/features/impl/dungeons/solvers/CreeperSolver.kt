@@ -35,6 +35,7 @@ import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -59,7 +60,7 @@ class CreeperSolver {
         val world: World? = mc.theWorld
         val player = mc.thePlayer
         if (ticks % 20 == 0) {
-            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null) {
+            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null && DungeonListener.missingPuzzles.contains("Creeper Beams")) {
                 val x = player.posX
                 val y = player.posY
                 val z = player.posZ

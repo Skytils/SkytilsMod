@@ -35,28 +35,31 @@ import skytils.skytilsmod.utils.TabListUtils
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.getText
 import skytils.skytilsmod.utils.stripControlCodes
+import java.util.regex.Pattern
 
 object DungeonListener {
 
     val team = HashSet<DungeonTeammate>()
     val deads = HashSet<DungeonTeammate>()
+    val missingPuzzles = HashSet<String>()
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
         Regex("§r§.(?<name>\\w+?) §r§f\\(§r§d(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)§r§f\\)§r")
+    private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
 
     private var ticks = 0
 
     @SubscribeEvent
     fun onEvent(event: Event) {
         if (!Utils.inDungeons) return
-        if (!Skytils.config.boxedTanks && !Skytils.config.showTankRadius && !Skytils.config.boxedProtectedTeammates && !Skytils.config.dungeonDeathCounter && !Skytils.config.autoRepartyOnDungeonEnd && !Skytils.config.spiritLeapNames) return
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
                     if (event.packet.chatComponent.formattedText.startsWith("§r§aDungeon starts in 1 second.")) {
                         team.clear()
                         deads.clear()
+                        missingPuzzles.clear()
                         TickTask(40) {
                             getMembers()
                         }
@@ -85,8 +88,26 @@ object DungeonListener {
             }
             is TickEvent.ClientTickEvent -> {
                 if (event.phase != TickEvent.Phase.START) return
-                if (ticks % 2 == 0) {
+                if (ticks % 4 == 0) {
+                    val localMissingPuzzles = HashSet<String>()
+                    for (pi in TabListUtils.tabEntries) {
+                        val name = pi.getText()
+                        if (name.contains("✦")) {
+                            val matcher = missingPuzzlePattern.find(name)
+                            if (matcher != null) {
+                                val puzzleName = matcher.groups["puzzle"]!!.value
+                                if (puzzleName != "???") {
+                                    localMissingPuzzles.add(puzzleName)
+                                }
+                                continue
+                            }
+                        }
+                    }
+                    missingPuzzles.clear()
+                    missingPuzzles.addAll(localMissingPuzzles)
                     ticks = 0
+                }
+                if (ticks % 2 == 0) {
                     if (DungeonTimer.scoreShownAt == -1L) {
                         val tabEntries = TabListUtils.tabEntries
                         for (teammate in team) {

@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -44,7 +45,7 @@ class IceFillSolver {
         if (!Skytils.config.iceFillSolver) return
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (chestPos == null || roomFacing == null) {
+            if (DungeonListener.missingPuzzles.contains("Ice Fill") && (chestPos == null || roomFacing == null)) {
                 thread(name = "Skytils-Ice-Fill-Detection") {
                     findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                         if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && mc.thePlayer.getDistanceSq(
@@ -83,7 +84,7 @@ class IceFillSolver {
                     }
                 }
             }
-            if ((solverThread == null || !solverThread!!.isAlive) && chestPos != null) {
+            if (chestPos != null && (solverThread == null || !solverThread!!.isAlive)) {
                 solverThread = Thread({
                     if (three == null) {
                         three = IceFillPuzzle(world, 70)
@@ -213,7 +214,7 @@ class IceFillSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         chestPos = null
         roomFacing = null
         three = null

@@ -34,6 +34,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -52,7 +53,7 @@ class WaterBoardSolver {
         val player = mc.thePlayer
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (variant == -1 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
+            if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
                 workerThread = Thread({
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
