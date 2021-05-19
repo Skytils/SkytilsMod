@@ -52,7 +52,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         name = "Hypixel API Key",
         description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
         category = "General",
-        subcategory = "API"
+        subcategory = "API",
+        protected = true
     )
     var apiKey = ""
 
