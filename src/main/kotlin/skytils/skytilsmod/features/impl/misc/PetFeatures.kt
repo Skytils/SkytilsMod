@@ -59,9 +59,10 @@ class PetFeatures {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityArmorStand) {
             val entity = event.entity
-            if (Skytils.config.hidePetNametags && entity.customNameTag.contains("§8[§7Lv") && entity.customNameTag.contains(
+            val name = entity.customNameTag
+            if (Skytils.config.hidePetNametags && name.startsWith("§8[§7Lv") && name.contains(
                     "'s "
-                )
+                ) && !name.contains("❤") && !name.contains("Hit")
             ) {
                 event.isCanceled = true
             }
