@@ -163,7 +163,7 @@ class FarmingFeatures {
     fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
         if (!Utils.inSkyblock) return
         if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
-            if (Skytils.config.acceptTrapperTask && acceptTrapperCommand.isBlank()) {
+            if (Skytils.config.acceptTrapperTask && acceptTrapperCommand.isNotBlank()) {
                 Skytils.sendMessageQueue.add(acceptTrapperCommand)
                 acceptTrapperCommand = ""
             }
