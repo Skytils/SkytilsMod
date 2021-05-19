@@ -158,39 +158,56 @@ object CataCommand : StatCommand() {
                 ChatComponentText(masterCompletionsHoverString)
             )
 
-            val masterFastestSTimes = masterCataData["fastest_time_s"].asJsonObject
-            val fastestSHoverString1 = buildString {
-                for (i in 1..highestMasterFloor) {
-                    append("§2§l●§a ")
-                    append("Floor $i: ")
-                    append("§e")
-                    append(if (masterFastestSTimes.has(i.toString())) timeFormat(masterFastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
-                    append(if (i < highestMasterFloor) "\n" else "")
-                }
-            }
 
             val masterFastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
-            masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText(fastestSHoverString1)
-            )
 
-            val masterFastestSPlusTimes = masterCataData["fastest_time_s_plus"].asJsonObject
-            val fastestSPlusHoverString1 = buildString {
-                for (i in 1..highestMasterFloor) {
-                    append("§2§l●§a ")
-                    append("Floor $i: ")
-                    append("§e")
-                    append(if (masterFastestSPlusTimes.has(i.toString())) timeFormat(masterFastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
-                    append(if (i < highestMasterFloor) "\n" else "")
+            if (masterCataData.has("fastest_time_s")) {
+                val masterFastestSTimes = masterCataData["fastest_time_s"].asJsonObject
+                val fastestSHoverString1 = buildString {
+                    for (i in 1..highestMasterFloor) {
+                        append("§2§l●§a ")
+                        append("Floor $i: ")
+                        append("§e")
+                        append(if (masterFastestSTimes.has(i.toString())) timeFormat(masterFastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
+                        append(if (i < highestMasterFloor) "\n" else "")
+                    }
                 }
+                masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText(fastestSHoverString1)
+                )
+            } else {
+                masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText("§cNo S Completions")
+                )
             }
 
             val masterFastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
-            masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText(fastestSPlusHoverString1)
-            )
+
+            if (masterCataData.has("fastest_time_s_plus")) {
+                val masterFastestSPlusTimes = masterCataData["fastest_time_s_plus"].asJsonObject
+                val fastestSPlusHoverString1 = buildString {
+                    for (i in 1..highestMasterFloor) {
+                        append("§2§l●§a ")
+                        append("Floor $i: ")
+                        append("§e")
+                        append(if (masterFastestSPlusTimes.has(i.toString())) timeFormat(masterFastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
+                        append(if (i < highestMasterFloor) "\n" else "")
+                    }
+                }
+
+                masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText(fastestSPlusHoverString1)
+                )
+            } else {
+                masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText("§cNo S+ Completions")
+                )
+            }
+
             component
                 .appendText("§a§l➜ Master Mode:\n")
                 .appendSibling(masterCompletions)
