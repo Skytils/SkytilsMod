@@ -264,6 +264,8 @@ class Skytils {
                 cch.commandMap["rp"] = RepartyCommand
             }
         } else throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
+
+        MayorInfo.fetchMayorData()
     }
 
     @SubscribeEvent
