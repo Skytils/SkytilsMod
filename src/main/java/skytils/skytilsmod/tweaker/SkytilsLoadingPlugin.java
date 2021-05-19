@@ -66,6 +66,13 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             e.printStackTrace();
         }
 
+        // This makes the JOptionPane show on taskbar and stay on top
+        JFrame frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.setAlwaysOnTop(true);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
         Icon icon = null;
         try {
             URL url = SkytilsLoadingPlugin.class.getResource("/assets/skytils/sychicpet.gif");
@@ -98,7 +105,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
         Object[] options = new Object[]{discordLink, close};
         JOptionPane.showOptionDialog(
-            null,
+            frame,
             errorMessage,
             "Skytils Error",
             JOptionPane.DEFAULT_OPTION,
