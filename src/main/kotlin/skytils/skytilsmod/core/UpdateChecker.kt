@@ -19,6 +19,7 @@ package skytils.skytilsmod.core
 
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiMainMenu
+import net.minecraft.util.Util
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,6 +32,7 @@ import skytils.skytilsmod.core.UpdateChecker.getJarNameFromUrl
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils
+import java.awt.Desktop
 import java.io.*
 import java.net.URL
 import kotlin.concurrent.thread
@@ -67,6 +69,10 @@ object UpdateChecker {
                     return@Thread
                 }
                 val runtime = Utils.getJavaRuntime()
+                if (Util.getOSType() == Util.EnumOS.OSX) {
+                    println("On Mac, trying to open mods folder")
+                    Desktop.getDesktop().open(oldJar.parentFile)
+                }
                 println("Using runtime $runtime")
                 Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" \"${oldJar.absolutePath}\"")
                 println("Successfully applied Skytils update.")
