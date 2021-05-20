@@ -531,6 +531,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Tic Tac Toe Solver",
+        description = "§b[WIP] §rDisplays the best move on the Tic Tac Toe puzzle.",
+        category = "Dungeons",
+        subcategory = "Solvers"
+    )
+    var ticTacToeSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Trivia Solver",
         description = "Shows the correct answer for the questions on the Trivia puzzle.",
         category = "Dungeons",

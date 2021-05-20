@@ -13,5 +13,6 @@ Software | License
 [Not Enough Updates](https://github.com/Moulberry/NotEnoughUpdates/) | [Creative Commons Public License](https://creativecommons.org/licenses/by-nc/3.0/)
 [Skyblock Addons](https://github.com/BiscuitDevelopment/SkyblockAddons) | [MIT License](https://choosealicense.com/licenses/mit/)
 [SoopyAddons](https://github.com/Soopyboo32/soopyAddons) | Unlicensed
+[Tic-Tac-Toe](https://github.com/LazoCoder/Tic-Tac-Toe) | [GPL 3.0](https://github.com/LazoCoder/Tic-Tac-Toe/blob/master/LICENSE)
 [Vigilance](https://github.com/Sk1erLLC/Vigilance) | [LGPL 3.0](https://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 [Wynntils](https://github.com/Wynntils/Wynntils) | [AGPL 3.0](https://github.com/Wynntils/Wynntils/blob/development/LICENSE)
