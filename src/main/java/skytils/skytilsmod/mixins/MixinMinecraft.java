@@ -106,7 +106,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "run", at = @At("HEAD"))
     private void preRun(CallbackInfo ci) {
-        File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
+/*        File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
         if (!file.exists()) {
             CloseableHttpClient client = APIUtil.INSTANCE.getBuilder().build();
             try {
@@ -129,6 +129,6 @@ public abstract class MixinMinecraft {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
     }
 }
