@@ -208,7 +208,7 @@ class BossHPDisplays {
 
         companion object {
             private val GIANT_NAMES =
-                arrayOf("§3§lThe Diamond Giant", "§c§lBigfoot", "§4§lL.A.S.R.", "§d§lJolly Pink Giant")
+                arrayOf("§3§lThe Diamond Giant", "§c§lBigfoot", "§4§lL.A.S.R.", "§d§lJolly Pink Giant", "§d§lMutant Giant")
         }
 
         init {
