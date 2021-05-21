@@ -92,7 +92,7 @@ class DungeonTimer {
             }
             return
         }
-        if (message.startsWith("§r§4[BOSS] Necron") && DungeonsFeatures.dungeonFloor == "F7") {
+        if (message.startsWith("§r§4[BOSS] Necron") && DungeonFeatures.dungeonFloor == "F7") {
             if (message.endsWith("§r§cFINE! LET'S MOVE TO SOMEWHERE ELSE!!§r") && phase1ClearTime == -1L) {
                 phase1ClearTime = System.currentTimeMillis()
                 if (Skytils.config.necronPhaseTimer) mc.thePlayer.addChatMessage(
@@ -229,7 +229,7 @@ class DungeonTimer {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
-            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonsFeatures.dungeonFloor == "F7") {
+            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonFeatures.dungeonFloor == "F7") {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = """

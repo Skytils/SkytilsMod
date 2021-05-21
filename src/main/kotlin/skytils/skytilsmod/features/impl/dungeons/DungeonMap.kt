@@ -46,7 +46,7 @@ class DungeonMap {
 
         override fun render() {
             if (!toggled || SBInfo.mode != SBInfo.SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
-            if (DungeonsFeatures.hasBossSpawned) return
+            if (DungeonFeatures.hasBossSpawned) return
             readMapData()
             if (mapData == null) return
             GlStateManager.color(1f, 1f, 1f, 1f)

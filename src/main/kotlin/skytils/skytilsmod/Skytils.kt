@@ -189,7 +189,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(CommandAliases())
         MinecraftForge.EVENT_BUS.register(DamageSplash())
         MinecraftForge.EVENT_BUS.register(DarkModeMist())
-        MinecraftForge.EVENT_BUS.register(DungeonsFeatures())
+        MinecraftForge.EVENT_BUS.register(DungeonFeatures())
         MinecraftForge.EVENT_BUS.register(DungeonMap())
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())

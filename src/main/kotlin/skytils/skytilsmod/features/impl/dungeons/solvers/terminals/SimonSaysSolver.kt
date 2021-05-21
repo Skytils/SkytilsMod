@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.BlockChangeEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -40,7 +40,7 @@ class SimonSaysSolver {
         val old = event.old
         val state = event.update
         if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver && DungeonsFeatures.dungeonFloor == "F7" && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L) {
+            if (Skytils.config.simonSaysSolver && DungeonFeatures.dungeonFloor == "F7" && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L) {
                 if (pos.y in 120..123 && pos.z >= 291 && pos.z <= 294) {
                     if (pos.x == 310) {
                         println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")

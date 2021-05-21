@@ -71,7 +71,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 import java.util.regex.Pattern
 
-class DungeonsFeatures {
+class DungeonFeatures {
     companion object {
         private val mc = Minecraft.getMinecraft()
         private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")

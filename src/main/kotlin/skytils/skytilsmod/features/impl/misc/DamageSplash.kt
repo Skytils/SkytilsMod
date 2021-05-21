@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.EntityManager.spawnEntity
 import skytils.skytilsmod.core.EntityManager.tickEntities
-import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location
 import skytils.skytilsmod.utils.stripControlCodes
@@ -57,7 +57,7 @@ class DamageSplash {
         if (damageMatcher.matches()) {
             e.isCanceled = true
             e.entity.worldObj.removeEntity(e.entity)
-            if (Skytils.config.hideDamageInBoss && DungeonsFeatures.hasBossSpawned) return
+            if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
             val name = entity.customNameTag
             val damage =
                 if (name.startsWith("§0"))

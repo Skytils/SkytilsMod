@@ -34,7 +34,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -115,7 +115,7 @@ class CreeperSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonsFeatures.hasBossSpawned && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
+        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonFeatures.hasBossSpawned && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
                 "Creeper Beams"
             )
         ) {

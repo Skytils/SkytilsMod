@@ -262,6 +262,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Hide Dying Giants",
+        description = "Removes dead/dying giants from your screen.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var hideDyingGiants = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Hide Floor 4 Crowd Messages",
         description = "Hides the messages from the Crowd on Floor 4.",
         category = "Dungeons",
@@ -359,6 +368,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Quality of Life"
     )
     var showGiantHP = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Show Giant HP at Feet",
+        description = "Shows the HP of giants' at the giant's feet.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var showGiantHPAtFeet = false
 
     @Property(
         type = PropertyType.SWITCH,

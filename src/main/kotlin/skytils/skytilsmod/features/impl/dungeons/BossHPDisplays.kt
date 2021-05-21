@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -31,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
@@ -59,20 +61,29 @@ class BossHPDisplays {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         canGiantsSpawn = false
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!Utils.inSkyblock) return
+        if (event.entity is EntityGiantZombie && event.entity.health <= 0) {
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent
     fun onRenderSpecialPost(event: RenderLivingEvent.Specials.Post<*>) {
         if (!Utils.inDungeons) return
-        if (canGiantsSpawn && Skytils.config.showGiantHP && event.entity is EntityArmorStand) {
+        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet && event.entity is EntityArmorStand) {
             val name = event.entity.displayName.formattedText
-            if (name.contains("❤") && (name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && DungeonsFeatures.dungeonFloor == "F7") || GiantHPElement.GIANT_NAMES.any {
+            if (name.contains("❤") && (name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && DungeonFeatures.dungeonFloor == "F7") || GiantHPElement.GIANT_NAMES.any {
                     name.contains(
                         it
                     )
                 })) {
+                GlStateManager.disableCull()
                 GlStateManager.disableDepth()
                 RenderUtil.draw3DString(
                     event.entity.positionVector.addVector(0.0, -10.0, 0.0),
@@ -81,6 +92,7 @@ class BossHPDisplays {
                     RenderUtil.getPartialTicks()
                 )
                 GlStateManager.enableDepth()
+                GlStateManager.enableCull()
             }
         }
     }
@@ -100,8 +112,8 @@ class BossHPDisplays {
         private val timerRegex = Pattern.compile("§c ☠ §7 (.+?) §c ☠ §7")
 
         override fun render() {
-            if (toggled && DungeonsFeatures.hasBossSpawned && Utils.equalsOneOf(
-                    DungeonsFeatures.dungeonFloor,
+            if (toggled && DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
                     "M3",
                     "F3"
                 ) && mc.theWorld != null
@@ -183,14 +195,18 @@ class BossHPDisplays {
                         if (name.contains("❤")) {
                             if (name.contains("§e﴾ §c§lSadan§r")) {
                                 return@Predicate true
-                            } else if (name.contains("Giant") && DungeonsFeatures.dungeonFloor == "F7") return@Predicate true
+                            } else if (name.contains("Giant") && DungeonFeatures.dungeonFloor == "F7") return@Predicate true
                             for (giant in GIANT_NAMES) {
                                 if (name.contains(giant)) return@Predicate true
                             }
                         }
                         false
                     })
-                giantNames.removeIf { entity: EntityArmorStand -> entity.displayName.formattedText.contains("Sadan") && giantNames.size > 1 }
+                giantNames.removeIf { entity: EntityArmorStand ->
+                    DungeonFeatures.dungeonFloor == "F6" && entity.displayName.formattedText.contains(
+                        "Sadan"
+                    ) && giantNames.size > 1
+                }
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 for (i in giantNames.indices) {

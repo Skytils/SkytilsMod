@@ -84,7 +84,7 @@ class ScoreCalculation {
         if (event.phase != TickEvent.Phase.START) return
         if (ticks % 30 == 0) {
             if (Utils.inDungeons && mc.thePlayer != null && mc.theWorld != null) {
-                if (!DungeonsFeatures.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
+                if (!DungeonFeatures.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
                     ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
                 }
             }
@@ -282,7 +282,7 @@ class ScoreCalculation {
                 val speedScore: Double
                 val bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
                 val countedSeconds =
-                    if (DungeonsFeatures.dungeonFloor == "F2") 0.0.coerceAtLeast(secondsElapsed - 120) else secondsElapsed
+                    if (DungeonFeatures.dungeonFloor == "F2") 0.0.coerceAtLeast(secondsElapsed - 120) else secondsElapsed
                 speedScore = if (countedSeconds <= 1320) {
                     100.0
                 } else if (1320 < countedSeconds && countedSeconds <= 1420) {
@@ -298,7 +298,7 @@ class ScoreCalculation {
                 text.add("§6Secrets Found:§a $foundSecrets")
                 if (totalSecrets != 0) text.add("§6Estimated Secret Count:§a $totalSecrets")
                 text.add("§6Crypts:§a $crypts")
-                if (Utils.equalsOneOf(DungeonsFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
+                if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
                     text.add("§6Mimic Killed:" + if (mimicKilled) "§a ✓" else " §c X")
                 }
                 if (isPaul) {
