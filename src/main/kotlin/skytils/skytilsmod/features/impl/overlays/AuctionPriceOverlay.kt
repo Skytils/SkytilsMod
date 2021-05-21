@@ -341,7 +341,13 @@ class AuctionPriceOverlay {
             return if (multiplier == 1L) {
                 null
             } else {
-                val valueMultiplier = values[0].toDouble()
+                val valueMultiplier: Double = try {
+                    values[0].toDouble()
+                } catch (ex: ArrayIndexOutOfBoundsException) {
+                    0.0
+                } catch (ex: NumberFormatException) {
+                    0.0
+                }
                 val valueAdder: Double = try {
                     values[1].toDouble()
                 } catch (ex: ArrayIndexOutOfBoundsException) {

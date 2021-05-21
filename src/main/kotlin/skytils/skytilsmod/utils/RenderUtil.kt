@@ -320,7 +320,7 @@ object RenderUtil {
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
      * @author bowser0000
      */
-    fun draw3DString(pos: Vec3, text: String?, color: Color, partialTicks: Float) {
+    fun draw3DString(pos: Vec3, text: String, color: Color, partialTicks: Float) {
         val mc = Minecraft.getMinecraft()
         val player: EntityPlayer = mc.thePlayer
         val x =

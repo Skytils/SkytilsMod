@@ -20,21 +20,25 @@ package skytils.skytilsmod.features.impl.dungeons
 import com.google.common.base.Predicate
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.awt.Color
 import java.util.regex.Pattern
 
 class BossHPDisplays {
@@ -57,6 +61,28 @@ class BossHPDisplays {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load?) {
         canGiantsSpawn = false
+    }
+
+    @SubscribeEvent
+    fun onRenderSpecialPost(event: RenderLivingEvent.Specials.Post<*>) {
+        if (!Utils.inDungeons) return
+        if (canGiantsSpawn && Skytils.config.showGiantHP && event.entity is EntityArmorStand) {
+            val name = event.entity.displayName.formattedText
+            if (name.contains("❤") && (name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && DungeonsFeatures.dungeonFloor == "F7") || GiantHPElement.GIANT_NAMES.any {
+                    name.contains(
+                        it
+                    )
+                })) {
+                GlStateManager.disableDepth()
+                RenderUtil.draw3DString(
+                    event.entity.positionVector.addVector(0.0, -10.0, 0.0),
+                    name,
+                    Color.WHITE,
+                    RenderUtil.getPartialTicks()
+                )
+                GlStateManager.enableDepth()
+            }
+        }
     }
 
     companion object {
@@ -207,8 +233,14 @@ class BossHPDisplays {
             get() = Skytils.config.showGiantHP
 
         companion object {
-            private val GIANT_NAMES =
-                arrayOf("§3§lThe Diamond Giant", "§c§lBigfoot", "§4§lL.A.S.R.", "§d§lJolly Pink Giant", "§d§lMutant Giant")
+            val GIANT_NAMES =
+                arrayOf(
+                    "§3§lThe Diamond Giant",
+                    "§c§lBigfoot",
+                    "§4§lL.A.S.R.",
+                    "§d§lJolly Pink Giant",
+                    "§d§lMutant Giant"
+                )
         }
 
         init {
