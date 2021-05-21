@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.listeners
 
+import io.netty.util.internal.ConcurrentSet
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ChatComponentText
@@ -39,9 +40,9 @@ import java.util.regex.Pattern
 
 object DungeonListener {
 
-    val team = HashSet<DungeonTeammate>()
-    val deads = HashSet<DungeonTeammate>()
-    val missingPuzzles = HashSet<String>()
+    val team = ConcurrentSet<DungeonTeammate>()
+    val deads = ConcurrentSet<DungeonTeammate>()
+    val missingPuzzles = ConcurrentSet<String>()
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
@@ -56,7 +57,7 @@ object DungeonListener {
         when (event) {
             is PacketEvent.ReceiveEvent -> {
                 if (event.packet is S02PacketChat) {
-                    if (event.packet.chatComponent.formattedText.startsWith("§r§aDungeon starts in 1 second.")) {
+                    if (event.packet.chatComponent.unformattedText.startsWith("Dungeon starts in 1 second.")) {
                         team.clear()
                         deads.clear()
                         missingPuzzles.clear()
@@ -150,7 +151,7 @@ object DungeonListener {
         }
 
         val partyCount = partyCountPattern.find(tabEntries[0].getText())?.groupValues?.get(1)?.toInt()
-
+        println("There are $partyCount members in this party")
         for (i in 0 until partyCount!!) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].getText()
