@@ -60,7 +60,10 @@ class CreeperSolver {
         val world: World? = mc.theWorld
         val player = mc.thePlayer
         if (ticks % 20 == 0) {
-            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null && DungeonListener.missingPuzzles.contains("Creeper Beams")) {
+            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null && DungeonListener.missingPuzzles.contains(
+                    "Creeper Beams"
+                )
+            ) {
                 val x = player.posX
                 val y = player.posY
                 val z = player.posZ
@@ -112,7 +115,10 @@ class CreeperSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonsFeatures.hasBossSpawned && !creeper!!.isDead) {
+        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonsFeatures.hasBossSpawned && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
+                "Creeper Beams"
+            )
+        ) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
             GlStateManager.disableCull()
             val blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND)
