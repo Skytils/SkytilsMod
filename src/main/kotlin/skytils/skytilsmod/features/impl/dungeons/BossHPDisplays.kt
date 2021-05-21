@@ -25,6 +25,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -64,25 +65,34 @@ class BossHPDisplays {
     }
 
     @SubscribeEvent
-    fun onRenderSpecialPost(event: RenderLivingEvent.Specials.Post<*>) {
+    fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons) return
-        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet && event.entity is EntityArmorStand) {
-            val name = event.entity.displayName.formattedText
-            if (name.contains("❤") && (name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && DungeonFeatures.dungeonFloor == "F7") || GiantHPElement.GIANT_NAMES.any {
-                    name.contains(
-                        it
+        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet) {
+            val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
+            for (entity in mc.theWorld.loadedEntityList) {
+                if (entity !is EntityArmorStand) continue
+                val name = entity.displayName.formattedText
+                if (name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
+                        DungeonFeatures.dungeonFloor,
+                        "F7",
+                        "M6"
+                    )) || GiantHPElement.GIANT_NAMES.any {
+                        name.contains(
+                            it
+                        )
+                    })
+                ) {
+                    GlStateManager.disableCull()
+                    GlStateManager.disableDepth()
+                    RenderUtil.draw3DString(
+                        entity.positionVector.addVector(0.0, -10.0, 0.0),
+                        name,
+                        Color.WHITE,
+                        event.partialTicks
                     )
-                })) {
-                GlStateManager.disableCull()
-                GlStateManager.disableDepth()
-                RenderUtil.draw3DString(
-                    event.entity.positionVector.addVector(0.0, -10.0, 0.0),
-                    name,
-                    Color.WHITE,
-                    RenderUtil.getPartialTicks()
-                )
-                GlStateManager.enableDepth()
-                GlStateManager.enableCull()
+                    GlStateManager.enableDepth()
+                    GlStateManager.enableCull()
+                }
             }
         }
     }
@@ -185,7 +195,12 @@ class BossHPDisplays {
                         if (name.contains("❤")) {
                             if (name.contains("§e﴾ §c§lSadan§r")) {
                                 return@Predicate true
-                            } else if (name.contains("Giant") && DungeonFeatures.dungeonFloor == "F7") return@Predicate true
+                            } else if (name.contains("Giant") && Utils.equalsOneOf(
+                                    DungeonFeatures.dungeonFloor,
+                                    "F7",
+                                    "M6"
+                                )
+                            ) return@Predicate true
                             for (giant in GIANT_NAMES) {
                                 if (name.contains(giant)) return@Predicate true
                             }
