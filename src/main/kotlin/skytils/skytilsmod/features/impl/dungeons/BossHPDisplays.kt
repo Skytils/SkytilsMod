@@ -22,7 +22,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -32,14 +31,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -63,14 +61,6 @@ class BossHPDisplays {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         canGiantsSpawn = false
-    }
-
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!Utils.inSkyblock) return
-        if (event.entity is EntityGiantZombie && event.entity.health <= 0) {
-            event.isCanceled = true
-        }
     }
 
     @SubscribeEvent

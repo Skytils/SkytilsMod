@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
@@ -91,7 +92,9 @@ class MiscFeatures {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
-        if (event.entity is EntityCreeper) {
+        if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
+            event.isCanceled = true
+        } else if (event.entity is EntityCreeper) {
             val entity = event.entity
             if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.maxHealth == 20f && entity.health == 20f && entity.powered) {
                 if (mc.theWorld.playerEntities.any { p: EntityPlayer ->
@@ -103,14 +106,12 @@ class MiscFeatures {
                     event.isCanceled = true
                 }
             }
-        }
-        if (event.entity is EntityFallingBlock) {
+        } else if (event.entity is EntityFallingBlock) {
             val entity = event.entity
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.block.block === Blocks.gold_block) {
                 event.isCanceled = true
             }
-        }
-        if (event.entity is EntityItem) {
+        } else if (event.entity is EntityItem) {
             val entity = event.entity
             if (Skytils.config.hideJerryRune) {
                 val item = entity.entityItem
@@ -118,8 +119,7 @@ class MiscFeatures {
                     event.isCanceled = true
                 }
             }
-        }
-        if (event.entity is EntityLightningBolt) {
+        } else if (event.entity is EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
                 event.isCanceled = true
             }
