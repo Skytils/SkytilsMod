@@ -84,6 +84,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.awt.Desktop
 import java.io.File
 import java.net.URL
+import java.util.concurrent.Executors
 
 
 @Mod(
@@ -133,6 +134,9 @@ class Skytils {
 
         @JvmField
         var displayScreen: GuiScreen? = null
+
+        @JvmField
+        val threadPool = Executors.newFixedThreadPool(10)
     }
 
 

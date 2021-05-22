@@ -17,6 +17,8 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -54,6 +56,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
@@ -107,7 +110,7 @@ class DungeonFeatures {
         private var rerollClicks = 0
         private var foundLivid = false
         private var livid: Entity? = null
-        private var blockLividThread: Thread? = Thread()
+        private var active = false
 
         init {
             LividGuiElement()
@@ -160,8 +163,9 @@ class DungeonFeatures {
                             }
                         }
                         0 -> {
-                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && blockLividThread?.isAlive != true) {
-                                blockLividThread = Thread({
+                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && !active) {
+                                active = true
+                                Skytils.threadPool.submit {
                                     while (mc.thePlayer.isPotionActive(Potion.blindness)) {
                                         Thread.sleep(10)
                                     }
@@ -171,10 +175,11 @@ class DungeonFeatures {
                                         if (entity.name.startsWith("$a﴾ $a§lLivid")) {
                                             livid = entity
                                             foundLivid = true
+                                            break
                                         }
                                     }
-                                }, "Skytils-Block-Livid-Finder")
-                                blockLividThread!!.start()
+                                    active = false
+                                }
                             }
                         }
                     }

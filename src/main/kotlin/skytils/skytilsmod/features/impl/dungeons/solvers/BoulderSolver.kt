@@ -106,13 +106,14 @@ class BoulderSolver {
         var variantSteps = ArrayList<ArrayList<BoulderPush>>()
         var expectedBoulders = ArrayList<ArrayList<BoulderState>>()
         private var ticks = 0
-        private var workerThread: Thread? = null
+        private var active = false
         fun update() {
             if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
             val player = mc.thePlayer
             val world: World? = mc.theWorld
-            if (Utils.inDungeons && world != null && player != null && roomVariant != -2 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
-                workerThread = Thread({
+            if (!active && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
+                active = true
+                Skytils.threadPool.submit {
                     var foundBirch = false
                     var foundBarrier = false
                     for (potentialBarrier in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 68)) {
@@ -133,7 +134,7 @@ class BoulderSolver {
                             }
                         }
                     }
-                    if (!foundBirch || !foundBarrier) return@Thread
+                    if (!foundBirch || !foundBarrier) return@submit
                     if (boulderChest == null || boulderFacing == null) {
                         findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                             val playerX = mc.thePlayer.posX.toInt()
@@ -204,8 +205,8 @@ class BoulderSolver {
                             }
                         }
                     }
-                }, "Skytils-Boulder-Puzzle")
-                workerThread!!.start()
+                    active = false
+                }
             }
         }
 
@@ -214,7 +215,6 @@ class BoulderSolver {
             boulderFacing = null
             grid = Array(7) { arrayOfNulls(6) }
             roomVariant = -1
-            workerThread = null
         }
     }
 

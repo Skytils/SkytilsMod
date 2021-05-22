@@ -53,8 +53,9 @@ class WaterBoardSolver {
         val player = mc.thePlayer
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
-                workerThread = Thread({
+            if (!active && DungeonListener.missingPuzzles.contains("Water Board") && variant == -1) {
+                active = true
+                Skytils.threadPool.submit {
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
                     if (Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54).any {
@@ -91,7 +92,10 @@ class WaterBoardSolver {
                                 }
                             }
                         }
-                        if (chestPos == null) return@Thread
+                        if (chestPos == null) {
+                            active = false
+                            return@submit
+                        }
                         for (blockPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 82)) {
                             if (world.getBlockState(blockPos).block === Blocks.piston_head) {
                                 inWaterRoom = true
@@ -220,8 +224,8 @@ class WaterBoardSolver {
                         variant = -1
                         solutions.clear()
                     }
-                }, "Skytils-Water-Board-Puzzle")
-                workerThread!!.start()
+                    active = false
+                }
             }
             ticks = 0
         }
@@ -326,7 +330,7 @@ class WaterBoardSolver {
         private var prevInWaterRoom = false
         private var inWaterRoom = false
         private var variant = -1
-        private var workerThread: Thread? = null
         private var ticks = 0
+        private var active = false
     }
 }

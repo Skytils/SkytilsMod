@@ -69,7 +69,7 @@ object SkytilsCommand : CommandBase() {
                     player.addChatMessage(ChatComponentText("§c§l[ERROR] §8» §cPlease provide your Hypixel API key!"))
                     return
                 }
-                Thread {
+                Skytils.threadPool.submit {
                     val apiKey = args[1]
                     if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=$apiKey").get("success")
                             .asBoolean
@@ -80,7 +80,7 @@ object SkytilsCommand : CommandBase() {
                     } else {
                         player.addChatMessage(ChatComponentText("§c§l[ERROR] §8» §cThe Hypixel API key you provided was §finvalid§c."))
                     }
-                }.start()
+                }
             }
             "config" -> Skytils.displayScreen = Skytils.config.gui()
             "fetchur" -> player.addChatMessage(

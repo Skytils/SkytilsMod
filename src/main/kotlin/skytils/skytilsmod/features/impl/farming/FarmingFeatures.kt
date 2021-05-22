@@ -35,10 +35,11 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 
 class FarmingFeatures {
     private var lastNotifyBreakTime: Long = 0
@@ -101,12 +102,7 @@ class FarmingFeatures {
             val solution = hungerHikerItems.getOrDefault(hungerHikerItems.keys.find { s: String ->
                 unformatted.contains(s)
             }, null)
-            Thread {
-                try {
-                    Thread.sleep(200)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
+            TickTask(4) {
                 if (solution != null) {
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "The Hiker needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"))
                 } else {
@@ -122,7 +118,7 @@ class FarmingFeatures {
                         )
                     }
                 }
-            }.start()
+            }
         }
     }
 

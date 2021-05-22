@@ -53,7 +53,7 @@ class BlazeSolver {
         if (ticks % 20 == 0) {
             ticks = 0
             if (blazeMode == 0 && orderedBlazes.size > 0) {
-                Thread({
+                Skytils.threadPool.submit {
                     val blazes = world.getEntities(
                         EntityBlaze::class.java
                     ) { blaze: EntityBlaze? -> player.getDistanceToEntity(blaze) < 100 }
@@ -101,7 +101,7 @@ class BlazeSolver {
                             }
                         }
                     }
-                }, "Skytils-Blaze-Orientation").start()
+                }
             }
         }
         if (ticks % 4 == 0) {

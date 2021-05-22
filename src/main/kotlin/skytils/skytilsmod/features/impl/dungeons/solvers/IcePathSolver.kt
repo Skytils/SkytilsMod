@@ -38,7 +38,6 @@ import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.awt.Point
 import java.util.*
-import kotlin.concurrent.thread
 
 class IcePathSolver {
     private var ticks = 0
@@ -55,7 +54,7 @@ class IcePathSolver {
                 if (silverfish.size > 0) {
                     Companion.silverfish = silverfish[0]
                     if (silverfishChestPos == null || roomFacing == null) {
-                        thread(name = "Skytils-Ice-Path-Detection") {
+                        Skytils.threadPool.submit {
                             findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                                 val playerX = mc.thePlayer.posX.toInt()
                                 val playerZ = mc.thePlayer.posZ.toInt()

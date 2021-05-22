@@ -46,24 +46,24 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
             printMessage("§cYou must have an API key set to use this command!")
             return
         }
-        Thread {
+        Skytils.threadPool.submit {
             val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
             printMessage("§aGetting data for ${username}...")
             val uuid =
                 if (args.isEmpty()) mc.thePlayer.uniqueID.toString().replace("-", "") else APIUtil.getUUID(username)
-            if (uuid.isNullOrEmpty()) return@Thread
+            if (uuid.isNullOrEmpty()) return@submit
             if (needProfile) {
-                val latestProfile: String = APIUtil.getLatestProfileID(uuid, key) ?: return@Thread
+                val latestProfile: String = APIUtil.getLatestProfileID(uuid, key) ?: return@submit
 
                 val profileResponse: JsonObject =
                     APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
                 if (!profileResponse["success"].asBoolean) {
                     printMessage("§cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
-                    return@Thread
+                    return@submit
                 }
                 displayStats(username, uuid, profileResponse)
             } else displayStats(username, uuid)
-        }.start()
+        }
     }
 
     protected fun printMessage(component: IChatComponent) {

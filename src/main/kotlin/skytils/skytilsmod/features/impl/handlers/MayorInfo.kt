@@ -36,7 +36,6 @@ import java.io.IOException
 import java.net.URLEncoder
 import java.time.ZonedDateTime
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -196,7 +195,7 @@ object MayorInfo {
     }
 
     fun fetchMayorData() {
-        thread(name = "Skytils-FetchMayor") {
+        Skytils.threadPool.submit {
             val res = APIUtil.getJSONResponse(baseURL)
             if (res.has("name") && res.has("perks")) {
                 if (res["name"].asString == currentMayor) isLocal = false
@@ -216,7 +215,7 @@ object MayorInfo {
     fun sendMayorData(mayor: String?, perks: HashSet<String>) {
         if (mayor == null || perks.size == 0) return
         if (lastSentData - System.currentTimeMillis() < 300000) lastSentData = System.currentTimeMillis()
-        thread(name = "Skytils-SendMayor") {
+        Skytils.threadPool.submit {
             try {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
                 val url =
@@ -243,7 +242,7 @@ object MayorInfo {
     }
 
     fun fetchJerryData() {
-        thread(name = "Skytils-FetchJerry") {
+        Skytils.threadPool.submit {
             val res = APIUtil.getJSONResponse("$baseURL/jerry")
             if (res.has("nextSwitch") && res.has("mayor") && res.has("perks")) {
                 TickTask(1) {
@@ -256,7 +255,7 @@ object MayorInfo {
 
     fun sendJerryData(mayor: Mayor?, nextSwitch: Long) {
         if (nextSwitch <= 0 || mayor == null) return
-        thread(name = "Skytils-SendJerry") {
+        Skytils.threadPool.submit {
             try {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
                 val url =

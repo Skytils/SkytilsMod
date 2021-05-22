@@ -40,6 +40,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
@@ -134,12 +135,7 @@ class MiningFeatures {
                     s
                 )
             }, null)
-            Thread {
-                try {
-                    Thread.sleep(2500)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
+            TickTask(50) {
                 if (solution != null) {
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Fetchur needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"))
                 } else {
@@ -155,7 +151,7 @@ class MiningFeatures {
                         )
                     }
                 }
-            }.start()
+            }
         }
     }
 

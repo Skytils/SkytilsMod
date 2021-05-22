@@ -57,27 +57,27 @@ class GriffinBurrows {
         var shouldRefreshBurrows = false
         private val mc = Minecraft.getMinecraft()
         fun refreshBurrows() {
-            Thread {
+            Skytils.threadPool.submit {
                 println("Finding burrows")
                 val uuid = mc.thePlayer.gameProfile.id.toString().replace("[\\-]".toRegex(), "")
                 val apiKey = Skytils.config.apiKey
                 if (apiKey.isEmpty()) {
                     mc.thePlayer.addChatMessage(ChatComponentText("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>"))
                     Skytils.config.showGriffinBurrows = false
-                    return@Thread
+                    return@submit
                 }
-                val latestProfile = APIUtil.getLatestProfileID(uuid, apiKey) ?: return@Thread
+                val latestProfile = APIUtil.getLatestProfileID(uuid, apiKey) ?: return@submit
                 val profileResponse =
                     APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$apiKey")
                 if (!profileResponse["success"].asBoolean) {
                     val reason = profileResponse["cause"].asString
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed getting burrows with reason: " + reason))
-                    return@Thread
+                    return@submit
                 }
                 val playerObject = profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid].asJsonObject
                 if (!playerObject.has("griffin")) {
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed getting burrows with reason: No griffin object."))
-                    return@Thread
+                    return@submit
                 }
                 val burrowArray = playerObject["griffin"].asJsonObject["burrows"].asJsonArray
                 val receivedBurrows = ArrayList<Burrow>()
@@ -109,7 +109,7 @@ class GriffinBurrows {
                         ChatComponentText("§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs.")
                     )
                 } else mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size + EnumChatFormatting.GREEN + " burrows!"))
-            }.start()
+            }
         }
 
         init {

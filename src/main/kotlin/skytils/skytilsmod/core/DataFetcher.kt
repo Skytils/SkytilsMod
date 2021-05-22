@@ -37,7 +37,7 @@ import kotlin.concurrent.fixedRateTimer
 object DataFetcher {
     private fun loadData() {
         val dataUrl: String = Skytils.config.dataURL
-        Thread {
+        Skytils.threadPool.submit {
             val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
             for ((key, value) in fetchurData.entrySet()) {
                 MiningFeatures.fetchurItems[key] = value.asString
@@ -92,7 +92,7 @@ object DataFetcher {
             for ((key, value) in APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").entrySet()) {
                 ItemFeatures.sellPrices[key] = value.asDouble
             }
-        }.start()
+        }
     }
 
     private fun clearData() {

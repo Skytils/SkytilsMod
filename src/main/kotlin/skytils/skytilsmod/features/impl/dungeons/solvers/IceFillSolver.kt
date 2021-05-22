@@ -36,7 +36,6 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import kotlin.concurrent.thread
 
 class IceFillSolver {
     @SubscribeEvent
@@ -46,7 +45,7 @@ class IceFillSolver {
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
             if (DungeonListener.missingPuzzles.contains("Ice Fill") && (chestPos == null || roomFacing == null)) {
-                thread(name = "Skytils-Ice-Fill-Detection") {
+                Skytils.threadPool.submit {
                     findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                         val playerX = mc.thePlayer.posX.toInt()
                         val playerZ = mc.thePlayer.posZ.toInt()
@@ -86,8 +85,9 @@ class IceFillSolver {
                     }
                 }
             }
-            if (chestPos != null && (solverThread == null || !solverThread!!.isAlive)) {
-                solverThread = Thread({
+            if (chestPos != null && !solverActive) {
+                solverActive = true
+                Skytils.threadPool.submit {
                     if (three == null) {
                         three = IceFillPuzzle(world, 70)
                     }
@@ -106,8 +106,7 @@ class IceFillSolver {
                     if (seven!!.paths.size == 0) {
                         seven!!.genPaths(world)
                     }
-                }, "Skytils-Ice-Fill-Solution")
-                solverThread!!.start()
+                }
             }
             ticks = 0
         }
@@ -356,6 +355,6 @@ class IceFillSolver {
         private var three: IceFillPuzzle? = null
         private var five: IceFillPuzzle? = null
         private var seven: IceFillPuzzle? = null
-        private var solverThread: Thread? = null
+        private var solverActive = false
     }
 }
