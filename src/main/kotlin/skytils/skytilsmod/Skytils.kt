@@ -18,7 +18,7 @@
 
 package skytils.skytilsmod
 
-import gg.essential.vigilance.gui.SettingsGui
+import club.sk1er.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder

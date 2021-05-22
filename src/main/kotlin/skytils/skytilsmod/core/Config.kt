@@ -17,11 +17,11 @@
 */
 package skytils.skytilsmod.core
 
-import gg.essential.vigilance.Vigilant
-import gg.essential.vigilance.data.Category
-import gg.essential.vigilance.data.Property
-import gg.essential.vigilance.data.PropertyType
-import gg.essential.vigilance.data.SortingBehavior
+import club.sk1er.vigilance.Vigilant
+import club.sk1er.vigilance.data.Category
+import club.sk1er.vigilance.data.Property
+import club.sk1er.vigilance.data.PropertyType
+import club.sk1er.vigilance.data.SortingBehavior
 import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 import java.io.File
