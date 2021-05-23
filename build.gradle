@@ -71,7 +71,7 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("club.sk1er:Vigilance:105-10809-SNAPSHOT") {
+    implementation("gg.essential:Vigilance:108-10809-SNAPSHOT") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
@@ -101,7 +101,7 @@ shadowJar {
     archiveFileName = jar.archiveFileName
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    relocate("club.sk1er", "skytils.sk1er")
+    relocate("gg.essential", "skytils.essentialgg")
     relocate("kotlinx.coroutines", "skytils.kotlinx.coroutines")
 
     exclude "LICENSE.txt"
@@ -116,13 +116,13 @@ shadowJar {
     exclude "com/jcraft/**"
     exclude "org/lwjgl/**"
     exclude "net/java/**"
-    exclude "club/sk1er/vigilance/example"
 
     exclude "META-INF/proguard/**"
     exclude "META-INF/maven/**"
     exclude "META-INF/versions/**"
     exclude "META-INF/com.android.tools/**"
 
+    exclude "fabric.mod.json"
 }
 
 processResources {

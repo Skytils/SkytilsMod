@@ -17,7 +17,7 @@
  */
 package skytils.skytilsmod.gui
 
-import club.sk1er.vigilance.VigilanceConfig
+import gg.essential.vigilance.VigilanceConfig
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
