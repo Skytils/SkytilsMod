@@ -31,7 +31,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors
 class RainTimer {
     class RainTimerGuiElement : GuiElement(name = "Rain Timer", fp = FloatPair(10, 10)) {
         override fun render() {
-            if (Utils.inSkyblock && toggled) {
+            if (Utils.inSkyblock && Utils.inSpidersDen && toggled) {
                 if (nextRain < System.currentTimeMillis()) nextRain += 4850000
                 val remainingRain = ((nextRain - System.currentTimeMillis()) - 3850000) / 1000L
                 if (remainingRain > 0) {
