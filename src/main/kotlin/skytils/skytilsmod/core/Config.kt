@@ -1733,6 +1733,39 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var petItemConfirmation = false
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER,
+        name = "Current Revenant RNG Meter",
+        description = "Internal value to store current Revenant RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var revRNG = 0f
+
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER,
+        name = "Current Tarantula RNG Meter",
+        description = "Internal value to store current Tarantula RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var taraRNG = 0f
+
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER,
+        name = "Current Sven RNG Meter",
+        description = "Internal value to store current Sven RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var svenRNG = 0f
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Ping when in Atoned Horror Danger Zone",
         description = "Pings when you are standing on the Atoned Horror's TNT target.",
@@ -1758,6 +1791,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Quality of Life"
     )
     var slayerMinibossSpawnAlert = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Show RNGesus Meter",
+        description = "Shows your current RNGesus meter as the boss bar.",
+        category = "Slayer",
+        subcategory = "Quality of Life"
+    )
+    var showRNGMeter = false
 
     @Property(
         type = PropertyType.SWITCH,

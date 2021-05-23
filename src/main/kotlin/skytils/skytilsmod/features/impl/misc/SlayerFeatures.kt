@@ -23,11 +23,16 @@ import net.minecraft.block.BlockPlanks
 import net.minecraft.block.BlockStoneSlab
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.boss.BossStatus
+import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -40,6 +45,7 @@ import skytils.skytilsmod.utils.RenderUtil.drawOutlinedBoundingBox
 import skytils.skytilsmod.utils.ScoreboardUtil.cleanSB
 import skytils.skytilsmod.utils.ScoreboardUtil.sidebarLines
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 
 class SlayerFeatures {
@@ -79,6 +85,43 @@ class SlayerFeatures {
                         }
                         if (isDanger) {
                             mc.thePlayer.playSound("random.orb", 1f, 1f)
+                        }
+                    }
+                }
+            }
+            if (Skytils.config.showRNGMeter) {
+                for (index in 0 until sidebarLines.size - 1) {
+                    if (cleanSB(sidebarLines[index]) == "Slayer Quest") {
+                        val boss = cleanSB(sidebarLines[(index - 1).coerceAtLeast(0)].stripControlCodes())
+                        if (boss.startsWith("Revenant Horror")) {
+                            BossStatus.setBossStatus(
+                                RNGMeter(
+                                    100f,
+                                    Skytils.config.revRNG,
+                                    ChatComponentText("§2§lRevenant Horror RNG§r - §d${Skytils.config.revRNG}%")
+                                ), true
+                            )
+                            break
+                        }
+                        if (boss.startsWith("Tarantula Broodfather")) {
+                            BossStatus.setBossStatus(
+                                RNGMeter(
+                                    100f,
+                                    Skytils.config.taraRNG,
+                                    ChatComponentText("§8§lTarantula Broodfather RNG§r - §d${Skytils.config.taraRNG}%")
+                                ), true
+                            )
+                            break
+                        }
+                        if (boss.startsWith("Sven Packmaster")) {
+                            BossStatus.setBossStatus(
+                                RNGMeter(
+                                    100f,
+                                    Skytils.config.svenRNG,
+                                    ChatComponentText("§7§lSven Packmaster RNG§r - §d${Skytils.config.svenRNG}%")
+                                ), true
+                            )
+                            break
                         }
                     }
                 }
@@ -149,6 +192,45 @@ class SlayerFeatures {
                 createTitle("§cMINIBOSS", 20)
             }
         }
+        if (event.packet is S02PacketChat) {
+            if (event.packet.chatComponent.unformattedText.stripControlCodes().trim().startsWith("RNGesus Meter")) {
+                val rngMeter =
+                    event.packet.chatComponent.unformattedText.stripControlCodes().replace(RNGRegex, "").toFloat()
+                for (index in 0 until sidebarLines.size - 1) {
+                    if (cleanSB(sidebarLines[index]) == "Slayer Quest") {
+                        val boss = cleanSB(sidebarLines[(index - 1).coerceAtLeast(0)].stripControlCodes())
+                        if (boss.startsWith("Revenant Horror")) {
+                            Skytils.config.revRNG = rngMeter
+                            break
+                        }
+                        if (boss.startsWith("Tarantula Broodfather")) {
+                            Skytils.config.taraRNG = rngMeter
+                            break
+                        }
+                        if (boss.startsWith("Sven Packmaster")) {
+                            Skytils.config.svenRNG = rngMeter
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private class RNGMeter(val max: Float, val current: Float, val name: IChatComponent) : IBossDisplayData {
+
+        override fun getMaxHealth(): Float {
+            return max
+        }
+
+        override fun getHealth(): Float {
+            return current
+        }
+
+        override fun getDisplayName(): IChatComponent {
+            return name
+        }
+
     }
 
     companion object {
@@ -163,5 +245,6 @@ class SlayerFeatures {
         )
         private val SPIDER_BOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
         private val WOLF_BOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
+        private val RNGRegex = Regex("[^0-9.]")
     }
 }
