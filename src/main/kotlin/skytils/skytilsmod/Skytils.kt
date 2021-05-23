@@ -18,7 +18,7 @@
 
 package skytils.skytilsmod
 
-import gg.essential.vigilance.gui.SettingsGui
+import club.sk1er.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -292,6 +292,7 @@ class Skytils {
             if (mc.thePlayer != null) {
                 Utils.checkForSkyblock()
                 Utils.checkForDungeons()
+                Utils.checkForSpidersDen()
             }
             ticks = 0
         }
