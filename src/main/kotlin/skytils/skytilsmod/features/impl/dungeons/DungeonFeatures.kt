@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -42,6 +40,7 @@ import net.minecraft.item.Item
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.potion.Potion
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World
@@ -56,7 +55,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
@@ -340,13 +338,39 @@ class DungeonFeatures {
                 }
             }
             if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned && event.entity.maxHealth == 100f && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
-                RenderUtil.drawOutlinedBoundingBox(event.entity.entityBoundingBox, Color(0, 255, 255, 255), 3f, 1f)
+                RenderUtil.drawOutlinedBoundingBox(
+                    event.entity.entityBoundingBox,
+                    Color(0, 255, 255, 255),
+                    3f,
+                    RenderUtil.getPartialTicks()
+                )
             }
             if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible && ItemUtil.getSkyBlockItemID(
                     event.entity.getCurrentArmor(0)
                 ) == "SKELETON_MASTER_BOOTS"
             ) {
-                RenderUtil.drawOutlinedBoundingBox(event.entity.entityBoundingBox, Color(255, 107, 11, 255), 3f, 1f)
+                RenderUtil.drawOutlinedBoundingBox(
+                    event.entity.entityBoundingBox,
+                    Color(255, 107, 11, 255),
+                    3f,
+                    RenderUtil.getPartialTicks()
+                )
+            }
+            if (event.entity == livid) {
+                val aabb = AxisAlignedBB(
+                    event.entity.posX - 0.5,
+                    event.entity.posY - 2,
+                    event.entity.posZ - 0.5,
+                    event.entity.posX + 0.5,
+                    event.entity.posY,
+                    event.entity.posZ + 0.5
+                )
+                RenderUtil.drawOutlinedBoundingBox(
+                    aabb,
+                    Color(255, 107, 11, 255),
+                    3f,
+                    RenderUtil.getPartialTicks()
+                )
             }
         }
     }
