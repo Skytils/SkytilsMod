@@ -19,10 +19,9 @@
 package skytils.skytilsmod.commands.stats.impl
 
 import com.google.gson.JsonObject
-import net.minecraft.command.ICommandSender
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import skytils.skytilsmod.commands.StatCommand
+import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
@@ -33,10 +32,6 @@ object CataCommand : StatCommand() {
 
     override fun getCommandName(): String {
         return "skytilscata"
-    }
-
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        super.processCommand(sender, args)
     }
 
     override fun displayStats(username: String, uuid: String, profileData: JsonObject) {
@@ -75,15 +70,14 @@ object CataCommand : StatCommand() {
         val completionObj = cataData["tier_completions"].asJsonObject
         val highestFloor = cataData["highest_tier_completed"].asInt
 
-        val completionsHoverString = StringBuilder()
-
-        for (i in 0..highestFloor) {
-            completionsHoverString
-                .append("§2§l●§a ")
-                .append(if (i == 0) "Entrance: " else "Floor $i: ")
-                .append("§e")
-                .append(completionObj[i.toString()].asInt)
-                .append(if (i < highestFloor) "\n" else "")
+        val completionsHoverString = buildString {
+            for (i in 0..highestFloor) {
+                append("§2§l●§a ")
+                append(if (i == 0) "Entrance: " else "Floor $i: ")
+                append("§e")
+                append(completionObj[i.toString()].asInt)
+                append(if (i < highestFloor) "\n" else "")
+            }
         }
 
         val completions =
@@ -91,47 +85,45 @@ object CataCommand : StatCommand() {
 
         completions.chatStyle.chatHoverEvent = HoverEvent(
             HoverEvent.Action.SHOW_TEXT,
-            ChatComponentText(completionsHoverString.toString())
+            ChatComponentText(completionsHoverString)
         )
 
         val fastestSTimes = cataData["fastest_time_s"].asJsonObject
-        val fastestSHoverString = StringBuilder()
-
-        for (i in 0..highestFloor) {
-            fastestSHoverString
-                .append("§2§l●§a ")
-                .append(if (i == 0) "Entrance: " else "Floor $i: ")
-                .append("§e")
-                .append(if (fastestSTimes.has(i.toString())) timeFormat(fastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
-                .append(if (i < highestFloor) "\n" else "")
+        val fastestSHoverString = buildString {
+            for (i in 0..highestFloor) {
+                append("§2§l●§a ")
+                append(if (i == 0) "Entrance: " else "Floor $i: ")
+                append("§e")
+                append(if (fastestSTimes.has(i.toString())) timeFormat(fastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
+                append(if (i < highestFloor) "\n" else "")
+            }
         }
 
         val fastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
         fastestS.chatStyle.chatHoverEvent = HoverEvent(
             HoverEvent.Action.SHOW_TEXT,
-            ChatComponentText(fastestSHoverString.toString())
+            ChatComponentText(fastestSHoverString)
         )
 
         val fastestSPlusTimes = cataData["fastest_time_s_plus"].asJsonObject
-        val fastestSPlusHoverString = StringBuilder()
-
-        for (i in 0..highestFloor) {
-            fastestSPlusHoverString
-                .append("§2§●§a ")
-                .append(if (i == 0) "Entrance: " else "Floor $i: ")
-                .append("§e")
-                .append(if (fastestSPlusTimes.has(i.toString())) timeFormat(fastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
-                .append(if (i < highestFloor) "\n" else "")
+        val fastestSPlusHoverString = buildString {
+            for (i in 0..highestFloor) {
+                append("§2§l●§a ")
+                append(if (i == 0) "Entrance: " else "Floor $i: ")
+                append("§e")
+                append(if (fastestSPlusTimes.has(i.toString())) timeFormat(fastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
+                append(if (i < highestFloor) "\n" else "")
+            }
         }
 
         val fastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
         fastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
             HoverEvent.Action.SHOW_TEXT,
-            ChatComponentText(fastestSPlusHoverString.toString())
+            ChatComponentText(fastestSPlusHoverString)
         )
 
         val component = ChatComponentText("§a➜ Catacombs Statistics Viewer\n")
-            .appendText("§2§l ❣ §7§oYou are looking at data from §f§o${username}§7§o.\n\n")
+            .appendText("§2§l ❣ §7§oYou are looking at data for ${APIUtil.getRankFromResponse(playerResponse["player"].asJsonObject)} ${playerResponse["player"].asJsonObject["displayname"].asString}§7§o.\n\n")
             .appendText("§a§l➜ Catacombs Levels:\n")
             .appendText("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
             .appendText("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
@@ -144,69 +136,83 @@ object CataCommand : StatCommand() {
             .appendSibling(fastestS)
             .appendSibling(fastestSPlus)
 
-        if (masterCataData.get("tier_completions").asJsonObject.entrySet().size != 0) {
-            val completionObj = masterCataData["tier_completions"].asJsonObject
-            val highestFloor = masterCataData["highest_tier_completed"].asInt
+        if (masterCataData.has("tier_completions")) {
+            val masterCompletionObj = masterCataData["tier_completions"].asJsonObject
+            val highestMasterFloor = masterCataData["highest_tier_completed"].asInt
 
-            val completionsHoverString = StringBuilder()
-
-            for (i in 1..highestFloor) {
-                completionsHoverString
-                    .append("§2§●§a ")
-                    .append("Floor $i: ")
-                    .append("§e")
-                    .append(if (completionObj.has(i.toString())) completionObj[i.toString()].asInt else "§cDNF")
-                    .append(if (i < highestFloor) "\n" else "")
+            val masterCompletionsHoverString = buildString {
+                for (i in 1..highestMasterFloor) {
+                    append("§2§l●§a ")
+                    append("Floor $i: ")
+                    append("§e")
+                    append(if (masterCompletionObj.has(i.toString())) masterCompletionObj[i.toString()].asInt else "§cDNF")
+                    append(if (i < highestMasterFloor) "\n" else "")
+                }
             }
 
-            val completions =
+            val masterCompletions =
                 ChatComponentText(" §aFloor Completions: §7(Hover)\n")
 
-            completions.chatStyle.chatHoverEvent = HoverEvent(
+            masterCompletions.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText(completionsHoverString.toString())
+                ChatComponentText(masterCompletionsHoverString)
             )
 
-            val fastestSTimes = masterCataData["fastest_time_s"].asJsonObject
-            val fastestSHoverString = StringBuilder()
 
-            for (i in 1..highestFloor) {
-                fastestSHoverString
-                    .append("§2§●§a ")
-                    .append("Floor $i: ")
-                    .append("§e")
-                    .append(if (fastestSTimes.has(i.toString())) timeFormat(fastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
-                    .append(if (i < highestFloor) "\n" else "")
+            val masterFastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
+
+            if (masterCataData.has("fastest_time_s")) {
+                val masterFastestSTimes = masterCataData["fastest_time_s"].asJsonObject
+                val fastestSHoverString1 = buildString {
+                    for (i in 1..highestMasterFloor) {
+                        append("§2§l●§a ")
+                        append("Floor $i: ")
+                        append("§e")
+                        append(if (masterFastestSTimes.has(i.toString())) timeFormat(masterFastestSTimes[i.toString()].asDouble / 1000.0) else "§cNo S Completion")
+                        append(if (i < highestMasterFloor) "\n" else "")
+                    }
+                }
+                masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText(fastestSHoverString1)
+                )
+            } else {
+                masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText("§cNo S Completions")
+                )
             }
 
-            val fastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
-            fastestS.chatStyle.chatHoverEvent = HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText(fastestSHoverString.toString())
-            )
+            val masterFastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
 
-            val fastestSPlusTimes = masterCataData["fastest_time_s_plus"].asJsonObject
-            val fastestSPlusHoverString = StringBuilder()
+            if (masterCataData.has("fastest_time_s_plus")) {
+                val masterFastestSPlusTimes = masterCataData["fastest_time_s_plus"].asJsonObject
+                val fastestSPlusHoverString1 = buildString {
+                    for (i in 1..highestMasterFloor) {
+                        append("§2§l●§a ")
+                        append("Floor $i: ")
+                        append("§e")
+                        append(if (masterFastestSPlusTimes.has(i.toString())) timeFormat(masterFastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
+                        append(if (i < highestMasterFloor) "\n" else "")
+                    }
+                }
 
-            for (i in 1..highestFloor) {
-                fastestSPlusHoverString
-                    .append("§2§●§a ")
-                    .append("Floor $i: ")
-                    .append("§e")
-                    .append(if (fastestSPlusTimes.has(i.toString())) timeFormat(fastestSPlusTimes[i.toString()].asDouble / 1000.0) else "§cNo S+ Completion")
-                    .append(if (i < highestFloor) "\n" else "")
+                masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText(fastestSPlusHoverString1)
+                )
+            } else {
+                masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText("§cNo S+ Completions")
+                )
             }
 
-            val fastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
-            fastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText(fastestSPlusHoverString.toString())
-            )
             component
                 .appendText("§a§l➜ Master Mode:\n")
-                .appendSibling(completions)
-                .appendSibling(fastestS)
-                .appendSibling(fastestSPlus)
+                .appendSibling(masterCompletions)
+                .appendSibling(masterFastestS)
+                .appendSibling(masterFastestSPlus)
         }
 
         printMessage(
