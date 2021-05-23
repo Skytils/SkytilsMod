@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils
 
+import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.EntityLivingBase
@@ -222,4 +223,7 @@ object Utils {
         }
         return java
     }
+
 }
+
+typealias ConcurrentHashSet<T> = ConcurrentSet<T>

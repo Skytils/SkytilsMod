@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.listeners
 
-import io.netty.util.internal.ConcurrentSet
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ChatComponentText
@@ -31,18 +30,14 @@ import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.addSuffix
-import skytils.skytilsmod.utils.TabListUtils
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.getText
-import skytils.skytilsmod.utils.stripControlCodes
-import java.util.regex.Pattern
 
 object DungeonListener {
 
-    val team = ConcurrentSet<DungeonTeammate>()
-    val deads = ConcurrentSet<DungeonTeammate>()
-    val missingPuzzles = ConcurrentSet<String>()
+    val team = ConcurrentHashSet<DungeonTeammate>()
+    val deads = ConcurrentHashSet<DungeonTeammate>()
+    val missingPuzzles = ConcurrentHashSet<String>()
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =

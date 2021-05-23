@@ -193,7 +193,7 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
         @JvmStatic
         fun createTitle(title: String?, ticks: Int) {
-            Utils.playLoudSound("random.orb", 0.5)
+            SoundQueue.addToQueue("random.orb", 0.5f, isLoud = true)
             Companion.title = title
             titleDisplayTicks = ticks
         }
