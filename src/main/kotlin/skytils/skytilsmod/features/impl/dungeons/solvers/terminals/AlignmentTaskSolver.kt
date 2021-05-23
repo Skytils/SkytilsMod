@@ -32,8 +32,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -96,7 +96,7 @@ class AlignmentTaskSolver {
                                                 else -> SpaceType.EMPTY
                                             }
                                         }
-                                        grid.add(MazeSpace(frame, type, coords))
+                                        grid.add(MazeSpace(frame.hangingPosition, type, coords))
                                     } else {
                                         grid.add(MazeSpace(type = SpaceType.EMPTY, coords = coords))
                                     }
@@ -128,8 +128,11 @@ class AlignmentTaskSolver {
             }
             is RenderWorldLastEvent -> {
                 for (space in grid) {
-                    if (space.type != SpaceType.PATH || space.frame == null) continue
-                    var neededClicks = directionSet.getOrElse(space.coords) { 0 } - space.frame.rotation
+                    if (space.type != SpaceType.PATH || space.framePos == null) continue
+                    val frame =
+                        (mc.theWorld.loadedEntityList.find { it is EntityItemFrame && it.hangingPosition == space.framePos }
+                            ?: continue) as EntityItemFrame
+                    var neededClicks = directionSet.getOrElse(space.coords) { 0 } - frame.rotation
                     if (neededClicks == 0) continue
                     if (neededClicks < 0) neededClicks += 8
                     RenderUtil.draw3DString(
@@ -143,7 +146,7 @@ class AlignmentTaskSolver {
         }
     }
 
-    class MazeSpace(val frame: EntityItemFrame? = null, val type: SpaceType, val coords: Point)
+    class MazeSpace(val framePos: BlockPos? = null, val type: SpaceType, val coords: Point)
 
     enum class SpaceType {
         EMPTY,
@@ -188,7 +191,7 @@ class AlignmentTaskSolver {
             for (row in 0..4) {
                 for (column in 0..4) {
                     val space = this.grid.find { it.coords == Point(row, column) }
-                    grid[column][row] = if (space?.frame != null) 0 else 1
+                    grid[column][row] = if (space?.framePos != null) 0 else 1
                 }
             }
             return grid
