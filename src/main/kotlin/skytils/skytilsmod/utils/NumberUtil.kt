@@ -25,7 +25,14 @@ import kotlin.math.roundToInt
 object NumberUtil {
     @JvmField
     val nf: NumberFormat = NumberFormat.getInstance(Locale.US)
-    private val suffixes: NavigableMap<Long, String> = TreeMap()
+    private val suffixes = TreeMap<Long, String>().apply {
+        this[1000L] = "k"
+        this[1000000L] = "M"
+        this[1000000000L] = "B"
+        this[1000000000000L] = "T"
+        this[1000000000000000L] = "P"
+        this[1000000000000000000L] = "E"
+    }
 
     /**
      * This code was unmodified and taken under CC BY-SA 3.0 license
@@ -55,12 +62,14 @@ object NumberUtil {
         return (value * scale).roundToInt().toDouble() / scale
     }
 
-    init {
-        suffixes[1000L] = "k"
-        suffixes[1000000L] = "M"
-        suffixes[1000000000L] = "B"
-        suffixes[1000000000000L] = "T"
-        suffixes[1000000000000000L] = "P"
-        suffixes[1000000000000000000L] = "E"
+    fun Number.addSuffix(): String {
+        val long = this.toLong()
+        if (long in 11..13) return "${this}th"
+        return when (long % 10) {
+            1L -> "${this}st"
+            2L -> "${this}nd"
+            3L -> "${this}rd"
+            else -> "${this}th"
+        }
     }
 }

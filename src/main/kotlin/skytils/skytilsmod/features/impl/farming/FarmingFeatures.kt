@@ -17,7 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
-import net.minecraft.client.Minecraft
+import net.minecraft.block.Block
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemAxe
@@ -35,11 +35,11 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
-import java.util.*
+import skytils.skytilsmod.utils.stripControlCodes
 
 class FarmingFeatures {
     private var lastNotifyBreakTime: Long = 0
@@ -51,35 +51,6 @@ class FarmingFeatures {
         val heldItem = p.heldItem
         val block = mc.theWorld.getBlockState(event.pos).block
         if (Skytils.config.preventBreakingFarms && heldItem != null) {
-            val farmBlocks = listOf(
-                Blocks.dirt,
-                Blocks.farmland,
-                Blocks.carpet,
-                Blocks.glowstone,
-                Blocks.sea_lantern,
-                Blocks.soul_sand,
-                Blocks.waterlily,
-                Blocks.standing_sign,
-                Blocks.wall_sign,
-                Blocks.wooden_slab,
-                Blocks.double_wooden_slab,
-                Blocks.oak_fence,
-                Blocks.dark_oak_fence,
-                Blocks.birch_fence,
-                Blocks.spruce_fence,
-                Blocks.acacia_fence,
-                Blocks.jungle_fence,
-                Blocks.oak_fence_gate,
-                Blocks.acacia_fence_gate,
-                Blocks.birch_fence_gate,
-                Blocks.jungle_fence_gate,
-                Blocks.spruce_fence_gate,
-                Blocks.dark_oak_fence_gate,
-                Blocks.glass,
-                Blocks.glass_pane,
-                Blocks.stained_glass,
-                Blocks.stained_glass_pane
-            )
             if ((heldItem.item is ItemHoe || heldItem.item is ItemAxe) && farmBlocks.contains(block)) {
                 event.isCanceled = true
                 if (System.currentTimeMillis() - lastNotifyBreakTime > 10000) {
@@ -98,17 +69,13 @@ class FarmingFeatures {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
 
         val formatted = event.message.formattedText
-        val unformatted = stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
 
         if (Skytils.config.acceptTrapperTask) {
             if (formatted.contains("§a§l[YES]")) {
                 val listOfSiblings = event.message.siblings
-                for (sibling in listOfSiblings) {
-                    if (sibling.unformattedText.contains("[YES]")) {
-                        acceptTrapperCommand = sibling.chatStyle.chatClickEvent.value
-                        commandSent = false
-                    }
-                }
+                acceptTrapperCommand =
+                    listOfSiblings.find { it.unformattedText.contains("[YES]") }?.chatStyle?.chatClickEvent?.value ?: ""
                 mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to accept task"))
             }
         }
@@ -133,16 +100,9 @@ class FarmingFeatures {
                 return
             }
             val solution = hungerHikerItems.getOrDefault(hungerHikerItems.keys.find { s: String ->
-                unformatted.contains(
-                    s
-                )
+                unformatted.contains(s)
             }, null)
-            Thread {
-                try {
-                    Thread.sleep(200)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
+            TickTask(4) {
                 if (solution != null) {
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "The Hiker needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"))
                 } else {
@@ -158,7 +118,7 @@ class FarmingFeatures {
                         )
                     }
                 }
-            }.start()
+            }
         }
     }
 
@@ -168,7 +128,7 @@ class FarmingFeatures {
         if (event.packet is S45PacketTitle) {
             val packet = event.packet
             if (packet.message != null) {
-                val unformatted = stripControlCodes(packet.message.unformattedText)
+                val unformatted = packet.message.unformattedText.stripControlCodes()
                 if (Skytils.config.hideFarmingRNGTitles && unformatted.contains("DROP!")) {
                     event.isCanceled = true
                 }
@@ -179,7 +139,7 @@ class FarmingFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
-        if (trapperStart > 0) {
+        if (trapperStart > 0 && mc.thePlayer != null) {
             if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
                 trapperStart = -1.0
                 mc.thePlayer.addChatMessage(ChatComponentText("§dSkytils: Trapper cooldown has now expired!"))
@@ -199,9 +159,9 @@ class FarmingFeatures {
     fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
         if (!Utils.inSkyblock) return
         if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
-            if (Skytils.config.acceptTrapperTask && !commandSent) {
+            if (Skytils.config.acceptTrapperTask && acceptTrapperCommand.isNotBlank()) {
                 Skytils.sendMessageQueue.add(acceptTrapperCommand)
-                commandSent = true
+                acceptTrapperCommand = ""
             }
         }
     }
@@ -211,6 +171,34 @@ class FarmingFeatures {
         var trapperStart = -1.0
         var animalFound = false
         var acceptTrapperCommand = ""
-        var commandSent = false
+        val farmBlocks = setOf<Block>(
+            Blocks.dirt,
+            Blocks.farmland,
+            Blocks.carpet,
+            Blocks.glowstone,
+            Blocks.sea_lantern,
+            Blocks.soul_sand,
+            Blocks.waterlily,
+            Blocks.standing_sign,
+            Blocks.wall_sign,
+            Blocks.wooden_slab,
+            Blocks.double_wooden_slab,
+            Blocks.oak_fence,
+            Blocks.dark_oak_fence,
+            Blocks.birch_fence,
+            Blocks.spruce_fence,
+            Blocks.acacia_fence,
+            Blocks.jungle_fence,
+            Blocks.oak_fence_gate,
+            Blocks.acacia_fence_gate,
+            Blocks.birch_fence_gate,
+            Blocks.jungle_fence_gate,
+            Blocks.spruce_fence_gate,
+            Blocks.dark_oak_fence_gate,
+            Blocks.glass,
+            Blocks.glass_pane,
+            Blocks.stained_glass,
+            Blocks.stained_glass_pane
+        )
     }
 }

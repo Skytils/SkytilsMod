@@ -55,7 +55,7 @@ class BlessingToast(blessing: String, private val buffs: List<BlessingBuff>) : I
         return if (delta >= maxDrawTime) IToast.Visibility.HIDE else IToast.Visibility.SHOW
     }
 
-    private enum class Blessing(val blessingName: String, location: String, formattedName: String) {
+    private enum class Blessing(val blessingName: String, location: String, val formattedName: String) {
         LIFE("life", "skytils:toasts/blessings/life.png", "§c§lLIFE BLESSING!"), POWER(
             "power",
             "skytils:toasts/blessings/power.png",
@@ -69,7 +69,6 @@ class BlessingToast(blessing: String, private val buffs: List<BlessingBuff>) : I
         TIME("time", "skytils:toasts/blessings/time.png", "§6§lTIME BLESSING!");
 
         val texture: ResourceLocation = ResourceLocation(location)
-        val formattedName: String = formattedName
 
         companion object {
             fun fromName(name: String): Blessing? {

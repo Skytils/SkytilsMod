@@ -47,15 +47,13 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
-import java.io.IOException
-import java.util.*
 
 class AuctionPriceOverlay {
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiEditSign && Utils.equalsOneOf(
-                SBInfo.instance.lastOpenContainerName,
+                SBInfo.lastOpenContainerName,
                 "Create Auction",
                 "Create BIN Auction"
             )
@@ -72,7 +70,7 @@ class AuctionPriceOverlay {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiChest) {
             if (Utils.equalsOneOf(
-                    SBInfo.instance.lastOpenContainerName,
+                    SBInfo.lastOpenContainerName,
                     "Create Auction",
                     "Create BIN Auction"
                 ) && event.slotId == 31
@@ -85,7 +83,7 @@ class AuctionPriceOverlay {
                 }
             }
             if (Utils.equalsOneOf(
-                    SBInfo.instance.lastOpenContainerName,
+                    SBInfo.lastOpenContainerName,
                     "Confirm Auction",
                     "Confirm BIN Auction"
                 )
@@ -98,11 +96,11 @@ class AuctionPriceOverlay {
     }
 
     open class AuctionPriceScreen(oldScreen: GuiEditSign) : GuiScreen() {
-        lateinit var undercutButton: CleanButton
-        lateinit var priceField: GuiTextField
-        var sign: TileEntitySign = (oldScreen as AccessorGuiEditSign).tileSign
+        private lateinit var undercutButton: CleanButton
+        private lateinit var priceField: GuiTextField
+        private var sign: TileEntitySign = (oldScreen as AccessorGuiEditSign).tileSign
         var fr: SmartFontRenderer = ScreenRenderer.fontRenderer
-        var dragging = false
+        private var dragging = false
         private var xOffset = 0f
         private var yOffset = 0f
         override fun initGui() {
@@ -132,7 +130,7 @@ class AuctionPriceOverlay {
         }
 
         override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-            onMouseMove(mouseX, mouseY)
+            onMouseMove()
             drawGradientRect(0, 0, width, height, Color(117, 115, 115, 25).rgb, Color(0, 0, 0, 200).rgb)
             priceField.drawTextBox()
             if (lastAuctionedStack != null) {
@@ -221,7 +219,7 @@ class AuctionPriceOverlay {
             super.updateScreen()
         }
 
-        @Throws(IOException::class)
+
         override fun keyTyped(typedChar: Char, keyCode: Int) {
             if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
                 sign.markDirty()
@@ -238,7 +236,7 @@ class AuctionPriceOverlay {
             }
         }
 
-        @Throws(IOException::class)
+
         override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
             priceField.mouseClicked(mouseX, mouseY, mouseButton)
             super.mouseClicked(mouseX, mouseY, mouseButton)
@@ -249,7 +247,7 @@ class AuctionPriceOverlay {
             dragging = false
         }
 
-        private fun onMouseMove(mouseX: Int, mouseY: Int) {
+        private fun onMouseMove() {
             val sr = ScaledResolution(mc)
             val minecraftScale = sr.scaleFactor.toFloat()
             val floatMouseX = Mouse.getX() / minecraftScale
@@ -260,7 +258,7 @@ class AuctionPriceOverlay {
             }
         }
 
-        @Throws(IOException::class)
+
         override fun actionPerformed(button: GuiButton) {
             if (button.id == 0) {
                 undercut = !undercut
@@ -343,7 +341,13 @@ class AuctionPriceOverlay {
             return if (multiplier == 1L) {
                 null
             } else {
-                val valueMultiplier = values[0].toDouble()
+                val valueMultiplier: Double = try {
+                    values[0].toDouble()
+                } catch (ex: ArrayIndexOutOfBoundsException) {
+                    0.0
+                } catch (ex: NumberFormatException) {
+                    0.0
+                }
                 val valueAdder: Double = try {
                     values[1].toDouble()
                 } catch (ex: ArrayIndexOutOfBoundsException) {

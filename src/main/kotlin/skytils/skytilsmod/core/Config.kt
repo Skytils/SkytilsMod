@@ -17,13 +17,16 @@
 */
 package skytils.skytilsmod.core
 
-import club.sk1er.vigilance.Vigilant
-import club.sk1er.vigilance.data.*
+import gg.essential.vigilance.Vigilant
+import gg.essential.vigilance.data.Category
+import gg.essential.vigilance.data.Property
+import gg.essential.vigilance.data.PropertyType
+import gg.essential.vigilance.data.SortingBehavior
 import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 import java.io.File
 
-class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting()) {
+class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
     @Property(
         type = PropertyType.TEXT,
@@ -33,7 +36,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "API",
         hidden = true
     )
-    @JvmField
     var dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
     @Property(
@@ -50,7 +52,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         name = "Hypixel API Key",
         description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
         category = "General",
-        subcategory = "API"
+        subcategory = "API",
+        protected = true
     )
     var apiKey = ""
 
@@ -138,6 +141,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Miscellaneous"
     )
     var autoCopyFailToClipboard = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Auto-Reparty on Dungeon Ending",
+        description = "Runs the reparty command when your dungeon ends.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var autoRepartyOnDungeonEnd = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Death Counter",
+        description = "Counts the amount of times each member of your team has died in a dungeon.",
+        category = "Dungeons",
+        subcategory = "Miscellaneous"
+    )
+    var dungeonDeathCounter = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -339,6 +360,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var showGiantHP = false
 
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Show Giant HP at Feet",
+        description = "Shows the HP of giants' at the giant's feet.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var showGiantHPAtFeet = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Show Guardian Respawn Timer",
+        description = "Shows the respawn timer for the Guardians in Floor 3.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var showGuardianRespawnTimer = false
+
     /* @Property(
    type = PropertyType.SWITCH,
    name = "Show Hidden Fels",
@@ -501,6 +540,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Tic Tac Toe Solver",
+        description = "§b[WIP] §rDisplays the best move on the Tic Tac Toe puzzle.",
+        category = "Dungeons",
+        subcategory = "Solvers"
+    )
+    var ticTacToeSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Trivia Solver",
         description = "Shows the correct answer for the questions on the Trivia puzzle.",
         category = "Dungeons",
@@ -544,6 +592,69 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
    subcategory = "Terminal Solvers"
    )*/
     var blockIncorrectTerminalClicks = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Boxed Tanks",
+        description = "Shows the bounding box of all tanks through walls.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedTanks = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Boxed Tank Color",
+        description = "Choose the color of the tanks in the bounding box",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedTankColor = Color(0, 255, 0)
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Box Protected Teammates",
+        description = "Shows the bounding box of protected teammates through walls.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedProtectedTeammates = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Protected Teammate Box Color",
+        description = "Choose the color of the teammates in the bounding box",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var boxedProtectedTeammatesColor = Color(255, 0, 0)
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Tank Protection Range Display",
+        description = "Shows the range in which players will be protected by a tank.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var showTankRadius = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Tank Range Wall",
+        description = "Shows the range as a wall instead of a circle.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var showTankRadiusWall = true
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Tank Range Wall Color",
+        description = "The color to display the Tank Range as.",
+        category = "Dungeons",
+        subcategory = "Tank Helper Tools"
+    )
+    var tankRadiusDisplayColor = Color(100, 255, 0, 50)
 
     @Property(
         type = PropertyType.SWITCH,
@@ -598,6 +709,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Item Frame Alignment Solver",
+        description = "Shows the amount of clicks needed on the device in Floor 7.",
+        category = "Dungeons",
+        subcategory = "Terminal Solvers"
+    )
+    var alignmentTerminalSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Shoot the Target Solver",
+        description = "Shows all the shot blocks on the device in Floor 7.",
+        category = "Dungeons",
+        subcategory = "Terminal Solvers"
+    )
+    var shootTheTargetSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Simon Says Solver",
         description = "Show which buttons to press on the Simon Says device in Floor 7.\n§cIf a teammate clicks a button it will not register.",
         category = "Dungeons",
@@ -607,12 +736,39 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Display Jerry Perks",
+        description = "Displays the perks for Jerry.\nYou must visit Jerry in order for the display to function correctly.",
+        category = "Events",
+        subcategory = "Mayor Jerry"
+    )
+    var displayJerryPerks = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Hidden Jerry Alert",
         description = "Displays an alert when you find a hidden Jerry.",
         category = "Events",
         subcategory = "Mayor Jerry"
     )
     var hiddenJerryAlert = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Hidden Jerry Timer",
+        description = "Displays a timer from when you last discovered a Hidden Jerry.",
+        category = "Events",
+        subcategory = "Mayor Jerry"
+    )
+    var hiddenJerryTimer = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Track Mayor Jerry Items",
+        description = "Tracks the amount of each type of Jerry that you've found, as well as drops obtained from Jerry Boxes.",
+        category = "Events",
+        subcategory = "Mayor Jerry"
+    )
+    var trackHiddenJerry = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -722,6 +878,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Mythological"
     )
     var trackGaiaHits = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Hide Leftover Bleeds",
+        description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var removeLeftOverBleeds = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -997,11 +1162,20 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.SWITCH,
         name = "Prevent Placing Weapons",
-        description = "Stops the game from trying to place the Flower of Truth and the Spirit Sceptre.",
+        description = "Stops the game from trying to place the Flower of Truth, Spirit Sceptre, and Weird Tuba items.",
         category = "Miscellaneous",
         subcategory = "Items"
     )
     var preventPlacingWeapons = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Show Dungeon Item Level",
+        description = "Shows the amount of stars on dungeon items as the stack size.",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var showDungeonItemLevel = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1056,6 +1230,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Items"
     )
     var showSoulEaterBonus = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Radioactive Bonus",
+        description = "Shows the current Critical Damage bonus from Tarantula helmet",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var showRadioactiveBonus = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1227,6 +1410,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Hide Dying Mobs",
+        description = "Removes dead/dying mobs from your screen.",
+        category = "Dungeons",
+        subcategory = "Quality of Life"
+    )
+    var hideDyingMobs = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Hide Fire on Entities",
         description = "Prevents the game from rendering fire on burning entities.",
         category = "Miscellaneous",
@@ -1272,6 +1464,25 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     @JvmField
     var hideDeathParticles = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Hide Potion Effects in Inventory",
+        description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    @JvmField
+    var hidePotionEffects = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Highlight Disabled Potion Effects",
+        description = "Marks disabled potion effects in the toggle menu.",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    var highlightDisabledPotionEffects = false
 
     @Property(
         type = PropertyType.SWITCH,
@@ -1666,6 +1877,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR,
+        name = "Healing Message Hider",
+        description = "Removes Zombie Sword and Werewolf healing messages from your chat.",
+        category = "Spam",
+        subcategory = "Abilities",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var healingHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
         name = "Blessing Hider",
         description = "Removes blessing messages from your chat.",
         category = "Spam",
@@ -1968,9 +2189,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
 
+        ::showTankRadiusWall dependsOn ::showTankRadius
+        ::tankRadiusDisplayColor dependsOn ::showTankRadius
+        ::boxedTankColor dependsOn ::boxedTanks
+        ::boxedProtectedTeammatesColor dependsOn ::boxedProtectedTeammates
+
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")
-            protectItemBINThreshold = if (numeric.isEmpty()) "0" else numeric
+            protectItemBINThreshold = numeric.ifEmpty { "0" }
         }
 
         // asbyth cool code
@@ -1991,9 +2217,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
             this.itemRarityOpacity /= 100f
             markDirty()
         }
+        if (this.transparentHeadLayer > 1) {
+            this.transparentHeadLayer /= 100f
+            markDirty()
+        }
     }
 
-    class ConfigSorting : SortingBehavior() {
+    private object ConfigSorting : SortingBehavior() {
         override fun getCategoryComparator(): Comparator<in Category> {
             return Comparator { o1, o2 ->
                 if (o1.name == "General") return@Comparator -1

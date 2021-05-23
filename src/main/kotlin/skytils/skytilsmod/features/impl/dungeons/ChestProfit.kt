@@ -32,7 +32,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -60,7 +60,7 @@ class ChestProfit {
                     val openChest = inv.getStackInSlot(31)
                     if (openChest != null && openChest.displayName == "§aOpen Reward Chest") {
                         for (unclean in ItemUtil.getItemLore(openChest)) {
-                            val line = StringUtils.stripControlCodes(unclean)
+                            val line = unclean.stripControlCodes()
                             if (line.contains("FREE")) {
                                 chestType.price = 0.0
                                 break
@@ -79,7 +79,7 @@ class ChestProfit {
                                 var value = AuctionData.lowestBINs[identifier]
                                 if (value == null) value = 0.0
                                 chestType.value += value
-                                chestType.items.add(DungeonChestLootItem(lootSlot, identifier, value))
+                                chestType.items.add(DungeonChestLootItem(lootSlot, value))
                             }
                         }
                     }
@@ -158,7 +158,7 @@ class ChestProfit {
         }
     }
 
-    private class DungeonChestLootItem(var item: ItemStack, var itemId: String, var value: Double)
+    private class DungeonChestLootItem(var item: ItemStack, var value: Double)
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
@@ -214,7 +214,7 @@ class ChestProfit {
             get() = Skytils.config.dungeonChestProfit
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 

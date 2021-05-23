@@ -18,8 +18,10 @@ A Hypixel Skyblock Utilities mod.
 
 
 ## Features
-***
-#### General
+<details>
+  <summary>General</summary>
+
+### General
  - Client Side Custom Armor Colors (with animated rainbow)
  - Custom Command Aliases
  - Griffin Burrow Locator and Waypoints
@@ -53,7 +55,11 @@ A Hypixel Skyblock Utilities mod.
      - Combo messages
      - Blessing enchant and bait messages
      - Wither and Undead Essence unlock messages
-##### Dungeons
+</details>
+<details>
+  <summary>Dungeons</summary>
+
+#### Dungeons
  - ~~Show Hidden Fels, Shadow Assassins, and blood room mobs~~
  - Blaze Solver Which Replaces The Skin Textures
  - Boulder Puzzle Solver [WIP]
@@ -75,12 +81,20 @@ A Hypixel Skyblock Utilities mod.
  - Skeleton Master Boxes
  - Correct Livid Finder (with M5 support)
  - Dungeon Chest Profit
-#### Farming
+</details>
+<details>
+  <summary>Farming</summary>
+
+### Farming
  - ~~Block Math Hoe Recipe Viewer~~
  - ~~Block Breaking Farms~~
  - Hungry Hiker solver
  - Treasure Hunter Solver
-#### Mining 
+</details>
+<details>
+  <summary>Mining</summary>
+
+### Mining 
  - ~~Show Ghosts in the Mist (Also their health)~~
  - ~~Disable Pickaxe Ability on Private Island~~
  - Fetchur Solver
@@ -91,7 +105,11 @@ A Hypixel Skyblock Utilities mod.
  - More Visible Ghosts
  - Recolor Carpets
  - Highlight Completed Comissions
-#### Items
+</details>
+<details>
+  <summary>Items</summary>
+  
+### Items
  - Soul Eater Bonus Strength
  - ~~Block Useless Zombie Sword Uses~~
  - ~~Prioritize Item Abilities~~
@@ -114,7 +132,11 @@ A Hypixel Skyblock Utilities mod.
  - Show Price of Items in the Experimentation Table
  - Jerry-chine Gun Sound Hider
  - Show Enchanted Book Abbreviation
-### Miscellaneous
+</details>
+<details>
+  <summary>Miscellaneous</summary>
+
+## Miscellaneous
  - Hide Witherborn Boss Bars
  - Hide Fire and Lightning
  - Custom Damage Splash
@@ -127,12 +149,13 @@ A Hypixel Skyblock Utilities mod.
  - Placed Summoning Eye Display
  - Spider's Den Rain Timer
  - Stop Dropping Valuable Items (customizable BIN value)
-
+</details>
 
 And more to come!
+<details>
+  <summary>Commands</summary>
 
 ## Commands
-***
 - /skytils - Opens the main GUI. (Alias is /st)
 - /skytils config - Opens the GUI to edit the config.
 - /skytils help - Displays the various commands and their usages
@@ -148,10 +171,10 @@ And more to come!
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 - /glintcustomize override <on/off/clear/clearall> - Change the visibility of enchantment glints for the item.
 - /glintcustomize color <set/clear/clearall> - Change the enchant glint color for the item.
-
+</details>
 
 ### Credits to Open Source Software
 ***
 Skytils would not be possible without other open source projects.
 
-[For more information, click here](https://github.com/Skytils/SkytilsMod/blob/main/OPEN_SOURCE_SOFTWARE.md)
+[For more information, click here](https://github.com/Skytils/SkytilsMod/blob/main/OPEN_SOURCE_SOFTWARE.md "Credits")

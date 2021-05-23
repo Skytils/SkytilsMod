@@ -28,7 +28,7 @@ abstract class ItemProtectStrategy {
     abstract fun toggled(): Boolean
 
     companion object {
-        val STRATEGIES = HashSet<ItemProtectStrategy>()
+        private val STRATEGIES = HashSet<ItemProtectStrategy>()
 
         fun isAnyToggled(): Boolean {
             for (strategy in STRATEGIES) {

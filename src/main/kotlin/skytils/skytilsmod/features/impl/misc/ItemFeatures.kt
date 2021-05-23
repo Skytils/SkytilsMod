@@ -43,17 +43,13 @@ import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.BlockAbility
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
-import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils.startsWith
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
-import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -79,7 +75,7 @@ class ItemFeatures {
                         val extraAttr = getExtraAttributes(stack)
                         if (extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && !extraAttr.hasKey("dungeon_item_level")) {
                             GlStateManager.translate(0f, 0f, 1f)
-                            event.slot highlight Color(15, 233, 233, 225)
+                            event.slot highlight Color(15, 233, 233)
                             GlStateManager.translate(0f, 0f, -1f)
                         }
                     }
@@ -89,11 +85,22 @@ class ItemFeatures {
                 if (Skytils.config.highlightDungeonSellableItems) {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
-                        if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30, 255)
-                        else if (stack.displayName.contains("Mimic Fragment") || stack.displayName.contains("Training Weights") || stack.displayName.contains(
-                                "Journal Entry"
-                            ) || stack.displayName.contains("Defuse Kit")
-                        ) event.slot highlight Color(255, 50, 150, 255)
+                        if (stack.displayName.contains("Health Potion")) event.slot highlight Color(255, 225, 30)
+                        else if (stack.displayName.containsAny(
+                                "Defuse Kit", "Lever", "Torch",
+                                "Stone", "Tripwire Hook", "Journal Entry",
+                                "Training Weights", "Mimic Fragment"
+                            )
+                        ) event.slot highlight Color(255, 50, 150, 255) else {
+                            val itemId = AuctionData.getIdentifier(stack) ?: ""
+                            if ((itemId.startsWith("ENCHANTED_BOOK-") && itemId.containsAny(
+                                    "FEATHER_FALLING",
+                                    "BANK",
+                                    "NO_PAIN_NO_GAIN",
+                                    "INFINITE_QUIVER"
+                                )) || itemId == "ENCHANTED_BOOK"
+                            ) event.slot highlight Color(50, 50, 255)
+                        }
                     }
                 }
             }
@@ -111,7 +118,6 @@ class ItemFeatures {
                 val item: ItemStack = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
-                    val itemId = getSkyBlockItemID(item)
                     if (chestName.startsWith("Salvage") && extraAttr != null) {
                         if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
@@ -132,16 +138,15 @@ class ItemFeatures {
         val extraAttr = getExtraAttributes(item)
         var itemId = getSkyBlockItemID(extraAttr)
         var isSuperpairsReward = false
-        if (item != null && mc.thePlayer.openContainer != null && startsWith(
-                SBInfo.instance.lastOpenContainerName,
+        if (item != null && mc.thePlayer.openContainer != null && SBInfo.lastOpenContainerName?.startsWith(
                 "Superpairs ("
-            )
+            ) == true
         ) {
-            if (stripControlCodes(getDisplayName(item)) == "Enchanted Book") {
+            if (getDisplayName(item).stripControlCodes() == "Enchanted Book") {
                 val lore = getItemLore(item)
                 if (lore.size >= 3) {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
-                        val line2 = stripControlCodes(lore[2])
+                        val line2 = lore[2].stripControlCodes()
                         val enchantName =
                             line2.substring(0, line2.lastIndexOf(" ")).replace(" ".toRegex(), "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
@@ -170,10 +175,9 @@ class ItemFeatures {
                         }
                         if (Skytils.config.showCoinsPerBit) {
                             var bitValue = bitCosts.getOrDefault(auctionIdentifier, -1)
-                            if (bitValue == -1 && SBInfo.instance.lastOpenContainerName == "Community Shop" || startsWith(
-                                    SBInfo.instance.lastOpenContainerName,
+                            if (bitValue == -1 && SBInfo.lastOpenContainerName == "Community Shop" || SBInfo.lastOpenContainerName?.startsWith(
                                     "Bits Shop - "
-                                )
+                                ) == true
                             ) {
                                 val lore = getItemLore(item!!)
                                 for (i in lore.indices) {
@@ -223,6 +227,17 @@ class ItemFeatures {
                 }
             }
         }
+        if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
+            val name = TabListUtils.tabEntries[68].getText()
+            val bonus = (name.substringAfter("❁").removeSuffix("§r").toInt().coerceAtMost(1000) / 10).toString()
+            for (i in event.toolTip.indices) {
+                val line = event.toolTip[i]
+                if (line.contains("§7Crit Damage:")) {
+                    event.toolTip.add(i + 1, "§8Radioactive Bonus: §c+${bonus}%")
+                    break
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -248,7 +263,7 @@ class ItemFeatures {
                             if (pos.squareDistanceTo(Vec3(player.posX, player.posY, player.posZ)) <= 11 * 11) {
                                 val item = player.heldItem
                                 if (item != null) {
-                                    val itemName = stripControlCodes(getDisplayName(item))
+                                    val itemName = getDisplayName(item).stripControlCodes()
                                     if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains(
                                             "Astraea"
                                         ) || itemName.contains("Hyperion") || itemName.contains("Valkyrie")
@@ -283,7 +298,13 @@ class ItemFeatures {
         if (event.entity !== mc.thePlayer) return
         val item = event.entityPlayer.heldItem
         val itemId = getSkyBlockItemID(item) ?: return
-        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (itemId == "FLOWER_OF_TRUTH" || itemId == "BAT_WAND")) {
+        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (Utils.equalsOneOf(
+                itemId,
+                "FLOWER_OF_TRUTH",
+                "BAT_WAND",
+                "WEIRD_TUBA"
+            ))
+        ) {
             val block = mc.theWorld.getBlockState(event.pos)
             if (!BlockAbility.interactables.contains(block.block) || Utils.inDungeons && (block.block === Blocks.coal_block || block.block === Blocks.stained_hardened_clay)) {
                 event.isCanceled = true
@@ -309,7 +330,7 @@ class ItemFeatures {
                 if (enchantments.keySet.size == 1) {
                     val name = enchantmentNames.first()
                     if (Skytils.config.showEnchantedBookAbbreviation) {
-                        var parts = name.split("_")
+                        val parts = name.split("_")
                         val prefix: String = if (parts[0] == "ultimate") {
                             "§d§l" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
                         } else {
@@ -341,6 +362,8 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookTier) stackTip =
                         enchantments.getInteger(name.toString()).toString()
                 }
+            } else if (Skytils.config.showDungeonItemLevel && extraAttributes.hasKey("dungeon_item_level")) {
+                stackTip = extraAttributes.getInteger("dungeon_item_level").toString()
             }
         }
         val lore = getItemLore(item)
@@ -417,7 +440,7 @@ class ItemFeatures {
             get() = Skytils.config.showSoulEaterBonus
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

@@ -51,12 +51,10 @@ class KeyShortcutsList(
 
     fun keyTyped(typedChar: Char, keyCode: Int) {
         if (clickedShortcut != null) {
-            if (keyCode == 1) {
-                clickedShortcut!!.keyCode = 0
-            } else if (keyCode != 0) {
-                clickedShortcut!!.keyCode = keyCode
-            } else if (typedChar.code > 0) {
-                clickedShortcut!!.keyCode = typedChar.code + 256
+            when {
+                keyCode == 1 -> clickedShortcut!!.keyCode = 0
+                keyCode != 0 -> clickedShortcut!!.keyCode = keyCode
+                typedChar.code > 0 -> clickedShortcut!!.keyCode = typedChar.code + 256
             }
             clickedShortcut = null
         } else {

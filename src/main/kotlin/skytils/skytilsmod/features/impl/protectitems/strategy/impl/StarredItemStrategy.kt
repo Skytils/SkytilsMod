@@ -34,7 +34,7 @@ class StarredItemStrategy : ItemProtectStrategy() {
                 }
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (SBInfo.instance.mode != SBInfo.SkyblockIslands.DUNGEON.mode && extraAttr.hasKey("dungeon_item_level")) {
+                if (SBInfo.mode != SBInfo.SkyblockIsland.Dungeon.mode && extraAttr.hasKey("dungeon_item_level")) {
                     return true
                 }
             }

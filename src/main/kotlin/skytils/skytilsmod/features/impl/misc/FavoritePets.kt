@@ -109,7 +109,12 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         if (!Utils.inSkyblock || !highlighting || event.container !is ContainerChest) return
         val chest = event.container
         if (!chest.lowerChestInventory.name.endsWith(") Pets") && chest.lowerChestInventory.name != "Pets") return
-        if (event.slot == null || event.slotId < 10 || event.slotId > 43 || !event.slot.hasStack) return
+        if (event.slot == null || !event.slot.hasStack || event.slotId < 10 || event.slotId > 43 || Utils.equalsOneOf(
+                event.slot.slotNumber % 9,
+                0,
+                8
+            )
+        ) return
         val item = event.slot.stack!!
         val petId = getPetIdFromItem(item)
         event.isCanceled = true
@@ -122,7 +127,12 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets || event.container !is ContainerChest) return
         val chest = event.container
         if (!chest.lowerChestInventory.name.endsWith(") Pets") && chest.lowerChestInventory.name != "Pets") return
-        if (event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || !event.slot.hasStack) return
+        if (!event.slot.hasStack || event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || Utils.equalsOneOf(
+                event.slot.slotNumber % 9,
+                0,
+                8
+            )
+        ) return
         val item = event.slot.stack
         val petId = getPetIdFromItem(item)
         if (favorited.contains(petId)) {

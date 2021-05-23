@@ -29,11 +29,10 @@ import net.minecraftforge.fml.client.GuiScrollingList
  * @author P0keDev
  */
 class ScrollingCommandAliasesList(
-    mc: Minecraft, width: Int, height: Int, top: Int, bottom: Int, left: Int, entryHeight: Int,
+    private val mc: Minecraft, width: Int, height: Int, top: Int, bottom: Int, left: Int, entryHeight: Int,
     screenWidth: Int, screenHeight: Int
 ) : GuiScrollingList(mc, width, height, top, bottom, left, entryHeight, screenWidth, screenHeight) {
-    private val mc: Minecraft
-    val aliases: ArrayList<AliasListEntry>
+    val aliases: ArrayList<AliasListEntry> = ArrayList()
     fun addAlias(id: Int, key: GuiTextField, message: GuiTextField, removeButton: GuiButton) {
         aliases.add(AliasListEntry(id, key, message, removeButton))
     }
@@ -106,8 +105,4 @@ class ScrollingCommandAliasesList(
     override fun drawGradientRect(left: Int, top: Int, right: Int, bottom: Int, color1: Int, color2: Int) {}
     class AliasListEntry(val id: Int, val key: GuiTextField, val message: GuiTextField, val removeButton: GuiButton)
 
-    init {
-        aliases = ArrayList()
-        this.mc = mc
-    }
 }

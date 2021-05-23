@@ -23,6 +23,7 @@ import net.minecraft.block.BlockLever
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
@@ -33,6 +34,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -50,22 +52,24 @@ class WaterBoardSolver {
         if (!Skytils.config.waterBoardSolver) return
         val player = mc.thePlayer
         val world: World = mc.theWorld
-        if (ticks % 4 == 0) {
-            if (variant == -1 && (workerThread == null || !workerThread!!.isAlive || workerThread!!.isInterrupted)) {
-                workerThread = Thread({
+        if (ticks % 20 == 0) {
+            if (!active && DungeonListener.missingPuzzles.contains("Water Board") && variant == -1) {
+                active = true
+                Skytils.threadPool.submit {
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
-                    var foundPiston = false
-                    for (potentialPiston in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54)) {
-                        if (world.getBlockState(potentialPiston).block === Blocks.sticky_piston) {
-                            foundPiston = true
-                            break
-                        }
-                    }
-                    if (foundPiston) {
-                        if (chestPos == null) {
-                            for (potentialChestPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 56)) {
-                                if (world.getBlockState(potentialChestPos).block === Blocks.chest) {
+                    if (Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54).any {
+                            world.getBlockState(it).block === Blocks.sticky_piston
+                        }) {
+                        if (chestPos == null || roomFacing == null) {
+                            findChest@ for (te in world.loadedTileEntityList) {
+                                val playerX = mc.thePlayer.posX.toInt()
+                                val playerZ = mc.thePlayer.posZ.toInt()
+                                val xRange = playerX - 25..playerX + 25
+                                val zRange = playerZ - 25..playerZ + 25
+                                if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                                ) {
+                                    val potentialChestPos = te.pos
                                     if (world.getBlockState(potentialChestPos.down()).block === Blocks.stone && world.getBlockState(
                                             potentialChestPos.up(2)
                                         ).block === Blocks.stained_glass
@@ -78,18 +82,20 @@ class WaterBoardSolver {
                                                 ).block === Blocks.stone
                                             ) {
                                                 chestPos = potentialChestPos
-                                                println("Water board chest is at $chestPos")
                                                 roomFacing = direction
+                                                println("Water board chest is at $chestPos")
                                                 println("Water board room is facing $direction")
-                                                break
+                                                break@findChest
                                             }
                                         }
-                                        break
                                     }
                                 }
                             }
                         }
-                        if (chestPos == null) return@Thread
+                        if (chestPos == null) {
+                            active = false
+                            return@submit
+                        }
                         for (blockPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 82)) {
                             if (world.getBlockState(blockPos).block === Blocks.piston_head) {
                                 inWaterRoom = true
@@ -218,8 +224,8 @@ class WaterBoardSolver {
                         variant = -1
                         solutions.clear()
                     }
-                }, "Skytils-Water-Board-Puzzle")
-                workerThread!!.start()
+                    active = false
+                }
             }
             ticks = 0
         }
@@ -244,7 +250,7 @@ class WaterBoardSolver {
                     if (switched && !solution.contains(lever) || !switched && solution.contains(lever)) {
                         val pos = lever.leverPos
                         val displayed =
-                            renderTimes.compute(lever) { k: LeverBlock?, v: Int? -> if (v == null) return@compute 0 else return@compute v.inc() }
+                            renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> if (v == null) return@compute 0 else return@compute v.inc() }
                         RenderUtil.draw3DString(
                             Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
                             "§l" + color.name,
@@ -324,7 +330,7 @@ class WaterBoardSolver {
         private var prevInWaterRoom = false
         private var inWaterRoom = false
         private var variant = -1
-        private var workerThread: Thread? = null
         private var ticks = 0
+        private var active = false
     }
 }

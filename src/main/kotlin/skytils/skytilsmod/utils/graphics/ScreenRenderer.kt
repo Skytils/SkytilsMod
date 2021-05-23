@@ -22,7 +22,6 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.entity.RenderItem
-import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraft.item.ItemStack
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -801,7 +800,7 @@ class ScreenRenderer {
             `is`,
             x + drawingOrigin.x,
             y + drawingOrigin.y,
-            if (text.isEmpty()) if (count) Integer.toString(`is`.stackSize) else null else text
+            text.ifEmpty { if (count) `is`.stackSize.toString() else null }
         )
         itemRenderer!!.zLevel = 0.0f
         RenderHelper.disableStandardItemLighting()
@@ -811,7 +810,7 @@ class ScreenRenderer {
         @JvmField
         var fontRenderer: SmartFontRenderer = SmartFontRenderer()
         var mc: Minecraft = Minecraft.getMinecraft()
-        var screen: ScaledResolution? = null
+        private var screen: ScaledResolution? = null
         var isRendering = false
         var scale = 1.0f
         var rotation = 0f

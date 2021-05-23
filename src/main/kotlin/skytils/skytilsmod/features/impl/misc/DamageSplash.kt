@@ -26,10 +26,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.EntityManager.spawnEntity
 import skytils.skytilsmod.core.EntityManager.tickEntities
-import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern
 
@@ -52,12 +52,12 @@ class DamageSplash {
         if (e.entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (e.entity.isDead) return
-        val strippedName = stripControlCodes(entity.customNameTag)
+        val strippedName = entity.customNameTag.stripControlCodes()
         val damageMatcher = damagePattern.matcher(strippedName)
         if (damageMatcher.matches()) {
             e.isCanceled = true
             e.entity.worldObj.removeEntity(e.entity)
-            if (Skytils.config.hideDamageInBoss && DungeonsFeatures.hasBossSpawned) return
+            if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
             val name = entity.customNameTag
             val damage =
                 if (name.startsWith("§0"))
@@ -79,6 +79,6 @@ class DamageSplash {
     }
 
     companion object {
-        private val damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?☄?)")
+        private val damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?☄?✷?)")
     }
 }

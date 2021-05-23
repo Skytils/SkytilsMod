@@ -31,7 +31,6 @@ import skytils.skytilsmod.core.structure.LocationButton
 import skytils.skytilsmod.core.structure.ResizeButton
 import skytils.skytilsmod.core.structure.ResizeButton.Corner
 import java.awt.Color
-import java.io.IOException
 
 open class LocationEditGui : GuiScreen() {
     private var xOffset = 0f
@@ -47,7 +46,7 @@ open class LocationEditGui : GuiScreen() {
 
     override fun initGui() {
         super.initGui()
-        for ((_, value) in Skytils.GUIMANAGER.elements) {
+        for ((_, value) in Skytils.guiManager.elements) {
             val lb = LocationButton(value)
             buttonList.add(lb)
             locationButtons[value] = lb
@@ -128,13 +127,19 @@ open class LocationEditGui : GuiScreen() {
             val middleY = scaledY1 + scaledHeight / 2f
             var xOffset = floatMouseX - xOffset * scale - middleX
             var yOffset = floatMouseY - yOffset * scale - middleY
-            if (resizingCorner == Corner.TOP_LEFT) {
-                xOffset *= -1f
-                yOffset *= -1f
-            } else if (resizingCorner == Corner.TOP_RIGHT) {
-                yOffset *= -1f
-            } else if (resizingCorner == Corner.BOTTOM_LEFT) {
-                xOffset *= -1f
+            when (resizingCorner) {
+                Corner.TOP_LEFT -> {
+                    xOffset *= -1f
+                    yOffset *= -1f
+                }
+                Corner.TOP_RIGHT -> {
+                    yOffset *= -1f
+                }
+                Corner.BOTTOM_LEFT -> {
+                    xOffset *= -1f
+                }
+                else -> {
+                }
             }
             val newWidth = xOffset * 2f
             val newHeight = yOffset * 2f
@@ -145,7 +150,6 @@ open class LocationEditGui : GuiScreen() {
             locationButton.drawButton(mc, mouseX, mouseY)
             recalculateResizeButtons()
         } else if (dragging != null) {
-            val lb = locationButtons[dragging] ?: return
             val x = (floatMouseX - xOffset) / sr.scaledWidth.toFloat()
             val y = (floatMouseY - yOffset) / sr.scaledHeight.toFloat()
             dragging!!.setPos(x, y)
@@ -170,32 +174,36 @@ open class LocationEditGui : GuiScreen() {
     private fun recalculateResizeButtons() {
         for (button in buttonList) {
             if (button is ResizeButton) {
-                val resizeButton = button
-                val corner = resizeButton.corner
-                val element = resizeButton.element
+                val corner = button.corner
+                val element = button.element
                 val locationButton = locationButtons[element] ?: continue
                 val boxXOne = locationButton.x - ResizeButton.SIZE * element.scale
                 val boxXTwo = locationButton.x + element.actualWidth + ResizeButton.SIZE * element.scale
                 val boxYOne = locationButton.y - ResizeButton.SIZE * element.scale
                 val boxYTwo = locationButton.y + element.actualHeight + ResizeButton.SIZE * element.scale
-                if (corner == Corner.TOP_LEFT) {
-                    resizeButton.x = boxXOne
-                    resizeButton.y = boxYOne
-                } else if (corner == Corner.TOP_RIGHT) {
-                    resizeButton.x = boxXTwo
-                    resizeButton.y = boxYOne
-                } else if (corner == Corner.BOTTOM_LEFT) {
-                    resizeButton.x = boxXOne
-                    resizeButton.y = boxYTwo
-                } else if (corner == Corner.BOTTOM_RIGHT) {
-                    resizeButton.x = boxXTwo
-                    resizeButton.y = boxYTwo
+                when (corner) {
+                    Corner.TOP_LEFT -> {
+                        button.x = boxXOne
+                        button.y = boxYOne
+                    }
+                    Corner.TOP_RIGHT -> {
+                        button.x = boxXTwo
+                        button.y = boxYOne
+                    }
+                    Corner.BOTTOM_LEFT -> {
+                        button.x = boxXOne
+                        button.y = boxYTwo
+                    }
+                    Corner.BOTTOM_RIGHT -> {
+                        button.x = boxXTwo
+                        button.y = boxYTwo
+                    }
                 }
             }
         }
     }
 
-    @Throws(IOException::class)
+
     override fun handleMouseInput() {
         super.handleMouseInput()
         val hovered = LocationButton.lastHoveredElement

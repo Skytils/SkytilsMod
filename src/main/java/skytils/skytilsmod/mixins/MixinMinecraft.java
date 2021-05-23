@@ -29,7 +29,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -104,19 +106,29 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "run", at = @At("HEAD"))
     private void preRun(CallbackInfo ci) {
-        File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
+/*        File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
         if (!file.exists()) {
+            CloseableHttpClient client = APIUtil.INSTANCE.getBuilder().build();
             try {
-                HttpGet request = new HttpGet(new URL(Skytils.config.dataURL + "files/vigilance.toml").toURI());
+                HttpGet request = new HttpGet(new URL(Skytils.config.getDataURL() + "files/vigilance.toml").toURI());
                 request.setProtocolVersion(HttpVersion.HTTP_1_1);
-                HttpResponse response = APIUtil.INSTANCE.getClient().execute(request);
+                HttpResponse response = client.execute(request);
                 if (response.getStatusLine().getStatusCode() == 200) {
-                    file.createNewFile();
-                    response.getEntity().writeTo(new FileOutputStream(file));
+                    if (file.createNewFile()) {
+                        response.getEntity().writeTo(new FileOutputStream(file));
+                    } else {
+                        throw new IllegalStateException("Failed to create file");
+                    }
                 }
-            } catch (URISyntaxException | IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        }*/
     }
 }

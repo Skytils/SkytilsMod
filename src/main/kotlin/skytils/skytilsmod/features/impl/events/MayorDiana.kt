@@ -19,6 +19,7 @@
 package skytils.skytilsmod.features.impl.events
 
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
@@ -30,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.mixins.AccessorMinecraft
 import skytils.skytilsmod.utils.RenderUtil
@@ -43,17 +45,17 @@ class MayorDiana {
 
     @SubscribeEvent
     fun onEvent(event: Event) {
-        if (!Utils.inSkyblock || !Skytils.config.trackGaiaHits) return
+        if (!Utils.inSkyblock) return
         when (event) {
             is TickEvent.ClientTickEvent -> {
-                if (event.phase == TickEvent.Phase.START) for (golem in gaiaConstructHits.keys) {
+                if (event.phase == TickEvent.Phase.START && Skytils.config.trackGaiaHits) for (golem in gaiaConstructHits.keys) {
                     if (golem.hurtTime == 10) {
                         gaiaConstructHits[golem] = 0
                     }
                 }
             }
             is PacketEvent.ReceiveEvent -> {
-                if (event.packet is S29PacketSoundEffect) {
+                if (Skytils.config.trackGaiaHits && event.packet is S29PacketSoundEffect) {
                     if (event.packet.volume == 0f) return
                     if (event.packet.volume == 0.8f && event.packet.soundName == "random.anvil_land") {
                         val pos = BlockPos(event.packet.x, event.packet.y, event.packet.z)
@@ -85,6 +87,23 @@ class MayorDiana {
                             (mc as AccessorMinecraft).timer.renderPartialTicks
                         )
                         GlStateManager.enableDepth()
+                    }
+                }
+            }
+            is CheckRenderEntityEvent<*> -> {
+                val entity = event.entity
+                if (Skytils.config.removeLeftOverBleeds && mc.theWorld != null && entity is EntityArmorStand && entity.hasCustomName() && entity.displayName.formattedText.startsWith(
+                        "§c☣ §fBleeds: §c"
+                    ) && entity.ticksExisted >= 20
+                ) {
+                    val aabb = entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
+                    if (mc.theWorld.loadedEntityList.none {
+                            it.displayName.formattedText.endsWith("§c❤") && it.displayName.formattedText.contains(
+                                "Minotaur §"
+                            ) && it.entityBoundingBox.intersectsWith(aabb)
+                        }) {
+                        event.isCanceled = true
+                        mc.theWorld.removeEntity(entity)
                     }
                 }
             }

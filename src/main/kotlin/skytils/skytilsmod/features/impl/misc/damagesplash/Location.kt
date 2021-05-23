@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.misc.damagesplash
 import net.minecraft.entity.Entity
 import javax.vecmath.Point3d
 import javax.vecmath.Tuple3d
+import kotlin.math.roundToInt
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -60,9 +61,6 @@ class Location : Point3d {
     }
 
     override fun toString(): String {
-        return "[" + Math.round(x).toInt() + ", " + Math.round(y).toInt() + ", " + Math.round(
-            z
-        )
-            .toInt() + "]"
+        return "[" + x.roundToInt() + ", " + y.roundToInt() + ", " + z.roundToInt() + "]"
     }
 }

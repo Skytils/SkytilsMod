@@ -179,8 +179,6 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     companion object {
         val GUIPOSITIONS = HashMap<String, FloatPair>()
         val GUISCALES = HashMap<String, Float>()
-        private const val GUI_SCALE_MINIMUM = 0.5f
-        private const val GUI_SCALE_MAXIMUM = 5f
         private val elements: MutableMap<Int, GuiElement> = HashMap()
         private val names: MutableMap<String, GuiElement> = HashMap()
 
@@ -195,20 +193,9 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
         @JvmStatic
         fun createTitle(title: String?, ticks: Int) {
-            Utils.playLoudSound("random.orb", 0.5)
+            SoundQueue.addToQueue("random.orb", 0.5f, isLoud = true)
             Companion.title = title
             titleDisplayTicks = ticks
-        }
-
-        fun normalizeValueNoStep(value: Float): Float {
-            println(snapNearDefaultValue(value))
-            return snapNearDefaultValue(value).coerceIn(GUI_SCALE_MINIMUM, GUI_SCALE_MAXIMUM)
-        }
-
-        private fun snapNearDefaultValue(value: Float): Float {
-            return if (value != 1f && value > 1 - 0.05 && value < 1 + 0.05) {
-                1f
-            } else value
         }
     }
 

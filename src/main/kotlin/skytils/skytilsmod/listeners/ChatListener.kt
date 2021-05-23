@@ -20,13 +20,14 @@ package skytils.skytilsmod.listeners
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
+import net.minecraft.util.StringUtils.stripControlCodes
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.RepartyCommand
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.mixins.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern
 
@@ -34,7 +35,7 @@ class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = stripControlCodes(event.message.unformattedText)
         if (unformatted.startsWith("Your new API key is ")) {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
             Skytils.config.apiKey = apiKey
@@ -70,6 +71,13 @@ class ChatListener {
                     return
                 }
             }
+        }
+
+        // Await delimiter
+        if (awaitingDelimiter && unformatted.startsWith("---")) {
+            event.isCanceled = true
+            awaitingDelimiter = false
+            return
         }
 
         // Reparty command
@@ -140,59 +148,41 @@ class ChatListener {
         }
         // Inviting
         if (RepartyCommand.inviting) {
-            if (unformatted.contains("-----")) {
-                when (RepartyCommand.Delimiter) {
-                    1 -> {
-                        event.isCanceled = true
-                        RepartyCommand.Delimiter = 0
-                        println("Player Invited!")
-                        RepartyCommand.inviting = false
-                        return
-                    }
-                    0 -> {
-                        RepartyCommand.Delimiter++
-                        event.isCanceled = true
-                        return
-                    }
-                }
-            } else if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
+            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
                 val invitee = invitePattern.matcher(unformatted)
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
                 }
+                tryRemoveLineAtIndex(1)
+                awaitingDelimiter = true
                 event.isCanceled = true
+                println("Player Invited!")
+                RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
+                tryRemoveLineAtIndex(1)
                 event.isCanceled = true
+                println("Player Invited!")
+                RepartyCommand.inviting = false
                 return
             }
         }
         // Fail Inviting
         if (RepartyCommand.failInviting) {
-            if (unformatted.contains("-----")) {
-                when (RepartyCommand.Delimiter) {
-                    1 -> {
-                        event.isCanceled = true
-                        RepartyCommand.Delimiter = 0
-                        println("Player Invited!")
-                        RepartyCommand.inviting = false
-                        return
-                    }
-                    0 -> {
-                        RepartyCommand.Delimiter++
-                        event.isCanceled = true
-                        return
-                    }
-                }
-            } else if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
+            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
                 val invitee = invitePattern.matcher(unformatted)
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
                 }
+                tryRemoveLineAtIndex(1)
                 event.isCanceled = true
+                RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
+                tryRemoveLineAtIndex(1)
                 event.isCanceled = true
+                println("Player Invited!")
+                RepartyCommand.inviting = false
                 return
             }
         }
@@ -205,8 +195,15 @@ class ChatListener {
         }
     }
 
+    fun tryRemoveLineAtIndex(index: Int) {
+        val lines = (mc.ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines
+        if (lines.size > index) {
+            lines.removeAt(index)
+        }
+    }
+
     companion object {
-        var mc = Minecraft.getMinecraft()
+        var mc = Minecraft.getMinecraft()!!
         private var rejoinThread: Thread? = null
         private var lastPartyDisbander = ""
         private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
@@ -214,5 +211,6 @@ class ChatListener {
         private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
         private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
         private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
+        private var awaitingDelimiter = false
     }
 }

@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 public abstract class MixinItemStack {
     @Shadow private NBTTagCompound stackTagCompound;
     private final static Pattern starPattern = Pattern.compile("(§6✪)");
+    private final static Pattern masterStarPattern = Pattern.compile("(§c✪)");
 
     private final ItemStack that = (ItemStack) (Object) this;
 
@@ -69,15 +70,26 @@ public abstract class MixinItemStack {
         if (!Utils.inSkyblock) return s;
         try {
             if (Skytils.config.compactStars && s.contains("✪")) {
-                Matcher starMatcher = starPattern.matcher(s);
-                if (starMatcher.find()) {
+                Matcher masterStarMatcher = masterStarPattern.matcher(s);
+                if (masterStarMatcher.find()) {
                     int count = 0;
                     int i = 0;
-                    while (starMatcher.find(i)) {
-                        count++;
-                        i = starMatcher.start() + 1;
+                    while(masterStarMatcher.find(i)) {
+                        count ++;
+                        i = masterStarMatcher.end();
                     }
-                    s = s.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
+                    s = s.replaceAll(starPattern.toString(), "").replaceAll(masterStarPattern.toString(), "") + "§c" + (count + 5) + "✪";
+                } else {
+                    Matcher starMatcher = starPattern.matcher(s);
+                    if (starMatcher.find()) {
+                        int count = 0;
+                        int i = 0;
+                        while (starMatcher.find(i)) {
+                            count++;
+                            i = starMatcher.end();
+                        }
+                        s = s.replaceAll(starPattern.toString(), "") + "§6" + count + "✪";
+                    }
                 }
             }
         } catch(Exception ignored) { }

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
@@ -31,10 +32,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.lang.NullPointerException
 
 class IceFillSolver {
     @SubscribeEvent
@@ -43,46 +44,50 @@ class IceFillSolver {
         if (!Skytils.config.iceFillSolver) return
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (chestPos == null || roomFacing == null) {
-                Thread({
-                    findChest@ for (pos in Utils.getBlocksWithinRangeAtSameY(mc.thePlayer.position, 25, 75)) {
-                        val block = world.getBlockState(pos)
-                        if (block.block === Blocks.chest && world.getBlockState(pos.down()).block === Blocks.stone) {
-                            for (direction in EnumFacing.HORIZONTALS) {
-                                if (world.getBlockState(pos.offset(direction)).block === Blocks.cobblestone && world.getBlockState(
-                                        pos.offset(direction.opposite, 2)
-                                    ).block === Blocks.iron_bars && world.getBlockState(
-                                        pos.offset(
-                                            direction.rotateY(),
-                                            2
+            if (DungeonListener.missingPuzzles.contains("Ice Fill") && (chestPos == null || roomFacing == null)) {
+                Skytils.threadPool.submit {
+                    findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                        val playerX = mc.thePlayer.posX.toInt()
+                        val playerZ = mc.thePlayer.posZ.toInt()
+                        val xRange = playerX - 25..playerX + 25
+                        val zRange = playerZ - 25..playerZ + 25
+                        if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                        ) {
+                            val pos = te.pos
+                            if (world.getBlockState(pos.down()).block == Blocks.stone) {
+                                for (direction in EnumFacing.HORIZONTALS) {
+                                    if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
+                                            pos.offset(direction.opposite, 2)
+                                        ).block == Blocks.iron_bars && world.getBlockState(
+                                            pos.offset(
+                                                direction.rotateY(),
+                                                2
+                                            )
+                                        ).block == Blocks.torch && world.getBlockState(
+                                            pos.offset(
+                                                direction.rotateYCCW(),
+                                                2
+                                            )
+                                        ).block == Blocks.torch && world.getBlockState(
+                                            pos.offset(direction.opposite).down(2)
+                                        ).block == Blocks.stone_brick_stairs
+                                    ) {
+                                        chestPos = pos
+                                        roomFacing = direction
+                                        println(
+                                            "Ice fill chest is at $chestPos and is facing $roomFacing"
                                         )
-                                    ).block === Blocks.torch && world.getBlockState(
-                                        pos.offset(
-                                            direction.rotateYCCW(),
-                                            2
-                                        )
-                                    ).block === Blocks.torch && world.getBlockState(
-                                        pos.offset(direction.opposite).down(2)
-                                    ).block === Blocks.stone_brick_stairs
-                                ) {
-                                    chestPos = pos
-                                    roomFacing = direction
-                                    println(
-                                        String.format(
-                                            "Ice fill chest is at %s and is facing %s",
-                                            chestPos,
-                                            roomFacing
-                                        )
-                                    )
-                                    break@findChest
+                                        break@findChest
+                                    }
                                 }
                             }
                         }
                     }
-                }, "Skytils-Ice-Fill-Detection").start()
+                }
             }
-            if ((solverThread == null || !solverThread!!.isAlive) && chestPos != null) {
-                solverThread = Thread({
+            if (chestPos != null && !solverActive) {
+                solverActive = true
+                Skytils.threadPool.submit {
                     if (three == null) {
                         three = IceFillPuzzle(world, 70)
                     }
@@ -101,8 +106,7 @@ class IceFillSolver {
                     if (seven!!.paths.size == 0) {
                         seven!!.genPaths(world)
                     }
-                }, "Skytils-Ice-Fill-Solution")
-                solverThread!!.start()
+                }
             }
             ticks = 0
         }
@@ -211,43 +215,12 @@ class IceFillSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         chestPos = null
         roomFacing = null
         three = null
         five = null
         seven = null
-    }
-
-    private fun getVec3RelativeToGrid7(row: Int, column: Int): Vec3? {
-        return if (chestPos == null || roomFacing == null) null else Vec3(
-            chestPos!!
-                .offset(roomFacing!!.opposite, 4)
-                .down(3)
-                .offset(roomFacing!!.rotateYCCW(), 3)
-                .offset(roomFacing!!.rotateY(), row)
-                .offset(roomFacing!!.opposite, column)
-        )
-    }
-
-    private fun getVec3RelativeToGrid5(row: Int, column: Int): Vec3? {
-        return if (chestPos == null || roomFacing == null) null else Vec3(
-            BlockPos(getVec3RelativeToGrid7(1, 6))
-                .offset(roomFacing!!.opposite, 3)
-                .down()
-                .offset(roomFacing!!.rotateY(), row)
-                .offset(roomFacing!!.opposite, column)
-        )
-    }
-
-    private fun getVec3RelativeToGrid3(row: Int, column: Int): Vec3? {
-        return if (chestPos == null || roomFacing == null) null else Vec3(
-            BlockPos(getVec3RelativeToGrid5(1, 4))
-                .offset(roomFacing!!.opposite, 3)
-                .down()
-                .offset(roomFacing!!.rotateY(), row)
-                .offset(roomFacing!!.opposite, column)
-        )
     }
 
     private inner class IceFillPuzzle(world: World, y: Int) {
@@ -289,20 +262,23 @@ class IceFillSolver {
 
                 // Check if every move starting from position `v` leads
                 // to a solution or not
-                for (w in g.adjList[v]!!) {
-                    // process only unvisited vertices as the Hamiltonian
-                    // path visit each vertex exactly once
-                    if (visited[w] == null || !visited[w]!!) {
-                        visited[w] = true
-                        path.add(w)
+                val check = g.adjList[v]
+                if (check != null) {
+                    for (w in check) {
+                        // process only unvisited vertices as the Hamiltonian
+                        // path visit each vertex exactly once
+                        if (visited[w] == null || !visited[w]!!) {
+                            visited[w] = true
+                            path.add(w)
 
-                        // check if adding vertex `w` to the path leads
-                        // to the solution or not
-                        getPaths(g, w, visited, path, N)
+                            // check if adding vertex `w` to the path leads
+                            // to the solution or not
+                            getPaths(g, w, visited, path, N)
 
-                        // backtrack
-                        visited[w] = false
-                        path.removeAt(path.size - 1)
+                            // backtrack
+                            visited[w] = false
+                            path.removeAt(path.size - 1)
+                        }
                     }
                 }
             }
@@ -359,7 +335,7 @@ class IceFillSolver {
      * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
      */
     private inner class Graph constructor(moves: List<Move>, world: World) {
-        var adjList: MutableMap<BlockPos?, List<BlockPos>> = HashMap()
+        var adjList: MutableMap<BlockPos, List<BlockPos>> = HashMap()
 
         init {
             for (move in moves) {
@@ -379,6 +355,6 @@ class IceFillSolver {
         private var three: IceFillPuzzle? = null
         private var five: IceFillPuzzle? = null
         private var seven: IceFillPuzzle? = null
-        private var solverThread: Thread? = null
+        private var solverActive = false
     }
 }

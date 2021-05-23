@@ -36,8 +36,8 @@ import java.util.regex.Pattern
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
-class DamageSplashEntity(damage: String, currentLocation: Location) : FakeEntity(currentLocation) {
-    var displayText: String
+class DamageSplashEntity(private var damage: String, currentLocation: Location) : FakeEntity(currentLocation) {
+    private var displayText: String
     private var scale = 1f
     private var color: CustomColor? = null
     private var love = false
@@ -88,7 +88,6 @@ class DamageSplashEntity(damage: String, currentLocation: Location) : FakeEntity
     }
 
     init {
-        var damage = damage
         val symbolMatcher = SYMBOL_PATTERN.matcher(damage)
         if (symbolMatcher.matches()) {
             var symbol = symbolMatcher.group(2)

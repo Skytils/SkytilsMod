@@ -34,7 +34,11 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.ItemRarity
+import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -139,7 +143,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         when (event.packet) {
             is S02PacketChat -> {
                 if (event.packet.type == 2.toByte() || !Skytils.config.trackMythEvent) return
-                val unformatted = StringUtils.stripControlCodes(event.packet.chatComponent.unformattedText)
+                val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
                 if (unformatted.startsWith("RARE DROP! You dug out a ")) {
                     val matcher = rareDugDrop.matcher(unformatted)
                     if (matcher.matches()) {
@@ -181,7 +185,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             }
             is S2FPacketSetSlot -> {
                 val item = event.packet.func_149174_e() ?: return
-                if (event.packet.func_149175_c() != 0 || mc.thePlayer.ticksExisted <= 1) return
+                if (event.packet.func_149175_c() != 0 || mc.thePlayer == null || mc.thePlayer.ticksExisted <= 1) return
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
                 if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
@@ -267,7 +271,6 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
     }
 
     override fun setDefault(writer: FileWriter) {
-        write(writer)
     }
 
     companion object {
@@ -280,42 +283,49 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock && SBInfo.instance.mode.equals("hub")) {
+            if (toggled && Utils.inSkyblock && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+                val player = Minecraft.getMinecraft().thePlayer
 
-                ScreenRenderer.fontRenderer.drawString(
-                    "Burrows Dug§f: $burrowsDug",
-                    if (leftAlign) 0f else width.toFloat(),
-                    0f,
-                    CommonColors.YELLOW,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-                var drawnLines = 1
-                for (mob in BurrowMob.values()) {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "${mob.mobName}§f: ${mob.dugTimes}",
-                        if (leftAlign) 0f else width.toFloat(),
-                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.CYAN,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                    drawnLines++
-                }
-                for (item in BurrowDrop.values()) {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
-                        if (leftAlign) 0f else width.toFloat(),
-                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.CYAN,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                    drawnLines++
+                for (i in 0..7) {
+                    val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
+                    if (hotbarItem.displayName.contains("Ancestral Spade")) {
+                        ScreenRenderer.fontRenderer.drawString(
+                            "Burrows Dug§f: $burrowsDug",
+                            if (leftAlign) 0f else width.toFloat(),
+                            0f,
+                            CommonColors.YELLOW,
+                            alignment,
+                            SmartFontRenderer.TextShadow.NORMAL
+                        )
+                        var drawnLines = 1
+                        for (mob in BurrowMob.values()) {
+                            ScreenRenderer.fontRenderer.drawString(
+                                "${mob.mobName}§f: ${mob.dugTimes}",
+                                if (leftAlign) 0f else width.toFloat(),
+                                (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                                CommonColors.CYAN,
+                                alignment,
+                                SmartFontRenderer.TextShadow.NORMAL
+                            )
+                            drawnLines++
+                        }
+                        for (item in BurrowDrop.values()) {
+                            ScreenRenderer.fontRenderer.drawString(
+                                "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
+                                if (leftAlign) 0f else width.toFloat(),
+                                (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                                CommonColors.CYAN,
+                                alignment,
+                                SmartFontRenderer.TextShadow.NORMAL
+                            )
+                            drawnLines++
+                        }
+                        break
+                    }
                 }
             }
         }
@@ -367,7 +377,7 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             get() = Skytils.config.trackMythEvent
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 

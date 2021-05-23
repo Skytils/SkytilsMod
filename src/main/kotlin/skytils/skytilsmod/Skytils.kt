@@ -18,7 +18,7 @@
 
 package skytils.skytilsmod
 
-import club.sk1er.vigilance.gui.SettingsGui
+import gg.essential.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -68,12 +68,14 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
+import skytils.skytilsmod.features.impl.trackers.MayorJerryTracker
 import skytils.skytilsmod.features.impl.trackers.MythologicalTracker
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.listeners.ChatListener
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.AccessorCommandHandler
 import skytils.skytilsmod.mixins.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
@@ -82,6 +84,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.awt.Desktop
 import java.io.File
 import java.net.URL
+import java.util.concurrent.Executors
 
 
 @Mod(
@@ -96,7 +99,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0-pre2"
+        const val VERSION = "1.0-pre9"
 
         @JvmField
         val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -104,14 +107,13 @@ class Skytils {
         @JvmField
         val mc: Minecraft = Minecraft.getMinecraft()
 
-        @JvmField
-        val config = Config()
+        lateinit var config: Config
 
         @JvmField
         val modDir = File(File(mc.mcDataDir, "config"), "skytils")
 
         @JvmStatic
-        lateinit var GUIMANAGER: GuiManager
+        lateinit var guiManager: GuiManager
         var ticks = 0
 
         @JvmField
@@ -132,6 +134,9 @@ class Skytils {
 
         @JvmField
         var displayScreen: GuiScreen? = null
+
+        @JvmField
+        val threadPool = Executors.newFixedThreadPool(10)
     }
 
 
@@ -152,24 +157,29 @@ class Skytils {
         }
         if (!modDir.exists()) modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
-        GUIMANAGER = GuiManager()
+        guiManager = GuiManager()
         jarFile = event.sourceFile
     }
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+        config = Config()
         config.preload()
+
+        UpdateChecker.downloadDeleteTask()
 
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
-        MinecraftForge.EVENT_BUS.register(GUIMANAGER)
-        MinecraftForge.EVENT_BUS.register(MayorInfo())
-        MinecraftForge.EVENT_BUS.register(SBInfo.instance)
+        MinecraftForge.EVENT_BUS.register(DungeonListener)
+        MinecraftForge.EVENT_BUS.register(guiManager)
+        MinecraftForge.EVENT_BUS.register(MayorInfo)
+        MinecraftForge.EVENT_BUS.register(SBInfo)
         MinecraftForge.EVENT_BUS.register(SoundQueue)
-        MinecraftForge.EVENT_BUS.register(UpdateChecker())
+        MinecraftForge.EVENT_BUS.register(UpdateChecker)
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
 
+        MinecraftForge.EVENT_BUS.register(AlignmentTaskSolver())
         MinecraftForge.EVENT_BUS.register(ArmorColor())
         MinecraftForge.EVENT_BUS.register(AuctionData())
         MinecraftForge.EVENT_BUS.register(AuctionPriceOverlay())
@@ -183,7 +193,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(CommandAliases())
         MinecraftForge.EVENT_BUS.register(DamageSplash())
         MinecraftForge.EVENT_BUS.register(DarkModeMist())
-        MinecraftForge.EVENT_BUS.register(DungeonsFeatures())
+        MinecraftForge.EVENT_BUS.register(DungeonFeatures())
         MinecraftForge.EVENT_BUS.register(DungeonMap())
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())
@@ -197,6 +207,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(LockOrb())
         MinecraftForge.EVENT_BUS.register(MayorDiana())
         MinecraftForge.EVENT_BUS.register(MayorJerry())
+        MinecraftForge.EVENT_BUS.register(MayorJerryTracker)
         MinecraftForge.EVENT_BUS.register(MiningFeatures())
         MinecraftForge.EVENT_BUS.register(MinionFeatures())
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
@@ -207,14 +218,17 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(RelicWaypoints())
         MinecraftForge.EVENT_BUS.register(ScoreCalculation())
         MinecraftForge.EVENT_BUS.register(SelectAllColorSolver())
+        MinecraftForge.EVENT_BUS.register(ShootTheTargetSolver())
         MinecraftForge.EVENT_BUS.register(SimonSaysSolver())
         MinecraftForge.EVENT_BUS.register(SlayerFeatures())
         MinecraftForge.EVENT_BUS.register(SpidersDenFeatures())
         MinecraftForge.EVENT_BUS.register(StartsWithSequenceSolver())
+        MinecraftForge.EVENT_BUS.register(TankDisplayStuff())
         MinecraftForge.EVENT_BUS.register(TechnoMayor())
         MinecraftForge.EVENT_BUS.register(TeleportMazeSolver())
         MinecraftForge.EVENT_BUS.register(TerminalFeatures())
         MinecraftForge.EVENT_BUS.register(ThreeWeirdosSolver())
+        MinecraftForge.EVENT_BUS.register(TicTacToeSolver())
         MinecraftForge.EVENT_BUS.register(TreasureHunter())
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
         MinecraftForge.EVENT_BUS.register(WaterBoardSolver())
@@ -254,7 +268,9 @@ class Skytils {
                 cch.commandSet.add(RepartyCommand)
                 cch.commandMap["rp"] = RepartyCommand
             }
-        }
+        } else throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
+
+        MayorInfo.fetchMayorData()
     }
 
     @SubscribeEvent
@@ -300,17 +316,17 @@ class Skytils {
     @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
         if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
-            var x = event.gui.width - 105
-            var x2 = x + 100
+            val x = event.gui.width - 105
+            val x2 = x + 100
             var y = event.gui.height - 22
             var y2 = y + 20
             val sorted = Lists.newArrayList(event.buttonList)
             sorted.sortWith { a, b -> b.yPosition + b.height - a.yPosition + a.height }
             for (button in sorted) {
-                var otherX = button.xPosition
-                var otherX2 = button.xPosition + button.width
-                var otherY = button.yPosition
-                var otherY2 = button.yPosition + button.height
+                val otherX = button.xPosition
+                val otherX2 = button.xPosition + button.width
+                val otherY = button.yPosition
+                val otherY2 = button.yPosition + button.height
                 if (otherX2 > x && otherX < x2 && otherY2 > y && otherY < y2) {
                     y = otherY - 20 - 2
                     y2 = y + 20

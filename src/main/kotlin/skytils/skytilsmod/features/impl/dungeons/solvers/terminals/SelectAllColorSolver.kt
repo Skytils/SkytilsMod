@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import com.google.common.collect.ImmutableList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -31,7 +30,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.Utils
-import java.util.*
 
 class SelectAllColorSolver {
     @SubscribeEvent
@@ -65,11 +63,9 @@ class SelectAllColorSolver {
                         }
                     }
                 } else {
-                    for (slotNum in ImmutableList.copyOf(shouldClick)) {
-                        val slot = chest.getSlot(slotNum)
-                        if (slot.hasStack && slot.stack.isItemEnchanted) {
-                            shouldClick.remove(slotNum as Int)
-                        }
+                    shouldClick.removeIf {
+                        val slot = chest.getSlot(it)
+                        return@removeIf slot.hasStack && slot.stack.isItemEnchanted
                     }
                 }
             } else {
@@ -134,6 +130,7 @@ class SelectAllColorSolver {
 
     companion object {
         private val mc = Minecraft.getMinecraft()
+
         @JvmField
         val shouldClick = ArrayList<Int>()
         private var colorNeeded: String? = null

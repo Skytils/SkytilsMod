@@ -38,54 +38,50 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
-import java.util.function.Consumer
 import kotlin.math.roundToInt
 
 class GriffinBurrows {
     companion object {
-        var burrows = ArrayList<Burrow>()
-        var dugBurrows = ArrayList<BlockPos>()
+        var burrows = arrayListOf<Burrow>()
+        var dugBurrows = arrayListOf<BlockPos>()
         var lastDugBurrow: BlockPos? = null
-        var particleBurrows = ArrayList<ParticleBurrow>()
+        var particleBurrows = arrayListOf<ParticleBurrow>()
         var lastDugParticleBurrow: BlockPos? = null
         var burrowRefreshTimer = StopWatch()
         var shouldRefreshBurrows = false
         private val mc = Minecraft.getMinecraft()
         fun refreshBurrows() {
-            Thread {
+            Skytils.threadPool.submit {
                 println("Finding burrows")
                 val uuid = mc.thePlayer.gameProfile.id.toString().replace("[\\-]".toRegex(), "")
                 val apiKey = Skytils.config.apiKey
                 if (apiKey.isEmpty()) {
                     mc.thePlayer.addChatMessage(ChatComponentText("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>"))
                     Skytils.config.showGriffinBurrows = false
-                    return@Thread
+                    return@submit
                 }
-                val latestProfile = APIUtil.getLatestProfileID(uuid, apiKey) ?: return@Thread
+                val latestProfile = APIUtil.getLatestProfileID(uuid, apiKey) ?: return@submit
                 val profileResponse =
                     APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$apiKey")
                 if (!profileResponse["success"].asBoolean) {
                     val reason = profileResponse["cause"].asString
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed getting burrows with reason: " + reason))
-                    return@Thread
+                    return@submit
                 }
                 val playerObject = profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid].asJsonObject
                 if (!playerObject.has("griffin")) {
                     mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed getting burrows with reason: No griffin object."))
-                    return@Thread
+                    return@submit
                 }
                 val burrowArray = playerObject["griffin"].asJsonObject["burrows"].asJsonArray
                 val receivedBurrows = ArrayList<Burrow>()
-                burrowArray.forEach(Consumer { jsonElement: JsonElement ->
+                burrowArray.forEach { jsonElement: JsonElement ->
                     val burrowObject = jsonElement.asJsonObject
                     val x = burrowObject["x"].asInt
                     val y = burrowObject["y"].asInt
@@ -95,7 +91,7 @@ class GriffinBurrows {
                     val chain = burrowObject["chain"].asInt
                     val burrow = Burrow(x, y, z, type, tier, chain)
                     receivedBurrows.add(burrow)
-                })
+                }
                 dugBurrows.removeIf { dug: BlockPos ->
                     receivedBurrows.none { burrow: Burrow -> burrow.blockPos == dug }
                 }
@@ -113,7 +109,7 @@ class GriffinBurrows {
                         ChatComponentText("§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs.")
                     )
                 } else mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size + EnumChatFormatting.GREEN + " burrows!"))
-            }.start()
+            }
         }
 
         init {
@@ -124,7 +120,7 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
-        if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode) return
+        if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
         if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
@@ -142,9 +138,11 @@ class GriffinBurrows {
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
-        if (Skytils.config.showGriffinBurrows && (unformatted == "You died!" || unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted == "You finished the Griffin burrow chain! (4/4)"
-                    )
+        val unformatted = event.message.unformattedText.stripControlCodes()
+        if (Skytils.config.showGriffinBurrows &&
+            (unformatted == "You died!" ||
+                    unformatted.startsWith("You dug out a Griffin Burrow! (") ||
+                    unformatted == "You finished the Griffin burrow chain! (4/4)")
         ) {
             if (lastDugBurrow != null) {
                 dugBurrows.add(lastDugBurrow!!)
@@ -208,12 +206,14 @@ class GriffinBurrows {
         if (Skytils.config.showGriffinBurrows) {
             if (burrows.isNotEmpty()) {
                 for (burrow in burrows.toTypedArray()) {
-                    burrow.drawWaypoint(event.partialTicks)
+                    if (burrow != null) {
+                        burrow.drawWaypoint(event.partialTicks)
+                    }
                 }
             }
             if (Skytils.config.particleBurrows && particleBurrows.isNotEmpty()) {
                 for (pb in particleBurrows.toTypedArray()) {
-                    if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
+                    if (pb != null && pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
                         pb.drawWaypoint(event.partialTicks)
                     }
                 }
@@ -230,7 +230,7 @@ class GriffinBurrows {
 
     class GriffinGuiElement : GuiElement("Griffin Timer", FloatPair(100, 10)) {
         override fun render() {
-            if (SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode) return
+            if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null) {
                 for (i in 0..7) {
@@ -273,7 +273,7 @@ class GriffinBurrows {
             get() = Skytils.config.showGriffinBurrows && Skytils.config.showGriffinCountdown
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 
@@ -281,7 +281,7 @@ class GriffinBurrows {
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
-            if (SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode) return
+            if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
             val packet = event.packet
             val type = packet.particleType
             val longDistance = packet.isLongDistance
@@ -338,7 +338,7 @@ class GriffinBurrows {
         type: Int
     ) {
         var type = -1
-        var timestamp: Long
+        private var timestamp: Long
         var dug = false
 
         constructor(vec3: Vec3i, hasFootstep: Boolean, hasEnchant: Boolean, type: Int) : this(
@@ -360,7 +360,7 @@ class GriffinBurrows {
                     1 -> type = EnumChatFormatting.RED.toString() + "Mob"
                     2 -> type = EnumChatFormatting.GOLD.toString() + "Treasure"
                 }
-                return String.format("%s §a(Particle)", type)
+                return "$type §a(Particle)"
             }
         private val color: Color
             get() {
@@ -373,10 +373,7 @@ class GriffinBurrows {
             }
 
         fun drawWaypoint(partialTicks: Float) {
-            val viewer = Minecraft.getMinecraft().renderViewEntity
-            val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-            val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-            val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
             val x = pos.x - viewerX
             val y = pos.y - viewerY
@@ -387,7 +384,7 @@ class GriffinBurrows {
             RenderUtil.drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
                 this.color,
-                0.1f + 0.005f * distSq.toFloat()
+                (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
@@ -423,7 +420,7 @@ class GriffinBurrows {
         /**
          * This variable appears to hold what order the burrow is in the chain
          */
-        var chain: Int
+        private var chain: Int
     ) {
         val blockPos: BlockPos
             get() = BlockPos(x, y, z)
@@ -446,12 +443,9 @@ class GriffinBurrows {
                         closest = warp
                     }
                 }
-                return String.format(
-                    "%s §bPosition: %s/4%s",
-                    type,
-                    chain + 1,
-                    if (closest != null) " " + closest.nameWithColor else ""
-                )
+                return "$type §bPosition: ${chain + 1}/4${
+                    if (closest != null) " ${closest.nameWithColor}" else ""
+                }"
             }
 
         private val color: Color
@@ -465,10 +459,7 @@ class GriffinBurrows {
             }
 
         fun drawWaypoint(partialTicks: Float) {
-            val viewer = Minecraft.getMinecraft().renderViewEntity
-            val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-            val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-            val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
             val x = pos.x - viewerX
             val y = pos.y - viewerY
@@ -479,7 +470,7 @@ class GriffinBurrows {
             RenderUtil.drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
                 this.color,
-                0.1f + 0.005f * distSq.toFloat()
+                (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)

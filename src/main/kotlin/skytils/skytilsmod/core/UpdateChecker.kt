@@ -18,89 +18,136 @@
 package skytils.skytilsmod.core
 
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiMainMenu
+import net.minecraft.util.Util
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
+import org.apache.http.HttpVersion
+import org.apache.http.client.methods.HttpGet
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.UpdateChecker.getJarNameFromUrl
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.Utils
+import java.awt.Desktop
 import java.io.*
+import java.net.URL
+import kotlin.concurrent.thread
 
-class UpdateChecker {
-    companion object {
-        val updateGetter = UpdateGetter()
-        val updateDownloadURL: String
-            get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject["browser_download_url"].asString
+object UpdateChecker {
+    val updateGetter = UpdateGetter()
+    val updateDownloadURL: String
+        get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject["browser_download_url"].asString
 
-        fun getJarNameFromUrl(url: String): String {
-            val sUrl = url.split("/".toRegex()).toTypedArray()
-            return sUrl[sUrl.size - 1]
-        }
+    fun getJarNameFromUrl(url: String): String {
+        return url.split(Regex("/")).last()
+    }
 
-        fun scheduleCopyUpdateAtShutdown(jarName: String?) {
-            Runtime.getRuntime().addShutdownHook(Thread {
-                try {
-                    println("Attempting to apply Skytils update.")
-                    val oldJar = Skytils.jarFile
-                    if (oldJar == null || !oldJar.exists() || oldJar.isDirectory) {
-                        println("Old jar file not found.")
-                        return@Thread
-                    }
-                    val newJar = File(File(Skytils.modDir, "updates"), jarName)
-                    copyFile(newJar, oldJar)
-                    newJar.delete()
-                    println("Successfully applied Skytils update.")
-                } catch (ex: Throwable) {
-                    ex.printStackTrace()
-                }
-            })
-        }
-
-        /**
-         * Taken from Wynntils under GNU Affero General Public License v3.0
-         * Modified to perform faster
-         * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
-         * @author Wynntils
-         * Copy a file from a location to another
-         *
-         * @param sourceFile The source file
-         * @param destFile Where it will be
-         */
-        @Throws(IOException::class)
-        fun copyFile(sourceFile: File, destFile: File?) {
-            var destFile = destFile
-            if (destFile == null || !destFile.exists()) {
-                destFile = File(File(sourceFile.parentFile, "mods"), "Skytils.jar")
-                sourceFile.renameTo(destFile)
-                return
-            }
-            var source: InputStream? = null
-            var dest: OutputStream? = null
+    fun scheduleCopyUpdateAtShutdown(jarName: String) {
+        Runtime.getRuntime().addShutdownHook(Thread {
             try {
-                source = FileInputStream(sourceFile)
-                dest = FileOutputStream(destFile)
-                val buffer = ByteArray(1024)
-                var length: Int
-                while (source.read(buffer).also { length = it } > 0) {
-                    dest.write(buffer, 0, length)
+                println("Attempting to apply Skytils update.")
+                val oldJar = Skytils.jarFile
+                if (oldJar == null || !oldJar.exists() || oldJar.isDirectory) {
+                    println("Old jar file not found.")
+                    return@Thread
                 }
-            } finally {
-                source!!.close()
-                dest!!.close()
-            }
-        }
-
-        init {
-            val thread = Thread(updateGetter)
-            thread.start()
-            try {
-                thread.join()
-            } catch (ex: InterruptedException) {
+                println("Copying updated jar to mods.")
+                val newJar = File(File(Skytils.modDir, "updates"), jarName)
+                println("Copying to mod folder")
+                val newLocation = File(oldJar.parent, "${if (oldJar.name.startsWith("!")) "!" else ""}${jarName}")
+                newLocation.createNewFile()
+                copyFile(newJar, newLocation)
+                newJar.delete()
+                println("Running delete task")
+                val taskFile = File(File(Skytils.modDir, "updates"), "tasks").listFiles()?.first()
+                if (taskFile == null) {
+                    println("Task doesn't exist")
+                    return@Thread
+                }
+                val runtime = Utils.getJavaRuntime()
+                if (Util.getOSType() == Util.EnumOS.OSX) {
+                    println("On Mac, trying to open mods folder")
+                    Desktop.getDesktop().open(oldJar.parentFile)
+                }
+                println("Using runtime $runtime")
+                Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" \"${oldJar.absolutePath}\"")
+                println("Successfully applied Skytils update.")
+            } catch (ex: Throwable) {
+                println("Failed to apply Skytils Update.")
                 ex.printStackTrace()
             }
+        })
+    }
+
+    fun downloadDeleteTask() {
+        Thread {
+            println("Checking for Skytils install task...")
+            val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
+            if (taskDir.mkdirs() || taskDir.list()?.isEmpty() == true) {
+                println("Downloading Skytils delete task.")
+                val client = APIUtil.builder.build()
+                val url =
+                    "https://cdn.discordapp.com/attachments/807303259902705685/841080571731640401/SkytilsInstaller-1.0-SNAPSHOT.jar"
+                val req = HttpGet(URL(url).toURI())
+                req.protocolVersion = HttpVersion.HTTP_1_1
+                val taskFile = File(taskDir, getJarNameFromUrl(url))
+                taskFile.createNewFile()
+                val res = client.execute(req)
+                if (res.statusLine.statusCode != 200) {
+                    println("Downloading delete task failed!")
+                } else {
+                    println("Writing Skytils delete task.")
+                    res.entity.writeTo(taskFile.outputStream())
+                    client.close()
+                    println("Delete task successfully downloaded!")
+                }
+            }
+        }.start()
+    }
+
+    /**
+     * Taken from Wynntils under GNU Affero General Public License v3.0
+     * Modified to perform faster
+     * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
+     * @author Wynntils
+     * Copy a file from a location to another
+     *
+     * @param sourceFile The source file
+     * @param destFile Where it will be
+     */
+
+    private fun copyFile(sourceFile: File, destFile: File?) {
+        var destFileModifiable = destFile
+        if (destFileModifiable == null || !destFileModifiable.exists()) {
+            destFileModifiable = File(File(sourceFile.parentFile, "mods"), "Skytils.jar")
+            sourceFile.renameTo(destFileModifiable)
+            return
+        }
+        var source: InputStream? = null
+        var dest: OutputStream? = null
+        try {
+            source = FileInputStream(sourceFile)
+            dest = FileOutputStream(destFileModifiable)
+            val buffer = ByteArray(1024)
+            var length: Int
+            while (source.read(buffer).also { length = it } > 0) {
+                dest.write(buffer, 0, length)
+            }
+        } finally {
+            source!!.close()
+            dest!!.close()
+        }
+    }
+
+    init {
+        try {
+            thread(block = updateGetter::run).join()
+        } catch (ex: InterruptedException) {
+            ex.printStackTrace()
         }
     }
 
@@ -108,16 +155,7 @@ class UpdateChecker {
     fun onGuiOpen(e: GuiOpenEvent) {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
-        try {
-            Skytils.displayScreen = RequestUpdateGui()
-/*            Notifications notifs = Notifications.INSTANCE;
-            notifs.pushNotification("New Skytils Version Available", "Click here to download", () -> {
-                Skytils.displayScreen = new UpdateGui();
-                return Unit.INSTANCE;
-            });*/
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
+        Skytils.displayScreen = RequestUpdateGui()
     }
 
     class UpdateGetter : Runnable {

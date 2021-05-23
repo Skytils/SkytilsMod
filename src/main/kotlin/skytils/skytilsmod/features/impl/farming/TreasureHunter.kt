@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -30,21 +29,21 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 
 
 class TreasureHunter {
 
-    var treasureLocation: BlockPos? = null
+    private var treasureLocation: BlockPos? = null
 
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
 
         val formatted = event.message.formattedText
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
 
         if (formatted == "§r§aYou found a treasure chest!§r") {
             treasureLocation = null
@@ -57,9 +56,7 @@ class TreasureHunter {
             }
             val solution =
                 treasureHunterLocations.getOrDefault(treasureHunterLocations.keys.find { s: String ->
-                    unformatted.contains(
-                        s
-                    )
+                    unformatted.contains(s)
                 }, null)
             if (solution != null) {
                 treasureLocation = solution
@@ -70,11 +67,9 @@ class TreasureHunter {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Utils.inSkyblock || treasureLocation == null || SBInfo.instance.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SBInfo.SkyblockIsland.FarmingIsland.mode) return
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
         val pos = treasureLocation!!
         val x = pos.x - viewerX
         val y = pos.y - viewerY

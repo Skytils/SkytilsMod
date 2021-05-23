@@ -45,8 +45,8 @@ class DungeonMap {
     class TrashDungeonMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
 
         override fun render() {
-            if (!toggled || SBInfo.instance.mode != SBInfo.SkyblockIslands.DUNGEON.mode || mc.thePlayer == null || mc.theWorld == null) return
-            if (DungeonsFeatures.hasBossSpawned) return
+            if (!toggled || SBInfo.mode != SBInfo.SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
+            if (DungeonFeatures.hasBossSpawned) return
             readMapData()
             if (mapData == null) return
             GlStateManager.color(1f, 1f, 1f, 1f)
@@ -91,7 +91,7 @@ class DungeonMap {
             get() = 128
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 

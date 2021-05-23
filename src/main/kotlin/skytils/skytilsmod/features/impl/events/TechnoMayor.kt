@@ -36,7 +36,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 
@@ -66,12 +66,10 @@ class TechnoMayor {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.instance.mode != SBInfo.SkyblockIslands.HUB.mode && SBInfo.instance.mode != SBInfo.SkyblockIslands.FARMINGISLANDS.mode) return
+        if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode && SBInfo.mode != SBInfo.SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         for (orb in ImmutableList.copyOf(orbLocations)) {
             val x = orb.xCoord - viewerX
             val y = orb.yCoord - viewerY
@@ -94,7 +92,7 @@ class TechnoMayor {
         if (event.packet !is S02PacketChat) return
         val packet = event.packet
         if (packet.type.toInt() == 2) return
-        val unformatted = StringUtils.stripControlCodes(packet.chatComponent.unformattedText)
+        val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         if (unformatted == "Your Shiny Orb and associated pig expired and disappeared." || unformatted == "SHINY! The orb is charged! Click on it for loot!") {
             orbLocations.removeIf { pos: Vec3 ->
                 mc.thePlayer.position.distanceSq(

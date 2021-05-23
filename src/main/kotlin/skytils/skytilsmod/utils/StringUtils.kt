@@ -17,30 +17,13 @@
  */
 package skytils.skytilsmod.utils
 
-object StringUtils {
-    @JvmStatic
-    fun stripControlCodes(string: String?): String {
-        return net.minecraft.util.StringUtils.stripControlCodes(string)
-    }
+import net.minecraft.util.StringUtils as MinecraftStringUtils
+import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
-    @JvmStatic
-    fun startsWith(string: CharSequence?, sequence: CharSequence?): Boolean {
-        return org.apache.commons.lang3.StringUtils.startsWith(string, sequence)
-    }
+fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
 
-    @JvmStatic
-    fun startsWithAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
-        return org.apache.commons.lang3.StringUtils.startsWithAny(string, *sequences)
-    }
-
-    @JvmStatic
-    fun containsAny(string: CharSequence?, vararg sequences: CharSequence?): Boolean {
-        if (string == null) return false
-        for(sequence in sequences) {
-            if (sequence?.let { string.contains(it) } == true) {
-                return true
-            }
-        }
-        return false
-    }
+fun String?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
+fun String?.containsAny(vararg sequences: CharSequence?): Boolean {
+    if (this == null) return false
+    return sequences.any { it != null && this.contains(it) }
 }

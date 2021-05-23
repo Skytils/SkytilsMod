@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import net.minecraft.block.BlockButtonStone
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
@@ -28,7 +27,8 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.BlockChangeEvent
-import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
@@ -40,17 +40,10 @@ class SimonSaysSolver {
         val old = event.old
         val state = event.update
         if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver && DungeonsFeatures.dungeonFloor == "F7") {
+            if (Skytils.config.simonSaysSolver && DungeonFeatures.dungeonFloor == "F7" && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L) {
                 if (pos.y in 120..123 && pos.z >= 291 && pos.z <= 294) {
                     if (pos.x == 310) {
-                        println(
-                            String.format(
-                                "Block at %s changed to %s from %s",
-                                pos,
-                                state.block.localizedName,
-                                old.block.localizedName
-                            )
-                        )
+                        println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
                         if (state.block === Blocks.sea_lantern) {
                             if (!clickInOrder.contains(pos)) {
                                 clickInOrder.add(pos)
@@ -84,10 +77,8 @@ class SimonSaysSolver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
             val pos = clickInOrder[clickNeeded].west()
             val x = pos.x - viewerX

@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.base.Predicate
 import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
@@ -33,6 +32,7 @@ import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import kotlin.math.floor
 
 /**
@@ -44,7 +44,7 @@ class ThreeWeirdosSolver {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons) return
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.contains("PUZZLE SOLVED!")) {
             if (unformatted.contains("wasn't fooled by ")) {
                 riddleNPC = null
@@ -61,11 +61,7 @@ class ThreeWeirdosSolver {
                     val npcName = unformatted.substring(unformatted.indexOf("]") + 2, unformatted.indexOf(":"))
                     riddleNPC = npcName
                     mc.thePlayer.addChatMessage(
-                        ChatComponentText(
-                            EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + StringUtils.stripControlCodes(
-                                npcName
-                            ) + EnumChatFormatting.DARK_GREEN + " has the blessing."
-                        )
+                        ChatComponentText("§a§l${npcName.stripControlCodes()} §2has the blessing.")
                     )
                     break
                 }
@@ -85,7 +81,7 @@ class ThreeWeirdosSolver {
                     if (entity == null) return@getEntities false
                     if (!entity.hasCustomName()) return@getEntities false
                     entity.customNameTag.contains("CLICK")
-                }.stream().findFirst().orElse(null)
+                }.firstOrNull()
                 if (clickLabel != null) {
                     if (clickLabel.getDistanceSq(event.pos) <= 5) {
                         println("Chest was too close to NPC; Chest Pos: " + event.pos.x + ", " + event.pos.y + ", " + event.pos.z + " NPC Pos: " + clickLabel.posX + ", " + clickLabel.posY + ", " + clickLabel.posZ)
@@ -100,7 +96,7 @@ class ThreeWeirdosSolver {
                         if (entity == null) return@getEntities false
                         if (!entity.hasCustomName()) return@getEntities false
                         entity.customNameTag.contains(riddleNPC!!)
-                    }.stream().findFirst().orElse(null)
+                    }.firstOrNull()
                     if (riddleLabel != null) {
                         println("Found Riddle NPC " + riddleLabel.customNameTag + " at " + riddleLabel.posX + ", " + riddleLabel.posY + ", " + riddleLabel.posY)
                         val actualPos = BlockPos(floor(riddleLabel.posX), 69.0, floor(riddleLabel.posZ))
@@ -124,7 +120,7 @@ class ThreeWeirdosSolver {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent?) {
+    fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || riddleNPC == null) return
         if (riddleChest == null) {
             val riddleLabel = mc.theWorld.getEntities(
@@ -133,7 +129,7 @@ class ThreeWeirdosSolver {
                 if (entity == null) return@getEntities false
                 if (!entity.hasCustomName()) return@getEntities false
                 entity.customNameTag.contains(riddleNPC!!)
-            }.stream().findFirst().orElse(null)
+            }.firstOrNull()
             if (riddleLabel != null) {
                 println("Chest Finder: Found Riddle NPC " + riddleLabel.customNameTag + " at " + riddleLabel.position)
                 val npcPos = riddleLabel.position
@@ -159,6 +155,7 @@ class ThreeWeirdosSolver {
         var solutions = ArrayList<String>()
         private val mc = Minecraft.getMinecraft()
         var riddleNPC: String? = null
+
         @JvmField
         var riddleChest: BlockPos? = null
     }

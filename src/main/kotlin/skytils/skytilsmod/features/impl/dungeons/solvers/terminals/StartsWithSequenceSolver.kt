@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import com.google.common.collect.ImmutableList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -29,7 +28,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern
 
@@ -54,19 +53,14 @@ class StartsWithSequenceSolver {
                         val item = slot.stack ?: continue
                         if (item.isItemEnchanted) continue
                         if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
-                        if (StringUtils.stripControlCodes(item.displayName).startsWith(
-                                sequenceNeeded!!
-                            )
-                        ) {
+                        if (item.displayName.stripControlCodes().startsWith(sequenceNeeded!!)) {
                             shouldClick.add(slot.slotNumber)
                         }
                     }
                 } else {
-                    for (slotNum in ImmutableList.copyOf(shouldClick)) {
-                        val slot = chest.getSlot(slotNum)
-                        if (slot.hasStack && slot.stack.isItemEnchanted) {
-                            shouldClick.remove(slotNum as Int)
-                        }
+                    shouldClick.removeIf {
+                        val slot = chest.getSlot(it)
+                        return@removeIf slot.hasStack && slot.stack.isItemEnchanted
                     }
                 }
             } else {
@@ -132,6 +126,7 @@ class StartsWithSequenceSolver {
 
     companion object {
         private val mc = Minecraft.getMinecraft()
+
         @JvmField
         val shouldClick = ArrayList<Int>()
         private var sequenceNeeded: String? = null

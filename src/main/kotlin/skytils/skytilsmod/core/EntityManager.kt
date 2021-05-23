@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
 import skytils.skytilsmod.features.impl.misc.damagesplash.FakeEntity
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -49,7 +48,7 @@ object EntityManager {
      * This method is THREAD SAFE.
      */
     fun clearEntities() {
-        entityList.forEach(Consumer { obj: FakeEntity -> obj.remove() })
+        entityList.forEach { it.remove() }
     }
 
     /**

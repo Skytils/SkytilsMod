@@ -20,26 +20,33 @@ package skytils.skytilsmod.features.impl.dungeons
 import com.google.common.base.Predicate
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
+import java.awt.Color
+import java.util.regex.Pattern
 
 class BossHPDisplays {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || event.type.toInt() == 2) return
-        val unformatted = StringUtils.stripControlCodes(event.message.unformattedText)
+        val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.startsWith("[BOSS] Sadan")) {
             if (unformatted.contains("My giants! Unleashed!")) canGiantsSpawn = true
             if (unformatted.contains("It was inevitable.") || unformatted.contains("NOOOOOOOOO")) canGiantsSpawn = false
@@ -53,8 +60,41 @@ class BossHPDisplays {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         canGiantsSpawn = false
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!Utils.inDungeons) return
+        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet) {
+            val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
+            for (entity in mc.theWorld.loadedEntityList) {
+                if (entity !is EntityArmorStand) continue
+                val name = entity.displayName.formattedText
+                if (name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
+                        DungeonFeatures.dungeonFloor,
+                        "F7",
+                        "M6"
+                    )) || GiantHPElement.GIANT_NAMES.any {
+                        name.contains(
+                            it
+                        )
+                    })
+                ) {
+                    GlStateManager.disableCull()
+                    GlStateManager.disableDepth()
+                    RenderUtil.draw3DString(
+                        entity.positionVector.addVector(0.0, -10.0, 0.0),
+                        name,
+                        Color.WHITE,
+                        event.partialTicks
+                    )
+                    GlStateManager.enableDepth()
+                    GlStateManager.enableCull()
+                }
+            }
+        }
     }
 
     companion object {
@@ -63,6 +103,84 @@ class BossHPDisplays {
 
         init {
             GiantHPElement()
+            GuardianRespawnTimer()
+        }
+    }
+
+    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", FloatPair(200, 30)) {
+        private val guardianNameRegex = Pattern.compile("§c(Healthy|Reinforced|Chaos|Laser) Guardian §e0§c❤")
+        private val timerRegex = Pattern.compile("§c ☠ §7 (.+?) §c ☠ §7")
+
+        override fun render() {
+            if (toggled && DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "M3",
+                    "F3"
+                ) && mc.theWorld != null
+            ) {
+                val respawnTimers = HashMap<String, String>()
+                for (entity in mc.theWorld.loadedEntityList) {
+                    if (respawnTimers.size >= 4) break
+                    if (entity !is EntityArmorStand) continue
+                    val name = entity.customNameTag
+                    if (name.startsWith("§c ☠ §7 ") && name.endsWith(" §c ☠ §7")) {
+                        val nameTag = mc.theWorld.getEntitiesWithinAABB(
+                            EntityArmorStand::class.java,
+                            entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
+                        ).find {
+                            it.customNameTag.endsWith(" Guardian §e0§c❤")
+                        } ?: continue
+                        val matcher = guardianNameRegex.matcher(nameTag.customNameTag)
+                        if (matcher.find()) {
+                            val timeMatcher = timerRegex.matcher(name)
+                            if (timeMatcher.find()) {
+                                respawnTimers[matcher.group(1)] = timeMatcher.group(1)
+                            }
+                        }
+                    }
+                }
+                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                var i = 0
+                for ((name, timer) in respawnTimers.entries) {
+                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    ScreenRenderer.fontRenderer.drawString(
+                        "$name: $timer",
+                        if (leftAlign) 0f else actualWidth,
+                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.WHITE,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    i++
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Guardian Respawn Timer Here",
+                if (leftAlign) 0f else actualWidth,
+                (0 * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                CommonColors.WHITE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Guardian Respawn Timer Here")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showGuardianRespawnTimer
+
+        init {
+            Skytils.guiManager.registerElement(this)
         }
     }
 
@@ -77,14 +195,23 @@ class BossHPDisplays {
                         if (name.contains("❤")) {
                             if (name.contains("§e﴾ §c§lSadan§r")) {
                                 return@Predicate true
-                            } else if (name.contains("Giant") && DungeonsFeatures.dungeonFloor == "F7") return@Predicate true
+                            } else if (name.contains("Giant") && Utils.equalsOneOf(
+                                    DungeonFeatures.dungeonFloor,
+                                    "F7",
+                                    "M6"
+                                )
+                            ) return@Predicate true
                             for (giant in GIANT_NAMES) {
                                 if (name.contains(giant)) return@Predicate true
                             }
                         }
                         false
                     })
-                giantNames.removeIf { entity: EntityArmorStand -> entity.displayName.formattedText.contains("Sadan") && giantNames.size > 1 }
+                giantNames.removeIf { entity: EntityArmorStand ->
+                    DungeonFeatures.dungeonFloor == "F6" && entity.displayName.formattedText.contains(
+                        "Sadan"
+                    ) && giantNames.size > 1
+                }
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 for (i in giantNames.indices) {
@@ -127,12 +254,18 @@ class BossHPDisplays {
             get() = Skytils.config.showGiantHP
 
         companion object {
-            private val GIANT_NAMES =
-                arrayOf("§3§lThe Diamond Giant", "§c§lBigfoot", "§4§lL.A.S.R.", "§d§lJolly Pink Giant")
+            val GIANT_NAMES =
+                arrayOf(
+                    "§3§lThe Diamond Giant",
+                    "§c§lBigfoot",
+                    "§4§lL.A.S.R.",
+                    "§d§lJolly Pink Giant",
+                    "§d§lMutant Giant"
+                )
         }
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

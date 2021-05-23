@@ -31,9 +31,11 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.features.impl.dungeons.DungeonsFeatures
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -58,7 +60,10 @@ class CreeperSolver {
         val world: World? = mc.theWorld
         val player = mc.thePlayer
         if (ticks % 20 == 0) {
-            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null) {
+            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null && DungeonListener.missingPuzzles.contains(
+                    "Creeper Beams"
+                )
+            ) {
                 val x = player.posX
                 val y = player.posY
                 val z = player.posZ
@@ -96,9 +101,7 @@ class CreeperSolver {
                                                 it.first,
                                                 it.second
                                             ) || Utils.equalsOneOf(endBlock, it.first, it.second)
-                                        }) {
-                                        solutionPairs.add(Pair(blockPos, endBlock))
-                                    }
+                                        }) solutionPairs.add(blockPos to endBlock)
                                 }
                             }
                         }
@@ -112,12 +115,15 @@ class CreeperSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonsFeatures.hasBossSpawned && !creeper!!.isDead) {
-            val viewer = Minecraft.getMinecraft().renderViewEntity
-            val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks
-            val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks
-            val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks
+        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonFeatures.hasBossSpawned && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
+                "Creeper Beams"
+            )
+        ) {
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
             GlStateManager.disableCull()
+            val blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND)
+            GlStateManager.enableBlend()
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
             for (i in solutionPairs.indices) {
                 val (one, two) = solutionPairs[i]
                 if (mc.theWorld.getBlockState(one).block == Blocks.prismarine && mc.theWorld.getBlockState(two).block == Blocks.prismarine) {
@@ -149,6 +155,7 @@ class CreeperSolver {
                     aabb2.expand(0.01, 0.01, 0.01), color, 0.5f
                 )
             }
+            if (!blendEnabled) GlStateManager.disableBlend()
             GlStateManager.enableCull()
         }
     }

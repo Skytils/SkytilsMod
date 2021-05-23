@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
-import skytils.skytilsmod.utils.StringUtils
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 
 class TerminalFeatures {
@@ -60,7 +60,7 @@ class TerminalFeatures {
                 if (chestName == "Correct all the panes!" && Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
                     val item = event.slot.stack
                     if (item != null) {
-                        if (!StringUtils.stripControlCodes(item.displayName).startsWith("Off")) return
+                        if (!item.displayName.stripControlCodes().startsWith("Off")) return
                     }
                 }
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)

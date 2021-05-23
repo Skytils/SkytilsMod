@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.mojang.authlib.exceptions.AuthenticationException
-import net.minecraft.client.Minecraft
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -27,37 +26,67 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.utils.*
 import java.io.IOException
 import java.net.URLEncoder
+import java.time.ZonedDateTime
 import java.util.*
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
-class MayorInfo {
+object MayorInfo {
+
+    val mayorData = HashSet<Mayor>()
+
+    var currentMayor: String? = null
+    var mayorPerks = HashSet<String>()
+    var isLocal = true
+    var jerryMayor: Mayor? = null
+    var newJerryPerks = 0L
+    private var ticks = 0
+    private var lastCheckedElectionOver = 0L
+    private var lastFetchedMayorData = 0L
+    private var lastSentData = 0L
+    const val baseURL = "https://sbe-stole-skytils.design/api/mayor"
+
+    private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (ticks % (60*20) == 0) {
+        if (ticks % (60 * 20) == 0) {
+            if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {
+                if (jerryMayor != null && Skytils.config.displayJerryPerks) {
+                    SoundQueue.addToQueue("random.orb", 0.8f, 1f, 1, true)
+                    SoundQueue.addToQueue("random.orb", 0.8f, 1f, 2, true)
+                    SoundQueue.addToQueue("random.orb", 0.8f, 1f, 3, true)
+                }
+                jerryMayor = null
+                fetchJerryData()
+            }
             if (System.currentTimeMillis() - lastFetchedMayorData > 24 * 60 * 60 * 1000 || isLocal) {
                 fetchMayorData()
             }
             if (System.currentTimeMillis() - lastCheckedElectionOver > 60 * 60 * 1000) {
                 var elected = currentMayor
                 for (pi in TabListUtils.tabEntries) {
-                    val name = mc.ingameGUI.tabList.getPlayerName(pi)
+                    val name = pi.getText()
                     if (name.startsWith("§r §r§fWinner: §r§a")) {
                         elected = name.substring(19, name.length - 2)
                         break
                     }
                 }
-                if (currentMayor != null) {
-                    if (currentMayor != elected) {
-                        isLocal = true
-                        currentMayor = elected
-                        mayorPerks.clear()
-                    }
-                    lastCheckedElectionOver = System.currentTimeMillis()
+                if (currentMayor != elected) {
+                    isLocal = true
+                    currentMayor = elected
+                    mayorPerks.clear()
                 }
+                lastCheckedElectionOver = System.currentTimeMillis()
             }
             ticks = 0
         }
@@ -75,7 +104,7 @@ class MayorInfo {
                 val lines = value.formattedText.split("\n".toRegex()).toTypedArray()
                 if (lines.size < 2) return
                 var color = ""
-                if (StringUtils.stripControlCodes(lines[0]).startsWith("Mayor ")) {
+                if (lines[0].stripControlCodes().startsWith("Mayor ")) {
                     color = lines[0].substring(0, 2)
                 }
                 isLocal = true
@@ -88,10 +117,10 @@ class MayorInfo {
                     if (!line.contains("§") || line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
                     if (color.isNotEmpty()) {
                         if (line.startsWith("§r$color")) {
-                            perks.add(StringUtils.stripControlCodes(line))
+                            perks.add(line.stripControlCodes())
                         }
                     } else if (!line.startsWith("§r§7") && !line.startsWith("§r§8")) {
-                        perks.add(StringUtils.stripControlCodes(line))
+                        perks.add(line.stripControlCodes())
                     }
                 }
                 println("Got perks from chat: $perks")
@@ -101,15 +130,40 @@ class MayorInfo {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
             val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith("Mayor ") && (currentMayor == null || !chestName.contains(
+            if (currentMayor == "Jerry" && chestName == "Mayor Jerry" && event.slot.slotNumber == 11 && event.slot.hasStack) {
+                val lore = ItemUtil.getItemLore(event.slot.stack)
+                if (!lore.contains("§9Perkpocalypse Perks:")) return
+                val endingIn = lore.find { it.startsWith("§7Next set of perks in") } ?: return
+                val perks =
+                    lore.subList(lore.indexOf("§9Perkpocalypse Perks:"), lore.size - 1).filter { it.startsWith("§b") }
+                        .map { it.stripControlCodes() }.ifEmpty { return }
+                val mayor = mayorData.find {
+                    it.perks.any { p ->
+                        perks.contains(p.name)
+                    }
+                } ?: return
+                val matcher = jerryNextPerkRegex.find(endingIn) ?: return
+                val timeLeft =
+                    Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
+                val nextPerks = (ZonedDateTime.now().withSecond(59).withNano(999999999)
+                    .toEpochSecond() * 1000) + timeLeft.inWholeMilliseconds
+                if (jerryMayor != mayor || nextPerks != newJerryPerks) {
+                    println("Jerry has ${mayor.name}'s perks ($perks) and is ending in $newJerryPerks ($${endingIn.stripControlCodes()})")
+                    sendJerryData(mayor, nextPerks)
+                }
+                newJerryPerks = nextPerks
+                jerryMayor = mayor
+            } else if ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith("Mayor ") && (currentMayor == null || !chestName.contains(
                     currentMayor!!
-                )))) {
+                )))
+            ) {
                 val slot = event.slot
                 val item = slot.stack
                 if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || currentMayor == null && item.displayName.contains(
@@ -128,7 +182,7 @@ class MayorInfo {
                         val perks = HashSet<String>()
                         for (line in lore) {
                             if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {
-                                perks.add(StringUtils.stripControlCodes(line))
+                                perks.add(line.stripControlCodes())
                             }
                         }
                         println("Got Perks: $perks")
@@ -140,21 +194,12 @@ class MayorInfo {
         }
     }
 
-    companion object {
-        var currentMayor: String? = null
-        var mayorPerks = HashSet<String>()
-        var isLocal = true
-        private val mc = Minecraft.getMinecraft()
-        private var ticks = 0
-        private var lastCheckedElectionOver = 0L
-        private var lastFetchedMayorData = 0L
-        private var lastSentData = 0L
-        const val baseURL = "https://sbe-stole-skytils.design/api/mayor"
-        fun fetchMayorData() {
-            Thread({
-                val res = APIUtil.getJSONResponse(baseURL)
-                if (res.has("name") && res.has("perks")) {
-                    if (res["name"].asString == currentMayor) isLocal = false
+    fun fetchMayorData() {
+        Skytils.threadPool.submit {
+            val res = APIUtil.getJSONResponse(baseURL)
+            if (res.has("name") && res.has("perks")) {
+                if (res["name"].asString == currentMayor) isLocal = false
+                if (!isLocal) {
                     currentMayor = res["name"].asString
                     lastFetchedMayorData = System.currentTimeMillis()
                     mayorPerks.clear()
@@ -163,30 +208,70 @@ class MayorInfo {
                         mayorPerks.add(perks[i].asJsonObject.get("name").asString)
                     }
                 }
-            }, "Skytils-FetchMayor").start()
+            }
         }
+    }
 
-        fun sendMayorData(mayor: String?, perks: HashSet<String>) {
-            if (mayor == null || perks.size == 0) return
-            if (lastSentData - System.currentTimeMillis() < 300_000) lastSentData = System.currentTimeMillis()
-            Thread({
-                try {
-                    val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
-                    val url =
-                        StringBuilder(baseURL + "/new?username=" + mc.session.username + "&serverId=" + serverId + "&mayor=" + mayor)
-                    for (perk in perks) {
-                        url.append("&perks[]=").append(URLEncoder.encode(perk, "UTF-8"))
-                    }
-                    val commentForDecompilers =
-                        "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
-                    mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
-                    println(APIUtil.getJSONResponse(url.toString()))
-                } catch (e: AuthenticationException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
+    fun sendMayorData(mayor: String?, perks: HashSet<String>) {
+        if (mayor == null || perks.size == 0) return
+        if (lastSentData - System.currentTimeMillis() < 300000) lastSentData = System.currentTimeMillis()
+        Skytils.threadPool.submit {
+            try {
+                val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
+                val url =
+                    "$baseURL/new?username=${mc.session.username}&serverId=${serverId}&mayor=${mayor}${
+                        perks.joinToString(separator = "") {
+                            "&perks[]=${
+                                URLEncoder.encode(
+                                    it,
+                                    "UTF-8"
+                                )
+                            }"
+                        }
+                    }"
+                val commentForDecompilers =
+                    "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
+                mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
+                println(APIUtil.getJSONResponse(url))
+            } catch (e: AuthenticationException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun fetchJerryData() {
+        Skytils.threadPool.submit {
+            val res = APIUtil.getJSONResponse("$baseURL/jerry")
+            if (res.has("nextSwitch") && res.has("mayor") && res.has("perks")) {
+                TickTask(1) {
+                    newJerryPerks = res["nextSwitch"].asLong
+                    jerryMayor = mayorData.find { it.name == res["mayor"].asJsonObject["name"].asString }
                 }
-            }, "Skytils-SendMayor").start()
+            }
+        }
+    }
+
+    fun sendJerryData(mayor: Mayor?, nextSwitch: Long) {
+        if (nextSwitch <= 0 || mayor == null) return
+        Skytils.threadPool.submit {
+            try {
+                val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
+                val url =
+                    StringBuilder("$baseURL/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}")
+                val commentForDecompilers =
+                    "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
+                mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
+                println(APIUtil.getJSONResponse(url.toString()))
+            } catch (e: AuthenticationException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
     }
 }
+
+class Mayor(val name: String, val role: String, val perks: List<MayorPerk>, val special: Boolean)
+class MayorPerk(val name: String, val description: String)

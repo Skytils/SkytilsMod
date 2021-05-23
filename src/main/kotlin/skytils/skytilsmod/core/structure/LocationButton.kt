@@ -24,24 +24,17 @@ import net.minecraft.client.renderer.GlStateManager
 import skytils.skytilsmod.utils.RenderUtil
 import java.awt.Color
 
-class LocationButton : GuiButton {
+class LocationButton(var element: GuiElement) : GuiButton(-1, 0, 0, null) {
     var x = 0f
     var y = 0f
     var x2 = 0f
     var y2 = 0f
-    private val scale = 0.0
-    var element: GuiElement
 
-    constructor(element: GuiElement) : super(-1, 0, 0, null) {
-        this.element = element
+    init {
         x = this.element.actualX - 4
         y = this.element.actualY - 4
         x2 = x + this.element.actualWidth + 6
         y2 = y + this.element.actualHeight + 6
-    }
-
-    constructor(buttonId: Int, element: GuiElement) : super(-1, 0, 0, null) {
-        this.element = element
     }
 
     private fun refreshLocations() {

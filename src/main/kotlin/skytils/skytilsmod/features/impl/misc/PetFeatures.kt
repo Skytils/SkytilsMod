@@ -44,7 +44,7 @@ import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.StringUtils.stripControlCodes
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.isInTablist
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -59,9 +59,10 @@ class PetFeatures {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityArmorStand) {
             val entity = event.entity
-            if (Skytils.config.hidePetNametags && entity.customNameTag.contains("§8[§7Lv") && entity.customNameTag.contains(
+            val name = entity.customNameTag
+            if (Skytils.config.hidePetNametags && name.startsWith("§8[§7Lv") && name.contains(
                     "'s "
-                )
+                ) && !name.contains("❤") && !name.contains("Hit")
             ) {
                 event.isCanceled = true
             }
@@ -77,12 +78,12 @@ class PetFeatures {
         } else if (message.startsWith("§r§aYou summoned your §r")) {
             val petMatcher = SUMMON_PATTERN.matcher(message)
             if (petMatcher.find()) {
-                lastPet = stripControlCodes(petMatcher.group("pet"))
+                lastPet = petMatcher.group("pet").stripControlCodes()
             } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
             val autopetMatcher = AUTOPET_PATTERN.matcher(message)
             if (autopetMatcher.find()) {
-                lastPet = stripControlCodes(autopetMatcher.group("pet"))
+                lastPet = autopetMatcher.group("pet").stripControlCodes()
             } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
         }
     }
@@ -90,7 +91,7 @@ class PetFeatures {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (Skytils.config.highlightActivePet && (SBInfo.instance.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.instance.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
+        if (Skytils.config.highlightActivePet && (SBInfo.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
             val item = event.slot.stack
             for (line in getItemLore(item)) {
                 if (line == "§7§cClick to despawn ") {
@@ -112,7 +113,9 @@ class PetFeatures {
                 val itemId = getSkyBlockItemID(item)
                 if (itemId != null) {
                     var isPetItem =
-                        itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP") || itemId.endsWith("CARROT_CANDY")
+                        (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY") || itemId.startsWith(
+                            "PET_SKIN_"
+                        )
                     if (!isPetItem) {
                         val lore = getItemLore(item)
                         for (i in lore.size - 1 downTo 1) {
@@ -228,7 +231,7 @@ class PetFeatures {
         }
 
         init {
-            Skytils.GUIMANAGER.registerElement(this)
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

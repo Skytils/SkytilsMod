@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
  * Hopefully thread safe way to queue sounds with a delay
- * @author My-Name-Is-Jeff
  */
 object SoundQueue {
     private val soundQueue = ConcurrentLinkedQueue<QueuedSound>()
@@ -51,6 +50,24 @@ object SoundQueue {
      */
     fun addToQueue(queuedSound: QueuedSound) {
         soundQueue.add(queuedSound)
+    }
+
+    /**
+     * Add a sound to the SoundQueue
+     * @param sound the name of the sound to play
+     * @param pitch the pitch of the sound to play
+     * @param volume the volume of the sound to play
+     * @param ticks the amount of ticks to delay the sound by
+     * @param isLoud whether or not the sound should bypass the user's volume settings
+     */
+    fun addToQueue(
+        sound: String,
+        pitch: Float,
+        volume: Float = 1f,
+        ticks: Int = 0,
+        isLoud: Boolean = false
+    ) {
+        soundQueue.add(QueuedSound(sound, pitch, volume, ticks, isLoud))
     }
 
     /**
