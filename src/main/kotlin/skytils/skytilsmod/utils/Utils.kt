@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.utils
 
-import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.EntityLivingBase
@@ -51,6 +50,9 @@ object Utils {
 
     @JvmField
     var inDungeons = false
+
+    @JvmField
+    var inSpidersDen = false
 
     @JvmField
     var shouldBypassVolume = false
@@ -118,6 +120,25 @@ object Utils {
             }
         }
         inDungeons = false
+    }
+
+    /**
+     * Taken from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
+    fun checkForSpidersDen() {
+        if (inSkyblock) {
+            val scoreboard = ScoreboardUtil.sidebarLines
+            for (s in scoreboard) {
+                val sCleaned = ScoreboardUtil.cleanSB(s)
+                if (sCleaned.contains("Spider's Den")) {
+                    inSpidersDen = true
+                    return
+                }
+            }
+        }
+        inSpidersDen = false
     }
 
     fun getSlotUnderMouse(gui: GuiContainer): Slot {
@@ -223,7 +244,4 @@ object Utils {
         }
         return java
     }
-
 }
-
-typealias ConcurrentHashSet<T> = ConcurrentSet<T>
