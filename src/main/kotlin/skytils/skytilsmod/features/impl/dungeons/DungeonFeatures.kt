@@ -47,7 +47,6 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderPlayerEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -376,19 +375,6 @@ class DungeonFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderPlayerPre(event: RenderPlayerEvent.Pre) {
-        if (livid != null && event.entityPlayer != livid && event.entityPlayer.uniqueID.version() != 4) {
-            GlStateManager.enableBlend()
-            GlStateManager.color(1f, 1f, 1f, 0.3f)
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderPlayerPost(event: RenderPlayerEvent.Post) {
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        GlStateManager.disableBlend()
-    }
     // Spirit leap names
     @SubscribeEvent
     fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
