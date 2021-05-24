@@ -25,7 +25,9 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
@@ -227,3 +229,5 @@ object Utils {
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
+fun AxisAlignedBB.getMinVec() = Vec3(minX, minY, minZ)
+fun AxisAlignedBB.getMaxVec() = Vec3(maxX, maxY, maxZ)
