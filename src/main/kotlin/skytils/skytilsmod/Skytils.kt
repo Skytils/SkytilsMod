@@ -93,6 +93,7 @@ import java.util.concurrent.Executors
     version = Skytils.VERSION,
     acceptedMinecraftVersions = "[1.8.9]",
     clientSideOnly = true
+    modLanguage = "Kotlin"
 )
 class Skytils {
 
