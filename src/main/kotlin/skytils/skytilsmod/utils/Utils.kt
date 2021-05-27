@@ -225,6 +225,23 @@ object Utils {
         return java
     }
 
+    fun checkBossName(floor: String, bossName: String): Boolean {
+        val correctBoss = when (floor) {
+            "E" -> "The Watcher"
+            "F1", "M1" -> "Bonzo"
+            "F2", "M2" -> "Scarf"
+            "F3", "M3" -> "The Professor"
+            "F4", "M4" -> "Thorn"
+            "F5", "M5" -> "Livid"
+            "F6", "M6" -> "Sadan"
+            "F7", "M7" -> "Necron"
+            else -> null
+        } ?: return false
+
+        // Livid has a prefix in front of the name, so we check ends with to cover all the livids
+        return bossName.endsWith(correctBoss)
+    }
+
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>

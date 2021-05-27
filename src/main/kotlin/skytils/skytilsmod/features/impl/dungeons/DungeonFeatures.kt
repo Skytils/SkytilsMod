@@ -307,10 +307,15 @@ class DungeonFeatures {
             }
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]")) event.isCanceled = true
             if (unformatted.startsWith("[BOSS]") && unformatted.contains(":")) {
-                if (!unformatted.startsWith("[BOSS] The Watcher") && DungeonTimer.bloodClearTime != -1L) {
+                val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
+                if (!hasBossSpawned && bossName != "The Watcher" && dungeonFloor != null && Utils.checkBossName(
+                        dungeonFloor!!,
+                        bossName
+                    )
+                ) {
                     hasBossSpawned = true
                 }
-                if (unformatted.contains("Sadan")) {
+                if (bossName == "Sadan") {
                     if (unformatted.contains("So you made it all the way here")) isInTerracottaPhase = true
                     if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable.")) isInTerracottaPhase =
                         false

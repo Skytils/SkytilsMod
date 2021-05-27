@@ -115,7 +115,7 @@ class CreeperSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !DungeonFeatures.hasBossSpawned && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
+        if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
                 "Creeper Beams"
             )
         ) {
