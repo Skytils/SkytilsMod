@@ -110,13 +110,12 @@ object Utils {
      */
     fun checkForDungeons() {
         if (inSkyblock) {
-            val scoreboard = ScoreboardUtil.sidebarLines
-            for (s in scoreboard) {
-                val sCleaned = ScoreboardUtil.cleanSB(s)
-                if (sCleaned.contains("The Catacombs") && !sCleaned.contains("Queue") || sCleaned.contains("Dungeon Cleared:")) {
-                    inDungeons = true
-                    return
-                }
+            if (ScoreboardUtil.sidebarLines.any {
+                    val sCleaned = ScoreboardUtil.cleanSB(it)
+                    sCleaned.contains("The Catacombs") && !sCleaned.contains("Queue") || sCleaned.contains("Dungeon Cleared:")
+                }) {
+                inDungeons = true
+                return
             }
         }
         inDungeons = false
@@ -229,5 +228,6 @@ object Utils {
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
+
 fun AxisAlignedBB.getMinVec() = Vec3(minX, minY, minZ)
 fun AxisAlignedBB.getMaxVec() = Vec3(maxX, maxY, maxZ)

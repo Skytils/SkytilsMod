@@ -43,10 +43,12 @@ import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.client.event.RenderPlayerEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -63,7 +65,6 @@ import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.mixins.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -108,6 +109,7 @@ class DungeonFeatures {
         private var rerollClicks = 0
         private var foundLivid = false
         private var livid: Entity? = null
+        private var lividTag: Entity? = null
         private var active = false
 
         init {
@@ -144,19 +146,28 @@ class DungeonFeatures {
                 if (Utils.equalsOneOf(dungeonFloor, "F5", "M5")) {
                     when (Skytils.config.lividFinderType) {
                         1 -> {
-                            val loadedLivids: MutableList<Entity> = ArrayList()
-                            val entities = mc.theWorld.getLoadedEntityList()
-                            for (entity in entities) {
-                                val name = entity.name
-                                if (name.contains("Livid") && name.length > 5 && name[1] == name[5] && !loadedLivids.contains(
-                                        entity
-                                    )
-                                ) {
-                                    loadedLivids.add(entity)
-                                }
+                            val loadedLivids = mc.theWorld.loadedEntityList.filter {
+                                val name = it.name
+                                name.contains("Livid") && name.length > 5 && name[1] == name[5]
                             }
                             if (loadedLivids.size > 8) {
-                                livid = loadedLivids[0]
+                                lividTag = loadedLivids[0]
+                                val aabb = AxisAlignedBB(
+                                    lividTag!!.posX - 0.5,
+                                    lividTag!!.posY - 2,
+                                    lividTag!!.posZ - 0.5,
+                                    lividTag!!.posX + 0.5,
+                                    lividTag!!.posY,
+                                    lividTag!!.posZ + 0.5
+                                )
+                                livid = mc.theWorld.loadedEntityList.find {
+                                    val coll = it.entityBoundingBox ?: return@find false
+                                    return@find it is EntityOtherPlayerMP && it.name.endsWith(" Livid") && aabb.isVecInside(
+                                        coll.getMinVec()
+                                    ) && aabb.isVecInside(
+                                        coll.getMaxVec()
+                                    )
+                                }
                                 foundLivid = true
                             }
                         }
@@ -168,10 +179,42 @@ class DungeonFeatures {
                                         Thread.sleep(10)
                                     }
                                     val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
-                                    val a = (state.getValue(BlockStainedGlass.COLOR) as AccessorEnumDyeColor).chatColor
+                                    val a = when (state.getValue(BlockStainedGlass.COLOR).name.lowercase()) {
+                                        "white" -> EnumChatFormatting.WHITE
+                                        "pink" -> EnumChatFormatting.LIGHT_PURPLE
+                                        "red" -> EnumChatFormatting.RED
+                                        "silver" -> EnumChatFormatting.GRAY
+                                        "gray" -> EnumChatFormatting.GRAY
+                                        "green" -> EnumChatFormatting.DARK_GREEN
+                                        "lime" -> EnumChatFormatting.GREEN
+                                        "blue" -> EnumChatFormatting.BLUE
+                                        "purple" -> EnumChatFormatting.DARK_PURPLE
+                                        "yellow" -> EnumChatFormatting.YELLOW
+                                        else -> null
+                                    }
+                                    if (a == null) {
+                                        active = false
+                                        return@submit
+                                    }
                                     for (entity in mc.theWorld.loadedEntityList) {
                                         if (entity.name.startsWith("$a﴾ $a§lLivid")) {
-                                            livid = entity
+                                            lividTag = entity
+                                            val aabb = AxisAlignedBB(
+                                                lividTag!!.posX - 0.5,
+                                                lividTag!!.posY - 2,
+                                                lividTag!!.posZ - 0.5,
+                                                lividTag!!.posX + 0.5,
+                                                lividTag!!.posY,
+                                                lividTag!!.posZ + 0.5
+                                            )
+                                            livid = mc.theWorld.loadedEntityList.find {
+                                                val coll = it.entityBoundingBox ?: return@find false
+                                                return@find it is EntityOtherPlayerMP && it.name.endsWith(" Livid") && aabb.isVecInside(
+                                                    coll.getMinVec()
+                                                ) && aabb.isVecInside(
+                                                    coll.getMaxVec()
+                                                )
+                                            }
                                             foundLivid = true
                                             break
                                         }
@@ -264,7 +307,7 @@ class DungeonFeatures {
             }
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]")) event.isCanceled = true
             if (unformatted.startsWith("[BOSS]") && unformatted.contains(":")) {
-                if (!unformatted.startsWith("[BOSS] The Watcher")) {
+                if (!unformatted.startsWith("[BOSS] The Watcher") && DungeonTimer.bloodClearTime != -1L) {
                     hasBossSpawned = true
                 }
                 if (unformatted.contains("Sadan")) {
@@ -356,7 +399,7 @@ class DungeonFeatures {
                     RenderUtil.getPartialTicks()
                 )
             }
-            if (event.entity == livid) {
+            if (event.entity == lividTag) {
                 val aabb = AxisAlignedBB(
                     event.entity.posX - 0.5,
                     event.entity.posY - 2,
@@ -373,6 +416,20 @@ class DungeonFeatures {
                 )
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderPlayerPre(event: RenderPlayerEvent.Pre) {
+        if (livid != null && event.entityPlayer != livid && event.entityPlayer.uniqueID.version() != 4) {
+            GlStateManager.enableBlend()
+            GlStateManager.color(1f, 1f, 1f, 0.3f)
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderPlayerPost(event: RenderPlayerEvent.Post) {
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.disableBlend()
     }
 
     // Spirit leap names
@@ -548,6 +605,7 @@ class DungeonFeatures {
         hasBossSpawned = false
         isInTerracottaPhase = false
         terracottaEndTime = -1.0
+        lividTag = null
         livid = null
         foundLivid = false
     }
@@ -557,12 +615,12 @@ class DungeonFeatures {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
-                if (livid == null) return
+                if (lividTag == null) return
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
-                    livid!!.name.replace("§l", ""),
+                    lividTag!!.name.replace("§l", ""),
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     CommonColors.WHITE,

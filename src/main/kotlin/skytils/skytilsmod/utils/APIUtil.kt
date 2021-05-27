@@ -78,10 +78,7 @@ object APIUtil {
                     }
                 }
             }
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
-        } catch (ex: URISyntaxException) {
+        } catch (ex: Throwable) {
             ex.printStackTrace()
             mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
         } finally {
@@ -102,10 +99,7 @@ object APIUtil {
             } else {
                 mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest failed. HTTP Error Code: ${response.statusLine.statusCode}"))
             }
-        } catch (ex: IOException) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured. See logs for more details."))
-            ex.printStackTrace()
-        } catch (ex: URISyntaxException) {
+        } catch (ex: Throwable) {
             mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured. See logs for more details."))
             ex.printStackTrace()
         } finally {
