@@ -198,14 +198,17 @@ object MayorInfo {
         Skytils.threadPool.submit {
             val res = APIUtil.getJSONResponse(baseURL)
             if (res.has("name") && res.has("perks")) {
-                if (res["name"].asString == currentMayor) isLocal = false
+                if (res["name"].asString == currentMayor || currentMayor == null || mayorPerks.size == 0) isLocal =
+                    false
                 if (!isLocal) {
-                    currentMayor = res["name"].asString
-                    lastFetchedMayorData = System.currentTimeMillis()
-                    mayorPerks.clear()
-                    val perks = res["perks"].asJsonArray
-                    for (i in 0 until perks.size()) {
-                        mayorPerks.add(perks[i].asJsonObject.get("name").asString)
+                    TickTask(1) {
+                        currentMayor = res["name"].asString
+                        lastFetchedMayorData = System.currentTimeMillis()
+                        mayorPerks.clear()
+                        val perks = res["perks"].asJsonArray
+                        for (i in 0 until perks.size()) {
+                            mayorPerks.add(perks[i].asJsonObject.get("name").asString)
+                        }
                     }
                 }
             }
