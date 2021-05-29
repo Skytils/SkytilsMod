@@ -35,7 +35,7 @@ class TerminalFeatures {
         if (!Utils.inDungeons) return
         // Skytils doesn't use this event, so it must be another mod that cancelled it
         if (event.isCanceled && Skytils.config.blockIncorrectTerminalClicks) {
-            if (mc.thePlayer.openContainer is ContainerChest) {
+            if (mc.thePlayer.openContainer != null && mc.thePlayer.openContainer is ContainerChest) {
                 val chest = mc.thePlayer.openContainer as ContainerChest
                 val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
                 if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!" || chestName.startsWith("Select all the") && Skytils.config.selectAllColorTerminalSolver || chestName.startsWith(

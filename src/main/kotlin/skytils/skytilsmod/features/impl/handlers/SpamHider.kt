@@ -277,7 +277,7 @@ class SpamHider {
                         if (unformatted.contains("was picked up")) {
                             GuiManager.toastGui.add(KeyToast("wither", ""))
                         } else {
-                            val player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
+                            val player = formatted.substringBefore("§r§f §r§ehas")
                             GuiManager.toastGui.add(KeyToast("wither", player))
                         }
                     }

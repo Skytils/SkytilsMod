@@ -65,7 +65,6 @@ class ShootTheTargetSolver {
         if (!Skytils.config.shootTheTargetSolver || shot.isEmpty()) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
-
         for (pos in shot) {
             val x = pos.x - viewerX
             val y = pos.y - viewerY

@@ -148,7 +148,7 @@ class ItemFeatures {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
                         val line2 = lore[2].stripControlCodes()
                         val enchantName =
-                            line2.substring(0, line2.lastIndexOf(" ")).replace(" ".toRegex(), "_").uppercase()
+                            line2.substringBeforeLast(" ").replace(" ", "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
                         isSuperpairsReward = true
                     }

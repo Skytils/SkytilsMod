@@ -125,7 +125,7 @@ class DungeonFeatures {
                 for (s in ScoreboardUtil.sidebarLines) {
                     val line = ScoreboardUtil.cleanSB(s)
                     if (line.contains("The Catacombs (")) {
-                        dungeonFloor = line.substring(line.indexOf("(") + 1, line.indexOf(")"))
+                        dungeonFloor = line.substringAfter("(").substringBefore(")")
                         break
                     }
                 }

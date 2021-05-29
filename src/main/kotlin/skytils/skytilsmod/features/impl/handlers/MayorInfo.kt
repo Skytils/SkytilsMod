@@ -108,7 +108,7 @@ object MayorInfo {
                     color = lines[0].substring(0, 2)
                 }
                 isLocal = true
-                currentMayor = lines[0].substring(lines[0].lastIndexOf(" ") + 1)
+                currentMayor = lines[0].substringAfterLast(" ")
                 mayorPerks.clear()
                 fetchMayorData()
                 val perks = HashSet<String>()

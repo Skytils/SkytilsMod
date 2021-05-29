@@ -37,11 +37,6 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 
-/**
- * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 class BlazeSolver {
     private var ticks = 0
 
@@ -115,7 +110,7 @@ class BlazeSolver {
                             val blazeName = entity.getName().stripControlCodes()
                             try {
                                 val health =
-                                    blazeName.substring(blazeName.indexOf("/") + 1, blazeName.length - 1).toInt()
+                                    blazeName.substringAfter("/").dropLast(1).toInt()
                                 val aabb = AxisAlignedBB(
                                     entity.posX - 0.5,
                                     entity.posY - 2,
@@ -139,7 +134,7 @@ class BlazeSolver {
                     val compare = blaze1.health.compareTo(blaze2.health)
                     if (compare == 0 && !impossible) {
                         impossible = true
-                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§c[§f§lWARNING§c]Skytils detected two blazes with the exact same amount of health!"))
+                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§c[§f§lWARNING§c] Skytils detected two blazes with the exact same amount of health!"))
                     }
                     return@sortWith compare
                 }
@@ -148,6 +143,11 @@ class BlazeSolver {
         ticks++
     }
 
+    /**
+     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size > 0) {
