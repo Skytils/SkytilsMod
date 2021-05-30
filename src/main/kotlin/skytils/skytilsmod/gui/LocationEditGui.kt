@@ -112,41 +112,38 @@ open class LocationEditGui : GuiScreen() {
         val minecraftScale = sr.scaleFactor.toFloat()
         val floatMouseX = Mouse.getX() / minecraftScale
         val floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale
-        if (resizing) { //TODO Fix the rescaling by changing it on corner
+        if (resizing) { //TODO Fix rescaling for top right, top left, and bottom right corners
             val locationButton = locationButtons[dragging] ?: return
-            val scale = scaleCache
-            val scaledX1 = locationButton.x * scale
-            val scaledY1 = locationButton.y * scale
-            val scaledX2 = locationButton.x2 * scale
-            val scaledY2 = locationButton.y2 * scale
-            val scaledWidth = scaledX2 - scaledX1
-            val scaledHeight = scaledY2 - scaledY1
-            val width = locationButton.x2 - locationButton.x
-            val height = locationButton.y2 - locationButton.y
-            val middleX = scaledX1 + scaledWidth / 2f
-            val middleY = scaledY1 + scaledHeight / 2f
-            var xOffset = floatMouseX - xOffset * scale - middleX
-            var yOffset = floatMouseY - yOffset * scale - middleY
             when (resizingCorner) {
-                Corner.TOP_LEFT -> {
-                    xOffset *= -1f
-                    yOffset *= -1f
+                Corner.BOTTOM_RIGHT -> {
+                    val scaledX1 = locationButton.x
+                    val scaledY1 = locationButton.y
+                    val width = locationButton.x2 - locationButton.x
+                    val height = locationButton.y2 - locationButton.y
+                    val newWidth = floatMouseX - scaledX1
+                    val newHeight = floatMouseY - scaledY1
+                    val scaleX = newWidth / width
+                    val scaleY = newHeight / height
+                    val newScale = scaleX.coerceAtLeast(scaleY / 2).coerceAtLeast(0.01f)
+                    locationButton.element.scale *= newScale
                 }
+                Corner.TOP_LEFT -> {}
                 Corner.TOP_RIGHT -> {
-                    yOffset *= -1f
+                    val scaledX = locationButton.x
+                    val scaledY = locationButton.y2
+                    val width = locationButton.x2 - locationButton.x
+                    val height = locationButton.y2 - locationButton.y
+                    val newWidth = floatMouseX - scaledX
+                    val newHeight = scaledY - floatMouseY
+                    val scaleX = newWidth / width
+                    val scaleY = newHeight / height
+                    val newScale = scaleX.coerceAtLeast(scaleY).coerceAtLeast(0.01f)
+                    locationButton.element.scale *= newScale
+                    locationButton.element.pos.setY((scaledY - newHeight) / sr.scaledHeight)
                 }
-                Corner.BOTTOM_LEFT -> {
-                    xOffset *= -1f
-                }
-                else -> {
-                }
+                Corner.BOTTOM_LEFT -> {}
             }
-            val newWidth = xOffset * 2f
-            val newHeight = yOffset * 2f
-            val scaleX = newWidth / width
-            val scaleY = newHeight / height
-            val newScale = scaleX.coerceAtLeast(scaleY).coerceAtLeast(0.01f)
-            locationButton.element.scale = scaleCache + newScale
+
             locationButton.drawButton(mc, mouseX, mouseY)
             recalculateResizeButtons()
         } else if (dragging != null) {
