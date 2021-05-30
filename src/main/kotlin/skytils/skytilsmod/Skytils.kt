@@ -45,10 +45,7 @@ import skytils.skytilsmod.commands.GlintCustomizeCommand
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.commands.SkytilsCommand
 import skytils.skytilsmod.commands.stats.impl.CataCommand
-import skytils.skytilsmod.core.Config
-import skytils.skytilsmod.core.GuiManager
-import skytils.skytilsmod.core.SoundQueue
-import skytils.skytilsmod.core.UpdateChecker
+import skytils.skytilsmod.core.*
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.*
@@ -347,8 +344,11 @@ class Skytils {
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
         if (event.gui == null && config.reopenOptionsMenu) {
-            if (old is CommandAliasesGui || old is LocationEditGui || old is KeyShortcutsGui || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) event.gui =
-                OptionsGui()
+            if (old is CommandAliasesGui || old is LocationEditGui || old is KeyShortcutsGui || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) {
+                TickTask(1) {
+                    displayScreen = OptionsGui()
+                }
+            }
         }
     }
 }
