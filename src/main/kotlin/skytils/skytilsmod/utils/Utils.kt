@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.vigilance.Vigilant
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -31,6 +32,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -41,6 +43,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
+import java.util.concurrent.Future
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -248,3 +251,7 @@ typealias ConcurrentHashSet<T> = ConcurrentSet<T>
 
 fun AxisAlignedBB.getMinVec() = Vec3(minX, minY, minZ)
 fun AxisAlignedBB.getMaxVec() = Vec3(maxX, maxY, maxZ)
+
+fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
+    Skytils.displayScreen = this.gui()
+}

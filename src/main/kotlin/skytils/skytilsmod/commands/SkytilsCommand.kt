@@ -32,6 +32,7 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.openGUI
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -82,7 +83,7 @@ object SkytilsCommand : CommandBase() {
                     }
                 }
             }
-            "config" -> Skytils.displayScreen = Skytils.config.gui()
+            "config" -> Skytils.config.openGUI()
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
                     "§e§l[FETCHUR] §8» §eToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()

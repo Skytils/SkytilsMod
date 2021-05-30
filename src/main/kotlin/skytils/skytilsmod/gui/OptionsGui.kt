@@ -38,7 +38,6 @@ class OptionsGui : GuiScreen() {
     override fun doesGuiPauseGame() = false
 
     override fun initGui() {
-        super.initGui()
         buttonList.add(CleanButton(0, width / 2 - 100, height / 4 + 100, 200, 20, "Config"))
         buttonList.add(CleanButton(1, width / 2 - 100, height / 4 + 125, 200, 20, "Edit Aliases"))
         buttonList.add(CleanButton(2, width / 2 - 100, height / 4 + 150, 200, 20, "Edit Locations"))
@@ -87,11 +86,11 @@ class OptionsGui : GuiScreen() {
 
     override fun actionPerformed(button: GuiButton) {
         when (button.id) {
-            0 -> mc.displayGuiScreen(Skytils.config.gui())
+            0 -> Skytils.config.openGUI()
             1 -> mc.displayGuiScreen(CommandAliasesGui())
             2 -> mc.displayGuiScreen(LocationEditGui())
             3 -> mc.displayGuiScreen(KeyShortcutsGui())
-            4 -> mc.displayGuiScreen(VigilanceConfig.gui())
+            4 -> VigilanceConfig.openGUI()
             5 -> try {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
             } catch (ex: IOException) {
