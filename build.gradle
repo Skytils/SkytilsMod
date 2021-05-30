@@ -71,7 +71,7 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("gg.essential:Vigilance:114-10809-SNAPSHOT") {
+    implementation("gg.essential:Vigilance:115-10809-SNAPSHOT") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
