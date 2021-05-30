@@ -244,13 +244,12 @@ class MiscFeatures {
         val item = event.slot.stack
         if (getSkyBlockItemID(item) == null) {
             if (SBInfo.lastOpenContainerName.startsWithAny(
-                    "Auctions"
-                ) && item.item === Items.arrow
-            ) return
-            if (SBInfo.lastOpenContainerName.startsWithAny(
                     "Reforge Item"
                 ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
             ) return
+            if (ItemUtil.getItemLore(item).any {
+                    it.startsWith("§bRight-Click")
+                }) return
             event.isCanceled = true
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer)
         }
