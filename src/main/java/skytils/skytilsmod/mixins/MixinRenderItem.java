@@ -59,7 +59,7 @@ public abstract class MixinRenderItem {
         if (Utils.inSkyblock && Skytils.config.showItemRarity) {
             if (mc.currentScreen != null) {
                 String name = mc.currentScreen.getClass().getName();
-                if (name.equals("io.github.moulberry.notenoughupdates.auction.CustomAHGui")) {
+                if (Utils.getAcceptableRarityGuiDisplays().contains(name)) {
                     RenderUtil.renderRarity(stack, x, y);
                 }
             }
