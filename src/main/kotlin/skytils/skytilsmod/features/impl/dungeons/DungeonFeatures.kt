@@ -71,6 +71,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
+import java.util.concurrent.Future
 import java.util.regex.Pattern
 
 class DungeonFeatures {
@@ -110,7 +111,7 @@ class DungeonFeatures {
         private var foundLivid = false
         private var livid: Entity? = null
         private var lividTag: Entity? = null
-        private var active = false
+        private var lividJob: Future<*>? = null
 
         init {
             LividGuiElement()
@@ -172,9 +173,8 @@ class DungeonFeatures {
                             }
                         }
                         0 -> {
-                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && !active) {
-                                active = true
-                                Skytils.threadPool.submit {
+                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && (lividJob == null || lividJob?.isCancelled == true || lividJob?.isDone == true)) {
+                                lividJob = Skytils.threadPool.submit {
                                     while (mc.thePlayer.isPotionActive(Potion.blindness)) {
                                         Thread.sleep(10)
                                     }
@@ -192,10 +192,7 @@ class DungeonFeatures {
                                         "yellow" -> EnumChatFormatting.YELLOW
                                         else -> null
                                     }
-                                    if (a == null) {
-                                        active = false
-                                        return@submit
-                                    }
+                                    if (a == null) return@submit
                                     for (entity in mc.theWorld.loadedEntityList) {
                                         if (entity.name.startsWith("$a﴾ $a§lLivid")) {
                                             lividTag = entity
@@ -219,7 +216,6 @@ class DungeonFeatures {
                                             break
                                         }
                                     }
-                                    active = false
                                 }
                             }
                         }

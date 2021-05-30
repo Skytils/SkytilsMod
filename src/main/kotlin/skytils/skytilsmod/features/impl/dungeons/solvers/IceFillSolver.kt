@@ -36,6 +36,7 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
+import java.util.concurrent.Future
 
 class IceFillSolver {
     @SubscribeEvent
@@ -44,67 +45,68 @@ class IceFillSolver {
         if (!Skytils.config.iceFillSolver) return
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (DungeonListener.missingPuzzles.contains("Ice Fill") && (chestPos == null || roomFacing == null)) {
-                Skytils.threadPool.submit {
-                    findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                        val playerX = mc.thePlayer.posX.toInt()
-                        val playerZ = mc.thePlayer.posZ.toInt()
-                        val xRange = playerX - 25..playerX + 25
-                        val zRange = playerZ - 25..playerZ + 25
-                        if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
-                        ) {
-                            val pos = te.pos
-                            if (world.getBlockState(pos.down()).block == Blocks.stone) {
-                                for (direction in EnumFacing.HORIZONTALS) {
-                                    if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
-                                            pos.offset(direction.opposite, 2)
-                                        ).block == Blocks.iron_bars && world.getBlockState(
-                                            pos.offset(
-                                                direction.rotateY(),
-                                                2
+            if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isDone == true)) {
+                if (chestPos == null || roomFacing == null) {
+                    job = Skytils.threadPool.submit {
+                        findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                            val playerX = mc.thePlayer.posX.toInt()
+                            val playerZ = mc.thePlayer.posZ.toInt()
+                            val xRange = playerX - 25..playerX + 25
+                            val zRange = playerZ - 25..playerZ + 25
+                            if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                            ) {
+                                val pos = te.pos
+                                if (world.getBlockState(pos.down()).block == Blocks.stone) {
+                                    for (direction in EnumFacing.HORIZONTALS) {
+                                        if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
+                                                pos.offset(direction.opposite, 2)
+                                            ).block == Blocks.iron_bars && world.getBlockState(
+                                                pos.offset(
+                                                    direction.rotateY(),
+                                                    2
+                                                )
+                                            ).block == Blocks.torch && world.getBlockState(
+                                                pos.offset(
+                                                    direction.rotateYCCW(),
+                                                    2
+                                                )
+                                            ).block == Blocks.torch && world.getBlockState(
+                                                pos.offset(direction.opposite).down(2)
+                                            ).block == Blocks.stone_brick_stairs
+                                        ) {
+                                            chestPos = pos
+                                            roomFacing = direction
+                                            println(
+                                                "Ice fill chest is at $chestPos and is facing $roomFacing"
                                             )
-                                        ).block == Blocks.torch && world.getBlockState(
-                                            pos.offset(
-                                                direction.rotateYCCW(),
-                                                2
-                                            )
-                                        ).block == Blocks.torch && world.getBlockState(
-                                            pos.offset(direction.opposite).down(2)
-                                        ).block == Blocks.stone_brick_stairs
-                                    ) {
-                                        chestPos = pos
-                                        roomFacing = direction
-                                        println(
-                                            "Ice fill chest is at $chestPos and is facing $roomFacing"
-                                        )
-                                        break@findChest
+                                            break@findChest
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (chestPos != null && !solverActive) {
-                solverActive = true
-                Skytils.threadPool.submit {
-                    if (three == null) {
-                        three = IceFillPuzzle(world, 70)
-                    }
-                    if (five == null) {
-                        five = IceFillPuzzle(world, 71)
-                    }
-                    if (seven == null) {
-                        seven = IceFillPuzzle(world, 72)
-                    }
-                    if (three!!.paths.size == 0) {
-                        three!!.genPaths(world)
-                    }
-                    if (five!!.paths.size == 0) {
-                        five!!.genPaths(world)
-                    }
-                    if (seven!!.paths.size == 0) {
-                        seven!!.genPaths(world)
+                if (chestPos != null) {
+                    job = Skytils.threadPool.submit {
+                        if (three == null) {
+                            three = IceFillPuzzle(world, 70)
+                        }
+                        if (five == null) {
+                            five = IceFillPuzzle(world, 71)
+                        }
+                        if (seven == null) {
+                            seven = IceFillPuzzle(world, 72)
+                        }
+                        if (three!!.paths.size == 0) {
+                            three!!.genPaths(world)
+                        }
+                        if (five!!.paths.size == 0) {
+                            five!!.genPaths(world)
+                        }
+                        if (seven!!.paths.size == 0) {
+                            seven!!.genPaths(world)
+                        }
                     }
                 }
             }
@@ -355,6 +357,6 @@ class IceFillSolver {
         private var three: IceFillPuzzle? = null
         private var five: IceFillPuzzle? = null
         private var seven: IceFillPuzzle? = null
-        private var solverActive = false
+        private var job: Future<*>? = null
     }
 }

@@ -34,6 +34,7 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
+import java.util.concurrent.Future
 import kotlin.math.floor
 
 class BoulderSolver {
@@ -106,14 +107,13 @@ class BoulderSolver {
         var variantSteps = ArrayList<ArrayList<BoulderPush>>()
         var expectedBoulders = ArrayList<ArrayList<BoulderState>>()
         private var ticks = 0
-        private var active = false
+        private var job: Future<*>? = null
         fun update() {
             if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
             val player = mc.thePlayer
             val world: World? = mc.theWorld
-            if (!active && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
-                active = true
-                Skytils.threadPool.submit {
+            if ((job == null || job?.isCancelled == true || job?.isDone == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
+                job = Skytils.threadPool.submit {
                     var foundBirch = false
                     var foundBarrier = false
                     for (potentialBarrier in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 68)) {
@@ -205,7 +205,6 @@ class BoulderSolver {
                             }
                         }
                     }
-                    active = false
                 }
             }
         }

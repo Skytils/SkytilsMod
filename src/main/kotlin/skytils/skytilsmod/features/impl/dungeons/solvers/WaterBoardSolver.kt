@@ -38,6 +38,7 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
+import java.util.concurrent.Future
 
 /**
  * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
@@ -53,9 +54,8 @@ class WaterBoardSolver {
         val player = mc.thePlayer
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (!active && DungeonListener.missingPuzzles.contains("Water Board") && variant == -1) {
-                active = true
-                Skytils.threadPool.submit {
+            if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isDone == true)) {
+                job = Skytils.threadPool.submit {
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
                     if (Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54).any {
@@ -92,10 +92,7 @@ class WaterBoardSolver {
                                 }
                             }
                         }
-                        if (chestPos == null) {
-                            active = false
-                            return@submit
-                        }
+                        if (chestPos == null) return@submit
                         for (blockPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 82)) {
                             if (world.getBlockState(blockPos).block === Blocks.piston_head) {
                                 inWaterRoom = true
@@ -224,7 +221,6 @@ class WaterBoardSolver {
                         variant = -1
                         solutions.clear()
                     }
-                    active = false
                 }
             }
             ticks = 0
@@ -331,6 +327,6 @@ class WaterBoardSolver {
         private var inWaterRoom = false
         private var variant = -1
         private var ticks = 0
-        private var active = false
+        private var job: Future<*>? = null
     }
 }
