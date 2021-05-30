@@ -20,6 +20,7 @@ package skytils.skytilsmod.gui
 import gg.essential.vigilance.VigilanceConfig
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
@@ -28,6 +29,7 @@ import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.openGUI
 import java.awt.Color
 import java.awt.Desktop
 import java.io.IOException
@@ -35,6 +37,13 @@ import java.net.URI
 import java.net.URISyntaxException
 
 class OptionsGui : GuiScreen() {
+
+    private var origGuiScale: Int
+
+    init {
+        origGuiScale = Skytils.mc.gameSettings.guiScale
+    }
+
     override fun doesGuiPauseGame() = false
 
     override fun initGui() {
@@ -105,6 +114,24 @@ class OptionsGui : GuiScreen() {
             } catch (ex: URISyntaxException) {
                 ex.printStackTrace()
             }
+        }
+    }
+
+    override fun updateScreen() {
+        loadGuiScale(2)
+    }
+
+    override fun onGuiClosed() {
+        loadGuiScale(origGuiScale)
+    }
+
+    fun loadGuiScale(scale: Int) {
+        if (mc.gameSettings.guiScale != scale) {
+            mc.gameSettings.guiScale = scale
+            val scaledresolution = ScaledResolution(mc)
+            val j = scaledresolution.scaledWidth
+            val k = scaledresolution.scaledHeight
+            setWorldAndResolution(mc, j, k)
         }
     }
 }
