@@ -233,8 +233,14 @@ class ItemFeatures {
             }
         }
         if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
-            val name = TabListUtils.tabEntries[68].getText()
-            val bonus = (name.substringAfter("❁").removeSuffix("§r").toInt().coerceAtMost(1000) / 10).toString()
+            var bonus: String
+            try {
+                bonus =
+                    (TabListUtils.tabEntries[68].getText().substringAfter("❁").removeSuffix("§r").toInt().coerceAtMost(1000) / 10).toString()
+            } catch (e: Exception) {
+                bonus = "Error"
+                e.printStackTrace()
+            }
             for (i in event.toolTip.indices) {
                 val line = event.toolTip[i]
                 if (line.contains("§7Crit Damage:")) {
