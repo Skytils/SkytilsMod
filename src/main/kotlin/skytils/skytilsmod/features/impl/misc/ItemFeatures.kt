@@ -68,7 +68,12 @@ class ItemFeatures {
             val chest = gui.inventorySlots as ContainerChest
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
-            if (chestName.startsWith("Salvage") || chestName.startsWith("Storage") || chestName == "Ophelia" || chestName == "Trades") {
+            if (chestName.startsWithAny("Salvage", "Ender Chest") || Utils.equalsOneOf(
+                    chestName,
+                    "Ophelia",
+                    "Trades"
+                ) || (chestName.contains("Backpack") && !chestName.endsWith("Recipe"))
+            ) {
                 if (Skytils.config.highlightSalvageableItems) {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
