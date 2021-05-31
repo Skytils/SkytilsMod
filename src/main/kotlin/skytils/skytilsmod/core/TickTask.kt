@@ -22,13 +22,13 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class TickTask(private var ticks: Int = 0, private val runnable: Runnable) {
+class TickTask(private var ticks: Int = 0, private val task: () -> Unit) {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (ticks <= 0) {
-            runnable.run()
+            task()
             MinecraftForge.EVENT_BUS.unregister(this)
         }
         ticks--
