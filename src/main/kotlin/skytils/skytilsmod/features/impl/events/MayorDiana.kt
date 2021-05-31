@@ -60,34 +60,33 @@ class MayorDiana {
                     if (event.packet.volume == 0f) return
                     if (event.packet.volume == 0.8f && event.packet.soundName == "random.anvil_land") {
                         val pos = BlockPos(event.packet.x, event.packet.y, event.packet.z)
-                        for (entity in mc.theWorld.loadedEntityList) {
-                            if (entity is EntityIronGolem && entity.isEntityAlive && entity.getDistanceSq(pos) <= 2 * 2) {
-                                gaiaConstructHits.compute(entity) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
-                                break
-                            }
-                        }
+                        val golem = (mc.theWorld.loadedEntityList.filter {
+                            it is EntityIronGolem && it.health > 0 && it.getDistanceSq(pos) <= 25 * 25
+                        }.minByOrNull { it.getDistanceSq(pos) } ?: return) as EntityIronGolem
+                        gaiaConstructHits.compute(golem) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
                     }
                 }
             }
             is RenderLivingEvent.Post<*> -> {
                 if (event.entity is EntityIronGolem) {
-                    val golem = event.entity as EntityIronGolem
-                    if (gaiaConstructHits.containsKey(golem)) {
-                        val percentageHp = golem.health / golem.baseMaxHealth
-                        val neededHits = when {
-                            percentageHp <= (1f / 3f) -> 7
-                            percentageHp <= (2f / 3f) -> 6
-                            else -> 5
+                    with(event.entity) {
+                        if (gaiaConstructHits.containsKey(this)) {
+                            val percentageHp = health / baseMaxHealth
+                            val neededHits = when {
+                                percentageHp <= 0.33 -> 7
+                                percentageHp <= 0.66 -> 6
+                                else -> 5
+                            }
+                            val hits = gaiaConstructHits.getOrDefault(this, 0)
+                            GlStateManager.disableDepth()
+                            RenderUtil.draw3DString(
+                                Vec3(posX, posY + 2, posZ),
+                                "Hits: $hits / $neededHits",
+                                if (hits < neededHits) Color.RED else Color.GREEN,
+                                (mc as AccessorMinecraft).timer.renderPartialTicks
+                            )
+                            GlStateManager.enableDepth()
                         }
-                        val hits = gaiaConstructHits.getOrDefault(event.entity, 0)
-                        GlStateManager.disableDepth()
-                        RenderUtil.draw3DString(
-                            Vec3(event.entity.posX, event.entity.posY + 2, event.entity.posZ),
-                            "Hits: $hits / $neededHits",
-                            if (hits < neededHits) Color.RED else Color.GREEN,
-                            (mc as AccessorMinecraft).timer.renderPartialTicks
-                        )
-                        GlStateManager.enableDepth()
                     }
                 }
             }

@@ -253,8 +253,10 @@ object Utils {
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
 
-fun AxisAlignedBB.getMinVec() = Vec3(minX, minY, minZ)
-fun AxisAlignedBB.getMaxVec() = Vec3(maxX, maxY, maxZ)
+val AxisAlignedBB.minVec: Vec3
+    get() = Vec3(minX, minY, minZ)
+val AxisAlignedBB.maxVec: Vec3
+    get() = Vec3(maxX, maxY, maxZ)
 
 fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
     Skytils.displayScreen = this.gui()

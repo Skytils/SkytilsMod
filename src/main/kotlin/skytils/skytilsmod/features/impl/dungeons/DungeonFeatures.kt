@@ -164,9 +164,9 @@ class DungeonFeatures {
                                 livid = mc.theWorld.loadedEntityList.find {
                                     val coll = it.entityBoundingBox ?: return@find false
                                     return@find it is EntityOtherPlayerMP && it.name.endsWith(" Livid") && aabb.isVecInside(
-                                        coll.getMinVec()
+                                        coll.minVec
                                     ) && aabb.isVecInside(
-                                        coll.getMaxVec()
+                                        coll.maxVec
                                     )
                                 }
                                 foundLivid = true
@@ -207,9 +207,9 @@ class DungeonFeatures {
                                             livid = mc.theWorld.loadedEntityList.find {
                                                 val coll = it.entityBoundingBox ?: return@find false
                                                 return@find it is EntityOtherPlayerMP && it.name.endsWith(" Livid") && aabb.isVecInside(
-                                                    coll.getMinVec()
+                                                    coll.minVec
                                                 ) && aabb.isVecInside(
-                                                    coll.getMaxVec()
+                                                    coll.maxVec
                                                 )
                                             }
                                             foundLivid = true
@@ -601,7 +601,7 @@ class DungeonFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         dungeonFloor = null
         hasBossSpawned = false
         isInTerracottaPhase = false
