@@ -22,6 +22,7 @@ import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
@@ -258,3 +259,6 @@ fun AxisAlignedBB.getMaxVec() = Vec3(maxX, maxY, maxZ)
 fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
     Skytils.displayScreen = this.gui()
 }
+
+val EntityLivingBase.baseMaxHealth: Double
+    get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue

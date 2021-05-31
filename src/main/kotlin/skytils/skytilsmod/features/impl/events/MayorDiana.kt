@@ -36,6 +36,7 @@ import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.mixins.AccessorMinecraft
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.baseMaxHealth
 import java.awt.Color
 
 class MayorDiana {
@@ -61,7 +62,7 @@ class MayorDiana {
                         val pos = BlockPos(event.packet.x, event.packet.y, event.packet.z)
                         for (entity in mc.theWorld.loadedEntityList) {
                             if (entity is EntityIronGolem && entity.isEntityAlive && entity.getDistanceSq(pos) <= 2 * 2) {
-                                gaiaConstructHits.compute(entity) { _: EntityIronGolem, i: Int? -> if (i == null) 1 else i + 1 }
+                                gaiaConstructHits.compute(entity) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
                                 break
                             }
                         }
@@ -72,7 +73,7 @@ class MayorDiana {
                 if (event.entity is EntityIronGolem) {
                     val golem = event.entity as EntityIronGolem
                     if (gaiaConstructHits.containsKey(golem)) {
-                        val percentageHp = golem.health / golem.maxHealth
+                        val percentageHp = golem.health / golem.baseMaxHealth
                         val neededHits = when {
                             percentageHp <= (1f / 3f) -> 7
                             percentageHp <= (2f / 3f) -> 6
