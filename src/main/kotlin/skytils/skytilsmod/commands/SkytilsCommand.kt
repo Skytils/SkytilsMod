@@ -17,12 +17,17 @@
 */
 package skytils.skytilsmod.commands
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
@@ -32,6 +37,7 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.openGUI
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -166,6 +172,19 @@ object SkytilsCommand : CommandBase() {
                 sender,
                 args.copyOfRange(1, args.size)
             )
+            "swaphub" -> {
+                if (Utils.inSkyblock) {
+                    Skytils.sendMessageQueue.add("/warpforge")
+                    Skytils.threadPool.submit {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            while (mc.thePlayer.ticksExisted < 20) {
+                                delay(50)
+                            }
+                            Skytils.sendMessageQueue.add("/warp hub")
+                        }
+                    }
+                }
+            }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
     }
