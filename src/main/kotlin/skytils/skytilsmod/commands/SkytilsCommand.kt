@@ -17,10 +17,7 @@
 */
 package skytils.skytilsmod.commands
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -177,9 +174,14 @@ object SkytilsCommand : CommandBase() {
                     Skytils.sendMessageQueue.add("/warpforge")
                     Skytils.threadPool.submit {
                         CoroutineScope(Dispatchers.Default).launch {
-                            while (mc.thePlayer.ticksExisted < 20) {
+                            val startedAt = System.currentTimeMillis()
+                            while (mc.thePlayer != null) {
+                                if (System.currentTimeMillis() - startedAt >= 1000) {
+                                    return@launch
+                                }
                                 delay(50)
                             }
+                            delay(500)
                             Skytils.sendMessageQueue.add("/warp hub")
                         }
                     }
