@@ -67,6 +67,43 @@ class SpamHider {
     private var abilityUses = 0
     private var lastAbilityUsed = ""
 
+    private var SEA_CREATURES = setOf<String>(
+        // Jerry Workshop
+        "Frozen Steve fell into the pond long ago.",
+        "It's a snowman! He looks harmless.",
+        "The Grinch stole Jerry's Gifts...get them back!",
+        // Spooky Fishing
+        "Phew! It's only a scarecrow.",
+        "You hear trotting from beneath the waves, you caught a Nightmare.",
+        "It must be a full moon, it's a Werewolf!",
+        // Fishing Festival
+        "A tiny fin emerges from the water, you've caught a Nurse Shark.",
+        "You spot a fin as blue as the water it came from, it's a Blue Shark.",
+        "A striped beast bounds from the depths, the wild Tiger Shark!",
+        // Regular
+        "A Squid appeared.",
+        "You caught a Sea Walker.",
+        "Pitch darkness reveals you've caught a Night Squid.",
+        "You stumbled upon a Sea Guardian.",
+        "It looks like you've disrupted the Sea Witch's brewing session. Watch out, she's furious!",
+        "You reeled in a Sea Archer.",
+        "The Monster of The Deep emerges from the dark depths...",
+        "Huh? A Catfish!",
+        "Is this even a Fish? It's the Carrot King!",
+        "Gross! A Sea Leech!",
+        "You've discovered a Guardian Defender of the sea.",
+        "You have awoken the Deep Sea Protector, prepare for a battle!",
+    )
+
+    private var LEGENDARY_SEA_CREATURES = setOf<String>(
+        "What is this creature!?",
+        "The spirit of a long lost Phantom Fisher has come to haunt you.",
+        "This can't be! The manifestation of death himself!",
+        "Hide no longer, a Great White Shark has tracked your scent and thirsts for your blood!",
+        "The Water Hydra has come to test your Strength.",
+        "The Sea Emperor arises from the depths..."
+    )
+
     @SubscribeEvent
     fun onActionBarDisplay(event: SetActionBarEvent) {
         if (!Utils.inSkyblock) return
@@ -373,6 +410,33 @@ class SpamHider {
             if (formatted.startsWith("§r§aYour bait got you double")) {
                 when (Skytils.config.blessedBaitHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.blessedBaitHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
+            // Sea creature catch
+            if (SEA_CREATURES.contains(unformatted)) {
+                when (Skytils.config.scCatchHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.scCatchHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
+            // Legendary sea creature catch
+            if (LEGENDARY_SEA_CREATURES.contains(unformatted)) {
+                when (Skytils.config.legendaryScCatchHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.legendaryScCatchHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
+            // Good/Great catch
+            if (unformatted.startsWith("GOOD CATCH! You found") || unformatted.startsWith("GREAT CATCH! You found")) {
+                when (Skytils.config.fishingTreasureHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.fishingTreasureHider == 2)
                     else -> {
                     }
                 }

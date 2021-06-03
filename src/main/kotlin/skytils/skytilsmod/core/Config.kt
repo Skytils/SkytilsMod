@@ -2239,6 +2239,36 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var blessedBaitHider = 0
 
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Sea Creature Catch Hider",
+        description = "Removes regular sea creature catch messages from fishing.",
+        category = "Spam",
+        subcategory = "Fishing",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var scCatchHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Legendary Sea Creature Catch Hider",
+        description = "Removes legendary sea creature catch messages as well.",
+        category = "Spam",
+        subcategory = "Fishing",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var legendaryScCatchHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Fishing Treasure Hider",
+        description = "Removes good/great catch messages from fishing.",
+        category = "Spam",
+        subcategory = "Fishing",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var fishingTreasureHider = 0
+
     init {
         initialize()
 
