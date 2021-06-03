@@ -189,6 +189,17 @@ class SlayerFeatures {
                         return
                     }
                 }
+                for (endermanBoss in ENDERMAN_BOSSES) {
+                    if (name.contains(endermanBoss)) {
+                        drawOutlinedBoundingBox(
+                            AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
+                            Color(0, 255, 255, 255),
+                            3f,
+                            1f
+                        )
+                        return
+                    }
+                }
             }
         }
     }
@@ -259,6 +270,7 @@ class SlayerFeatures {
         )
         private val SPIDER_BOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
         private val WOLF_BOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
+        private val ENDERMAN_BOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidgloom Maniac")
         private val RNGRegex = Regex("[^0-9.]")
     }
 }
