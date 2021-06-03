@@ -67,7 +67,7 @@ class SpamHider {
     private var abilityUses = 0
     private var lastAbilityUsed = ""
 
-    private var SEA_CREATURES = setOf<String>(
+    private val SEA_CREATURES = setOf<String>(
         // Jerry Workshop
         "Frozen Steve fell into the pond long ago.",
         "It's a snowman! He looks harmless.",
@@ -95,7 +95,7 @@ class SpamHider {
         "You have awoken the Deep Sea Protector, prepare for a battle!",
     )
 
-    private var LEGENDARY_SEA_CREATURES = setOf<String>(
+    private val LEGENDARY_SEA_CREATURES = setOf<String>(
         "What is this creature!?",
         "The spirit of a long lost Phantom Fisher has come to haunt you.",
         "This can't be! The manifestation of death himself!",
