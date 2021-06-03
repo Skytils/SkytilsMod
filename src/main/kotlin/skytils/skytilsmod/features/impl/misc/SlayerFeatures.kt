@@ -123,6 +123,16 @@ class SlayerFeatures {
                             )
                             break
                         }
+                        if (boss.startsWith("Voidgloom Seraph")) {
+                            BossStatus.setBossStatus(
+                                RNGMeter(
+                                    100f,
+                                    Skytils.config.voidRNG,
+                                    ChatComponentText("§5§lVoidgloom Seraph RNG§r - §d${Skytils.config.voidRNG}%")
+                                ), true
+                            )
+                            break
+                        }
                     }
                 }
             }
@@ -209,6 +219,10 @@ class SlayerFeatures {
                         }
                         if (boss.startsWith("Sven Packmaster")) {
                             Skytils.config.svenRNG = rngMeter
+                            break
+                        }
+                        if (boss.startsWith("Voidgloom Seraph")) {
+                            Skytils.config.voidRNG = rngMeter
                             break
                         }
                     }

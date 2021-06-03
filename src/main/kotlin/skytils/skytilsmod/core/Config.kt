@@ -1766,6 +1766,17 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var svenRNG = 0f
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER,
+        name = "Current Voidgloom RNG Meter",
+        description = "Internal value to store current Voidgloom Seraph RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var voidRNG = 0f
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Ping when in Atoned Horror Danger Zone",
         description = "Pings when you are standing on the Atoned Horror's TNT target.",
