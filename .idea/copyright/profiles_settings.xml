@@ -1,0 +1,10 @@
+<component name="CopyrightManager">
+  <settings default="Skytils GNU APL 3.0">
+    <module2copyright>
+      <element module="Project Files" copyright="Skytils GNU APL 3.0" />
+    </module2copyright>
+    <LanguageOptions name="JAVA">
+      <option name="fileTypeOverride" value="3" />
+    </LanguageOptions>
+  </settings>
+</component>
