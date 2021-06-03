@@ -1823,6 +1823,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showRNGMeter = false
 
     @Property(
+        PropertyType.SWITCH,
+        name = "Show Soulflow Display",
+        description = "Shows your current internalized soulflow.\n§cRequires your Soulflow battery to be in your inventory.",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var showSoulflowDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH,
         name = "Disable Cooldown Sounds",
         description = "Blocks the sound effect played while an item is on cooldown.",

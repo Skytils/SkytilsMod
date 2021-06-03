@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.misc
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.projectile.EntityFishHook
@@ -410,6 +411,7 @@ class ItemFeatures {
 
         init {
             SoulStrengthGuiElement()
+            SoulflowGuiElement()
         }
     }
 
@@ -447,6 +449,54 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§cSoul Strength: §a1000")
         override val toggled: Boolean
             get() = Skytils.config.showSoulEaterBonus
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class SoulflowGuiElement : GuiElement("Soulflow Display", FloatPair(0.65f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock) {
+                for (i in Skytils.mc.thePlayer.inventory.mainInventory) {
+                    if (i == null) continue
+                    if (!i.displayName.containsAny("Soulflow Pile", "Soulflow Battery", "Soulflow Supercell")) continue
+                    for (str in getItemLore(i)) {
+                        if (!str.startsWith("§7Internalized: ")) continue
+                        val alignment =
+                            if (actualX < ScaledResolution(mc).scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                        ScreenRenderer.fontRenderer.drawString(
+                            str.substring(16),
+                            if (actualX < ScaledResolution(mc).scaledWidth / 2f) 0f else width.toFloat(),
+                            0f,
+                            CommonColors.WHITE,
+                            alignment,
+                            TextShadow.NORMAL
+                        )
+                    }
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < ScaledResolution(mc).scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§3100⸎ Soulflow",
+                if (actualX < ScaledResolution(mc).scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§3100⸎ Soulflow")
+        override val toggled: Boolean
+            get() = Skytils.config.showSoulflowDisplay
 
         init {
             Skytils.guiManager.registerElement(this)
