@@ -2261,13 +2261,23 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR,
-        name = "Fishing Treasure Hider",
-        description = "Removes good/great catch messages from fishing.",
+        name = "Good Fishing Treasure Hider",
+        description = "Removes good catch messages from fishing.",
         category = "Spam",
         subcategory = "Fishing",
         options = ["Normal", "Hidden", "Separate GUI"]
     )
-    var fishingTreasureHider = 0
+    var goodTreasureHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Great Fishing Treasure Hider",
+        description = "Removes great catch messages from fishing.",
+        category = "Spam",
+        subcategory = "Fishing",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var greatTreasureHider = 0
 
     init {
         initialize()

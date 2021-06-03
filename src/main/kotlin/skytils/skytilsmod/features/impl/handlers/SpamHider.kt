@@ -433,10 +433,19 @@ class SpamHider {
                 }
             }
 
-            // Good/Great catch
-            if (unformatted.startsWith("GOOD CATCH! You found") || unformatted.startsWith("GREAT CATCH! You found")) {
-                when (Skytils.config.fishingTreasureHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.fishingTreasureHider == 2)
+            // Good catch
+            if (unformatted.startsWith("GOOD CATCH! You found")) {
+                when (Skytils.config.goodTreasureHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.goodTreasureHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
+            // Great catch
+            if (unformatted.startsWith("GREAT CATCH! You found")) {
+                when (Skytils.config.greatTreasureHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.greatTreasureHider == 2)
                     else -> {
                     }
                 }
