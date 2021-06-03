@@ -1652,6 +1652,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Lower Enderman Nametags",
+        category = "Miscellaneous",
+        subcategory = "Quality of Life"
+    )
+    @JvmField
+    var lowerEndermanNametags = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Dolphin Pet Display",
         description = "Shows the players within the range of the Dolphin pet.",
         category = "Pets",

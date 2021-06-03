@@ -19,10 +19,13 @@
 package skytils.skytilsmod.mixins;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,6 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.CheckRenderEntityEvent;
 import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.utils.StringUtilsKt;
 
 @Mixin(Render.class)
 public abstract class MixinRender<T extends Entity> {
@@ -49,6 +53,16 @@ public abstract class MixinRender<T extends Entity> {
     private void removeEntityOnFire(Entity entity, double x, double y, double z, float partialTicks, CallbackInfo ci) {
         if (Skytils.config.hideEntityFire && Utils.inSkyblock) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderLivingLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V", shift = At.Shift.AFTER))
+    private void renderLivingLabel(T entityIn, String str, double x, double y, double z, int maxDistance, CallbackInfo ci) {
+        if (Skytils.config.lowerEndermanNametags && (str.contains("Enderman") || str.contains("Zealot") || str.contains("Voidling") || str.contains("Voidgloom"))) {
+            EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+            Vec3 vec3 = new Vec3(entityIn.posX - player.posX, 0, entityIn.posZ - player.posZ);
+            vec3 = vec3.normalize();
+            GlStateManager.translate(-vec3.xCoord, -1.5, -vec3.zCoord);
         }
     }
 
