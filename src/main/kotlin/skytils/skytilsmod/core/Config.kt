@@ -2220,7 +2220,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.SELECTOR,
         name = "Legendary Sea Creature Catch Hider",
-        description = "Removes legendary sea creature catch messages as well.",
+        description = "Removes legendary sea creature catch messages from fishing.",
         category = "Spam",
         subcategory = "Fishing",
         options = ["Normal", "Hidden", "Separate GUI"]
