@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.utils.NEUCompatibility;
 
 @Pseudo
-@Mixin(targets = "io.github.moulberry.notenoughupdates.miscgui.TradeWindow")
+@Mixin(targets = "io.github.moulberry.notenoughupdates.miscgui.TradeWindow", remap = false)
 public class MixinTradeWindow {
     @Inject(method = "tradeWindowActive", at = @At("RETURN"))
     private static void tradeWindowActive(String containerName, CallbackInfoReturnable<Boolean> cir) {

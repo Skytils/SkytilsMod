@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.utils.NEUCompatibility;
 
 @Pseudo
-@Mixin(targets = "io.github.moulberry.notenoughupdates.miscfeatures.StorageManager")
+@Mixin(targets = "io.github.moulberry.notenoughupdates.miscfeatures.StorageManager", remap = false)
 public class MixinStorageManager {
     @Shadow
     private boolean shouldRenderStorageOverlayCached = false;
