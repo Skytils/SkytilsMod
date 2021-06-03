@@ -40,6 +40,7 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.events.GuiRenderItemEvent;
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.utils.ItemUtil;
+import skytils.skytilsmod.utils.NEUCompatibility;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 
@@ -59,7 +60,7 @@ public abstract class MixinRenderItem {
         if (Utils.inSkyblock && Skytils.config.showItemRarity) {
             if (mc.currentScreen != null) {
                 String name = mc.currentScreen.getClass().getName();
-                if (Utils.getAcceptableRarityGuiDisplays().contains(name)) {
+                if (NEUCompatibility.INSTANCE.isStorageMenuActive() || NEUCompatibility.INSTANCE.isTradeWindowActive() || name.equals("io.github.moulberry.notenoughupdates.auction.CustomAHGui")) {
                     RenderUtil.renderRarity(stack, x, y);
                 }
             }

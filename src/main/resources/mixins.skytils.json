@@ -46,7 +46,9 @@
     "MixinTileEntityItemStackRenderer",
     "MixinTileEntitySkullRenderer",
     "MixinUtil",
-    "MixinWorld"
+    "MixinWorld",
+    "neu.MixinStorageManager",
+    "neu.MixinTradeWindow"
   ],
   "verbose": true
 }
