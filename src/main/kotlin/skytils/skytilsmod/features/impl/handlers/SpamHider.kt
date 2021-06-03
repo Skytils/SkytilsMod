@@ -50,10 +50,8 @@ class SpamHider {
         var spamMessages = ArrayList<SpamMessage>()
         private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
             if (ReceivePacketEvent.packet !is S02PacketChat) return
-            ReceivePacketEvent.isCanceled = true
-            val packet = ReceivePacketEvent.packet
-            if (addToSpam) newMessage(packet.chatComponent.formattedText)
-            MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
+            Utils.cancelChatPacket(ReceivePacketEvent)
+            if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
         }
 
         private fun newMessage(message: String) {
