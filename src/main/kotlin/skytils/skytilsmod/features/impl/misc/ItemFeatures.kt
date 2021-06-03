@@ -28,6 +28,7 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -36,6 +37,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.GuiContainerEvent
@@ -457,22 +459,33 @@ class ItemFeatures {
 
     class SoulflowGuiElement : GuiElement("Soulflow Display", FloatPair(0.65f, 0.85f)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock) {
+            if (Utils.inSkyblock) {
                 for (i in Skytils.mc.thePlayer.inventory.mainInventory) {
                     if (i == null) continue
                     if (!i.displayName.containsAny("Soulflow Pile", "Soulflow Battery", "Soulflow Supercell")) continue
                     for (str in getItemLore(i)) {
                         if (!str.startsWith("§7Internalized: ")) continue
-                        val alignment =
-                            if (actualX < ScaledResolution(mc).scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                        ScreenRenderer.fontRenderer.drawString(
-                            str.substring(16),
-                            if (actualX < ScaledResolution(mc).scaledWidth / 2f) 0f else width.toFloat(),
-                            0f,
-                            CommonColors.WHITE,
-                            alignment,
-                            TextShadow.NORMAL
-                        )
+                        if (Skytils.config.lowSoulflowPing > 0) {
+                            val soulflow = (str.substring(18).filter { it.isDigit() }).toInt()
+                            if (soulflow <= Skytils.config.lowSoulflowPing && !pinged) {
+                                GuiManager.createTitle("§cLow Soulflow", 20)
+                                pinged = true
+                            } else if (soulflow > Skytils.config.lowSoulflowPing) {
+                                pinged = false
+                            }
+                        }
+                        if (toggled) {
+                            val alignment =
+                                if (actualX < ScaledResolution(mc).scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                            ScreenRenderer.fontRenderer.drawString(
+                                str.substring(16),
+                                if (actualX < ScaledResolution(mc).scaledWidth / 2f) 0f else width.toFloat(),
+                                0f,
+                                CommonColors.WHITE,
+                                alignment,
+                                TextShadow.NORMAL
+                            )
+                        }
                     }
                 }
             }
@@ -497,6 +510,7 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§3100⸎ Soulflow")
         override val toggled: Boolean
             get() = Skytils.config.showSoulflowDisplay
+        private var pinged = false
 
         init {
             Skytils.guiManager.registerElement(this)

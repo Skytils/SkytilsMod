@@ -1825,11 +1825,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         PropertyType.SWITCH,
         name = "Show Soulflow Display",
-        description = "Shows your current internalized soulflow.\n§cRequires your Soulflow battery to be in your inventory.",
+        description = "Shows your current internalized soulflow.\n" +
+                "§cRequires your Soulflow battery to be in your inventory.",
         category = "Slayer",
         subcategory = "Voidgloom Seraph"
     )
     var showSoulflowDisplay = false
+
+    @Property(
+        PropertyType.NUMBER,
+        name = "Low Soulflow Ping",
+        description = "Alerts you when your soulflow is low.\n" +
+                "§cRequires your Soulflow battery to be in your inventory.",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph",
+        min = 0,
+        max = 500
+    )
+    var lowSoulflowPing = 0
 
     @Property(
         type = PropertyType.SWITCH,
