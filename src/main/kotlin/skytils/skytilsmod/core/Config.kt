@@ -1653,6 +1653,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.SWITCH,
         name = "Lower Enderman Nametags",
+        description = "Lowers the health and nametag of endermen so it's easier to see.",
         category = "Miscellaneous",
         subcategory = "Quality of Life"
     )
