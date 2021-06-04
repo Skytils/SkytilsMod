@@ -43,7 +43,7 @@ class SimonSaysSolver {
             if (Skytils.config.simonSaysSolver && DungeonFeatures.dungeonFloor == "F7" && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L) {
                 if (pos.y in 120..123 && pos.z >= 291 && pos.z <= 294) {
                     if (pos.x == 310) {
-                        println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
+                        //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
                         if (state.block === Blocks.sea_lantern) {
                             if (!clickInOrder.contains(pos)) {
                                 clickInOrder.add(pos)
@@ -51,12 +51,12 @@ class SimonSaysSolver {
                         }
                     } else if (pos.x == 309) {
                         if (state.block === Blocks.air) {
-                            println("Buttons on simon says were removed!")
+                            //println("Buttons on simon says were removed!")
                             clickNeeded = 0
                         } else if (state.block === Blocks.stone_button) {
                             if (old.block === Blocks.stone_button) {
                                 if (state.getValue(BlockButtonStone.POWERED)) {
-                                    println("Button on simon says was pressed")
+                                    //println("Button on simon says was pressed")
                                     clickNeeded++
                                 }
                             }
@@ -65,7 +65,7 @@ class SimonSaysSolver {
                 } else if (pos == BlockPos(309, 121, 290)) {
                     if (state.block === Blocks.stone_button) {
                         if (state.getValue(BlockButtonStone.POWERED)) {
-                            println("Simon says was started")
+                            //println("Simon says was started")
                             clickInOrder.clear()
                             clickNeeded = 0
                         }
