@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins.neu;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -28,10 +29,20 @@ import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.RenderUtil;
 
 @Pseudo
-@Mixin(targets = "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer", remap = false)
-public class MixinGuiProfileViewer {
-    @ModifyArgs(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V"))
-    private void renderRarity(Args args) {
+@Mixin(targets = "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer")
+public abstract class MixinGuiProfileViewer extends GuiScreen {
+    @ModifyArgs(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false), remap = false)
+    private void renderRarityOnInvPage(Args args) {
+        if (Skytils.config.showItemRarity) {
+            ItemStack stack = args.get(0);
+            int x = args.get(1);
+            int y = args.get(2);
+            RenderUtil.renderRarity(stack, x, y);
+        }
+    }
+
+    @ModifyArgs(method = "drawPetsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 0), remap = false)
+    private void renderRarityOnPetsPage(Args args) {
         if (Skytils.config.showItemRarity) {
             ItemStack stack = args.get(0);
             int x = args.get(1);
