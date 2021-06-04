@@ -259,7 +259,7 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
-        if (!sidebarLines.map { cleanSB(it) == "Slay the boss!" }.any()) return
+        if (!sidebarLines.filter { cleanSB(it) == "Slay the boss!" }.any()) return
         val entity = event.entity
         if (entity is EntityZombie) {
             TickTask(5) {
