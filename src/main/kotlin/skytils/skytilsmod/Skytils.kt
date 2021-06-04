@@ -73,8 +73,8 @@ import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.mixins.AccessorCommandHandler
-import skytils.skytilsmod.mixins.AccessorSettingsGui
+import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
+import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer

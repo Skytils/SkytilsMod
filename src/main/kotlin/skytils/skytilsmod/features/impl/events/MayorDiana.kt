@@ -33,7 +33,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.PacketEvent
-import skytils.skytilsmod.mixins.AccessorMinecraft
+import skytils.skytilsmod.mixins.accessors.AccessorMinecraft
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.baseMaxHealth

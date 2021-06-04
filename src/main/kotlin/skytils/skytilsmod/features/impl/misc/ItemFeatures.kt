@@ -426,7 +426,7 @@ class ItemFeatures {
                     val extraAttr = getExtraAttributes(item)
                     if (extraAttr != null) {
                         if (extraAttr.hasKey("ultimateSoulEaterData")) {
-                            val bonus = extraAttr.getInteger("ultimateSoulEaterData")
+                            val bonus = extraAttr.getDouble("ultimateSoulEaterData")
                             mc.fontRendererObj.drawString("§cSoul Strength: §a$bonus", 0f, 0f, 0xFFFFFF, true)
                         }
                     }

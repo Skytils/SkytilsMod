@@ -20,8 +20,6 @@ package skytils.skytilsmod.features.impl.handlers
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -30,7 +28,7 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SetActionBarEvent
-import skytils.skytilsmod.mixins.AccessorGuiNewChat
+import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer

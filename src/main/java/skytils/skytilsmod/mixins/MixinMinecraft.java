@@ -26,12 +26,6 @@ import net.minecraft.client.resources.LanguageManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,18 +34,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.core.GuiManager;
-import skytils.skytilsmod.utils.APIUtil;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Objects;
 
 @Mixin(Minecraft.class)
@@ -102,33 +89,5 @@ public abstract class MixinMinecraft {
             ScreenRenderer.fontRenderer.setBidiFlag(this.mcLanguageManager.isCurrentLanguageBidirectional());
         }
         this.mcResourceManager.registerReloadListener(ScreenRenderer.fontRenderer);
-    }
-
-    @Inject(method = "run", at = @At("HEAD"))
-    private void preRun(CallbackInfo ci) {
-/*        File file = new File(new File(mcDataDir, "config"), "vigilance.toml");
-        if (!file.exists()) {
-            CloseableHttpClient client = APIUtil.INSTANCE.getBuilder().build();
-            try {
-                HttpGet request = new HttpGet(new URL(Skytils.config.getDataURL() + "files/vigilance.toml").toURI());
-                request.setProtocolVersion(HttpVersion.HTTP_1_1);
-                HttpResponse response = client.execute(request);
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    if (file.createNewFile()) {
-                        response.getEntity().writeTo(new FileOutputStream(file));
-                    } else {
-                        throw new IllegalStateException("Failed to create file");
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
     }
 }
