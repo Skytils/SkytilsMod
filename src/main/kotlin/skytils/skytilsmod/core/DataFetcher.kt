@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
@@ -29,6 +30,7 @@ import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.handlers.MayorPerk
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.SkillUtils
@@ -92,6 +94,10 @@ object DataFetcher {
             for ((key, value) in APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").entrySet()) {
                 ItemFeatures.sellPrices[key] = value.asDouble
             }
+            val slayerHealthData = APIUtil.getJSONResponse("${dataUrl}constants/slayerhealth.json")
+            for ((key, value) in slayerHealthData.entrySet()) {
+                SlayerFeatures.BossHealths[key] = value.asJsonObject
+            }
         }
     }
 
@@ -103,6 +109,7 @@ object DataFetcher {
         SkillUtils.dungeoneeringXp.clone()
         ThreeWeirdosSolver.solutions.clear()
         TriviaSolver.triviaSolutions.clear()
+        SlayerFeatures.BossHealths.clear()
     }
 
     @JvmStatic

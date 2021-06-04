@@ -1823,6 +1823,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showRNGMeter = false
 
     @Property(
+        type = PropertyType.SWITCH,
+        name = "Show Slayer Display",
+        description = "Shows your current slayer's health and the time left",
+        category = "Slayer",
+        subcategory = "Quality of Life"
+    )
+    var showSlayerDisplay = false
+
+    @Property(
         PropertyType.SWITCH,
         name = "Show Soulflow Display",
         description = "Shows your current internalized soulflow.\n" +
