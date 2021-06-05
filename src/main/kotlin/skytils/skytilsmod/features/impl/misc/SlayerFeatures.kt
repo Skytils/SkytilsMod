@@ -515,7 +515,7 @@ class SlayerFeatures {
         )
         private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
         private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
-        private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidgloom Maniac")
+        private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
         private val RNGRegex = Regex("[^0-9.]")
         private var slayerEntity: Entity? = null
         private var slayerNameEntity: EntityArmorStand? = null
