@@ -30,7 +30,9 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
 
-class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
+object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
+
+    val aliases = HashMap<String, String>()
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
@@ -79,9 +81,5 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
 
     override fun setDefault(writer: FileWriter) {
         gson.toJson(JsonObject(), writer)
-    }
-
-    companion object {
-        val aliases = HashMap<String, String>()
     }
 }

@@ -52,9 +52,9 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
         if (Utils.inSkyblock) {
             ItemStack itemstack = this.getCurrentArmor(entitylivingbaseIn, armorSlot);
             String itemId = ItemUtil.getSkyBlockItemID(itemstack);
-            if (GlintCustomizer.glintColors.containsKey(itemId)) {
+            if (GlintCustomizer.INSTANCE.getGlintColors().containsKey(itemId)) {
                 ci.cancel();
-                CustomColor color = GlintCustomizer.glintColors.get(itemId);
+                CustomColor color = GlintCustomizer.INSTANCE.getGlintColors().get(itemId);
 
                 float f = (float)entitylivingbaseIn.ticksExisted + partialTicks;
                 this.renderer.bindTexture(ENCHANTED_ITEM_GLINT_RES);
@@ -63,7 +63,7 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
                 GlStateManager.depthMask(false);
                 float f1 = 0.5F;
                 GlStateManager.color(f1, f1, f1, 1.0F);
-                //GlintCustomizer.glintColors.get(itemId).applyColor();
+                //GlintCustomizer.INSTANCE.getGlintColors().get(itemId).applyColor();
 
                 for (int i = 0; i < 2; ++i)
                 {

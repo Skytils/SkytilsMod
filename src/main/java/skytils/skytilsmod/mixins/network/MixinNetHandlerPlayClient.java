@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.events.PacketEvent;
 
-@Mixin(NetHandlerPlayClient.class)
+@Mixin(value = NetHandlerPlayClient.class, priority = 999)
 public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient {
     @Inject(method = "addToSendQueue", at = @At("HEAD"), cancellable = true)
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {

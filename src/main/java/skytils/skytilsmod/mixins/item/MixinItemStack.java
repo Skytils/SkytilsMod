@@ -48,8 +48,8 @@ public abstract class MixinItemStack {
         NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(that);
         if (extraAttr != null) {
             String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
-            if (GlintCustomizer.overrides.containsKey(itemId)) {
-                cir.setReturnValue(GlintCustomizer.overrides.get(itemId));
+            if (GlintCustomizer.INSTANCE.getOverrides().containsKey(itemId)) {
+                cir.setReturnValue(GlintCustomizer.INSTANCE.getOverrides().get(itemId));
                 return;
             }
             if (Skytils.config.enchantGlintFix) {

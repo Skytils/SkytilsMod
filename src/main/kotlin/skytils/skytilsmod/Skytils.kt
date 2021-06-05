@@ -18,10 +18,10 @@
 
 package skytils.skytilsmod
 
-import gg.essential.vigilance.gui.SettingsGui
 import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import gg.essential.vigilance.gui.SettingsGui
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
@@ -174,20 +174,20 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SoundQueue)
         MinecraftForge.EVENT_BUS.register(UpdateChecker)
 
-        MinecraftForge.EVENT_BUS.register(SpamHider())
+        MinecraftForge.EVENT_BUS.register(SpamHider)
 
         MinecraftForge.EVENT_BUS.register(AlignmentTaskSolver())
-        MinecraftForge.EVENT_BUS.register(ArmorColor())
-        MinecraftForge.EVENT_BUS.register(AuctionData())
+        MinecraftForge.EVENT_BUS.register(ArmorColor)
+        MinecraftForge.EVENT_BUS.register(AuctionData)
         MinecraftForge.EVENT_BUS.register(AuctionPriceOverlay())
         MinecraftForge.EVENT_BUS.register(BlazeSolver())
-        MinecraftForge.EVENT_BUS.register(BlockAbility())
+        MinecraftForge.EVENT_BUS.register(BlockAbility)
         MinecraftForge.EVENT_BUS.register(BossHPDisplays())
         MinecraftForge.EVENT_BUS.register(BoulderSolver())
         MinecraftForge.EVENT_BUS.register(ChestProfit())
         MinecraftForge.EVENT_BUS.register(ClickInOrderSolver())
         MinecraftForge.EVENT_BUS.register(CreeperSolver())
-        MinecraftForge.EVENT_BUS.register(CommandAliases())
+        MinecraftForge.EVENT_BUS.register(CommandAliases)
         MinecraftForge.EVENT_BUS.register(DamageSplash())
         MinecraftForge.EVENT_BUS.register(DarkModeMist())
         MinecraftForge.EVENT_BUS.register(DungeonFeatures())
@@ -195,12 +195,12 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())
         MinecraftForge.EVENT_BUS.register(FavoritePets())
-        MinecraftForge.EVENT_BUS.register(GlintCustomizer())
+        MinecraftForge.EVENT_BUS.register(GlintCustomizer)
         MinecraftForge.EVENT_BUS.register(GriffinBurrows())
         MinecraftForge.EVENT_BUS.register(IceFillSolver())
         MinecraftForge.EVENT_BUS.register(IcePathSolver())
         MinecraftForge.EVENT_BUS.register(ItemFeatures())
-        MinecraftForge.EVENT_BUS.register(KeyShortcuts())
+        MinecraftForge.EVENT_BUS.register(KeyShortcuts)
         MinecraftForge.EVENT_BUS.register(LockOrb())
         MinecraftForge.EVENT_BUS.register(MayorDiana())
         MinecraftForge.EVENT_BUS.register(MayorJerry())
