@@ -66,7 +66,7 @@ object CooldownTracker {
                             val itemCooldown = getCooldownFromItem(packet.stack)
                             if (itemCooldown == 0.0) return
                             cooldowns.computeIfAbsent(itemId) {
-                                System.currentTimeMillis() + ((1 - cooldownReduction) * itemCooldown * 1000).toLong()
+                                System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
                             }
                         }
                     }
