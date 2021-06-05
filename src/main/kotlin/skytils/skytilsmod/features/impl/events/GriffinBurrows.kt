@@ -280,51 +280,53 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
-        if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
-            if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
-            val packet = event.packet
-            val type = packet.particleType
-            val longDistance = packet.isLongDistance
-            val count = packet.particleCount
-            val speed = packet.particleSpeed
-            val xOffset = packet.xOffset
-            val yOffset = packet.yOffset
-            val zOffset = packet.zOffset
-            val x = packet.xCoordinate
-            val y = packet.yCoordinate
-            val z = packet.zCoordinate
-            val pos = BlockPos(x, y, z).down()
-            val footstepFilter =
-                type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
-            val enchantFilter =
-                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
-            val startFilter =
-                type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
-            val mobFilter =
-                type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
-            val treasureFilter =
-                type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
-            if (longDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
-                if (burrows.none { b: Burrow -> b.blockPos == pos } && dugBurrows.none { b: BlockPos -> b == pos }) {
-                    for (existingBurrow in burrows) {
-                        if (existingBurrow.blockPos.distanceSq(x, y, z) < 4) return
-                    }
-                    var burrow = particleBurrows.find { b: ParticleBurrow -> b.blockPos == pos }
-                    if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
-                    if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
-                    if (!burrow.hasFootstep && footstepFilter) {
-                        burrow.hasFootstep = true
-                    } else if (!burrow.hasEnchant && enchantFilter) {
-                        burrow.hasEnchant = true
-                    } else if (burrow.type == -1 && type != EnumParticleTypes.FOOTSTEP && type != EnumParticleTypes.ENCHANTMENT_TABLE) {
-                        when {
-                            startFilter -> burrow.type = 0
-                            mobFilter -> burrow.type = 1
-                            treasureFilter -> burrow.type = 2
+        Utils.checkThreadAndQueue {
+            if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
+                if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return@checkThreadAndQueue
+                val packet = event.packet
+                val type = packet.particleType
+                val longDistance = packet.isLongDistance
+                val count = packet.particleCount
+                val speed = packet.particleSpeed
+                val xOffset = packet.xOffset
+                val yOffset = packet.yOffset
+                val zOffset = packet.zOffset
+                val x = packet.xCoordinate
+                val y = packet.yCoordinate
+                val z = packet.zCoordinate
+                val pos = BlockPos(x, y, z).down()
+                val footstepFilter =
+                    type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
+                val enchantFilter =
+                    type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
+                val startFilter =
+                    type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+                val mobFilter =
+                    type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+                val treasureFilter =
+                    type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
+                if (longDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
+                    if (burrows.none { b: Burrow -> b.blockPos == pos } && dugBurrows.none { b: BlockPos -> b == pos }) {
+                        for (existingBurrow in burrows) {
+                            if (existingBurrow.blockPos.distanceSq(x, y, z) < 4) return@checkThreadAndQueue
+                        }
+                        var burrow = particleBurrows.find { b: ParticleBurrow -> b.blockPos == pos }
+                        if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+                        if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
+                        if (!burrow.hasFootstep && footstepFilter) {
+                            burrow.hasFootstep = true
+                        } else if (!burrow.hasEnchant && enchantFilter) {
+                            burrow.hasEnchant = true
+                        } else if (burrow.type == -1 && type != EnumParticleTypes.FOOTSTEP && type != EnumParticleTypes.ENCHANTMENT_TABLE) {
+                            when {
+                                startFilter -> burrow.type = 0
+                                mobFilter -> burrow.type = 1
+                                treasureFilter -> burrow.type = 2
+                            }
                         }
                     }
+                    //System.out.println(String.format("%s %s %s particles with %s speed at %s, %s, %s, offset by %s %s %s", count, longDistance ? "long-distance" : "", type.getParticleName(), speed, x, y, z, xOffset, yOffset, zOffset));
                 }
-                //System.out.println(String.format("%s %s %s particles with %s speed at %s, %s, %s, offset by %s %s %s", count, longDistance ? "long-distance" : "", type.getParticleName(), speed, x, y, z, xOffset, yOffset, zOffset));
             }
         }
     }

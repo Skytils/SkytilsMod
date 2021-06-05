@@ -64,6 +64,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
+import kotlin.math.floor
 
 
 class SlayerFeatures {
@@ -71,9 +72,10 @@ class SlayerFeatures {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock) return
         if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
+        val hasSlayerText = sidebarLines.any { cleanSB(it) == "Slay the boss!" }
         if (ticks % 4 == 0) {
             if (Skytils.config.rev5TNTPing) {
-                if (sidebarLines.any { l: String -> cleanSB(l).contains("Slay the boss!") }) {
+                if (hasSlayerText) {
                     var under: BlockPos? = null
                     if (mc.thePlayer.onGround) {
                         under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
@@ -160,7 +162,7 @@ class SlayerFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase?>) {
+    fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase>) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityArmorStand) {
             val entity = event.entity as EntityArmorStand
@@ -286,20 +288,18 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
         if (!sidebarLines.any { cleanSB(it) == "Slay the boss!" }) return
+        if (slayerEntity != null) return
         val entity = event.entity
         if (entity is EntityZombie) {
             TickTask(5) {
                 val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
-                    entity, entity.getEntityBoundingBox().expand(0.2, 3.0, 0.2)
+                    entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
                 ) { nearbyEntity: Entity? ->
                     if (nearbyEntity is EntityArmorStand) {
-                        val armorStand = nearbyEntity
-                        if (armorStand.isInvisible && armorStand.hasCustomName()) {
-                            for (equipment in armorStand.inventory) {
-                                if (equipment != null) {
-                                    // armor stand has equipment, abort!
-                                    return@getEntitiesInAABBexcluding false
-                                }
+                        if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
+                            if (nearbyEntity.inventory.any { it != null }) {
+                                // armor stand has equipment, abort!
+                                return@getEntitiesInAABBexcluding false
                             }
                             // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
                             return@getEntitiesInAABBexcluding true
@@ -309,16 +309,12 @@ class SlayerFeatures {
                 }
                 var isSlayer = 0
                 for (nearby in nearbyArmorStands) {
-                    if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) return@TickTask
+                    if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
                     if (nearby.displayName.formattedText.startsWith("§c☠ §bRevenant Horror") ||
                         nearby.displayName.formattedText.startsWith("§c☠ §fAtoned Horror")
                     ) {
-                        var currentTier = ""
-                        for (line in sidebarLines) {
-                            if (cleanSB(line).startsWith("Revenant Horror ")) {
-                                currentTier = cleanSB(line).substring(16)
-                            }
-                        }
+                        val currentTier = sidebarLines.map { cleanSB(it) }.find { it.startsWith("Revenant Horror ") }
+                            ?.substringAfter("Revenant Horror ") ?: ""
                         if (BossHealths["Revenant"]?.get(currentTier)?.asInt
                             == entity.baseMaxHealth.toInt()
                         ) {
@@ -352,16 +348,13 @@ class SlayerFeatures {
     private fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String, nameStart: String) {
         TickTask(5) {
             val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
-                entity, entity.getEntityBoundingBox().expand(0.2, 3.0, 0.2)
+                entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
             ) { nearbyEntity: Entity? ->
                 if (nearbyEntity is EntityArmorStand) {
-                    val armorStand = nearbyEntity
-                    if (armorStand.isInvisible && armorStand.hasCustomName()) {
-                        for (equipment in armorStand.inventory) {
-                            if (equipment != null) {
-                                // armor stand has equipment, abort!
-                                return@getEntitiesInAABBexcluding false
-                            }
+                    if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
+                        if (nearbyEntity.inventory.any { it != null }) {
+                            // armor stand has equipment, abort!
+                            return@getEntitiesInAABBexcluding false
                         }
                         // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
                         return@getEntitiesInAABBexcluding true
@@ -371,17 +364,13 @@ class SlayerFeatures {
             }
             var isSlayer = 0
             for (nearby in nearbyArmorStands) {
-                if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) return@TickTask
+                if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
                 if (nearby.displayName.formattedText.startsWith(nameStart)
                 ) {
-                    var currentTier = ""
-                    for (line in sidebarLines) {
-                        if (cleanSB(line).startsWith(name)) {
-                            currentTier = cleanSB(line).substring(name.length + 1)
-                        }
-                    }
-                    if (BossHealths[name.substring(0, name.indexOf(" "))]?.get(currentTier)?.asInt
-                        == entity.baseMaxHealth.toInt()
+                    val currentTier =
+                        sidebarLines.find { cleanSB(it).startsWith(name) }?.substringAfter(name)?.drop(1) ?: ""
+                    if (BossHealths[name.substringBefore(" ")]?.get(currentTier)?.asInt
+                        == floor(entity.baseMaxHealth).toInt()
                     ) {
                         slayerNameEntity = nearby as EntityArmorStand
                         isSlayer++

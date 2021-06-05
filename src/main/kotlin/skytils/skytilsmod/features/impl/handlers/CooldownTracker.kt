@@ -49,6 +49,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
 
     @SubscribeEvent
     fun onActionBar(event: SetActionBarEvent) {
+        if (!Utils.inSkyblock || !Skytils.config.itemCooldownDisplay) return
         event.apply {
             if (message.contains("§b-") && message.contains(" Mana (§6")) {
                 val itemId = message.substringAfter(" Mana (§6").substringBefore("§b)")
