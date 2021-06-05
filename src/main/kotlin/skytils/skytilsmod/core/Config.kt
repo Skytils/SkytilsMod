@@ -2316,6 +2316,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var greatTreasureHider = 0
 
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Compact Hider",
+        description = "Removes Compact messages from mining.",
+        category = "Spam",
+        subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var compactHider = 0
+
     init {
         initialize()
 

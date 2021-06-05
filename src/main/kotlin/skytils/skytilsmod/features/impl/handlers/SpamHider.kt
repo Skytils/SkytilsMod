@@ -449,6 +449,15 @@ class SpamHider {
                 }
             }
 
+            // Compact
+            if (unformatted.startsWith("COMPACT! You found")) {
+                when (Skytils.config.compactHider) {
+                    1, 2 -> cancelChatPacket(event, Skytils.config.compactHider == 2)
+                    else -> {
+                    }
+                }
+            }
+
             // Blocks in the way
             if (unformatted.contains("There are blocks in the way")) {
                 when (Skytils.config.inTheWayHider) {
