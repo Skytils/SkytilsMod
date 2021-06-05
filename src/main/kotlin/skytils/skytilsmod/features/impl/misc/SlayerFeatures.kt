@@ -368,7 +368,8 @@ class SlayerFeatures {
                 if (nearby.displayName.formattedText.startsWith(nameStart)
                 ) {
                     val currentTier =
-                        sidebarLines.find { cleanSB(it).startsWith(name) }?.substringAfter(name)?.drop(1) ?: ""
+                        sidebarLines.map { cleanSB(it) }.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
+                            ?: ""
                     if (BossHealths[name.substringBefore(" ")]?.get(currentTier)?.asInt
                         == floor(entity.baseMaxHealth).toInt()
                     ) {
