@@ -1833,6 +1833,25 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         PropertyType.SWITCH,
+        name = "Yang Glyph Ping",
+        description = "Alerts you when the Voidgloom Seraph throws down a Yang Glyph(beacon).",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var yangGlyphPing = false
+
+    @Property(
+        PropertyType.SWITCH,
+        name = "Highlight Yang Glyph",
+        description = "Highlights the Yang Glyph block.\n" +
+                "§cNote!§7 May not work properly.",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var highlightYangGlyph = false
+
+    @Property(
+        PropertyType.SWITCH,
         name = "Show Soulflow Display",
         description = "Shows your current internalized soulflow.\n" +
                 "§cRequires your Soulflow battery to be in your inventory.",

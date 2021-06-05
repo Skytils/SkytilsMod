@@ -18,11 +18,9 @@
 package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
-import net.minecraft.block.BlockHalfStoneSlab
-import net.minecraft.block.BlockHalfWoodSlab
-import net.minecraft.block.BlockPlanks
-import net.minecraft.block.BlockStoneSlab
+import net.minecraft.block.*
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -41,6 +39,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -51,7 +50,10 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.events.BlockChangeEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.RenderUtil.drawFilledBoundingBox
 import skytils.skytilsmod.utils.RenderUtil.drawOutlinedBoundingBox
 import skytils.skytilsmod.utils.ScoreboardUtil.cleanSB
 import skytils.skytilsmod.utils.ScoreboardUtil.sidebarLines
@@ -258,6 +260,43 @@ class SlayerFeatures {
     }
 
     @SubscribeEvent
+    fun onBlockChange(event: BlockChangeEvent) {
+        if (event.old.block is BlockBeacon && event.update.block is BlockAir) {
+            yangGlyph = null
+        }
+        if (slayerEntity == null) return
+        if (event.update.block is BlockBeacon && event.pos.distanceSq(
+                slayerEntity!!.posX,
+                slayerEntity!!.posY,
+                slayerEntity!!.posZ
+            ) < 225
+        ) {
+            yangGlyph = event.pos
+            if (Skytils.config.yangGlyphPing) {
+                createTitle("§cYang Glyph!", 30)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldRender(event: RenderWorldLastEvent) {
+        if (Skytils.config.highlightYangGlyph && yangGlyph != null) {
+            GlStateManager.pushMatrix()
+            GlStateManager.disableDepth()
+            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+            val x = yangGlyph!!.x - viewerX
+            val y = yangGlyph!!.y - viewerY
+            val z = yangGlyph!!.z - viewerZ
+            drawFilledBoundingBox(
+                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
+                Color(65, 102, 245),
+                0.5f
+            )
+            GlStateManager.popMatrix()
+        }
+    }
+
+    @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
         if (!sidebarLines.filter { cleanSB(it) == "Slay the boss!" }.any()) return
         val entity = event.entity
@@ -395,11 +434,11 @@ class SlayerFeatures {
 
     class SlayerDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock) {
+            if (Utils.inSkyblock) {
                 if (slayerTimerEntity != null) {
                     if (slayerTimerEntity!!.isDead) {
                         slayerTimerEntity = null
-                    } else {
+                    } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
                             slayerTimerEntity!!.displayName.formattedText,
                             0f,
@@ -413,7 +452,7 @@ class SlayerFeatures {
                 if (slayerNameEntity != null) {
                     if (slayerNameEntity!!.isDead) {
                         slayerNameEntity = null
-                    } else {
+                    } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
                             slayerNameEntity!!.displayName.formattedText,
                             0f,
@@ -422,6 +461,11 @@ class SlayerFeatures {
                             SmartFontRenderer.TextAlignment.LEFT_RIGHT,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
+                    }
+                }
+                if (slayerEntity != null) {
+                    if (slayerEntity!!.isDead) {
+                        slayerEntity = null
                     }
                 }
             }
@@ -476,6 +520,7 @@ class SlayerFeatures {
         private var slayerEntity: Entity? = null
         private var slayerNameEntity: EntityArmorStand? = null
         private var slayerTimerEntity: EntityArmorStand? = null
+        private var yangGlyph: BlockPos? = null
         var BossHealths = HashMap<String, JsonObject>()
 
         init {
