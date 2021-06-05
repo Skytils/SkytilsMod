@@ -281,7 +281,7 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.highlightYangGlyph && yangGlyph != null) {
-            GlStateManager.pushMatrix()
+            GlStateManager.disableCull()
             GlStateManager.disableDepth()
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
             val x = yangGlyph!!.x - viewerX
@@ -292,13 +292,14 @@ class SlayerFeatures {
                 Color(65, 102, 245),
                 0.5f
             )
-            GlStateManager.popMatrix()
+            GlStateManager.enableDepth()
+            GlStateManager.enableCull()
         }
     }
 
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
-        if (!sidebarLines.filter { cleanSB(it) == "Slay the boss!" }.any()) return
+        if (!sidebarLines.any { cleanSB(it) == "Slay the boss!" }) return
         val entity = event.entity
         if (entity is EntityZombie) {
             TickTask(5) {
