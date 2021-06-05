@@ -57,7 +57,7 @@ public abstract class MixinRender<T extends Entity> {
 
     @Inject(method = "renderLivingLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V", shift = At.Shift.AFTER))
     private void renderLivingLabel(T entityIn, String str, double x, double y, double z, int maxDistance, CallbackInfo ci) {
-        if (Skytils.config.lowerEndermanNametags && (str.contains("Enderman") || str.contains("Zealot") || str.contains("Voidling") || str.contains("Voidgloom"))) {
+        if (Skytils.config.lowerEndermanNametags && (str.contains("❤") || str.contains("Hits")) && (str.contains("Enderman") || str.contains("Zealot") || str.contains("Voidling") || str.contains("Voidgloom"))) {
             EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
             Vec3 vec3 = new Vec3(entityIn.posX - player.posX, 0, entityIn.posZ - player.posZ);
             vec3 = vec3.normalize();
