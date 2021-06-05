@@ -20,7 +20,6 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -43,22 +42,19 @@ import kotlin.time.ExperimentalTime
 class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.json")) {
 
     @SubscribeEvent
-    fun onEvent(event: Event) {
-        if (!Utils.inSkyblock) return
+    fun onWorldLoad(event: WorldEvent.Load) {
+        cooldownReduction = 0.0
+        cooldowns.clear()
+    }
+
+    @SubscribeEvent
+    fun onActionBar(event: SetActionBarEvent) {
         event.apply {
-            when (this) {
-                is WorldEvent.Load -> {
-                    cooldownReduction = 0.0
-                    cooldowns.clear()
-                }
-                is SetActionBarEvent -> {
-                    if (message.contains("§b-") && message.contains(" Mana (§6")) {
-                        val itemId = message.substringAfter(" Mana (§6").substringBefore("§b)")
-                        val itemCooldown = itemCooldowns[itemId] ?: return
-                        cooldowns.computeIfAbsent(itemId) {
-                            System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
-                        }
-                    }
+            if (message.contains("§b-") && message.contains(" Mana (§6")) {
+                val itemId = message.substringAfter(" Mana (§6").substringBefore("§b)")
+                val itemCooldown = itemCooldowns[itemId] ?: return
+                cooldowns.computeIfAbsent(itemId) {
+                    System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
                 }
             }
         }
