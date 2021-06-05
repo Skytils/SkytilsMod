@@ -56,10 +56,19 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/22186845
      * @author jpdymond
      */
-    @JvmStatic
-    fun round(value: Double, precision: Int): Double {
-        val scale = 10.0.pow(precision.toDouble()).toInt()
-        return (value * scale).roundToInt().toDouble() / scale
+    fun Double.roundToPrecision(precision: Int): Double {
+        val scale = 10.0.pow(precision).toInt()
+        return (this * scale).roundToInt().toDouble() / scale
+    }
+
+    /**
+     * This code was unmodified and taken under CC BY-SA 3.0 license
+     * @link https://stackoverflow.com/a/22186845
+     * @author jpdymond
+     */
+    fun Float.roundToPrecision(precision: Int): Float {
+        val scale = 10.0.pow(precision).toInt()
+        return (this * scale).roundToInt().toFloat() / scale
     }
 
     fun Number.addSuffix(): String {

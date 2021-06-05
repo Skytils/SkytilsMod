@@ -18,31 +18,29 @@
 
 package skytils.skytilsmod.features.impl.handlers
 
-import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import com.google.gson.JsonObject
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.SetActionBarEvent
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 import kotlin.math.floor
 import kotlin.time.ExperimentalTime
 
-object CooldownTracker {
-
-    var cooldownReduction = 0.0
-    val itemCooldowns = mutableMapOf<String, Double>()
-    val cooldowns = mutableMapOf<String, Long>()
+class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.json")) {
 
     @SubscribeEvent
     fun onEvent(event: Event) {
@@ -53,57 +51,17 @@ object CooldownTracker {
                     cooldownReduction = 0.0
                     cooldowns.clear()
                 }
-                is TickEvent.ClientTickEvent -> {
-                    if (phase != TickEvent.Phase.START) return
-                    cooldowns.entries.removeIf {
-                        it.value <= System.currentTimeMillis()
-                    }
-                }
-                is PacketEvent.SendEvent -> {
-                    when (packet) {
-                        is C08PacketPlayerBlockPlacement -> {
-                            val itemId = ItemUtil.getSkyBlockItemID(packet.stack) ?: return
-                            val itemCooldown = getCooldownFromItem(packet.stack)
-                            if (itemCooldown == 0.0) return
-                            cooldowns.computeIfAbsent(itemId) {
-                                System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
-                            }
+                is SetActionBarEvent -> {
+                    if (message.contains("§b-") && message.contains(" Mana (§6")) {
+                        val itemId = message.substringAfter(" Mana (§6").substringBefore("§b)")
+                        val itemCooldown = itemCooldowns[itemId] ?: return
+                        cooldowns.computeIfAbsent(itemId) {
+                            System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
                         }
                     }
                 }
             }
         }
-    }
-
-    fun updateCooldownReduction() {
-        val mages = DungeonListener.team.filter { it.dungeonClass == DungeonListener.DungeonClass.MAGE }
-        val self = mages.find { it.playerName == mc.session.username } ?: return
-        val soloMage = mages.size == 1
-        cooldownReduction = ((if (soloMage) 50 else 25) + floor(self.classLevel / 2.0))
-        println("Mage ${self.classLevel}, they are ${if (soloMage) "a" else "not a"} solo mage with cooldown reduction ${cooldownReduction}.")
-    }
-
-    fun getCooldownFromItem(item: ItemStack): Double {
-        val itemId = ItemUtil.getSkyBlockItemID(item) ?: return 0.0
-        if (itemCooldowns.containsKey(itemId)) return itemCooldowns[itemId]!!
-        var foundRightClickAbility = false
-        var cooldown: Double? = null
-        for (line in ItemUtil.getItemLore(item)) {
-            if (!foundRightClickAbility) {
-                if (line.startsWith("§6Ability: ") && line.endsWith("§e§lRIGHT CLICK")) {
-                    foundRightClickAbility = true
-                }
-            } else {
-                if (line.startsWith("§8Cooldown: §a")) {
-                    cooldown = line.substringAfter("§a").substringBefore("s").toDoubleOrNull()
-                    break
-                }
-            }
-        }
-        if (cooldown != null) {
-            itemCooldowns[itemId] = cooldown
-        }
-        return cooldown ?: 0.0
     }
 
     init {
@@ -115,10 +73,13 @@ object CooldownTracker {
         @OptIn(ExperimentalTime::class)
         override fun render() {
             if (Utils.inSkyblock && toggled) {
+                cooldowns.entries.removeAll {
+                    it.value <= System.currentTimeMillis()
+                }
                 for ((i, entry) in (cooldowns.entries).withIndex()) {
                     val elapsed = (entry.value - System.currentTimeMillis()) / 1000.0
                     ScreenRenderer.fontRenderer.drawString(
-                        "${entry.key.replace("_", " ")}: ${elapsed}s",
+                        "${entry.key.replace("_", " ")}: ${elapsed.roundToPrecision(1)}s",
                         0f,
                         (ScreenRenderer.fontRenderer.FONT_HEIGHT * i).toFloat(),
                         CommonColors.ORANGE,
@@ -131,7 +92,7 @@ object CooldownTracker {
 
         override fun demoRender() {
             ScreenRenderer.fontRenderer.drawString(
-                "Ice Spray Wand: 5s",
+                "Ice Spray: 5s",
                 0f,
                 0f,
                 CommonColors.ORANGE,
@@ -143,13 +104,47 @@ object CooldownTracker {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Ice Spray Wand: 5s")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Ice Spray: 5s")
 
         override val toggled: Boolean
             get() = Skytils.config.itemCooldownDisplay
 
         init {
             Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    override fun read(reader: FileReader) {
+        itemCooldowns.clear()
+        val obj = gson.fromJson(reader, JsonObject::class.java)
+        for ((key, value) in obj.entrySet()) {
+            itemCooldowns[key] = value.asDouble
+        }
+    }
+
+    override fun write(writer: FileWriter) {
+        val obj = JsonObject()
+        for ((key, value) in itemCooldowns) {
+            obj.addProperty(key, value)
+        }
+        gson.toJson(obj, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        gson.toJson(JsonObject(), writer)
+    }
+
+    companion object {
+        var cooldownReduction = 0.0
+        val itemCooldowns = mutableMapOf<String, Double>()
+        val cooldowns = mutableMapOf<String, Long>()
+
+        fun updateCooldownReduction() {
+            val mages = DungeonListener.team.filter { it.dungeonClass == DungeonListener.DungeonClass.MAGE }
+            val self = mages.find { it.playerName == mc.session.username } ?: return
+            val soloMage = mages.size == 1
+            cooldownReduction = ((if (soloMage) 50 else 25) + floor(self.classLevel / 2.0))
+            println("Mage ${self.classLevel}, they are ${if (soloMage) "a" else "not a"} solo mage with cooldown reduction ${cooldownReduction}.")
         }
     }
 

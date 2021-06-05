@@ -40,10 +40,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import skytils.skytilsmod.commands.ArmorColorCommand
-import skytils.skytilsmod.commands.GlintCustomizeCommand
-import skytils.skytilsmod.commands.RepartyCommand
-import skytils.skytilsmod.commands.SkytilsCommand
+import skytils.skytilsmod.commands.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.core.*
 import skytils.skytilsmod.events.PacketEvent
@@ -188,7 +185,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(ClickInOrderSolver())
         MinecraftForge.EVENT_BUS.register(CreeperSolver())
         MinecraftForge.EVENT_BUS.register(CommandAliases())
-        MinecraftForge.EVENT_BUS.register(CooldownTracker)
+        MinecraftForge.EVENT_BUS.register(CooldownTracker())
         MinecraftForge.EVENT_BUS.register(DamageSplash())
         MinecraftForge.EVENT_BUS.register(DarkModeMist())
         MinecraftForge.EVENT_BUS.register(DungeonFeatures())
@@ -255,6 +252,10 @@ class Skytils {
 
             if (!cch.commands.containsKey("glintcustomize")) {
                 cch.registerCommand(GlintCustomizeCommand)
+            }
+
+            if (!cch.commands.containsKey("trackcooldown")) {
+                cch.registerCommand(TrackCooldownCommand)
             }
 
             if (config.overrideReparty || !cch.commands.containsKey("reparty")) {

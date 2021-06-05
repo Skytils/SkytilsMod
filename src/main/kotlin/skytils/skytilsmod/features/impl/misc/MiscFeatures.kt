@@ -56,7 +56,7 @@ import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
-import skytils.skytilsmod.utils.NumberUtil.round
+import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
@@ -273,7 +273,7 @@ class MiscFeatures {
                 val sr = ScaledResolution(mc)
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val text =
-                    "§cGolem spawn in: §a" + round((golemSpawnTime - System.currentTimeMillis()) / 1000.0, 1) + "s"
+                    "§cGolem spawn in: §a" + ((golemSpawnTime - System.currentTimeMillis()) / 1000.0).roundToPrecision(1) + "s"
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     text,
