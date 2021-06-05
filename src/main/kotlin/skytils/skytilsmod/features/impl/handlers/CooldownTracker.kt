@@ -29,16 +29,13 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
-import skytils.skytilsmod.features.impl.events.MayorJerry
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlin.math.floor
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 object CooldownTracker {
@@ -69,7 +66,7 @@ object CooldownTracker {
                             val itemCooldown = getCooldownFromItem(packet.stack)
                             if (itemCooldown == 0.0) return
                             cooldowns.computeIfAbsent(itemId) {
-                                System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
+                                System.currentTimeMillis() + ((1 - cooldownReduction) * itemCooldown * 1000).toLong()
                             }
                         }
                     }

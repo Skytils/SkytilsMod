@@ -58,6 +58,7 @@ import skytils.skytilsmod.utils.RenderUtil.drawOutlinedBoundingBox
 import skytils.skytilsmod.utils.ScoreboardUtil.cleanSB
 import skytils.skytilsmod.utils.ScoreboardUtil.sidebarLines
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.baseMaxHealth
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -169,53 +170,38 @@ class SlayerFeatures {
                 val x = entity.posX
                 val y = entity.posY
                 val z = entity.posZ
-                for (zombieBoss in ZOMBIE_MINIBOSSES) {
-                    if (name.contains(zombieBoss)) {
-                        drawOutlinedBoundingBox(
-                            AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
-                            Color(0, 255, 255, 255),
-                            3f,
-                            1f
-                        )
-                        return
-                    }
-                }
-                for (spiderBoss in SPIDER_MINIBOSSES) {
-                    if (name.contains(spiderBoss)) {
-                        drawOutlinedBoundingBox(
-                            AxisAlignedBB(
-                                x - 0.625,
-                                y - 1,
-                                z - 0.625,
-                                x + 0.625,
-                                y - 0.25,
-                                z + 0.625
-                            ), Color(0, 255, 255, 255), 3f, 1f
-                        )
-                        return
-                    }
-                }
-                for (wolfBoss in WOLF_MINIBOSSES) {
-                    if (name.contains(wolfBoss)) {
-                        drawOutlinedBoundingBox(
-                            AxisAlignedBB(x - 0.5, y - 1, z - 0.5, x + 0.5, y, z + 0.5),
-                            Color(0, 255, 255, 255),
-                            3f,
-                            1f
-                        )
-                        return
-                    }
-                }
-                for (endermanBoss in ENDERMAN_MINIBOSSES) {
-                    if (name.contains(endermanBoss)) {
-                        drawOutlinedBoundingBox(
-                            AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
-                            Color(0, 255, 255, 255),
-                            3f,
-                            1f
-                        )
-                        return
-                    }
+                if (ZOMBIE_MINIBOSSES.any { name.contains(it) }) {
+                    drawOutlinedBoundingBox(
+                        AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
+                        Color(0, 255, 255, 255),
+                        3f,
+                        1f
+                    )
+                } else if (SPIDER_MINIBOSSES.any { name.contains(it) }) {
+                    drawOutlinedBoundingBox(
+                        AxisAlignedBB(
+                            x - 0.625,
+                            y - 1,
+                            z - 0.625,
+                            x + 0.625,
+                            y - 0.25,
+                            z + 0.625
+                        ), Color(0, 255, 255, 255), 3f, 1f
+                    )
+                } else if (WOLF_MINIBOSSES.any { name.contains(it) }) {
+                    drawOutlinedBoundingBox(
+                        AxisAlignedBB(x - 0.5, y - 1, z - 0.5, x + 0.5, y, z + 0.5),
+                        Color(0, 255, 255, 255),
+                        3f,
+                        1f
+                    )
+                } else if (ENDERMAN_MINIBOSSES.any { name.contains(it) }) {
+                    drawOutlinedBoundingBox(
+                        AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
+                        Color(0, 255, 255, 255),
+                        3f,
+                        1f
+                    )
                 }
             }
         }
@@ -334,7 +320,7 @@ class SlayerFeatures {
                             }
                         }
                         if (BossHealths["Revenant"]?.get(currentTier)?.asInt
-                            == entity.health.toInt()
+                            == entity.baseMaxHealth.toInt()
                         ) {
                             slayerNameEntity = nearby as EntityArmorStand
                             isSlayer++
@@ -363,7 +349,7 @@ class SlayerFeatures {
         }
     }
 
-    fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String, nameStart: String) {
+    private fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String, nameStart: String) {
         TickTask(5) {
             val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
                 entity, entity.getEntityBoundingBox().expand(0.2, 3.0, 0.2)
@@ -395,7 +381,7 @@ class SlayerFeatures {
                         }
                     }
                     if (BossHealths[name.substring(0, name.indexOf(" "))]?.get(currentTier)?.asInt
-                        == entity.health.toInt()
+                        == entity.baseMaxHealth.toInt()
                     ) {
                         slayerNameEntity = nearby as EntityArmorStand
                         isSlayer++
