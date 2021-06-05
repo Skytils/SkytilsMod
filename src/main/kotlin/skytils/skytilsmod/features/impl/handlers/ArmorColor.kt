@@ -26,8 +26,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-object ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
-    val armorColors = HashMap<String, CustomColor>()
+class ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
 
     override fun read(reader: FileReader) {
         armorColors.clear()
@@ -48,5 +47,10 @@ object ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
 
     override fun setDefault(writer: FileWriter) {
         gson.toJson(JsonObject(), writer)
+    }
+
+    companion object {
+        @JvmField
+        val armorColors = HashMap<String, CustomColor>()
     }
 }

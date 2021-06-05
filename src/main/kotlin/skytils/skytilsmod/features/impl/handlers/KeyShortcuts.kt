@@ -31,10 +31,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
-
-    val shortcuts = HashMap<String, Int>()
-
+class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     @SubscribeEvent
     fun onInput(event: InputEvent) {
         if (!Utils.inSkyblock) return
@@ -71,5 +68,9 @@ object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) 
 
     override fun setDefault(writer: FileWriter) {
         gson.toJson(JsonObject(), writer)
+    }
+
+    companion object {
+        val shortcuts = HashMap<String, Int>()
     }
 }

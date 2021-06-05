@@ -26,37 +26,39 @@ import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
 import kotlin.concurrent.fixedRateTimer
 
-object AuctionData {
+class AuctionData {
 
-    const val dataURL = "https://sbe-stole-skytils.design/api/auctions/lowestbins"
-    val lowestBINs = HashMap<String, Double>()
-    private val gson = GsonBuilder().setPrettyPrinting().create()
-    fun getIdentifier(item: ItemStack?): String? {
-        val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
-        var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
-        when (id) {
-            "PET" -> if (extraAttr.hasKey("petInfo")) {
-                val petInfo = gson.fromJson(extraAttr.getString("petInfo"), JsonObject::class.java)
-                if (petInfo.has("type") && petInfo.has("tier")) {
-                    id = "PET-" + petInfo["type"].asString + "-" + petInfo["tier"].asString
+    companion object {
+        const val dataURL = "https://sbe-stole-skytils.design/api/auctions/lowestbins"
+        val lowestBINs = HashMap<String, Double>()
+        private val gson = GsonBuilder().setPrettyPrinting().create()
+        fun getIdentifier(item: ItemStack?): String? {
+            val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
+            var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
+            when (id) {
+                "PET" -> if (extraAttr.hasKey("petInfo")) {
+                    val petInfo = gson.fromJson(extraAttr.getString("petInfo"), JsonObject::class.java)
+                    if (petInfo.has("type") && petInfo.has("tier")) {
+                        id = "PET-" + petInfo["type"].asString + "-" + petInfo["tier"].asString
+                    }
+                }
+                "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
+                    val enchants = extraAttr.getCompoundTag("enchantments")
+                    if (!enchants.hasNoTags()) {
+                        val enchant = enchants.keySet.iterator().next()
+                        id = "ENCHANTED_BOOK-" + enchant.uppercase() + "-" + enchants.getInteger(enchant)
+                    }
+                }
+                "POTION" -> if (extraAttr.hasKey("potion") && extraAttr.hasKey("potion_level")) {
+                    id = "POTION-" + extraAttr.getString("potion")
+                        .uppercase() + "-" + extraAttr.getInteger("potion_level") + (if (extraAttr.hasKey("enhanced")) "-ENHANCED" else "") + (if (extraAttr.hasKey(
+                            "extended"
+                        )
+                    ) "-EXTENDED" else "") + if (extraAttr.hasKey("splash")) "-SPLASH" else ""
                 }
             }
-            "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
-                val enchants = extraAttr.getCompoundTag("enchantments")
-                if (!enchants.hasNoTags()) {
-                    val enchant = enchants.keySet.iterator().next()
-                    id = "ENCHANTED_BOOK-" + enchant.uppercase() + "-" + enchants.getInteger(enchant)
-                }
-            }
-            "POTION" -> if (extraAttr.hasKey("potion") && extraAttr.hasKey("potion_level")) {
-                id = "POTION-" + extraAttr.getString("potion")
-                    .uppercase() + "-" + extraAttr.getInteger("potion_level") + (if (extraAttr.hasKey("enhanced")) "-ENHANCED" else "") + (if (extraAttr.hasKey(
-                        "extended"
-                    )
-                ) "-EXTENDED" else "") + if (extraAttr.hasKey("splash")) "-SPLASH" else ""
-            }
+            return id
         }
-        return id
     }
 
     init {

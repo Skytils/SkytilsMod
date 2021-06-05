@@ -27,10 +27,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-object GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")) {
-
-    val overrides = HashMap<String, Boolean>()
-    val glintColors = HashMap<String, CustomColor>()
+class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")) {
 
     override fun read(reader: FileReader) {
         overrides.clear()
@@ -69,5 +66,14 @@ object GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.j
 
     override fun setDefault(writer: FileWriter) {
         gson.toJson(JsonObject(), writer)
+    }
+
+    companion object {
+
+        @JvmField
+        val overrides = HashMap<String, Boolean>()
+
+        @JvmField
+        val glintColors = HashMap<String, CustomColor>()
     }
 }

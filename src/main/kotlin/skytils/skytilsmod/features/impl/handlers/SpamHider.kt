@@ -23,7 +23,6 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -43,20 +42,23 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.sin
 
-object SpamHider {
-    var spamMessages = ArrayList<SpamMessage>()
-    private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
-        if (ReceivePacketEvent.packet !is S02PacketChat) return
-        Utils.cancelChatPacket(ReceivePacketEvent)
-        if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
-    }
+class SpamHider {
+    companion object {
+        private val mc = Minecraft.getMinecraft()
+        var spamMessages = ArrayList<SpamMessage>()
+        private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
+            if (ReceivePacketEvent.packet !is S02PacketChat) return
+            Utils.cancelChatPacket(ReceivePacketEvent)
+            if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
+        }
 
-    private fun newMessage(message: String) {
-        spamMessages.add(SpamMessage(message, 0, 0.0))
-    }
+        private fun newMessage(message: String) {
+            spamMessages.add(SpamMessage(message, 0, 0.0))
+        }
 
-    init {
-        SpamGuiElement()
+        init {
+            SpamGuiElement()
+        }
     }
 
     private var lastBlessingType = ""

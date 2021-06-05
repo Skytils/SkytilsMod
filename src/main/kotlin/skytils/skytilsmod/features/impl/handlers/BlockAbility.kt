@@ -31,43 +31,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-object BlockAbility : PersistentSave(File(Skytils.modDir, "blockability.json")) {
-    val blockedItems = HashSet<String>()
-    val interactables = setOf(
-        Blocks.acacia_door,
-        Blocks.anvil,
-        Blocks.beacon,
-        Blocks.bed,
-        Blocks.birch_door,
-        Blocks.brewing_stand,
-        Blocks.command_block,
-        Blocks.crafting_table,
-        Blocks.chest,
-        Blocks.dark_oak_door,
-        Blocks.daylight_detector,
-        Blocks.daylight_detector_inverted,
-        Blocks.dispenser,
-        Blocks.dropper,
-        Blocks.enchanting_table,
-        Blocks.ender_chest,
-        Blocks.furnace,
-        Blocks.hopper,
-        Blocks.jungle_door,
-        Blocks.lever,
-        Blocks.noteblock,
-        Blocks.powered_comparator,
-        Blocks.unpowered_comparator,
-        Blocks.powered_repeater,
-        Blocks.unpowered_repeater,
-        Blocks.standing_sign,
-        Blocks.wall_sign,
-        Blocks.trapdoor,
-        Blocks.trapped_chest,
-        Blocks.wooden_button,
-        Blocks.stone_button,
-        Blocks.oak_door,
-        Blocks.skull
-    )
+class BlockAbility : PersistentSave(File(Skytils.modDir, "blockability.json")) {
     //@SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.entityPlayer !== mc.thePlayer) return
@@ -123,5 +87,45 @@ object BlockAbility : PersistentSave(File(Skytils.modDir, "blockability.json")) 
 
     override fun setDefault(writer: FileWriter) {
         gson.toJson(JsonArray(), writer)
+    }
+
+
+    companion object {
+        val blockedItems = HashSet<String>()
+        val interactables = setOf(
+            Blocks.acacia_door,
+            Blocks.anvil,
+            Blocks.beacon,
+            Blocks.bed,
+            Blocks.birch_door,
+            Blocks.brewing_stand,
+            Blocks.command_block,
+            Blocks.crafting_table,
+            Blocks.chest,
+            Blocks.dark_oak_door,
+            Blocks.daylight_detector,
+            Blocks.daylight_detector_inverted,
+            Blocks.dispenser,
+            Blocks.dropper,
+            Blocks.enchanting_table,
+            Blocks.ender_chest,
+            Blocks.furnace,
+            Blocks.hopper,
+            Blocks.jungle_door,
+            Blocks.lever,
+            Blocks.noteblock,
+            Blocks.powered_comparator,
+            Blocks.unpowered_comparator,
+            Blocks.powered_repeater,
+            Blocks.unpowered_repeater,
+            Blocks.standing_sign,
+            Blocks.wall_sign,
+            Blocks.trapdoor,
+            Blocks.trapped_chest,
+            Blocks.wooden_button,
+            Blocks.stone_button,
+            Blocks.oak_door,
+            Blocks.skull
+        )
     }
 }

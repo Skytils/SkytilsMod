@@ -39,8 +39,8 @@ public abstract class MixinItemArmor extends Item {
         NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(stack);
         if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
             String uuid = extraAttributes.getString("uuid");
-            if (ArmorColor.INSTANCE.getArmorColors().containsKey(uuid)) {
-                cir.setReturnValue(ArmorColor.INSTANCE.getArmorColors().get(uuid).toInt());
+            if (ArmorColor.armorColors.containsKey(uuid)) {
+                cir.setReturnValue(ArmorColor.armorColors.get(uuid).toInt());
             }
         }
     }
@@ -51,8 +51,8 @@ public abstract class MixinItemArmor extends Item {
         NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(stack);
         if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
             String uuid = extraAttributes.getString("uuid");
-            if (ArmorColor.INSTANCE.getArmorColors().containsKey(uuid)) {
-                cir.setReturnValue(ArmorColor.INSTANCE.getArmorColors().get(uuid).toInt());
+            if (ArmorColor.armorColors.containsKey(uuid)) {
+                cir.setReturnValue(ArmorColor.armorColors.get(uuid).toInt());
             }
         }
     }
@@ -63,7 +63,7 @@ public abstract class MixinItemArmor extends Item {
         NBTTagCompound extraAttributes = ItemUtil.getExtraAttributes(stack);
         if (extraAttributes != null && extraAttributes.hasKey("uuid")) {
             String uuid = extraAttributes.getString("uuid");
-            if (ArmorColor.INSTANCE.getArmorColors().containsKey(uuid)) {
+            if (ArmorColor.armorColors.containsKey(uuid)) {
                 cir.setReturnValue(true);
             }
         }
