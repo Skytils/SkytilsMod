@@ -1148,6 +1148,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var itemDropScale = 1f
 
     @Property(
+        type = PropertyType.SWITCH,
+        name = "Item Cooldown Display",
+        description = "Displays the cooldowns for your items.",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var itemCooldownDisplay = false
+
+    @Property(
         type = PropertyType.DECIMAL_SLIDER,
         name = "Larger Heads",
         description = "Change the size of heads in your inventory.",

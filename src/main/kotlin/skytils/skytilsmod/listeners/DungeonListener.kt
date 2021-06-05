@@ -30,8 +30,10 @@ import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.addSuffix
+import skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 
 object DungeonListener {
 
@@ -157,7 +159,7 @@ object DungeonListener {
             }
             val name = matcher.groups["name"]!!.value
             val dungeonClass = matcher.groups["class"]!!.value
-            val classLevel = matcher.groups["lvl"]!!.value
+            val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
             println("Parsed teammate $name, they are a $dungeonClass $classLevel")
             team.add(
                 DungeonTeammate(
@@ -169,12 +171,13 @@ object DungeonListener {
                 )
             )
         }
+        CooldownTracker.updateCooldownReduction()
     }
 
     class DungeonTeammate(
         val playerName: String,
         val dungeonClass: DungeonClass,
-        val classLevel: String,
+        val classLevel: Int,
         val tabEntryIndex: Int
     ) {
         var player: EntityPlayer? = null
