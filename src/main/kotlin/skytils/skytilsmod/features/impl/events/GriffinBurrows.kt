@@ -142,7 +142,7 @@ class GriffinBurrows {
         val player = mc.thePlayer
         if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
-        if ((burrowRefreshTimer.time >= (Skytils.config.burrowIntervalRefresh * 1000) || shouldRefreshBurrows)) {
+        if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             for (i in 0..7) {
@@ -262,7 +262,7 @@ class GriffinBurrows {
                 for (i in 0..7) {
                     val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
                     if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        val diff = (((Skytils.config.burrowIntervalRefresh * 1000) - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
+                        val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
                         val sr = ScaledResolution(Minecraft.getMinecraft())
                         val leftAlign = actualX < sr.scaledWidth / 2f
                         val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -473,14 +473,14 @@ class GriffinBurrows {
                 }
                 return "$type §bPosition: ${chain + 1}/4${
                     if (closest != null) " ${closest.nameWithColor}" else ""
-                }${if (getClosestBurrow()!!.equals(this)) " (CLOSEST)" else ""}"
+                }${if (isThisClosest()!!) " (CLOSEST)" else ""}"
             }
 
         private val color: Color
             get() {
                 if (Skytils.config.useClosestBurrow) {
-                    if (getClosestBurrow() != null) {
-                        if (getClosestBurrow()!!.equals(this)) {
+                    if (isThisClosest() != null) {
+                        if (isThisClosest()!!) {
                             return Skytils.config.closestBurrowColor
                         }
                     }
@@ -527,7 +527,7 @@ class GriffinBurrows {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
-        fun getClosestBurrow(): Burrow? {
+        fun isThisClosest(): Boolean? {
             try {
                 println("Finding closest burrow")
                 if (burrows.size == 0 || !MayorInfo.currentMayor.equals("Diana")) return null
@@ -540,7 +540,7 @@ class GriffinBurrows {
                         closest = it
                     }
                 }
-                return closest
+                return closest.equals(this)
             } catch (ex: IndexOutOfBoundsException) {
                 ex.printStackTrace()
                 return null

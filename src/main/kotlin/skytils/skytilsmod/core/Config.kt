@@ -817,17 +817,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showGriffinCountdown = false
 
     @Property(
-        type = PropertyType.SLIDER,
-        name = "Interval Between Burrow Refreshes",
-        description = "Amount of time to wait in between griffin burrow API refreshes.",
-        category = "Events",
-        subcategory = "Mythological",
-        min = 30,
-        max = 60
-    )
-    var burrowIntervalRefresh = 60
-
-    @Property(
         type = PropertyType.SELECTOR,
         name = "Burrow Refresh Hider",
         description = "Toggles info about refreshing / loading burrows.",
@@ -2434,7 +2423,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         ::burrowCryptsFastTravel dependsOn ::showGriffinBurrows
         ::burrowDarkAuctionFastTravel dependsOn ::showGriffinBurrows
         ::burrowHubFastTravel dependsOn ::showGriffinBurrows
-        ::burrowIntervalRefresh dependsOn ::showGriffinBurrows
         ::burrowRefreshMsg dependsOn ::showGriffinBurrows
         ::trackGriffinPet dependsOn ::trackMythEvent
 
