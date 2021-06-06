@@ -18,9 +18,7 @@
 
 package skytils.skytilsmod.tweaker
 
-import net.minecraftforge.common.ForgeVersion
 import org.spongepowered.asm.lib.tree.ClassNode
-import org.spongepowered.asm.mixin.Mixins
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 
@@ -37,18 +35,6 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         if (!mixinClassName.startsWith("skytils.skytilsmod.mixins")) {
             println("Mixin $mixinClassName for $targetClassName is foreign, disabling.")
             return false
-        }
-        if (targetClassName == "io.github.quantizr.utils.Utils") {
-            val drmVersion = try {
-                Class.forName("io.github.quantizr.DungeonRooms").getDeclaredField("VERSION").get(null) as String
-            } catch (e: Exception) {
-                e.printStackTrace()
-                "1.0.0"
-            }
-            if (drmVersion.startsWith("1")) {
-                println("Disabling DRM mixin due to old version.")
-                return false
-            }
         }
         return true
     }

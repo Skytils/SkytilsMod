@@ -191,9 +191,7 @@ object Utils {
 
     fun checkThreadAndQueue(run: () -> Unit) {
         if (!mc.isCallingFromMinecraftThread) {
-            mc.addScheduledTask {
-                run()
-            }
+            mc.addScheduledTask(run)
         } else run()
     }
 

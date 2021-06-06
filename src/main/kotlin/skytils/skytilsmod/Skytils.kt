@@ -235,6 +235,11 @@ class Skytils {
         usingLabymod = Loader.isModLoaded("labymod")
         usingNEU = Loader.isModLoaded("notenoughupdates")
 
+        if (usingDungeonRooms && Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2")) {
+            ScoreCalculation.drmRoomScanMethod =
+                Class.forName("io.github.quantizr.utils.Utils").getDeclaredMethod("roomList")
+        }
+
         val cch = ClientCommandHandler.instance
 
         if (cch is AccessorCommandHandler) {

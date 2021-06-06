@@ -46,7 +46,10 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
+import kotlin.jvm.internal.Reflection
 import kotlin.math.floor
 import kotlin.math.pow
 
@@ -54,12 +57,14 @@ object ScoreCalculation {
 
     val partyAssistSecretsPattern: Pattern =
         Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
-    var rooms = HashMap<String, Int>()
+    var rooms = ConcurrentHashMap<String, Int>()
     var mimicKilled = false
     private val mc = Minecraft.getMinecraft()
     private var ticks = 0
     private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
     private var lastRoomScanPos: BlockPos? = null
+
+    var drmRoomScanMethod: Method? = null
 
     fun roomScanCallback(list: List<String>) {
         if (Skytils.config.scoreCalculationMethod != 1) return
@@ -118,14 +123,20 @@ object ScoreCalculation {
                     }
                 }
                 1 -> {
-                    if (lastRoomScanPos == null || ticks % 600 == 0 || mc.thePlayer.getDistanceSqToCenter(
+                    if (drmRoomScanMethod != null && (lastRoomScanPos == null || ticks % 900 == 0 || mc.thePlayer.getDistanceSqToCenter(
                             lastRoomScanPos
                         ) >= (mc.gameSettings.renderDistanceChunks.coerceAtMost(
-                            8
+                            10
                         ) * 16.0).pow(2)
+                                )
                     ) {
                         lastRoomScanPos = mc.thePlayer.position
-                        ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room scan")
+                        Skytils.threadPool.submit {
+                            @Suppress("UNCHECKED_CAST")
+                            roomScanCallback(
+                                drmRoomScanMethod!!.invoke(null) as List<String>
+                            )
+                        }
                         ticks = 0
                     }
                 }
