@@ -29,13 +29,13 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SetActionBarEvent
 import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.startsWithAny
+import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
 import java.util.*
@@ -85,7 +85,7 @@ class SpamHider {
         "You stumbled upon a Sea Guardian.",
         "It looks like you've disrupted the Sea Witch's brewing session. Watch out, she's furious!",
         "You reeled in a Sea Archer.",
-        "The Monster of The Deep has emerged.",
+        "The Monster of the Deep has emerged.",
         "Huh? A Catfish!",
         "Is this even a Fish? It's the Carrot King!",
         "Gross! A Sea Leech!",
@@ -149,478 +149,402 @@ class SpamHider {
         }
         if (!Utils.inSkyblock) return
         try {
-            // Hide Mort Messages
-            if (Utils.inDungeons && unformatted.startsWith("[NPC] Mort")) {
-                when (Skytils.config.hideMortMessages) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideMortMessages == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Hide Boss Messages
-            if (Utils.inDungeons && unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher")) {
-                when (Skytils.config.hideBossMessages) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideBossMessages == 2)
-                    else -> {
-                    }
-                }
-            }
-            if (Skytils.config.hideOruoMessages && Utils.inDungeons && unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && !unformatted.contains(
-                    "You should have listened"
-                ) && !unformatted.contains("Yikes") && !unformatted.contains("chose the wrong answer") && !unformatted.contains(
-                    "thinks the answer is"
-                ) && !(unformatted.contains("answered Question #") && unformatted.endsWith("correctly!"))
-            ) {
-                cancelChatPacket(event, false)
-            }
-            if (unformatted.contains(":")) return
-
-            //Autopet hider
-            if (unformatted.startsWith("Autopet equipped your")) {
-                when (Skytils.config.hideAutopetMessages) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideAutopetMessages == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // CantUseAbilityHider
-            if (unformatted.startsWith("You cannot use abilities in this room!")) {
-                when (Skytils.config.hideCantUseAbility) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideCantUseAbility == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            //No enemies nearby
-            if (formatted.startsWith("§r§cThere are no enemies nearby!")) {
-                when (Skytils.config.hideNoEnemiesNearby) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideNoEnemiesNearby == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Implosion
-            if (formatted.contains("§r§7Your Implosion hit ")) {
-                when (Skytils.config.implosionHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.implosionHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Midas Staff
-            if (formatted.contains("§r§7Your Molten Wave hit ")) {
-                when (Skytils.config.midasStaffHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.midasStaffHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Spirit Sceptre
-            if (formatted.contains("§r§7Your Spirit Sceptre hit ")) {
-                when (Skytils.config.spiritSceptreHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.spiritSceptreHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Giant Sword
-            if (formatted.contains("§r§7Your Giant's Sword hit ")) {
-                when (Skytils.config.giantSwordHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.giantSwordHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Livid Dagger
-            if (formatted.contains("§r§7Your Livid Dagger hit")) {
-                when (Skytils.config.lividHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.lividHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Ray of Hope
-            if (formatted.startsWith("§r§7Your Ray of Hope hit")) {
-                when (Skytils.config.hopeHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hopeHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Blessings
-            if (formatted.contains("§r§6§lDUNGEON BUFF!")) {
-                when (Skytils.config.blessingHider) {
-                    1 -> cancelChatPacket(event, false)
-                    2 -> {
-                        val blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.matcher(unformatted)
-                        if (blessingTypeMatcher.find()) {
-                            lastBlessingType = blessingTypeMatcher.group("blessing").lowercase()
-                            cancelChatPacket(event, false)
+            if (Utils.inDungeons) {
+                // Hide Mort Messages
+                when {
+                    unformatted.startsWith("[NPC] Mort") -> {
+                        when (Skytils.config.hideMortMessages) {
+                            1, 2 -> cancelChatPacket(event, Skytils.config.hideMortMessages == 2)
                         }
                     }
-                    else -> {
+                    unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher") -> {
+                        when (Skytils.config.hideBossMessages) {
+                            1, 2 -> cancelChatPacket(event, Skytils.config.hideBossMessages == 2)
+                        }
+                    }
+                    Skytils.config.hideOruoMessages && unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && !unformatted.contains(
+                        "You should have listened"
+                    ) && !unformatted.contains("Yikes") && !unformatted.contains("chose the wrong answer") && !unformatted.contains(
+                        "thinks the answer is"
+                    ) && !(unformatted.contains("answered Question #") && unformatted.endsWith("correctly!")) -> {
+                        cancelChatPacket(event, false)
                     }
                 }
-            } else if (unformatted.contains("Grant")) {
-                if (Regexs.BLESSINGGRANT.pattern.matcher(unformatted).find()) {
+            }
+            if (unformatted.contains(":") || event.isCanceled) return
+
+            when {
+                //Autopet hider
+                unformatted.startsWith("Autopet equipped your") -> {
+                    when (Skytils.config.hideAutopetMessages) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.hideAutopetMessages == 2)
+                    }
+                }
+                // CantUseAbilityHider
+                unformatted.startsWith("You cannot use abilities in this room!") -> {
+                    when (Skytils.config.hideCantUseAbility) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.hideCantUseAbility == 2)
+                    }
+                }
+                //No enemies nearby
+                formatted.startsWith("§r§cThere are no enemies nearby!") -> {
+                    when (Skytils.config.hideNoEnemiesNearby) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.hideNoEnemiesNearby == 2)
+                    }
+                }
+
+                // Implosion
+                formatted.contains("§r§7Your Implosion hit ") -> {
+                    when (Skytils.config.implosionHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.implosionHider == 2)
+                    }
+                }
+
+                // Midas Staff
+                formatted.contains("§r§7Your Molten Wave hit ") -> {
+                    when (Skytils.config.midasStaffHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.midasStaffHider == 2)
+                    }
+                }
+
+                // Spirit Sceptre
+                formatted.contains("§r§7Your Spirit Sceptre hit ") -> {
+                    when (Skytils.config.spiritSceptreHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.spiritSceptreHider == 2)
+                    }
+                }
+
+                // Giant Sword
+                formatted.contains("§r§7Your Giant's Sword hit ") -> {
+                    when (Skytils.config.giantSwordHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.giantSwordHider == 2)
+                    }
+                }
+
+                // Livid Dagger
+                formatted.contains("§r§7Your Livid Dagger hit") -> {
+                    when (Skytils.config.lividHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.lividHider == 2)
+                    }
+                }
+
+                // Ray of Hope
+                formatted.startsWith("§r§7Your Ray of Hope hit") -> {
+                    when (Skytils.config.hopeHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.hopeHider == 2)
+                    }
+                }
+
+                // Blessings
+                formatted.contains("§r§6§lDUNGEON BUFF!") -> {
                     when (Skytils.config.blessingHider) {
                         1 -> cancelChatPacket(event, false)
                         2 -> {
-                            val blessingBuffMatcher = Regexs.BLESSINGBUFF.pattern.matcher(unformatted)
-                            val buffs: MutableList<BlessingBuff> = ArrayList()
-                            while (blessingBuffMatcher.find()) {
-                                val symbol =
-                                    if (blessingBuffMatcher.group("symbol1") == "he") "\u2764" else blessingBuffMatcher.group(
-                                        "symbol1"
-                                    )
-                                buffs.add(BlessingBuff(blessingBuffMatcher.group("buff1"), symbol))
+                            val blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.matcher(unformatted)
+                            if (blessingTypeMatcher.find()) {
+                                lastBlessingType = blessingTypeMatcher.group("blessing").lowercase()
+                                cancelChatPacket(event, false)
                             }
-                            if (lastBlessingType != "") GuiManager.toastGui.add(BlessingToast(lastBlessingType, buffs))
+                        }
+                    }
+                }
+                Utils.inDungeons && unformatted.contains("Grant") -> {
+                    if (Regexs.BLESSINGGRANT.pattern.matcher(unformatted).find()) {
+                        when (Skytils.config.blessingHider) {
+                            1 -> cancelChatPacket(event, false)
+                            2 -> {
+                                val blessingBuffMatcher = Regexs.BLESSINGBUFF.pattern.matcher(unformatted)
+                                val buffs: MutableList<BlessingBuff> = ArrayList()
+                                while (blessingBuffMatcher.find()) {
+                                    val symbol =
+                                        if (blessingBuffMatcher.group("symbol1") == "he") "\u2764" else blessingBuffMatcher.group(
+                                            "symbol1"
+                                        )
+                                    buffs.add(BlessingBuff(blessingBuffMatcher.group("buff1"), symbol))
+                                }
+                                if (lastBlessingType != "") GuiManager.toastGui.add(
+                                    BlessingToast(
+                                        lastBlessingType,
+                                        buffs
+                                    )
+                                )
+                                cancelChatPacket(event, false)
+                            }
+                        }
+                    }
+                }
+                Utils.inDungeons && unformatted.contains("Blessing of ") -> {
+                    when (Skytils.config.blessingHider) {
+                        1, 2 -> cancelChatPacket(event, false)
+                    }
+                }
+
+                // Keys
+                // Wither
+                formatted.contains("§r§8Wither Key") && Utils.inDungeons -> {
+                    when (Skytils.config.witherKeyHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.witherKeyHider == 2)
+                        3 -> {
+                            cancelChatPacket(event, false)
+                            if (unformatted.contains("was picked up")) {
+                                GuiManager.toastGui.add(KeyToast("wither", ""))
+                            } else {
+                                val player = formatted.substringBefore("§r§f §r§ehas")
+                                GuiManager.toastGui.add(KeyToast("wither", player))
+                            }
+                        }
+                    }
+                }
+                formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.") -> {
+                    when (Skytils.config.witherKeyHider) {
+                        1, 2, 3 -> cancelChatPacket(event, false)
+                    }
+                }
+                // Blood
+                unformatted.contains("Blood Key") && Utils.inDungeons -> {
+                    when (Skytils.config.bloodKeyHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.bloodKeyHider == 2)
+                        3 -> {
+                            cancelChatPacket(event, false)
+                            if (unformatted.contains("was picked up")) {
+                                GuiManager.toastGui.add(KeyToast("blood", ""))
+                            } else {
+                                val player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
+                                GuiManager.toastGui.add(KeyToast("blood", player))
+                            }
+                        }
+                    }
+                }
+                unformatted.contains("RIGHT CLICK on the BLOOD DOOR to open it.") -> {
+                    when (Skytils.config.bloodKeyHider) {
+                        1, 2, 3 -> cancelChatPacket(event, false)
+                    }
+                }
+
+                // Superboom tnt
+                formatted.contains("§r§9Superboom TNT") && Utils.inDungeons -> {
+                    when (Skytils.config.superboomHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.superboomHider == 2)
+                        3 -> {
+                            cancelChatPacket(event, false)
+                            val username = Minecraft.getMinecraft().thePlayer.name
+                            if (formatted.contains(username)) GuiManager.toastGui.add(SuperboomToast())
+                        }
+                    }
+                }
+
+                // Revive Stone
+                formatted.contains("§r§6Revive Stone") && Utils.inDungeons -> {
+                    when (Skytils.config.reviveStoneHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.reviveStoneHider == 2)
+                        3 -> {
+                            cancelChatPacket(event, false)
+                            val username = Minecraft.getMinecraft().thePlayer.name
+                            if (formatted.contains(username)) GuiManager.toastGui.add(ReviveStoneToast())
+                        }
+                    }
+                }
+
+                // Combo
+                unformatted.contains("Combo") -> {
+                    when (Skytils.config.comboHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
+                        3 -> {
+                            if (unformatted.startsWith("Your Kill Combo has expired!")) {
+                                GuiManager.toastGui.add(ComboEndToast())
+                            } else {
+                                GuiManager.toastGui.add(ComboToast(formatted))
+                            }
                             cancelChatPacket(event, false)
                         }
-                        else -> {
-                        }
                     }
                 }
-            } else if (unformatted.contains("Blessing of ")) {
-                when (Skytils.config.blessingHider) {
-                    1, 2 -> cancelChatPacket(event, false)
-                    else -> {
-                    }
-                }
-            }
 
-            // Keys
-            // Wither
-            if (formatted.contains("§r§8Wither Key") && Utils.inDungeons) {
-                when (Skytils.config.witherKeyHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.witherKeyHider == 2)
-                    3 -> {
-                        cancelChatPacket(event, false)
-                        if (unformatted.contains("was picked up")) {
-                            GuiManager.toastGui.add(KeyToast("wither", ""))
-                        } else {
-                            val player = formatted.substringBefore("§r§f §r§ehas")
-                            GuiManager.toastGui.add(KeyToast("wither", player))
-                        }
-                    }
-                    else -> {
+                // Blessing enchant
+                formatted.startsWith("§r§aYour Blessing enchant") -> {
+                    when (Skytils.config.blessingEnchantHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.blessingEnchantHider == 2)
                     }
                 }
-            } else if (formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.")) {
-                when (Skytils.config.witherKeyHider) {
-                    1, 2, 3 -> cancelChatPacket(event, false)
-                    else -> {
-                    }
-                }
-            }
-            // Blood
-            if (unformatted.contains("Blood Key") && Utils.inDungeons) {
-                when (Skytils.config.bloodKeyHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.bloodKeyHider == 2)
-                    3 -> {
-                        cancelChatPacket(event, false)
-                        if (unformatted.contains("was picked up")) {
-                            GuiManager.toastGui.add(KeyToast("blood", ""))
-                        } else {
-                            val player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
-                            GuiManager.toastGui.add(KeyToast("blood", player))
-                        }
-                    }
-                    else -> {
-                    }
-                }
-            } else if (unformatted.contains("RIGHT CLICK on the BLOOD DOOR to open it.")) {
-                when (Skytils.config.bloodKeyHider) {
-                    1, 2, 3 -> cancelChatPacket(event, false)
-                    else -> {
-                    }
-                }
-            }
 
-            // Superboom tnt
-            if (formatted.contains("§r§9Superboom TNT") && Utils.inDungeons) {
-                when (Skytils.config.superboomHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.superboomHider == 2)
-                    3 -> {
-                        cancelChatPacket(event, false)
-                        val username = Minecraft.getMinecraft().thePlayer.name
-                        if (!formatted.contains(username)) return
-                        GuiManager.toastGui.add(SuperboomToast())
-                    }
-                    else -> {
+                // Blessing bair
+                formatted.startsWith("§r§aYour bait got you double") -> {
+                    when (Skytils.config.blessedBaitHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.blessedBaitHider == 2)
                     }
                 }
-            }
 
-            // Revive Stone
-            if (formatted.contains("§r§6Revive Stone") && Utils.inDungeons) {
-                when (Skytils.config.reviveStoneHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.reviveStoneHider == 2)
-                    3 -> {
-                        cancelChatPacket(event, false)
-                        val username = Minecraft.getMinecraft().thePlayer.name
-                        if (!formatted.contains(username)) return
-                        GuiManager.toastGui.add(ReviveStoneToast())
-                    }
-                    else -> {
+                // Sea creature catch
+                formatted.startsWith("§r§a") && SEA_CREATURES.contains(unformatted) -> {
+                    when (Skytils.config.scCatchHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.scCatchHider == 2)
                     }
                 }
-            }
 
-            // Combo
-            if (unformatted.contains("Combo")) {
-                when (Skytils.config.comboHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
-                    3 -> {
-                        if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                            GuiManager.toastGui.add(ComboEndToast())
-                        } else {
-                            GuiManager.toastGui.add(ComboToast(formatted))
-                        }
-                        cancelChatPacket(event, false)
-                    }
-                    else -> {
+                // Legendary sea creature catch
+                formatted.startsWith("§r§a") && LEGENDARY_SEA_CREATURES.contains(unformatted) -> {
+                    when (Skytils.config.legendaryScCatchHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.legendaryScCatchHider == 2)
                     }
                 }
-            }
 
-            // Blessing enchant
-            if (formatted.startsWith("§r§aYour Blessing enchant")) {
-                when (Skytils.config.blessingEnchantHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.blessingEnchantHider == 2)
-                    else -> {
+                // Good catch
+                unformatted.startsWith("GOOD CATCH! You found") -> {
+                    when (Skytils.config.goodTreasureHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.goodTreasureHider == 2)
                     }
                 }
-            }
 
-            // Blessing bair
-            if (formatted.startsWith("§r§aYour bait got you double")) {
-                when (Skytils.config.blessedBaitHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.blessedBaitHider == 2)
-                    else -> {
+                // Great catch
+                unformatted.startsWith("GREAT CATCH! You found") -> {
+                    when (Skytils.config.greatTreasureHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.greatTreasureHider == 2)
                     }
                 }
-            }
 
-            // Sea creature catch
-            if (formatted.startsWith("§r§a") && SEA_CREATURES.contains(unformatted)) {
-                when (Skytils.config.scCatchHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.scCatchHider == 2)
-                    else -> {
+                // Compact
+                unformatted.startsWith("COMPACT! You found") -> {
+                    when (Skytils.config.compactHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.compactHider == 2)
                     }
                 }
-            }
 
-            // Legendary sea creature catch
-            if (formatted.startsWith("§r§a") && LEGENDARY_SEA_CREATURES.contains(unformatted)) {
-                when (Skytils.config.legendaryScCatchHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.legendaryScCatchHider == 2)
-                    else -> {
+                // Blocks in the way
+                unformatted.contains("There are blocks in the way") -> {
+                    when (Skytils.config.inTheWayHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.inTheWayHider == 2)
                     }
                 }
-            }
 
-            // Good catch
-            if (unformatted.startsWith("GOOD CATCH! You found")) {
-                when (Skytils.config.goodTreasureHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.goodTreasureHider == 2)
-                    else -> {
+                // Cooldown
+                unformatted.contains("cooldown") -> {
+                    when (Skytils.config.cooldownHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.cooldownHider == 2)
                     }
                 }
-            }
 
-            // Great catch
-            if (unformatted.startsWith("GREAT CATCH! You found")) {
-                when (Skytils.config.greatTreasureHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.greatTreasureHider == 2)
-                    else -> {
+                // Out of mana
+                unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!") -> {
+                    when (Skytils.config.manaMessages) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.manaMessages == 2)
                     }
                 }
-            }
 
-            // Compact
-            if (unformatted.startsWith("COMPACT! You found")) {
-                when (Skytils.config.compactHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.compactHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Blocks in the way
-            if (unformatted.contains("There are blocks in the way")) {
-                when (Skytils.config.inTheWayHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.inTheWayHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Cooldown
-            if (unformatted.contains("cooldown")) {
-                when (Skytils.config.cooldownHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.cooldownHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Out of mana
-            if (unformatted.contains("You do not have enough mana to do this!") || unformatted.startsWith("Not enough mana!")) {
-                when (Skytils.config.manaMessages) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.manaMessages == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            //Hide Abilities
-            if (Utils.inDungeons && unformatted.contains("is now available!") && !unformatted.contains("Mining Speed Boost") && !unformatted.contains(
+                //Hide Abilities
+                (Utils.inDungeons && unformatted.contains("is now available!") && !unformatted.contains("Mining Speed Boost") && !unformatted.contains(
                     "Pickobulus"
                 ) || unformatted.contains("is ready to use!") || unformatted.startsWith("Used") || unformatted.contains(
                     "Your Guided Sheep hit"
                 ) || unformatted.contains("Your Thunderstorm hit") || unformatted.contains("Your Wish healed") || unformatted.contains(
                     "Your Throwing Axe hit"
                 ) || unformatted.contains("Your Explosive Shot hit") || unformatted.contains("Your Seismic Wave hit")
-            ) {
-                when (Skytils.config.hideDungeonAbilities) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideDungeonAbilities == 2)
-                    else -> {
+                        ) -> {
+                    when (Skytils.config.hideDungeonAbilities) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.hideDungeonAbilities == 2)
                     }
                 }
-            }
 
-            // Hide Dungeon Countdown / Ready messages
-            if (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains(
+                // Hide Dungeon Countdown / Ready messages
+                (Utils.inDungeons && unformatted.contains("has started the dungeon countdown. The dungeon will begin in 1 minute.") || unformatted.contains(
                     "is now ready!"
                 ) || unformatted.contains("Dungeon starts in") || unformatted.contains("selected the")
-            ) {
-                when (Skytils.config.hideDungeonCountdownAndReady) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.hideDungeonCountdownAndReady == 2)
-                    else -> {
+                        ) -> {
+                    when (Skytils.config.hideDungeonCountdownAndReady) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.hideDungeonCountdownAndReady == 2)
                     }
                 }
-            }
 
-            // Compact Building Tools
-            if (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
+                // Compact Building Tools
+                (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
                     "place"
                 ) || formatted.contains("zap"))
-            ) {
-                if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
-                    val chatGui = mc.ingameGUI.chatGUI
-                    val lines = (chatGui as AccessorGuiNewChat).chatLines
-                    val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
-                    var i = 0
-                    while (i < 100 && i < lines.size) {
-                        val line = lines[i]
-                        if (line.chatComponent.formattedText.replace(
-                                "\\d".toRegex(),
-                                ""
-                            ) == formatted.replace("\\d".toRegex(), "")
-                        ) {
-                            drawnLines.removeAt(i)
+                        ) -> {
+                    if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
+                        val chatGui = mc.ingameGUI.chatGUI
+                        val lines = (chatGui as AccessorGuiNewChat).chatLines
+                        val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
+                        var i = 0
+                        while (i < 100 && i < lines.size) {
+                            val line = lines[i]
+                            if (line.chatComponent.formattedText.replace(
+                                    "\\d".toRegex(),
+                                    ""
+                                ) == formatted.replace("\\d".toRegex(), "")
+                            ) {
+                                drawnLines.removeAt(i)
+                            }
+                            i++
                         }
-                        i++
                     }
                 }
-            }
 
-            // Healer Tethers
-            if (formatted.startsWith("§r§eYou formed a tether")) {
-                when (Skytils.config.tetherHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.tetherHider == 2)
-                    else -> {
+                // Healer Tethers
+                formatted.startsWith("§r§eYou formed a tether") -> {
+                    when (Skytils.config.tetherHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.tetherHider == 2)
                     }
                 }
-            }
 
-            // Self Orb Pickups
-            if (formatted.startsWith("§r§c◕ §r§eYou picked up a")) {
-                when (Skytils.config.selfOrbHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.selfOrbHider == 2)
-                    else -> {
+                // Self Orb Pickups
+                formatted.startsWith("§r§c◕ §r§eYou picked up a") -> {
+                    when (Skytils.config.selfOrbHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.selfOrbHider == 2)
                     }
                 }
-            }
 
-            // Other Orb Pickups
-            if (formatted.contains("§r§epicked up your ")) {
-                when (Skytils.config.otherOrbHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.otherOrbHider == 2)
-                    else -> {
+                // Other Orb Pickups
+                formatted.contains("§r§epicked up your ") -> {
+                    when (Skytils.config.otherOrbHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.otherOrbHider == 2)
                     }
                 }
-            }
 
-            // Traps
-            if (formatted.startsWithAny(
+                // Traps
+                formatted.startsWithAny(
                     "§r§cThe Tripwire Trap",
                     "§r§cThe Flamethrower",
                     "§r§cThe Arrow Trap",
                     "§r§cThe Crusher"
-                )
-            ) {
-                when (Skytils.config.trapDamageHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.trapDamageHider == 2)
-                    else -> {
+                ) -> {
+                    when (Skytils.config.trapDamageHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.trapDamageHider == 2)
                     }
                 }
-            }
 
-            // Auto-Recombobulator
-            if (unformatted.startsWith("Your Auto-Recomb")) {
-                when (Skytils.config.autoRecombHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.autoRecombHider == 2)
-                    3 -> {
-                        val matcher = RecombToast.pattern.matcher(formatted)
-                        if (matcher.find(formatted.indexOf(" "))) {
-                            GuiManager.toastGui.add(RecombToast(matcher.group(1)))
+                // Auto-Recombobulator
+                unformatted.startsWith("Your Auto-Recomb") -> {
+                    when (Skytils.config.autoRecombHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.autoRecombHider == 2)
+                        3 -> {
+                            val matcher = RecombToast.pattern.matcher(formatted)
+                            if (matcher.find(formatted.indexOf(" "))) {
+                                GuiManager.toastGui.add(RecombToast(matcher.group(1)))
+                            }
+                            cancelChatPacket(event, false)
                         }
-                        cancelChatPacket(event, false)
                     }
-                    else -> {
+                }
+                formatted.contains("§r§eunlocked §r§dWither Essence §r§8x") -> {
+                    when (Skytils.config.witherEssenceHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceHider == 2)
+                    }
+                }
+
+                // Undead Essence
+                formatted.contains("§r§eunlocked §r§dUndead Essence §r§8x") -> {
+                    when (Skytils.config.undeadEssenceHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.undeadEssenceHider == 2)
+                    }
+                }
+
+                // Healing (Zombie sword & Werewolf)
+                formatted.startsWith("§r§a§l") && formatted.contains("healed") -> {
+                    when (Skytils.config.healingHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.healingHider == 2)
                     }
                 }
             }
 
-            // Wither Essence
-            if (formatted.contains("§r§eunlocked §r§dWither Essence §r§8x")) {
-                when (Skytils.config.witherEssenceHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Undead Essence
-            if (formatted.contains("§r§eunlocked §r§dUndead Essence §r§8x")) {
-                when (Skytils.config.undeadEssenceHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.undeadEssenceHider == 2)
-                    else -> {
-                    }
-                }
-            }
-
-            // Healing (Zombie sword & Werewolf)
-            if (formatted.startsWith("§r§a§l") && formatted.contains("healed")) {
-                when (Skytils.config.healingHider) {
-                    1, 2 -> cancelChatPacket(event, Skytils.config.healingHider == 2)
-                    else -> {
-                    }
-                }
-            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
