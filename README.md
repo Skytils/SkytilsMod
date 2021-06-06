@@ -163,6 +163,7 @@ And more to come!
 - /skytils reload <aliases/data> - Forces Skytils to re-fetch your command aliases or solutions from the data repository.
 - /skytils fetchur - Displays the current Fetchur item for the day.
 - /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
+- /skytils swaphub - Quickly leaves the hub and goes to the forge, then back to the hub. Useful for Diana event.
 - /skytils aliases - Opens the GUI to edit command aliases.
 - /skytils editlocations (/skytils editlocation, gui, loc) - Opens the GUI to modify HUD element locations.
 - /skytils shortcuts - Opens the GUI to modify keybind shortcuts.
