@@ -65,15 +65,15 @@ class SpamHider {
     private var abilityUses = 0
     private var lastAbilityUsed = ""
 
-    private val SEA_CREATURES = setOf<String>(
+    private val SEA_CREATURES = setOf(
         // Jerry Workshop
-        "Frozen Steve fell into the pond long ago.",
-        "It's a snowman! He looks harmless.",
+        "Frozen Steve fell into the pond long ago, never to resurface...until now!",
+        "It's a snowman! He looks harmless",
         "The Grinch stole Jerry's Gifts...get them back!",
         // Spooky Fishing
-        "Phew! It's only a scarecrow.",
+        "Phew! It's only a Scarecrow.",
         "You hear trotting from beneath the waves, you caught a Nightmare.",
-        "It must be a full moon, it's a Werewolf!",
+        "It must be a full moon, a Werewolf appears.",
         // Fishing Festival
         "A tiny fin emerges from the water, you've caught a Nurse Shark.",
         "You spot a fin as blue as the water it came from, it's a Blue Shark.",
@@ -85,7 +85,7 @@ class SpamHider {
         "You stumbled upon a Sea Guardian.",
         "It looks like you've disrupted the Sea Witch's brewing session. Watch out, she's furious!",
         "You reeled in a Sea Archer.",
-        "The Monster of The Deep emerges from the dark depths...",
+        "The Monster of The Deep has emerged.",
         "Huh? A Catfish!",
         "Is this even a Fish? It's the Carrot King!",
         "Gross! A Sea Leech!",
@@ -93,13 +93,13 @@ class SpamHider {
         "You have awoken the Deep Sea Protector, prepare for a battle!",
     )
 
-    private val LEGENDARY_SEA_CREATURES = setOf<String>(
+    private val LEGENDARY_SEA_CREATURES = setOf(
         "What is this creature!?",
         "The spirit of a long lost Phantom Fisher has come to haunt you.",
         "This can't be! The manifestation of death himself!",
         "Hide no longer, a Great White Shark has tracked your scent and thirsts for your blood!",
-        "The Water Hydra has come to test your Strength.",
-        "The Sea Emperor arises from the depths..."
+        "The Water Hydra has come to test your strength.",
+        "The Sea Emperor arises from the depths."
     )
 
     @SubscribeEvent
@@ -411,10 +411,10 @@ class SpamHider {
                     else -> {
                     }
                 }
-            }
+            }<
 
             // Sea creature catch
-            if (SEA_CREATURES.contains(unformatted)) {
+            if (formatted.startsWith("§r§a") && SEA_CREATURES.contains(unformatted)) {
                 when (Skytils.config.scCatchHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.scCatchHider == 2)
                     else -> {
@@ -423,7 +423,7 @@ class SpamHider {
             }
 
             // Legendary sea creature catch
-            if (LEGENDARY_SEA_CREATURES.contains(unformatted)) {
+            if (formatted.startsWith("§r§a") && LEGENDARY_SEA_CREATURES.contains(unformatted)) {
                 when (Skytils.config.legendaryScCatchHider) {
                     1, 2 -> cancelChatPacket(event, Skytils.config.legendaryScCatchHider == 2)
                     else -> {
