@@ -147,7 +147,7 @@ object SkytilsCommand : CommandBase() {
                                   §3/skytils config §l➡ §bOpens the configuration GUI.
                                   §3/skytils setkey §l➡ §bSets your Hypixel API key.
                                   §3/skytils help §l➡ §bShows this help menu.
-                                  §3/skytils reload <data/mayor> §l➡ §bForces a refresh of solutions from the data repository.
+                                  §3/skytils reload <data/mayor/slayer> §l➡ §bForces a refresh of data.
                                   §3/skytils editlocations §l➡ §bOpens the location editing GUI.
                                   §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
                                  §9§l➜ Events:
