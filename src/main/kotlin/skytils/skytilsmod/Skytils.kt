@@ -236,8 +236,11 @@ class Skytils {
         usingNEU = Loader.isModLoaded("notenoughupdates")
 
         if (usingDungeonRooms && Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2")) {
-            ScoreCalculation.drmRoomScanMethod =
-                Class.forName("io.github.quantizr.utils.Utils").getDeclaredMethod("roomList")
+            try {
+                ScoreCalculation.drmRoomScanMethod =
+                    Class.forName("io.github.quantizr.utils.Utils").getDeclaredMethod("roomList")
+            } catch (_: Exception) {
+            }
         }
 
         val cch = ClientCommandHandler.instance
