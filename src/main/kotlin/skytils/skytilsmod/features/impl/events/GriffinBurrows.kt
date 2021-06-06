@@ -19,8 +19,11 @@ package skytils.skytilsmod.features.impl.events
 
 import com.google.gson.JsonElement
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
@@ -34,16 +37,23 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.lang3.time.StopWatch
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.features.impl.handlers.Mayor
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import skytils.skytilsmod.features.impl.handlers.SpamHider
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.toasts.GuiToast
+import skytils.skytilsmod.utils.toasts.IToast
 import java.awt.Color
+import java.lang.IndexOutOfBoundsException
 import kotlin.math.roundToInt
 
 class GriffinBurrows {
@@ -108,7 +118,17 @@ class GriffinBurrows {
                     if (!removedDupes) mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.")) else mc.thePlayer.addChatMessage(
                         ChatComponentText("§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs.")
                     )
-                } else mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size + EnumChatFormatting.GREEN + " burrows!"))
+                } else {
+                    val msg = EnumChatFormatting.GREEN.toString() + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size + EnumChatFormatting.GREEN + " burrows!"
+                    when (Skytils.config.burrowRefreshMsg) {
+                        0 -> mc.thePlayer.addChatComponentMessage(ChatComponentText(msg))
+                        2 -> SpamHider.newMessage(msg)
+                        3 -> GuiManager.toastGui.add(BurrowToast(msg))
+                        else -> {
+                        }
+                    }
+
+                }
             }
         }
 
@@ -122,13 +142,19 @@ class GriffinBurrows {
         val player = mc.thePlayer
         if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
-        if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
+        if ((burrowRefreshTimer.time >= (Skytils.config.burrowIntervalRefresh * 1000) || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             for (i in 0..7) {
                 val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
                 if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
+                    when (Skytils.config.burrowRefreshMsg) {
+                        0 -> player.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
+                        2 -> SpamHider.newMessage(EnumChatFormatting.GREEN.toString() + "Looking for burrows...")
+                        3 -> GuiManager.toastGui.add(BurrowToast(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
+                        else -> {
+                        }
+                    }
                     refreshBurrows()
                     break
                 }
@@ -236,7 +262,7 @@ class GriffinBurrows {
                 for (i in 0..7) {
                     val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
                     if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
+                        val diff = (((Skytils.config.burrowIntervalRefresh * 1000) - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
                         val sr = ScaledResolution(Minecraft.getMinecraft())
                         val leftAlign = actualX < sr.scaledWidth / 2f
                         val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -447,11 +473,18 @@ class GriffinBurrows {
                 }
                 return "$type §bPosition: ${chain + 1}/4${
                     if (closest != null) " ${closest.nameWithColor}" else ""
-                }"
+                }${if (getClosestBurrow()!!.equals(this)) " (CLOSEST)" else ""}"
             }
 
         private val color: Color
             get() {
+                if (Skytils.config.useClosestBurrow) {
+                    if (getClosestBurrow() != null) {
+                        if (getClosestBurrow()!!.equals(this)) {
+                            return Skytils.config.closestBurrowColor
+                        }
+                    }
+                }
                 return when (this.type) {
                     0 -> Skytils.config.emptyBurrowColor
                     1 -> Skytils.config.mobBurrowColor
@@ -460,6 +493,13 @@ class GriffinBurrows {
                 }
             }
 
+        override fun equals(other: Any?): Boolean { // overriding just to be safe cause I can't really test this lol
+            if (!(other is Burrow)) {
+                return false
+            }
+            val burrow = other as Burrow
+            return burrow.x == this.x && burrow.y == this.y && burrow.z == this.z
+        }
         fun drawWaypoint(partialTicks: Float) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
@@ -487,6 +527,25 @@ class GriffinBurrows {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
+        fun getClosestBurrow(): Burrow? {
+            try {
+                println("Finding closest burrow")
+                if (burrows.size == 0 || !MayorInfo.currentMayor.equals("Diana")) return null
+                var closest = burrows.get(0)
+                burrows.forEach {
+                    if (Minecraft.getMinecraft().thePlayer.getDistanceSq(it.blockPos) < Minecraft.getMinecraft().thePlayer.getDistanceSq(
+                            closest.blockPos
+                        )
+                    ) {
+                        closest = it
+                    }
+                }
+                return closest
+            } catch (ex: IndexOutOfBoundsException) {
+                ex.printStackTrace()
+                return null
+            }
+        }
     }
 
     enum class FastTravelLocations(val pos: BlockPos) {
@@ -513,5 +572,18 @@ class GriffinBurrows {
                 DA -> EnumChatFormatting.DARK_PURPLE.toString() + "DA"
                 HUB -> EnumChatFormatting.WHITE.toString() + "HUB"
             }
+    }
+}
+class BurrowToast(private val msg: String) : IToast<BurrowToast> {
+    private val maxDrawTime: Long = Skytils.config.toastTime.toLong()
+    override fun draw(toastGui: GuiToast, delta: Long): IToast.Visibility {
+        toastGui.mc.textureManager.bindTexture(ResourceLocation("skytils:gui/toast.png"))
+        GlStateManager.color(1.0f, 1.0f, 1.0f)
+        Gui.drawModalRectWithCustomSizedTexture(0, 0, 0f, 0f, 160, 32, 160f, 32f)
+        toastGui.mc.fontRendererObj.drawStringWithShadow(msg, 30f, 7f, 16777215)
+        RenderHelper.enableGUIStandardItemLighting()
+        RenderUtil.renderTexture(ResourceLocation("skytils:toasts/spade.png"), 8, 8) // ancestral spade img
+        GlStateManager.disableLighting()
+        return if (delta >= maxDrawTime) IToast.Visibility.HIDE else IToast.Visibility.SHOW
     }
 }

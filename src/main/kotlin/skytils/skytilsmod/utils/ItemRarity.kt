@@ -26,28 +26,28 @@ import java.awt.Color
  * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
  * @author SteveKunG
  */
-enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting, val color: Color) {
-    COMMON("COMMON", EnumChatFormatting.WHITE, Color(255, 255, 255)), UNCOMMON(
+enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting, val color: Color, val rarityInt: Int) {
+    COMMON("COMMON", EnumChatFormatting.WHITE, Color(255, 255, 255),0), UNCOMMON(
         "UNCOMMON",
         EnumChatFormatting.GREEN,
-        Color(85, 255, 85)
+        Color(85, 255, 85),1
     ),
-    RARE("RARE", EnumChatFormatting.BLUE, Color(85, 85, 255)), EPIC(
+    RARE("RARE", EnumChatFormatting.BLUE, Color(85, 85, 255), 2), EPIC(
         "EPIC",
         EnumChatFormatting.DARK_PURPLE,
-        Color(190, 0, 190)
+        Color(190, 0, 190),3
     ),
-    LEGENDARY("LEGENDARY", EnumChatFormatting.GOLD, Color(255, 170, 0)), MYTHIC(
+    LEGENDARY("LEGENDARY", EnumChatFormatting.GOLD, Color(255, 170, 0), 4), MYTHIC(
         "MYTHIC",
         EnumChatFormatting.LIGHT_PURPLE,
-        Color(255, 85, 255)
+        Color(255, 85, 255),5
     ),
-    SUPREME("SUPREME", EnumChatFormatting.DARK_RED, Color(170, 0, 0)), SPECIAL(
+    SUPREME("SUPREME", EnumChatFormatting.DARK_RED, Color(170, 0, 0),6), SPECIAL(
         "SPECIAL",
         EnumChatFormatting.RED,
-        Color(255, 85, 85)
+        Color(255, 85, 85),7
     ),
-    VERY_SPECIAL("VERY SPECIAL", EnumChatFormatting.RED, Color(170, 0, 0));
+    VERY_SPECIAL("VERY SPECIAL", EnumChatFormatting.RED, Color(170, 0, 0),8);
 
     companion object {
         private val VALUES = values().sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()

@@ -30,6 +30,7 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.common.MinecraftForge
@@ -39,6 +40,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.commands.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
@@ -131,6 +133,8 @@ class Skytils {
 
         @JvmField
         val threadPool = Executors.newFixedThreadPool(10)
+
+        var needsToInteract = 2 // prevent triggering first before ever running swaphub command
     }
 
 
@@ -275,7 +279,10 @@ class Skytils {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-
+        if (needsToInteract == 0) { // effectively using it as a boolean, just need 3 options: first run, false, and true; didn't want to make 2 variables
+            sendMessageQueue.add("/warp hub")
+            needsToInteract = 2
+        }
         ScreenRenderer.refresh()
 
         if (displayScreen != null) {
@@ -351,6 +358,13 @@ class Skytils {
                     displayScreen = OptionsGui()
                 }
             }
+        }
+    }
+    @SubscribeEvent(receiveCanceled = true)
+    fun onInteract(event: MouseEvent) {
+        if (needsToInteract == 1 && Minecraft.getMinecraft().theWorld != null && Minecraft.getMinecraft().thePlayer != null) {
+            needsToInteract = 0 // the player made an interaction, which will be counted as sending /warp hub
+            event.isCanceled = true // prevent double interactions so as not to trigger watchdog
         }
     }
 }

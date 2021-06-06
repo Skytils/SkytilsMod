@@ -52,7 +52,7 @@ class SpamHider {
             if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
         }
 
-        private fun newMessage(message: String) {
+        fun newMessage(message: String) {
             spamMessages.add(SpamMessage(message, 0, 0.0))
         }
 
@@ -748,7 +748,8 @@ class SpamHider {
                     Skytils.config.autoRecombHider == 2 ||
                     Skytils.config.witherEssenceHider == 2 ||
                     Skytils.config.undeadEssenceHider == 2 ||
-                    Skytils.config.healingHider == 2
+                    Skytils.config.healingHider == 2 ||
+                    Skytils.config.burrowRefreshMsg == 2
 
         companion object {
             var lastTimeRender = Date().time

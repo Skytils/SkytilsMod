@@ -22,9 +22,13 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -60,22 +64,23 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         val itemId: String,
         val itemName: String,
         val rarity: ItemRarity,
+        val neededGriffin: Int,
         val isChat: Boolean = false,
         val mobDrop: Boolean = false,
         var droppedTimes: Long = 0L
     ) {
-        REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
+        REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC, 4),
 
         // this does have a chat message but it's just Enchanted Book
-        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
-        COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
-        PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC),
-        COG("CROWN_OF_GREED", "Crown of Greed", ItemRarity.LEGENDARY, true),
-        STICK("DAEDALUS_STICK", "Daedalus Stick", ItemRarity.LEGENDARY, mobDrop = true),
-        SHELMET("DWARF_TURTLE_SHELMET", "Dwarf Turtle Shelmet", ItemRarity.RARE),
-        FEATHER("GRIFFIN_FEATHER", "Griffin Feather", ItemRarity.RARE, isChat = true),
-        RELIC("MINOS_RELIC", "Minos Relic", ItemRarity.EPIC),
-        WASHED("WASHED_UP_SOUVENIR", "Washed-up Souvenir", ItemRarity.LEGENDARY, true);
+        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON, 4),
+        COINS("COINS", "Coins", ItemRarity.LEGENDARY, -1, isChat = true),
+        PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC, 4),
+        COG("CROWN_OF_GREED", "Crown of Greed", ItemRarity.LEGENDARY, 3, true),
+        STICK("DAEDALUS_STICK", "Daedalus Stick", ItemRarity.LEGENDARY, 4, mobDrop = true),
+        SHELMET("DWARF_TURTLE_SHELMET", "Dwarf Turtle Shelmet", ItemRarity.RARE, 4),
+        FEATHER("GRIFFIN_FEATHER", "Griffin Feather", ItemRarity.RARE, -1, isChat = true),
+        RELIC("MINOS_RELIC", "Minos Relic", ItemRarity.EPIC, 4),
+        WASHED("WASHED_UP_SOUVENIR", "Washed-up Souvenir", ItemRarity.LEGENDARY, 4, true);
 
         companion object {
             fun getFromId(id: String?): BurrowDrop? {
@@ -92,16 +97,17 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
     enum class BurrowMob(
         val mobName: String,
         val modId: String,
+        val neededGriffin: Int = 5,
         val plural: Boolean = false,
         var dugTimes: Long = 0L,
     ) {
 
-        GAIA("Gaia Construct", "GAIA_CONSTRUCT"),
-        CHAMP("Minos Champion", "MINOS_CHAMPION"),
-        HUNTER("Minos Hunter", "MINOS_HUNTER"),
-        INQUIS("Minos Inquisitor", "MINOS_INQUISITOR"),
-        MINO("Minotaur", "MINOTAUR"),
-        LYNX("Siamese Lynxes", "SIAMESE_LYNXES", plural = true);
+        GAIA("Gaia Construct", "GAIA_CONSTRUCT", 2),
+        CHAMP("Minos Champion", "MINOS_CHAMPION", 3),
+        HUNTER("Minos Hunter", "MINOS_HUNTER", -1),
+        INQUIS("Minos Inquisitor", "MINOS_INQUISITOR", 4),
+        MINO("Minotaur", "MINOTAUR", 1),
+        LYNX("Siamese Lynxes", "SIAMESE_LYNXES", 0, plural = true);
 
         companion object {
             fun getFromId(id: String?): BurrowMob? {
@@ -123,11 +129,11 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             if (event.entity.name == "Minos Champion") {
                 println("Dug is: Minos Champion")
                 lastMinosChamp = 0L
-                BurrowMob.CHAMP.dugTimes++
+                //BurrowMob.CHAMP.dugTimes++
             } else if (event.entity.name == "Minos Inquisitor") {
                 println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
-                BurrowMob.INQUIS.dugTimes++
+                //BurrowMob.INQUIS.dugTimes++
                 mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!"))
             }
         }
@@ -156,12 +162,12 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                     if (matcher.matches()) {
                         val mob = BurrowMob.getFromName(matcher.group(1)) ?: return
                         //for some reason, minos inquisitors say minos champion in the chat
-                        if (mob == BurrowMob.CHAMP) {
-                            lastMinosChamp = System.currentTimeMillis()
-                        } else {
+                        //if (mob == BurrowMob.CHAMP) {
+                        //    lastMinosChamp = System.currentTimeMillis()
+                        //} else {
                             mob.dugTimes++
                             markDirty(this::class)
-                        }
+                        //}
                     }
                 } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
                         "You finished the Griffin burrow chain! (4"
@@ -278,6 +284,21 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
     }
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
+        fun getTotal(): Int {
+            if (!Skytils.config.trackGriffinPet) return 17
+            var sum = 1
+            BurrowMob.values().forEach {
+                if (it.neededGriffin <= Skytils.config.griffinPetRarity) {
+                    sum++
+                }
+            }
+            BurrowDrop.values().forEach {
+                if (it.neededGriffin <= Skytils.config.griffinPetRarity) {
+                    sum++
+                }
+            }
+            return sum
+        }
         override fun render() {
             if (toggled && Utils.inSkyblock && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
@@ -299,26 +320,31 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                         )
                         var drawnLines = 1
                         for (mob in BurrowMob.values()) {
-                            ScreenRenderer.fontRenderer.drawString(
-                                "${mob.mobName}§f: ${mob.dugTimes}",
-                                if (leftAlign) 0f else width.toFloat(),
-                                (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                                CommonColors.CYAN,
-                                alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
-                            )
-                            drawnLines++
+                            if (mob.neededGriffin <= Skytils.config.griffinPetRarity || !Skytils.config.trackGriffinPet) {
+                                ScreenRenderer.fontRenderer.drawString(
+                                    "${mob.mobName}§f: ${mob.dugTimes}",
+                                    if (leftAlign) 0f else width.toFloat(),
+                                    (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                                    CommonColors.CYAN,
+                                    alignment,
+                                    SmartFontRenderer.TextShadow.NORMAL
+                                )
+                                drawnLines++
+                            }
+
                         }
                         for (item in BurrowDrop.values()) {
-                            ScreenRenderer.fontRenderer.drawString(
-                                "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
-                                if (leftAlign) 0f else width.toFloat(),
-                                (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                                CommonColors.CYAN,
-                                alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
-                            )
-                            drawnLines++
+                            if (item.neededGriffin <= Skytils.config.griffinPetRarity || !Skytils.config.trackGriffinPet) {
+                                ScreenRenderer.fontRenderer.drawString(
+                                    "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
+                                    if (leftAlign) 0f else width.toFloat(),
+                                    (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                                    CommonColors.CYAN,
+                                    alignment,
+                                    SmartFontRenderer.TextShadow.NORMAL
+                                )
+                                drawnLines++
+                            }
                         }
                         break
                     }
@@ -341,33 +367,42 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
             )
             var drawnLines = 1
             for (mob in BurrowMob.values()) {
-                ScreenRenderer.fontRenderer.drawString(
-                    "${mob.mobName}§f: 100",
-                    if (leftAlign) 0f else width.toFloat(),
-                    (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.CYAN,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-                drawnLines++
+                if (mob.neededGriffin <= Skytils.config.griffinPetRarity  || !Skytils.config.trackGriffinPet) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${mob.mobName}§f: 100",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.CYAN,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
+                }
             }
             for (item in BurrowDrop.values()) {
-                ScreenRenderer.fontRenderer.drawString(
-                    "${item.rarity.baseColor}${item.itemName}§f: §r100",
-                    if (leftAlign) 0f else width.toFloat(),
-                    (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.CYAN,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-                drawnLines++
+                if (item.neededGriffin <= Skytils.config.griffinPetRarity || !Skytils.config.trackGriffinPet) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${item.rarity.baseColor}${item.itemName}§f: §r100",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.CYAN,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
+                }
             }
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 17
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * getTotal()
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Crochet Tiger Plushie: 100")
+            get() {
+                if (!Skytils.config.trackGriffinPet) return ScreenRenderer.fontRenderer.getStringWidth("Crochet Tiger Plushie: 100")
+                if (Skytils.config.griffinPetRarity == 3) return ScreenRenderer.fontRenderer.getStringWidth("Crown of Greed: 100")
+                else if (Skytils.config.griffinPetRarity < 4) return ScreenRenderer.fontRenderer.getStringWidth("Griffin Feather: 100")
+                return ScreenRenderer.fontRenderer.getStringWidth("Crochet Tiger Plushie: 100")
+            }
 
         override val toggled: Boolean
             get() = Skytils.config.trackMythEvent
@@ -377,4 +412,27 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
         }
     }
 
+    @SubscribeEvent
+    fun onGuiOpen(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!Utils.inSkyblock) return
+        if (mc.currentScreen is GuiChest) {
+            val chest = mc.currentScreen as GuiChest
+            val inventory = chest.inventorySlots as ContainerChest
+            if (inventory.lowerChestInventory.displayName.unformattedText.equals("Pets")) { // pets menu
+                var slots = chest.inventorySlots.inventorySlots
+                slots.forEach {
+                    if (it.hasStack) {
+                        if (ItemUtil.isPet(it.stack)) {
+                            val name = it.stack.displayName
+                            if (name.contains("Griffin")) {
+                                Skytils.config.griffinPetRarity = ItemUtil.getRarity(it.stack)!!.rarityInt // set rarity for use above, 0-indexed with -1 as no griffin
+                                Skytils.config.markDirty()
+                                Skytils.config.writeData()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

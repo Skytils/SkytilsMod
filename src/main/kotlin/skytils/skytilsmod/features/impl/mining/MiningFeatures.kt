@@ -120,7 +120,6 @@ class MiningFeatures {
                         }
                     }
                     println("Puzzler Solution: $puzzlerSolution")
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Mine the block highlighted in " + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "RED" + EnumChatFormatting.GREEN + "!"))
                 }
             }
         }

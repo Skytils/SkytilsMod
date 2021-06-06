@@ -816,6 +816,26 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var showGriffinCountdown = false
 
+    @Property(
+        type = PropertyType.SLIDER,
+        name = "Interval Between Burrow Refreshes",
+        description = "Amount of time to wait in between griffin burrow API refreshes.",
+        category = "Events",
+        subcategory = "Mythological",
+        min = 30,
+        max = 60
+    )
+    var burrowIntervalRefresh = 60
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Burrow Refresh Hider",
+        description = "Toggles info about refreshing / loading burrows.",
+        category = "Events",
+        subcategory = "Mythological",
+        options = ["Normal", "Hidden", "Separate GUI", "Toasts"]
+    )
+    var burrowRefreshMsg = 0
 
     @Property(
         type = PropertyType.CHECKBOX,
@@ -882,6 +902,34 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Color Closest Burrow",
+        description = "Display the closest griffin burrow to you in a different color.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var useClosestBurrow = false
+
+    @Property(
+        type = PropertyType.COLOR,
+        name = "Closest Burrow Color", // american spelling :pepecringe:
+        description = "Color used to highlight the Griffin Burrows in.", // see above
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var closestBurrowColor = Color.WHITE
+
+    @Property(
+        type = PropertyType.NUMBER,
+        name = "Griffin Pet Tier",
+        description = "The tier of the user's pet. -1 is no griffin, 1 is common, etc. Used for Mythological Tracker display length.",
+        category = "Events",
+        subcategory = "Mythological",
+        hidden = true
+    )
+    var griffinPetRarity = -1
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Broadcast Rare Drop Notifications",
         description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
         category = "Events",
@@ -916,6 +964,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var trackMythEvent = false
 
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Track Based on Griffin Rarity",
+        description = "The tracker only tracks Mythological creatures' drops that theoretically can drop based on your griffin.\nThis feature requires you to open your pets menu at least once.",
+        category = "Events",
+        subcategory = "Mythological"
+    )
+    var trackGriffinPet = false
     /*    @Property(
         type = PropertyType.SWITCH,
         name = "Trick or Treat Chest Alert",
@@ -2367,15 +2423,20 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
         ::showGriffinCountdown dependsOn ::showGriffinBurrows
         ::particleBurrows dependsOn ::showGriffinBurrows
+        ::useClosestBurrow dependsOn ::showGriffinBurrows
 
         ::emptyBurrowColor dependsOn ::showGriffinBurrows
         ::mobBurrowColor dependsOn ::showGriffinBurrows
         ::treasureBurrowColor dependsOn ::showGriffinBurrows
+        ::closestBurrowColor dependsOn ::useClosestBurrow
 
         ::burrowCastleFastTravel dependsOn ::showGriffinBurrows
         ::burrowCryptsFastTravel dependsOn ::showGriffinBurrows
         ::burrowDarkAuctionFastTravel dependsOn ::showGriffinBurrows
         ::burrowHubFastTravel dependsOn ::showGriffinBurrows
+        ::burrowIntervalRefresh dependsOn ::showGriffinBurrows
+        ::burrowRefreshMsg dependsOn ::showGriffinBurrows
+        ::trackGriffinPet dependsOn ::trackMythEvent
 
         ::activePetColor dependsOn ::highlightActivePet
         ::favoritePetColor dependsOn ::highlightFavoritePets
