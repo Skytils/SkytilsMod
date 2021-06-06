@@ -411,7 +411,7 @@ class SpamHider {
                     else -> {
                     }
                 }
-            }<
+            }
 
             // Sea creature catch
             if (formatted.startsWith("§r§a") && SEA_CREATURES.contains(unformatted)) {
