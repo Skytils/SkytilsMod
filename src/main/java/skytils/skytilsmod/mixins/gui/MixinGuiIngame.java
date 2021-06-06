@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,10 +38,26 @@ import skytils.skytilsmod.utils.Utils;
 @Mixin(GuiIngame.class)
 public abstract class MixinGuiIngame extends Gui {
 
+    @Shadow protected String recordPlaying;
+
+    @Shadow protected int recordPlayingUpFor;
+
+    @Shadow protected boolean recordIsPlaying;
+
     @Inject(method = "setRecordPlaying(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSetActionBar(String message, boolean isPlaying, CallbackInfo ci) {
         try {
-            if (MinecraftForge.EVENT_BUS.post(new SetActionBarEvent(message, isPlaying))) ci.cancel();
+            SetActionBarEvent event = new SetActionBarEvent(message, isPlaying);
+            if (MinecraftForge.EVENT_BUS.post(event)) {
+                ci.cancel();
+                return;
+            }
+            if (!message.equals(event.getMessage()) || isPlaying != event.isPlaying()) {
+                ci.cancel();
+                this.recordPlaying = event.getMessage();
+                this.recordPlayingUpFor = 60;
+                this.recordIsPlaying = event.isPlaying();
+            }
         } catch (Throwable e) {
             Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at SetActionBarEvent. Please report this on the Discord server."));
             e.printStackTrace();

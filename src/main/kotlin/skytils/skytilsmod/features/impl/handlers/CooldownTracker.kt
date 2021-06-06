@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -47,7 +48,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         cooldowns.clear()
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onActionBar(event: SetActionBarEvent) {
         if (!Utils.inSkyblock || !Skytils.config.itemCooldownDisplay) return
         event.apply {
