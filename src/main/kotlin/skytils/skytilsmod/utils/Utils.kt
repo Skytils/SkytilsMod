@@ -27,9 +27,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.Vec3
+import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
@@ -254,6 +252,15 @@ object Utils {
         // Livid has a prefix in front of the name, so we check ends with to cover all the livids
         return bossName.endsWith(correctBoss)
     }
+
+    fun printDebugMessage(component: IChatComponent) {
+        if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(component)
+    }
+
+    fun printDebugMessage(string: String) {
+        if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
+    }
+
 
 }
 

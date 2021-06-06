@@ -88,6 +88,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Debug Mode",
+        description = "Will do weird things to your game. You probably don't want this on.",
+        category = "General",
+        subcategory = "Other"
+    )
+    var debugMode = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Reopen Options Menu",
         description = "Sets the menu to the Skytils options menu instead of exiting when on a Skytils config menu.",
         category = "General",
@@ -204,6 +213,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Score Calculation"
     )
     var showScoreCalculation = false
+
+    @Property(
+        type = PropertyType.SELECTOR,
+        name = "Score Calculation Method",
+        description = "New method requires Dungeon Rooms Mod version 2.",
+        category = "Dungeons",
+        subcategory = "Score Calculation",
+        options = arrayOf("Old", "New")
+    )
+    var scoreCalculationMethod = 0
 
     @Property(
         type = PropertyType.SWITCH,

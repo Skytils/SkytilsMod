@@ -15,6 +15,7 @@
     "accessors.AccessorSettingsGui",
     "audio.MixinSoundManager",
     "crash.MixinCrashReport",
+    "drm.MixinUtils",
     "entity.MixinBossStatus",
     "entity.MixinEntityBlaze",
     "entity.MixinEntityLivingBase",

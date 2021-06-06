@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S29PacketSoundEffect
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World
 import net.minecraftforge.client.ClientCommandHandler
@@ -47,11 +48,37 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.util.regex.Pattern
 import kotlin.math.floor
+import kotlin.math.pow
 
-class ScoreCalculation {
+object ScoreCalculation {
+
+    val partyAssistSecretsPattern: Pattern =
+        Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
+    var rooms = HashMap<String, Int>()
+    var mimicKilled = false
+    private val mc = Minecraft.getMinecraft()
+    private var ticks = 0
+    private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
+    private var lastRoomScanPos: BlockPos? = null
+
+    fun roomScanCallback(list: List<String>) {
+        if (Skytils.config.scoreCalculationMethod != 1) return
+        Utils.checkThreadAndQueue {
+            for (room in list) {
+                if (!rooms.containsKey(room)) {
+                    val secrets = room.substringAfterLast("-").toIntOrNull() ?: 0
+                    rooms[room] = secrets
+                    if (Skytils.config.scoreCalculationAssist) {
+                        Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-ROOM$: [$room] ($secrets)")
+                    }
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     fun onAddChatMessage(event: AddChatMessageEvent) {
-        if (!Utils.inDungeons) return
+        if (!Utils.inDungeons || Skytils.config.scoreCalculationMethod != 0) return
         try {
             val unformatted = event.message.unformattedText.stripControlCodes()
             if (unformatted == "null" || unformatted.startsWith("Dungeon Rooms: Use this command in dungeons")) {
@@ -82,13 +109,27 @@ class ScoreCalculation {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        if (ticks % 30 == 0) {
-            if (Utils.inDungeons && mc.thePlayer != null && mc.theWorld != null) {
-                if (!DungeonFeatures.hasBossSpawned && Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
-                    ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
+        if (Utils.inDungeons && Skytils.usingDungeonRooms && mc.thePlayer != null && mc.theWorld != null && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
+            when (Skytils.config.scoreCalculationMethod) {
+                0 -> {
+                    if (ticks % 30 == 0) {
+                        ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
+                        ticks = 0
+                    }
+                }
+                1 -> {
+                    if (lastRoomScanPos == null || ticks % 600 == 0 || mc.thePlayer.getDistanceSqToCenter(
+                            lastRoomScanPos
+                        ) >= (mc.gameSettings.renderDistanceChunks.coerceAtMost(
+                            8
+                        ) * 16.0).pow(2)
+                    ) {
+                        lastRoomScanPos = mc.thePlayer.position
+                        ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room scan")
+                        ticks = 0
+                    }
                 }
             }
-            ticks = 0
         }
         ticks++
     }
@@ -165,7 +206,7 @@ class ScoreCalculation {
 
     @SubscribeEvent
     fun onSendChat(event: SendChatMessageEvent) {
-        if (event.message == "/debugscorecalcrooms") {
+        if (Skytils.config.debugMode && event.message == "/debugscorecalcrooms") {
             mc.thePlayer.addChatMessage(ChatComponentText(rooms.toString()))
             event.isCanceled = true
         }
@@ -174,21 +215,12 @@ class ScoreCalculation {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load?) {
         mimicKilled = false
+        lastRoomScanPos = null
         rooms.clear()
     }
 
-    companion object {
-        val partyAssistSecretsPattern: Pattern =
-            Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
-        var rooms = HashMap<String, Int>()
-        var mimicKilled = false
-        private val mc = Minecraft.getMinecraft()
-        private var ticks = 0
-        private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
-
-        init {
-            ScoreCalculationElement()
-        }
+    init {
+        ScoreCalculationElement()
     }
 
     class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", FloatPair(200, 100)) {

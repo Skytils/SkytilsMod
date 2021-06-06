@@ -58,6 +58,7 @@ import skytils.skytilsmod.utils.RenderUtil.drawOutlinedBoundingBox
 import skytils.skytilsmod.utils.ScoreboardUtil.cleanSB
 import skytils.skytilsmod.utils.ScoreboardUtil.sidebarLines
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.Utils.printDebugMessage
 import skytils.skytilsmod.utils.baseMaxHealth
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -288,7 +289,12 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
         if (!sidebarLines.any { cleanSB(it) == "Slay the boss!" }) return
-        if (slayerEntity != null) return
+        if (slayerEntity != null) {
+            printDebugMessage(
+                "boss not null"
+            )
+            return
+        }
         val entity = event.entity
         if (entity is EntityZombie) {
             TickTask(5) {
@@ -370,15 +376,24 @@ class SlayerFeatures {
                     val currentTier =
                         sidebarLines.map { cleanSB(it) }.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
                             ?: ""
+                    printDebugMessage(
+                        "expected tier $currentTier - spawned hp ${floor(entity.baseMaxHealth).toInt()}"
+                    )
                     if (BossHealths[name.substringBefore(" ")]?.get(currentTier)?.asInt
                         == floor(entity.baseMaxHealth).toInt()
                     ) {
+                        printDebugMessage(
+                            "hp matched"
+                        )
                         slayerNameEntity = nearby as EntityArmorStand
                         isSlayer++
                     }
                     continue
                 }
                 if (nearby.displayName.formattedText == timer) {
+                    printDebugMessage(
+                        "timer matched"
+                    )
                     slayerTimerEntity = nearby as EntityArmorStand
                     isSlayer++
                     continue
@@ -414,6 +429,10 @@ class SlayerFeatures {
             if (Utils.inSkyblock) {
                 if (slayerTimerEntity != null) {
                     if (slayerTimerEntity!!.isDead) {
+                        printDebugMessage(
+                            "timer died"
+
+                        )
                         slayerTimerEntity = null
                     } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
@@ -428,6 +447,10 @@ class SlayerFeatures {
                 }
                 if (slayerNameEntity != null) {
                     if (slayerNameEntity!!.isDead) {
+                        printDebugMessage(
+                            "name died"
+
+                        )
                         slayerNameEntity = null
                     } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
@@ -442,6 +465,10 @@ class SlayerFeatures {
                 }
                 if (slayerEntity != null) {
                     if (slayerEntity!!.isDead) {
+                        printDebugMessage(
+                            "slayer died"
+
+                        )
                         slayerEntity = null
                     }
                 }

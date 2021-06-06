@@ -53,7 +53,7 @@ class ShootTheTargetSolver {
             if (old.block == Blocks.emerald_block && state.block == Blocks.stained_hardened_clay) {
                 shot.add(pos)
             }
-        } else if (pos == plate && state.block == Blocks.light_weighted_pressure_plate) {
+        } else if (pos == plate && state.block is BlockPressurePlateWeighted) {
             if (state.getValue(BlockPressurePlateWeighted.POWER) == 0 || old.getValue(BlockPressurePlateWeighted.POWER) == 0) {
                 shot.clear()
             }
