@@ -21,6 +21,7 @@ import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.Skytils
@@ -29,6 +30,7 @@ import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
@@ -121,7 +123,17 @@ object SkytilsCommand : CommandBase() {
                             MayorInfo.fetchJerryData()
                             player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully."))
                         }
-                        else -> player.addChatMessage(ChatComponentText("/skytils reload <aliases/data>"))
+                        "slayer" -> {
+                            for (entity in mc.theWorld.getEntitiesWithinAABBExcludingEntity(
+                                mc.thePlayer,
+                                mc.thePlayer.entityBoundingBox.expand(5.0, 3.0, 5.0)
+                            )) {
+                                if (entity is EntityArmorStand) continue
+                                SlayerFeatures.processSlayerEntity(entity)
+                                println(entity.displayName.formattedText)
+                            }
+                        }
+                        else -> player.addChatMessage(ChatComponentText("/skytils reload <aliases/data/slayer>"))
                     }
                 }
                 if (args.size == 1) {
