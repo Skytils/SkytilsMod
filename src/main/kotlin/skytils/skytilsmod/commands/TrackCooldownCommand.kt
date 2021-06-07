@@ -51,7 +51,7 @@ object TrackCooldownCommand : CommandBase() {
 
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        if (args.size <= 2) throw WrongUsageException("You must specify valid arguments.")
+        if (args.size < 2) throw WrongUsageException("You must specify valid arguments.")
         val seconds = args[0].toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
         val ability = args.drop(1).joinToString(" ")
         if (ability.isBlank()) throw WrongUsageException("You must specify valid arguments.")

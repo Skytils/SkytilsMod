@@ -402,6 +402,9 @@ class SlayerFeatures {
             if (isSlayer == 2) {
                 slayerEntity = entity
             } else {
+                printDebugMessage(
+                    "resetting, captured amount $isSlayer exceeded allowed value"
+                )
                 slayerTimerEntity = null
                 slayerNameEntity = null
             }
