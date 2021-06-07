@@ -26,7 +26,7 @@ import java.util.*
 object ItemUtil {
     private val RARITY_PATTERN = "(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)".toRegex()
     private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
-    private const val NBT_INTEGER = 3
+    const val NBT_INTEGER = 3
     private const val NBT_STRING = 8
     private const val NBT_LIST = 9
     private const val NBT_COMPOUND = 10

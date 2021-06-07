@@ -1852,6 +1852,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Show Slayer Armor Kills",
+        description = "Displays the kills on your Final Destination Armor.",
+        category = "Slayer",
+        subcategory = "Quality of Life"
+    )
+    var showSlayerArmorKills = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show Slayer Display",
         description = "Shows your current slayer's health and the time left",
         category = "Slayer",
