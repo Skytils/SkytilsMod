@@ -1889,12 +1889,20 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         PropertyType.SWITCH,
         name = "Highlight Yang Glyph",
-        description = "Highlights the Yang Glyph block.\n" +
-                "§cNote!§7 May not work properly.",
+        description = "Highlights the Yang Glyph block.",
         category = "Slayer",
         subcategory = "Voidgloom Seraph"
     )
     var highlightYangGlyph = false
+
+    @Property(
+        PropertyType.COLOR,
+        name = "Yang Glyph Highlight Color",
+        description = "Changes the color for the Yang Glyph block",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var yangGlyphColor = Color(65, 102, 245, 128)
 
     @Property(
         PropertyType.SWITCH,
@@ -1904,6 +1912,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Voidgloom Seraph"
     )
     var highlightNukekebiHeads = false
+
+    @Property(
+        PropertyType.COLOR,
+        name = "Nukekebi Fixation Head Color",
+        description = "Changes the color for the Nukekebi Fixation Head Highlight",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var nukekebiHeadColor = Color(65, 102, 245, 128)
 
     @Property(
         PropertyType.SWITCH,
@@ -2411,6 +2428,9 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         ::tankRadiusDisplayColor dependsOn ::showTankRadius
         ::boxedTankColor dependsOn ::boxedTanks
         ::boxedProtectedTeammatesColor dependsOn ::boxedProtectedTeammates
+
+        ::yangGlyphColor dependsOn ::highlightYangGlyph
+        ::nukekebiHeadColor dependsOn ::highlightNukekebiHeads
 
         registerListener(::protectItemBINThreshold) {
             val numeric = it.replace(Regex("[^0-9]"), "")

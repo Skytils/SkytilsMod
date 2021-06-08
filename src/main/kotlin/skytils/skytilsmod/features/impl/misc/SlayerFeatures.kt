@@ -21,7 +21,7 @@ import com.google.gson.JsonObject
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
@@ -29,7 +29,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
@@ -37,7 +36,6 @@ import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
-import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.AxisAlignedBB
@@ -283,8 +281,8 @@ class SlayerFeatures {
             val z = yangGlyph!!.z - viewerZ
             drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
-                Color(65, 102, 245),
-                0.5f
+                Skytils.config.yangGlyphColor,
+                Skytils.config.yangGlyphColor.alpha / 255f
             )
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
@@ -299,8 +297,8 @@ class SlayerFeatures {
                 val z = head.posZ - viewerZ
                 drawFilledBoundingBox(
                     AxisAlignedBB(x, y, z, x + 0.5, y + 1.975, x + 0.5),
-                    Color(65, 102, 245),
-                    0.5f
+                    Skytils.config.nukekebiHeadColor,
+                    Skytils.config.nukekebiHeadColor.alpha / 255f
                 )
                 GlStateManager.enableDepth()
                 GlStateManager.enableCull()
@@ -360,6 +358,9 @@ class SlayerFeatures {
     class SlayerDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
         override fun render() {
             if (Utils.inSkyblock) {
+                val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+                val alignment =
+                    if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 if (slayerTimerEntity != null) {
                     if (slayerTimerEntity!!.isDead) {
                         printDebugMessage(
@@ -369,10 +370,10 @@ class SlayerFeatures {
                     } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
                             slayerTimerEntity!!.displayName.formattedText,
-                            0f,
+                            if (leftAlign) 0f else width.toFloat(),
                             0f,
                             CommonColors.WHITE,
-                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                            alignment,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
                     }
@@ -386,10 +387,10 @@ class SlayerFeatures {
                     } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
                             slayerNameEntity!!.displayName.formattedText,
-                            0f,
+                            if (leftAlign) 0f else width.toFloat(),
                             10f,
                             CommonColors.WHITE,
-                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                            alignment,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
                     }
@@ -440,24 +441,27 @@ class SlayerFeatures {
 
     class SeraphDisplayElement : GuiElement("Seraph Display", FloatPair(20, 20)) {
         override fun render() {
-            if (Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
+            if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
+                val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+                val alignment =
+                    if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 if (slayerNameEntity != null) {
                     if (slayerNameEntity!!.displayName.formattedText.contains("Hits")) {
                         ScreenRenderer.fontRenderer.drawString(
                             "§dShield Phase",
-                            0f,
+                            if (leftAlign) 0f else width.toFloat(),
                             0f,
                             CommonColors.WHITE,
-                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                            alignment,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
                     } else {
                         ScreenRenderer.fontRenderer.drawString(
                             "§6Damage Phase",
-                            0f,
+                            if (leftAlign) 0f else width.toFloat(),
                             0f,
                             CommonColors.WHITE,
-                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                            alignment,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
                     }
@@ -466,57 +470,57 @@ class SlayerFeatures {
                 if (heldBlock != null && heldBlock.block is BlockBeacon) {
                     ScreenRenderer.fontRenderer.drawString(
                         "§cHolding beacon!",
-                        0f,
+                        if (leftAlign) 0f else width.toFloat(),
                         10f,
                         CommonColors.WHITE,
-                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
                 } else {
                     ScreenRenderer.fontRenderer.drawString(
                         "§bHolding nothing!",
-                        0f,
+                        if (leftAlign) 0f else width.toFloat(),
                         10f,
                         CommonColors.WHITE,
-                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
                 }
                 if (yangGlyph != null) {
                     ScreenRenderer.fontRenderer.drawString(
                         "§cYang Glyph placed!",
-                        0f,
+                        if (leftAlign) 0f else width.toFloat(),
                         20f,
                         CommonColors.WHITE,
-                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
                 } else {
                     ScreenRenderer.fontRenderer.drawString(
                         "§bNo yang glyph",
-                        0f,
+                        if (leftAlign) 0f else width.toFloat(),
                         20f,
                         CommonColors.WHITE,
-                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
                 }
                 if (nukekebiHeads.size > 0) {
                     ScreenRenderer.fontRenderer.drawString(
                         "§dNukekebi Heads: §c${nukekebiHeads.size}",
-                        0f,
+                        if (leftAlign) 0f else width.toFloat(),
                         30f,
                         CommonColors.WHITE,
-                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
                 } else {
                     ScreenRenderer.fontRenderer.drawString(
                         "§bNo Nukekebi Heads",
-                        0f,
+                        if (leftAlign) 0f else width.toFloat(),
                         30f,
                         CommonColors.WHITE,
-                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
                 }
@@ -524,28 +528,31 @@ class SlayerFeatures {
         }
 
         override fun demoRender() {
+            val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+            val alignment =
+                if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§dShield Phase",
-                0f,
+                if (leftAlign) 0f else width.toFloat(),
                 0f,
                 CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                alignment,
                 SmartFontRenderer.TextShadow.NORMAL
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§bHolding beacon!",
-                0f,
+                if (leftAlign) 0f else width.toFloat(),
                 10f,
                 CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                alignment,
                 SmartFontRenderer.TextShadow.NORMAL
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§cNo yang glyph",
-                0f,
+                if (leftAlign) 0f else width.toFloat(),
                 20f,
                 CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                alignment,
                 SmartFontRenderer.TextShadow.NORMAL
             )
         }
