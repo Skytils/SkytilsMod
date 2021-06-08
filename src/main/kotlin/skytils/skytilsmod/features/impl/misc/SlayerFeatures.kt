@@ -288,12 +288,8 @@ class SlayerFeatures {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
-        if (Skytils.config.highlightNukekebiHeads && nukekebiHeads.size > 0) {
-            for (head in nukekebiHeads) {
-                if (head.isDead) {
-                    nukekebiHeads.remove(head)
-                    return
-                }
+        if (Skytils.config.highlightNukekebiHeads && nukekebiHeads.isNotEmpty()) {
+            for (head in nukekebiHeads.also { list -> list.removeAll { it.isDead } }) {
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
                 val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
@@ -303,7 +299,7 @@ class SlayerFeatures {
                 drawFilledBoundingBox(
                     AxisAlignedBB(x, y, z, x + 0.5, y + 1.975, z + 0.5),
                     Skytils.config.nukekebiHeadColor,
-                    Skytils.config.nukekebiHeadColor.alpha / 255f
+                    1f
                 )
                 GlStateManager.enableDepth()
                 GlStateManager.enableCull()
