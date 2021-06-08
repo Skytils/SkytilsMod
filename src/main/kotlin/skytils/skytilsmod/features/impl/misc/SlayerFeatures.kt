@@ -314,7 +314,8 @@ class SlayerFeatures {
             TickTask(1) {
                 val e = event.entity as EntityArmorStand
                 if (slayerEntity != null && e.entityBoundingBox.expand(2.0, 3.0, 2.0)
-                        .intersectsWith(slayerEntity!!.entityBoundingBox)) {
+                        .intersectsWith(slayerEntity!!.entityBoundingBox)
+                ) {
                     printDebugMessage("Found nearby armor stand")
                     for (item in e.inventory) {
                         if (item == null) continue
@@ -562,6 +563,76 @@ class SlayerFeatures {
         }
     }
 
+    class SlayerArmorDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
+        val upgradeBonusRegex =
+            Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
+
+        override fun render() {
+            if (Utils.inSkyblock && toggled && mc.thePlayer != null) {
+                ScreenRenderer.apply {
+                    var drawnArmors = 0
+                    (3 downTo 0).map { SlayerFeatures.mc.thePlayer.getCurrentArmor(it) }.forEach { armor ->
+                        if (armor == null) return@forEach
+                        val extraAttr = ItemUtil.getExtraAttributes(armor) ?: return@forEach
+                        val killsKey =
+                            extraAttr.keySet.find { it.endsWith("_kills") && extraAttr.getTagId(it) == ItemUtil.NBT_INTEGER.toByte() }
+                        if (killsKey.isNullOrEmpty()) return@forEach
+                        for (lore in ItemUtil.getItemLore(armor).asReversed()) {
+                            if (lore == "§a§lMAXED OUT! NICE!") {
+                                val kills = extraAttr.getInteger(killsKey)
+                                RenderUtil.renderItem(armor, 0, drawnArmors * 16)
+                                fontRenderer.drawString(
+                                    "§a§lMAX §b(§f${NumberUtil.nf.format(kills)}§b)",
+                                    18f,
+                                    drawnArmors * 16 + 4.5f
+                                )
+                                drawnArmors++
+                                break
+                            } else if (lore.startsWith("§7Next Upgrade:")) {
+                                val match = upgradeBonusRegex.find(lore) ?: return@forEach
+                                val currentKills =
+                                    match.groups["kills"]!!.value.replace(",", "").toDoubleOrNull() ?: return@forEach
+                                val nextKills = match.groups["nextKills"]!!.value.replace(",", "").toDoubleOrNull()
+                                    ?: return@forEach
+                                val percentToNext = (currentKills / nextKills * 100).roundToPrecision(1)
+                                RenderUtil.renderItem(armor, 0, drawnArmors * 16)
+                                fontRenderer.drawString(
+                                    "§e$percentToNext% §b(§f${NumberUtil.nf.format(currentKills)}§b)",
+                                    18f,
+                                    drawnArmors * 16 + 4.5f
+                                )
+                                drawnArmors++
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "slayer armor display here",
+                0f,
+                0f,
+                CommonColors.WHITE,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("slayer armor display here")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showSlayerArmorKills
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
         private var ticks = 0
@@ -699,194 +770,6 @@ class SlayerFeatures {
             }
         }
 
-    private class RNGMeter(val max: Float, val current: Float, val name: IChatComponent) : IBossDisplayData {
-
-        override fun getMaxHealth(): Float {
-            return max
-        }
-
-        override fun getHealth(): Float {
-            return current
-        }
-
-        override fun getDisplayName(): IChatComponent {
-            return name
-        }
-
-    }
-
-    class SlayerDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
-        override fun render() {
-            if (Utils.inSkyblock) {
-                if (slayerTimerEntity != null) {
-                    if (slayerTimerEntity!!.isDead) {
-                        printDebugMessage(
-                            "timer died"
-
-                        )
-                        slayerTimerEntity = null
-                    } else if (toggled) {
-                        ScreenRenderer.fontRenderer.drawString(
-                            slayerTimerEntity!!.displayName.formattedText,
-                            0f,
-                            0f,
-                            CommonColors.WHITE,
-                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
-                    }
-                }
-                if (slayerNameEntity != null) {
-                    if (slayerNameEntity!!.isDead) {
-                        printDebugMessage(
-                            "name died"
-
-                        )
-                        slayerNameEntity = null
-                    } else if (toggled) {
-                        ScreenRenderer.fontRenderer.drawString(
-                            slayerNameEntity!!.displayName.formattedText,
-                            0f,
-                            10f,
-                            CommonColors.WHITE,
-                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
-                    }
-                }
-                if (slayerEntity != null) {
-                    if (slayerEntity!!.isDead) {
-                        printDebugMessage(
-                            "slayer died"
-
-                        )
-                        slayerEntity = null
-                    }
-                }
-            }
-        }
-
-        override fun demoRender() {
-            ScreenRenderer.fontRenderer.drawString(
-                "§c02:59§r",
-                0f,
-                0f,
-                CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
-            )
-            ScreenRenderer.fontRenderer.drawString(
-                "§c☠ §bRevenant Horror §a500§c❤§r",
-                0f,
-                10f,
-                CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 2 + 1
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§c☠ §bRevenant Horror §a500§c❤§r")
-
-        override val toggled: Boolean
-            get() = Skytils.config.showSlayerDisplay
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
-    }
-
-    class SlayerArmorDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
-        val upgradeBonusRegex =
-            Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
-
-        override fun render() {
-            if (Utils.inSkyblock && toggled && mc.thePlayer != null) {
-                ScreenRenderer.apply {
-                    var drawnArmors = 0
-                    (3 downTo 0).map { SlayerFeatures.mc.thePlayer.getCurrentArmor(it) }.forEach { armor ->
-                        if (armor == null) return@forEach
-                        val extraAttr = ItemUtil.getExtraAttributes(armor) ?: return@forEach
-                        val killsKey =
-                            extraAttr.keySet.find { it.endsWith("_kills") && extraAttr.getTagId(it) == ItemUtil.NBT_INTEGER.toByte() }
-                        if (killsKey.isNullOrEmpty()) return@forEach
-                        for (lore in ItemUtil.getItemLore(armor).asReversed()) {
-                            if (lore == "§a§lMAXED OUT! NICE!") {
-                                val kills = extraAttr.getInteger(killsKey)
-                                RenderUtil.renderItem(armor, 0, drawnArmors * 16)
-                                fontRenderer.drawString(
-                                    "§a§lMAX §b(§f${NumberUtil.nf.format(kills)}§b)",
-                                    18f,
-                                    drawnArmors * 16 + 4.5f
-                                )
-                                drawnArmors++
-                                break
-                            } else if (lore.startsWith("§7Next Upgrade:")) {
-                                val match = upgradeBonusRegex.find(lore) ?: return@forEach
-                                val currentKills =
-                                    match.groups["kills"]!!.value.replace(",", "").toDoubleOrNull() ?: return@forEach
-                                val nextKills = match.groups["nextKills"]!!.value.replace(",", "").toDoubleOrNull()
-                                    ?: return@forEach
-                                val percentToNext = (currentKills / nextKills * 100).roundToPrecision(1)
-                                RenderUtil.renderItem(armor, 0, drawnArmors * 16)
-                                fontRenderer.drawString(
-                                    "§e$percentToNext% §b(§f${NumberUtil.nf.format(currentKills)}§b)",
-                                    18f,
-                                    drawnArmors * 16 + 4.5f
-                                )
-                                drawnArmors++
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun demoRender() {
-            ScreenRenderer.fontRenderer.drawString(
-                "slayer armor display here",
-                0f,
-                0f,
-                CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("slayer armor display here")
-
-        override val toggled: Boolean
-            get() = Skytils.config.showSlayerArmorKills
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-        private var ticks = 0
-        private val ZOMBIE_MINIBOSSES = arrayOf(
-            "§cRevenant Sycophant",
-            "§cRevenant Champion",
-            "§4Deformed Revenant",
-            "§cAtoned Champion",
-            "§4Atoned Revenant"
-        )
-        private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
-        private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
-        private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
-        private val RNGRegex = Regex("[^0-9.]")
-        private var slayerEntity: Entity? = null
-        private var slayerNameEntity: EntityArmorStand? = null
-        private var slayerTimerEntity: EntityArmorStand? = null
-        private var yangGlyph: BlockPos? = null
-        var BossHealths = HashMap<String, JsonObject>()
 
         init {
             SlayerArmorDisplayElement()
