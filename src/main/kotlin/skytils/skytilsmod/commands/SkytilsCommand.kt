@@ -130,7 +130,6 @@ object SkytilsCommand : CommandBase() {
                             )) {
                                 if (entity is EntityArmorStand) continue
                                 SlayerFeatures.processSlayerEntity(entity)
-                                println(entity.displayName.formattedText)
                             }
                         }
                         else -> player.addChatMessage(ChatComponentText("/skytils reload <aliases/data/slayer>"))

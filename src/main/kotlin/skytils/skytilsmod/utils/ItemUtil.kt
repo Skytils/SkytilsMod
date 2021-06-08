@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils
 
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
@@ -205,5 +206,12 @@ object ItemUtil {
 
         item.tagCompound = nbtTag
         return item
+    }
+
+    fun getSkullTexture(item: ItemStack): String? {
+        if (item.item != Items.skull) return null
+        val nbt = item.tagCompound
+        if (!nbt.hasKey("SkullOwner")) return null
+        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 }

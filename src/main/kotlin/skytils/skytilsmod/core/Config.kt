@@ -1870,6 +1870,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         PropertyType.SWITCH,
+        name = "Show Seraph Display",
+        description = "§b[WIP] §rShows info about your current Voidgloom Seraph boss.",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var showSeraphDisplay = false
+
+    @Property(
+        PropertyType.SWITCH,
         name = "Yang Glyph Ping",
         description = "Alerts you when the Voidgloom Seraph throws down a Yang Glyph(beacon).",
         category = "Slayer",
@@ -1886,6 +1895,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         subcategory = "Voidgloom Seraph"
     )
     var highlightYangGlyph = false
+
+    @Property(
+        PropertyType.SWITCH,
+        name = "Highlight Nukekebi Fixation Heads",
+        description = "Draws the hitbox of Nukekebi Fixation heads",
+        category = "Slayer",
+        subcategory = "Voidgloom Seraph"
+    )
+    var highlightNukekebiHeads = false
 
     @Property(
         PropertyType.SWITCH,

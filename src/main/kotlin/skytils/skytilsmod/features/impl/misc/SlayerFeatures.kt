@@ -19,7 +19,9 @@ package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
 import net.minecraft.block.*
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
@@ -27,11 +29,15 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.Item
+import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.AxisAlignedBB
@@ -248,19 +254,20 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
-        if (event.old.block is BlockBeacon && event.update.block is BlockAir) {
+        if (yangGlyph != null && event.pos == yangGlyph && event.old.block is BlockBeacon && event.update.block is BlockAir) {
             yangGlyph = null
+            return
         }
         if (slayerEntity == null) return
-        if (event.update.block is BlockBeacon && event.pos.distanceSq(
-                slayerEntity!!.posX,
-                slayerEntity!!.posY,
-                slayerEntity!!.posZ
-            ) < 225
-        ) {
-            yangGlyph = event.pos
-            if (Skytils.config.yangGlyphPing) {
-                createTitle("§cYang Glyph!", 30)
+        if (yangGlyphEntity != null) {
+            printDebugMessage("Glyph Entity exists")
+            if (event.update.block is BlockBeacon && yangGlyphEntity!!.position.distanceSq(event.pos) < 9) {
+                printDebugMessage("Beacon entity near beacon block!")
+                yangGlyph = event.pos
+                yangGlyphEntity = null
+                if (Skytils.config.yangGlyphPing) {
+                    createTitle("§cYang Glyph!", 30)
+                }
             }
         }
     }
@@ -282,10 +289,47 @@ class SlayerFeatures {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
+        if (Skytils.config.highlightNukekebiHeads && nukekebiHeads.size > 0) {
+            for (head in nukekebiHeads) {
+                GlStateManager.disableCull()
+                GlStateManager.disableDepth()
+                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+                val x = head.posX - viewerX
+                val y = head.posY - viewerY
+                val z = head.posZ - viewerZ
+                drawFilledBoundingBox(
+                    AxisAlignedBB(x, y, z, x + 0.5, y + 1.975, x + 0.5),
+                    Color(65, 102, 245),
+                    0.5f
+                )
+                GlStateManager.enableDepth()
+                GlStateManager.enableCull()
+            }
+        }
     }
 
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
+        if (event.entity is EntityArmorStand && slayerEntity != null) {
+            TickTask(1) {
+                val e = event.entity as EntityArmorStand
+                if (slayerEntity != null && e.entityBoundingBox.expand(2.0, 3.0, 2.0)
+                        .intersectsWith(slayerEntity!!.entityBoundingBox)) {
+                    printDebugMessage("Found nearby armor stand")
+                    for (item in e.inventory) {
+                        if (item == null) continue
+                        if (item.item == Item.getItemFromBlock(Blocks.beacon)) {
+                            printDebugMessage("Beacon armor stand is close to slayer entity")
+                            yangGlyphEntity = e
+                        } else if (item.item == Items.skull) {
+                            if (ItemUtil.getSkullTexture(item) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0=") {
+                                nukekebiHeads.add(e)
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if (!sidebarLines.any { cleanSB(it) == "Slay the boss!" }) return
         if (slayerEntity != null) {
             printDebugMessage(
@@ -319,7 +363,6 @@ class SlayerFeatures {
                     if (slayerTimerEntity!!.isDead) {
                         printDebugMessage(
                             "timer died"
-
                         )
                         slayerTimerEntity = null
                     } else if (toggled) {
@@ -337,7 +380,6 @@ class SlayerFeatures {
                     if (slayerNameEntity!!.isDead) {
                         printDebugMessage(
                             "name died"
-
                         )
                         slayerNameEntity = null
                     } else if (toggled) {
@@ -355,9 +397,9 @@ class SlayerFeatures {
                     if (slayerEntity!!.isDead) {
                         printDebugMessage(
                             "slayer died"
-
                         )
                         slayerEntity = null
+                        nukekebiHeads.clear()
                     }
                 }
             }
@@ -395,6 +437,131 @@ class SlayerFeatures {
         }
     }
 
+    class SeraphDisplayElement : GuiElement("Seraph Display", FloatPair(20, 20)) {
+        override fun render() {
+            if (Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
+                if (slayerNameEntity != null) {
+                    if (slayerNameEntity!!.displayName.formattedText.contains("Hits")) {
+                        ScreenRenderer.fontRenderer.drawString(
+                            "§dShield Phase",
+                            0f,
+                            0f,
+                            CommonColors.WHITE,
+                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                            SmartFontRenderer.TextShadow.NORMAL
+                        )
+                    } else {
+                        ScreenRenderer.fontRenderer.drawString(
+                            "§6Damage Phase",
+                            0f,
+                            0f,
+                            CommonColors.WHITE,
+                            SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                            SmartFontRenderer.TextShadow.NORMAL
+                        )
+                    }
+                }
+                val heldBlock: IBlockState? = (slayerEntity as EntityEnderman).heldBlockState
+                if (heldBlock != null && heldBlock.block is BlockBeacon) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§cHolding beacon!",
+                        0f,
+                        10f,
+                        CommonColors.WHITE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                } else {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§bHolding nothing!",
+                        0f,
+                        10f,
+                        CommonColors.WHITE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                }
+                if (yangGlyph != null) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§cYang Glyph placed!",
+                        0f,
+                        20f,
+                        CommonColors.WHITE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                } else {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§bNo yang glyph",
+                        0f,
+                        20f,
+                        CommonColors.WHITE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                }
+                if (nukekebiHeads.size > 0) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§dNukekebi Heads: §c${nukekebiHeads.size}",
+                        0f,
+                        30f,
+                        CommonColors.WHITE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                } else {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§bNo Nukekebi Heads",
+                        0f,
+                        30f,
+                        CommonColors.WHITE,
+                        SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                }
+            }
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "§dShield Phase",
+                0f,
+                0f,
+                CommonColors.WHITE,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+            ScreenRenderer.fontRenderer.drawString(
+                "§bHolding beacon!",
+                0f,
+                10f,
+                CommonColors.WHITE,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+            ScreenRenderer.fontRenderer.drawString(
+                "§cNo yang glyph",
+                0f,
+                20f,
+                CommonColors.WHITE,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT + 20
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§bHolding beacon!")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showSeraphDisplay
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
         private var ticks = 0
@@ -412,7 +579,9 @@ class SlayerFeatures {
         var slayerEntity: Entity? = null
         var slayerNameEntity: EntityArmorStand? = null
         var slayerTimerEntity: EntityArmorStand? = null
+        var yangGlyphEntity: EntityArmorStand? = null
         private var yangGlyph: BlockPos? = null
+        private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
 
         fun processSlayerEntity(entity: Entity) {
@@ -490,6 +659,8 @@ class SlayerFeatures {
                     false
                 }
                 var isSlayer = 0
+                var potentialTimerEntity: EntityArmorStand? = null
+                var potentialNameEntity: EntityArmorStand? = null
                 for (nearby in nearbyArmorStands) {
                     if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
                     if (nearby.displayName.formattedText.startsWith(nameStart)
@@ -506,7 +677,7 @@ class SlayerFeatures {
                             printDebugMessage(
                                 "hp matched"
                             )
-                            slayerNameEntity = nearby as EntityArmorStand
+                            potentialNameEntity = nearby as EntityArmorStand
                             isSlayer++
                         }
                         continue
@@ -515,16 +686,15 @@ class SlayerFeatures {
                         printDebugMessage(
                             "timer matched"
                         )
-                        slayerTimerEntity = nearby as EntityArmorStand
+                        potentialTimerEntity = nearby as EntityArmorStand
                         isSlayer++
                         continue
                     }
                 }
                 if (isSlayer == 2) {
                     slayerEntity = entity
-                } else {
-                    slayerTimerEntity = null
-                    slayerNameEntity = null
+                    slayerNameEntity = potentialNameEntity
+                    slayerTimerEntity = potentialTimerEntity
                 }
             }
         }
@@ -721,6 +891,7 @@ class SlayerFeatures {
         init {
             SlayerArmorDisplayElement()
             SlayerDisplayElement()
+            SeraphDisplayElement()
         }
     }
 }
