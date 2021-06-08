@@ -1226,6 +1226,15 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH,
+        name = "Show Etherwarp Teleport Position",
+        description = "Shows the block you will teleport to with the Etherwarp Transmission ability.",
+        category = "Miscellaneous",
+        subcategory = "Items"
+    )
+    var showEtherwarpTeleportPos = false
+
+    @Property(
+        type = PropertyType.SWITCH,
         name = "Show NPC Sell Price",
         description = "Shows the NPC Sell Price on certain items.",
         category = "Miscellaneous",
