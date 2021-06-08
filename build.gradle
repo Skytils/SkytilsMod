@@ -62,11 +62,6 @@ repositories {
 dependencies {
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         transitive = false
-        exclude module: "guava"
-        exclude module: "commons-io"
-        exclude module: "gson"
-        exclude module: "launchwrapper"
-        exclude module: "log4j-core"
     }
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")

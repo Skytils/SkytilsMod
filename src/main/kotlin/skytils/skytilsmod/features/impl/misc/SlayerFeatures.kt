@@ -571,7 +571,7 @@ class SlayerFeatures {
             if (Utils.inSkyblock && toggled && mc.thePlayer != null) {
                 ScreenRenderer.apply {
                     var drawnArmors = 0
-                    (3 downTo 0).map { SlayerFeatures.mc.thePlayer.getCurrentArmor(it) }.forEach { armor ->
+                    (3 downTo 0).map { mc.thePlayer.getCurrentArmor(it) }.forEach { armor ->
                         if (armor == null) return@forEach
                         val extraAttr = ItemUtil.getExtraAttributes(armor) ?: return@forEach
                         val killsKey =

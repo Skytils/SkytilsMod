@@ -564,10 +564,10 @@ class SpamHider {
             val sr = ScaledResolution(Minecraft.getMinecraft())
             val animDiv = timePassed.toDouble() / 1000.0
             lastTimeRender = now
-            spamMessages.reverse()
             var i = 0
+            val reversed = spamMessages.asReversed()
             while (i in spamMessages.indices) {
-                val message = spamMessages[i]
+                val message = reversed[i]
                 val messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(
                     message.message.stripControlCodes()
                 )
@@ -613,7 +613,6 @@ class SpamHider {
                 message.time += timePassed
                 i++
             }
-            spamMessages.reverse()
         }
 
         override fun demoRender() {
