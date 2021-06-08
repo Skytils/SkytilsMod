@@ -36,6 +36,7 @@ import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.AxisAlignedBB
@@ -577,7 +578,7 @@ class SlayerFeatures {
         override fun render() {
             if (Utils.inSkyblock && toggled && mc.thePlayer != null) {
                 ScreenRenderer.apply {
-                    var drawnArmors = 0
+                    val armors = arrayListOf<Pair<ItemStack, String>>()
                     (3 downTo 0).map { mc.thePlayer.getCurrentArmor(it) }.forEach { armor ->
                         if (armor == null) return@forEach
                         val extraAttr = ItemUtil.getExtraAttributes(armor) ?: return@forEach
@@ -587,13 +588,7 @@ class SlayerFeatures {
                         for (lore in ItemUtil.getItemLore(armor).asReversed()) {
                             if (lore == "§a§lMAXED OUT! NICE!") {
                                 val kills = extraAttr.getInteger(killsKey)
-                                RenderUtil.renderItem(armor, 0, drawnArmors * 16)
-                                fontRenderer.drawString(
-                                    "§a§lMAX §b(§f${NumberUtil.nf.format(kills)}§b)",
-                                    18f,
-                                    drawnArmors * 16 + 4.5f
-                                )
-                                drawnArmors++
+                                armors.add(armor to "§a§lMAX §b(§f${NumberUtil.nf.format(kills)}§b)")
                                 break
                             } else if (lore.startsWith("§7Next Upgrade:")) {
                                 val match = upgradeBonusRegex.find(lore) ?: return@forEach
@@ -602,14 +597,27 @@ class SlayerFeatures {
                                 val nextKills = match.groups["nextKills"]!!.value.replace(",", "").toDoubleOrNull()
                                     ?: return@forEach
                                 val percentToNext = (currentKills / nextKills * 100).roundToPrecision(1)
-                                RenderUtil.renderItem(armor, 0, drawnArmors * 16)
-                                fontRenderer.drawString(
-                                    "§e$percentToNext% §b(§f${NumberUtil.nf.format(currentKills)}§b)",
-                                    18f,
-                                    drawnArmors * 16 + 4.5f
-                                )
-                                drawnArmors++
+                                armors.add(armor to "§e$percentToNext% §b(§f${NumberUtil.nf.format(currentKills)}§b)")
                             }
+                        }
+                    }
+
+                    if (armors.isNotEmpty()) {
+                        val leftAlign = actualX < ScaledResolution(SlayerFeatures.mc).scaledWidth / 2f
+                        if (!leftAlign) {
+                            val longest = armors.maxByOrNull { it.second.length } ?: null to ""
+                            GlStateManager.translate(
+                                (-fontRenderer.getStringWidth(longest.second)).toDouble(), 0.0,
+                                0.0
+                            )
+                        }
+                        armors.forEachIndexed { index, pair ->
+                            RenderUtil.renderItem(pair.first, 0, index * 16)
+                            fontRenderer.drawString(
+                                pair.second,
+                                18f,
+                                index * 16 + 4.5f
+                            )
                         }
                     }
                 }
@@ -617,20 +625,26 @@ class SlayerFeatures {
         }
 
         override fun demoRender() {
+            val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+            val text = "§e99.9% §b(§f199§b)"
+            if (!leftAlign) {
+                GlStateManager.translate(
+                    (-ScreenRenderer.fontRenderer.getStringWidth(text)).toDouble(), 0.0,
+                    0.0
+                )
+            }
+            RenderUtil.renderItem(ItemStack(Items.leather_chestplate), 0, 0)
             ScreenRenderer.fontRenderer.drawString(
-                "slayer armor display here",
-                0f,
-                0f,
-                CommonColors.WHITE,
-                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
+                text,
+                18f,
+                4.5f
             )
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT + 5
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("slayer armor display here")
+            get() = 18 + ScreenRenderer.fontRenderer.getStringWidth("§e99.9% §b(§f199§b)")
 
         override val toggled: Boolean
             get() = Skytils.config.showSlayerArmorKills

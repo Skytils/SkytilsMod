@@ -183,18 +183,9 @@ object SkytilsCommand : CommandBase() {
             "swaphub" -> {
                 if (Utils.inSkyblock) {
                     Skytils.sendMessageQueue.add("/warpforge")
-                    Skytils.threadPool.submit {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            val startedAt = System.currentTimeMillis()
-                            while (mc.thePlayer != null) {
-                                if (System.currentTimeMillis() - startedAt >= 1000) {
-                                    return@launch
-                                }
-                                delay(50)
-                            }
-                            delay(500)
-                            Skytils.sendMessageQueue.add("/warp hub")
-                        }
+                    CoroutineScope(Dispatchers.Default).launch {
+                        delay(500)
+                        Skytils.sendMessageQueue.add("/warp hub")
                     }
                 }
             }
