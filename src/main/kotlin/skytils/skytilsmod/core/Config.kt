@@ -91,7 +91,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         name = "Debug Mode",
         description = "Will do weird things to your game. You probably don't want this on.",
         category = "General",
-        subcategory = "Other"
+        subcategory = "Other",
+        hidden = true
     )
     var debugMode = false
 

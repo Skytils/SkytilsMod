@@ -198,6 +198,10 @@ object SkytilsCommand : CommandBase() {
                     }
                 }
             }
+            "debug" -> {
+                Skytils.config.debugMode = !Skytils.config.debugMode
+                player.addChatComponentMessage(ChatComponentText("§c§lSkytils ➜ §cDebug mode was toggled to: §6${Skytils.config.debugMode}"))
+            }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
     }
