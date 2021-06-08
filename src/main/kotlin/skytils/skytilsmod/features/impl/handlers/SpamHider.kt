@@ -235,6 +235,13 @@ class SpamHider {
                     }
                 }
 
+                // Mining Abilities
+                formatted.startsWith("§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
+                    when (Skytils.config.miningAbilityHider) {
+                        1,2 -> cancelChatPacket(event, Skytils.config.miningAbilityHider == 2)
+                    }
+                }
+
                 // Blessings
                 formatted.contains("§r§6§lDUNGEON BUFF!") -> {
                     when (Skytils.config.blessingHider) {

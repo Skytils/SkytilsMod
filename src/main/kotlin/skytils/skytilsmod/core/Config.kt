@@ -2053,6 +2053,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR,
+        name = "Mining ability hider",
+        description = "Removes Mining ability messages from your chat.",
+        category = "Spam",
+        subcategory = "Abilities",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var miningAbilityHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR,
         name = "Mana Use Hider",
         description = "Removes mana usage updates from the action bar.\nWorks best with SkyblockAddons.",
         category = "Spam",

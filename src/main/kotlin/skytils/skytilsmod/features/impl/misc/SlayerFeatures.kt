@@ -283,7 +283,7 @@ class SlayerFeatures {
             drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
                 Skytils.config.yangGlyphColor,
-                Skytils.config.yangGlyphColor.alpha / 255f
+                1f
             )
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
