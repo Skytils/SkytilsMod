@@ -571,7 +571,7 @@ class SlayerFeatures {
         }
     }
 
-    class SlayerArmorDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
+    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", FloatPair(150, 20)) {
         val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 
