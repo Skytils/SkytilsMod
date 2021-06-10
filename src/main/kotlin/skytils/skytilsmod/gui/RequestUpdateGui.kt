@@ -19,9 +19,11 @@
 package skytils.skytilsmod.gui
 
 import gg.essential.elementa.WindowScreen
+import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.dsl.*
+import gg.essential.elementa.markdown.MarkdownComponent
 import net.minecraft.client.gui.GuiMainMenu
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.UpdateChecker
@@ -33,7 +35,7 @@ class RequestUpdateGui : WindowScreen() {
         val updateButton = SimpleButton("Update")
             .constrain {
                 x = CenterConstraint()
-                y = CenterConstraint().plus((window.getHeight() / 20).pixels())
+                y = CenterConstraint().plus((window.getHeight() / 5).pixels())
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
@@ -42,7 +44,7 @@ class RequestUpdateGui : WindowScreen() {
         val mainMenuButton = SimpleButton("Main Menu")
             .constrain {
                 x = CenterConstraint()
-                y = CenterConstraint().plus((window.getHeight() / 5).pixels())
+                y = CenterConstraint().plus((window.getHeight() / 3).pixels())
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
@@ -53,14 +55,28 @@ class RequestUpdateGui : WindowScreen() {
             UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")
                 .constrain {
                     x = CenterConstraint()
-                    y = CenterConstraint().minus((window.getHeight() / 8).pixels())
+                    y = CenterConstraint().minus((window.getHeight() / 3).pixels())
+                        .minus((window.getHeight() / 16).pixels())
                 } childOf window
         val versionText =
             UIText("You are currently on version ${Skytils.VERSION}.")
                 .constrain {
                     x = CenterConstraint()
-                    y = CenterConstraint().minus((window.getHeight() / 8).pixels())
-                        .minus((window.getHeight() / 16).pixels())
+                    y = CenterConstraint().minus((window.getHeight() / 3).pixels())
                 } childOf window
+        val changelogWrapper = ScrollComponent()
+            .constrain {
+                x = CenterConstraint()
+                y = CenterConstraint().minus((window.getHeight() / 15).pixels())
+                height = ((window.getHeight() / 3 * 2) - (window.getHeight() / 4)).pixels()
+                width = (window.getWidth() / 3 * 2).pixels()
+            } childOf window
+        val changelog =
+            UpdateChecker.updateGetter.updateObj?.get("body")?.asString?.let { MarkdownComponent(it.replace("*", "")) }
+                ?.constrain {
+                    height = ((window.getHeight() / 3 * 2) - (window.getHeight() / 4)).pixels()
+                    width = (window.getWidth() / 3 * 2).pixels()
+                }
+                ?.childOf(changelogWrapper)
     }
 }
