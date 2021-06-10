@@ -17,121 +17,103 @@
  */
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.WindowScreen
+import gg.essential.elementa.components.UIText
+import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.constraints.RainbowColorConstraint
+import gg.essential.elementa.constraints.animation.Animations
+import gg.essential.elementa.dsl.animate
+import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.pixels
 import gg.essential.vigilance.VigilanceConfig
-import net.minecraft.client.gui.GuiButton
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
-import skytils.skytilsmod.gui.commandaliases.elements.CleanButton
+import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
-import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
-import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.openGUI
-import java.awt.Color
 import java.awt.Desktop
-import java.io.IOException
 import java.net.URI
-import java.net.URISyntaxException
 
-class OptionsGui : GuiScreen() {
+class OptionsGui : WindowScreen(newGuiScale = 2) {
 
-    private var origGuiScale: Int
+    private val skytilsText: UIText
+    private val rainbowColorConstraint = RainbowColorConstraint()
 
     init {
-        origGuiScale = Skytils.mc.gameSettings.guiScale
-    }
-
-    override fun doesGuiPauseGame() = false
-
-    override fun initGui() {
-        buttonList.add(CleanButton(0, width / 2 - 100, height / 4 + 100, 200, 20, "Config"))
-        buttonList.add(CleanButton(1, width / 2 - 100, height / 4 + 125, 200, 20, "Edit Aliases"))
-        buttonList.add(CleanButton(2, width / 2 - 100, height / 4 + 150, 200, 20, "Edit Locations"))
-        buttonList.add(CleanButton(3, width / 2 - 100, height / 4 + 175, 200, 20, "Edit Shortcuts"))
-        buttonList.add(CleanButton(4, width / 2 - 100, height / 4 + 200, 200, 20, "Edit Vigilance"))
-        buttonList.add(
-            CleanButton(
-                5,
-                width - width / 10 - 3,
-                height - height / 20 - 3,
-                width / 10 - 3,
-                height / 20 - 3,
-                "Discord"
-            )
-        )
-        buttonList.add(
-            CleanButton(
-                6,
-                width - width / 10 - 3,
-                height - 2 * height / 20 - 3,
-                width / 10 - 3,
-                height / 20 - 3,
-                "Github"
-            )
-        )
-    }
-
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val fr = ScreenRenderer.fontRenderer
-        drawGradientRect(0, 0, width, height, Color(117, 115, 115, 25).rgb, Color(0, 0, 0, 200).rgb)
-        val scale = 12.5f
-        GlStateManager.scale(scale, scale, 0f)
-        fr.drawString(
-            "Skytils",
-            width / 2f / scale,
-            (height / 4f - 75) / scale,
-            CommonColors.RAINBOW,
-            SmartFontRenderer.TextAlignment.MIDDLE,
-            SmartFontRenderer.TextShadow.NONE
-        )
-        GlStateManager.scale(1 / scale, 1 / scale, 0f)
-        for (button in buttonList) {
-            button.drawButton(mc, mouseX, mouseY)
+        val startPos = window.getHeight() / 4 + 100
+        SimpleButton("Config").childOf(window).constrain {
+            x = CenterConstraint()
+            y = startPos.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            Skytils.config.openGUI()
         }
-    }
-
-    override fun actionPerformed(button: GuiButton) {
-        when (button.id) {
-            0 -> Skytils.config.openGUI()
-            1 -> mc.displayGuiScreen(CommandAliasesGui())
-            2 -> mc.displayGuiScreen(LocationEditGui())
-            3 -> mc.displayGuiScreen(KeyShortcutsGui())
-            4 -> VigilanceConfig.openGUI()
-            5 -> try {
+        SimpleButton("Edit Aliases").childOf(window).constrain {
+            x = CenterConstraint()
+            y = (startPos + 25).pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(CommandAliasesGui())
+        }
+        SimpleButton("Edit Locations").childOf(window).constrain {
+            x = CenterConstraint()
+            y = (startPos + 50).pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(LocationEditGui())
+        }
+        SimpleButton("Edit Shortcuts").childOf(window).constrain {
+            x = CenterConstraint()
+            y = (startPos + 75).pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(KeyShortcutsGui())
+        }
+        SimpleButton("Edit Vigilance").childOf(window).constrain {
+            x = CenterConstraint()
+            y = (startPos + 100).pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            VigilanceConfig.openGUI()
+        }
+        SimpleButton("Discord").childOf(window).constrain {
+            x = (window.getWidth() - window.getWidth() / 10 - 3).pixels()
+            y = (window.getHeight() - window.getHeight() / 20 - 3).pixels()
+            width = (window.getWidth() / 10 - 3).pixels()
+            height = (window.getHeight() / 20 - 3).pixels()
+        }.onMouseClick {
+            runCatching {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-            } catch (ex: URISyntaxException) {
-                ex.printStackTrace()
             }
-            6 -> try {
+        }
+        SimpleButton("GitHub").childOf(window).constrain {
+            x = (window.getWidth() - window.getWidth() / 10 - 3).pixels()
+            y = (window.getHeight() - 2 * window.getHeight() / 20 - 3).pixels()
+            width = (window.getWidth() / 10 - 3).pixels()
+            height = (window.getHeight() / 20 - 3).pixels()
+        }.onMouseClick {
+            runCatching {
                 Desktop.getDesktop().browse(URI("https://github.com/Skytils/SkytilsMod"))
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-            } catch (ex: URISyntaxException) {
-                ex.printStackTrace()
             }
+        }
+        skytilsText = UIText("Skytils", shadow = false).childOf(window).constrain {
+            x = CenterConstraint()
+            y = (window.getHeight() / 4 - 75).pixels()
+            textScale = 12.5.pixels()
         }
     }
 
-    override fun updateScreen() {
-        loadGuiScale(2)
-    }
-
-    override fun onGuiClosed() {
-        loadGuiScale(origGuiScale)
-    }
-
-    fun loadGuiScale(scale: Int) {
-        if (mc.gameSettings.guiScale != scale) {
-            mc.gameSettings.guiScale = scale
-            val scaledresolution = ScaledResolution(mc)
-            val j = scaledresolution.scaledWidth
-            val k = scaledresolution.scaledHeight
-            setWorldAndResolution(mc, j, k)
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        super.onDrawScreen(mouseX, mouseY, partialTicks)
+        skytilsText.animate {
+            //TODO check if this is actually how you're supposed to do this
+            setColorAnimation(Animations.LINEAR, 1f, rainbowColorConstraint)
         }
     }
 }
