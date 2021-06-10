@@ -18,45 +18,49 @@
 
 package skytils.skytilsmod.gui
 
-import net.minecraft.client.gui.GuiButton
+import gg.essential.elementa.WindowScreen
+import gg.essential.elementa.components.UIText
+import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.dsl.*
 import net.minecraft.client.gui.GuiMainMenu
-import net.minecraft.client.gui.GuiScreen
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.UpdateChecker
-import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import skytils.skytilsmod.gui.components.SimpleButton
 
-class RequestUpdateGui : GuiScreen() {
-    override fun initGui() {
-        buttonList.add(GuiButton(0, this.width / 2 - 50, this.height / 2 - 50, 100, 20, "Update"))
-        buttonList.add(GuiButton(1, this.width / 2 - 50, this.height / 2 + 5, 100, 20, "Main Menu"))
-    }
+class RequestUpdateGui : WindowScreen() {
 
-    override fun actionPerformed(button: GuiButton) {
-        if (button.id == 0) {
-            Skytils.displayScreen = UpdateGui()
-        } else if (button.id == 1) {
-            UpdateChecker.updateGetter.updateObj = null
-            Skytils.displayScreen = GuiMainMenu()
-        }
-    }
-
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        drawDefaultBackground()
-        ScreenRenderer.fontRenderer.drawString(
-            "Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!",
-            this.width / 2f,
-            this.height / 2f - 125,
-            alignment = SmartFontRenderer.TextAlignment.MIDDLE,
-            shadow = SmartFontRenderer.TextShadow.NORMAL
-        )
-        ScreenRenderer.fontRenderer.drawString(
-            "You are currently on version ${Skytils.VERSION}.",
-            this.width / 2f,
-            this.height / 2f - 100,
-            alignment = SmartFontRenderer.TextAlignment.MIDDLE,
-            shadow = SmartFontRenderer.TextShadow.NORMAL
-        )
-        super.drawScreen(mouseX, mouseY, partialTicks)
+    init {
+        val updateButton = SimpleButton("Update")
+            .constrain {
+                x = CenterConstraint()
+                y = CenterConstraint().plus((window.getHeight() / 20).pixels())
+                width = 100.pixels()
+                height = 20.pixels()
+            }.onMouseClick {
+                Skytils.displayScreen = UpdateGui()
+            } childOf window
+        val mainMenuButton = SimpleButton("Main Menu")
+            .constrain {
+                x = CenterConstraint()
+                y = CenterConstraint().plus((window.getHeight() / 5).pixels())
+                width = 100.pixels()
+                height = 20.pixels()
+            }.onMouseClick {
+                UpdateChecker.updateGetter.updateObj = null
+                Skytils.displayScreen = GuiMainMenu()
+            } childOf window
+        val updateAvailableText =
+            UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")
+                .constrain {
+                    x = CenterConstraint()
+                    y = CenterConstraint().minus((window.getHeight() / 8).pixels())
+                } childOf window
+        val versionText =
+            UIText("You are currently on version ${Skytils.VERSION}.")
+                .constrain {
+                    x = CenterConstraint()
+                    y = CenterConstraint().minus((window.getHeight() / 8).pixels())
+                        .minus((window.getHeight() / 16).pixels())
+                } childOf window
     }
 }
