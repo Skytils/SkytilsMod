@@ -99,7 +99,7 @@ shadowJar {
     relocate("gg.essential", "skytils.essentialgg")
     relocate("kotlinx.coroutines", "skytils.kotlinx.coroutines")
 
-    exclude "LICENSE.txt"
+    exclude "LICENSE.md"
     exclude "pack.mcmeta"
     exclude "dummyThing"
     exclude "**/module-info.class"

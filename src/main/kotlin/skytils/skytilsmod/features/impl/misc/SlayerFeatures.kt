@@ -330,7 +330,7 @@ class SlayerFeatures {
                 }
             }
         }
-        if (!sidebarLines.any { cleanSB(it) == "Slay the boss!" }) return
+        if (sidebarLines.none { cleanSB(it) == "Slay the boss!" }) return
         if (slayerEntity != null) {
             printDebugMessage(
                 "boss not null"
@@ -750,9 +750,8 @@ class SlayerFeatures {
                     }
                     false
                 }
-                var isSlayer = 0
-                var potentialTimerEntity: EntityArmorStand? = null
-                var potentialNameEntity: EntityArmorStand? = null
+                val potentialTimerEntities = arrayListOf<EntityArmorStand>()
+                val potentialNameEntities = arrayListOf<EntityArmorStand>()
                 for (nearby in nearbyArmorStands) {
                     if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
                     if (nearby.displayName.formattedText.startsWith(nameStart)
@@ -769,8 +768,7 @@ class SlayerFeatures {
                             printDebugMessage(
                                 "hp matched"
                             )
-                            potentialNameEntity = nearby as EntityArmorStand
-                            isSlayer++
+                            potentialNameEntities.add(nearby as EntityArmorStand)
                         }
                         continue
                     }
@@ -778,15 +776,14 @@ class SlayerFeatures {
                         printDebugMessage(
                             "timer matched"
                         )
-                        potentialTimerEntity = nearby as EntityArmorStand
-                        isSlayer++
+                        potentialTimerEntities.add(nearby as EntityArmorStand)
                         continue
                     }
                 }
-                if (isSlayer == 2) {
+                if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
                     slayerEntity = entity
-                    slayerNameEntity = potentialNameEntity
-                    slayerTimerEntity = potentialTimerEntity
+                    slayerNameEntity = potentialNameEntities.first()
+                    slayerTimerEntity = potentialTimerEntities.first()
                 }
             }
         }
