@@ -22,6 +22,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.entity.RenderItem
+import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraft.item.ItemStack
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -838,6 +839,15 @@ class ScreenRenderer {
         @JvmStatic
         fun refresh() {
             screen = ScaledResolution(mc)
+        }
+
+        @JvmStatic
+        fun init() {
+            if (Minecraft.getMinecraft().gameSettings.language != null) {
+                fontRenderer.unicodeFlag = Minecraft.getMinecraft().isUnicode
+                fontRenderer.bidiFlag = Minecraft.getMinecraft().languageManager.isCurrentLanguageBidirectional()
+            }
+            (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener(fontRenderer)
         }
     }
 }

@@ -38,7 +38,6 @@ import java.net.URI
 class OptionsGui : WindowScreen(newGuiScale = 2) {
 
     private val skytilsText: UIText
-    private val rainbowColorConstraint = RainbowColorConstraint()
 
     init {
         val startPos = window.getHeight() / 4 + 100
@@ -113,7 +112,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         super.onDrawScreen(mouseX, mouseY, partialTicks)
         skytilsText.animate {
             //TODO check if this is actually how you're supposed to do this
-            setColorAnimation(Animations.LINEAR, 1f, rainbowColorConstraint)
+            setColorAnimation(Animations.IN_OUT_EXP, 1f, RainbowColorConstraint())
         }
     }
 }

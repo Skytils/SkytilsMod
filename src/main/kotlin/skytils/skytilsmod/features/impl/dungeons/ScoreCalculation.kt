@@ -98,7 +98,7 @@ object ScoreCalculation {
                         val secrets = obj["secrets"].asInt
                         if (!rooms.containsKey(name)) {
                             rooms[name] = secrets
-                            if (Skytils.config.scoreCalculationAssist) {
+                            if (Skytils.config.scoreCalculationAssist && Skytils.config.scoreCalculationMethod == 0) {
                                 Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-ROOM$: [$name] ($secrets)")
                             }
                         }
@@ -339,7 +339,16 @@ object ScoreCalculation {
                 text.add("§6Missing Puzzles:§a $missingPuzzles")
                 text.add("§6Failed Puzzles:§a $failedPuzzles")
                 text.add("§6Secrets Found:§a $foundSecrets")
-                if (totalSecrets != 0) text.add("§6Estimated Secret Count:§a $totalSecrets")
+                if (totalSecrets != 0) {
+                    if (Skytils.config.scoreCalculationMethod == 0) text.add("§6Estimated Secret Count:§a $totalSecrets")
+                    else {
+                        if (clearedPercentage >= 80) {
+                            text.add("§6Estimated Secret Count:§a $totalSecrets")
+                        } else {
+                            text.add("§6Estimated Secret Count:§c HIDDEN")
+                        }
+                    }
+                }
                 text.add("§6Crypts:§a $crypts")
                 if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
                     text.add("§6Mimic Killed:" + if (mimicKilled) "§a ✓" else " §c X")
