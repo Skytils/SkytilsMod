@@ -26,6 +26,7 @@ import gg.essential.elementa.dsl.animate
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.font.DefaultFonts
 import gg.essential.vigilance.VigilanceConfig
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
@@ -105,6 +106,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
             x = CenterConstraint()
             y = (window.getHeight() / 4 - 75).pixels()
             textScale = 12.5.pixels()
+            fontProvider = DefaultFonts.JETBRAINS_MONO_FONT_RENDERER
         }
     }
 
