@@ -26,8 +26,8 @@ import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.font.DefaultFonts
-import gg.essential.universal.GuiScale
 import gg.essential.vigilance.VigilanceConfig
+import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -36,20 +36,19 @@ import skytils.skytilsmod.utils.openGUI
 import java.awt.Desktop
 import java.net.URI
 
-// TODO Figure out a way to force a refresh of the scale on window resize, right now it just stays small if you increase size and vice versa for decreasing window size
-class OptionsGui : WindowScreen(newGuiScale = GuiScale.scaleForScreenSize().ordinal) {
+class OptionsGui : WindowScreen(newGuiScale = 2) {
 
     private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
         x = CenterConstraint()
-        y = RelativeConstraint(0.25f) - 75.pixels()
-        textScale = 12.5.pixels()
+        y = RelativeConstraint(0.1f)
+        textScale = basicTextScaleConstraint { window.getHeight() / 40 }
         fontProvider = DefaultFonts.ELEMENTA_MINECRAFT_FONT_RENDERER
     }
 
     init {
         SimpleButton("Config").childOf(window).constrain {
             x = CenterConstraint()
-            y = RelativeConstraint(0.25f) + 100.pixels()
+            y = SiblingConstraint() + RelativeConstraint(0.15f)
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -117,5 +116,13 @@ class OptionsGui : WindowScreen(newGuiScale = GuiScale.scaleForScreenSize().ordi
                     animate()
                 }
         }
+    }
+
+    override fun setWorldAndResolution(mc: Minecraft, width: Int, height: Int) {
+        window.onWindowResize()
+        skytilsText.constrain {
+            textScale = basicTextScaleConstraint { window.getHeight() / 40 }
+        }
+        super.setWorldAndResolution(mc, width, height)
     }
 }
