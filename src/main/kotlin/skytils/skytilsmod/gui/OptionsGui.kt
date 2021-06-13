@@ -21,11 +21,10 @@ import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.RainbowColorConstraint
+import gg.essential.elementa.constraints.RelativeConstraint
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.animate
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.*
 import gg.essential.elementa.font.DefaultFonts
 import gg.essential.vigilance.VigilanceConfig
 import skytils.skytilsmod.Skytils
@@ -38,13 +37,18 @@ import java.net.URI
 
 class OptionsGui : WindowScreen(newGuiScale = 2) {
 
-    private val skytilsText: UIText
+    private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
+        x = CenterConstraint()
+        y = RelativeConstraint(0.25f) - 75.pixels()
+        textScale = 12.5.pixels()
+        fontProvider = DefaultFonts.ELEMENTA_MINECRAFT_FONT_RENDERER
+    }
 
     init {
-        val startPos = window.getHeight() / 4 + 100
+        // TODO figure out the math to make everything fit on screen even when it's small
         SimpleButton("Config").childOf(window).constrain {
             x = CenterConstraint()
-            y = startPos.pixels()
+            y = RelativeConstraint(0.25f) + 100.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -52,7 +56,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }
         SimpleButton("Edit Aliases").childOf(window).constrain {
             x = CenterConstraint()
-            y = (startPos + 25).pixels()
+            y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -60,7 +64,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }
         SimpleButton("Edit Locations").childOf(window).constrain {
             x = CenterConstraint()
-            y = (startPos + 50).pixels()
+            y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -68,7 +72,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }
         SimpleButton("Edit Shortcuts").childOf(window).constrain {
             x = CenterConstraint()
-            y = (startPos + 75).pixels()
+            y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -76,45 +80,41 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }
         SimpleButton("Edit Vigilance").childOf(window).constrain {
             x = CenterConstraint()
-            y = (startPos + 100).pixels()
+            y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
             VigilanceConfig.openGUI()
         }
         SimpleButton("Discord").childOf(window).constrain {
-            x = (window.getWidth() - window.getWidth() / 10 - 3).pixels()
-            y = (window.getHeight() - window.getHeight() / 20 - 3).pixels()
-            width = (window.getWidth() / 10 - 3).pixels()
-            height = (window.getHeight() / 20 - 3).pixels()
+            x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
+            y = basicYConstraint { window.getHeight() - this.getHeight() - 3 }
+            width = RelativeConstraint(0.1f)
+            height = RelativeConstraint(0.05f)
         }.onMouseClick {
             runCatching {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
             }
         }
         SimpleButton("GitHub").childOf(window).constrain {
-            x = (window.getWidth() - window.getWidth() / 10 - 3).pixels()
-            y = (window.getHeight() - 2 * window.getHeight() / 20 - 3).pixels()
-            width = (window.getWidth() / 10 - 3).pixels()
-            height = (window.getHeight() / 20 - 3).pixels()
+            x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
+            y = basicYConstraint { window.getHeight() - this.getHeight() * 2 - 6 }
+            width = RelativeConstraint(0.1f)
+            height = RelativeConstraint(0.05f)
         }.onMouseClick {
             runCatching {
                 Desktop.getDesktop().browse(URI("https://github.com/Skytils/SkytilsMod"))
             }
         }
-        skytilsText = UIText("Skytils", shadow = false).childOf(window).constrain {
-            x = CenterConstraint()
-            y = (window.getHeight() / 4 - 75).pixels()
-            textScale = 12.5.pixels()
-            fontProvider = DefaultFonts.JETBRAINS_MONO_FONT_RENDERER
-        }
+        animate()
     }
 
-    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        super.onDrawScreen(mouseX, mouseY, partialTicks)
+    fun animate() {
         skytilsText.animate {
-            //TODO check if this is actually how you're supposed to do this
-            setColorAnimation(Animations.IN_OUT_EXP, 1f, RainbowColorConstraint())
+            setColorAnimation(Animations.IN_OUT_SIN, 1f, RainbowColorConstraint())
+                .onComplete {
+                    animate()
+                }
         }
     }
 }
