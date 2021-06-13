@@ -22,6 +22,8 @@ import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.constraints.RelativeConstraint
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.markdown.MarkdownComponent
 import net.minecraft.client.gui.GuiMainMenu
@@ -32,51 +34,48 @@ import skytils.skytilsmod.gui.components.SimpleButton
 class RequestUpdateGui : WindowScreen() {
 
     init {
-        val updateButton = SimpleButton("Update")
+        UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")
             .constrain {
                 x = CenterConstraint()
-                y = CenterConstraint().plus((window.getHeight() / 5).pixels())
+                y = RelativeConstraint(0.1f)
+            } childOf window
+        val versionText =
+            UIText("You are currently on version ${Skytils.VERSION}.")
+                .constrain {
+                    x = CenterConstraint()
+                    y = SiblingConstraint()
+                } childOf window
+        val changelogWrapper = ScrollComponent()
+            .constrain {
+                x = CenterConstraint()
+                y = SiblingConstraint() + 10.pixels()
+                height = basicHeightConstraint { window.getHeight() - 90 - versionText.getBottom() }
+                width = RelativeConstraint(0.7f)
+            } childOf window
+        UpdateChecker.updateGetter.updateObj?.get("body")?.asString?.let { MarkdownComponent(it.replace("*", "")) }
+            ?.constrain {
+                height = RelativeConstraint()
+                width = RelativeConstraint()
+            }
+            ?.childOf(changelogWrapper)
+        SimpleButton("Update")
+            .constrain {
+                x = CenterConstraint()
+                y = SiblingConstraint() + 20.pixels()
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
                 Skytils.displayScreen = UpdateGui()
             } childOf window
-        val mainMenuButton = SimpleButton("Main Menu")
+        SimpleButton("Main Menu")
             .constrain {
                 x = CenterConstraint()
-                y = CenterConstraint().plus((window.getHeight() / 3).pixels())
+                y = SiblingConstraint() + 10.pixels()
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
                 UpdateChecker.updateGetter.updateObj = null
                 Skytils.displayScreen = GuiMainMenu()
             } childOf window
-        val updateAvailableText =
-            UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")
-                .constrain {
-                    x = CenterConstraint()
-                    y = CenterConstraint().minus((window.getHeight() / 3).pixels())
-                        .minus((window.getHeight() / 16).pixels())
-                } childOf window
-        val versionText =
-            UIText("You are currently on version ${Skytils.VERSION}.")
-                .constrain {
-                    x = CenterConstraint()
-                    y = CenterConstraint().minus((window.getHeight() / 3).pixels())
-                } childOf window
-        val changelogWrapper = ScrollComponent()
-            .constrain {
-                x = CenterConstraint()
-                y = CenterConstraint().minus((window.getHeight() / 15).pixels())
-                height = ((window.getHeight() / 3 * 2) - (window.getHeight() / 4)).pixels()
-                width = (window.getWidth() / 3 * 2).pixels()
-            } childOf window
-        val changelog =
-            UpdateChecker.updateGetter.updateObj?.get("body")?.asString?.let { MarkdownComponent(it.replace("*", "")) }
-                ?.constrain {
-                    height = ((window.getHeight() / 3 * 2) - (window.getHeight() / 4)).pixels()
-                    width = (window.getWidth() / 3 * 2).pixels()
-                }
-                ?.childOf(changelogWrapper)
     }
 }
