@@ -42,7 +42,6 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         x = CenterConstraint()
         y = RelativeConstraint(0.1f)
         textScale = basicTextScaleConstraint { window.getHeight() / 40 }
-        fontProvider = DefaultFonts.ELEMENTA_MINECRAFT_FONT_RENDERER
     }
 
     init {

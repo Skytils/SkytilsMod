@@ -33,7 +33,7 @@ public abstract class MixinRenderBat {
 
     @Inject(method = "preRenderCallback", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;scale(FFF)V", shift = At.Shift.AFTER))
     private void preRender(EntityBat bat, float partialTicks, CallbackInfo ci) {
-        if (Utils.inDungeons && Skytils.config.biggerBatModels && bat.getMaxHealth() == 100) {
+        if (Utils.inDungeons && Skytils.config.biggerBatModels && Utils.equalsOneOf(bat.getMaxHealth(), 100, 400)) {
             GlStateManager.scale(3, 3, 3);
         }
     }

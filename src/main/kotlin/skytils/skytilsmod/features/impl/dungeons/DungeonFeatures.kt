@@ -381,7 +381,12 @@ class DungeonFeatures {
                     ) mc.theWorld.removeEntity(event.entity)
                 }
             }
-            if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned && event.entity.maxHealth == 100f && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
+            if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned && Utils.equalsOneOf(
+                    event.entity.maxHealth,
+                    100f,
+                    400f
+                ) && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible
+            ) {
                 RenderUtil.drawOutlinedBoundingBox(
                     event.entity.entityBoundingBox,
                     Color(0, 255, 255, 255),
