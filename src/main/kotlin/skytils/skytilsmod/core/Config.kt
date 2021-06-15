@@ -221,7 +221,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "New method requires Dungeon Rooms Mod version 2.",
         category = "Dungeons",
         subcategory = "Score Calculation",
-        options = arrayOf("Old", "New")
+        options = ["Old", "New"]
     )
     var scoreCalculationMethod = 0
 
@@ -2412,54 +2412,55 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     init {
         initialize()
 
-        ::itemRarityOpacity dependsOn ::showItemRarity
+        addDependency("itemRarityOpacity", "showItemRarity")
 
-        ::showLowestBINPrice dependsOn ::fetchLowestBINPrices
-        ::betterAuctionPriceInput dependsOn ::fetchLowestBINPrices
-        ::dungeonChestProfit dependsOn ::fetchLowestBINPrices
-        ::showCoinsPerBit dependsOn ::fetchLowestBINPrices
-        ::protectItemBINThreshold dependsOn ::fetchLowestBINPrices
+        listOf(
+            "showLowestBINPrice",
+            "betterAuctionPriceInput",
+            "dungeonChestProfit",
+            "showCoinsPerBit",
+            "protectItemBINThreshold"
+        ).forEach { propertyName -> addDependency(propertyName, "fetchLowestBINPrices") }
 
-        ::showNextBlaze dependsOn ::blazeSolver
-        ::lowestBlazeColor dependsOn ::blazeSolver
-        ::highestBlazeColor dependsOn ::blazeSolver
-        ::nextBlazeColor dependsOn ::showNextBlaze
-        ::clickInOrderFirst dependsOn ::clickInOrderTerminalSolver
-        ::clickInOrderSecond dependsOn ::clickInOrderTerminalSolver
-        ::clickInOrderThird dependsOn ::clickInOrderTerminalSolver
-        ::lividFinderType dependsOn ::findCorrectLivid
+        addDependency("showNextBlaze", "blazeSolver")
+        addDependency("lowestBlazeColor", "blazeSolver")
+        addDependency("highestBlazeColor", "blazeSolver")
+        addDependency("nextBlazeColor", "showNextBlaze")
+        addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
+        addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
+        addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
+        addDependency("lividFinderType", "findCorrectLivid")
 
-        ::showGriffinCountdown dependsOn ::showGriffinBurrows
-        ::particleBurrows dependsOn ::showGriffinBurrows
+        listOf(
+            "showGriffinCountdown",
+            "particleBurrows",
+            "emptyBurrowColor",
+            "mobBurrowColor",
+            "treasureBurrowColor",
+            "burrowCastleFastTravel",
+            "burrowCryptsFastTravel",
+            "burrowDarkAuctionFastTravel",
+            "burrowHubFastTravel"
+        ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
 
-        ::emptyBurrowColor dependsOn ::showGriffinBurrows
-        ::mobBurrowColor dependsOn ::showGriffinBurrows
-        ::treasureBurrowColor dependsOn ::showGriffinBurrows
+        addDependency("activePetColor", "highlightActivePet")
+        addDependency("favoritePetColor", "highlightFavoritePets")
 
-        ::burrowCastleFastTravel dependsOn ::showGriffinBurrows
-        ::burrowCryptsFastTravel dependsOn ::showGriffinBurrows
-        ::burrowDarkAuctionFastTravel dependsOn ::showGriffinBurrows
-        ::burrowHubFastTravel dependsOn ::showGriffinBurrows
+        addDependency("showTankRadiusWall", "showTankRadius")
+        addDependency("tankRadiusDisplayColor", "showTankRadius")
+        addDependency("boxedTankColor", "boxedTanks")
+        addDependency("boxedProtectedTeammatesColor", "boxedProtectedTeammates")
 
-        ::activePetColor dependsOn ::highlightActivePet
-        ::favoritePetColor dependsOn ::highlightFavoritePets
+        addDependency("yangGlyphColor", "highlightYangGlyph")
+        addDependency("nukekebiHeadColor", "highlightNukekebiHeads")
 
-        ::showTankRadiusWall dependsOn ::showTankRadius
-        ::tankRadiusDisplayColor dependsOn ::showTankRadius
-        ::boxedTankColor dependsOn ::boxedTanks
-        ::boxedProtectedTeammatesColor dependsOn ::boxedProtectedTeammates
-
-        ::yangGlyphColor dependsOn ::highlightYangGlyph
-        ::nukekebiHeadColor dependsOn ::highlightNukekebiHeads
-
-        registerListener(::protectItemBINThreshold) {
-            val numeric = it.replace(Regex("[^0-9]"), "")
+        registerListener("protectItemBINThreshold") { threshold: String ->
+            val numeric = threshold.replace(Regex("[^0-9]"), "")
             protectItemBINThreshold = numeric.ifEmpty { "0" }
         }
 
-        // asbyth cool code
-        registerListener(::darkModeMist) { mc.renderGlobal.loadRenderers() }
-        registerListener(::recolorCarpets) { mc.renderGlobal.loadRenderers() }
+        registerListener("darkModeMist") { _: Nothing -> mc.renderGlobal.loadRenderers() }
+        registerListener("recolorCarpets") { _: Nothing -> mc.renderGlobal.loadRenderers() }
 
         this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
