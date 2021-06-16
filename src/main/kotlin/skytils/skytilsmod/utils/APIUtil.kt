@@ -30,13 +30,11 @@ import org.apache.http.HttpVersion
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HttpContext
+import org.apache.http.util.EntityUtils
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
-import skytils.skytilsmod.utils.Utils.readTextAndClose
-import java.io.IOException
-import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 
@@ -59,7 +57,7 @@ object APIUtil {
             val response: HttpResponse = client.execute(request)
             val entity = response.entity
             if (response.statusLine.statusCode == 200) {
-                return parser.parse(entity.content.readTextAndClose()).asJsonObject
+                return parser.parse(EntityUtils.toString(entity)).asJsonObject
             } else {
                 if (urlString.startsWithAny(
                         "https://api.ashcon.app/mojang/v2/user/",
@@ -80,7 +78,7 @@ object APIUtil {
             }
         } catch (ex: Throwable) {
             ex.printStackTrace()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "An error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
         } finally {
             client.close()
         }
@@ -95,12 +93,12 @@ object APIUtil {
             val response: HttpResponse = client.execute(request)
             val entity = response.entity
             if (response.statusLine.statusCode == 200) {
-                return parser.parse(entity.content.readTextAndClose()).asJsonArray
+                return parser.parse(EntityUtils.toString(entity)).asJsonArray
             } else {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest failed. HTTP Error Code: ${response.statusLine.statusCode}"))
+                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest to a resource failed. HTTP Error Code: ${response.statusLine.statusCode}"))
             }
         } catch (ex: Throwable) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
             ex.printStackTrace()
         } finally {
             client.close()

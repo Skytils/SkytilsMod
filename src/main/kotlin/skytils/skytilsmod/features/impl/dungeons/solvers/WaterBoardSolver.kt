@@ -38,7 +38,9 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
+import java.util.*
 import java.util.concurrent.Future
+import kotlin.collections.HashMap
 
 /**
  * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
@@ -230,11 +232,10 @@ class WaterBoardSolver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Skytils.config.waterBoardSolver) return
+        if (!Skytils.config.waterBoardSolver || !DungeonListener.missingPuzzles.contains("Water Board")) return
         if (chestPos == null || roomFacing == null || variant == -1) return
-        val leverStates = HashMap<LeverBlock, Boolean>()
-        for (lever in LeverBlock.values()) {
-            leverStates[lever] = getLeverToggleState(lever.leverPos)
+        val leverStates = LeverBlock.values().associateWithTo(EnumMap(LeverBlock::class.java)) {
+            getLeverToggleState(it.leverPos)
         }
         val renderTimes = HashMap<LeverBlock, Int>()
         var matching = 0
@@ -246,7 +247,7 @@ class WaterBoardSolver {
                     if (switched && !solution.contains(lever) || !switched && solution.contains(lever)) {
                         val pos = lever.leverPos
                         val displayed =
-                            renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> if (v == null) return@compute 0 else return@compute v.inc() }
+                            renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> v?.inc() ?: 0 }
                         RenderUtil.draw3DString(
                             Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
                             "§l" + color.name,

@@ -185,7 +185,7 @@ object SkytilsCommand : CommandBase() {
                     Skytils.sendMessageQueue.add("/warpforge")
                     CoroutineScope(Dispatchers.Default).launch {
                         delay(500)
-                        Skytils.sendMessageQueue.add("/warp hub")
+                        Skytils.sendMessageQueue.add("/warp ${args.getOrNull(1) ?: "hub"}")
                     }
                 }
             }
