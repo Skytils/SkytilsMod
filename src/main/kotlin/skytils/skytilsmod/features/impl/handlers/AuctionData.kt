@@ -44,8 +44,8 @@ class AuctionData {
                 }
                 "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
                     val enchants = extraAttr.getCompoundTag("enchantments")
-                    if (!enchants.hasNoTags()) {
-                        val enchant = enchants.keySet.iterator().next()
+                    val enchant = enchants.keySet.firstOrNull()
+                    if (enchant != null) {
                         id = "ENCHANTED_BOOK-" + enchant.uppercase() + "-" + enchants.getInteger(enchant)
                     }
                 }
@@ -55,6 +55,13 @@ class AuctionData {
                             "extended"
                         )
                     ) "-EXTENDED" else "") + if (extraAttr.hasKey("splash")) "-SPLASH" else ""
+                }
+                "RUNE" -> if (extraAttr.hasKey("runes")) {
+                    val runes = extraAttr.getCompoundTag("runes")
+                    val rune = runes.keySet.firstOrNull()
+                    if (rune != null) {
+                        id = "RUNE-" + rune.uppercase() + "-" + runes.getInteger(rune)
+                    }
                 }
             }
             return id
