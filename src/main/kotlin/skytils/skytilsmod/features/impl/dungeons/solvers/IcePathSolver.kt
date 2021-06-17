@@ -50,7 +50,7 @@ class IcePathSolver {
             if (DungeonListener.missingPuzzles.contains("Ice Path")) {
                 val silverfish = mc.theWorld.getEntities(
                     EntitySilverfish::class.java
-                ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceToEntity(s) < 20 }
+                ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceSqToEntity(s) < 20 * 20 }
                 if (silverfish.size > 0) {
                     Companion.silverfish = silverfish[0]
                     if (silverfishChestPos == null || roomFacing == null) {

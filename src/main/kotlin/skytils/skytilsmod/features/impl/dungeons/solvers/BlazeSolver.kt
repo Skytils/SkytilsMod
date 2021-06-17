@@ -51,7 +51,7 @@ class BlazeSolver {
                 Skytils.threadPool.submit {
                     val blazes = world.getEntities(
                         EntityBlaze::class.java
-                    ) { blaze: EntityBlaze? -> player.getDistanceToEntity(blaze) < 100 }
+                    ) { blaze: EntityBlaze? -> player.getDistanceSqToEntity(blaze) < 100 * 100 }
                     if (blazes.size > 10) {
                         println("More than 10 blazes, was there an update?")
                     } else if (blazes.size > 0) {

@@ -189,7 +189,7 @@ class PetFeatures {
                 val players = mc.theWorld.getPlayers<EntityPlayer>(
                     EntityOtherPlayerMP::class.java
                 ) { p: EntityPlayer? ->
-                    p!!.getDistanceToEntity(player) <= 10 && p.uniqueID.version() != 2 && p !== player && isInTablist(
+                    p!!.getDistanceSqToEntity(player) <= 10 * 10 && p.uniqueID.version() != 2 && p !== player && isInTablist(
                         p
                     )
                 }

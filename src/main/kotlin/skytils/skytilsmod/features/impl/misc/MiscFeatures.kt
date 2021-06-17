@@ -375,7 +375,7 @@ class MiscFeatures {
                 val players = mc.theWorld.getPlayers<EntityPlayer>(
                     EntityOtherPlayerMP::class.java
                 ) { p: EntityPlayer? ->
-                    p!!.getDistanceToEntity(player) <= 30 && p.uniqueID.version() != 2 && p !== player && isInTablist(
+                    p!!.getDistanceSqToEntity(player) <= 30 * 30 && p.uniqueID.version() != 2 && p !== player && isInTablist(
                         p
                     )
                 }
