@@ -40,7 +40,6 @@ import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.util.*
 import java.util.concurrent.Future
-import kotlin.collections.HashMap
 
 /**
  * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team

@@ -39,6 +39,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
@@ -56,6 +57,7 @@ import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -72,6 +74,19 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 
 class MiscFeatures {
+
+    private var lastGLeaveCommand = 0L
+
+    @SubscribeEvent
+    fun onSendChatMessage(event: SendChatMessageEvent) {
+        if (!event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
+        if (System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
+            event.isCanceled = true
+            lastGLeaveCommand = System.currentTimeMillis()
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!"))
+        }
+    }
+
     @SubscribeEvent
     fun onBossBarSet(event: BossBarEvent.Set) {
         val displayData = event.displayData
