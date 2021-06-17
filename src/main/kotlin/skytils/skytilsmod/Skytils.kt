@@ -41,7 +41,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.commands.*
-import skytils.skytilsmod.commands.stats.impl.CataCommand
+import skytils.skytilsmod.commands.stats.impl.*
 import skytils.skytilsmod.core.*
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
@@ -245,6 +245,7 @@ class Skytils {
             cch.registerCommand(SkytilsCommand)
 
             cch.registerCommand(CataCommand)
+            cch.registerCommand(SlayerCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)

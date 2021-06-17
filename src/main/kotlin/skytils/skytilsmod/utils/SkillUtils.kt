@@ -18,21 +18,34 @@
 
 package skytils.skytilsmod.utils
 
+import gg.essential.elementa.utils.withIndex
+
 object SkillUtils {
     val dungeoneeringXp = LinkedHashMap<Int, Long>()
+    val slayerXp = LinkedHashMap<String, LinkedHashMap<Int, Long>>()
 
-    fun calcDungeonsClassLevelWithProgress(experience: Double): Double {
+    fun calcXpWithProgress(experience: Double, values: Collection<Long>): Double {
         var xp = experience
         var level = 0.0
 
-        for (toRemove in dungeoneeringXp.values) {
-            xp -= toRemove.toDouble()
+        for (toRemove in values) {
+            xp -= toRemove
             if (xp < 0) {
                 return level + (1 - (xp * -1) / toRemove)
             }
             level++
         }
 
-        return level.coerceAtMost(50.0)
+        return level
+    }
+
+    fun findNextLevel(experience: Double, values: Map<Int, Long>?): Int {
+        if (values == null) return -1
+        values.onEach { entry ->
+            if (experience < entry.value) {
+                return@findNextLevel entry.key - 1
+            }
+        }
+        return values.size
     }
 }

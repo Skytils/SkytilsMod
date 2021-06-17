@@ -52,17 +52,34 @@ object CataCommand : StatCommand() {
             return
         }
 
-        val cataLevel = SkillUtils.calcDungeonsClassLevelWithProgress(cataData["experience"].asDouble)
+        val cataLevel =
+            SkillUtils.calcXpWithProgress(cataData["experience"].asDouble, SkillUtils.dungeoneeringXp.values)
+                .coerceAtMost(50.0)
         val archLevel =
-            SkillUtils.calcDungeonsClassLevelWithProgress(dungeonsData["player_classes"].asJsonObject["archer"].asJsonObject["experience"].asDouble)
+            SkillUtils.calcXpWithProgress(
+                dungeonsData["player_classes"].asJsonObject["archer"].asJsonObject["experience"].asDouble,
+                SkillUtils.dungeoneeringXp.values
+            ).coerceAtMost(50.0)
         val bersLevel =
-            SkillUtils.calcDungeonsClassLevelWithProgress(dungeonsData["player_classes"].asJsonObject["berserk"].asJsonObject["experience"].asDouble)
+            SkillUtils.calcXpWithProgress(
+                dungeonsData["player_classes"].asJsonObject["berserk"].asJsonObject["experience"].asDouble,
+                SkillUtils.dungeoneeringXp.values
+            ).coerceAtMost(50.0)
         val healerLevel =
-            SkillUtils.calcDungeonsClassLevelWithProgress(dungeonsData["player_classes"].asJsonObject["healer"].asJsonObject["experience"].asDouble)
+            SkillUtils.calcXpWithProgress(
+                dungeonsData["player_classes"].asJsonObject["healer"].asJsonObject["experience"].asDouble,
+                SkillUtils.dungeoneeringXp.values
+            ).coerceAtMost(50.0)
         val mageLevel =
-            SkillUtils.calcDungeonsClassLevelWithProgress(dungeonsData["player_classes"].asJsonObject["mage"].asJsonObject["experience"].asDouble)
+            SkillUtils.calcXpWithProgress(
+                dungeonsData["player_classes"].asJsonObject["mage"].asJsonObject["experience"].asDouble,
+                SkillUtils.dungeoneeringXp.values
+            ).coerceAtMost(50.0)
         val tankLevel =
-            SkillUtils.calcDungeonsClassLevelWithProgress(dungeonsData["player_classes"].asJsonObject["tank"].asJsonObject["experience"].asDouble)
+            SkillUtils.calcXpWithProgress(
+                dungeonsData["player_classes"].asJsonObject["tank"].asJsonObject["experience"].asDouble,
+                SkillUtils.dungeoneeringXp.values
+            ).coerceAtMost(50.0)
 
         val secrets =
             playerResponse["player"].asJsonObject["achievements"].asJsonObject["skyblock_treasure_hunter"].asInt
