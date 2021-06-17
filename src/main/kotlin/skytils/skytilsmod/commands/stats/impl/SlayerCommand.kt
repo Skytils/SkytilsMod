@@ -23,7 +23,6 @@ import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
-import kotlin.math.roundToInt
 
 
 object SlayerCommand : StatCommand() {
@@ -43,17 +42,15 @@ object SlayerCommand : StatCommand() {
             }.getOrDefault(0.0)
         }
 
-        val component = ChatComponentText("§a➜ Slayer Statistics Viewer\n")
-            .appendText("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
-            .appendText("§a§l➜ Slayer Levels:\n")
-            .appendText(xpMap.map { (slayer, xp) ->
-                "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
-                    SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
-                }:§e ${NumberUtil.nf.format(xp)} XP"
-            }.joinToString(separator = "\n"))
-
-
-        printMessage(component)
-
+        printMessage(
+            ChatComponentText("§a➜ Slayer Statistics Viewer\n")
+                .appendText("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
+                .appendText("§a§l➜ Slayer Levels:\n")
+                .appendText(xpMap.map { (slayer, xp) ->
+                    "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
+                        SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
+                    }:§e ${NumberUtil.nf.format(xp)} XP"
+                }.joinToString(separator = "\n"))
+        )
     }
 }

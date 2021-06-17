@@ -50,6 +50,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
@@ -166,16 +167,18 @@ class MiscFeatures {
     fun onJoin(event: EntityJoinWorldEvent) {
         if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return
         if (event.entity is EntityArmorStand) {
-            val entity = event.entity as EntityArmorStand
-            val headSlot = entity.getCurrentArmor(3)
-            if (Skytils.config.trickOrTreatChestAlert && headSlot != null && headSlot.item === Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(
-                    mc.thePlayer
-                ) < 10 * 10
-            ) {
-                if (headSlot.tagCompound.getCompoundTag("SkullOwner")
-                        .getString("Id") == "f955b4ac-0c41-3e45-8703-016c46a8028e"
+            TickTask(5) {
+                val entity = event.entity as EntityArmorStand
+                val headSlot = entity.getCurrentArmor(3)
+                if (Skytils.config.trickOrTreatChestAlert && headSlot != null && headSlot.item === Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(
+                        mc.thePlayer
+                    ) < 10 * 10
                 ) {
-                    createTitle("§cTrick or Treat!", 60)
+                    if (headSlot.tagCompound.getCompoundTag("SkullOwner")
+                            .getString("Id") == "f955b4ac-0c41-3e45-8703-016c46a8028e"
+                    ) {
+                        createTitle("§cTrick or Treat!", 60)
+                    }
                 }
             }
         }
