@@ -72,7 +72,7 @@ class ChestProfit {
                         }
                         chestType.value = 0.0
                         chestType.items.clear()
-                        for (i in 11..15) {
+                        for (i in 9..17) {
                             val lootSlot = inv.getStackInSlot(i)
                             val identifier = AuctionData.getIdentifier(lootSlot)
                             if (identifier != null) {
