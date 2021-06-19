@@ -57,6 +57,9 @@ object Utils {
     var inDungeons = false
 
     @JvmField
+    var isOnHypixel = false
+
+    @JvmField
     var shouldBypassVolume = false
 
     @JvmField
@@ -68,24 +71,24 @@ object Utils {
     @JvmStatic
     var random = Random()
 
-    @JvmStatic
-    val isOnHypixel: Boolean
-        get() {
+
+    fun checkForHypixel() {
+        isOnHypixel = run {
             try {
                 if (mc.theWorld != null && !mc.isSingleplayer) {
                     if (mc.thePlayer != null && mc.thePlayer.clientBrand != null) {
-                        if (mc.thePlayer.clientBrand.lowercase().contains("hypixel")) return true
+                        if (mc.thePlayer.clientBrand.lowercase().contains("hypixel")) return@run true
                     }
-                    if (mc.currentServerData != null) return mc.currentServerData.serverIP.lowercase()
+                    if (mc.currentServerData != null) return@run mc.currentServerData.serverIP.lowercase()
                         .contains("hypixel")
                 }
-                return false
+                return@run false
             } catch (e: Exception) {
                 e.printStackTrace()
-                return false
+                return@run false
             }
         }
-
+    }
     /**
      * Taken from Danker's Skyblock Mod under GPL 3.0 license
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
@@ -138,12 +141,7 @@ object Utils {
         if (mc!!.isSingleplayer) {
             return true
         }
-        for (pi in mc.netHandler.playerInfoMap) {
-            if (pi.gameProfile.name.equals(player.name, ignoreCase = true)) {
-                return true
-            }
-        }
-        return false
+        return mc.netHandler.playerInfoMap.any { it.gameProfile.name.equals(player.name, ignoreCase = true) }
     }
 
     /**

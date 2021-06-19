@@ -24,12 +24,12 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(GuiContainer.class)
 public interface AccessorGuiContainer {
-    @Accessor("xSize")
+    @Accessor
     int getXSize();
-    @Accessor("ySize")
+    @Accessor
     int getYSize();
-    @Accessor("guiLeft")
+    @Accessor
     int getGuiLeft();
-    @Accessor("guiTop")
+    @Accessor
     int getGuiTop();
 }

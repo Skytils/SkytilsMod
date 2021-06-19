@@ -31,7 +31,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.gui.components.SimpleButton
 
-class RequestUpdateGui : WindowScreen() {
+class RequestUpdateGui : WindowScreen(newGuiScale = 2) {
 
     init {
         UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")

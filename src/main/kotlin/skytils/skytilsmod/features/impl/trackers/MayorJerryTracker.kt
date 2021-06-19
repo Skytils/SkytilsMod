@@ -159,6 +159,7 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 var drawnLines = 0
                 for (jerry in HiddenJerry.values()) {
+                    if (jerry.discoveredTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "§${jerry.colorCode}${jerry.type}§f: ${jerry.discoveredTimes}",
                         if (leftAlign) 0f else width.toFloat(),
@@ -170,6 +171,7 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
                     drawnLines++
                 }
                 for (drop in JerryBoxDrops.values()) {
+                    if (drop.droppedAmount == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "§${drop.colorCode}${drop.dropName}§f: ${drop.droppedAmount}",
                         if (leftAlign) 0f else width.toFloat(),

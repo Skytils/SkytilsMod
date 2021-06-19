@@ -28,10 +28,10 @@ import java.util.Set;
 
 @Mixin(CommandHandler.class)
 public interface AccessorCommandHandler {
-    @Accessor("commandSet")
+    @Accessor
     Set<ICommand> getCommandSet();
 
-    @Accessor("commandMap")
+    @Accessor
     Map<String, ICommand> getCommandMap();
 
 }

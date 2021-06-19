@@ -195,7 +195,7 @@ class ChatListener {
         }
     }
 
-    fun tryRemoveLineAtIndex(index: Int) {
+    private fun tryRemoveLineAtIndex(index: Int) {
         val lines = (mc.ingameGUI.chatGUI as AccessorGuiNewChat).drawnChatLines
         if (lines.size > index) {
             lines.removeAt(index)

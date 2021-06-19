@@ -256,41 +256,37 @@ object ScoreCalculation {
                         ?: "") == "Paul"
                 for (pi in TabListUtils.tabEntries) {
                     try {
-                        val name = pi.getText()
-                        if (name.contains("Deaths:")) {
-                            val matcher = deathsTabPattern.matcher(name)
-                            if (matcher.find()) {
-                                deaths = matcher.group("deaths").toInt()
-                                continue
+                        val name = pi.text
+                        when {
+                            name.contains("Deaths:") -> {
+                                val matcher = deathsTabPattern.matcher(name)
+                                if (matcher.find()) {
+                                    deaths = matcher.group("deaths").toInt()
+                                }
                             }
-                        }
-                        if (name.contains("✦")) {
-                            val matcher = missingPuzzlePattern.matcher(name)
-                            if (matcher.find()) {
-                                missingPuzzles++
-                                continue
+                            name.contains("✦") -> {
+                                val matcher = missingPuzzlePattern.matcher(name)
+                                if (matcher.find()) {
+                                    missingPuzzles++
+                                }
                             }
-                        }
-                        if (name.contains("✖")) {
-                            val matcher = failedPuzzlePattern.matcher(name)
-                            if (matcher.find()) {
-                                failedPuzzles++
-                                continue
+                            name.contains("✖") -> {
+                                val matcher = failedPuzzlePattern.matcher(name)
+                                if (matcher.find()) {
+                                    failedPuzzles++
+                                }
                             }
-                            continue
-                        }
-                        if (name.contains("Secrets Found:")) {
-                            val matcher = secretsFoundPattern.matcher(name)
-                            if (matcher.find()) {
-                                foundSecrets = matcher.group("secrets").toInt()
-                                continue
+                            name.contains("Secrets Found:") -> {
+                                val matcher = secretsFoundPattern.matcher(name)
+                                if (matcher.find()) {
+                                    foundSecrets = matcher.group("secrets").toInt()
+                                }
                             }
-                        }
-                        if (name.contains("Crypts:")) {
-                            val matcher = cryptsPattern.matcher(name)
-                            if (matcher.find()) {
-                                crypts = matcher.group("crypts").toInt()
-                                continue
+                            name.contains("Crypts:") -> {
+                                val matcher = cryptsPattern.matcher(name)
+                                if (matcher.find()) {
+                                    crypts = matcher.group("crypts").toInt()
+                                }
                             }
                         }
                     } catch (ignored: NumberFormatException) {

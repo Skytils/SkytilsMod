@@ -39,9 +39,7 @@ class KeyShortcutsGui : GuiScreen() {
         id = 0
         keyShortcutsList = KeyShortcutsList(mc, width, height - 80, 20, height - 60, 0, 25, width, height)
         buttonList.clear()
-        for ((key, value) in KeyShortcuts.shortcuts) {
-            addShortcut(key, value)
-        }
+        KeyShortcuts.shortcuts.onEach { addShortcut(it.key, it.value) }
         buttonList.add(CleanButton(9000, width / 2 - 220, height - 40, "Save & Exit"))
         buttonList.add(CleanButton(9001, width / 2 + 20, height - 40, "Add Shortcut"))
     }

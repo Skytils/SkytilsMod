@@ -25,6 +25,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(EnumDyeColor.class)
 public interface AccessorEnumDyeColor {
-    @Accessor("chatColor")
+    @Accessor
     EnumChatFormatting getChatColor();
 }

@@ -25,6 +25,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Minecraft.class)
 public interface AccessorMinecraft {
-    @Accessor("timer")
+    @Accessor
     Timer getTimer();
 }

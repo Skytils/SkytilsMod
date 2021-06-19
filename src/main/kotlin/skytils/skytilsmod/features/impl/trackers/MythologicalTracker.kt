@@ -33,6 +33,7 @@ import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -279,49 +280,43 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
+            if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-                val player = Minecraft.getMinecraft().thePlayer
-
-                for (i in 0..7) {
-                    val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
-                    if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        ScreenRenderer.fontRenderer.drawString(
-                            "Burrows Dug§f: $burrowsDug",
-                            if (leftAlign) 0f else width.toFloat(),
-                            0f,
-                            CommonColors.YELLOW,
-                            alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
-                        var drawnLines = 1
-                        for (mob in BurrowMob.values()) {
-                            ScreenRenderer.fontRenderer.drawString(
-                                "${mob.mobName}§f: ${mob.dugTimes}",
-                                if (leftAlign) 0f else width.toFloat(),
-                                (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                                CommonColors.CYAN,
-                                alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
-                            )
-                            drawnLines++
-                        }
-                        for (item in BurrowDrop.values()) {
-                            ScreenRenderer.fontRenderer.drawString(
-                                "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
-                                if (leftAlign) 0f else width.toFloat(),
-                                (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                                CommonColors.CYAN,
-                                alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
-                            )
-                            drawnLines++
-                        }
-                        break
-                    }
+                ScreenRenderer.fontRenderer.drawString(
+                    "Burrows Dug§f: $burrowsDug",
+                    if (leftAlign) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.YELLOW,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+                var drawnLines = 1
+                for (mob in BurrowMob.values()) {
+                    if (mob.dugTimes == 0L) continue
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${mob.mobName}§f: ${mob.dugTimes}",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.CYAN,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
+                }
+                for (item in BurrowDrop.values()) {
+                    if (item.droppedTimes == 0L) continue
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.CYAN,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    drawnLines++
                 }
             }
         }

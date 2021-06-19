@@ -75,7 +75,7 @@ object MayorInfo {
             if (System.currentTimeMillis() - lastCheckedElectionOver > 60 * 60 * 1000) {
                 var elected = currentMayor
                 for (pi in TabListUtils.tabEntries) {
-                    val name = pi.getText()
+                    val name = pi.text
                     if (name.startsWith("§r §r§fWinner: §r§a")) {
                         elected = name.substring(19, name.length - 2)
                         break

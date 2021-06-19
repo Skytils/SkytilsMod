@@ -41,7 +41,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.commands.*
-import skytils.skytilsmod.commands.stats.impl.*
+import skytils.skytilsmod.commands.stats.impl.CataCommand
+import skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import skytils.skytilsmod.core.*
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
@@ -294,6 +295,7 @@ class Skytils {
 
         if (ticks % 20 == 0) {
             if (mc.thePlayer != null) {
+                Utils.checkForHypixel()
                 Utils.checkForSkyblock()
                 Utils.checkForDungeons()
             }

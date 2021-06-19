@@ -41,14 +41,9 @@ class SelectAllColorSolver {
             val invSlots = (mc.currentScreen as GuiChest).inventorySlots.inventorySlots
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
             if (chestName.startsWith("Select all the")) {
-                var promptColor: String? = null
-                for (color in EnumDyeColor.values()) {
-                    val unlocalized = color.getName().replace("_".toRegex(), " ").uppercase()
-                    if (chestName.contains(unlocalized)) {
-                        promptColor = color.unlocalizedName
-                        break
-                    }
-                }
+                val promptColor = EnumDyeColor.values().find {
+                    chestName.contains(it.getName().replace("_", " ").uppercase())
+                }?.unlocalizedName
                 if (promptColor != colorNeeded) {
                     colorNeeded = promptColor
                     shouldClick.clear()

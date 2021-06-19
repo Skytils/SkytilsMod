@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.misc.damagesplash
 
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.util.regex.Pattern
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -26,6 +25,7 @@ import java.util.regex.Pattern
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
+@Suppress("unused")
 enum class Damage(val symbol: String, val color: CommonColors) {
     CRITICAL("✧", CommonColors.CRITICAL),
     PET("♞", CommonColors.MAGENTA),
@@ -39,10 +39,7 @@ enum class Damage(val symbol: String, val color: CommonColors) {
 
     companion object {
         fun fromSymbol(symbol: String): Damage? {
-            for (type in values()) {
-                if (type.symbol == symbol) return type
-            }
-            return null
+            return values().find { it.symbol == symbol }
         }
     }
 }

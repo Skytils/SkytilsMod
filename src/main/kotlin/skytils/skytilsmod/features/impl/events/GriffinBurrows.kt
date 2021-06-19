@@ -44,6 +44,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
+import java.util.concurrent.Future
 import kotlin.math.roundToInt
 
 class GriffinBurrows {
@@ -55,9 +56,12 @@ class GriffinBurrows {
         var lastDugParticleBurrow: BlockPos? = null
         var burrowRefreshTimer = StopWatch()
         var shouldRefreshBurrows = false
+
+        var hasSpadeInHotbar = false
+
         private val mc = Minecraft.getMinecraft()
-        fun refreshBurrows() {
-            Skytils.threadPool.submit {
+        fun refreshBurrows(): Future<*> {
+            return Skytils.threadPool.submit {
                 println("Finding burrows")
                 val uuid = mc.thePlayer.gameProfile.id.toString().replace("[\\-]".toRegex(), "")
                 val apiKey = Skytils.config.apiKey
@@ -120,18 +124,19 @@ class GriffinBurrows {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val player = mc.thePlayer
-        if (!Skytils.config.showGriffinBurrows || event.phase != TickEvent.Phase.START || !Utils.inSkyblock || player == null || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
+        if (event.phase != TickEvent.Phase.START) return
+        hasSpadeInHotbar = player != null && Utils.inSkyblock && (0..7).any {
+            val hotbarItem = player.inventory.getStackInSlot(it) ?: return@any false
+            return@any ItemUtil.getDisplayName(hotbarItem).contains("Ancestral Spade")
+        }
+        if (!Utils.inSkyblock || player == null || !Skytils.config.showGriffinBurrows || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
         if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
-            for (i in 0..7) {
-                val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
-                if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
-                    refreshBurrows()
-                    break
-                }
+            if (hasSpadeInHotbar) {
+                player.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Looking for burrows..."))
+                refreshBurrows()
             }
         }
     }
@@ -169,7 +174,7 @@ class GriffinBurrows {
         val item = mc.thePlayer.heldItem
         if (Utils.inSkyblock) {
             if (Skytils.config.showGriffinBurrows && item != null) {
-                if (item.displayName.contains("Ancestral Spade") && blockState.block === Blocks.grass) {
+                if (ItemUtil.getDisplayName(item).contains("Ancestral Spade") && blockState.block === Blocks.grass) {
                     if (burrows.any { burrow: Burrow -> burrow.blockPos == event.pos }) {
                         lastDugBurrow = event.pos
                     }
@@ -189,7 +194,7 @@ class GriffinBurrows {
         val item = mc.thePlayer.heldItem
         if (Utils.inSkyblock) {
             if (Skytils.config.showGriffinBurrows && item != null) {
-                if (item.displayName.contains("Ancestral Spade") && blockState.block === Blocks.grass) {
+                if (ItemUtil.getDisplayName(item).contains("Ancestral Spade") && blockState.block === Blocks.grass) {
                     if (burrows.any { burrow: Burrow -> burrow.blockPos == event.pos }) {
                         lastDugBurrow = event.pos
                     }
@@ -232,25 +237,19 @@ class GriffinBurrows {
         override fun render() {
             if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
             val player = mc.thePlayer
-            if (toggled && Utils.inSkyblock && player != null) {
-                for (i in 0..7) {
-                    val hotbarItem = player.inventory.getStackInSlot(i) ?: continue
-                    if (hotbarItem.displayName.contains("Ancestral Spade")) {
-                        val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
-                        val sr = ScaledResolution(Minecraft.getMinecraft())
-                        val leftAlign = actualX < sr.scaledWidth / 2f
-                        val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                        ScreenRenderer.fontRenderer.drawString(
-                            "Time until refresh: " + diff + "s",
-                            if (leftAlign) 0f else actualWidth,
-                            0f,
-                            CommonColors.WHITE,
-                            alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
-                        break
-                    }
-                }
+            if (toggled && Utils.inSkyblock && player != null && hasSpadeInHotbar) {
+                val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
+                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    "Time until refresh: " + diff + "s",
+                    if (leftAlign) 0f else actualWidth,
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
             }
         }
 
@@ -311,7 +310,8 @@ class GriffinBurrows {
                             if (existingBurrow.blockPos.distanceSq(x, y, z) < 4) return@checkThreadAndQueue
                         }
                         var burrow = particleBurrows.find { b: ParticleBurrow -> b.blockPos == pos }
-                        if (burrow == null) burrow = ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+                        if (burrow == null) burrow =
+                            ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
                         if (!particleBurrows.contains(burrow)) particleBurrows.add(burrow)
                         if (!burrow.hasFootstep && footstepFilter) {
                             burrow.hasFootstep = true

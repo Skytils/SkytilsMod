@@ -34,12 +34,13 @@ import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.SkillUtils
+import java.util.concurrent.Future
 import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
-    private fun loadData() {
+    private fun loadData(): Future<*> {
         val dataUrl: String = Skytils.config.dataURL
-        Skytils.threadPool.submit {
+        return Skytils.threadPool.submit {
             val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
             for ((key, value) in fetchurData.entrySet()) {
                 MiningFeatures.fetchurItems[key] = value.asString

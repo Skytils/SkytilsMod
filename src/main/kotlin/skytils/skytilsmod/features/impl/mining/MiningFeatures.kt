@@ -206,9 +206,9 @@ class MiningFeatures {
             val x = puzzlerSolution!!.x - viewerX
             val y = puzzlerSolution!!.y - viewerY
             val z = puzzlerSolution!!.z - viewerZ
-            GlStateManager.enableCull()
-            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), Color(255, 0, 0, 200), 1f)
             GlStateManager.disableCull()
+            RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), Color(255, 0, 0, 200), 1f)
+            GlStateManager.enableCull()
         }
         if (Skytils.config.raffleWaypoint && inRaffle && raffleBox != null) {
             GlStateManager.disableDepth()

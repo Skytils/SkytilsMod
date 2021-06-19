@@ -29,8 +29,8 @@ import skytils.skytilsmod.core.EntityManager.tickEntities
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
 /**
@@ -59,16 +59,15 @@ class DamageSplash {
             e.entity.worldObj.removeEntity(e.entity)
             if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
             val name = entity.customNameTag
-            val damage =
-                if (name.startsWith("§0"))
-                    damageMatcher.group(1) + "☠"
-                else if (name.startsWith("§f") && !name.contains("§e"))
-                    damageMatcher.group(1) + "❂"
-                else if (name.startsWith("§6") && !name.contains("§e"))
-                    damageMatcher.group(1) + "火"
-                else if (name.startsWith("§3"))
-                    damageMatcher.group(1) + "水"
-                else damageMatcher.group(1)
+            val damage = damageMatcher.group(1).run {
+                when {
+                    name.startsWith("§0") -> "${this}☠"
+                    name.startsWith("§f") && !name.contains("§e") -> "${this}❂"
+                    name.startsWith("§6") && !name.contains("§e") -> "${this}火"
+                    name.startsWith("§3") -> "${this}水"
+                    else -> this
+                }
+            }
             spawnEntity(
                 DamageSplashEntity(
                     damage,
