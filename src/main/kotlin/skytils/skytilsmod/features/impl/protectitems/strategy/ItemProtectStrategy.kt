@@ -25,27 +25,17 @@ import skytils.skytilsmod.features.impl.protectitems.strategy.impl.StarredItemSt
 
 abstract class ItemProtectStrategy {
     abstract fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean
-    abstract fun toggled(): Boolean
+    abstract val isToggled: Boolean
 
     companion object {
         private val STRATEGIES = HashSet<ItemProtectStrategy>()
 
         fun isAnyToggled(): Boolean {
-            for (strategy in STRATEGIES) {
-                if (strategy.toggled()) {
-                    return true
-                }
-            }
-            return false
+            return STRATEGIES.any { it.isToggled }
         }
 
         fun isAnyWorth(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
-            for (strategy in STRATEGIES) {
-                if (strategy.toggled() && strategy.worthProtecting(item, extraAttr, type)) {
-                    return true
-                }
-            }
-            return false
+            return STRATEGIES.any { it.isToggled && it.worthProtecting(item, extraAttr, type) }
         }
 
         init {
