@@ -605,19 +605,25 @@ class SlayerFeatures {
                     if (armors.isNotEmpty()) {
                         val leftAlign = actualX < ScaledResolution(SlayerFeatures.mc).scaledWidth / 2f
                         if (!leftAlign) {
-                            val longest = armors.maxByOrNull { it.second.length } ?: null to ""
-                            GlStateManager.translate(
-                                (-fontRenderer.getStringWidth(longest.second)).toDouble(), 0.0,
-                                0.0
-                            )
-                        }
-                        armors.forEachIndexed { index, pair ->
-                            RenderUtil.renderItem(pair.first, 0, index * 16)
-                            fontRenderer.drawString(
-                                pair.second,
-                                18f,
-                                index * 16 + 4.5f
-                            )
+                            val longest = fontRenderer.getStringWidth((armors.maxByOrNull { it.second.length }
+                                ?: null to "").second)
+                            armors.forEachIndexed { index, pair ->
+                                RenderUtil.renderItem(pair.first, longest + 2, index * 16)
+                                fontRenderer.drawString(
+                                    pair.second,
+                                    longest - fontRenderer.getStringWidth(pair.second).toFloat(),
+                                    index * 16 + 4.5f
+                                )
+                            }
+                        } else {
+                            armors.forEachIndexed { index, pair ->
+                                RenderUtil.renderItem(pair.first, 0, index * 16)
+                                fontRenderer.drawString(
+                                    pair.second,
+                                    18f,
+                                    index * 16 + 4.5f
+                                )
+                            }
                         }
                     }
                 }
@@ -627,18 +633,25 @@ class SlayerFeatures {
         override fun demoRender() {
             val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
             val text = "§e99.9% §b(§f199§b)"
-            if (!leftAlign) {
-                GlStateManager.translate(
-                    (-ScreenRenderer.fontRenderer.getStringWidth(text)).toDouble(), 0.0,
-                    0.0
+            if (leftAlign) {
+                RenderUtil.renderItem(ItemStack(Items.leather_chestplate), 0, 0)
+                ScreenRenderer.fontRenderer.drawString(
+                    text,
+                    18f,
+                    4.5f
+                )
+            } else {
+                ScreenRenderer.fontRenderer.drawString(
+                    text,
+                    0f,
+                    4.5f
+                )
+                RenderUtil.renderItem(
+                    ItemStack(Items.leather_chestplate),
+                    ScreenRenderer.fontRenderer.getStringWidth(text) + 2,
+                    0
                 )
             }
-            RenderUtil.renderItem(ItemStack(Items.leather_chestplate), 0, 0)
-            ScreenRenderer.fontRenderer.drawString(
-                text,
-                18f,
-                4.5f
-            )
         }
 
         override val height: Int

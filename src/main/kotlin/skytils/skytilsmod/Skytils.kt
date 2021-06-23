@@ -130,7 +130,7 @@ class Skytils {
 
         @JvmField
         var displayScreen: GuiScreen? = null
-        
+
         @JvmField
         val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
     }

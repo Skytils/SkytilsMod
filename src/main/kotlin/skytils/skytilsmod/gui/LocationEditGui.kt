@@ -40,12 +40,9 @@ open class LocationEditGui : GuiScreen() {
     private var dragging: GuiElement? = null
     private val locationButtons: MutableMap<GuiElement?, LocationButton> = HashMap()
     private var scaleCache = 0f
-    override fun doesGuiPauseGame(): Boolean {
-        return false
-    }
+    override fun doesGuiPauseGame() = false
 
     override fun initGui() {
-        super.initGui()
         for ((_, value) in Skytils.guiManager.elements) {
             val lb = LocationButton(value)
             buttonList.add(lb)
