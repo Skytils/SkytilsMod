@@ -78,6 +78,6 @@ class DamageSplash {
     }
 
     companion object {
-        private val damagePattern = Pattern.compile("✧*(\\d+✧?❤?♞?☄?✷?)")
+        private val damagePattern = Pattern.compile("✧*(\\d+[⚔+✧❤♞☄✷]*)")
     }
 }

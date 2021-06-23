@@ -41,6 +41,8 @@ class DamageSplashEntity(private var damage: String, currentLocation: Location) 
     private var scale = 1f
     private var color: CustomColor? = null
     private var love = false
+    private var extremeFocus = false
+    private var octodexterity = false
     override val name: String
         get() = "EntityDamageSplash"
 
@@ -96,13 +98,27 @@ class DamageSplashEntity(private var damage: String, currentLocation: Location) 
                 love = true
                 symbol = symbol.replace("❤", "")
             }
+            if (symbol.contains("⚔")) {
+                extremeFocus = true
+                symbol = symbol.replace("⚔", "")
+            }
+            if (symbol.contains("+")) {
+                octodexterity = true
+                symbol = symbol.replace("+", "")
+            }
             color = Damage.fromSymbol(symbol)?.color
         }
-        displayText = format(damage.toLong())
-        if (love) {
-            displayText += '❤'
-        }
+        displayText = "${format(damage.toLong())}${exportStringIfTrue(love, "❤")}${
+            exportStringIfTrue(
+                extremeFocus,
+                "⚔"
+            )
+        }${exportStringIfTrue(octodexterity, "+")}"
         val uuid = UUID(random.nextLong(), random.nextLong())
         if (added.containsValue(uuid)) remove() else added[displayText] = uuid
     }
+}
+
+private fun exportStringIfTrue(bool: Boolean, str: String): String {
+    return if (bool) str else ""
 }
