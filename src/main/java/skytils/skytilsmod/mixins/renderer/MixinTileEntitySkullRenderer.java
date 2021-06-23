@@ -102,7 +102,8 @@ public abstract class MixinTileEntitySkullRenderer extends TileEntitySpecialRend
         GlStateManager.enableLighting();
         GlStateManager.depthMask(true);
         GlStateManager.depthFunc(515);
-        GlStateManager.disableBlend();
+        //GlStateManager.disableBlend();
+        GlStateManager.blendFunc(770, 771);
     }
 
 }
