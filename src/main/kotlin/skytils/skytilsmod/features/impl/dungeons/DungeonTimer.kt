@@ -52,9 +52,9 @@ class DungeonTimer {
             (message.endsWith("§r§ehas obtained §r§8Wither Key§r§e!§r") || message == "§r§eA §r§8Wither Key§r§e was picked up!§r") -> {
                 witherDoors++
             }
-            (bloodOpenTime == -1L && message == "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r" || message.startsWith(
+            (bloodOpenTime == -1L && (message == "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r" || message.startsWith(
                 "§r§c[BOSS] The Watcher§r§f"
-            )) -> {
+            ))) -> {
                 bloodOpenTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(
                     ChatComponentText(

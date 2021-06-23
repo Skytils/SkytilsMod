@@ -184,7 +184,7 @@ object SkytilsCommand : CommandBase() {
                 if (Utils.inSkyblock) {
                     Skytils.sendMessageQueue.add("/warpforge")
                     CoroutineScope(Dispatchers.Default).launch {
-                        delay(500)
+                        delay(2000)
                         Skytils.sendMessageQueue.add("/warp ${args.getOrNull(1) ?: "hub"}")
                     }
                 }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.features.impl.trackers
+package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft

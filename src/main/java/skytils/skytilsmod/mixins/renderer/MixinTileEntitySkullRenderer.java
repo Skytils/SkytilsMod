@@ -35,13 +35,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
-import skytils.skytilsmod.mixins.renderer.MixinLayerArmorBase;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.RenderUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
+import static skytils.skytilsmod.Skytils.getMc;
 
-import static skytils.skytilsmod.Skytils.mc;
 
 @Mixin(TileEntitySkullRenderer.class)
 public abstract class MixinTileEntitySkullRenderer extends TileEntitySpecialRenderer<TileEntitySkull> {
@@ -71,7 +70,7 @@ public abstract class MixinTileEntitySkullRenderer extends TileEntitySpecialRend
     private void renderGlint(EntityLivingBase entity, ModelBase model, float rotation, CustomColor color) {
         float partialTicks = RenderUtil.INSTANCE.getPartialTicks();
         float f = (float)entity.ticksExisted + partialTicks;
-        mc.getTextureManager().bindTexture(ENCHANTED_ITEM_GLINT_RES);
+        getMc().getTextureManager().bindTexture(ENCHANTED_ITEM_GLINT_RES);
         GlStateManager.enableBlend();
         GlStateManager.depthFunc(514);
         GlStateManager.depthMask(false);

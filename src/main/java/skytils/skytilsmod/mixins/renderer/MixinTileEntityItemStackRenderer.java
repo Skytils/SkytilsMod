@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
-import static skytils.skytilsmod.Skytils.mc;
+import static skytils.skytilsmod.Skytils.getMc;
 
 @Mixin(TileEntityItemStackRenderer.class)
 public abstract class MixinTileEntityItemStackRenderer {
@@ -35,7 +35,7 @@ public abstract class MixinTileEntityItemStackRenderer {
     private void fixGlintForSkulls(ItemStack itemStack, CallbackInfo ci) {
         if (Utils.inSkyblock && Skytils.config.enchantGlintFix && itemStack.hasEffect()) {
             Utils.lastRenderedSkullStack = itemStack;
-            Utils.lastRenderedSkullEntity = mc.thePlayer;
+            Utils.lastRenderedSkullEntity = getMc().thePlayer;
         }
     }
 }

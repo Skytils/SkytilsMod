@@ -63,8 +63,8 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
-import skytils.skytilsmod.features.impl.trackers.MayorJerryTracker
-import skytils.skytilsmod.features.impl.trackers.MythologicalTracker
+import skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
+import skytils.skytilsmod.features.impl.trackers.impl.MythologicalTracker
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
@@ -100,8 +100,9 @@ class Skytils {
         @JvmField
         val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
-        @JvmField
-        val mc: Minecraft = Minecraft.getMinecraft()
+        @JvmStatic
+        val mc: Minecraft
+            get() = Minecraft.getMinecraft()
 
         lateinit var config: Config
 

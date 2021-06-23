@@ -27,7 +27,7 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
-import skytils.skytilsmod.features.impl.trackers.MayorJerryTracker
+import skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
