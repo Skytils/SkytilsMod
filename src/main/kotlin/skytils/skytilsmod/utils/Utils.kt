@@ -89,6 +89,7 @@ object Utils {
             }
         }
     }
+
     /**
      * Taken from Danker's Skyblock Mod under GPL 3.0 license
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE

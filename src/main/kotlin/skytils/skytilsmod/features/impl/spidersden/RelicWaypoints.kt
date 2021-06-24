@@ -142,12 +142,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
 
     override fun read(reader: FileReader) {
         foundRelics.clear()
-        for (serializedPosition in DataFetcher.getStringArrayFromJsonArray(
-            gson.fromJson(
-                reader,
-                JsonArray::class.java
-            ) as JsonArray
-        )) {
+        for (serializedPosition in gson.fromJson(reader, JsonArray::class.java).asJsonArray.map { it.asString }) {
             val parts = serializedPosition.split(",".toRegex()).toTypedArray()
             foundRelics.add(BlockPos(parts[0].toInt(), parts[1].toInt(), parts[2].toInt()))
         }

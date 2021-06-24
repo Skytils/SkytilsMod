@@ -83,7 +83,7 @@ object DataFetcher {
             }
             val triviaData = APIUtil.getJSONResponse("${dataUrl}solvers/oruotrivia.json")
             for ((key, value) in triviaData.entrySet()) {
-                TriviaSolver.triviaSolutions[key] = getStringArrayFromJsonArray(value.asJsonArray)
+                TriviaSolver.triviaSolutions[key] = value.asJsonArray.map { it.asString }.toTypedArray()
             }
             val relicData = APIUtil.getArrayResponse("${dataUrl}constants/relics.json")
             for (i in 0 until relicData.size()) {
@@ -124,15 +124,6 @@ object DataFetcher {
         loadData()
     }
 
-    @JvmStatic
-    fun getStringArrayFromJsonArray(jsonArray: JsonArray): Array<String> {
-        val arraySize = jsonArray.size()
-        val stringArray = arrayOfNulls<String>(arraySize)
-        for (i in 0 until arraySize) {
-            stringArray[i] = jsonArray[i].asString
-        }
-        return stringArray.filterNotNull().toTypedArray()
-    }
 
     init {
         reloadData()

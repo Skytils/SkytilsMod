@@ -68,12 +68,10 @@ class BlockAbility : PersistentSave(File(Skytils.modDir, "blockability.json")) {
     override fun read(reader: FileReader) {
         blockedItems.clear()
         blockedItems.addAll(
-            DataFetcher.getStringArrayFromJsonArray(
-                gson.fromJson(
-                    reader,
-                    JsonArray::class.java
-                ) as JsonArray
-            ).asList()
+            gson.fromJson(
+                reader,
+                JsonArray::class.java
+            ).asJsonArray.map { it.asString }
         )
     }
 

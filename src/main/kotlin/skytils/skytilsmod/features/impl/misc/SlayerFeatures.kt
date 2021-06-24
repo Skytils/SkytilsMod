@@ -30,6 +30,7 @@ import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
@@ -46,6 +47,7 @@ import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -56,6 +58,7 @@ import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BlockChangeEvent
+import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -338,6 +341,26 @@ class SlayerFeatures {
             return
         }
         processSlayerEntity(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        slayerEntity = null
+        slayerNameEntity = null
+        slayerTimerEntity = null
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        // TODO force someone to test this
+        if (!Skytils.config.hideOthersBrokenHeartRadiation || event.entity !is EntityGuardian || SBInfo.SkyblockIsland.TheEnd.mode != SBInfo.mode) return
+        if (slayerEntity != null) {
+            if (slayerEntity!!.isRiding) {
+                if (event.entity.getDistanceSqToEntity(slayerEntity!!) > 2 * 2) event.isCanceled = true
+            } else {
+                event.isCanceled = true
+            }
+        }
     }
 
     private class RNGMeter(val max: Float, val current: Float, val name: IChatComponent) : IBossDisplayData {

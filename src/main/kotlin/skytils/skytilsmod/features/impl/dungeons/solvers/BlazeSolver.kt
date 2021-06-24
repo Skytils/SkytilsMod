@@ -175,7 +175,7 @@ class BlazeSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         orderedBlazes.clear()
         blazeMode = 0
         blazeChest = null

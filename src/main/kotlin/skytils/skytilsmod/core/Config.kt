@@ -1482,6 +1482,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showSlayerDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Others' Broken Heart Radiation",
+        description = "Removes Broken Heart Radiation from other slayer's while yours is spawned",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+    )
+    var hideOthersBrokenHeartRadiation = false
+
+    @Property(
         PropertyType.SWITCH, name = "Show Seraph Display",
         description = "§b[WIP] §rShows info about your current Voidgloom Seraph boss.",
         category = "Slayer", subcategory = "Voidgloom Seraph"
