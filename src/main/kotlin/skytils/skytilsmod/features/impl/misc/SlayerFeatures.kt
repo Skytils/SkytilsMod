@@ -353,11 +353,16 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         // TODO force someone to test this
-        if (!Skytils.config.hideOthersBrokenHeartRadiation || event.entity !is EntityGuardian || SBInfo.SkyblockIsland.TheEnd.mode != SBInfo.mode) return
-        if (slayerEntity != null) {
+        if (!Skytils.config.hideOthersBrokenHeartRadiation || event.entity !is EntityGuardian) return
+        if (slayerEntity != null && slayerEntity is EntityEnderman) {
             if (slayerEntity!!.isRiding) {
-                if (event.entity.getDistanceSqToEntity(slayerEntity!!) > 2 * 2) event.isCanceled = true
+                printDebugMessage("Slayer is Riding")
+                if (event.entity.getDistanceSqToEntity(slayerEntity!!) > 2 * 2) {
+                    printDebugMessage("Guardian too far")
+                    event.isCanceled = true
+                }
             } else {
+                printDebugMessage("Slayer not riding, removing guardian")
                 event.isCanceled = true
             }
         }
