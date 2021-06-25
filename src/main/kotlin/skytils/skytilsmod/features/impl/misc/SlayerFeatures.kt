@@ -353,7 +353,7 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         // TODO force someone to test this
-        if (!Skytils.config.hideOthersBrokenHeartRadiation || event.entity !is EntityGuardian) return
+        if (!Skytils.config.hideOthersBrokenHeartRadiation || !event.entity.isInvisible || event.entity !is EntityGuardian) return
         if (slayerEntity != null && slayerEntity is EntityEnderman) {
             if (slayerEntity!!.isRiding) {
                 printDebugMessage("Slayer is Riding")
