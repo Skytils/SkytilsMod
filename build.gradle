@@ -19,11 +19,11 @@
 plugins {
     id "net.minecraftforge.gradle.forge" version "6f5327"
     id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "org.jetbrains.kotlin.jvm" version "1.5.10"
+    id "org.jetbrains.kotlin.jvm" version "1.5.20"
     id "org.spongepowered.mixin" version "d5f9873d60"
 }
 
-ext.kotlin_version = "1.5.10"
+ext.kotlin_version = "1.5.20"
 
 version = "1.0-pre13.1"
 group = "skytils.skytilsmod"

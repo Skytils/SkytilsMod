@@ -46,11 +46,13 @@ object SlayerCommand : StatCommand() {
             ChatComponentText("§a➜ Slayer Statistics Viewer\n")
                 .appendText("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
                 .appendText("§a§l➜ Slayer Levels:\n")
-                .appendText(xpMap.map { (slayer, xp) ->
-                    "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
-                        SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
-                    }:§e ${NumberUtil.nf.format(xp)} XP"
-                }.joinToString(separator = "\n"))
+                .appendText(
+                    xpMap.map { (slayer, xp) ->
+                        "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
+                            SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
+                        }:§e ${NumberUtil.nf.format(xp)} XP"
+                    }.joinToString(separator = "\n")
+                        .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" })
         )
     }
 }
