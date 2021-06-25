@@ -27,8 +27,6 @@ import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
 import org.apache.http.HttpVersion
 import org.apache.http.client.methods.HttpGet
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.core.UpdateChecker.getJarNameFromUrl
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils

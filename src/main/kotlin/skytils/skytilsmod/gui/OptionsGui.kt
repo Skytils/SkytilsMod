@@ -25,7 +25,6 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
-import gg.essential.elementa.font.DefaultFonts
 import gg.essential.vigilance.VigilanceConfig
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils

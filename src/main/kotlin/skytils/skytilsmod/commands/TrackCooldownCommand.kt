@@ -17,16 +17,13 @@
  */
 package skytils.skytilsmod.commands
 
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
-import skytils.skytilsmod.utils.ItemUtil
 
 object TrackCooldownCommand : CommandBase() {
     override fun getCommandName(): String {

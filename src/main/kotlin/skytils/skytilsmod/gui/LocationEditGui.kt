@@ -124,7 +124,8 @@ open class LocationEditGui : GuiScreen() {
                     val newScale = scaleX.coerceAtLeast(scaleY / 2).coerceAtLeast(0.01f)
                     locationButton.element.scale *= newScale
                 }
-                Corner.TOP_LEFT -> {}
+                Corner.TOP_LEFT -> {
+                }
                 Corner.TOP_RIGHT -> {
                     val scaledX = locationButton.x
                     val scaledY = locationButton.y2
@@ -138,7 +139,8 @@ open class LocationEditGui : GuiScreen() {
                     locationButton.element.scale *= newScale
                     locationButton.element.pos.setY((scaledY - newHeight) / sr.scaledHeight)
                 }
-                Corner.BOTTOM_LEFT -> {}
+                Corner.BOTTOM_LEFT -> {
+                }
             }
 
             locationButton.drawButton(mc, mouseX, mouseY)

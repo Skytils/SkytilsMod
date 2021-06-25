@@ -120,7 +120,8 @@ class KeyShortcutsList(
             ks.commandField.drawTextBox()
             ks.keyButton.displayString = GameSettings.getKeyDisplayString(ks.keyCode)
             val pressed = clickedShortcut === ks
-            var reused = ks.keyCode != 0 && mc.gameSettings.keyBindings.none { it.keyCode == ks.keyCode } && keyShortcuts.none { it.keyCode != 0 && it !== ks && it.keyCode == ks.keyCode }
+            val reused =
+                ks.keyCode != 0 && mc.gameSettings.keyBindings.none { it.keyCode == ks.keyCode } && keyShortcuts.none { it.keyCode != 0 && it !== ks && it.keyCode == ks.keyCode }
             if (pressed) {
                 ks.keyButton.displayString =
                     EnumChatFormatting.WHITE.toString() + "> " + EnumChatFormatting.YELLOW + ks.keyButton.displayString + EnumChatFormatting.WHITE + " <"

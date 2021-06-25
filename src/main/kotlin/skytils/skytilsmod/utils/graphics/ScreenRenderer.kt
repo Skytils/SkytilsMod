@@ -845,7 +845,7 @@ class ScreenRenderer {
         fun init() {
             if (Minecraft.getMinecraft().gameSettings.language != null) {
                 fontRenderer.unicodeFlag = Minecraft.getMinecraft().isUnicode
-                fontRenderer.bidiFlag = Minecraft.getMinecraft().languageManager.isCurrentLanguageBidirectional()
+                fontRenderer.bidiFlag = Minecraft.getMinecraft().languageManager.isCurrentLanguageBidirectional
             }
             (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener(fontRenderer)
         }

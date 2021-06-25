@@ -284,7 +284,7 @@ class MiningFeatures {
         var fetchurItems = LinkedHashMap<String, String>()
         private val mc = Minecraft.getMinecraft()
         private val EVENT_PATTERN =
-            Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:(?:ACTIVE IN (?<location>.+))|(?:RUNNING)) (FOR|for) (?<min>\\d+):(?<sec>\\d+)")
+            Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:ACTIVE IN (?<location>.+)|RUNNING) (FOR|for) (?<min>\\d+):(?<sec>\\d+)")
         private var lastJukebox: BlockPos? = null
         private var puzzlerSolution: BlockPos? = null
         private var raffleBox: BlockPos? = null

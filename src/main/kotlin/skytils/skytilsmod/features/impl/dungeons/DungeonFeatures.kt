@@ -79,7 +79,7 @@ class DungeonFeatures {
         private val mc = Minecraft.getMinecraft()
         private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
         private val deathOrPuzzleFail =
-            Pattern.compile("(?:^ ☠ .+ and became a ghost\\.$)|(?:^PUZZLE FAIL! .+$)|(?:^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!)")
+            Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
         private val WATCHER_MOBS = arrayOf(
             "Revoker",
             "Psycho",
@@ -191,8 +191,7 @@ class DungeonFeatures {
                                         "purple" -> EnumChatFormatting.DARK_PURPLE
                                         "yellow" -> EnumChatFormatting.YELLOW
                                         else -> null
-                                    }
-                                    if (a == null) return@submit
+                                    } ?: return@submit
                                     for (entity in mc.theWorld.loadedEntityList) {
                                         if (entity.name.startsWith("$a﴾ $a§lLivid")) {
                                             lividTag = entity

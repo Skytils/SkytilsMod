@@ -28,6 +28,7 @@ import org.apache.http.HttpRequest
 import org.apache.http.HttpResponse
 import org.apache.http.HttpVersion
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HttpContext
 import org.apache.http.util.EntityUtils
@@ -42,7 +43,7 @@ import java.util.*
 object APIUtil {
     private val parser = JsonParser()
 
-    val builder =
+    val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION)
             .addInterceptorFirst { request: HttpRequest, _: HttpContext? ->
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")

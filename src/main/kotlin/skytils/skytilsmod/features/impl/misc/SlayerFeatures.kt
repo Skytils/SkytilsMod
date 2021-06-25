@@ -771,7 +771,7 @@ class SlayerFeatures {
 
         private fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String, nameStart: String) {
             TickTask(5) {
-                val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
+                val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
                     entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
                 ) { nearbyEntity: Entity? ->
                     if (nearbyEntity is EntityArmorStand) {

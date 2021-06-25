@@ -238,7 +238,7 @@ class SpamHider {
                 // Mining Abilities
                 formatted.startsWith("§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
                     when (Skytils.config.miningAbilityHider) {
-                        1,2 -> cancelChatPacket(event, Skytils.config.miningAbilityHider == 2)
+                        1, 2 -> cancelChatPacket(event, Skytils.config.miningAbilityHider == 2)
                     }
                 }
 

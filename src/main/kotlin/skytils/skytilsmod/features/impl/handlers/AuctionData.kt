@@ -22,9 +22,12 @@ import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.Config
+import skytils.skytilsmod.features.impl.handlers.AuctionData.Companion.lowestBINs
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
+import java.util.function.Consumer
 import kotlin.concurrent.fixedRateTimer
+import kotlin.reflect.jvm.javaField
 
 class AuctionData {
 
@@ -69,10 +72,10 @@ class AuctionData {
     }
 
     init {
-        Skytils.config.registerListener(Config::fetchLowestBINPrices) { value ->
+        Skytils.config.registerListener(Config::fetchLowestBINPrices.javaField!!) { value: Boolean ->
             if (!value) lowestBINs.clear()
         }
-        fixedRateTimer(name = "Skytils-FetchAuctionData", period = 60 * 1000) {
+        fixedRateTimer(name = "Skytils-FetchAuctionData", period = 60 * 1000L) {
             if (Skytils.config.fetchLowestBINPrices) {
                 val data = APIUtil.getJSONResponse(dataURL)
                 for ((key, value) in data.entrySet()) {

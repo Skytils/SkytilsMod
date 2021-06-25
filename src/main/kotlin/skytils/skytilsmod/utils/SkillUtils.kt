@@ -18,8 +18,6 @@
 
 package skytils.skytilsmod.utils
 
-import gg.essential.elementa.utils.withIndex
-
 object SkillUtils {
     val dungeoneeringXp = LinkedHashMap<Int, Long>()
     val slayerXp = LinkedHashMap<String, LinkedHashMap<Int, Long>>()

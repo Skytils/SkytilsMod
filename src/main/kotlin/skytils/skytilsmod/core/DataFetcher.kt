@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.core
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver

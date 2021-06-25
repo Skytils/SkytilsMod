@@ -31,7 +31,7 @@ class Board internal constructor() {
         Blank, X, O
     }
 
-    private val board: Array<Array<State?>>
+    private val board: Array<Array<State?>> = Array(BOARD_WIDTH) { arrayOfNulls(BOARD_WIDTH) }
 
     /**
      * Check to see who's turn it is.
@@ -288,7 +288,6 @@ class Board internal constructor() {
      * Construct the Tic Tac Toe board.
      */
     init {
-        board = Array(BOARD_WIDTH) { arrayOfNulls(BOARD_WIDTH) }
         availableMoves = HashSet()
         reset()
     }

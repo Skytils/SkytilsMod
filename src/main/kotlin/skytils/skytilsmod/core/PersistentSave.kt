@@ -27,7 +27,7 @@ import java.io.FileWriter
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KClass
 
-abstract class PersistentSave(private val saveFile: File, private val interval: Long = 30_000) {
+abstract class PersistentSave(private val saveFile: File, interval: Long = 30_000) {
 
     var dirty = false
 

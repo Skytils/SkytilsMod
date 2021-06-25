@@ -19,6 +19,7 @@ package skytils.skytilsmod.utils.graphics.colors
 
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
+import kotlin.math.min
 
 class RainbowColor(var speed: Int, var offset: Int, var saturation: Float, var brightness: Float) : CustomColor() {
     val rainbowColor: Color
@@ -43,7 +44,7 @@ class RainbowColor(var speed: Int, var offset: Int, var saturation: Float, var b
         val saturation: Float
         val value: Float
         val cmax = r.coerceAtLeast(g).coerceAtLeast(b)
-        val cmin = Math.min(r.coerceAtMost(g), b)
+        val cmin = min(r.coerceAtMost(g), b)
         value = cmax
         saturation = if (cmax == 0f) 0F else (cmax - cmin) / cmax
         if (saturation == 0f) {
