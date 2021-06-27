@@ -35,6 +35,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.AuctionData
+import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -48,7 +49,7 @@ import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import kotlin.math.pow
 
-class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers"), "mythological.json")) {
+class MythologicalTracker : Tracker("mythological") {
 
     private val rareDugDrop: Pattern = Pattern.compile("^RARE DROP! You dug out a (.+)!$")
     private val mythCreatureDug =
@@ -235,6 +236,11 @@ class MythologicalTracker : PersistentSave(File(File(Skytils.modDir, "trackers")
                 }
             }
         }
+    }
+
+    override fun resetLoot() {
+        BurrowDrop.values().onEach { it.droppedTimes = 0L }
+        BurrowMob.values().onEach { it.dugTimes = 0L }
     }
 
     override fun read(reader: FileReader) {

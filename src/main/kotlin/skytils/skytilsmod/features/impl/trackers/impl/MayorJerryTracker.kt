@@ -28,6 +28,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -37,7 +38,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"), "mayorjerry.json")) {
+object MayorJerryTracker : Tracker("mayorjerry") {
 
     @Suppress("UNUSED")
     enum class HiddenJerry(val type: String, val colorCode: String, var discoveredTimes: Long = 0L) {
@@ -115,6 +116,11 @@ object MayorJerryTracker : PersistentSave(File(File(Skytils.modDir, "trackers"),
                 formatted.contains(it.dropName)
             } ?: return).droppedAmount++
         }
+    }
+
+    override fun resetLoot() {
+        HiddenJerry.values().onEach { it.discoveredTimes = 0L }
+        JerryBoxDrops.values().onEach { it.droppedAmount = 0L }
     }
 
     override fun read(reader: FileReader) {
