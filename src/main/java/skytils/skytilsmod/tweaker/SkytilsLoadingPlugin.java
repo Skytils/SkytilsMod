@@ -67,6 +67,17 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "ask for support in the Discord." +
         "</p></html>";
 
+    private static final String voidChatMessage =
+            "<html><p>" +
+                    "Skytils has detected that you are using VoidChat.<br>" +
+                    "VoidChat breaks many of my features!<br>" +
+                    "In order to resolve this conflict you must remove<br>" +
+                    "VoidChat from your Minecraft mods folder.<br>" +
+                    "A good alternative is Patcher at sk1er.club/mods/Patcher.<br>" +
+                    "If you have already done this and are still getting this error,<br>" +
+                    "ask for support in the Discord." +
+                    "</p></html>";
+
     public SkytilsLoadingPlugin() {
         if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
             showMessage(kotlinErrorMessage);
@@ -81,6 +92,14 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 showMessage(badMixinVersionMessage);
                 exit();
             }
+        }
+
+        try {
+            Class.forName("com.sky.voidchat.EDFMLLoadingPlugin");
+            showMessage(voidChatMessage);
+            exit();
+        } catch (ClassNotFoundException e) {
+
         }
     }
 

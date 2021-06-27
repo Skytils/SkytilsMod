@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins.renderer;
 
+import kotlin.collections.CollectionsKt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -47,18 +48,15 @@ public abstract class MixinEntityRenderer implements IResourceManagerReloadListe
         if (Utils.inSkyblock) {
             if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs) {
                 List<EntityOtherPlayerMP> npcs = this.mc.theWorld.getPlayers(EntityOtherPlayerMP.class, p -> p.getUniqueID().version() == 2 && p.getHealth() == 20 && !p.isPlayerSleeping());
-                for (Entity entity : entityList) {
+                CollectionsKt.removeAll(entityList, (entity -> {
                     if (entity instanceof EntityCreeper && entity.isInvisible()) {
                         final EntityCreeper creeper = (EntityCreeper) entity;
                         if (creeper.getMaxHealth() == 20 && creeper.getHealth() == 20 && creeper.getPowered()) {
-                            for (EntityOtherPlayerMP npc : npcs) {
-                                if (npc.getDistanceSqToEntity(entity) <= 49) {
-                                    entityList.remove(creeper);
-                                }
-                            }
+                            if (CollectionsKt.any(npcs, (npc -> npc.getDistanceSqToEntity(entity) <= 49))) return true;
                         }
                     }
-                }
+                    return false;
+                }));
             }
         }
         return entityList;
