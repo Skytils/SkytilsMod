@@ -887,6 +887,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var blockUselessZombieSword = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Block Zapper Fatigue Timer",
+        description = "Displays how long your block zapper is fatigued for.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var blockZapperFatigueTimer = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Compact Item Stars",
         description = "Shortens item names with stars in them.",
         category = "Miscellaneous", subcategory = "Items"

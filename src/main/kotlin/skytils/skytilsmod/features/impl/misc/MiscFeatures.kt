@@ -73,10 +73,14 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class MiscFeatures {
 
     private var lastGLeaveCommand = 0L
+    private var blockZapperCooldownExpiration = 0L
+    private var blockZapperUses = 0
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
@@ -99,12 +103,38 @@ class MiscFeatures {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
         val unformatted = event.message.unformattedText.stripControlCodes().trim { it <= ' ' }
+        val formatted = event.message.formattedText
         if (unformatted == "The ground begins to shake as an Endstone Protector rises from below!") {
             golemSpawnTime = System.currentTimeMillis() + 20000
+        }
+
+        if (Skytils.config.blockZapperFatigueTimer) {
+            if (formatted.startsWith("§eZapped §a") && formatted.endsWith("§a§lUNDO§r")) {
+                blockZapperCooldownExpiration = 0L
+                blockZapperUses++
+                Utils.printDebugMessage("$blockZapperUses")
+
+                if (blockZapperUses >= 20) {
+                    blockZapperUses = 0
+                    blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
+                    Utils.printDebugMessage("$blockZapperCooldownExpiration")
+                }
+            }
+            if (unformatted == "Your zapper is temporarily fatigued!") {
+                val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
+                Utils.printDebugMessage("$blockZapperUses ${duration.inWholeSeconds}")
+                if (duration.isPositive()) event.message.appendText(
+                    " §eThis will expire in${
+                        duration
+                            .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
+                    }"
+                )
+            }
         }
     }
 

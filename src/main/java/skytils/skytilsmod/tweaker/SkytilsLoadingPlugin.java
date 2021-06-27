@@ -98,8 +98,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             Class.forName("com.sky.voidchat.EDFMLLoadingPlugin");
             showMessage(voidChatMessage);
             exit();
-        } catch (ClassNotFoundException e) {
-
+        } catch (ClassNotFoundException ignored) {
         }
     }
 
