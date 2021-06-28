@@ -200,7 +200,7 @@ class MiscFeatures {
             TickTask(5) {
                 val entity = event.entity as EntityArmorStand
                 val headSlot = entity.getCurrentArmor(3)
-                if (Skytils.config.trickOrTreatChestAlert && headSlot != null && headSlot.item === Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(
+                if (Skytils.config.trickOrTreatChestAlert && mc.thePlayer != null && headSlot != null && headSlot.item === Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(
                         mc.thePlayer
                     ) < 10 * 10
                 ) {

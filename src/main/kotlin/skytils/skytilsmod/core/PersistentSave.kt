@@ -86,7 +86,9 @@ abstract class PersistentSave(private val saveFile: File, interval: Long = 30_00
             }
         }
         Runtime.getRuntime().addShutdownHook(Thread({
-            writeSave()
+            if (dirty) {
+                writeSave()
+            }
         }, "${this::class.simpleName}-Save"))
     }
 
