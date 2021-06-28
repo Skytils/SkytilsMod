@@ -25,7 +25,6 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.trackers.Tracker
@@ -34,7 +33,6 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.stripControlCodes
-import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
@@ -81,6 +79,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
     fun onJerry(type: String) {
         if (!Skytils.config.trackHiddenJerry) return
         HiddenJerry.getFromString(type)!!.discoveredTimes++
+        markDirty(this::class)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -92,6 +91,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         if (formatted.startsWith("§r§b ☺ §r§eYou claimed ") && formatted.endsWith("§efrom the Jerry Box!§r")) {
             if (formatted.contains("coins")) {
                 JerryBoxDrops.COINS.droppedAmount += unformatted.replace(Regex("[^0-9]"), "").toLong()
+                markDirty(this::class)
             } else if (formatted.contains("XP")) {
                 val xpType = with(formatted) {
                     when {
@@ -103,11 +103,13 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                 }
                 if (xpType != null) {
                     xpType.droppedAmount += unformatted.replace(Regex("[^0-9]"), "").toLong()
+                    markDirty(this::class)
                 }
             } else {
                 (JerryBoxDrops.values().find {
                     formatted.contains(it.dropName)
                 } ?: return).droppedAmount++
+                markDirty(this::class)
             }
             return
         }
@@ -115,6 +117,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
             (JerryBoxDrops.values().find {
                 formatted.contains(it.dropName)
             } ?: return).droppedAmount++
+            markDirty(this::class)
         }
     }
 
