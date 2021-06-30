@@ -21,22 +21,33 @@ package skytils.skytilsmod.gui.components
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import java.awt.Color
 
-class SimpleButton(val t: String) : UIBlock(Color(0, 0, 0, 80)) {
+class SimpleButton @JvmOverloads constructor(val t: String, val h: Boolean = false, val w: Boolean = false) :
+    UIBlock(Color(0, 0, 0, 80)) {
+
+    val text = UIText(t).constrain {
+        x = CenterConstraint()
+        y = CenterConstraint()
+        color = Color(14737632).toConstraint()
+    } childOf this
 
     init {
-        val text = UIText(t).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            color = Color(14737632).toConstraint()
-        } childOf this
         this
             .constrain {
-                width = (text.getWidth() + 40).pixels()
-                height = (text.getHeight() + 10).pixels()
+                width = if (w) {
+                    RelativeConstraint()
+                } else {
+                    (text.getWidth() + 40).pixels()
+                }
+                height = if (h) {
+                    RelativeConstraint()
+                } else {
+                    (text.getHeight() + 10).pixels()
+                }
             }
             .onMouseEnter {
                 animate {
