@@ -42,7 +42,7 @@ object DungeonListener {
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
-        Regex("§r§.(?<name>\\w+?) §r§f\\(§r§d(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)§r§f\\)§r")
+        Regex("§r(?:§.)+(?<name>\\w+?) §r§f\\(§r§d(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
 
     private var ticks = 0
