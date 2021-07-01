@@ -70,9 +70,6 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
     }
 
     fun _show() {
-        val totalHeight = this.children.sumOf {
-            it.getHeight().toDouble()
-        }
         this.animate {
             setHeightAnimation(
                 Animations.IN_OUT_QUAD,
