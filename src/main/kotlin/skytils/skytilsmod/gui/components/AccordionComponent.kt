@@ -20,12 +20,11 @@ package skytils.skytilsmod.gui.components
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIBlock
+import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.*
-import gg.essential.elementa.effects.ScissorEffect
 import java.awt.Color
 
 class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
@@ -60,28 +59,6 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
         super.afterInitialization()
     }
 
-    fun AccordionComponent.adjustParentHeight(height: Float, instantly: Boolean = false) {
-        var thing: UIComponent? = this@AccordionComponent
-        var otherThing: UIComponent? = this@AccordionComponent
-        var totalHeight = height
-        while (true) {
-            thing = thing?.parent
-            if (thing != null && thing is AccordionComponent) {
-                totalHeight += thing.children.filter { it != otherThing }.sumOf { it.getHeight().toDouble() }.toFloat()
-                thing.animate {
-                    setHeightAnimation(
-                        Animations.IN_OUT_QUAD,
-                        if (instantly) 0f else 1f,
-                        basicHeightConstraint { totalHeight }
-                    )
-                }
-                otherThing = thing
-            } else {
-                break
-            }
-        }
-    }
-
     fun _hide(instantly: Boolean = false) {
         this.animate {
             setHeightAnimation(
@@ -89,9 +66,6 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
                 if (instantly) 0f else 1f,
                 basicHeightConstraint { button.getHeight() }
             )
-        }
-        if (this.parent is AccordionComponent && (this.parent as AccordionComponent).toggle) {
-            this.adjustParentHeight(button.getHeight(), instantly)
         }
     }
 
@@ -103,11 +77,8 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
             setHeightAnimation(
                 Animations.IN_OUT_QUAD,
                 1f,
-                basicHeightConstraint { totalHeight.toFloat() }
+                ChildBasedSizeConstraint()
             )
-        }
-        if (this.parent is AccordionComponent) {
-            this.adjustParentHeight(totalHeight.toFloat())
         }
     }
 
