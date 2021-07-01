@@ -60,6 +60,28 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
         super.afterInitialization()
     }
 
+    fun AccordionComponent.adjustParentHeight(height: Float, instantly: Boolean = false) {
+        var thing: UIComponent? = this@AccordionComponent
+        var otherThing: UIComponent? = this@AccordionComponent
+        var totalHeight = height
+        while (true) {
+            thing = thing?.parent
+            if (thing != null && thing is AccordionComponent) {
+                totalHeight += thing.children.filter { it != otherThing }.sumOf { it.getHeight().toDouble() }.toFloat()
+                thing.animate {
+                    setHeightAnimation(
+                        Animations.IN_OUT_QUAD,
+                        if (instantly) 0f else 1f,
+                        basicHeightConstraint { totalHeight }
+                    )
+                }
+                otherThing = thing
+            } else {
+                break
+            }
+        }
+    }
+
     fun _hide(instantly: Boolean = false) {
         this.animate {
             setHeightAnimation(
@@ -69,16 +91,7 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
             )
         }
         if (this.parent is AccordionComponent && (this.parent as AccordionComponent).toggle) {
-            val height = this.button.getHeight() + this.parent.children.filter { it != this }.sumOf {
-                it.getHeight().toDouble()
-            }
-            this.parent.animate {
-                setHeightAnimation(
-                    Animations.IN_OUT_QUAD,
-                    if (instantly) 0f else 1f,
-                    basicHeightConstraint { height.toFloat() }
-                )
-            }
+            this.adjustParentHeight(button.getHeight(), instantly)
         }
     }
 
@@ -94,16 +107,7 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
             )
         }
         if (this.parent is AccordionComponent) {
-            val parentHeight = totalHeight + this.parent.children.filter { it != this }.sumOf {
-                it.getHeight().toDouble()
-            }
-            this.parent.animate {
-                setHeightAnimation(
-                    Animations.IN_OUT_QUAD,
-                    1f,
-                    basicHeightConstraint { parentHeight.toFloat() }
-                )
-            }
+            this.adjustParentHeight(totalHeight.toFloat())
         }
     }
 
