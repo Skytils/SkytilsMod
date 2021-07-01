@@ -68,6 +68,18 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
                 basicHeightConstraint { button.getHeight() }
             )
         }
+        if (this.parent is AccordionComponent && (this.parent as AccordionComponent).toggle) {
+            val height = this.button.getHeight() + this.parent.children.filter { it != this }.sumOf {
+                it.getHeight().toDouble()
+            }
+            this.parent.animate {
+                setHeightAnimation(
+                    Animations.IN_OUT_QUAD,
+                    if (instantly) 0f else 1f,
+                    basicHeightConstraint { height.toFloat() }
+                )
+            }
+        }
     }
 
     fun _show() {
@@ -80,6 +92,18 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
                 1f,
                 basicHeightConstraint { totalHeight.toFloat() }
             )
+        }
+        if (this.parent is AccordionComponent) {
+            val parentHeight = totalHeight + this.parent.children.filter { it != this }.sumOf {
+                it.getHeight().toDouble()
+            }
+            this.parent.animate {
+                setHeightAnimation(
+                    Animations.IN_OUT_QUAD,
+                    1f,
+                    basicHeightConstraint { parentHeight.toFloat() }
+                )
+            }
         }
     }
 
