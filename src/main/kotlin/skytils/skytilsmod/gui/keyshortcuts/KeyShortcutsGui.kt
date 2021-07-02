@@ -96,7 +96,7 @@ class KeyShortcutsGui : GuiScreen() {
                 KeyShortcuts.shortcuts[e.command] = e.keyCode
             }
         }
-        PersistentSave.markDirty(KeyShortcuts::class)
+        PersistentSave.markDirty<KeyShortcuts>()
     }
 
     private fun addBlankShortcut() {

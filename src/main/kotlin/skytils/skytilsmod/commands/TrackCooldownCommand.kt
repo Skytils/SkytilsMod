@@ -54,11 +54,11 @@ object TrackCooldownCommand : CommandBase() {
         if (ability.isBlank()) throw WrongUsageException("You must specify valid arguments.")
         if (CooldownTracker.itemCooldowns[ability] == seconds) {
             CooldownTracker.itemCooldowns.remove(ability)
-            PersistentSave.markDirty(CooldownTracker::class)
+            PersistentSave.markDirty<CooldownTracker>()
             sender.addChatMessage(ChatComponentText("Removed the cooldown for $ability."))
         } else {
             CooldownTracker.itemCooldowns[ability] = seconds
-            PersistentSave.markDirty(CooldownTracker::class)
+            PersistentSave.markDirty<CooldownTracker>()
             sender.addChatMessage(ChatComponentText("Set the cooldown for $ability to $seconds seconds."))
         }
     }

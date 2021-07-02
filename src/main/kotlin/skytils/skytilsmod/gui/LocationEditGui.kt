@@ -222,6 +222,6 @@ open class LocationEditGui : GuiScreen() {
      * Saves the positions when the gui is closed
      */
     override fun onGuiClosed() {
-        PersistentSave.markDirty(GuiManager::class)
+        PersistentSave.markDirty<GuiManager>()
     }
 }

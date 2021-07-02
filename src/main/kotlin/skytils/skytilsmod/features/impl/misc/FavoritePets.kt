@@ -69,7 +69,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
                     ) {
                         favorited.add(getPetIdFromMatcher(matcher))
                         favorited.remove(favorite)
-                        markDirty(FavoritePets::class)
+                        markDirty<FavoritePets>()
                         break
                     }
                 }
@@ -119,7 +119,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         val petId = getPetIdFromItem(item)
         event.isCanceled = true
         if (favorited.contains(petId)) favorited.remove(petId) else favorited.add(petId)
-        markDirty(FavoritePets::class)
+        markDirty<FavoritePets>()
     }
 
     @SubscribeEvent

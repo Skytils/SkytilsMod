@@ -93,7 +93,7 @@ class CommandAliasesGui : GuiScreen() {
                 CommandAliases.aliases[e.key.text] = e.message.text
             }
         }
-        PersistentSave.markDirty(CommandAliases::class)
+        PersistentSave.markDirty<CommandAliases>()
     }
 
     private fun addAlias(key: String = "", message: String = "") {

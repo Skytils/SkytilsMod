@@ -79,7 +79,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
     fun onJerry(type: String) {
         if (!Skytils.config.trackHiddenJerry) return
         HiddenJerry.getFromString(type)!!.discoveredTimes++
-        markDirty(this::class)
+        markDirty<MayorJerryTracker>()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -91,7 +91,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         if (formatted.startsWith("§r§b ☺ §r§eYou claimed ") && formatted.endsWith("§efrom the Jerry Box!§r")) {
             if (formatted.contains("coins")) {
                 JerryBoxDrops.COINS.droppedAmount += unformatted.replace(Regex("[^0-9]"), "").toLong()
-                markDirty(this::class)
+                markDirty<MayorJerryTracker>()
             } else if (formatted.contains("XP")) {
                 val xpType = with(formatted) {
                     when {
@@ -103,13 +103,13 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                 }
                 if (xpType != null) {
                     xpType.droppedAmount += unformatted.replace(Regex("[^0-9]"), "").toLong()
-                    markDirty(this::class)
+                    markDirty<MayorJerryTracker>()
                 }
             } else {
                 (JerryBoxDrops.values().find {
                     formatted.contains(it.dropName)
                 } ?: return).droppedAmount++
-                markDirty(this::class)
+                markDirty<MayorJerryTracker>()
             }
             return
         }
@@ -117,7 +117,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
             (JerryBoxDrops.values().find {
                 formatted.contains(it.dropName)
             } ?: return).droppedAmount++
-            markDirty(this::class)
+            markDirty<MayorJerryTracker>()
         }
     }
 

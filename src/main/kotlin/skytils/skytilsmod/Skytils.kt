@@ -217,6 +217,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SimonSaysSolver())
         MinecraftForge.EVENT_BUS.register(SlayerFeatures())
         MinecraftForge.EVENT_BUS.register(SpidersDenFeatures())
+        MinecraftForge.EVENT_BUS.register(SpiritLeap())
         MinecraftForge.EVENT_BUS.register(StartsWithSequenceSolver())
         MinecraftForge.EVENT_BUS.register(TankDisplayStuff())
         MinecraftForge.EVENT_BUS.register(TechnoMayor())

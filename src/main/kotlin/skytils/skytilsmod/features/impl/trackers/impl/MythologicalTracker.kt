@@ -146,7 +146,7 @@ class MythologicalTracker : Tracker("mythological") {
                     val matcher = rareDugDrop.matcher(unformatted)
                     if (matcher.matches()) {
                         (BurrowDrop.getFromName(matcher.group(1)) ?: return).droppedTimes++
-                        markDirty(this::class)
+                        markDirty<MythologicalTracker>()
                     }
                 } else if (unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(
                         " coins!"
@@ -162,7 +162,7 @@ class MythologicalTracker : Tracker("mythological") {
                             lastMinosChamp = System.currentTimeMillis()
                         } else {
                             mob.dugTimes++
-                            markDirty(this::class)
+                            markDirty<MythologicalTracker>()
                         }
                     }
                 } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
@@ -170,7 +170,7 @@ class MythologicalTracker : Tracker("mythological") {
                     ))
                 ) {
                     burrowsDug++
-                    markDirty(this::class)
+                    markDirty<MythologicalTracker>()
                 } else if (unformatted.startsWith("RARE DROP! ")) {
                     for (drop in BurrowDrop.values()) {
                         if (!drop.mobDrop) continue
@@ -232,7 +232,7 @@ class MythologicalTracker : Tracker("mythological") {
                 }
                 if (Skytils.config.trackMythEvent) {
                     drop.droppedTimes++
-                    markDirty(this::class)
+                    markDirty<MythologicalTracker>()
                 }
             }
         }

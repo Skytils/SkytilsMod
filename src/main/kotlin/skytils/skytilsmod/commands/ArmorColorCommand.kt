@@ -63,7 +63,7 @@ object ArmorColorCommand : CommandBase() {
         val subcommand = args[0].lowercase()
         if (subcommand == "clearall") {
             ArmorColor.armorColors.clear()
-            PersistentSave.markDirty(ArmorColor::class)
+            PersistentSave.markDirty<ArmorColor>()
             sender.addChatMessage(ChatComponentText("§aCleared all your custom armor colors!"))
         } else if (subcommand == "clear") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
@@ -76,7 +76,7 @@ object ArmorColorCommand : CommandBase() {
             val uuid = extraAttributes.getString("uuid")
             if (ArmorColor.armorColors.containsKey(uuid)) {
                 ArmorColor.armorColors.remove(uuid)
-                PersistentSave.markDirty(ArmorColor::class)
+                PersistentSave.markDirty<ArmorColor>()
                 sender.addChatMessage(ChatComponentText("§aCleared the custom color for your " + item.displayName + "§a!"))
             } else sender.addChatMessage(ChatComponentText("§cThat item doesn't have a custom color!"))
         } else if (subcommand == "set") {
@@ -95,7 +95,7 @@ object ArmorColorCommand : CommandBase() {
                 throw SyntaxErrorException("Unable to get a color from inputted string.")
             }
             ArmorColor.armorColors[uuid] = color
-            PersistentSave.markDirty(ArmorColor::class)
+            PersistentSave.markDirty<ArmorColor>()
             sender.addChatMessage(ChatComponentText("§aSet the color of your " + item.displayName + "§a to " + args[1] + "!"))
         } else player.addChatMessage(ChatComponentText(getCommandUsage(sender)))
     }

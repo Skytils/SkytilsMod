@@ -77,7 +77,6 @@ import java.util.regex.Pattern
 class DungeonFeatures {
     companion object {
         private val mc = Minecraft.getMinecraft()
-        private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
         private val deathOrPuzzleFail =
             Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
         private val WATCHER_MOBS = arrayOf(
@@ -435,107 +434,6 @@ class DungeonFeatures {
     fun onRenderPlayerPost(event: RenderPlayerEvent.Post) {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.disableBlend()
-    }
-
-    // Spirit leap names
-    @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons) return
-        if (event.container is ContainerChest) {
-            val containerChest = event.container
-            val fr = ScreenRenderer.fontRenderer
-            val invSlots = containerChest.inventorySlots
-            val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
-            if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap" || Skytils.config.reviveStoneNames && displayName == "Revive A Teammate") {
-                var people = 0
-                for (slot in invSlots) {
-                    if (slot.inventory == mc.thePlayer.inventory) continue
-                    if (!slot.hasStack || slot.stack.item != Items.skull) continue
-                    val item = slot.stack
-                    people++
-
-                    //slot is 16x16
-                    val x = slot.xDisplayPosition
-                    val y = slot.yDisplayPosition + if (people % 2 != 0) -15 else 20
-                    val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
-                    if (!matcher.find()) continue
-                    val name = matcher.group(1)
-                    if (name == "Unknown") continue
-                    val dungeonClass = (DungeonListener.team.find { it.playerName == name }
-                        ?: continue).dungeonClass.className.first().uppercase()
-                    val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
-                    var shouldDrawBkg = true
-                    if (Skytils.usingNEU && displayName != "Revive A Teammate") {
-                        try {
-                            val neuClass =
-                                Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
-                            val neuInstance = neuClass.getDeclaredField("INSTANCE")
-                            val neu = neuInstance[null]
-                            val neuConfig = neuClass.getDeclaredField("config")
-                            val config = neuConfig[neu]
-                            val improvedSBMenu = config.javaClass.getDeclaredField("improvedSBMenu")
-                            val improvedSBMenuS = improvedSBMenu[config]
-                            val enableSbMenus = improvedSBMenuS.javaClass.getDeclaredField("enableSbMenus")
-                            val customGuiEnabled = enableSbMenus.getBoolean(improvedSBMenuS)
-                            if (customGuiEnabled) shouldDrawBkg = false
-                        } catch (ignored: ClassNotFoundException) {
-                        } catch (ignored: NoSuchFieldException) {
-                        } catch (ignored: IllegalAccessException) {
-                        }
-                    }
-                    val scale = 0.9
-                    val scaleReset = 1 / scale
-                    GlStateManager.pushMatrix()
-                    GlStateManager.pushAttrib()
-                    GlStateManager.disableLighting()
-                    GlStateManager.disableDepth()
-                    GlStateManager.disableBlend()
-                    GlStateManager.translate(0f, 0f, 1f)
-                    if (shouldDrawBkg) Gui.drawRect(
-                        x - 2 - fr.getStringWidth(text) / 2,
-                        y - 2,
-                        x + fr.getStringWidth(text) / 2 + 2,
-                        y + fr.FONT_HEIGHT + 2,
-                        Color(47, 40, 40).rgb
-                    )
-                    fr.drawString(
-                        text,
-                        x.toFloat(),
-                        y.toFloat(),
-                        alignment = TextAlignment.MIDDLE,
-                        shadow = SmartFontRenderer.TextShadow.OUTLINE
-                    )
-                    GlStateManager.scale(scale, scale, 1.0)
-                    fr.drawString(
-                        dungeonClass,
-                        (scaleReset * x).toFloat(),
-                        (scaleReset * slot.yDisplayPosition).toFloat(),
-                        Color(255, 255, 0).rgb,
-                        true
-                    )
-                    GlStateManager.popAttrib()
-                    GlStateManager.popMatrix()
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (!Utils.inSkyblock) return
-        val slot = event.slot
-        if (event.container is ContainerChest) {
-            val cc = event.container
-            val displayName = cc.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
-            if (slot.hasStack) {
-                val item = slot.stack
-                if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap") {
-                    if (item.item === Item.getItemFromBlock(Blocks.stained_glass_pane)) {
-                        event.isCanceled = true
-                    }
-                }
-            }
-        }
     }
 
     @SubscribeEvent

@@ -76,7 +76,7 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
             if (relicLocations.contains(packet!!.position)) {
                 foundRelics.add(packet.position)
                 rareRelicLocations.remove(packet.position)
-                markDirty(this::class)
+                markDirty<RelicWaypoints>()
             }
         }
     }

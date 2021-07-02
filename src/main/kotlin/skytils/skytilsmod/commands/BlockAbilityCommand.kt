@@ -63,11 +63,11 @@ object BlockAbilityCommand : CommandBase() {
             }
             if (BlockAbility.blockedItems.contains(itemId)) {
                 BlockAbility.blockedItems.remove(itemId)
-                PersistentSave.markDirty(BlockAbility::class)
+                PersistentSave.markDirty<BlockAbility>()
                 sender.addChatMessage(ChatComponentText("§aRemoved the block on $itemId!"))
             } else {
                 BlockAbility.blockedItems.add(itemId)
-                PersistentSave.markDirty(BlockAbility::class)
+                PersistentSave.markDirty<BlockAbility>()
                 sender.addChatMessage(ChatComponentText("§aYou are now blocking abilities for $itemId!"))
             }
             return
@@ -75,7 +75,7 @@ object BlockAbilityCommand : CommandBase() {
         val subcommand = args[0].lowercase()
         if (subcommand == "clearall") {
             BlockAbility.blockedItems.clear()
-            PersistentSave.markDirty(BlockAbility::class)
+            PersistentSave.markDirty<BlockAbility>()
             sender.addChatMessage(ChatComponentText("§aCleared all your custom ability blocks!"))
         } else {
             player.addChatMessage(ChatComponentText(getCommandUsage(sender)))
