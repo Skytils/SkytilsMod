@@ -59,6 +59,9 @@ object MayorInfo {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
+        if (mc.currentServerData?.serverIP?.lowercase()
+            ?.contains("alpha") == true
+        ) return
         if (ticks % (60 * 20) == 0) {
             if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {
                 if (jerryMayor != null && Skytils.config.displayJerryPerks) {
@@ -96,6 +99,9 @@ object MayorInfo {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
+        if (mc.currentServerData?.serverIP?.lowercase()
+                ?.contains("alpha") == true
+        ) return
         if (event.message.unformattedText == "§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]" && event.message.siblings.size == 1) {
             val hoverEvent = event.message.siblings[0].chatStyle.chatHoverEvent
             if (hoverEvent != null && hoverEvent.action == HoverEvent.Action.SHOW_TEXT) {
@@ -134,6 +140,9 @@ object MayorInfo {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
+        if (mc.currentServerData?.serverIP?.lowercase()
+                ?.contains("alpha") == true
+        ) return
         if (event.container is ContainerChest) {
             val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
