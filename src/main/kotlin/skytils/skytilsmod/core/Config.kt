@@ -127,6 +127,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var autoCopyFailToClipboard = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Copy Deaths to Clipboard",
+        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var copyDeathToClipboard = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Auto-Reparty on Dungeon Ending",
         description = "Runs the reparty command when your dungeon ends.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -167,6 +174,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Miscellaneous"
     )
     var necronPhaseTimer = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Sadan Phase Timer",
+        description = "Shows the time taken for each phase in the Sadan boss fight.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var sadanPhaseTimer = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Dungeon Score Estimate",

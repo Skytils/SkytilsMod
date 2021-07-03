@@ -30,6 +30,8 @@ import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -131,6 +133,21 @@ class MiscFeatures {
                             .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
                     }"
                 )
+            }
+            if (!Utils.inDungeons) {
+                if (Skytils.config.copyDeathToClipboard) {
+                    if (formatted.startsWith("§r§c ☠ ")) {
+                        event.message.chatStyle
+                            .setChatHoverEvent(
+                                HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    ChatComponentText("§aClick to copy to clipboard.")
+                                )
+                            ).chatClickEvent =
+                            ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
+
+                    }
+                }
             }
         }
     }
