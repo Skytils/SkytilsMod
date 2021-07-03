@@ -37,7 +37,6 @@ import java.awt.Color
 
 class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
-
     val scrollComponent: ScrollComponent
 
     init {
