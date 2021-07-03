@@ -65,10 +65,8 @@ import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
 import skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
 import skytils.skytilsmod.features.impl.trackers.impl.MythologicalTracker
-import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
-import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
-import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
+import skytils.skytilsmod.gui.ReopenableGUI
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
@@ -357,7 +355,7 @@ class Skytils {
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
         if (event.gui == null && config.reopenOptionsMenu) {
-            if (old is CommandAliasesGui || old is LocationEditGui || old is KeyShortcutsGui || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) {
+            if (old is ReopenableGUI || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) {
                 TickTask(1) {
                     displayScreen = OptionsGui()
                 }

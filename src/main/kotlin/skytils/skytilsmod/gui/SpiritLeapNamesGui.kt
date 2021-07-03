@@ -34,8 +34,7 @@ import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.listeners.DungeonListener
 import java.awt.Color
 
-class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2) {
-
+class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
     val scrollComponent: ScrollComponent
     private val classCheckboxes = HashMap<DungeonListener.DungeonClass, UIContainer>()
@@ -150,7 +149,6 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2) {
         textBox.setText(name)
 
         if (!enabled) enabledButton.effect(RecursiveFadeEffect())
-
 
         textBox.onKeyType { typedChar, keyCode ->
             textBox.setText(textBox.getText().filter(Char::isLetterOrDigit).take(16))

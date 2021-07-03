@@ -32,7 +32,7 @@ import skytils.skytilsmod.core.structure.ResizeButton
 import skytils.skytilsmod.core.structure.ResizeButton.Corner
 import java.awt.Color
 
-open class LocationEditGui : GuiScreen() {
+open class LocationEditGui : GuiScreen(), ReopenableGUI {
     private var xOffset = 0f
     private var yOffset = 0f
     private var resizing = false

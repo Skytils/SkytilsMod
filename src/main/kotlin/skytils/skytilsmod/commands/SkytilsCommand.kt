@@ -35,7 +35,6 @@ import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.gui.OptionsGui
-import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.APIUtil
@@ -186,7 +185,8 @@ object SkytilsCommand : CommandBase() {
                 )
                 return
             }
-            "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen = CommandAliasesGui()
+            "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen =
+                skytils.skytilsmod.gui.CommandAliasesGui()
             "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
                 LocationEditGui()
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()

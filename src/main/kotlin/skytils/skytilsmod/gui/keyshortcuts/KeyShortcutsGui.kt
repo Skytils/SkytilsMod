@@ -23,7 +23,8 @@ import net.minecraft.client.gui.GuiTextField
 import net.minecraft.client.settings.GameSettings
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.KeyShortcuts
-import skytils.skytilsmod.gui.commandaliases.elements.CleanButton
+import skytils.skytilsmod.gui.ReopenableGUI
+import skytils.skytilsmod.gui.keyshortcuts.elements.CleanButton
 import skytils.skytilsmod.gui.keyshortcuts.elements.KeyShortcutsList
 import java.awt.Color
 
@@ -32,7 +33,7 @@ import java.awt.Color
  * https://github.com/P0keDev/ChatShortcuts/blob/master/LICENSE
  * @author P0keDev
  */
-class KeyShortcutsGui : GuiScreen() {
+class KeyShortcutsGui : GuiScreen(), ReopenableGUI {
     private var keyShortcutsList: KeyShortcutsList? = null
     private var id = 0
     override fun initGui() {

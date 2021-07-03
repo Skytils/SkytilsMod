@@ -28,7 +28,6 @@ import gg.essential.elementa.dsl.*
 import gg.essential.vigilance.VigilanceConfig
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.gui.commandaliases.CommandAliasesGui
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.openGUI
