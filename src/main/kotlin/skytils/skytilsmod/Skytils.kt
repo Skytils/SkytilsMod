@@ -71,6 +71,8 @@ import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
+import skytils.skytilsmod.mixins.AccessorCommandHandler
+import skytils.skytilsmod.mixins.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -168,6 +170,11 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SBInfo)
         MinecraftForge.EVENT_BUS.register(SoundQueue)
         MinecraftForge.EVENT_BUS.register(UpdateChecker)
+        MinecraftForge.EVENT_BUS.register(DataFetcher())
+        MinecraftForge.EVENT_BUS.register(GUIMANAGER)
+        MinecraftForge.EVENT_BUS.register(MayorInfo())
+        MinecraftForge.EVENT_BUS.register(SBInfo.instance)
+        MinecraftForge.EVENT_BUS.register(UpdateChecker())
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
 
