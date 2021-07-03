@@ -324,7 +324,7 @@ class DungeonTimer {
                 val lines = """
                     §dTerracotta: ${timeFormat(((if (TerraClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else TerraClearTime) - bossEntryTime).toDouble() / 1000f)}
                     §aGiants: ${if (TerraClearTime == -1L) "0s" else timeFormat(((if (GiantsClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else GiantsClearTime) - TerraClearTime).toDouble() / 1000f)}
-                    §5Sadan: ${if (GiantsClearTime == -1L) "0s" else timeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - GiantsClearTime).toDouble() / 1000f)}
+                    §cSadan: ${if (GiantsClearTime == -1L) "0s" else timeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - GiantsClearTime).toDouble() / 1000f)}
                     """.trimIndent().split("\n".toRegex()).toTypedArray()
                 for (i in lines.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -346,7 +346,7 @@ class DungeonTimer {
             val displayText = """
                 §dTerracotta: 0s
                 §aGiants: 0s
-                §5Sadan: 0s
+                §cSadan: 0s
                 """.trimIndent()
             val lines = displayText.split("\n".toRegex()).toTypedArray()
             for (i in lines.indices) {
