@@ -246,7 +246,6 @@ class MiscFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        // TODO: Get someone to test this
         if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
             val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
             if (!extraAttr.getBoolean("ethermerge")) return
