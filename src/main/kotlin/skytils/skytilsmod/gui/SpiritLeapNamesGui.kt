@@ -19,15 +19,12 @@
 package skytils.skytilsmod.gui
 
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.ScrollComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIText
+import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.effects.RecursiveFadeEffect
-import gg.essential.elementa.utils.sizeStringToWidth
 import gg.essential.universal.UGraphics
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.utils.onLeftClick
@@ -99,12 +96,12 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2) {
                 y = CenterConstraint()
             }
 
-            val container = UIContainer().childOf(checkboxes).constrain {
+            val container = UIContainer().childOf(checkboxes).addChildren(text, checkbox).constrain {
                 x = 4.pixels()
                 y = RelativeConstraint(1f / DungeonListener.DungeonClass.values().size * index)
-                width = ChildBasedSizeConstraint()
+                width = longestTextConstraint + checkbox.getWidth().pixels()
                 height = ChildBasedSizeConstraint()
-            }.addChildren(text, checkbox) as UIContainer
+            } as UIContainer
 
             classCheckboxes[dClass] = container
         }
@@ -152,7 +149,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2) {
 
         textBox.setText(name)
 
-        if (enabled) enabledButton.effect(RecursiveFadeEffect())
+        if (!enabled) enabledButton.effect(RecursiveFadeEffect())
 
 
         textBox.onKeyType { typedChar, keyCode ->
