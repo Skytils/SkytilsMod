@@ -17,7 +17,10 @@
  */
 package skytils.skytilsmod.commands
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -33,10 +36,7 @@ import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.gui.LocationEditGui
-import skytils.skytilsmod.gui.OptionsGui
-import skytils.skytilsmod.gui.SpiritLeapNamesGui
-import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
+import skytils.skytilsmod.gui.*
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.openGUI
@@ -186,7 +186,7 @@ object SkytilsCommand : CommandBase() {
                 return
             }
             "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen =
-                skytils.skytilsmod.gui.CommandAliasesGui()
+                CommandAliasesGui()
             "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
                 LocationEditGui()
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()

@@ -37,7 +37,7 @@ import org.lwjgl.opengl.Display
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.gui.keyshortcuts.elements.CleanButton
+import skytils.skytilsmod.gui.elements.CleanButton
 import skytils.skytilsmod.mixins.accessors.AccessorGuiEditSign
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.NumberUtil

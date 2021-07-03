@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.gui.keyshortcuts.elements
+package skytils.skytilsmod.gui.elements
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton

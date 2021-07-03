@@ -29,7 +29,6 @@ import gg.essential.vigilance.VigilanceConfig
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.components.SimpleButton
-import skytils.skytilsmod.gui.keyshortcuts.KeyShortcutsGui
 import skytils.skytilsmod.utils.openGUI
 import java.awt.Desktop
 import java.net.URI

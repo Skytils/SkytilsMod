@@ -29,19 +29,24 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
+import net.minecraft.client.settings.GameSettings
 import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.features.impl.handlers.CommandAliases
+import skytils.skytilsmod.features.impl.handlers.KeyShortcuts
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
     val scrollComponent: ScrollComponent
+    var clickedButton: Entry? = null
+
+    val components = HashMap<UIContainer, Entry>()
 
     init {
-        UIText("Command Aliases").childOf(window).constrain {
+        UIText("Key Shortcuts").childOf(window).constrain {
             x = CenterConstraint()
             y = RelativeConstraint(0.075f)
             height = 14.pixels()
@@ -68,19 +73,19 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
         }
 
-        SimpleButton("Add Alias").childOf(bottomButtons).constrain {
+        SimpleButton("Add Shortcut").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
         }.onLeftClick {
-            addNewAlias()
+            addNewShortcut()
         }
 
-        for (name in CommandAliases.aliases) {
-            addNewAlias(name.key, name.value)
+        KeyShortcuts.shortcuts.onEach {
+            addNewShortcut(it.key, it.value)
         }
     }
 
-    private fun addNewAlias(alias: String = "", replacement: String = "") {
+    private fun addNewShortcut(command: String = "", keyCode: Int = 0) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -88,30 +93,23 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val aliasBox = (UITextInput("Alias Name").childOf(container).constrain {
+        val commandToRun = (UITextInput("Executed Command").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
-            width = 30.percent()
+            width = 75.percent()
         }.onLeftClick {
-            grabWindowFocus()
+            if (clickedButton == null) grabWindowFocus()
         } as UITextInput).also {
-            it.setText(alias)
+            it.setText(command)
             it.onKeyType { typedChar, keyCode ->
                 it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
 
-        val replacementBox = (UITextInput("Executed Command").childOf(container).constrain {
+        val keybindButton = SimpleButton(GameSettings.getKeyDisplayString(keyCode)).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 50.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(replacement)
-            it.onKeyType { typedChar, keyCode ->
-                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
-            }
+            height = 75.percent()
         }
 
         SimpleButton("Remove").childOf(container).constrain {
@@ -120,24 +118,68 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 75.percent()
         }.onLeftClick {
             container.parent.removeChild(container)
+            components.remove(container)
         }
+        val entry = Entry(container, commandToRun, keybindButton, keyCode)
+
+        keybindButton.onLeftClick {
+            clickedButton = entry
+        }
+
+        components[container] = entry
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
-        CommandAliases.aliases.clear()
+        KeyShortcuts.shortcuts.clear()
 
         for (container in scrollComponent.allChildren) {
-            val text = container.childrenOfType<UITextInput>()
-            if (text.size != 2) throw IllegalStateException("${container.componentName} does not have 2 UITextInput's! Available children ${container.children.map { it.componentName }}")
-            val alias = (text.find { it.placeholder == "Alias Name" }
-                ?: throw IllegalStateException("${container.componentName} does not have the alias UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
-            val replacement = (text.find { it.placeholder == "Executed Command" }
-                ?: throw IllegalStateException("${container.componentName} does not have the command UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
-            if (alias.isBlank() || replacement.isBlank()) continue
-            CommandAliases.aliases[alias] = replacement
+            val triple = components[container] ?: throw IllegalStateException("Missing container in map")
+
+            val command = triple.input.getText()
+            val keyCode = triple.keyCode
+            if (command.isBlank() || keyCode == 0) continue
+
+            KeyShortcuts.shortcuts[command] = keyCode
         }
 
-        PersistentSave.markDirty<CommandAliases>()
+        PersistentSave.markDirty<KeyShortcuts>()
     }
+
+    override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {
+        if (clickedButton != null) {
+            when {
+                keyCode == 1 -> clickedButton!!.keyCode = 0
+                keyCode != 0 -> clickedButton!!.keyCode = keyCode
+                typedChar.code > 0 -> clickedButton!!.keyCode = typedChar.code + 256
+            }
+            clickedButton = null
+        } else super.onKeyPressed(keyCode, typedChar, modifiers)
+    }
+
+    override fun onMouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int) {
+        if (clickedButton != null) {
+            clickedButton!!.keyCode = -100 + mouseButton
+            clickedButton = null
+        } else super.onMouseClicked(mouseX, mouseY, mouseButton)
+    }
+
+    override fun onTick() {
+        super.onTick()
+        for (item in components) {
+            val button = item.value.button
+            val keyCode = item.value.keyCode
+            button.text.setText(GameSettings.getKeyDisplayString(keyCode))
+            val pressed = clickedButton === item.value
+            val reused =
+                keyCode != 0 && (mc.gameSettings.keyBindings.any { it.keyCode == keyCode } || components.any { it.value.keyCode != 0 && it !== item && it.value.keyCode == keyCode })
+            if (pressed) {
+                button.text.setText("§f> §e${button.text.getText()}§f <")
+            } else if (reused) {
+                button.text.setText("§c${button.text.getText()}")
+            }
+        }
+    }
+
+    data class Entry(val container: UIContainer, val input: UITextInput, val button: SimpleButton, var keyCode: Int)
 }
