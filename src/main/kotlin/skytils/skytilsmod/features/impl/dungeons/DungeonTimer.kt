@@ -118,6 +118,27 @@ class DungeonTimer {
                     }
                 }
             }
+            (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6" && message.startsWith("§r§c[BOSS] Sadan")) -> {
+                when {
+                    (message.endsWith("§r§f: ENOUGH!§r") && TerraClearTime == -1L) -> {
+                        TerraClearTime = System.currentTimeMillis()
+                        if (Skytils.config.SadanPhaseTimer) mc.thePlayer.addChatMessage(
+                                ChatComponentText(
+                                    "§bTerracotta took " + ((TerraClearTime - bossEntryTime) / 1000f).roundToInt() + " seconds."
+                                )
+                        )
+                    }
+                    (message.endsWith("§r§f: You did it. I understand now, you have earned my respect.§r") && GiantsClearTime == -1L) -> {
+                        GiantsClearTime = System.currentTimeMillis()
+                        if (Skytils.config.SadanPhaseTimer) mc.thePlayer.addChatMessage(
+                                ChatComponentText(
+                                    "§bGiants took " + ((GiantsClearTime - TerraClearTime) / 1000f).roundToInt() + " seconds."
+                                )
+                        )
+                    }
+
+                }
+            }
         }
     }
 
@@ -131,6 +152,9 @@ class DungeonTimer {
         phase1ClearTime = -1
         phase2ClearTime = -1
         phase3ClearTime = -1
+        TerraClearTime = -1
+        GiantsClearTime = -1
+        SadanTime = -1
         witherDoors = 0
         scoreShownAt = -1
     }
@@ -145,12 +169,16 @@ class DungeonTimer {
         var phase1ClearTime = -1L
         var phase2ClearTime = -1L
         var phase3ClearTime = -1L
+        var TerraClearTime = -1L
+        var GiantsClearTime = -1L
+        var SadanTime = -1L
         var witherDoors = 0
         var scoreShownAt = -1L
 
         init {
             DungeonTimerElement()
             NecronPhaseTimerElement()
+            SadanPhaseTimerElement()
         }
     }
 
@@ -280,6 +308,68 @@ class DungeonTimer {
 
         override val toggled: Boolean
             get() = Skytils.config.necronPhaseTimer
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", FloatPair(200, 120)) {
+        override fun render() {
+            val player = mc.thePlayer
+            val world: World? = mc.theWorld
+            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6") {
+                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                val lines = """
+                    §dTerracotta: ${timeFormat(((if (TerraClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else TerraClearTime) - bossEntryTime).toDouble() / 1000f)}
+                    §aGiants: ${if (TerraClearTime == -1L) "0s" else timeFormat(((if (GiantsClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else GiantsClearTime) - TerraClearTime).toDouble() / 1000f)}
+                    §5Sadan: ${if (GiantsClearTime == -1L) "0s" else timeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - GiantsClearTime).toDouble() / 1000f)}
+                    """.trimIndent().split("\n".toRegex()).toTypedArray()
+                for (i in lines.indices) {
+                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    ScreenRenderer.fontRenderer.drawString(
+                        lines[i],
+                        if (leftAlign) 0f else width.toFloat(),
+                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        CommonColors.WHITE,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val displayText = """
+                §dTerracotta: 0s
+                §aGiants: 0s
+                §5Sadan: 0s
+                """.trimIndent()
+            val lines = displayText.split("\n".toRegex()).toTypedArray()
+            for (i in lines.indices) {
+                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    lines[i],
+                    if (leftAlign) 0f else width.toFloat(),
+                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                    CommonColors.WHITE,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+            }
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 3
+
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§dTerracotta: 0s")
+
+        override val toggled: Boolean
+            get() = Skytils.config.SadanPhaseTimer
 
         init {
             Skytils.guiManager.registerElement(this)

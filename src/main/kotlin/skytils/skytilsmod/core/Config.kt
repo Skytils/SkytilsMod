@@ -169,6 +169,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var necronPhaseTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Sadan Phase Timer",
+        description = "Shows the time taken for each phase in the Sadan boss fight.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var SadanPhaseTimer = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Dungeon Score Estimate",
         description = "Shows an estimate of the current dungeon score.\nRequires the Dungeon Rooms mod in order to use.",
         category = "Dungeons", subcategory = "Score Calculation"
