@@ -37,10 +37,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemMonsterPlacer
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.ResourceLocation
+import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -237,8 +234,21 @@ class MiscFeatures {
             val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
             if (!extraAttr.getBoolean("ethermerge")) return
             val dist = 57.0 + extraAttr.getInteger("tuned_transmission")
-            val block = (mc.thePlayer.rayTrace(dist, event.partialTicks) ?: return).blockPos
-            if (mc.theWorld.getBlockState(block).block != Blocks.air) {
+            val vec3 = mc.thePlayer.getPositionEyes(event.partialTicks)
+            val vec31 = mc.thePlayer.getLook(event.partialTicks)
+            val vec32 = vec3.addVector(
+                vec31.xCoord * dist,
+                vec31.yCoord * dist,
+                vec31.zCoord * dist
+            )
+            val block = (mc.theWorld.rayTraceBlocks(vec3, vec32, true, false, true) ?: return).blockPos
+            if (mc.theWorld.getBlockState(block).block.material.isSolid && (1..2).none {
+                    mc.theWorld.getBlockState(
+                        block.up(
+                            it
+                        )
+                    ).block != Blocks.air
+                }) {
                 val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
                 val x = block.x - viewerX
