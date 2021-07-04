@@ -150,6 +150,21 @@ class MiscFeatures {
                 }
             }
         }
+        if (!Utils.inDungeons) {
+            if (Skytils.config.copyDeathToClipboard) {
+                if (formatted.startsWith("§r§c ☠ ")) {
+                    event.message.chatStyle
+                        .setChatHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("§aClick to copy to clipboard.")
+                            )
+                        ).chatClickEvent =
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
+
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -246,7 +261,6 @@ class MiscFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        // TODO: Get someone to test this
         if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
             val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
             if (!extraAttr.getBoolean("ethermerge")) return

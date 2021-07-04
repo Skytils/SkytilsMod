@@ -96,7 +96,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         val commandToRun = (UITextInput("Executed Command").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
-            width = 75.percent()
+            width = 70.percent()
         }.onLeftClick {
             if (clickedButton == null) grabWindowFocus()
         } as UITextInput).also {

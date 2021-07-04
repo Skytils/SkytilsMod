@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.features.impl.trackers;
+package skytils.skytilsmod.features.impl.trackers
 
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave

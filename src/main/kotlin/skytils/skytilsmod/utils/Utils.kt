@@ -32,6 +32,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -48,7 +49,8 @@ import kotlin.math.roundToInt
 
 
 object Utils {
-    private val mc = Minecraft.getMinecraft()
+    @JvmField
+    var noSychic = false
 
     @JvmField
     var inSkyblock = false
@@ -97,7 +99,7 @@ object Utils {
      */
     fun checkForSkyblock() {
         if (isOnHypixel) {
-            val scoreboardObj = mc!!.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
+            val scoreboardObj = mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
             if (scoreboardObj != null) {
                 val scObjName = ScoreboardUtil.cleanSB(scoreboardObj.displayName)
                 if (scObjName.contains("SKYBLOCK")) {
@@ -139,7 +141,7 @@ object Utils {
 
     @JvmStatic
     fun isInTablist(player: EntityPlayer): Boolean {
-        if (mc!!.isSingleplayer) {
+        if (mc.isSingleplayer) {
             return true
         }
         return mc.netHandler.playerInfoMap.any { it.gameProfile.name.equals(player.name, ignoreCase = true) }
@@ -152,7 +154,7 @@ object Utils {
      */
     fun playLoudSound(sound: String?, pitch: Double) {
         shouldBypassVolume = true
-        mc!!.thePlayer.playSound(sound, 1f, pitch.toFloat())
+        mc.thePlayer.playSound(sound, 1f, pitch.toFloat())
         shouldBypassVolume = false
     }
 

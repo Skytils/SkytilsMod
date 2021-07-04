@@ -94,7 +94,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     val name = matcher.group(1)
                     if (name == "Unknown") continue
                     val teammate = (DungeonListener.team.find { it.playerName == name }
-                        ?: continue);
+                        ?: continue)
                     val dungeonClass = teammate.dungeonClass
                     val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
                     var shouldDrawBkg = true

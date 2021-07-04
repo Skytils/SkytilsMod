@@ -58,7 +58,7 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
     }
 
     private boolean isSummonMob() {
-        if (!Utils.inSkyblock) return false;
+        if (!Utils.inSkyblock || Utils.noSychic) return false;
         try {
             if (isSummonMob == null) {
                 if ("Lost Adventurer".equals(this.getName())) {

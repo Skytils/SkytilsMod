@@ -151,7 +151,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         if (!enabled) enabledButton.effect(RecursiveFadeEffect())
 
         textBox.onKeyType { typedChar, keyCode ->
-            textBox.setText(textBox.getText().filter(Char::isLetterOrDigit).take(16))
+            textBox.setText(textBox.getText().filter { it.isLetterOrDigit() || it == '_' }.take(16))
         }
 
         container.onLeftClick {
@@ -175,7 +175,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val button =
                 container.childrenOfType<SimpleButton>().find { it.t != "Remove" }
                     ?: throw IllegalStateException("Button cannot be missing!")
-            val name = text.getText();
+            val name = text.getText()
             if (name.isBlank()) continue
             SpiritLeap.names[name] = button.text.getText() == "Enabled"
         }

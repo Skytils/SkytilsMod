@@ -25,7 +25,7 @@ plugins {
 
 ext.kotlin_version = "1.5.20"
 
-version = "1.0-pre13.1"
+version = "1.0-pre14"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
@@ -66,7 +66,7 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("gg.essential:Vigilance:123-10809-SNAPSHOT") {
+    implementation("gg.essential:Vigilance:127-10809-SNAPSHOT") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }

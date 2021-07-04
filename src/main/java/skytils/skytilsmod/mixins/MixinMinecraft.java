@@ -21,8 +21,10 @@ package skytils.skytilsmod.mixins;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +36,7 @@ import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
 
+import java.io.File;
 import java.util.Objects;
 
 @Mixin(Minecraft.class)
@@ -41,6 +44,7 @@ public abstract class MixinMinecraft {
     @Shadow
     public EntityPlayerSP thePlayer;
 
+    @Shadow @Final public File mcDataDir;
     private final Minecraft $this = (Minecraft) (Object) this;
 
     /**
@@ -73,5 +77,10 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 1))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         ScreenRenderer.init();
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onPostInit(GameConfiguration gameConfig, CallbackInfo ci) {
+        if (new File(new File(new File(this.mcDataDir, "config"), "skytils"), "nosychic").exists()) Utils.noSychic = true;
     }
 }
