@@ -204,8 +204,8 @@ class IcePathSolver {
                 val nextPos = move(iceCave, iceCaveColors, currPos, dir)
                 if (nextPos != null) {
                     queue.addLast(nextPos)
-                    iceCaveColors[nextPos.getY().toInt()][nextPos.getX().toInt()] = Point(
-                        currPos.getX().toInt(), currPos.getY().toInt()
+                    iceCaveColors[nextPos.y][nextPos.x] = Point(
+                        currPos.x, currPos.y
                     )
                     if (nextPos.getY() == endY.toDouble() && nextPos.getX() == endX.toDouble()) {
                         val steps = ArrayList<Point?>()
@@ -216,7 +216,7 @@ class IcePathSolver {
                         steps.add(currPos)
                         while (tmp !== startPoint) {
                             count++
-                            tmp = iceCaveColors[tmp!!.getY().toInt()][tmp.getX().toInt()]
+                            tmp = iceCaveColors[tmp!!.y][tmp.x]
                             steps.add(tmp)
                         }
                         //System.out.println("Silverfish solved in " + count + " moves.");
@@ -240,8 +240,8 @@ class IcePathSolver {
         currPos: Point,
         dir: EnumFacing
     ): Point? {
-        val x = currPos.getX().toInt()
-        val y = currPos.getY().toInt()
+        val x = currPos.x
+        val y = currPos.y
         val diffX = dir.directionVec.x
         val diffY = dir.directionVec.z
         var i = 1

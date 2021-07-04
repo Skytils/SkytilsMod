@@ -79,14 +79,11 @@ class TicTacToeSolver {
                             70 -> 2
                             else -> continue
                         }
-                        val column =
-                            if (mc.theWorld.getBlockState(blockBehind.offset(frame.facingDirection.rotateYCCW())).block != Blocks.iron_block) {
-                                2
-                            } else {
-                                if (mc.theWorld.getBlockState(blockBehind.offset(frame.facingDirection.rotateY())).block != Blocks.iron_block) {
-                                    0
-                                } else 1
-                            }
+                        val column = when {
+                            mc.theWorld.getBlockState(blockBehind.offset(frame.facingDirection.rotateYCCW())).block != Blocks.iron_block -> 2
+                            mc.theWorld.getBlockState(blockBehind.offset(frame.facingDirection.rotateY())).block != Blocks.iron_block -> 0
+                            else -> 1
+                        }
                         val mapData = Items.filled_map.getMapData(frame.displayedItem, mc.theWorld) ?: continue
                         val colorInt: Int = (mapData.colors[8256] and 255.toByte()).toInt()
                         val owner = if (colorInt == 114) Board.State.X else Board.State.O

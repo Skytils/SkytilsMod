@@ -36,7 +36,7 @@ import java.awt.Color
 
 class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
-    val scrollComponent: ScrollComponent
+    private val scrollComponent: ScrollComponent
     private val classCheckboxes = HashMap<DungeonListener.DungeonClass, UIContainer>()
 
     init {
@@ -122,6 +122,11 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = 5.pixels()
             y = CenterConstraint()
             width = 50.percent()
+        }.also {
+            it.setText(name)
+            it.onKeyType { _, _ ->
+                it.setText(it.getText().filter { c -> c.isLetterOrDigit() || c == '_' }.take(16))
+            }
         }
 
         SimpleButton("Remove").childOf(container).constrain {
@@ -146,13 +151,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
 
-        textBox.setText(name)
-
         if (!enabled) enabledButton.effect(RecursiveFadeEffect())
-
-        textBox.onKeyType { typedChar, keyCode ->
-            textBox.setText(textBox.getText().filter { it.isLetterOrDigit() || it == '_' }.take(16))
-        }
 
         container.onLeftClick {
             textBox.grabWindowFocus()

@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.common.collect.Lists
 import com.google.gson.JsonObject
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
@@ -35,8 +34,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message.startsWith("/")) {
-            val args =
-                Lists.newArrayList(*event.message.substring(1).trim { it <= ' ' }.split(" +".toRegex()).toTypedArray())
+            val args = event.message.substring(1).trim().split(" ").toMutableList()
             val command = args.removeAt(0)
             if (aliases.containsKey(command)) {
                 event.isCanceled = true
@@ -45,9 +43,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
                         if (Skytils.config.commandAliasMode == 0) "/" + aliases[command] + " " + java.lang.String.join(
                             " ",
                             args
-                        ) else "/" + String.format(
-                            aliases[command]!!, *args.toTypedArray()
-                        )
+                        ) else "/${aliases[command]!!.format(*args.toTypedArray())}"
                     if (event.addToChat) {
                         mc.ingameGUI.chatGUI.addToSentMessages(msg)
                     }

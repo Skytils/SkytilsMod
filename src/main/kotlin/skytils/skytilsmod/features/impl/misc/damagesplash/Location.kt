@@ -27,9 +27,8 @@ import kotlin.math.roundToInt
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
-class Location : Point3d {
-    constructor(x: Double, y: Double, z: Double) : super(x, y, z)
-    constructor(entity: Entity) : super(entity.posX, entity.posY, entity.posZ)
+class Location(x: Double, y: Double, z: Double) : Point3d() {
+    constructor(entity: Entity) : this(entity.posX, entity.posY, entity.posZ)
 
     fun add(x: Double, y: Double, z: Double): Location {
         this.x += x
@@ -52,15 +51,12 @@ class Location : Point3d {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return if (other is Tuple3d) {
-            equals(other)
+            return x == other.x && y == other.y && z == other.z
         } else false
-    }
-
-    override fun equals(other: Tuple3d): Boolean {
-        return x == other.x && y == other.y && z == other.z
     }
 
     override fun toString(): String {
         return "[" + x.roundToInt() + ", " + y.roundToInt() + ", " + z.roundToInt() + "]"
     }
+
 }

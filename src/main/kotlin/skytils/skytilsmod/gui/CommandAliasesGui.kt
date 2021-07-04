@@ -19,14 +19,9 @@
 package skytils.skytilsmod.gui
 
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.ScrollComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIText
+import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.RelativeConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
+import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.vigilance.utils.onLeftClick
@@ -38,7 +33,7 @@ import java.awt.Color
 
 class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
-    val scrollComponent: ScrollComponent
+    private val scrollComponent: ScrollComponent
 
     init {
         UIText("Command Aliases").childOf(window).constrain {
@@ -75,6 +70,26 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             addNewAlias()
         }
 
+        val tooltipBlock = UIBlock().constrain {
+            x = 5.pixels(); y = basicYConstraint { it.parent.getTop() - it.getHeight() - 6 }; height =
+            ChildBasedSizeConstraint(4f); width = ChildBasedSizeConstraint(4f); color =
+            ConstantColorConstraint(Color(224, 224, 224, 100))
+        }.effect(OutlineEffect(Color(0, 243, 255), 1f)).also { it.hide() }
+            .addChild(UIWrappedText("What are aliases? Aliases are little shortcuts for commands. For example, /sychic could be short for /boop Sychic. Want to give it a try? Click 'Add Alias', enter 'sychic' for 'Alias Name' and 'boop Sychic' as the executed command! Then, run the command /sychic! Aliases will also append any arguments that you supply.").constrain {
+                x = 2.pixels(); y = 0.pixels(); width = 90.percentOfWindow()
+            })
+        UICircle(7f).childOf(window).constrain {
+            x = 9.pixels()
+            y = basicYConstraint { it.parent.getBottom() - it.getHeight() - 2 }
+        }.addChildren(
+            UIText("?", true).constrain { x = CenterConstraint(); y = CenterConstraint() },
+            tooltipBlock
+        ).onMouseEnter {
+            tooltipBlock.unhide()
+        }.onMouseLeave {
+            tooltipBlock.hide()
+        }
+
         for (name in CommandAliases.aliases) {
             addNewAlias(name.key, name.value)
         }
@@ -88,7 +103,7 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val aliasBox = (UITextInput("Alias Name").childOf(container).constrain {
+        (UITextInput("Alias Name").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
             width = 30.percent()
@@ -96,12 +111,12 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             grabWindowFocus()
         } as UITextInput).also {
             it.setText(alias)
-            it.onKeyType { typedChar, keyCode ->
+            it.onKeyType { _, _ ->
                 it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
 
-        val replacementBox = (UITextInput("Executed Command").childOf(container).constrain {
+        (UITextInput("Executed Command").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 50.percent()
@@ -109,7 +124,7 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             grabWindowFocus()
         } as UITextInput).also {
             it.setText(replacement)
-            it.onKeyType { typedChar, keyCode ->
+            it.onKeyType { _, _ ->
                 it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }

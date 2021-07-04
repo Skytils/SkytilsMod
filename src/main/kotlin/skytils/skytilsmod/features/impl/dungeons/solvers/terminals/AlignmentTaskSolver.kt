@@ -226,8 +226,8 @@ class AlignmentTaskSolver {
                 val nextPos = move(grid, gridCopy, currPos, dir)
                 if (nextPos != null) {
                     queue.addLast(nextPos)
-                    gridCopy[nextPos.getY().toInt()][nextPos.getX().toInt()] = Point(
-                        currPos.getX().toInt(), currPos.getY().toInt()
+                    gridCopy[nextPos.y][nextPos.x] = Point(
+                        currPos.x, currPos.y
                     )
                     if (end == Point(nextPos.x, nextPos.y)) {
                         val steps = ArrayList<Point>()
@@ -238,7 +238,7 @@ class AlignmentTaskSolver {
                         steps.add(currPos)
                         while (tmp !== start) {
                             count++
-                            tmp = gridCopy[tmp.getY().toInt()][tmp.getX().toInt()]!!
+                            tmp = gridCopy[tmp.y][tmp.x]!!
                             steps.add(tmp)
                         }
                         return steps
@@ -261,8 +261,8 @@ class AlignmentTaskSolver {
         currPos: Point,
         dir: EnumFacing
     ): Point? {
-        val x = currPos.getX().toInt()
-        val y = currPos.getY().toInt()
+        val x = currPos.x
+        val y = currPos.y
         val diffX = dir.directionVec.x
         val diffY = dir.directionVec.z
         val i =

@@ -59,7 +59,7 @@ object GlintCustomizeCommand : CommandBase() {
         if (args.isEmpty()) {
             throw WrongUsageException(getCommandUsage(sender))
         }
-        val originalMessage = java.lang.String.join(" ", *args)
+        val originalMessage = args.joinToString(" ")
         when (args[0].lowercase()) {
             "override" -> {
                 when {

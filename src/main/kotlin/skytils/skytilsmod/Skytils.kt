@@ -328,8 +328,7 @@ class Skytils {
             val x2 = x + 100
             var y = event.gui.height - 22
             var y2 = y + 20
-            val sorted = Lists.newArrayList(event.buttonList)
-            sorted.sortWith { a, b -> b.yPosition + b.height - a.yPosition + a.height }
+            val sorted = event.buttonList.sortedWith { a, b -> b.yPosition + b.height - a.yPosition + a.height }
             for (button in sorted) {
                 val otherX = button.xPosition
                 val otherX2 = button.xPosition + button.width

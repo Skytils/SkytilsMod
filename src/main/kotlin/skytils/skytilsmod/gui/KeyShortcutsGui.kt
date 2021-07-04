@@ -40,10 +40,10 @@ import java.awt.Color
 
 class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
-    val scrollComponent: ScrollComponent
-    var clickedButton: Entry? = null
+    private val scrollComponent: ScrollComponent
+    private var clickedButton: Entry? = null
 
-    val components = HashMap<UIContainer, Entry>()
+    private val components = HashMap<UIContainer, Entry>()
 
     init {
         UIText("Key Shortcuts").childOf(window).constrain {
@@ -101,7 +101,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             if (clickedButton == null) grabWindowFocus()
         } as UITextInput).also {
             it.setText(command)
-            it.onKeyType { typedChar, keyCode ->
+            it.onKeyType { _, _ ->
                 it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
@@ -133,11 +133,9 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         super.onScreenClose()
         KeyShortcuts.shortcuts.clear()
 
-        for (container in scrollComponent.allChildren) {
-            val triple = components[container] ?: throw IllegalStateException("Missing container in map")
-
-            val command = triple.input.getText()
-            val keyCode = triple.keyCode
+        for ((_, entry) in components) {
+            val command = entry.input.getText()
+            val keyCode = entry.keyCode
             if (command.isBlank() || keyCode == 0) continue
 
             KeyShortcuts.shortcuts[command] = keyCode

@@ -81,6 +81,6 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onPostInit(GameConfiguration gameConfig, CallbackInfo ci) {
-        if (new File(new File(new File(this.mcDataDir, "config"), "skytils"), "nosychic").exists()) Utils.noSychic = true;
+        if (new File(this.mcDataDir, "config/skytils/nosychic").exists()) Utils.noSychic = true;
     }
 }
