@@ -175,7 +175,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val button =
                 container.childrenOfType<SimpleButton>().find { it.t != "Remove" }
                     ?: throw IllegalStateException("Button cannot be missing!")
-            val name = text.getText();
+            val name = text.getText()
             if (name.isBlank()) continue
             SpiritLeap.names[name] = button.text.getText() == "Enabled"
         }

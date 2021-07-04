@@ -52,7 +52,7 @@ public abstract class MixinEntityRenderer implements IResourceManagerReloadListe
                     if (entity instanceof EntityCreeper && entity.isInvisible()) {
                         final EntityCreeper creeper = (EntityCreeper) entity;
                         if (creeper.getMaxHealth() == 20 && creeper.getHealth() == 20 && creeper.getPowered()) {
-                            if (CollectionsKt.any(npcs, (npc -> npc.getDistanceSqToEntity(entity) <= 49))) return true;
+                            return CollectionsKt.any(npcs, (npc -> npc.getDistanceSqToEntity(entity) <= 49));
                         }
                     }
                     return false;

@@ -23,11 +23,12 @@ import net.minecraftforge.fml.client.SplashProgress;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import skytils.skytilsmod.utils.Utils;
 
 @Mixin(value = SplashProgress.class, priority = 999)
 public abstract class MixinSplashProgress {
     @ModifyVariable(method = "start", at = @At(value = "STORE"), ordinal = 2, remap = false)
     private static ResourceLocation setForgeGif(ResourceLocation resourceLocation) {
-        return new ResourceLocation("skytils", "sychicpet.gif");
+        return Utils.noSychic ? resourceLocation : new ResourceLocation("skytils", "sychicpet.gif");
     }
 }
