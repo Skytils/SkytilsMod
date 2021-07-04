@@ -151,7 +151,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         if (!enabled) enabledButton.effect(RecursiveFadeEffect())
 
         textBox.onKeyType { typedChar, keyCode ->
-            textBox.setText(textBox.getText().filter(Char::isLetterOrDigit).take(16))
+            textBox.setText(textBox.getText().filter { it.isLetterOrDigit() || it == '_' }.take(16))
         }
 
         container.onLeftClick {
