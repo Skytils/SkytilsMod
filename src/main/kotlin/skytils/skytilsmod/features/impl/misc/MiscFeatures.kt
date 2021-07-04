@@ -134,19 +134,19 @@ class MiscFeatures {
                     }"
                 )
             }
-            if (!Utils.inDungeons) {
-                if (Skytils.config.copyDeathToClipboard) {
-                    if (formatted.startsWith("§r§c ☠ ")) {
-                        event.message.chatStyle
-                            .setChatHoverEvent(
-                                HoverEvent(
-                                    HoverEvent.Action.SHOW_TEXT,
-                                    ChatComponentText("§aClick to copy to clipboard.")
-                                )
-                            ).chatClickEvent =
-                            ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
+        }
+        if (!Utils.inDungeons) {
+            if (Skytils.config.copyDeathToClipboard) {
+                if (formatted.startsWith("§r§c ☠ ")) {
+                    event.message.chatStyle
+                        .setChatHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("§aClick to copy to clipboard.")
+                            )
+                        ).chatClickEvent =
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
 
-                    }
                 }
             }
         }

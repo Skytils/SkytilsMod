@@ -49,8 +49,7 @@ object ScoreboardUtil {
                 list
             }
             return scores.map {
-                val team = scoreboard.getPlayersTeam(it.playerName)
-                ScorePlayerTeam.formatPlayerName(team, it.playerName)
+                ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
             }
         }
 }
