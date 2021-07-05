@@ -1982,8 +1982,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
             protectItemBINThreshold = numeric.ifEmpty { "0" }
         }
 
-        registerListener("darkModeMist") { _: Nothing -> mc.renderGlobal.loadRenderers() }
-        registerListener("recolorCarpets") { _: Nothing -> mc.renderGlobal.loadRenderers() }
+        registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
+        registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
 
         this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 

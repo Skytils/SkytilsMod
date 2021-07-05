@@ -27,6 +27,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
@@ -44,18 +45,18 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "You can do this by renaming your Skytils jar to !Skytils.jar,<br>" +
         "or by renaming the other mod's jar to start with a Z.<br>" +
         "If you have already done this and are still getting this error,<br>" +
-        "ask for support in the Discord." +
-        "</p></html>";
+        "ask for support in the Discord.";
 
     private static final String badMixinVersionMessage =
         "<html><p>" +
         "Skytils has detected an older version of Mixin.<br>" +
         "Many of my features require Mixin 0.7 or later!<br>" +
         "In order to resolve this conflict you must remove<br>" +
-        "any mods with a Mixin version below 0.7<br>" +
+        "any mods with a Mixin version below 0.7.<br>" +
+        "You can also try to rename Skytils be above other mods alphabetically<br>" +
+        "by changing Skytils.jar to !Skytils.jar<br>" +
         "If you have already done this and are still getting this error,<br>" +
-        "ask for support in the Discord." +
-        "</p></html>";
+        "ask for support in the Discord.";
 
     private static final String liteloaderUserMessage =
         "<html><p>" +
@@ -68,19 +69,19 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "</p></html>";
 
     private static final String voidChatMessage =
-            "<html><p>" +
-            "Skytils has detected that you are using VoidChat.<br>" +
-            "VoidChat breaks many of my features!<br>" +
-            "In order to resolve this conflict you must remove<br>" +
-            "VoidChat from your Minecraft mods folder.<br>" +
-            "A good alternative is Patcher at sk1er.club/mods/Patcher.<br>" +
-            "If you have already done this and are still getting this error,<br>" +
-            "ask for support in the Discord." +
-            "</p></html>";
+        "<html><p>" +
+        "Skytils has detected that you are using VoidChat.<br>" +
+        "VoidChat breaks many of my features!<br>" +
+        "In order to resolve this conflict you must remove<br>" +
+        "VoidChat from your Minecraft mods folder.<br>" +
+        "A good alternative is Patcher at sk1er.club/mods/Patcher.<br>" +
+        "If you have already done this and are still getting this error,<br>" +
+        "ask for support in the Discord." +
+        "</p></html>";
 
     public SkytilsLoadingPlugin() {
         if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
-            showMessage(kotlinErrorMessage);
+            showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
             exit();
         }
         if (!StringUtilsKt.startsWithAny(MixinEnvironment.getCurrentEnvironment().getVersion(), "0.7", "0.8")) {
@@ -89,7 +90,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 showMessage(liteloaderUserMessage);
                 exit();
             } catch (ClassNotFoundException ignored) {
-                showMessage(badMixinVersionMessage);
+                showMessage(badMixinVersionMessage + "<br>The culprit seems to be " + new File(MixinEnvironment.class.getProtectionDomain().getCodeSource().getLocation().toString()).getName() + "</p></html>");
                 exit();
             }
         }
