@@ -358,7 +358,7 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onAttack(event: AttackEntityEvent) {
-        if (!Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityEnderman || !Skytils.config.useSlayerHitMethod) return
+        if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityEnderman || !Skytils.config.useSlayerHitMethod) return
         val enderman = event.target as EntityEnderman
         if (floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
             printDebugMessage("A valid enderman was attacked")

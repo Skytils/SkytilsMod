@@ -32,4 +32,7 @@ public interface AccessorGuiNewChat {
 
     @Accessor
     List<ChatLine> getDrawnChatLines();
+
+    @Accessor
+    int getScrollPos();
 }

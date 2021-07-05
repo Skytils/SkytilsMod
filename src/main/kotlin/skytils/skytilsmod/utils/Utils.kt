@@ -19,7 +19,9 @@ package skytils.skytilsmod.utils
 
 import gg.essential.vigilance.Vigilant
 import io.netty.util.internal.ConcurrentSet
-import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ChatLine
+import net.minecraft.client.gui.GuiNewChat
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -34,6 +36,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
@@ -260,7 +263,29 @@ object Utils {
         if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
     }
 
-
+    fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
+        if (this is AccessorGuiNewChat) {
+            if (this.chatOpen) {
+                val scaledresolution = ScaledResolution(mc)
+                val scaleFactor = scaledresolution.scaleFactor
+                val chatScale = this.chatScale
+                var xPos = mouseX / scaleFactor - 3
+                var yPos = mouseY / scaleFactor - 27
+                xPos = MathHelper.floor_float(xPos.toFloat() / chatScale)
+                yPos = MathHelper.floor_float(yPos.toFloat() / chatScale)
+                if (xPos >= 0 && yPos >= 0) {
+                    val lineCount: Int = this.lineCount.coerceAtMost(this.drawnChatLines.size)
+                    if (xPos <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && yPos < mc.fontRendererObj.FONT_HEIGHT * lineCount + lineCount) {
+                        val lineHeight: Int = yPos / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
+                        if (lineHeight >= 0 && lineHeight < this.drawnChatLines.size) {
+                            return drawnChatLines[lineHeight]
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>

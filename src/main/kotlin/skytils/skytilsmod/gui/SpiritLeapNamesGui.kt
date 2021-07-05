@@ -46,7 +46,9 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 14.pixels()
         }
 
-        scrollComponent = ScrollComponent().childOf(window).constrain {
+        scrollComponent = ScrollComponent(
+            innerPadding = 4f,
+        ).childOf(window).constrain {
             x = RelativeConstraint(0.1f)
             y = RelativeConstraint(0.15f)
             width = 80.percent()

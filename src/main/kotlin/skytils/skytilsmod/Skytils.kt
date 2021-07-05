@@ -18,15 +18,16 @@
 
 package skytils.skytilsmod
 
-import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import gg.essential.vigilance.gui.SettingsGui
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.client.C01PacketChatMessage
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -40,6 +41,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import org.lwjgl.input.Mouse
 import skytils.skytilsmod.commands.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.commands.stats.impl.SlayerCommand
@@ -73,6 +75,8 @@ import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.Utils.getChatLine
+import skytils.skytilsmod.utils.Utils.printDebugMessage
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.awt.Desktop
 import java.io.File
@@ -359,6 +363,18 @@ class Skytils {
                     displayScreen = OptionsGui()
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onMouseClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
+        if (event.gui is GuiChat && config.debugMode && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
+            val button = Mouse.getEventButton()
+            if (button != 0 && button != 1) return
+            val component = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
+            if (button == 0) GuiScreen.setClipboardString(component.chatComponent.formattedText)
+            else GuiScreen.setClipboardString(IChatComponent.Serializer.componentToJson(component.chatComponent))
+            printDebugMessage("Copied serialized message to clipboard!")
         }
     }
 }

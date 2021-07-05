@@ -52,7 +52,9 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 14.pixels()
         }
 
-        scrollComponent = ScrollComponent().childOf(window).constrain {
+        scrollComponent = ScrollComponent(
+            innerPadding = 4f,
+        ).childOf(window).constrain {
             x = CenterConstraint()
             y = 15.percent()
             width = 90.percent()
