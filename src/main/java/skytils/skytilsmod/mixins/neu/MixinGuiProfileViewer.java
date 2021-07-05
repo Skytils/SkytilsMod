@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,6 +43,7 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
     @Shadow(remap = false)
     private int guiTop;
 
+    @Dynamic
     @Inject(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 0), remap = false, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void renderRarityOnInvPage(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject inventoryInfo, int invNameIndex, int i, ItemStack stack) {
         if (Skytils.config.showItemRarity) {
@@ -49,6 +51,7 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
         }
     }
 
+    @Dynamic
     @Inject(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 1), remap = false, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void renderRarityOnInvPage1(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject inventoryInfo, int invNameIndex, ItemStack[][][] inventories, ItemStack[][] inventory, int i, ItemStack stack) {
         if (Skytils.config.showItemRarity) {
@@ -56,6 +59,7 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
         }
     }
 
+    @Dynamic
     @Inject(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 2), remap = false, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void renderRarityOnInvPage2(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject inventoryInfo, int invNameIndex, ItemStack[][][] inventories, ItemStack[][] inventory, int i, ItemStack stack) {
         if (Skytils.config.showItemRarity) {
@@ -63,6 +67,7 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
         }
     }
 
+    @Dynamic
     @Inject(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 3), remap = false, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void renderRarityOnInvPage3(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject inventoryInfo, int invNameIndex, ItemStack[][][] inventories, ItemStack[][] inventory, int inventoryRows, int invSizeY, int x, int y, boolean leftHovered, boolean rightHovered, ItemStack stackToRender, int overlay, int yIndex, int xIndex, ItemStack stack) {
         if (Skytils.config.showItemRarity) {
@@ -70,6 +75,7 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
         }
     }
 
+    @Dynamic
     @Inject(method = "drawPetsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 0), remap = false, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void renderRarityOnPetsPage(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject petsInfo, JsonObject petsJson, String location, JsonObject status, String panoramaIdentifier, JsonArray pets, JsonElement activePetElement, boolean leftHovered, boolean rightHovered, int i, JsonObject pet, ItemStack stack, int xIndex, int yIndex, float x, float y) {
         if (Skytils.config.showItemRarity) {

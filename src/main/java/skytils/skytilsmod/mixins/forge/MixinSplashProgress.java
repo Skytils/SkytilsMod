@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import skytils.skytilsmod.utils.Utils;
 
-@Mixin(value = SplashProgress.class, priority = 999)
+@Mixin(value = SplashProgress.class, priority = 0x7fffffff)
 public abstract class MixinSplashProgress {
     @ModifyVariable(method = "start", at = @At(value = "STORE"), ordinal = 2, remap = false)
     private static ResourceLocation setForgeGif(ResourceLocation resourceLocation) {

@@ -46,13 +46,14 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
                 this.saveFile.parentFile.mkdirs()
                 this.saveFile.createNewFile()
             }
-            FileReader(this.saveFile).use { `in` ->
-                read(`in`)
+            FileReader(this.saveFile).use {
+                read(it)
             }
         } catch (e: Exception) {
+            if (Skytils.config.debugMode) e.printStackTrace()
             try {
-                FileWriter(this.saveFile).use { writer ->
-                    setDefault(writer)
+                FileWriter(this.saveFile).use {
+                    setDefault(it)
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()

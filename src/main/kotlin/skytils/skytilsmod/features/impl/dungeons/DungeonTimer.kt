@@ -43,18 +43,18 @@ class DungeonTimer {
         if (!Utils.inDungeons || event.type.toInt() == 2) return
         val message = event.message.formattedText
         when {
-            (scoreShownAt == -1L && message.contains("§r§fTeam Score: §r")) -> {
+            scoreShownAt == -1L && message.contains("§r§fTeam Score: §r") -> {
                 scoreShownAt = System.currentTimeMillis()
             }
-            ((message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L) -> {
+            (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
             }
-            (message.endsWith("§r§ehas obtained §r§8Wither Key§r§e!§r") || message == "§r§eA §r§8Wither Key§r§e was picked up!§r") -> {
+            message.endsWith("§r§ehas obtained §r§8Wither Key§r§e!§r") || message == "§r§eA §r§8Wither Key§r§e was picked up!§r" -> {
                 witherDoors++
             }
-            (bloodOpenTime == -1L && (message == "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r" || message.startsWith(
+            bloodOpenTime == -1L && (message == "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r" || message.startsWith(
                 "§r§c[BOSS] The Watcher§r§f"
-            ))) -> {
+            )) -> {
                 bloodOpenTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(
                     ChatComponentText(
@@ -62,7 +62,7 @@ class DungeonTimer {
                     )
                 )
             }
-            (message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r") -> {
+            message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r" -> {
                 bloodClearTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) mc.thePlayer.addChatMessage(
                     ChatComponentText(
@@ -70,12 +70,12 @@ class DungeonTimer {
                     )
                 )
             }
-            (bloodClearTime != -1L && bossEntryTime == -1L && (message.startsWith("§r§c[BOSS] ") && !message.contains(" The Watcher§r§f:") || message.startsWith(
+            bloodClearTime != -1L && bossEntryTime == -1L && (message.startsWith("§r§c[BOSS] ") && !message.contains(" The Watcher§r§f:") || message.startsWith(
                 "§r§4[BOSS] "
-            ))) -> {
+            )) -> {
                 bossEntryTime = System.currentTimeMillis()
             }
-            (bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r")) -> {
+            bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r") -> {
                 bossClearTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) {
                     TickTask(5) {
@@ -90,9 +90,9 @@ class DungeonTimer {
                     }
                 }
             }
-            (DungeonFeatures.dungeonFloor == "F7" && message.startsWith("§r§4[BOSS] Necron")) -> {
+            DungeonFeatures.dungeonFloor == "F7" && message.startsWith("§r§4[BOSS] Necron") -> {
                 when {
-                    (message.endsWith("§r§cFINE! LET'S MOVE TO SOMEWHERE ELSE!!§r") && phase1ClearTime == -1L) -> {
+                    message.endsWith("§r§cFINE! LET'S MOVE TO SOMEWHERE ELSE!!§r") && phase1ClearTime == -1L -> {
                         phase1ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) mc.thePlayer.addChatMessage(
                             ChatComponentText(
@@ -100,7 +100,7 @@ class DungeonTimer {
                             )
                         )
                     }
-                    (message.endsWith("§r§cCRAP!! IT BROKE THE FLOOR!§r") && phase2ClearTime == -1L) -> {
+                    message.endsWith("§r§cCRAP!! IT BROKE THE FLOOR!§r") && phase2ClearTime == -1L -> {
                         phase2ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) mc.thePlayer.addChatMessage(
                             ChatComponentText(
@@ -118,22 +118,22 @@ class DungeonTimer {
                     }
                 }
             }
-            (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6" && message.startsWith("§r§c[BOSS] Sadan")) -> {
+            (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
                 when {
                     (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
                         terraClearTime = System.currentTimeMillis()
                         if (Skytils.config.sadanPhaseTimer) mc.thePlayer.addChatMessage(
-                                ChatComponentText(
-                                    "§bTerracotta took " + ((terraClearTime - bossEntryTime) / 1000f).roundToInt() + " seconds."
-                                )
+                            ChatComponentText(
+                                "§bTerracotta took " + ((terraClearTime - bossEntryTime) / 1000f).roundToInt() + " seconds."
+                            )
                         )
                     }
                     (message.endsWith("§r§f: You did it. I understand now, you have earned my respect.§r") && giantsClearTime == -1L) -> {
                         giantsClearTime = System.currentTimeMillis()
                         if (Skytils.config.sadanPhaseTimer) mc.thePlayer.addChatMessage(
-                                ChatComponentText(
-                                    "§bGiants took " + ((giantsClearTime - terraClearTime) / 1000f).roundToInt() + " seconds."
-                                )
+                            ChatComponentText(
+                                "§bGiants took " + ((giantsClearTime - terraClearTime) / 1000f).roundToInt() + " seconds."
+                            )
                         )
                     }
 
@@ -318,7 +318,12 @@ class DungeonTimer {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
-            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6") {
+            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F6",
+                    "M6"
+                )
+            ) {
                 val sr = ScaledResolution(Minecraft.getMinecraft())
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = """

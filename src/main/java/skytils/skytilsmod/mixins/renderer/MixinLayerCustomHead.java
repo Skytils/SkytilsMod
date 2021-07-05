@@ -88,7 +88,7 @@ public abstract class MixinLayerCustomHead implements LayerRenderer<EntityLiving
                 }
                 GlStateManager.enableAlpha();
                 GlStateManager.enableBlend();
-                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
                 GlStateManager.color(1, 1, 1, Skytils.config.transparentHeadLayer);
             }
         }

@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins.neu;
 
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,6 +29,7 @@ import skytils.skytilsmod.utils.NEUCompatibility;
 @Pseudo
 @Mixin(targets = "io.github.moulberry.notenoughupdates.miscgui.TradeWindow", remap = false)
 public class MixinTradeWindow {
+    @Dynamic
     @Inject(method = "tradeWindowActive", at = @At("RETURN"))
     private static void tradeWindowActive(String containerName, CallbackInfoReturnable<Boolean> cir) {
         NEUCompatibility.INSTANCE.setTradeWindowActive(cir.getReturnValue());
