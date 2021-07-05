@@ -21,6 +21,7 @@ import com.google.gson.JsonObject
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
@@ -47,6 +48,8 @@ import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.entity.player.AttackEntityEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -79,7 +82,15 @@ class SlayerFeatures {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock) return
         if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
-        val hasSlayerText = sidebarLines.any { cleanSB(it) == "Slay the boss!" }
+        lastTickHasSlayerText = hasSlayerText
+        hasSlayerText = sidebarLines.any { cleanSB(it) == "Slay the boss!" }
+        if (!lastTickHasSlayerText && hasSlayerText) {
+            val currentTier =
+                sidebarLines.map { cleanSB(it) }.find { it.startsWith("Voidgloom Seraph") }
+                    ?.substringAfter("Voidgloom Seraph")?.drop(1)
+                    ?: ""
+            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
+        }
         if (ticks % 4 == 0) {
             if (Skytils.config.rev5TNTPing) {
                 if (hasSlayerText) {
@@ -276,6 +287,7 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
+        if (!Utils.inSkyblock) return
         if (Skytils.config.highlightYangGlyph && yangGlyph != null) {
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
@@ -312,6 +324,7 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
+        if (!Utils.inSkyblock) return
         if (event.entity is EntityArmorStand && slayerEntity != null) {
             TickTask(1) {
                 val e = event.entity as EntityArmorStand
@@ -333,7 +346,7 @@ class SlayerFeatures {
                 }
             }
         }
-        if (sidebarLines.none { cleanSB(it) == "Slay the boss!" }) return
+        if (!hasSlayerText) return
         if (slayerEntity != null) {
             printDebugMessage(
                 "boss not null"
@@ -344,10 +357,40 @@ class SlayerFeatures {
     }
 
     @SubscribeEvent
+    fun onAttack(event: AttackEntityEvent) {
+        if (!Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityEnderman || !Skytils.config.useSlayerHitMethod) return
+        val enderman = event.target as EntityEnderman
+        if (floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
+            printDebugMessage("A valid enderman was attacked")
+            hitMap.compute(enderman) { _, int ->
+                return@compute (int ?: 0).inc()
+            }
+            if (slayerEntity !is EntityEnderman) {
+                detectSlayerEntities(enderman, "Voidgloom Seraph", null, "§c☠ §bVoidgloom Seraph")
+            } else if (enderman != slayerEntity && hitMap[enderman]!! - (hitMap[slayerEntity as EntityEnderman]
+                    ?: 0) >= 10
+            ) {
+                printDebugMessage("Processing new entity")
+                detectSlayerEntities(enderman, "Voidgloom Seraph", null, "§c☠ §bVoidgloom Seraph")
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDeath(event: LivingDeathEvent) {
+        if (!Utils.inSkyblock) return
+        if (event.entity is EntityEnderman) {
+            printDebugMessage("An Enderman died")
+            hitMap.remove(event.entity)
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         slayerEntity = null
         slayerNameEntity = null
         slayerTimerEntity = null
+        hitMap.clear()
     }
 
     @SubscribeEvent
@@ -708,10 +751,15 @@ class SlayerFeatures {
         private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
         private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
         private val RNGRegex = Regex("[^0-9.]")
+        private val timerRegex = Regex("§c\\d+:\\d+§r")
         var slayerEntity: Entity? = null
         var slayerNameEntity: EntityArmorStand? = null
         var slayerTimerEntity: EntityArmorStand? = null
         var yangGlyphEntity: EntityArmorStand? = null
+        var hasSlayerText = false
+        private var lastTickHasSlayerText = false
+        var expectedMaxHp: Int? = null
+        private val hitMap = HashMap<EntityEnderman, Int>()
         private var yangGlyph: BlockPos? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
@@ -773,7 +821,7 @@ class SlayerFeatures {
             }
         }
 
-        private fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String, nameStart: String) {
+        private fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String?, nameStart: String) {
             TickTask(5) {
                 val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
                     entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
@@ -815,6 +863,13 @@ class SlayerFeatures {
                     if (nearby.displayName.formattedText == timer) {
                         printDebugMessage(
                             "timer matched"
+                        )
+                        potentialTimerEntities.add(nearby as EntityArmorStand)
+                        continue
+                    }
+                    if (timer == null && nearby.displayName.formattedText.matches(timerRegex)) {
+                        printDebugMessage(
+                            "timer regex matched"
                         )
                         potentialTimerEntities.add(nearby as EntityArmorStand)
                         continue

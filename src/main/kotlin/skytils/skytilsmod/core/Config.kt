@@ -1461,6 +1461,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var voidRNG = 0f
 
     @Property(
+        type = PropertyType.SWITCH, name = "Use Hits to Detect Slayer",
+        description = "Finds your slayer based on the one you hit the most.",
+        category = "Slayer", subcategory = "General"
+    )
+    var useSlayerHitMethod = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Ping when in Atoned Horror Danger Zone",
         description = "Pings when you are standing on the Atoned Horror's TNT target.",
         category = "Slayer", subcategory = "Quality of Life"
