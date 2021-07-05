@@ -50,6 +50,7 @@ class GuiToast(val mc: Minecraft) : Gui() {
         }
     }
 
+    @Suppress("unchecked_cast")
     fun <T : IToast<*>> getToast(clazz: Class<out T>, obj: Any): T? {
         for (ins in visible) {
             if (ins != null && clazz.isAssignableFrom(ins.toast!!.javaClass) && ins.toast.getType() == obj) {

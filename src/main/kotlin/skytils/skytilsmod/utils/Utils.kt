@@ -262,30 +262,6 @@ object Utils {
     fun printDebugMessage(string: String) {
         if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
     }
-
-    fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
-        if (this is AccessorGuiNewChat) {
-            if (this.chatOpen) {
-                val scaledresolution = ScaledResolution(mc)
-                val scaleFactor = scaledresolution.scaleFactor
-                val chatScale = this.chatScale
-                var xPos = mouseX / scaleFactor - 3
-                var yPos = mouseY / scaleFactor - 27
-                xPos = MathHelper.floor_float(xPos.toFloat() / chatScale)
-                yPos = MathHelper.floor_float(yPos.toFloat() / chatScale)
-                if (xPos >= 0 && yPos >= 0) {
-                    val lineCount: Int = this.lineCount.coerceAtMost(this.drawnChatLines.size)
-                    if (xPos <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && yPos < mc.fontRendererObj.FONT_HEIGHT * lineCount + lineCount) {
-                        val lineHeight: Int = yPos / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
-                        if (lineHeight >= 0 && lineHeight < this.drawnChatLines.size) {
-                            return drawnChatLines[lineHeight]
-                        }
-                    }
-                }
-            }
-        }
-        return null
-    }
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
@@ -301,3 +277,27 @@ fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
 
 val EntityLivingBase.baseMaxHealth: Double
     get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
+
+fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
+    if (this is AccessorGuiNewChat) {
+        if (this.chatOpen) {
+            val scaledresolution = ScaledResolution(mc)
+            val scaleFactor = scaledresolution.scaleFactor
+            val chatScale = this.chatScale
+            var xPos = mouseX / scaleFactor - 3
+            var yPos = mouseY / scaleFactor - 27
+            xPos = MathHelper.floor_float(xPos.toFloat() / chatScale)
+            yPos = MathHelper.floor_float(yPos.toFloat() / chatScale)
+            if (xPos >= 0 && yPos >= 0) {
+                val lineCount: Int = this.lineCount.coerceAtMost(this.drawnChatLines.size)
+                if (xPos <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && yPos < mc.fontRendererObj.FONT_HEIGHT * lineCount + lineCount) {
+                    val lineHeight: Int = yPos / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
+                    if (lineHeight >= 0 && lineHeight < this.drawnChatLines.size) {
+                        return drawnChatLines[lineHeight]
+                    }
+                }
+            }
+        }
+    }
+    return null
+}

@@ -410,7 +410,7 @@ object ColorFactory {
         color: String, hoff: Int,
         hasAlpha: Boolean, a: Double
     ): Color {
-        var a = a
+        var alpha = a
         try {
             val hend = color.indexOf(',', hoff)
             val send = if (hend < 0) -1 else color.indexOf(',', hend + 1)
@@ -421,9 +421,9 @@ object ColorFactory {
                 val s = parseComponent(color, hend + 1, send, PARSE_PERCENT)
                 val l = parseComponent(color, send + 1, lend, PARSE_PERCENT)
                 if (hasAlpha) {
-                    a *= parseComponent(color, lend + 1, aend, PARSE_ALPHA)
+                    alpha *= parseComponent(color, lend + 1, aend, PARSE_ALPHA)
                 }
-                return hsb(h, s, l, a)
+                return hsb(h, s, l, alpha)
             }
         } catch (nfe: NumberFormatException) {
         }

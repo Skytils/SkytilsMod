@@ -70,14 +70,14 @@ internal object AlphaBetaAdvanced {
      * @return              the index of the move to make
      */
     private fun alphaBetaPruning(player: Board.State, board: Board, alpha: Double, beta: Double, currentPly: Int): Int {
-        var currentPly = currentPly
-        if (currentPly++.toDouble() == maxPly || board.isGameOver) {
-            return score(player, board, currentPly)
+        var cp = currentPly
+        if (cp++.toDouble() == maxPly || board.isGameOver) {
+            return score(player, board, cp)
         }
         return if (board.turn == player) {
-            getMax(player, board, alpha, beta, currentPly)
+            getMax(player, board, alpha, beta, cp)
         } else {
-            getMin(player, board, alpha, beta, currentPly)
+            getMin(player, board, alpha, beta, cp)
         }
     }
 
@@ -91,24 +91,24 @@ internal object AlphaBetaAdvanced {
      * @return              the index of the move to make
      */
     private fun getMax(player: Board.State, board: Board, alpha: Double, beta: Double, currentPly: Int): Int {
-        var alpha = alpha
+        var a = alpha
         var indexOfBestMove = -1
         for (theMove in board.availableMoves) {
             val modifiedBoard = board.deepCopy
             modifiedBoard.move(theMove)
-            val score = alphaBetaPruning(player, modifiedBoard, alpha, beta, currentPly)
-            if (score > alpha) {
-                alpha = score.toDouble()
+            val score = alphaBetaPruning(player, modifiedBoard, a, beta, currentPly)
+            if (score > a) {
+                a = score.toDouble()
                 indexOfBestMove = theMove
             }
-            if (alpha >= beta) {
+            if (a >= beta) {
                 break
             }
         }
         if (indexOfBestMove != -1) {
             board.algorithmBestMove = indexOfBestMove
         }
-        return alpha.toInt()
+        return a.toInt()
     }
 
     /**
@@ -121,24 +121,24 @@ internal object AlphaBetaAdvanced {
      * @return              the score of the move
      */
     private fun getMin(player: Board.State, board: Board, alpha: Double, beta: Double, currentPly: Int): Int {
-        var beta = beta
+        var b = beta
         var indexOfBestMove = -1
         for (theMove in board.availableMoves) {
             val modifiedBoard = board.deepCopy
             modifiedBoard.move(theMove)
-            val score = alphaBetaPruning(player, modifiedBoard, alpha, beta, currentPly)
-            if (score < beta) {
-                beta = score.toDouble()
+            val score = alphaBetaPruning(player, modifiedBoard, alpha, b, currentPly)
+            if (score < b) {
+                b = score.toDouble()
                 indexOfBestMove = theMove
             }
-            if (alpha >= beta) {
+            if (alpha >= b) {
                 break
             }
         }
         if (indexOfBestMove != -1) {
             board.algorithmBestMove = indexOfBestMove
         }
-        return beta.toInt()
+        return b.toInt()
     }
 
     /**

@@ -75,8 +75,8 @@ import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.Utils.getChatLine
 import skytils.skytilsmod.utils.Utils.printDebugMessage
+import skytils.skytilsmod.utils.getChatLine
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.awt.Desktop
 import java.io.File

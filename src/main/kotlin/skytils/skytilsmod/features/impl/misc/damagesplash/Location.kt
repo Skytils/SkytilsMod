@@ -27,7 +27,7 @@ import kotlin.math.roundToInt
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
-class Location(x: Double, y: Double, z: Double) : Point3d() {
+class Location(x: Double, y: Double, z: Double) : Point3d(x, y, z) {
     constructor(entity: Entity) : this(entity.posX, entity.posY, entity.posZ)
 
     fun add(x: Double, y: Double, z: Double): Location {
