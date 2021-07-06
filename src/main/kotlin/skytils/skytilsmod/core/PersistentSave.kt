@@ -50,7 +50,7 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
                 read(it)
             }
         } catch (e: Exception) {
-            if (Skytils.config.debugMode) e.printStackTrace()
+            e.printStackTrace()
             try {
                 FileWriter(this.saveFile).use {
                     setDefault(it)
