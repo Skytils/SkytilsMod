@@ -77,7 +77,7 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             ChildBasedSizeConstraint(4f); width = ChildBasedSizeConstraint(4f); color =
             ConstantColorConstraint(Color(224, 224, 224, 100))
         }.effect(OutlineEffect(Color(0, 243, 255), 1f)).also { it.hide() }
-            .addChild(UIWrappedText("What are aliases? Aliases are little shortcuts for commands. For example, /sychic could be short for /boop Sychic. Want to give it a try? Click 'Add Alias', enter 'sychic' for 'Alias Name' and 'boop Sychic' as the executed command! Then, run the command /sychic! Aliases will also append any arguments that you supply.").constrain {
+            .addChild(UIWrappedText("What are aliases? Aliases are little shortcuts for commands. For example, /slay could be short for /skytilsslayer. Want to give it a try? Click 'Add Alias', enter 'slay' for 'Alias Name' and 'skytilsslayer' as the executed command! Then, run the command /slay Sychic! Aliases will also append any arguments that you supply.").constrain {
                 x = 2.pixels(); y = 0.pixels(); width = 90.percentOfWindow()
             })
         UICircle(7f).childOf(window).constrain {

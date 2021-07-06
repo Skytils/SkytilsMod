@@ -72,6 +72,7 @@ import skytils.skytilsmod.gui.ReopenableGUI
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
+import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
@@ -280,7 +281,7 @@ class Skytils {
             }
         } else throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
 
-        DataFetcher.reloadData()
+        DataFetcher.preload()
         MayorInfo.fetchMayorData()
     }
 
@@ -371,10 +372,23 @@ class Skytils {
         if (event.gui is GuiChat && config.debugMode && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
             val button = Mouse.getEventButton()
             if (button != 0 && button != 1) return
-            val component = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
-            if (button == 0) GuiScreen.setClipboardString(component.chatComponent.formattedText)
-            else GuiScreen.setClipboardString(IChatComponent.Serializer.componentToJson(component.chatComponent))
-            printDebugMessage("Copied serialized message to clipboard!")
+            val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
+            if (button == 0) {
+                val realText =
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent?.formattedText
+                GuiScreen.setClipboardString(realText ?: chatLine.chatComponent.formattedText)
+                printDebugMessage("Copied formatted message to clipboard!")
+            } else {
+                val component =
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent
+
+                printDebugMessage("Copied serialized message to clipboard!")
+                GuiScreen.setClipboardString(
+                    IChatComponent.Serializer.componentToJson(
+                        component ?: chatLine.chatComponent
+                    )
+                )
+            }
         }
     }
 }

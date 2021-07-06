@@ -60,7 +60,7 @@ object MayorInfo {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
         if (mc.currentServerData?.serverIP?.lowercase()
-            ?.contains("alpha") == true
+                ?.contains("alpha") == true
         ) return
         if (ticks % (60 * 20) == 0) {
             if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {

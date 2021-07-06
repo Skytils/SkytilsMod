@@ -117,11 +117,12 @@ object DataFetcher {
     }
 
     @JvmStatic
-    fun reloadData() {
+    fun reloadData(): Future<*> {
         clearData()
-        loadData()
+        return loadData()
     }
 
+    internal fun preload() {}
 
     init {
         reloadData()

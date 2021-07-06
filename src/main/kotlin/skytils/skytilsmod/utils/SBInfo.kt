@@ -74,7 +74,7 @@ object SBInfo {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         lastLocRaw = -1
         locraw = null
         mode = null
@@ -85,7 +85,7 @@ object SBInfo {
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
         val msg = event.message
-        if (msg.trim { it <= ' ' }.startsWith("/locraw") || msg.trim { it <= ' ' }.startsWith("/locraw ")) {
+        if (msg.trim().startsWith("/locraw")) {
             lastManualLocRaw = System.currentTimeMillis()
         }
     }
@@ -113,7 +113,7 @@ object SBInfo {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
-        if (locraw == null && currentTime - joinedWorld > 1000 && currentTime - lastLocRaw > 15000) {
+        if (locraw == null && currentTime - joinedWorld > 1200 && currentTime - lastLocRaw > 15000) {
             lastLocRaw = System.currentTimeMillis()
             Skytils.sendMessageQueue.add("/locraw")
         }
@@ -130,11 +130,11 @@ object SBInfo {
                 lines.add(line)
             }
             if (lines.size >= 5) {
-                date = lines[2].stripControlCodes().trim { it <= ' ' }
+                date = lines[2].stripControlCodes().trim()
                 //§74:40am
                 val matcher = timePattern.find(lines[3])
                 if (matcher != null) {
-                    time = matcher.groupValues[0].stripControlCodes().trim { it <= ' ' }
+                    time = matcher.groupValues[0].stripControlCodes().trim()
                     try {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
                         val parseFormat = SimpleDateFormat("hh:mm a")

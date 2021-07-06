@@ -22,7 +22,9 @@ import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.data.SortingBehavior
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import java.awt.Color
 import java.io.File
 
@@ -374,6 +376,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var spiritLeapNames = false
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Spirit Leap Highlights",
+        description = "Highlights names and classes on the Spirit Leap menu.",
+        category = "Dungeons", subcategory = "Quality of Life",
+        placeholder = "Open GUI"
+    )
+    fun spiritLeapNameButton() {
+        Skytils.displayScreen = SpiritLeapNamesGui()
+    }
 
     @Property(
         type = PropertyType.SWITCH, name = "Blaze Solver",

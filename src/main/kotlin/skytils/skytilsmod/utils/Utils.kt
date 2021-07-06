@@ -291,9 +291,9 @@ fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
             if (xPos >= 0 && yPos >= 0) {
                 val lineCount: Int = this.lineCount.coerceAtMost(this.drawnChatLines.size)
                 if (xPos <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && yPos < mc.fontRendererObj.FONT_HEIGHT * lineCount + lineCount) {
-                    val lineHeight: Int = yPos / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
-                    if (lineHeight >= 0 && lineHeight < this.drawnChatLines.size) {
-                        return drawnChatLines[lineHeight]
+                    val lineNum: Int = yPos / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
+                    if (lineNum >= 0 && lineNum < this.drawnChatLines.size) {
+                        return drawnChatLines[lineNum]
                     }
                 }
             }
