@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.utils.Utils;
 
 @Mixin(AbstractClientPlayer.class)
@@ -47,7 +48,7 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
 
     @Inject(method = "getLocationSkin()Lnet/minecraft/util/ResourceLocation;", at = @At("RETURN"), cancellable = true)
     private void replaceSkin(CallbackInfoReturnable<ResourceLocation> cir) {
-        if (isSummonMob()) cir.setReturnValue(Utils.noSychic ? mc.thePlayer.getLocationSkin() : sychicSkin);
+        if (isSummonMob()) cir.setReturnValue(Skytils.config.usePlayerSkin ? mc.thePlayer.getLocationSkin() : sychicSkin);
     }
 
     @Inject(method = "hasSkin", at = @At("RETURN"), cancellable = true)

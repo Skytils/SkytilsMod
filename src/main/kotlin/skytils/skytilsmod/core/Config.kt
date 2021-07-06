@@ -1111,6 +1111,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var transparentHeadLayer = 1f
 
     @Property(
+        type = PropertyType.SWITCH, name = "Use Player Skin",
+        description = "Uses the player's skin for necromancy mobs",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    @JvmField
+    var usePlayerSkin = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Custom Auction Price Input",
         description = "Displays Skytils' own auction input GUI instead of a sign.",
         category = "Miscellaneous", subcategory = "Quality of Life"
