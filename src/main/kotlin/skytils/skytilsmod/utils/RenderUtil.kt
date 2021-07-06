@@ -144,7 +144,7 @@ object RenderUtil {
      * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
      * @author Moulberry
      */
-    fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float) {
+    fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)

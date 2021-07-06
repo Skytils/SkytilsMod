@@ -169,7 +169,7 @@ class TicTacToeSolver {
         if (bestMove != null) {
             RenderUtil.drawOutlinedBoundingBox(
                 AxisAlignedBB(bestMove, bestMove!!.add(1, 1, 1)),
-                Color(0, 255, 0),
+                Skytils.config.ticTacToeSolverColor,
                 3f,
                 event.partialTicks
             )

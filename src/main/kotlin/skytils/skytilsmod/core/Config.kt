@@ -383,6 +383,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Quality of Life",
         placeholder = "Open GUI"
     )
+    @Suppress("unused")
     fun spiritLeapNameButton() {
         Skytils.displayScreen = SpiritLeapNamesGui()
     }
@@ -464,6 +465,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var teleportMazeSolver = false
 
     @Property(
+        type = PropertyType.COLOR, name = "Teleport Maze Solver Color",
+        description = "Color of the thing that shows which pads you've stepped on in the Teleport Maze puzzle.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var teleportMazeSolverColor = Color(255, 0, 0, 200)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Three Weirdos Solver",
         description = "Shows which chest to click in the Three Weirdos puzzle.",
         category = "Dungeons", subcategory = "Solvers"
@@ -476,6 +484,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Solvers"
     )
     var ticTacToeSolver = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Tic Tac Toe Solver Color",
+        description = "Color of the thing that displays the best move on the Tic Tac Toe puzzle.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var ticTacToeSolverColor = Color(23, 234, 99, 204)
 
     @Property(
         type = PropertyType.SWITCH, name = "Trivia Solver",
@@ -1002,6 +1017,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Miscellaneous", subcategory = "Items"
     )
     var showEtherwarpTeleportPos = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Etherwarp Teleport Position Color",
+        description = "Color the thing that shows the block you will teleport to with the Etherwarp Transmission ability.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showEtherwarpTeleportPosColor = Color(0, 0, 255, 204)
 
     @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
@@ -1962,6 +1984,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     init {
         initialize()
 
+        addDependency("showEtherwarpTeleportPos", "showEtherwarpTeleport")
+
         addDependency("itemRarityOpacity", "showItemRarity")
 
         listOf(
@@ -1976,6 +2000,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         addDependency("lowestBlazeColor", "blazeSolver")
         addDependency("highestBlazeColor", "blazeSolver")
         addDependency("nextBlazeColor", "showNextBlaze")
+        addDependency("teleportMazeSolverColor", "teleportMazeSolver")
+        addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
         addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")

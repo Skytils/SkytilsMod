@@ -273,7 +273,13 @@ class MiscFeatures {
 
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
-                RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color.BLUE, 0.8f)
+                GlStateManager.enableBlend()
+                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+                RenderUtil.drawFilledBoundingBox(
+                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                    Skytils.config.showEtherwarpTeleportPosColor
+                )
+                GlStateManager.disableBlend()
                 GlStateManager.enableCull()
                 GlStateManager.enableDepth()
             }

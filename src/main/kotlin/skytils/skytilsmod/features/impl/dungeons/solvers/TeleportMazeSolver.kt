@@ -81,7 +81,7 @@ class TeleportMazeSolver {
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
-                Color(255, 0, 0),
+                Skytils.config.teleportMazeSolverColor,
                 1f
             )
             GlStateManager.enableCull()
