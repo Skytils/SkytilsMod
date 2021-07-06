@@ -1984,7 +1984,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     init {
         initialize()
 
-        addDependency("showEtherwarpTeleportPos", "showEtherwarpTeleport")
+        addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
         addDependency("itemRarityOpacity", "showItemRarity")
 
