@@ -44,7 +44,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
     init {
         SimpleButton("Config").childOf(window).constrain {
             x = CenterConstraint()
-            y = SiblingConstraint() + RelativeConstraint(0.15f)
+            y = SiblingConstraint() + RelativeConstraint(0.1f)
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -73,6 +73,14 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
             height = 20.pixels()
         }.onMouseClick {
             mc.displayGuiScreen(KeyShortcutsGui())
+        }
+        SimpleButton("Edit Spam Filters").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(SpamHiderGui())
         }
         SimpleButton("Edit Vigilance").childOf(window).constrain {
             x = CenterConstraint()
