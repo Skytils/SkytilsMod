@@ -140,7 +140,7 @@ object DataFetcher {
     internal fun preload() {}
 
     init {
-        fixedRateTimer(name = "Skytils-Reload-Data", period = 60 * 60 * 1000) {
+        fixedRateTimer(name = "Skytils-Reload-Data", period = 60 * 60 * 1000L) {
             reloadData()
         }
     }

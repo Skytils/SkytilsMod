@@ -21,6 +21,7 @@ package skytils.skytilsmod.mixins.entity;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import kotlin.collections.CollectionsKt;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -37,6 +38,8 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
         super(worldIn, gameProfileIn);
     }
 
+    private static final Minecraft mc = Minecraft.getMinecraft();
+
     private static final ResourceLocation sychicSkin = new ResourceLocation("skytils:sychicskin.png");
     private static final String phoenixSkinObject = "eyJ0aW1lc3RhbXAiOjE1NzU0NzAyNzE3MTUsInByb2ZpbGVJZCI6ImRlNTcxYTEwMmNiODQ4ODA4ZmU3YzlmNDQ5NmVjZGFkIiwicHJvZmlsZU5hbWUiOiJNSEZfTWluZXNraW4iLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM2YTAzODNhNTI3ODAzZDk5YjY2MmFkMThiY2FjNzhjMTE5MjUwZWJiZmIxNDQ3NWI0ZWI0ZDRhNjYyNzk2YjQifX19";
 
@@ -44,7 +47,7 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
 
     @Inject(method = "getLocationSkin()Lnet/minecraft/util/ResourceLocation;", at = @At("RETURN"), cancellable = true)
     private void replaceSkin(CallbackInfoReturnable<ResourceLocation> cir) {
-        if (isSummonMob()) cir.setReturnValue(sychicSkin);
+        if (isSummonMob()) cir.setReturnValue(Utils.noSychic ? mc.thePlayer.getLocationSkin() : sychicSkin);
     }
 
     @Inject(method = "hasSkin", at = @At("RETURN"), cancellable = true)
@@ -54,18 +57,17 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
 
     @Inject(method = "getSkinType", at = @At("RETURN"), cancellable = true)
     private void replaceSkinType(CallbackInfoReturnable<String> cir) {
-        if (isSummonMob()) cir.setReturnValue("slim");
+        if (isSummonMob()) cir.setReturnValue(Utils.noSychic ? mc.thePlayer.getSkinType() : "slim");
     }
 
     private boolean isSummonMob() {
-        if (!Utils.inSkyblock || Utils.noSychic) return false;
+        if (isSummonMob != null) return isSummonMob;
+        if (!Utils.inSkyblock) return false;
         try {
-            if (isSummonMob == null) {
-                if ("Lost Adventurer".equals(this.getName())) {
-                    Property textures = CollectionsKt.firstOrNull(this.getGameProfile().getProperties().get("textures"));
-                    if (textures != null) {
-                        isSummonMob = phoenixSkinObject.equals(textures.getValue());
-                    }
+            if ("Lost Adventurer".equals(this.getName())) {
+                Property textures = CollectionsKt.firstOrNull(this.getGameProfile().getProperties().get("textures"));
+                if (textures != null) {
+                    isSummonMob = phoenixSkinObject.equals(textures.getValue());
                 }
             }
         } catch(Exception e) {
