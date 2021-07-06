@@ -48,7 +48,7 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
 
     @Inject(method = "getLocationSkin()Lnet/minecraft/util/ResourceLocation;", at = @At("RETURN"), cancellable = true)
     private void replaceSkin(CallbackInfoReturnable<ResourceLocation> cir) {
-        if (isSummonMob()) cir.setReturnValue(Skytils.config.usePlayerSkin ? mc.thePlayer.getLocationSkin() : sychicSkin);
+        if (isSummonMob()) cir.setReturnValue((Skytils.config.usePlayerSkin || Utils.noSychic) ? mc.thePlayer.getLocationSkin() : sychicSkin);
     }
 
     @Inject(method = "hasSkin", at = @At("RETURN"), cancellable = true)
@@ -58,7 +58,7 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
 
     @Inject(method = "getSkinType", at = @At("RETURN"), cancellable = true)
     private void replaceSkinType(CallbackInfoReturnable<String> cir) {
-        if (isSummonMob()) cir.setReturnValue(Utils.noSychic ? mc.thePlayer.getSkinType() : "slim");
+        if (isSummonMob()) cir.setReturnValue((Skytils.config.usePlayerSkin || Utils.noSychic) ? mc.thePlayer.getSkinType() : "slim");
     }
 
     private boolean isSummonMob() {
