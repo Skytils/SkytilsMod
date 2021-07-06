@@ -174,8 +174,6 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SoundQueue)
         MinecraftForge.EVENT_BUS.register(UpdateChecker)
 
-        MinecraftForge.EVENT_BUS.register(SpamHider())
-
         MinecraftForge.EVENT_BUS.register(AlignmentTaskSolver())
         MinecraftForge.EVENT_BUS.register(ArmorColor())
         MinecraftForge.EVENT_BUS.register(AuctionData())
@@ -283,6 +281,8 @@ class Skytils {
 
         DataFetcher.preload()
         MayorInfo.fetchMayorData()
+
+        MinecraftForge.EVENT_BUS.register(SpamHider())
     }
 
     @SubscribeEvent

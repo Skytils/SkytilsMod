@@ -190,6 +190,7 @@ object SkytilsCommand : CommandBase() {
             "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
                 LocationEditGui()
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
+            "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()
             "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> ArmorColorCommand.processCommand(
                 sender,
                 args.copyOfRange(1, args.size)

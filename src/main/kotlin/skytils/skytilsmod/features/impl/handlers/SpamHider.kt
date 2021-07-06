@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
+import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
@@ -24,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
@@ -38,19 +40,87 @@ import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.ArrayList
 import kotlin.math.sin
 
-class SpamHider {
+class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
+
+    override fun read(reader: FileReader) {
+        filters.clear()
+        val obj = gson.fromJson(reader, JsonObject::class.java)
+        if (!obj["default"].isJsonNull) {
+            obj["default"].asJsonObject.entrySet().forEach { element ->
+                repoFilters.find { it.name == element.key }?.state = element.value.asJsonObject["state"].asInt
+            }
+        }
+        if (!obj["filter"].isJsonNull) {
+            obj["filter"].asJsonObject.entrySet().forEach { element ->
+                filters.add(gson.fromJson(element.value.asString, Filter::class.java))
+            }
+        }
+    }
+
+    override fun write(writer: FileWriter) {
+        val obj = JsonObject()
+        val defaultObj = JsonObject()
+        repoFilters.forEach {
+            val json = JsonObject()
+            json.addProperty("name", it.name)
+            json.addProperty("state", it.state)
+            defaultObj.add(it.name, json)
+        }
+        obj.add("default", defaultObj)
+        val filterObj = JsonObject()
+        filters.forEach {
+            filterObj.addProperty(it.name, gson.toJson(it))
+        }
+        obj.add("filter", filterObj)
+        gson.toJson(obj, writer)
+    }
+
+    override fun setDefault(writer: FileWriter) {
+        val obj = JsonObject()
+        obj.add("default", JsonObject())
+        obj.add("filter", JsonObject())
+        gson.toJson(obj, writer)
+    }
+
+    data class Filter(
+        var name: String,
+        var state: Int,
+        var skyblockOnly: Boolean,
+        var pattern: String,
+        var type: FilterType
+    ) {
+        val regex = Regex(pattern)
+
+        fun check(input: String): Boolean {
+            return this.type.method(input, regex)
+        }
+    }
+
+    enum class FilterType(val type: String, val method: (String, Regex) -> Boolean) {
+        STARTSWITH("startsWith", { first, second -> first.startsWith(second.pattern) }),
+        CONTAINS("contains", { first, second -> first.contains(second) }),
+        REGEX("regex", { first, second -> second.matchEntire(first) != null })
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
-        var spamMessages = ArrayList<SpamMessage>()
+        val spamMessages = ArrayList<SpamMessage>()
         private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
             if (ReceivePacketEvent.packet !is S02PacketChat) return
             Utils.cancelChatPacket(ReceivePacketEvent)
             if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
         }
+
+        val filters = ArrayList<Filter>()
+        val repoFilters = ArrayList<Filter>()
 
         private fun newMessage(message: String) {
             spamMessages.add(SpamMessage(message, 0, 0.0))
@@ -143,10 +213,25 @@ class SpamHider {
         if (formatted.startsWith("§aYou are playing on profile:")) {
             when (Skytils.config.profileHider) {
                 1, 2 -> cancelChatPacket(event, Skytils.config.profileHider == 2)
-                else -> {
-                }
             }
         }
+
+        filters.forEach {
+            if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
+            if (it.check(formatted) && it.state > 0) {
+                cancelChatPacket(event, it.state == 2)
+                return
+            }
+        }
+
+        repoFilters.forEach {
+            if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
+            if (it.check(formatted) && it.state > 0) {
+                cancelChatPacket(event, it.state == 2)
+                return
+            }
+        }
+
         if (!Utils.inSkyblock) return
         try {
             if (Utils.inDungeons) {
@@ -166,7 +251,9 @@ class SpamHider {
                         "You should have listened"
                     ) && !unformatted.contains("Yikes") && !unformatted.contains("chose the wrong answer") && !unformatted.contains(
                         "thinks the answer is"
-                    ) && !((unformatted.contains("answered Question #") || unformatted.contains("answered the final question")) && unformatted.endsWith("correctly!")) -> {
+                    ) && !((unformatted.contains("answered Question #") || unformatted.contains("answered the final question")) && unformatted.endsWith(
+                        "correctly!"
+                    )) -> {
                         cancelChatPacket(event, false)
                     }
                 }

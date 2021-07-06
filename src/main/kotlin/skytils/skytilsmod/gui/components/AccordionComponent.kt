@@ -30,6 +30,7 @@ import java.awt.Color
 class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
     var toggle = false
     val contents = ArrayList<UIComponent>()
+    var afterHeightChange: (Float) -> Unit = { }
     val button = SimpleButton(t)
         .constrain {
             x = 0.pixels()
@@ -65,7 +66,9 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
                 Animations.IN_OUT_QUAD,
                 if (instantly) 0f else 1f,
                 basicHeightConstraint { button.getHeight() }
-            )
+            ).onComplete {
+                afterHeightChange(button.getHeight())
+            }
         }
     }
 
@@ -75,8 +78,14 @@ class AccordionComponent(val t: String) : UIBlock(Color(22, 22, 24)) {
                 Animations.IN_OUT_QUAD,
                 1f,
                 ChildBasedSizeConstraint()
-            )
+            ).onComplete {
+                afterHeightChange(ChildBasedSizeConstraint().cachedValue)
+            }
         }
+    }
+
+    fun afterHeightChange(listener: (Float) -> Unit) {
+        afterHeightChange = listener
     }
 
 }

@@ -26,6 +26,7 @@ import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.handlers.Mayor
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.handlers.MayorPerk
+import skytils.skytilsmod.features.impl.handlers.SpamHider
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
@@ -101,6 +102,19 @@ object DataFetcher {
             for ((key, value) in slayerHealthData.entrySet()) {
                 SlayerFeatures.BossHealths[key] = value.asJsonObject
             }
+            for (value in APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json")) {
+                val json = value.asJsonObject
+                SpamHider.repoFilters.add(
+                    SpamHider.Filter(
+                        json["name"].asString, 0, true, json["pattern"].asString, when (json["type"].asString) {
+                            "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
+                            "CONTAINS" -> SpamHider.FilterType.CONTAINS
+                            "REGEX" -> SpamHider.FilterType.REGEX
+                            else -> SpamHider.FilterType.CONTAINS
+                        }
+                    )
+                )
+            }
         }
     }
 
@@ -114,6 +128,7 @@ object DataFetcher {
         ThreeWeirdosSolver.solutions.clear()
         TriviaSolver.triviaSolutions.clear()
         SlayerFeatures.BossHealths.clear()
+        SpamHider.repoFilters.clear()
     }
 
     @JvmStatic
@@ -125,7 +140,6 @@ object DataFetcher {
     internal fun preload() {}
 
     init {
-        reloadData()
         fixedRateTimer(name = "Skytils-Reload-Data", period = 60 * 60 * 1000) {
             reloadData()
         }
