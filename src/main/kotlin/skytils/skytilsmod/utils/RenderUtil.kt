@@ -262,7 +262,7 @@ object RenderUtil {
      * @author SteveKunG
      */
     @JvmStatic
-    fun renderTexture(texture: ResourceLocation?, x: Int, y: Int) {
+    fun renderTexture(texture: ResourceLocation?, x: Int, y: Int, width: Int = 16, height: Int = 16) {
         RenderHelper.enableGUIStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.enableBlend()
@@ -276,7 +276,7 @@ object RenderUtil {
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(770, 771)
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        Gui.drawModalRectWithCustomSizedTexture(x, y, 0f, 0f, 16, 16, 16f, 16f)
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0f, 0f, width, height, width.toFloat(), height.toFloat())
         GlStateManager.disableAlpha()
         GlStateManager.disableRescaleNormal()
         GlStateManager.disableLighting()

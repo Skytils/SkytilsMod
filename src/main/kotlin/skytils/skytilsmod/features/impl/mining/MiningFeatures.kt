@@ -19,7 +19,9 @@ package skytils.skytilsmod.features.impl.mining
 
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.init.Blocks
@@ -41,14 +43,17 @@ import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
+import skytils.skytilsmod.core.structure.FloatPair
+import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
 import java.util.regex.Pattern
+import kotlin.math.roundToInt
 
 class MiningFeatures {
     @SubscribeEvent
@@ -278,6 +283,37 @@ class MiningFeatures {
         ) {
             event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
         }
+    }
+
+    class CrystalHollowsMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
+
+        override fun render() {
+            if (!toggled || mc.thePlayer == null) return
+            RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 1000, 1000)
+            val x = mc.thePlayer.posX.coerceIn(0.0, 1000.0)
+            val y = mc.thePlayer.posZ.coerceIn(0.0, 1000.0)
+            RenderUtil.drawRect(x - 2, y - 2, x + 2, y + 2, Color.RED.rgb)
+        }
+
+        override fun demoRender() {
+            Gui.drawRect(0, 0, 1000, 1000, Color.RED.rgb)
+            fr.drawString("Crystal Hollows Map", 500f, 500f, alignment = SmartFontRenderer.TextAlignment.MIDDLE)
+        }
+
+        override val toggled: Boolean
+            get() = SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
+        override val height: Int
+            get() = 1000
+        override val width: Int
+            get() = 1000
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    init {
+        CrystalHollowsMap()
     }
 
     companion object {
