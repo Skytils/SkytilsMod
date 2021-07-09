@@ -1069,6 +1069,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showItemRarity = false
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Item Rarity Shape",
+        description = "Select the shape of the item rarity's background.\n" +
+                "§cCustom is made for Texture Pack makers, the png must be named customrarity.png.\n" +
+                "§cDon't use it if you don't know what you are doing",
+        category = "Miscellaneous", subcategory = "Item Rarity",
+        options = ["Circle", "Square", "Square Outline", "Outline", "Custom"]
+    )
+    var itemRarityShape = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Pet Rarity",
         description = "Shows the rarity of a pet in the color",
         category = "Miscellaneous", subcategory = "Item Rarity"
@@ -1987,6 +1997,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
         addDependency("itemRarityOpacity", "showItemRarity")
+        addDependency("itemRarityShape", "showItemRarity")
 
         listOf(
             "showLowestBINPrice",
