@@ -41,6 +41,10 @@ import kotlin.math.sqrt
 
 object RenderUtil {
     private val RARITY = ResourceLocation("skytils:gui/rarity.png")
+    private val RARITY2 = ResourceLocation("skytils:gui/rarity2.png")
+    private val RARITY3 = ResourceLocation("skytils:gui/rarity3.png")
+    private val RARITY4 = ResourceLocation("skytils:gui/rarity4.png")
+    private val CUSTOMRARITY = ResourceLocation("skytils:gui/customrarity.png")
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     /**
@@ -481,7 +485,23 @@ object RenderUtil {
             GlStateManager.disableDepth()
             GlStateManager.enableBlend()
             GlStateManager.enableAlpha()
-            Minecraft.getMinecraft().textureManager.bindTexture(RARITY)
+            when {
+                (Skytils.config.itemRarityShape == 0) -> {
+                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY)
+                }
+                (Skytils.config.itemRarityShape == 1) -> {
+                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY2)
+                }
+                (Skytils.config.itemRarityShape == 2) -> {
+                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY3)
+                }
+                (Skytils.config.itemRarityShape == 3) -> {
+                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY4)
+                }
+                (Skytils.config.itemRarityShape == 4) -> {
+                    Minecraft.getMinecraft().textureManager.bindTexture(CUSTOMRARITY)
+                }
+            }
             GlStateManager.color(
                 rarity.color.red / 255.0f,
                 rarity.color.green / 255.0f,
