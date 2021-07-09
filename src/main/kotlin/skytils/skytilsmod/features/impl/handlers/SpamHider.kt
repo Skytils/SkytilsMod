@@ -94,10 +94,15 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         var name: String,
         var state: Int,
         var skyblockOnly: Boolean,
-        var pattern: String,
+        private val initialPattern: String,
         var type: FilterType
     ) {
-        val regex = Regex(pattern)
+        var pattern: String = initialPattern
+            set(value) {
+                field = value
+                regex = Regex(value)
+            }
+        var regex = Regex(pattern)
 
         fun check(input: String): Boolean {
             return this.type.method(input, regex)
