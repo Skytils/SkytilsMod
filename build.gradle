@@ -150,7 +150,6 @@ mixin {
 reobf {
     shadowJar {
         classpath = sourceSets.main.compileClasspath
-        mappingType = "SEARGE"
     }
 }
 

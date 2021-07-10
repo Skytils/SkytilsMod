@@ -285,7 +285,7 @@ class MiningFeatures {
         }
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0), scale = 0.1f) {
 
         override fun render() {
             if (!toggled || mc.thePlayer == null) return

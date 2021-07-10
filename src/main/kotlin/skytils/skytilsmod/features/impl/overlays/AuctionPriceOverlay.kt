@@ -262,6 +262,7 @@ class AuctionPriceOverlay {
         override fun actionPerformed(button: GuiButton) {
             if (button.id == 0) {
                 undercut = !undercut
+                sign.signText[0] = ChatComponentText(input ?: "Invalid Value")
             } else if (button.id == 999) {
                 dragging = true
                 val sr = ScaledResolution(mc)
