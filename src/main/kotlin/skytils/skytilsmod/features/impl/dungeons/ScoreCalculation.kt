@@ -57,11 +57,25 @@ object ScoreCalculation {
     val partyAssistSecretsPattern: Pattern =
         Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
     var rooms = ConcurrentHashMap<String, Int>()
-    var mimicKilled = false
     private val mc = Minecraft.getMinecraft()
     private var ticks = 0
     private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
     private var lastRoomScanPos: BlockPos? = null
+
+    private val deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
+    private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
+    private val failedPuzzlePattern =
+        Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f\\((?:§r(?<player>.+))?§r§f\\)§r")
+    private val secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
+    private val cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r")
+
+    var deaths = 0
+    var missingPuzzles = 0
+    var failedPuzzles = 0
+    var foundSecrets = 0
+    val totalSecrets = rooms.values.sum()
+    var crypts = 0
+    var mimicKilled = false
 
     var drmRoomScanMethod: Method? = null
 
@@ -113,30 +127,72 @@ object ScoreCalculation {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        if (Utils.inDungeons && Skytils.usingDungeonRooms && mc.thePlayer != null && mc.theWorld != null && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
-            when (Skytils.config.scoreCalculationMethod) {
-                0 -> {
-                    if (ticks % 30 == 0) {
-                        ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
-                        ticks = 0
+        if (mc.thePlayer != null && mc.theWorld != null && Utils.inDungeons) {
+            if (ticks % 2 == 0) {
+                for (pi in TabListUtils.tabEntries) {
+                    try {
+                        val name = pi.text
+                        when {
+                            name.contains("Deaths:") -> {
+                                val matcher = deathsTabPattern.matcher(name)
+                                if (matcher.find()) {
+                                    deaths = matcher.group("deaths").toInt()
+                                }
+                            }
+                            name.contains("✦") -> {
+                                val matcher = missingPuzzlePattern.matcher(name)
+                                if (matcher.find()) {
+                                    missingPuzzles++
+                                }
+                            }
+                            name.contains("✖") -> {
+                                val matcher = failedPuzzlePattern.matcher(name)
+                                if (matcher.find()) {
+                                    failedPuzzles++
+                                }
+                            }
+                            name.contains("Secrets Found:") -> {
+                                val matcher = secretsFoundPattern.matcher(name)
+                                if (matcher.find()) {
+                                    foundSecrets = matcher.group("secrets").toInt()
+                                }
+                            }
+                            name.contains("Crypts:") -> {
+                                val matcher = cryptsPattern.matcher(name)
+                                if (matcher.find()) {
+                                    crypts = matcher.group("crypts").toInt()
+                                }
+                            }
+                        }
+                    } catch (ignored: NumberFormatException) {
                     }
                 }
-                1 -> {
-                    if (drmRoomScanMethod != null && (lastRoomScanPos == null || ticks % 900 == 0 || mc.thePlayer.getDistanceSqToCenter(
-                            lastRoomScanPos
-                        ) >= (mc.gameSettings.renderDistanceChunks.coerceAtMost(
-                            10
-                        ) * 16.0).pow(2)
-                                )
-                    ) {
-                        lastRoomScanPos = mc.thePlayer.position
-                        Skytils.threadPool.submit {
-                            @Suppress("UNCHECKED_CAST")
-                            roomScanCallback(
-                                drmRoomScanMethod!!.invoke(null) as List<String>
-                            )
+            }
+            if (Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
+                when (Skytils.config.scoreCalculationMethod) {
+                    0 -> {
+                        if (ticks % 30 == 0) {
+                            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
+                            ticks = 0
                         }
-                        ticks = 0
+                    }
+                    1 -> {
+                        if (drmRoomScanMethod != null && (lastRoomScanPos == null || ticks % 900 == 0 || mc.thePlayer.getDistanceSqToCenter(
+                                lastRoomScanPos
+                            ) >= (mc.gameSettings.renderDistanceChunks.coerceAtMost(
+                                10
+                            ) * 16.0).pow(2)
+                                    )
+                        ) {
+                            lastRoomScanPos = mc.thePlayer.position
+                            Skytils.threadPool.submit {
+                                @Suppress("UNCHECKED_CAST")
+                                roomScanCallback(
+                                    drmRoomScanMethod!!.invoke(null) as List<String>
+                                )
+                            }
+                            ticks = 0
+                        }
                     }
                 }
             }
@@ -231,6 +287,46 @@ object ScoreCalculation {
 
     init {
         ScoreCalculationElement()
+        HugeCryptsCounter()
+    }
+
+    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
+        override fun render() {
+            if (Utils.inDungeons) {
+                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                ScreenRenderer.fontRenderer.drawString(
+                    "Crypts: $crypts",
+                    0f,
+                    0f,
+                    alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
+                    customColor = if (crypts < 5) CommonColors.RED else CommonColors.LIGHT_GREEN
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            ScreenRenderer.fontRenderer.drawString(
+                "Crypts: 5",
+                0f,
+                0f,
+                alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
+                customColor = CommonColors.LIGHT_GREEN
+            )
+        }
+
+        override val toggled: Boolean
+            get() = Skytils.config.bigCryptsCounter
+        override val height: Int
+            get() = fr.FONT_HEIGHT
+        override val width: Int
+            get() = fr.getStringWidth("Crypts: 5")
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
     }
 
     class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", FloatPair(200, 100)) {
@@ -242,55 +338,11 @@ object ScoreCalculation {
 
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val text = ArrayList<String>()
-                var deaths = 0
-                var missingPuzzles = 0
-                var failedPuzzles = 0
-                var foundSecrets = 0
-                val totalSecrets = rooms.values.sum()
                 var clearedPercentage = 0
                 var secondsElapsed = 0.0
-                var crypts = 0
                 val isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
                         ?: "") == "Paul"
-                for (pi in TabListUtils.tabEntries) {
-                    try {
-                        val name = pi.text
-                        when {
-                            name.contains("Deaths:") -> {
-                                val matcher = deathsTabPattern.matcher(name)
-                                if (matcher.find()) {
-                                    deaths = matcher.group("deaths").toInt()
-                                }
-                            }
-                            name.contains("✦") -> {
-                                val matcher = missingPuzzlePattern.matcher(name)
-                                if (matcher.find()) {
-                                    missingPuzzles++
-                                }
-                            }
-                            name.contains("✖") -> {
-                                val matcher = failedPuzzlePattern.matcher(name)
-                                if (matcher.find()) {
-                                    failedPuzzles++
-                                }
-                            }
-                            name.contains("Secrets Found:") -> {
-                                val matcher = secretsFoundPattern.matcher(name)
-                                if (matcher.find()) {
-                                    foundSecrets = matcher.group("secrets").toInt()
-                                }
-                            }
-                            name.contains("Crypts:") -> {
-                                val matcher = cryptsPattern.matcher(name)
-                                if (matcher.find()) {
-                                    crypts = matcher.group("crypts").toInt()
-                                }
-                            }
-                        }
-                    } catch (ignored: NumberFormatException) {
-                    }
-                }
                 for (l in ScoreboardUtil.sidebarLines) {
                     val line = ScoreboardUtil.cleanSB(l)
                     if (line.startsWith("Dungeon Cleared:")) {
@@ -401,12 +453,6 @@ object ScoreCalculation {
             get() = Skytils.config.showScoreCalculation
 
         companion object {
-            private val deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
-            private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
-            private val failedPuzzlePattern =
-                Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f\\((?:§r(?<player>.+))?§r§f\\)§r")
-            private val secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
-            private val cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r")
             private val dungeonClearedPattern = Pattern.compile("Dungeon Cleared: (?<percentage>\\d+)%")
             private val timeElapsedPattern =
                 Pattern.compile("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
