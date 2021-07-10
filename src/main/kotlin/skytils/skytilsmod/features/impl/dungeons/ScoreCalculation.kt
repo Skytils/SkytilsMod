@@ -129,6 +129,8 @@ object ScoreCalculation {
         if (event.phase != TickEvent.Phase.START) return
         if (mc.thePlayer != null && mc.theWorld != null && Utils.inDungeons) {
             if (ticks % 2 == 0) {
+                missingPuzzles = 0
+                failedPuzzles = 0
                 for (pi in TabListUtils.tabEntries) {
                     try {
                         val name = pi.text
