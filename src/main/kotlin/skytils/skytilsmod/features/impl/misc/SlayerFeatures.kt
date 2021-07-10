@@ -471,6 +471,9 @@ class SlayerFeatures {
                         printDebugMessage(
                             "slayer died"
                         )
+                        if (Skytils.config.slayerTimeToKill) {
+                            mc.thePlayer.addChatComponentMessage(ChatComponentText("§9§lSkytils §8» §bSlayer took §f${slayerEntity!!.ticksExisted / 20f}§bs to kill"))
+                        }
                         slayerEntity = null
                         nukekebiHeads.clear()
                     }

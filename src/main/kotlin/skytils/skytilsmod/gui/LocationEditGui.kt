@@ -79,22 +79,18 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
     }
 
     public override fun actionPerformed(button: GuiButton) {
+        val sr = ScaledResolution(mc)
+        val minecraftScale = sr.scaleFactor.toFloat()
+        val floatMouseX = Mouse.getX() / minecraftScale
+        val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
         if (button is LocationButton) {
             dragging = button.element
-            val sr = ScaledResolution(mc)
-            val minecraftScale = sr.scaleFactor.toFloat()
-            val floatMouseX = Mouse.getX() / minecraftScale
-            val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
             xOffset = floatMouseX - dragging!!.actualX
             yOffset = floatMouseY - dragging!!.actualY
         } else if (button is ResizeButton) {
             dragging = button.element
             resizing = true
             scaleCache = button.element.scale
-            val sr = ScaledResolution(mc)
-            val minecraftScale = sr.scaleFactor.toFloat()
-            val floatMouseX = Mouse.getX() / minecraftScale
-            val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
             xOffset = floatMouseX - button.x
             yOffset = floatMouseY - button.y
             resizingCorner = button.corner

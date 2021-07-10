@@ -1552,6 +1552,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showSlayerDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Slayer Time to Kill",
+        description = "Shows the amount of time used to kill the slayer",
+        category = "Slayer", subcategory = "Quality of Life"
+    )
+    var slayerTimeToKill = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Others' Broken Heart Radiation",
         description = "Removes Broken Heart Radiation from other slayer's while yours is spawned",
         category = "Slayer", subcategory = "Voidgloom Seraph",
