@@ -450,7 +450,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
                         3 -> {
                             if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                                GuiManager.toastGui.add(ComboEndToast())
+                                GuiManager.toastGui.add(ComboEndToast(unformatted))
                             } else {
                                 GuiManager.toastGui.add(ComboToast(formatted))
                             }
