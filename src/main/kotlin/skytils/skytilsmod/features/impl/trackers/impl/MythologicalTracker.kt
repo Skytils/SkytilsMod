@@ -37,6 +37,7 @@ import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -69,7 +70,7 @@ class MythologicalTracker : Tracker("mythological") {
         REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
 
         // this does have a chat message but it's just Enchanted Book
-        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
+        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera", ItemRarity.COMMON),
         COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
         PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC),
         COG("CROWN_OF_GREED", "Crown of Greed", ItemRarity.LEGENDARY, true),
@@ -292,7 +293,7 @@ class MythologicalTracker : Tracker("mythological") {
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
-                    "Burrows Dug§f: $burrowsDug",
+                    "Burrows Dug§f: ${nf.format(burrowsDug)}",
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     CommonColors.YELLOW,
@@ -303,7 +304,7 @@ class MythologicalTracker : Tracker("mythological") {
                 for (mob in BurrowMob.values()) {
                     if (mob.dugTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
-                        "${mob.mobName}§f: ${mob.dugTimes}",
+                        "${mob.mobName}§f: ${nf.format(mob.dugTimes)}",
                         if (leftAlign) 0f else width.toFloat(),
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
@@ -315,7 +316,7 @@ class MythologicalTracker : Tracker("mythological") {
                 for (item in BurrowDrop.values()) {
                     if (item.droppedTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
-                        "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
+                        "${item.rarity.baseColor}${item.itemName}§f: §r${nf.format(item.droppedTimes)}",
                         if (leftAlign) 0f else width.toFloat(),
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
