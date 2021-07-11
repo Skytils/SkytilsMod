@@ -73,7 +73,8 @@ object ScoreCalculation {
     var missingPuzzles = 0
     var failedPuzzles = 0
     var foundSecrets = 0
-    val totalSecrets = rooms.values.sum()
+    val totalSecrets: Int
+        get() = rooms.values.sum()
     var crypts = 0
     var mimicKilled = false
 
