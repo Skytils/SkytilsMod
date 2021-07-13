@@ -45,6 +45,7 @@ import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -360,6 +361,16 @@ class MiscFeatures {
                 }) return
             event.isCanceled = true
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer)
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onTooltipLowest(event: ItemTooltipEvent) {
+        event.toolTip as ArrayList<String>
+        if (mc.session.username == "Refraction") {
+            event.toolTip.replaceAll {
+                it.replace("Smarty Pants", "Big PP")
+            }
         }
     }
 
