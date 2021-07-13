@@ -333,6 +333,7 @@ class MiningFeatures {
             denLoc.drawWayPoint("Goblin Queen's Den", event.partialTicks)
             minesLoc.drawWayPoint("Mines of Divan", event.partialTicks)
             balLoc.drawWayPoint("Khazad-dûm", event.partialTicks)
+            RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
         }
     }
 
