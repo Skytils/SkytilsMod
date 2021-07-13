@@ -62,7 +62,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+    implementation("org.spongepowered:mixin:0.8.3") {
         transitive = false
     }
 
