@@ -30,6 +30,7 @@ import skytils.skytilsmod.features.impl.handlers.SpamHider
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
+import skytils.skytilsmod.features.impl.misc.SummonSkins
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.SkillUtils
@@ -102,6 +103,10 @@ object DataFetcher {
             for ((key, value) in slayerHealthData.entrySet()) {
                 SlayerFeatures.BossHealths[key] = value.asJsonObject
             }
+            APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {
+                SummonSkins.skinMap[it.key] = it.value.asString
+            }
+            SummonSkins.loadSkins()
             for (value in APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json")) {
                 val json = value.asJsonObject
                 SpamHider.repoFilters.add(
@@ -129,6 +134,7 @@ object DataFetcher {
         TriviaSolver.triviaSolutions.clear()
         SlayerFeatures.BossHealths.clear()
         SpamHider.repoFilters.clear()
+        SummonSkins.skinMap.clear()
     }
 
     @JvmStatic
