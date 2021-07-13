@@ -333,6 +333,7 @@ class MiningFeatures {
             denLoc.drawWayPoint("Goblin Queen's Den", event.partialTicks)
             minesLoc.drawWayPoint("Mines of Divan", event.partialTicks)
             balLoc.drawWayPoint("Khazad-dûm", event.partialTicks)
+            RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
         }
     }
 
@@ -437,7 +438,7 @@ class MiningFeatures {
         }
 
         override val toggled: Boolean
-            get() = Skytils.config.hollowMap && SBInfo.mode ==  SBInfo.SkyblockIsland.CrystalHollows.mode
+            get() = Skytils.config.hollowMap && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
         override val height: Int
             get() = 1000
         override val width: Int
