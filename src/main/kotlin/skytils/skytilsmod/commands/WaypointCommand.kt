@@ -50,7 +50,11 @@ object WaypointCommand : CommandBase() {
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
         if (args == null || args.size < 3) {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Correct usage: /setwaypoint location x y z"))
+            if (args?.size == 1)
+                MiningFeatures.waypoints[args[0]] = Minecraft.getMinecraft().thePlayer.playerLocation
+            else {
+                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Correct usage: /setwaypoint location <x y z>"))
+            }
             return
         }
         val loc: String = args[0]
