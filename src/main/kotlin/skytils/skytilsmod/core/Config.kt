@@ -926,6 +926,27 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var puzzlerSolver = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows map",
+        description = "Shows a map to see in which part of the crystal hollows you are and saves locations of special places.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var hollowMap = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
+        description = "Shows waypoints to special places inside the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var hollowWaypoints = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows chat coordinates grabber",
+        description = "When coordinates are shared in chat asks which one it is and displays a waypoint there and shows it on the map.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var hollowChatCoords = false
+
     /*
    @Property(
    type = PropertyType.SWITCH, name = "Block Useless Zombie Sword",
