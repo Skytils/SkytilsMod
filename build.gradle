@@ -23,7 +23,7 @@ plugins {
     id "org.spongepowered.mixin" version "d5f9873d60"
 }
 
-ext.kotlin_version = "1.5.20"
+ext.kotlin_version = "1.5.21"
 
 version = "1.0-pre16"
 group = "skytils.skytilsmod"
