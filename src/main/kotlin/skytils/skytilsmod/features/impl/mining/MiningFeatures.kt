@@ -176,7 +176,6 @@ class MiningFeatures {
     }
 
     fun waypointChatMessage(x: String, y: String, z: String) {
-        if (cityLoc.exists() && templeLoc.exists() && minesLoc.exists() && denLoc.exists() && balLoc.exists()) return
         val component = ChatComponentText(
             EnumChatFormatting.DARK_AQUA.toString() + "Skytils > " + EnumChatFormatting.YELLOW +
                     "Found coordinates in a chat message, click a button to set a waypoint.\n"
@@ -186,7 +185,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/\$setwaypoint city $x $y $z"
+                        "/setwaypoint internal_city $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -200,7 +199,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/\$setwaypoint temple $x $y $z"
+                        "/setwaypoint internal_temple $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -214,7 +213,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/\$setwaypoint den $x $y $z"
+                        "/setwaypoint internal_den $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -228,7 +227,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/\$setwaypoint mines $x $y $z"
+                        "/setwaypoint internal_mines $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -237,12 +236,12 @@ class MiningFeatures {
                     )
                 )
         )
-        val bal = ChatComponentText(EnumChatFormatting.RED.toString() + "[Khazad-dûm]").setChatStyle(
+        val bal = ChatComponentText(EnumChatFormatting.RED.toString() + "[Khazad-dûm] ").setChatStyle(
             ChatStyle()
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/\$setwaypoint bal $x $y $z"
+                        "/setwaypoint internal_bal $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -250,6 +249,19 @@ class MiningFeatures {
                         ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set waypoint for Khazad-dûm")
                     )
                 )
+        )
+        val custom = ChatComponentText(EnumChatFormatting.YELLOW.toString() + "[Custom]").setChatStyle(
+            ChatStyle().setChatClickEvent(
+                ClickEvent(
+                    ClickEvent.Action.SUGGEST_COMMAND,
+                    "/setwaypoint name $x $y $z"
+                )
+            ).setChatHoverEvent(
+                HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set custom waypoint")
+                )
+            )
         )
         if (!cityLoc.exists())
             component.appendSibling(city)
@@ -261,6 +273,7 @@ class MiningFeatures {
             component.appendSibling(mines)
         if (!balLoc.exists())
             component.appendSibling(bal)
+        component.appendSibling(custom)
         mc.thePlayer.addChatMessage(component)
     }
 
@@ -334,6 +347,8 @@ class MiningFeatures {
             minesLoc.drawWayPoint("Mines of Divan", event.partialTicks)
             balLoc.drawWayPoint("Khazad-dûm", event.partialTicks)
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
+            for ((key, value) in waypoints)
+                RenderUtil.renderWaypointText(key, value, event.partialTicks)
         }
     }
 
@@ -517,5 +532,6 @@ class MiningFeatures {
         var denLoc: LocationObject = LocationObject()
         var minesLoc: LocationObject = LocationObject()
         var balLoc: LocationObject = LocationObject()
+        var waypoints: HashMap<String, BlockPos> = HashMap()
     }
 }
