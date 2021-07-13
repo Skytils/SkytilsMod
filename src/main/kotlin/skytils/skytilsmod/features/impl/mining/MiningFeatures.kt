@@ -21,9 +21,10 @@ import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCreeper
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -52,8 +53,9 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
+import java.util.regex.Matcher
 import java.util.regex.Pattern
-import kotlin.math.roundToInt
+import kotlin.math.min
 
 class MiningFeatures {
     @SubscribeEvent
@@ -78,6 +80,11 @@ class MiningFeatures {
             }
         }
     }
+
+    private val xyzPattern: Pattern =
+        Pattern.compile(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}) (?<y>[0-9]{1,3}) (?<z>[0-9]{1,3}).*")
+    private val xzPattern: Pattern =
+        Pattern.compile(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}) (?<z>[0-9]{1,3}).*")
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
@@ -158,6 +165,103 @@ class MiningFeatures {
                 }
             }
         }
+        if (Skytils.config.hollowChatCoords && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
+            val xyzMatcher: Matcher = xyzPattern.matcher(unformatted)
+            val xzMatcher: Matcher = xzPattern.matcher(unformatted)
+            if (xyzMatcher.matches())
+                waypointChatMessage(xyzMatcher.group("x"), xyzMatcher.group("y"), xyzMatcher.group("z"))
+            else if (xzMatcher.matches())
+                waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
+        }
+    }
+
+    fun waypointChatMessage(x: String, y: String, z: String) {
+        if (cityLoc.exists() && templeLoc.exists() && minesLoc.exists() && denLoc.exists() && balLoc.exists()) return
+        val component = ChatComponentText(
+            EnumChatFormatting.DARK_AQUA.toString() + "Skytils > " + EnumChatFormatting.YELLOW +
+                    "Found coordinates in a chat message, click a button to set a waypoint.\n"
+        )
+        val city = ChatComponentText(EnumChatFormatting.WHITE.toString() + "[Lost Precursor City] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/\$setwaypoint city $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set waypoint for Lost Precursor City")
+                    )
+                )
+        )
+        val temple = ChatComponentText(EnumChatFormatting.GREEN.toString() + "[Jungle Temple] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/\$setwaypoint temple $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set waypoint for Jungle Temple")
+                    )
+                )
+        )
+        val den = ChatComponentText(EnumChatFormatting.YELLOW.toString() + "[Goblin Queen's Den] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/\$setwaypoint den $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set waypoint for Goblin Queen's Den")
+                    )
+                )
+        )
+        val mines = ChatComponentText(EnumChatFormatting.BLUE.toString() + "[Mines of Divan] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/\$setwaypoint mines $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set waypoint for Mines of Divan")
+                    )
+                )
+        )
+        val bal = ChatComponentText(EnumChatFormatting.RED.toString() + "[Khazad-dûm]").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/\$setwaypoint bal $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText(EnumChatFormatting.YELLOW.toString() + "set waypoint for Khazad-dûm")
+                    )
+                )
+        )
+        if (!cityLoc.exists())
+            component.appendSibling(city)
+        if (!templeLoc.exists())
+            component.appendSibling(temple)
+        if (!denLoc.exists())
+            component.appendSibling(den)
+        if (!minesLoc.exists())
+            component.appendSibling(mines)
+        if (!balLoc.exists())
+            component.appendSibling(bal)
+        mc.thePlayer.addChatMessage(component)
     }
 
     @SubscribeEvent
@@ -223,6 +327,13 @@ class MiningFeatures {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
+        if (Skytils.config.hollowWaypoints && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
+            cityLoc.drawWayPoint("Lost Precursor City", event.partialTicks)
+            templeLoc.drawWayPoint("Jungle Temple", event.partialTicks)
+            denLoc.drawWayPoint("Goblin Queen's Den", event.partialTicks)
+            minesLoc.drawWayPoint("Mines of Divan", event.partialTicks)
+            balLoc.drawWayPoint("Khazad-dûm", event.partialTicks)
+        }
     }
 
     @SubscribeEvent
@@ -261,6 +372,22 @@ class MiningFeatures {
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
+        if ((Skytils.config.hollowWaypoints || Skytils.config.hollowMap) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
+            val scoreboard = ScoreboardUtil.sidebarLines
+            for (element in scoreboard) {
+                if (element.startsWith(" §7⏣ ")) {
+                    val clean = ScoreboardUtil.cleanSB(element)
+                    when {
+                        clean.contains("Lost Precursor City") -> cityLoc.set()
+                        clean.contains("Jungle Temple") -> templeLoc.set()
+                        clean.contains("Goblin Queen's Den") -> denLoc.set()
+                        clean.contains("Mines of Divan") -> minesLoc.set()
+                        clean.contains("Khazad-dm") -> balLoc.set()
+                    }
+                    break
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -269,6 +396,11 @@ class MiningFeatures {
         lastJukebox = null
         raffleBox = null
         inRaffle = false
+        cityLoc.reset()
+        templeLoc.reset()
+        denLoc.reset()
+        minesLoc.reset()
+        balLoc.reset()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -286,13 +418,17 @@ class MiningFeatures {
     }
 
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0), scale = 0.1f) {
-
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
             RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 1000, 1000)
+            cityLoc.drawRect(Color.WHITE.rgb)
+            templeLoc.drawRect(Color.GREEN.rgb)
+            denLoc.drawRect(Color.YELLOW.rgb)
+            minesLoc.drawRect(Color.BLUE.rgb)
+            balLoc.drawRect(Color.RED.rgb)
             val x = mc.thePlayer.posX.coerceIn(0.0, 1000.0)
             val y = mc.thePlayer.posZ.coerceIn(0.0, 1000.0)
-            RenderUtil.drawRect(x - 2, y - 2, x + 2, y + 2, Color.RED.rgb)
+            RenderUtil.drawRect(x - 10, y - 10, x + 10, y + 10, Color.RED.rgb)
         }
 
         override fun demoRender() {
@@ -316,6 +452,56 @@ class MiningFeatures {
         CrystalHollowsMap()
     }
 
+    class LocationObject {
+        var locX: Double? = null
+        var locY: Double? = null
+        var locZ: Double? = null
+        private var locMinX: Double = 1100.0
+        private var locMinY: Double = 1100.0
+        private var locMinZ: Double = 1100.0
+        private var locMaxX: Double = -100.0
+        private var locMaxY: Double = -100.0
+        private var locMaxZ: Double = -100.0
+
+        fun reset() {
+            locX = null
+            locY = null
+            locZ = null
+            locMinX = 1100.0
+            locMinY = 1100.0
+            locMinZ = 1100.0
+            locMaxX = -100.0
+            locMaxY = -100.0
+            locMaxZ = -100.0
+        }
+
+        fun set() {
+            locMinX = mc.thePlayer.posX.coerceIn(0.0, 1000.0).coerceAtMost(locMinX)
+            locMinY = mc.thePlayer.posY.coerceIn(0.0, 1000.0).coerceAtMost(locMinY)
+            locMinZ = mc.thePlayer.posZ.coerceIn(0.0, 1000.0).coerceAtMost(locMinZ)
+            locMaxX = mc.thePlayer.posX.coerceIn(0.0, 1000.0).coerceAtLeast(locMaxX)
+            locMaxY = mc.thePlayer.posY.coerceIn(0.0, 1000.0).coerceAtLeast(locMaxY)
+            locMaxZ = mc.thePlayer.posZ.coerceIn(0.0, 1000.0).coerceAtLeast(locMaxZ)
+            locX = (locMinX + locMaxX) / 2
+            locY = (locMinY + locMaxY) / 2
+            locZ = (locMinZ + locMaxZ) / 2
+        }
+
+        fun exists(): Boolean {
+            return locX != null && locY != null && locZ != null
+        }
+
+        fun drawWayPoint(text: String, partialTicks: Float) {
+            if (exists())
+                RenderUtil.renderWaypointText(text, locX!!, locY!!, locZ!!, partialTicks)
+        }
+
+        fun drawRect(color: Int) {
+            if (exists())
+                RenderUtil.drawRect(locX!! - 50, locZ!! - 50, locX!! + 50, locZ!! + 50, color)
+        }
+    }
+
     companion object {
         var fetchurItems = LinkedHashMap<String, String>()
         private val mc = Minecraft.getMinecraft()
@@ -325,5 +511,10 @@ class MiningFeatures {
         private var puzzlerSolution: BlockPos? = null
         private var raffleBox: BlockPos? = null
         private var inRaffle = false
+        var cityLoc: LocationObject = LocationObject()
+        var templeLoc: LocationObject = LocationObject()
+        var denLoc: LocationObject = LocationObject()
+        var minesLoc: LocationObject = LocationObject()
+        var balLoc: LocationObject = LocationObject()
     }
 }

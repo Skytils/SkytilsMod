@@ -249,6 +249,7 @@ class Skytils {
 
             cch.registerCommand(CataCommand)
             cch.registerCommand(SlayerCommand)
+            cch.registerCommand(WaypointCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)
