@@ -34,6 +34,7 @@ import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.handlers.EnchantNames
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.*
@@ -210,6 +211,7 @@ object SkytilsCommand : CommandBase() {
                 Skytils.config.markDirty()
                 player.addChatComponentMessage(ChatComponentText("§c§lSkytils ➜ §cDebug mode was toggled to: §6${Skytils.config.debugMode}"))
             }
+            "enchant" -> Skytils.displayScreen = EnchantNamesGui()
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
     }

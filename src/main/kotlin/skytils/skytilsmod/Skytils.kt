@@ -192,6 +192,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(DungeonFeatures())
         MinecraftForge.EVENT_BUS.register(DungeonMap())
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
+        MinecraftForge.EVENT_BUS.register(EnchantNames)
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())
         MinecraftForge.EVENT_BUS.register(FavoritePets())
         MinecraftForge.EVENT_BUS.register(GlintCustomizer())
