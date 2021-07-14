@@ -417,6 +417,7 @@ class MiningFeatures {
         denLoc.reset()
         minesLoc.reset()
         balLoc.reset()
+        waypoints.clear()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
