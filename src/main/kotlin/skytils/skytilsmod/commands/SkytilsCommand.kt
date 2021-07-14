@@ -216,7 +216,7 @@ object SkytilsCommand : CommandBase() {
                     player.addChatMessage(
                         ChatComponentText(
                             "§c§lSkytils ➜ §c${
-                                args[1].lowercase().replaceFirstChar { it.uppercase() }
+                                args[1]
                             } was toggled to: §6${
                                 if (DevTools.allToggle) "Overriden by all toggle to ${DevTools.allToggle}" else DevTools.getToggle(
                                     args[1]

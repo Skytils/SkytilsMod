@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.utils.DevTools
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -31,7 +32,7 @@ import java.io.FileWriter
 
 class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     companion object {
-        private val enchantRegex = Regex("§[0-9a-fz]([\\w \\-])+(?:§9, )?")
+        private val enchantRegex = Regex("§[0-9a-fzl]([\\w \\-])+(?:§[9d], )?")
         val replacements = HashMap<String, String>()
     }
 
@@ -41,12 +42,23 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
             var newline = it
             enchantRegex.findAll(it).forEach { result ->
                 val enchant = result.value.substring(2).substringBeforeLast(",").substringBeforeLast(" ")
-                if (replacements[enchant] == null) return@forEach
                 newline = newline.replace(
                     result.value,
-                    "${result.value.substring(0, 2)}§o${enchant.replaceEnchantNames()}${
-                        result.value.substring(result.value.indexOf(enchant) + enchant.length)
-                    }"
+                    buildString {
+                        append(
+                            result.value.substring(
+                                0,
+                                2
+                            )
+                        )
+                        if (DevTools.getToggle("enchantNames")) append("{")
+                        if (replacements[enchant] != null)
+                            append("§o${enchant.replaceEnchantNames()}")
+                        else
+                            append(enchant)
+                        append(result.value.substring(result.value.indexOf(enchant) + enchant.length))
+                        if (DevTools.getToggle("enchantNames")) append("}")
+                    }
                 )
             }
             newline
