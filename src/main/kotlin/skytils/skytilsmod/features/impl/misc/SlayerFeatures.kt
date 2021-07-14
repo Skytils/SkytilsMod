@@ -21,7 +21,6 @@ import com.google.gson.JsonObject
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
@@ -69,7 +68,6 @@ import skytils.skytilsmod.utils.RenderUtil.drawFilledBoundingBox
 import skytils.skytilsmod.utils.RenderUtil.drawOutlinedBoundingBox
 import skytils.skytilsmod.utils.ScoreboardUtil.cleanSB
 import skytils.skytilsmod.utils.ScoreboardUtil.sidebarLines
-import skytils.skytilsmod.utils.Utils.printDebugMessage
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -273,9 +271,9 @@ class SlayerFeatures {
         }
         if (slayerEntity == null) return
         if (yangGlyphEntity != null) {
-            printDebugMessage("Glyph Entity exists")
+            printDevMessage("Glyph Entity exists", "slayer", "seraph", "seraphGlyph")
             if (event.update.block is BlockBeacon && yangGlyphEntity!!.position.distanceSq(event.pos) < 9) {
-                printDebugMessage("Beacon entity near beacon block!")
+                printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
                 yangGlyph = event.pos
                 yangGlyphEntity = null
                 if (Skytils.config.yangGlyphPing) {
@@ -331,11 +329,11 @@ class SlayerFeatures {
                 if (slayerEntity != null && e.entityBoundingBox.expand(2.0, 3.0, 2.0)
                         .intersectsWith(slayerEntity!!.entityBoundingBox)
                 ) {
-                    printDebugMessage("Found nearby armor stand")
+                    printDevMessage("Found nearby armor stand", "slayer", "seraph", "seraphGlyph", "seraphFixation")
                     for (item in e.inventory) {
                         if (item == null) continue
                         if (item.item == Item.getItemFromBlock(Blocks.beacon)) {
-                            printDebugMessage("Beacon armor stand is close to slayer entity")
+                            printDevMessage("Beacon armor stand is close to slayer entity", "slayer", "seraph", "seraphGlyph")
                             yangGlyphEntity = e
                         } else if (item.item == Items.skull) {
                             if (ItemUtil.getSkullTexture(item) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0=") {
@@ -348,9 +346,7 @@ class SlayerFeatures {
         }
         if (!hasSlayerText) return
         if (slayerEntity != null) {
-            printDebugMessage(
-                "boss not null"
-            )
+            printDevMessage("boss not null", "slayer", "seraph")
             return
         }
         processSlayerEntity(event.entity)
@@ -361,7 +357,7 @@ class SlayerFeatures {
         if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityEnderman || !Skytils.config.useSlayerHitMethod) return
         val enderman = event.target as EntityEnderman
         if (floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
-            printDebugMessage("A valid enderman was attacked")
+            printDevMessage("A valid enderman was attacked", "slayer", "seraph", "seraphHit")
             hitMap.compute(enderman) { _, int ->
                 return@compute (int ?: 0).inc()
             }
@@ -370,7 +366,7 @@ class SlayerFeatures {
             } else if (enderman != slayerEntity && hitMap[enderman]!! - (hitMap[slayerEntity as EntityEnderman]
                     ?: 0) >= 10
             ) {
-                printDebugMessage("Processing new entity")
+                printDevMessage("Processing new entity", "slayer", "seraph", "seraphHit")
                 detectSlayerEntities(enderman, "Voidgloom Seraph", null, "§c☠ §bVoidgloom Seraph")
             }
         }
@@ -380,7 +376,7 @@ class SlayerFeatures {
     fun onDeath(event: LivingDeathEvent) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityEnderman) {
-            printDebugMessage("An Enderman died")
+            printDevMessage("An Enderman died", "slayer", "seraph", "seraphHit")
             hitMap.remove(event.entity)
         }
     }
@@ -398,13 +394,13 @@ class SlayerFeatures {
         if (!Skytils.config.hideOthersBrokenHeartRadiation || !event.entity.isInvisible || event.entity !is EntityGuardian) return
         if (slayerEntity != null && slayerEntity is EntityEnderman) {
             if (slayerEntity!!.isRiding) {
-                printDebugMessage("Slayer is Riding")
+                printDevMessage("Slayer is Riding", "slayer", "seraph", "seraphRadiation")
                 if (event.entity.getDistanceSqToEntity(slayerEntity!!) > 2 * 2) {
-                    printDebugMessage("Guardian too far")
+                    printDevMessage("Guardian too far", "slayer", "seraph", "seraphRadiation")
                     event.isCanceled = true
                 }
             } else {
-                printDebugMessage("Slayer not riding, removing guardian")
+                printDevMessage("Slayer not riding, removing guardian", "slayer", "seraph", "seraphRadiation")
                 event.isCanceled = true
             }
         }
@@ -434,9 +430,7 @@ class SlayerFeatures {
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 if (slayerTimerEntity != null) {
                     if (slayerTimerEntity!!.isDead) {
-                        printDebugMessage(
-                            "timer died"
-                        )
+                        printDevMessage("timer died", "slayer", "seraph")
                         slayerTimerEntity = null
                     } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
@@ -451,9 +445,7 @@ class SlayerFeatures {
                 }
                 if (slayerNameEntity != null) {
                     if (slayerNameEntity!!.isDead) {
-                        printDebugMessage(
-                            "name died"
-                        )
+                        printDevMessage("name died", "slayer", "seraph")
                         slayerNameEntity = null
                     } else if (toggled) {
                         ScreenRenderer.fontRenderer.drawString(
@@ -468,9 +460,7 @@ class SlayerFeatures {
                 }
                 if (slayerEntity != null) {
                     if (slayerEntity!!.isDead) {
-                        printDebugMessage(
-                            "slayer died"
-                        )
+                        printDevMessage("slayer died", "slayer", "seraph")
                         if (Skytils.config.slayerTimeToKill) {
                             mc.thePlayer.addChatComponentMessage(ChatComponentText("§9§lSkytils §8» §bSlayer took §f${slayerEntity!!.ticksExisted / 20f}§bs to kill"))
                         }
@@ -850,30 +840,22 @@ class SlayerFeatures {
                         val currentTier =
                             sidebarLines.map { cleanSB(it) }.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
                                 ?: ""
-                        printDebugMessage(
-                            "expected tier $currentTier - spawned hp ${floor(entity.baseMaxHealth).toInt()}"
-                        )
+                        printDevMessage("expected tier $currentTier - spawned hp ${floor(entity.baseMaxHealth).toInt()}", "slayer")
                         if (BossHealths[name.substringBefore(" ")]?.get(currentTier)?.asInt
                             == floor(entity.baseMaxHealth).toInt()
                         ) {
-                            printDebugMessage(
-                                "hp matched"
-                            )
+                            printDevMessage("hp matched", "slayer")
                             potentialNameEntities.add(nearby as EntityArmorStand)
                         }
                         continue
                     }
                     if (nearby.displayName.formattedText == timer) {
-                        printDebugMessage(
-                            "timer matched"
-                        )
+                        printDevMessage("timer matched", "slayer")
                         potentialTimerEntities.add(nearby as EntityArmorStand)
                         continue
                     }
                     if (timer == null && nearby.displayName.formattedText.matches(timerRegex)) {
-                        printDebugMessage(
-                            "timer regex matched"
-                        )
+                        printDevMessage("timer regex matched", "slayer")
                         potentialTimerEntities.add(nearby as EntityArmorStand)
                         continue
                     }

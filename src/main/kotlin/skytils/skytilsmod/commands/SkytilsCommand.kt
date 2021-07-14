@@ -39,6 +39,7 @@ import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.*
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.openGUI
 import java.time.ZoneId
@@ -206,10 +207,24 @@ object SkytilsCommand : CommandBase() {
             "spiritleapnames" -> {
                 Skytils.displayScreen = SpiritLeapNamesGui()
             }
-            "debug" -> {
-                Skytils.config.debugMode = !Skytils.config.debugMode
-                Skytils.config.markDirty()
-                player.addChatComponentMessage(ChatComponentText("§c§lSkytils ➜ §cDebug mode was toggled to: §6${Skytils.config.debugMode}"))
+            "dev" -> {
+                if (args.size == 1) {
+                    player.addChatMessage(ChatComponentText("/skytils dev <toggle>"))
+                    return
+                } else {
+                    DevTools.toggle(args[1])
+                    player.addChatMessage(
+                        ChatComponentText(
+                            "§c§lSkytils ➜ §c${
+                                args[1].lowercase().replaceFirstChar { it.uppercase() }
+                            } was toggled to: §6${
+                                if (DevTools.allToggle) "Overriden by all toggle to ${DevTools.allToggle}" else DevTools.getToggle(
+                                    args[1]
+                                )
+                            }"
+                        )
+                    )
+                }
             }
             "enchant" -> Skytils.displayScreen = EnchantNamesGui()
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))

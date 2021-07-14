@@ -77,14 +77,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var configButtonOnPause = true
 
     @Property(
-        type = PropertyType.SWITCH, name = "Debug Mode",
-        description = "Will do weird things to your game. You probably don't want this on.",
-        category = "General", subcategory = "Other",
-        hidden = true
-    )
-    var debugMode = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Reopen Options Menu",
         description = "Sets the menu to the Skytils options menu instead of exiting when on a Skytils config menu.",
         category = "General", subcategory = "Other"

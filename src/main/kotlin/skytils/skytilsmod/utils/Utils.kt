@@ -254,14 +254,6 @@ object Utils {
         // Livid has a prefix in front of the name, so we check ends with to cover all the livids
         return bossName.endsWith(correctBoss)
     }
-
-    fun printDebugMessage(component: IChatComponent) {
-        if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(component)
-    }
-
-    fun printDebugMessage(string: String) {
-        if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
-    }
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
