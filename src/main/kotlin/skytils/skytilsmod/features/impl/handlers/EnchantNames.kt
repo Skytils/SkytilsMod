@@ -30,7 +30,7 @@ import java.io.FileWriter
 
 
 object EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
-    private val enchantRegex = Regex("§[0-9a-fz]([\\w ])+(?:§?9?, )?")
+    private val enchantRegex = Regex("§[0-9a-fz]([\\w \\-])+(?:§9, )?")
     val replacements = HashMap<String, String>()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
