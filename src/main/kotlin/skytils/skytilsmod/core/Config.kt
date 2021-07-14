@@ -1148,7 +1148,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix Summon Skin",
-        description = "Changes the summon's skin to the correct one.",
+        description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
         category = "Miscellaneous", subcategory = "Other"
     )
     @JvmField
