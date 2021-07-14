@@ -51,7 +51,11 @@ object WaypointCommand : CommandBase() {
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
         if (args == null || args.size < 3) {
             if (args?.size == 1)
-                MiningFeatures.waypoints[args[0]] = Minecraft.getMinecraft().thePlayer.playerLocation
+                MiningFeatures.waypoints[args[0]] = BlockPos(
+                    Minecraft.getMinecraft().thePlayer.posX,
+                    Minecraft.getMinecraft().thePlayer.posY,
+                    Minecraft.getMinecraft().thePlayer.posZ
+                )
             else {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Correct usage: /setwaypoint location <x y z>"))
             }
