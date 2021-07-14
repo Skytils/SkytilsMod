@@ -39,6 +39,7 @@ import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.PacketEvent.SendEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
@@ -94,7 +95,7 @@ class PetFeatures {
         if (Skytils.config.highlightActivePet && (SBInfo.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
             val item = event.slot.stack
             for (line in getItemLore(item)) {
-                if (line == "§7§cClick to despawn ") {
+                if (line == "§7§cClick to despawn.") {
                     GlStateManager.translate(0f, 0f, 3f)
                     event.slot highlight Skytils.config.activePetColor
                     GlStateManager.translate(0f, 0f, -3f)
