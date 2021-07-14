@@ -235,6 +235,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var boxSkeletonMasters = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Box Spirit Bow",
+        description = "Draws a box around the Spirit Bow.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxSpiritBow = false
+
+    @Property(
         type = PropertyType.NUMBER, name = "Dungeon Chest Reroll Confirmation",
         description = "Requires you to click multiple times in order to reroll a chest.",
         category = "Dungeons", subcategory = "Quality of Life",

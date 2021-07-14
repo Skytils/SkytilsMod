@@ -20,7 +20,6 @@ package skytils.skytilsmod.features.impl.dungeons
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -33,10 +32,8 @@ import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.Item
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.potion.Potion
@@ -60,11 +57,9 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
-import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
-import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -101,6 +96,12 @@ class DungeonFeatures {
             "Bonzo",
             "Scarf",
             "Livid"
+        )
+        private val thornMissMessages = arrayOf(
+            "chickens",
+            "shot",
+            "dodg", "thumbs",
+            "aim"
         )
         var dungeonFloor: String? = null
         var hasBossSpawned = false
@@ -299,7 +300,10 @@ class DungeonFeatures {
                         ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
                 }
             }
-            if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]")) event.isCanceled = true
+            if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]") && thornMissMessages.none { unformatted.contains(it, true) }
+            ) {
+                event.isCanceled = true
+            }
             if (unformatted.startsWith("[BOSS]") && unformatted.contains(":")) {
                 val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
                 if (!hasBossSpawned && bossName != "The Watcher" && dungeonFloor != null && Utils.checkBossName(
@@ -349,6 +353,26 @@ class DungeonFeatures {
                         }
                     }
                 }
+            }
+            if (Skytils.config.boxSpiritBow && Utils.equalsOneOf(
+                    dungeonFloor,
+                    "F4",
+                    "M4"
+                ) && hasBossSpawned && event.entity is EntityArmorStand && event.entity.isInvisible && event.entity.heldItem?.item == Items.bow
+            ) {
+                GlStateManager.disableCull()
+                GlStateManager.disableDepth()
+                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(1f)
+                val x = event.entity.posX - viewerX
+                val y = event.entity.posY - viewerY
+                val z = event.entity.posZ - viewerZ
+                RenderUtil.drawFilledBoundingBox(
+                    AxisAlignedBB(x, y, z, x + 0.75, y + 1.975, z + 0.75),
+                    Color(255, 0, 255, 200),
+                    1f
+                )
+                GlStateManager.enableDepth()
+                GlStateManager.enableCull()
             }
             if (event.entity is EntityArmorStand && event.entity.hasCustomName()) {
                 if (Skytils.config.hideWitherMinerNametags) {
