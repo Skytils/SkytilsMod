@@ -301,7 +301,7 @@ class MiningFeatures {
         }
 
         override val toggled: Boolean
-            get() = SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
+            get() = Skytils.config.crystalHollowsMap && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
         override val height: Int
             get() = 1000
         override val width: Int

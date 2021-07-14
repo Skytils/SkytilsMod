@@ -847,6 +847,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var highlightCompletedComissions = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows Map",
+        description = "Shows a Crystal Hollows Map.",
+        category = "Mining", subcategory = "Quality of Life"
+    )
+    var crystalHollowsMap = false
+
     /* @Property(
    type = PropertyType.SWITCH, name = "Disable Pickaxe Ability on Private Island",
    description = "Prevents you from using pickaxe abilities on your island.",
