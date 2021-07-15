@@ -53,6 +53,7 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class MiningFeatures {
