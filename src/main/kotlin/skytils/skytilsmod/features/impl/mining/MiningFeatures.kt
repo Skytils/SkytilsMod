@@ -390,7 +390,7 @@ class MiningFeatures {
             when(SBInfo.location) {
                 "Lost Precursor City" -> cityLoc.set()
                 "Jungle Temple" -> templeLoc.set()
-                "Goblin Queen's Den" -> denLoc.set()
+                "Goblin Queens Den" -> denLoc.set()
                 "Mines of Divan" -> minesLoc.set()
                 "Khazad-dm" -> balLoc.set()
             }
