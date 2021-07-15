@@ -429,11 +429,11 @@ class MiningFeatures {
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
             RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 624, 624)
-            cityLoc.drawRect(Color.WHITE.rgb)
-            templeLoc.drawRect(Color.GREEN.rgb)
-            denLoc.drawRect(Color.YELLOW.rgb)
-            minesLoc.drawRect(Color.BLUE.rgb)
-            balLoc.drawRect(Color.RED.rgb)
+            cityLoc.drawOnMap(Color.WHITE.rgb)
+            templeLoc.drawOnMap(Color.GREEN.rgb)
+            denLoc.drawOnMap(Color.YELLOW.rgb)
+            minesLoc.drawOnMap(Color.BLUE.rgb)
+            balLoc.drawOnMap(Color.RED.rgb)
             val x = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0)
             val y = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0)
             RenderUtil.drawRect(x - 10, y - 10, x + 10, y + 10, Color.RED.rgb)

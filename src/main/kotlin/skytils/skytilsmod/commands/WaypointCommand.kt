@@ -67,29 +67,29 @@ object WaypointCommand : CommandBase() {
         val z: Double = args[3].toDouble()
         when (loc) {
             "internal_city" -> {
-                MiningFeatures.cityLoc.locX = x
+                MiningFeatures.cityLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                 MiningFeatures.cityLoc.locY = y
-                MiningFeatures.cityLoc.locZ = z
+                MiningFeatures.cityLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
             }
             "internal_temple" -> {
-                MiningFeatures.templeLoc.locX = x
+                MiningFeatures.templeLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                 MiningFeatures.templeLoc.locY = y
-                MiningFeatures.templeLoc.locZ = z
+                MiningFeatures.templeLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
             }
             "internal_den" -> {
-                MiningFeatures.denLoc.locX = x
+                MiningFeatures.denLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                 MiningFeatures.denLoc.locY = y
-                MiningFeatures.denLoc.locZ = z
+                MiningFeatures.denLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
             }
             "internal_mines" -> {
-                MiningFeatures.minesLoc.locX = x
+                MiningFeatures.minesLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                 MiningFeatures.minesLoc.locY = y
-                MiningFeatures.minesLoc.locZ = z
+                MiningFeatures.minesLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
             }
             "internal_bal" -> {
-                MiningFeatures.balLoc.locX = x
+                MiningFeatures.balLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                 MiningFeatures.balLoc.locY = y
-                MiningFeatures.balLoc.locZ = z
+                MiningFeatures.balLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
             }
             else -> MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
         }
