@@ -501,7 +501,7 @@ class MiningFeatures {
 
         fun drawWaypoint(text: String, partialTicks: Float) {
             if (exists())
-                RenderUtil.renderWaypointText(text, locX!!, locY!!, locZ!!, partialTicks)
+                RenderUtil.renderWaypointText(text, locX!! + 200, locY!!, locZ!! + 200, partialTicks)
         }
 
         fun drawOnMap(color: Int) {
