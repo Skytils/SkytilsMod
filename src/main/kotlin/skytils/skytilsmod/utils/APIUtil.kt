@@ -36,19 +36,37 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import java.awt.image.BufferedImage
+import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import javax.imageio.ImageIO
 
 
 object APIUtil {
     private val parser = JsonParser()
 
     val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION)
+        HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
             .addInterceptorFirst { request: HttpRequest, _: HttpContext? ->
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
             }
+
+    /**
+     * Taken from Elementa under MIT License
+     * @link https://github.com/Sk1erLLC/Elementa/blob/master/LICENSE
+     */
+    fun URL.getImage(): BufferedImage {
+        val connection = this.openConnection() as HttpURLConnection
+
+        connection.requestMethod = "GET"
+        connection.useCaches = true
+        connection.addRequestProperty("User-Agent", "Skytils/${Skytils.VERSION}")
+        connection.doOutput = true
+
+        return ImageIO.read(connection.inputStream)
+    }
 
     fun getJSONResponse(urlString: String): JsonObject {
         val client = builder.build()

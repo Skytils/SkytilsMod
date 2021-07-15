@@ -37,14 +37,14 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
 
     private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
         x = CenterConstraint()
-        y = RelativeConstraint(0.1f)
+        y = RelativeConstraint(0.075f)
         textScale = basicTextScaleConstraint { window.getHeight() / 40 }
     }
 
     init {
         SimpleButton("Config").childOf(window).constrain {
             x = CenterConstraint()
-            y = SiblingConstraint() + RelativeConstraint(0.1f)
+            y = SiblingConstraint() + RelativeConstraint(0.075f)
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -81,6 +81,14 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
             height = 20.pixels()
         }.onMouseClick {
             mc.displayGuiScreen(SpamHiderGui())
+        }
+        SimpleButton("Edit Enchantment Names").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(EnchantNamesGui())
         }
         SimpleButton("Edit Vigilance").childOf(window).constrain {
             x = CenterConstraint()

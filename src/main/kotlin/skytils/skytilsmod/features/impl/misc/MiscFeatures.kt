@@ -116,17 +116,17 @@ class MiscFeatures {
             if (formatted.startsWith("§eZapped §a") && formatted.endsWith("§a§lUNDO§r")) {
                 blockZapperCooldownExpiration = 0L
                 blockZapperUses++
-                Utils.printDebugMessage("$blockZapperUses")
+                printDevMessage("$blockZapperUses", "zapper")
 
                 if (blockZapperUses >= 20) {
                     blockZapperUses = 0
                     blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
-                    Utils.printDebugMessage("$blockZapperCooldownExpiration")
+                    printDevMessage("$blockZapperCooldownExpiration", "zapper")
                 }
             }
             if (unformatted == "Your zapper is temporarily fatigued!") {
                 val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
-                Utils.printDebugMessage("$blockZapperUses ${duration.inWholeSeconds}")
+                printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
                 if (duration.isPositive()) event.message.appendText(
                     " §eThis will expire in${
                         duration

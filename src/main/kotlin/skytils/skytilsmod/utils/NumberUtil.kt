@@ -51,6 +51,13 @@ object NumberUtil {
         return if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
     }
 
+    @JvmStatic
+    fun unformat(value: String): Long {
+        val suffix = value.filter { !it.isDigit() }.lowercase()
+        val num = value.filter { it.isDigit() }.toLong()
+        return num * (suffixes.entries.find { it.value.lowercase() == suffix }?.key ?: 1)
+    }
+
     /**
      * This code was unmodified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/22186845

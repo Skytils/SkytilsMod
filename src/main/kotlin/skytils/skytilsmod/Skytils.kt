@@ -74,10 +74,7 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.Utils.printDebugMessage
-import skytils.skytilsmod.utils.getChatLine
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.awt.Desktop
 import java.io.File
@@ -98,7 +95,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0-pre16"
+        const val VERSION = "1.0-pre17.1"
 
         @JvmField
         val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -192,6 +189,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(DungeonFeatures())
         MinecraftForge.EVENT_BUS.register(DungeonMap())
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
+        MinecraftForge.EVENT_BUS.register(EnchantNames())
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())
         MinecraftForge.EVENT_BUS.register(FavoritePets())
         MinecraftForge.EVENT_BUS.register(GlintCustomizer())
@@ -251,7 +249,7 @@ class Skytils {
 
             cch.registerCommand(CataCommand)
             cch.registerCommand(SlayerCommand)
-            cch.registerCommand(WaypointCommand)
+            cch.registerCommand(HollowWaypointCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)
@@ -370,7 +368,7 @@ class Skytils {
 
     @SubscribeEvent
     fun onMouseClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (event.gui is GuiChat && config.debugMode && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
+        if (event.gui is GuiChat && DevTools.getToggle("chat") && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
             val button = Mouse.getEventButton()
             if (button != 0 && button != 1) return
             val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
@@ -378,12 +376,12 @@ class Skytils {
                 val realText =
                     (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent?.formattedText
                 GuiScreen.setClipboardString(realText ?: chatLine.chatComponent.formattedText)
-                printDebugMessage("Copied formatted message to clipboard!")
+                printDevMessage("Copied formatted message to clipboard!", "chat")
             } else {
                 val component =
                     (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent
 
-                printDebugMessage("Copied serialized message to clipboard!")
+                printDevMessage("Copied serialized message to clipboard!", "chat")
                 GuiScreen.setClipboardString(
                     IChatComponent.Serializer.componentToJson(
                         component ?: chatLine.chatComponent

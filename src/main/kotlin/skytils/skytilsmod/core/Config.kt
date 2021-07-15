@@ -77,14 +77,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var configButtonOnPause = true
 
     @Property(
-        type = PropertyType.SWITCH, name = "Debug Mode",
-        description = "Will do weird things to your game. You probably don't want this on.",
-        category = "General", subcategory = "Other",
-        hidden = true
-    )
-    var debugMode = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Reopen Options Menu",
         description = "Sets the menu to the Skytils options menu instead of exiting when on a Skytils config menu.",
         category = "General", subcategory = "Other"
@@ -233,6 +225,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var boxSkeletonMasters = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Box Spirit Bow",
+        description = "Draws a box around the Spirit Bow.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxSpiritBow = false
 
     @Property(
         type = PropertyType.NUMBER, name = "Dungeon Chest Reroll Confirmation",
@@ -931,14 +930,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Shows a map to see in which part of the crystal hollows you are and saves locations of special places.",
         category = "Mining", subcategory = "Crystal Hollows"
     )
-    var hollowMap = true
+    var crystalHollowMap = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
         description = "Shows waypoints to special places inside the Crystal Hollows.",
         category = "Mining", subcategory = "Crystal Hollows"
     )
-    var hollowWaypoints = true
+    var crystalHollowWaypoints = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows chat coordinates grabber",
@@ -1161,8 +1160,16 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var transparentHeadLayer = 1f
 
     @Property(
+        type = PropertyType.SWITCH, name = "Fix Summon Skin",
+        description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    @JvmField
+    var fixSummonSkin = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Use Player Skin",
-        description = "Uses the player's skin for necromancy mobs",
+        description = "Uses the player's skin for necromancy mobs.",
         category = "Miscellaneous", subcategory = "Other"
     )
     @JvmField

@@ -275,7 +275,7 @@ object ScoreCalculation {
 
     @SubscribeEvent
     fun onSendChat(event: SendChatMessageEvent) {
-        if (Skytils.config.debugMode && event.message == "/debugscorecalcrooms") {
+        if (DevTools.getToggle("scorecalc") && event.message == "/debugscorecalcrooms") {
             mc.thePlayer.addChatMessage(ChatComponentText(rooms.toString()))
             event.isCanceled = true
         }
