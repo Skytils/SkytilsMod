@@ -344,6 +344,7 @@ class MiningFeatures {
             denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
             minesLoc.drawWaypoint("Mines of Divan", event.partialTicks)
             balLoc.drawWaypoint("Khazad-dûm", event.partialTicks)
+            fairyLoc.drawWaypoint("Fairy Grotto", event.partialTicks)
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
             for ((key, value) in waypoints)
                 RenderUtil.renderWaypointText(key, value, event.partialTicks)
@@ -387,12 +388,13 @@ class MiningFeatures {
             createTitle("§cSKYMALL RESET", 20)
         }
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMap) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
-            when(SBInfo.location) {
+            when (SBInfo.location) {
                 "Lost Precursor City" -> cityLoc.set()
                 "Jungle Temple" -> templeLoc.set()
                 "Goblin Queens Den" -> denLoc.set()
                 "Mines of Divan" -> minesLoc.set()
                 "Khazad-dm" -> balLoc.set()
+                "Fairy Grotto" -> fairyLoc.set()
             }
         }
     }
@@ -429,11 +431,12 @@ class MiningFeatures {
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
             RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 624, 624)
-            cityLoc.drawOnMap(Color.WHITE.rgb)
-            templeLoc.drawOnMap(Color.GREEN.rgb)
-            denLoc.drawOnMap(Color.YELLOW.rgb)
-            minesLoc.drawOnMap(Color.BLUE.rgb)
-            balLoc.drawOnMap(Color.RED.rgb)
+            cityLoc.drawOnMap(50, Color.WHITE.rgb)
+            templeLoc.drawOnMap(50, Color.GREEN.rgb)
+            denLoc.drawOnMap(50, Color.YELLOW.rgb)
+            minesLoc.drawOnMap(50, Color.BLUE.rgb)
+            balLoc.drawOnMap(50, Color.RED.rgb)
+            fairyLoc.drawOnMap(25, Color.PINK.rgb)
             val x = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0)
             val y = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0)
             RenderUtil.drawRect(x - 10, y - 10, x + 10, y + 10, Color.RED.rgb)
@@ -504,9 +507,9 @@ class MiningFeatures {
                 RenderUtil.renderWaypointText(text, locX!! + 200, locY!!, locZ!! + 200, partialTicks)
         }
 
-        fun drawOnMap(color: Int) {
+        fun drawOnMap(size: Int, color: Int) {
             if (exists())
-                RenderUtil.drawRect(locX!! - 50, locZ!! - 50, locX!! + 50, locZ!! + 50, color)
+                RenderUtil.drawRect(locX!! - size, locZ!! - size, locX!! + size, locZ!! + size, color)
         }
     }
 
@@ -524,6 +527,7 @@ class MiningFeatures {
         var denLoc = LocationObject()
         var minesLoc = LocationObject()
         var balLoc = LocationObject()
-        var waypoints= HashMap<String, BlockPos>()
+        var fairyLoc = LocationObject()
+        var waypoints = HashMap<String, BlockPos>()
     }
 }
