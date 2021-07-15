@@ -39,6 +39,8 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "<html><p>" +
         "Skytils has detected a mod with an older version of Kotlin.<br>" +
         "The most common culprit is the ChatTriggers mod.<br>" +
+        "If you do have ChatTriggers, you can update to 1.3.2<br>" +
+        "or later to fix the issue. https://www.chattriggers.com/<br>" +
         "In order to resolve this conflict you must make Skytils be<br>" +
         "above this mod alphabetically in your mods folder.<br>" +
         "This tricks Forge into loading Skytils first.<br>" +
