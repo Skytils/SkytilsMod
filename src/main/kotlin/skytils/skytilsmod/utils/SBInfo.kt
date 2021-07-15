@@ -162,19 +162,19 @@ object SBInfo {
         }
     }
 
-    sealed class SkyblockIsland(val mode: String) {
-        object BlazingFortress : SkyblockIsland("combat_2")
-        object CrystalHollows : SkyblockIsland("crystal_hollows")
-        object DeepCaverns : SkyblockIsland("mining_2")
-        object Dungeon : SkyblockIsland("dungeon")
-        object DungeonHub : SkyblockIsland("dungeon_hub")
-        object DwarvenMines : SkyblockIsland("mining_3")
-        object FarmingIsland : SkyblockIsland("farming_1")
-        object GoldMine : SkyblockIsland("mining_1")
-        object Hub : SkyblockIsland("hub")
-        object TheEnd : SkyblockIsland("combat_3")
-        object ThePark : SkyblockIsland("foraging_1")
-        object PrivateIsland : SkyblockIsland("dynamic")
-        object SpiderDen : SkyblockIsland("combat_1")
+    sealed class SkyblockIsland(val name: String, val mode: String) {
+        object PrivateIsland : SkyblockIsland("Private Island", "dynamic")
+        object SpiderDen : SkyblockIsland("Spider's Den", "combat_1")
+        object BlazingFortress : SkyblockIsland("Blazing Fortress", "combat_2")
+        object TheEnd : SkyblockIsland("The End", "combat_3")
+        object GoldMine : SkyblockIsland("Gold Mine", "mining_1")
+        object DeepCaverns : SkyblockIsland("Deep Caverns", "mining_2")
+        object DwarvenMines : SkyblockIsland("Dwarven Mines", "mining_3")
+        object CrystalHollows : SkyblockIsland("Crystal Hollows", "crystal_hollows")
+        object FarmingIsland : SkyblockIsland("Farming Island", "farming_1")
+        object ThePark : SkyblockIsland("The Park", "foraging_1")
+        object Dungeon : SkyblockIsland("Dungeon", "dungeon")
+        object DungeonHub : SkyblockIsland("Dungeon Hub", "dungeon_hub")
+        object Hub : SkyblockIsland("Hub", "hub")
     }
 }
