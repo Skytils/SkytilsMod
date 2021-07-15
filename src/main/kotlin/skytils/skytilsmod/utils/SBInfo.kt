@@ -144,7 +144,7 @@ object SBInfo {
                 }
                 for (loc in lines) {
                     if (loc.contains('⏣')) {
-                        location = loc.stripControlCodes().replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
+                        location = loc.stripControlCodes().replace("[^A-Za-z0-9() -]".toRegex(), "").trim { it <= ' ' }
                         break
                     }
                 }

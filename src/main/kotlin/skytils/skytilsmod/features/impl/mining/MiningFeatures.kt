@@ -409,7 +409,7 @@ class MiningFeatures {
                 "Jungle Temple" -> templeLoc.set()
                 "Goblin Queens Den" -> denLoc.set()
                 "Mines of Divan" -> minesLoc.set()
-                "Khazaddm" -> balLoc.set()
+                "Khazad-dm" -> balLoc.set()
                 "Fairy Grotto" -> fairyLoc.set()
             }
         }
