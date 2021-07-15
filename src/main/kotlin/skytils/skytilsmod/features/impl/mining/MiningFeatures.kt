@@ -441,7 +441,7 @@ class MiningFeatures {
 
         override fun demoRender() {
             Gui.drawRect(0, 0, 624, 624, Color.RED.rgb)
-            fr.drawString("Crystal Hollows Map", 500f, 500f, alignment = SmartFontRenderer.TextAlignment.MIDDLE)
+            fr.drawString("Crystal Hollows Map", 312f, 312f, alignment = SmartFontRenderer.TextAlignment.MIDDLE)
         }
 
         override val toggled: Boolean
