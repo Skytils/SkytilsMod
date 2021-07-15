@@ -437,14 +437,14 @@ class MiningFeatures {
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0), scale = 0.1f) {
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
-            RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 1000, 1000)
+            RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 624, 624)
             cityLoc.drawRect(Color.WHITE.rgb)
             templeLoc.drawRect(Color.GREEN.rgb)
             denLoc.drawRect(Color.YELLOW.rgb)
             minesLoc.drawRect(Color.BLUE.rgb)
             balLoc.drawRect(Color.RED.rgb)
-            val x = mc.thePlayer.posX.coerceIn(0.0, 1000.0)
-            val y = mc.thePlayer.posZ.coerceIn(0.0, 1000.0)
+            val x = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0)
+            val y = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0)
             RenderUtil.drawRect(x - 10, y - 10, x + 10, y + 10, Color.RED.rgb)
         }
 
@@ -456,9 +456,9 @@ class MiningFeatures {
         override val toggled: Boolean
             get() = Skytils.config.hollowMap && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
         override val height: Int
-            get() = 1000
+            get() = 624
         override val width: Int
-            get() = 1000
+            get() = 624
 
         init {
             Skytils.guiManager.registerElement(this)
@@ -493,12 +493,12 @@ class MiningFeatures {
         }
 
         fun set() {
-            locMinX = mc.thePlayer.posX.coerceIn(0.0, 1000.0).coerceAtMost(locMinX)
-            locMinY = mc.thePlayer.posY.coerceIn(0.0, 1000.0).coerceAtMost(locMinY)
-            locMinZ = mc.thePlayer.posZ.coerceIn(0.0, 1000.0).coerceAtMost(locMinZ)
-            locMaxX = mc.thePlayer.posX.coerceIn(0.0, 1000.0).coerceAtLeast(locMaxX)
-            locMaxY = mc.thePlayer.posY.coerceIn(0.0, 1000.0).coerceAtLeast(locMaxY)
-            locMaxZ = mc.thePlayer.posZ.coerceIn(0.0, 1000.0).coerceAtLeast(locMaxZ)
+            locMinX = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0).coerceAtMost(locMinX)
+            locMinY = (mc.thePlayer.posY - 200).coerceIn(0.0, 624.0).coerceAtMost(locMinY)
+            locMinZ = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0).coerceAtMost(locMinZ)
+            locMaxX = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0).coerceAtLeast(locMaxX)
+            locMaxY = (mc.thePlayer.posY - 200).coerceIn(0.0, 624.0).coerceAtLeast(locMaxY)
+            locMaxZ = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0).coerceAtLeast(locMaxZ)
             locX = (locMinX + locMaxX) / 2
             locY = (locMinY + locMaxY) / 2
             locZ = (locMinZ + locMaxZ) / 2
