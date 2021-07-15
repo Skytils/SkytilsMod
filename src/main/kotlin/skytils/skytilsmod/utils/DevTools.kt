@@ -28,7 +28,7 @@ object DevTools {
 
 
     fun getToggle(toggle: String): Boolean {
-        return if (allToggle) allToggle else toggles.getOrDefault(toggle.lowercase(), true)
+        return if (allToggle) allToggle else toggles.getOrDefault(toggle.lowercase(), false)
     }
 
     fun toggle(toggle: String) {
@@ -39,7 +39,7 @@ object DevTools {
         toggles[toggle.lowercase()]?.let {
             toggles[toggle.lowercase()] = !it
         } ?: kotlin.run {
-            toggles[toggle.lowercase()] = false
+            toggles[toggle.lowercase()] = true
         }
     }
 
