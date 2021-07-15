@@ -41,6 +41,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import org.lwjgl.input.Mouse
 import skytils.skytilsmod.commands.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
@@ -249,6 +250,7 @@ class Skytils {
 
             cch.registerCommand(CataCommand)
             cch.registerCommand(SlayerCommand)
+            cch.registerCommand(HollowWaypointCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)
@@ -308,6 +310,13 @@ class Skytils {
         }
 
         ticks++
+    }
+
+    @SubscribeEvent
+    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent){
+        Utils.isOnHypixel = false
+        Utils.inSkyblock = false
+        Utils.inDungeons = false
     }
 
     @SubscribeEvent

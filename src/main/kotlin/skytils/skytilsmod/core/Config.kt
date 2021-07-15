@@ -847,13 +847,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var highlightCompletedComissions = false
 
-    @Property(
-        type = PropertyType.SWITCH, name = "Crystal Hollows Map",
-        description = "Shows a Crystal Hollows Map.",
-        category = "Mining", subcategory = "Quality of Life"
-    )
-    var crystalHollowsMap = false
-
     /* @Property(
    type = PropertyType.SWITCH, name = "Disable Pickaxe Ability on Private Island",
    description = "Prevents you from using pickaxe abilities on your island.",
@@ -931,6 +924,27 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Mining", subcategory = "Solvers"
     )
     var puzzlerSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows map",
+        description = "Shows a map to see in which part of the crystal hollows you are and saves locations of special places.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowMap = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
+        description = "Shows waypoints to special places inside the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowWaypoints = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows chat coordinates grabber",
+        description = "When coordinates are shared in chat asks which one it is and displays a waypoint there and shows it on the map.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var hollowChatCoords = false
 
     /*
    @Property(
