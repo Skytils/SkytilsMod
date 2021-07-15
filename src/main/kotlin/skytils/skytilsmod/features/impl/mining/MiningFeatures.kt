@@ -248,6 +248,20 @@ class MiningFeatures {
                     )
                 )
         )
+        val fairy = ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "[Fairy Grotto] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/skytilshollowwaypoint internal_fairy $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText("§eset waypoint for Fairy Grotto")
+                    )
+                )
+        )
         val custom = ChatComponentText("§e[Custom]").setChatStyle(
             ChatStyle().setChatClickEvent(
                 ClickEvent(
@@ -271,6 +285,8 @@ class MiningFeatures {
             component.appendSibling(mines)
         if (!balLoc.exists())
             component.appendSibling(bal)
+        if (!fairyLoc.exists())
+            component.appendSibling(fairy)
         component.appendSibling(custom)
         mc.thePlayer.addChatMessage(component)
     }

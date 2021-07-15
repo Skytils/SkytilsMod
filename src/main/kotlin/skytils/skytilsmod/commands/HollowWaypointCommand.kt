@@ -90,6 +90,11 @@ object HollowWaypointCommand : CommandBase() {
                 MiningFeatures.balLoc.locY = y
                 MiningFeatures.balLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
             }
+            "internal_fairy" -> {
+                MiningFeatures.fairyLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                MiningFeatures.fairyLoc.locY = y
+                MiningFeatures.fairyLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+            }
             else -> MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
         }
     }
