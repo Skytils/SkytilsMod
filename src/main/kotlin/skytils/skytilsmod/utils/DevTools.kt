@@ -28,7 +28,7 @@ object DevTools {
 
 
     fun getToggle(toggle: String): Boolean {
-        return if (allToggle) allToggle else toggles.getOrDefault(toggle.lowercase(), false)
+        return if (allToggle) allToggle else toggles.getOrDefault(toggle.lowercase(), true)
     }
 
     fun toggle(toggle: String) {
