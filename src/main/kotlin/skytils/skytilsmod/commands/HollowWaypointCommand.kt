@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.commands
 
-import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -27,9 +26,9 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 
-object WaypointCommand : CommandBase() {
+object HollowWaypointCommand : CommandBase() {
     override fun getCommandName(): String {
-        return "setwaypoint"
+        return "skytilshollowwaypoint"
     }
 
     override fun getCommandAliases(): List<String> {
@@ -37,7 +36,7 @@ object WaypointCommand : CommandBase() {
     }
 
     override fun getCommandUsage(sender: ICommandSender): String {
-        return "/setwaypoint location x y z"
+        return "/skytilshollowwaypoint location x y z"
     }
 
     override fun getRequiredPermissionLevel(): Int {
@@ -57,7 +56,7 @@ object WaypointCommand : CommandBase() {
                     Minecraft.getMinecraft().thePlayer.posZ
                 )
             else {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Correct usage: /setwaypoint location <x y z>"))
+                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Correct usage: /skytilshollowwaypoint location <x y z>"))
             }
             return
         }
