@@ -142,8 +142,10 @@ object SBInfo {
                     } catch (e: ParseException) {
                     }
                 }
-                location =
+                location = if (lines[4].contains('⏣'))
                     lines[4].stripControlCodes().replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
+                else
+                    lines[3].stripControlCodes().replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
             }
             objective = null
             var objTextLast = false
