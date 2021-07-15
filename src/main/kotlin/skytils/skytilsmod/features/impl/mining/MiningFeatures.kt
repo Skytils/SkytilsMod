@@ -440,7 +440,7 @@ class MiningFeatures {
         }
 
         override fun demoRender() {
-            Gui.drawRect(0, 0, 1024, 1024, Color.RED.rgb)
+            Gui.drawRect(0, 0, 624, 624, Color.RED.rgb)
             fr.drawString("Crystal Hollows Map", 500f, 500f, alignment = SmartFontRenderer.TextAlignment.MIDDLE)
         }
 
