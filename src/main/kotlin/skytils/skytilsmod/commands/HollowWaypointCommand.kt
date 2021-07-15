@@ -56,7 +56,7 @@ object HollowWaypointCommand : CommandBase() {
                     Minecraft.getMinecraft().thePlayer.posZ
                 )
             else {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Correct usage: /skytilshollowwaypoint location <x y z>"))
+                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint location <x y z>"))
             }
             return
         }
