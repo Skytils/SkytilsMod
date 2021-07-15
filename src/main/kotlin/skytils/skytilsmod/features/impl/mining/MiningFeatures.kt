@@ -485,10 +485,10 @@ class MiningFeatures {
 
         fun set() {
             locMinX = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0).coerceAtMost(locMinX)
-            locMinY = (mc.thePlayer.posY - 200).coerceIn(0.0, 624.0).coerceAtMost(locMinY)
+            locMinY = mc.thePlayer.posY.coerceIn(0.0, 256.0).coerceAtMost(locMinY)
             locMinZ = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0).coerceAtMost(locMinZ)
             locMaxX = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0).coerceAtLeast(locMaxX)
-            locMaxY = (mc.thePlayer.posY - 200).coerceIn(0.0, 624.0).coerceAtLeast(locMaxY)
+            locMaxY = mc.thePlayer.posY.coerceIn(0.0, 256.0).coerceAtLeast(locMaxY)
             locMaxZ = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0).coerceAtLeast(locMaxZ)
             locX = (locMinX + locMaxX) / 2
             locY = (locMinY + locMaxY) / 2
