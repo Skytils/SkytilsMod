@@ -172,6 +172,9 @@ class MiningFeatures {
             else if (xzMatcher.matches())
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
         }
+        if (unformatted.startsWith(" ☠ You were killed by ")) {
+            deadCount = 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
+        }
     }
 
     fun waypointChatMessage(x: String, y: String, z: String) {
@@ -403,7 +406,7 @@ class MiningFeatures {
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
-        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMap) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
+        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMap) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode && deadCount == 0) {
             when (SBInfo.location) {
                 "Lost Precursor City" -> cityLoc.set()
                 "Jungle Temple" -> templeLoc.set()
@@ -412,7 +415,8 @@ class MiningFeatures {
                 "Khazad-dm" -> balLoc.set()
                 "Fairy Grotto" -> fairyLoc.set()
             }
-        }
+        } else if (deadCount > 0)
+            deadCount--
     }
 
     @SubscribeEvent
@@ -545,5 +549,6 @@ class MiningFeatures {
         var balLoc = LocationObject()
         var fairyLoc = LocationObject()
         var waypoints = HashMap<String, BlockPos>()
+        var deadCount: Int = 0
     }
 }
