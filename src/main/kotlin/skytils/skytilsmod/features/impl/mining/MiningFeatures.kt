@@ -182,7 +182,7 @@ class MiningFeatures {
         }
     }
 
-    fun waypointChatMessage(x: String, y: String, z: String) {
+    private fun waypointChatMessage(x: String, y: String, z: String) {
         val component = ChatComponentText(
             "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
@@ -191,7 +191,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_city $x $y $z"
+                        "/skytilshollowwaypoint set internal_city $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -205,7 +205,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_temple $x $y $z"
+                        "/skytilshollowwaypoint set internal_temple $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -219,7 +219,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_den $x $y $z"
+                        "/skytilshollowwaypoint set internal_den $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -233,7 +233,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_mines $x $y $z"
+                        "/skytilshollowwaypoint set internal_mines $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -242,12 +242,12 @@ class MiningFeatures {
                     )
                 )
         )
-        val bal = ChatComponentText(EnumChatFormatting.RED.toString() + "[Khazad-dûm] ").setChatStyle(
+        val bal = ChatComponentText("§c[Khazad-dûm] ").setChatStyle(
             ChatStyle()
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_bal $x $y $z"
+                        "/skytilshollowwaypoint set internal_bal $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -261,7 +261,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_fairy $x $y $z"
+                        "/skytilshollowwaypoint set internal_fairy $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -274,7 +274,7 @@ class MiningFeatures {
             ChatStyle().setChatClickEvent(
                 ClickEvent(
                     ClickEvent.Action.SUGGEST_COMMAND,
-                    "/skytilshollowwaypoint name $x $y $z"
+                    "/skytilshollowwaypoint set name $x $y $z"
                 )
             ).setChatHoverEvent(
                 HoverEvent(
@@ -568,6 +568,10 @@ class MiningFeatures {
         fun drawOnMap(size: Int, color: Int) {
             if (exists())
                 RenderUtil.drawRect(locX!! - size, locZ!! - size, locX!! + size, locZ!! + size, color)
+        }
+
+        override fun toString(): String {
+            return String.format("%.0f", locX) + " " + String.format("%.0f", locY) + " " + String.format("%.0f", locZ)
         }
     }
 
