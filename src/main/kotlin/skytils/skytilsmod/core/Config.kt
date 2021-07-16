@@ -933,6 +933,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var crystalHollowMap = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows map special places",
+        description = "Show special places on the map (like Lost Precusor City).",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowMapPlaces = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
         description = "Shows waypoints to special places inside the Crystal Hollows.",
         category = "Mining", subcategory = "Crystal Hollows"

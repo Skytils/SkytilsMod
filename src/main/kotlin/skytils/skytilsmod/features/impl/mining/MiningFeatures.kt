@@ -175,7 +175,8 @@ class MiningFeatures {
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
         }
         if (unformatted.startsWith(" ☠ You were killed by ")) {
-            deadCount = 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
+            deadCount =
+                50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
         }
     }
 
@@ -453,13 +454,21 @@ class MiningFeatures {
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0), scale = 0.1f) {
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
-            RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 624, 624)
-            cityLoc.drawOnMap(50, Color.WHITE.rgb)
-            templeLoc.drawOnMap(50, Color.GREEN.rgb)
-            denLoc.drawOnMap(50, Color.YELLOW.rgb)
-            minesLoc.drawOnMap(50, Color.BLUE.rgb)
-            balLoc.drawOnMap(50, Color.RED.rgb)
-            fairyLoc.drawOnMap(25, Color.PINK.rgb)
+            //basic render function to render map because the one in RenderUtil renders dark
+            GlStateManager.pushMatrix()
+            GlStateManager.enableRescaleNormal()
+            mc.textureManager.bindTexture(ResourceLocation("skytils", "crystalhollowsmap.png"))
+            GlStateManager.color(1.0F, 1.0F, 1.0F);
+            Gui.drawModalRectWithCustomSizedTexture(0, 0, 0f, 0f, 624, 624, 624f, 624f)
+            GlStateManager.popMatrix()
+            if (Skytils.config.crystalHollowMapPlaces) {
+                cityLoc.drawOnMap(50, Color.WHITE.rgb)
+                templeLoc.drawOnMap(50, Color.GREEN.rgb)
+                denLoc.drawOnMap(50, Color.YELLOW.rgb)
+                minesLoc.drawOnMap(50, Color.BLUE.rgb)
+                balLoc.drawOnMap(50, Color.RED.rgb)
+                fairyLoc.drawOnMap(25, Color.PINK.rgb)
+            }
             val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
             val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
 
@@ -474,7 +483,7 @@ class MiningFeatures {
             UGraphics.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
             UGraphics.scale(1.5f, 1.5f, 1.5f)
             UGraphics.translate(-0.125f, 0.125f, 0.0f)
-            UGraphics.color4f(1f,1f,1f,1f)
+            UGraphics.color4f(1f, 1f, 1f, 1f)
             UGraphics.enableAlpha()
             val d1 = 0.0
             val d2 = 0.25
