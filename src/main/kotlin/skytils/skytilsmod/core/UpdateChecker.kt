@@ -28,6 +28,7 @@ import org.apache.http.HttpVersion
 import org.apache.http.client.methods.HttpGet
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
+import skytils.skytilsmod.gui.UpdateGui
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
@@ -154,6 +155,7 @@ object UpdateChecker {
     fun onGuiOpen(e: GuiOpenEvent) {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
+        if (UpdateGui.complete || UpdateGui.complete) return
         Skytils.displayScreen = RequestUpdateGui()
     }
 
