@@ -45,6 +45,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
         var failed = false
         var complete = false
     }
+
     private var backButton: GuiButton? = null
     private var progress = 0f
     override fun initGui() {
