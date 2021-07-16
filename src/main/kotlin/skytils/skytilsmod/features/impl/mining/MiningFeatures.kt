@@ -474,6 +474,8 @@ class MiningFeatures {
             UGraphics.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
             UGraphics.scale(1.5f, 1.5f, 1.5f)
             UGraphics.translate(-0.125f, 0.125f, 0.0f)
+            UGraphics.color4f(1f,1f,1f,1f)
+            UGraphics.enableAlpha()
             val d1 = 0.0
             val d2 = 0.25
             wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
