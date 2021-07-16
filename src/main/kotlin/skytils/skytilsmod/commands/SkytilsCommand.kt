@@ -245,7 +245,7 @@ object SkytilsCommand : CommandBase() {
                     message.appendSibling(
                         ChatComponentText("§a[Update Now] ").setChatStyle(
                             ChatStyle().setChatClickEvent(
-                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilsupdate updateNow")
+                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytils updateNow")
                             ).setChatHoverEvent(
                                 HoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
@@ -257,7 +257,7 @@ object SkytilsCommand : CommandBase() {
                     message.appendSibling(
                         ChatComponentText("§b[Update Later] ").setChatStyle(
                             ChatStyle().setChatClickEvent(
-                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilsupdate updateLater")
+                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytils updateLater")
                             ).setChatHoverEvent(
                                 HoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
@@ -270,6 +270,14 @@ object SkytilsCommand : CommandBase() {
                 } catch (ex: InterruptedException) {
                     ex.printStackTrace()
                 }
+            }
+            "updatenow" -> {
+                Skytils.displayScreen = UpdateGui(true)
+                return
+            }
+            "updatelater" -> {
+                Skytils.displayScreen = UpdateGui(false)
+                return
             }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
