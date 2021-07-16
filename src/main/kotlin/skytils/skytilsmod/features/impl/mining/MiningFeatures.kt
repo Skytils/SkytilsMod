@@ -22,7 +22,6 @@ import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCreeper
@@ -464,9 +463,8 @@ class MiningFeatures {
             val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
 
             // player marker code
-            val texture = mc.textureManager.getTexture(ResourceLocation("textures/map/map_icons.png"))
-            val uRender = UGraphics.getFromTessellator()
-            UGraphics.bindTexture(texture.glTextureId)
+            val wr = UGraphics.getFromTessellator()
+            mc.textureManager.bindTexture(ResourceLocation("textures/map/map_icons.png"))
 
             UGraphics.pushMatrix()
             UGraphics.translate(x, y, 0.0)
@@ -477,11 +475,11 @@ class MiningFeatures {
             UGraphics.translate(-0.125f, 0.125f, 0.0f)
             val d1 = 0.0
             val d2 = 0.25
-            uRender.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
-            uRender.pos(-8.0, -8.0, 100.0).tex(d1, d1).endVertex()
-            uRender.pos(-8.0, 8.0, 100.0).tex(d1, d2).endVertex()
-            uRender.pos(8.0, 8.0, 100.0).tex(d2, d2).endVertex()
-            uRender.pos(8.0, -8.0, 100.0).tex(d2, d1).endVertex()
+            wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
+            wr.pos(-8.0, -8.0, 100.0).tex(d1, d1).endVertex()
+            wr.pos(-8.0, 8.0, 100.0).tex(d1, d2).endVertex()
+            wr.pos(8.0, 8.0, 100.0).tex(d2, d2).endVertex()
+            wr.pos(8.0, -8.0, 100.0).tex(d2, d1).endVertex()
             UGraphics.draw()
             UGraphics.popMatrix()
         }
