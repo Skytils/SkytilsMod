@@ -31,7 +31,7 @@ object HollowWaypointCommand : CommandBase() {
     }
 
     override fun getCommandAliases(): List<String> {
-        return emptyList()
+        return listOf("sthw")
     }
 
     override fun getCommandUsage(sender: ICommandSender): String {
