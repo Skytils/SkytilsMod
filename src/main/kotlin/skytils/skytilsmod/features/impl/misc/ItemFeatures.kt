@@ -80,7 +80,8 @@ class ItemFeatures {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
                         val extraAttr = getExtraAttributes(stack)
-                        if (extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && !extraAttr.hasKey("dungeon_item_level")) {
+                        val sbId = getSkyBlockItemID(stack)
+                        if (sbId != "ICE_SPRAY_WAND" && extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && !extraAttr.hasKey("dungeon_item_level")) {
                             GlStateManager.translate(0f, 0f, 1f)
                             event.slot highlight Color(15, 233, 233)
                             GlStateManager.translate(0f, 0f, -1f)
