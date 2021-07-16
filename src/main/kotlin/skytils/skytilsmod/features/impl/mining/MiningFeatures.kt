@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.mining
 
 import gg.essential.universal.UGraphics
+import kotlinx.coroutines.delay
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -57,6 +58,7 @@ import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
 import java.util.regex.Pattern
+import javax.print.DocFlavor
 
 class MiningFeatures {
     @SubscribeEvent
@@ -409,7 +411,9 @@ class MiningFeatures {
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
-        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMap) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode && deadCount == 0) {
+        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
+            && deadCount == 0 && mc.thePlayer != null
+        ) {
             when (SBInfo.location) {
                 "Lost Precursor City" -> cityLoc.set()
                 "Jungle Temple" -> templeLoc.set()
