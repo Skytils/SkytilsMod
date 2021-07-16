@@ -432,6 +432,7 @@ class MiningFeatures {
         denLoc.reset()
         minesLoc.reset()
         balLoc.reset()
+        fairyLoc.reset()
         waypoints.clear()
     }
 
