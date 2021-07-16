@@ -63,7 +63,7 @@ object HollowWaypointCommand : CommandBase() {
             }
             if (MiningFeatures.denLoc.exists()) {
                 message.appendSibling(ChatComponentText("§eGoblin Queen's Den "))
-                message.appendSibling(copyMessage("Lost Precursor City: " + MiningFeatures.denLoc.toString()))
+                message.appendSibling(copyMessage("Goblin Queen's Den: " + MiningFeatures.denLoc.toString()))
                 message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_den"))
             }
             if (MiningFeatures.minesLoc.exists()) {
@@ -73,12 +73,12 @@ object HollowWaypointCommand : CommandBase() {
             }
             if (MiningFeatures.balLoc.exists()) {
                 message.appendSibling(ChatComponentText("§cKhazad-dûm "))
-                message.appendSibling(copyMessage("Lost Precursor City: " + MiningFeatures.balLoc.toString()))
+                message.appendSibling(copyMessage("Khazad-dûm: " + MiningFeatures.balLoc.toString()))
                 message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_bal"))
             }
             if (MiningFeatures.fairyLoc.exists()) {
                 message.appendSibling(ChatComponentText("§dFairy Grotto "))
-                message.appendSibling(copyMessage("Lost Precursor City: " + MiningFeatures.fairyLoc.toString()))
+                message.appendSibling(copyMessage("Fairy Grotto: " + MiningFeatures.fairyLoc.toString()))
                 message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_fairy"))
             }
             for ((key, value) in MiningFeatures.waypoints) {
