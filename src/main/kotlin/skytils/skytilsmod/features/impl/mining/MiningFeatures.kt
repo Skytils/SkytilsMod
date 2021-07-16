@@ -42,6 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
@@ -464,25 +465,25 @@ class MiningFeatures {
 
             // player marker code
             val texture = mc.textureManager.getTexture(ResourceLocation("textures/map/map_icons.png"))
-            val uRender = UGraphics(Tessellator.getInstance().worldRenderer)
+            val uRender = UGraphics.getFromTessellator()
             UGraphics.bindTexture(texture.glTextureId)
 
-            GlStateManager.pushMatrix()
-            GlStateManager.translate(x, y, 0.0)
+            UGraphics.pushMatrix()
+            UGraphics.translate(x, y, 0.0)
 
             // Rotate about the center to match the player's yaw
-            GlStateManager.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
-            GlStateManager.scale(1.5f, 1.5f, 1.5f)
-            GlStateManager.translate(-0.125f, 0.125f, 0.0f)
+            UGraphics.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
+            UGraphics.scale(1.5f, 1.5f, 1.5f)
+            UGraphics.translate(-0.125f, 0.125f, 0.0f)
             val d1 = 0.0
             val d2 = 0.25
-            uRender.begin(7, DefaultVertexFormats.POSITION_TEX)
+            uRender.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
             uRender.pos(-8.0, -8.0, 100.0).tex(d1, d1).endVertex()
             uRender.pos(-8.0, 8.0, 100.0).tex(d1, d2).endVertex()
             uRender.pos(8.0, 8.0, 100.0).tex(d2, d2).endVertex()
             uRender.pos(8.0, -8.0, 100.0).tex(d2, d1).endVertex()
             UGraphics.draw()
-            GlStateManager.popMatrix()
+            UGraphics.popMatrix()
         }
 
         override fun demoRender() {

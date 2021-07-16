@@ -18,13 +18,20 @@
 
 package skytils.skytilsmod.tweaker
 
+import net.minecraft.launchwrapper.Launch
 import org.spongepowered.asm.lib.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 
 class SkytilsMixinPlugin : IMixinConfigPlugin {
-    override fun onLoad(mixinPackage: String) {
 
+    var deobfEnvironment = false
+
+    override fun onLoad(mixinPackage: String) {
+        deobfEnvironment = Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
+        if (deobfEnvironment) {
+            println("We are in a deobfuscated environment, loading compatability mixins.")
+        }
     }
 
     override fun getRefMapperConfig(): String? {
@@ -34,6 +41,10 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
         if (!mixinClassName.startsWith("skytils.skytilsmod.mixins")) {
             println("Mixin $mixinClassName for $targetClassName is foreign, disabling.")
+            return false
+        }
+        if (mixinClassName.startsWith("skytils.skytilsmod.mixins.deobfenv") && !deobfEnvironment) {
+            println("Mixin $mixinClassName is for a deobfuscated environment, disabling.")
             return false
         }
         return true

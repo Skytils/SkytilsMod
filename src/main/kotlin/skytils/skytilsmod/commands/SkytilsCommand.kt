@@ -34,7 +34,6 @@ import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
-import skytils.skytilsmod.features.impl.handlers.EnchantNames
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.*
