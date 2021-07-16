@@ -26,6 +26,7 @@ import org.lwjgl.opengl.Display
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.core.structure.LocationButton
 import skytils.skytilsmod.core.structure.ResizeButton
@@ -95,6 +96,16 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
             yOffset = floatMouseY - button.y
             resizingCorner = button.corner
         }
+    }
+
+    override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
+        if (mouseButton == 1) {
+            buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
+                it.element.pos = FloatPair(10, 10)
+                it.element.scale = 1f
+            }
+        }
+        super.mouseClicked(mouseX, mouseY, mouseButton)
     }
 
     /**
