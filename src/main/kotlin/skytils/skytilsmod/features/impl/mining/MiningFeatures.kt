@@ -571,7 +571,13 @@ class MiningFeatures {
         }
 
         override fun toString(): String {
-            return String.format("%.0f", locX) + " " + String.format("%.0f", locY) + " " + String.format("%.0f", locZ)
+            return String.format("%.0f", locX?.plus(200)) + " " + String.format(
+                "%.0f",
+                locY?.plus(200)
+            ) + " " + String.format(
+                "%.0f",
+                locZ?.plus(200)
+            )
         }
     }
 
