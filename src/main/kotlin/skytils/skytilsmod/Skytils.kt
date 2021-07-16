@@ -251,7 +251,6 @@ class Skytils {
             cch.registerCommand(CataCommand)
             cch.registerCommand(SlayerCommand)
             cch.registerCommand(HollowWaypointCommand)
-            cch.registerCommand(HollowWaypointRemoveCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)
