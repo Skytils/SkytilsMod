@@ -17,10 +17,13 @@
  */
 package skytils.skytilsmod.features.impl.mining
 
+import gg.essential.universal.UGraphics
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.event.ClickEvent
@@ -53,7 +56,6 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class MiningFeatures {
@@ -457,9 +459,30 @@ class MiningFeatures {
             minesLoc.drawOnMap(50, Color.BLUE.rgb)
             balLoc.drawOnMap(50, Color.RED.rgb)
             fairyLoc.drawOnMap(25, Color.PINK.rgb)
-            val x = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0)
-            val y = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0)
-            RenderUtil.drawRect(x - 10, y - 10, x + 10, y + 10, Color.RED.rgb)
+            val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
+            val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
+
+            // player marker code
+            val texture = mc.textureManager.getTexture(ResourceLocation("textures/map/map_icons.png"))
+            val uRender = UGraphics(Tessellator.getInstance().worldRenderer)
+            UGraphics.bindTexture(texture.glTextureId)
+
+            GlStateManager.pushMatrix()
+            GlStateManager.translate(x, y, 0.0)
+
+            // Rotate about the center to match the player's yaw
+            GlStateManager.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
+            GlStateManager.scale(1.5f, 1.5f, 1.5f)
+            GlStateManager.translate(-0.125f, 0.125f, 0.0f)
+            val d1 = 0.0
+            val d2 = 0.25
+            uRender.begin(7, DefaultVertexFormats.POSITION_TEX)
+            uRender.pos(-8.0, -8.0, 100.0).tex(d1, d1).endVertex()
+            uRender.pos(-8.0, 8.0, 100.0).tex(d1, d2).endVertex()
+            uRender.pos(8.0, 8.0, 100.0).tex(d2, d2).endVertex()
+            uRender.pos(8.0, -8.0, 100.0).tex(d2, d1).endVertex()
+            UGraphics.draw()
+            GlStateManager.popMatrix()
         }
 
         override fun demoRender() {
