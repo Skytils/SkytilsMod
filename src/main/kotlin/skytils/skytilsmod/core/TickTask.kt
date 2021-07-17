@@ -29,12 +29,12 @@ class TickTask(private var ticks: Int = 0, private val task: () -> Unit) {
         if (event.phase != TickEvent.Phase.START) return
         if (ticks <= 0) {
             task()
-            MinecraftForge.EVENT_BUS.unregister(this)
+            MinecraftForge.EVENT_BUS.unregister(this.javaClass)
         }
         ticks--
     }
 
     init {
-        MinecraftForge.EVENT_BUS.register(this)
+        MinecraftForge.EVENT_BUS.register(this.javaClass)
     }
 }
