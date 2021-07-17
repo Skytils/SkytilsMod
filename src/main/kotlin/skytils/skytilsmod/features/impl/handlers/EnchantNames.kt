@@ -32,7 +32,7 @@ import java.io.FileWriter
 
 class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     companion object {
-        private val enchantRegex = Regex("§[0-9a-fzl]([\\w \\-]+)(?:§[9d], )?")
+        private val enchantRegex = Regex("§[0-9a-fzl]( ?[\\w]+[\\w \\-]*?)( \\w{1,3})?(?:§[9d], )?")
         val replacements = HashMap<String, String>()
     }
 
@@ -41,7 +41,8 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
         val newToolTip = event.toolTip.map {
             var newline = it
             enchantRegex.findAll(it).forEach { result ->
-                val enchant = result.groups[1]!!.value.substringBeforeLast(",").substringBeforeLast(" ")
+                val enchant = result.groups[1]!!.value
+                val level = result.groups[2]?.value ?: ""
                 if (DevTools.getToggle("enchantNames")) {
                     println(enchant)
                     println(result.groups)
@@ -60,7 +61,7 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
                             append("§o${enchant.replaceEnchantNames()}")
                         else
                             append(enchant)
-                        append(result.value.substringAfterLast(enchant))
+                        append(level)
                         if (DevTools.getToggle("enchantNames")) append("}")
                     }
                 )
