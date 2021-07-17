@@ -90,14 +90,6 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }.onMouseClick {
             mc.displayGuiScreen(EnchantNamesGui())
         }
-        SimpleButton("Edit Vigilance").childOf(window).constrain {
-            x = CenterConstraint()
-            y = SiblingConstraint() + 2.pixels()
-            width = 200.pixels()
-            height = 20.pixels()
-        }.onMouseClick {
-            VigilanceConfig.openGUI()
-        }
         SimpleButton("Discord").childOf(window).constrain {
             x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
             y = basicYConstraint { window.getHeight() - this.getHeight() - 3 }
