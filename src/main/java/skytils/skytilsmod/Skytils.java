@@ -26,7 +26,9 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.command.ICommand;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.network.play.client.C01PacketChatMessage;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -39,6 +41,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import skytils.skytilsmod.commands.*;
 import skytils.skytilsmod.core.*;
 import skytils.skytilsmod.events.PacketEvent;
@@ -77,7 +80,7 @@ import java.util.Objects;
 public class Skytils {
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "0.3-pre4";
+    public static final String VERSION = "0.3.2";
     public static final Minecraft mc = Minecraft.getMinecraft();
 
     public static Config config = new Config();
@@ -198,6 +201,13 @@ public class Skytils {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onJoin(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        ChatComponentText component = new ChatComponentText("§aHey there! You're missing out on §lA LOT§a of features! If you'd like to test these features out, click here to download the pre-release version!");
+        component.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Skytils/SkytilsMod/releases"));
+        mc.ingameGUI.getChatGUI().printChatMessage(component);
     }
 
     @SubscribeEvent

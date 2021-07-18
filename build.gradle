@@ -42,6 +42,7 @@ dependencies {
     packageLib("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         transitive = false
     }
+    packageLib "org.apache.httpcomponents.client5:httpclient5:5.1"
     provided files("libs/modcore.jar")
 }
 
@@ -66,8 +67,45 @@ jar {
             "TweakOrder": "0",
     )
 
-    from {
-        configurations.packageLib.collect { it.isDirectory() ? it : zipTree(it) }
+    enabled = false;
+}
+
+shadowJar {
+    archiveFileName = jar.archiveFileName
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations = [project.configurations.packageLib]
+
+    relocate("org.apache.hc", "skytils.apacheorg.hc")
+    relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
+
+    exclude "LICENSE.md"
+    exclude "LICENSE.txt"
+    exclude "LICENSE"
+    exclude "NOTICE"
+    exclude "NOTICE.txt"
+    exclude "pack.mcmeta"
+    exclude "dummyThing"
+    exclude "**/module-info.class"
+    exclude "*.so"
+    exclude "*.dylib"
+    exclude "*.dll"
+    exclude "*.jnilib"
+    exclude "ibxm/**"
+    exclude "com/jcraft/**"
+    exclude "org/lwjgl/**"
+    exclude "net/java/**"
+
+    exclude "META-INF/proguard/**"
+    exclude "META-INF/maven/**"
+    exclude "META-INF/versions/**"
+    exclude "META-INF/com.android.tools/**"
+
+    exclude "fabric.mod.json"
+}
+
+reobf {
+    shadowJar {
+        classpath = sourceSets.main.compileClasspath
     }
 }
 
@@ -93,3 +131,5 @@ processResources {
 sourceSets {
     main { output.resourcesDir = java.outputDir }
 }
+
+tasks.reobfJar.dependsOn(shadowJar)

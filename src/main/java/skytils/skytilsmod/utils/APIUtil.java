@@ -18,137 +18,124 @@
 
 package skytils.skytilsmod.utils;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.features.impl.handlers.AuctionData;
-import skytils.skytilsmod.features.impl.handlers.MayorInfo;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.ssl.SSLContexts;
 
-import java.io.BufferedReader;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Scanner;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
-/**
- * Modified from Danker's Skyblock Mod under GPL 3.0 license
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 public class APIUtil {
 
-    public static CloseableHttpClient client = HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION).addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
-        if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache");
-        if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache");
-    }).build();
+    private static final JsonParser parser = new JsonParser();
+
+    private static SSLContext sslContext = null;
+
+    static {
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(APIUtil::isValidCert)
+                .build();
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static final SSLConnectionSocketFactory sslSocketFactory = SSLConnectionSocketFactoryBuilder.create()
+            .setSslContext(sslContext)
+            .build();
+
+    private static final PoolingHttpClientConnectionManagerBuilder cm = PoolingHttpClientConnectionManagerBuilder.create()
+            .setSSLSocketFactory(sslSocketFactory);
+
+    public static HttpClientBuilder builder =
+            HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
+            .addRequestInterceptorFirst((request, entity, context) -> {
+                if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache");
+                if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache");
+            });
 
     public static JsonObject getJSONResponse(String urlString) {
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        CloseableHttpClient client = builder.setConnectionManager(cm.build()).build();
         try {
             HttpGet request = new HttpGet(new URL(urlString).toURI());
-            request.setProtocolVersion(HttpVersion.HTTP_1_1);
 
-            HttpResponse response = client.execute(request);
-
+            CloseableHttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-
-            if (response.getStatusLine().getStatusCode() == 200) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent()));
-                String input;
-                StringBuilder r = new StringBuilder();
-
-                while ((input = in.readLine()) != null) {
-                    r.append(input);
-                }
-                in.close();
-
-                Gson gson = new Gson();
-
-                return gson.fromJson(r.toString(), JsonObject.class);
-            } else {
-                if (urlString.startsWith("https://api.hypixel.net/") || urlString.startsWith(MayorInfo.baseURL) || urlString.equals(AuctionData.dataURL)) {
-                    InputStream errorStream = entity.getContent();
-                    try (Scanner scanner = new Scanner(errorStream)) {
-                        scanner.useDelimiter("\\Z");
-                        String error = scanner.next();
-
-                        if (error.startsWith("{")) {
-                            Gson gson = new Gson();
-                            return gson.fromJson(error, JsonObject.class);
-                        }
-                    }
-                } else if (urlString.startsWith("https://api.mojang.com/users/profiles/minecraft/") && response.getStatusLine().getStatusCode() == 204) {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed with reason: Player does not exist."));
-                } else {
-                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + response.getStatusLine().getStatusCode()));
-                }
-            }
-        } catch (IOException | URISyntaxException ex) {
-            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "An error has occured. See logs for more details."));
+            JsonObject obj = parser.parse(EntityUtils.toString(entity)).getAsJsonObject();
+            EntityUtils.consume(entity);
+            return obj;
+        } catch (Throwable ex) {
             ex.printStackTrace();
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils ran into an error whilst fetching a resource. See logs for more details."));
+        } finally {
+            try {
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
         return new JsonObject();
     }
 
-    // Only used for UUID => Username
     public static JsonArray getArrayResponse(String urlString) {
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-
+        CloseableHttpClient client = builder.setConnectionManager(cm.build()).build();
         try {
             HttpGet request = new HttpGet(new URL(urlString).toURI());
 
-            request.setProtocolVersion(HttpVersion.HTTP_1_1);
-
-            HttpResponse response = client.execute(request);
-
+            CloseableHttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-
-            if (response.getStatusLine().getStatusCode() == 200) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent()));
-                String input;
-                StringBuilder r = new StringBuilder();
-
-                while ((input = in.readLine()) != null) {
-                    r.append(input);
-                }
-                in.close();
-
-                Gson gson = new Gson();
-
-                return gson.fromJson(r.toString(), JsonArray.class);
-            } else {
-                player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Request failed. HTTP Error Code: " + response.getStatusLine().getStatusCode()));
-            }
-        } catch (IOException | URISyntaxException ex) {
-            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "An error has occured. See logs for more details."));
+            JsonArray obj = parser.parse(EntityUtils.toString(entity)).getAsJsonArray();
+            EntityUtils.consume(entity);
+            return obj;
+        } catch (Throwable ex) {
             ex.printStackTrace();
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils ran into an error whilst fetching a resource. See logs for more details."));
+        } finally {
+            try {
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
         return new JsonArray();
     }
 
+    /**
+     * Modified from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     public static String getUUID(String username) {
         JsonObject uuidResponse = getJSONResponse("https://api.mojang.com/users/profiles/minecraft/" + username);
         return uuidResponse.get("id").getAsString();
     }
 
+    /**
+     * Modified from Danker's Skyblock Mod under GPL 3.0 license
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     public static String getLatestProfileID(String UUID, String key) {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
@@ -158,7 +145,7 @@ public class APIUtil {
         JsonObject profilesResponse = getJSONResponse("https://api.hypixel.net/skyblock/profiles?uuid=" + UUID + "&key=" + key);
         if (!profilesResponse.get("success").getAsBoolean()) {
             String reason = profilesResponse.get("cause").getAsString();
-            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Failed with reason: " + reason));
+            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Skytils failed to fetch UUID because reason: " + reason));
             return null;
         }
         if (profilesResponse.get("profiles").isJsonNull()) {
@@ -186,5 +173,12 @@ public class APIUtil {
         }
 
         return latestProfile;
+    }
+
+    private static boolean isValidCert(X509Certificate[] chain, String authType) {
+        for (X509Certificate cert : chain) {
+            if (cert.getIssuerDN().getName().equals("CN=R3, O=Let's Encrypt, C=US")) return true;
+        }
+        return false;
     }
 }
