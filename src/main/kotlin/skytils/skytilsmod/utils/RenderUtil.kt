@@ -262,8 +262,15 @@ object RenderUtil {
      * @author SteveKunG
      */
     @JvmStatic
-    fun renderTexture(texture: ResourceLocation?, x: Int, y: Int, width: Int = 16, height: Int = 16) {
-        RenderHelper.enableGUIStandardItemLighting()
+    fun renderTexture(
+        texture: ResourceLocation?,
+        x: Int,
+        y: Int,
+        width: Int = 16,
+        height: Int = 16,
+        enableLighting: Boolean = true
+    ) {
+        if (enableLighting) RenderHelper.enableGUIStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.enableBlend()
         GlStateManager.enableDepth()

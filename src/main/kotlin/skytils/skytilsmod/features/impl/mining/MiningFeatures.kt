@@ -175,11 +175,12 @@ class MiningFeatures {
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
         }
         if (unformatted.startsWith(" ☠ You were killed by ")) {
-            deadCount = 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
+            deadCount =
+                50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
         }
     }
 
-    fun waypointChatMessage(x: String, y: String, z: String) {
+    private fun waypointChatMessage(x: String, y: String, z: String) {
         val component = ChatComponentText(
             "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
@@ -188,7 +189,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_city $x $y $z"
+                        "/skytilshollowwaypoint set internal_city $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -202,7 +203,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_temple $x $y $z"
+                        "/skytilshollowwaypoint set internal_temple $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -216,7 +217,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_den $x $y $z"
+                        "/skytilshollowwaypoint set internal_den $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -230,7 +231,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_mines $x $y $z"
+                        "/skytilshollowwaypoint set internal_mines $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -239,12 +240,12 @@ class MiningFeatures {
                     )
                 )
         )
-        val bal = ChatComponentText(EnumChatFormatting.RED.toString() + "[Khazad-dûm] ").setChatStyle(
+        val bal = ChatComponentText("§c[Khazad-dûm] ").setChatStyle(
             ChatStyle()
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_bal $x $y $z"
+                        "/skytilshollowwaypoint set internal_bal $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -258,7 +259,7 @@ class MiningFeatures {
                 .setChatClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint internal_fairy $x $y $z"
+                        "/skytilshollowwaypoint set internal_fairy $x $y $z"
                     )
                 ).setChatHoverEvent(
                     HoverEvent(
@@ -271,7 +272,7 @@ class MiningFeatures {
             ChatStyle().setChatClickEvent(
                 ClickEvent(
                     ClickEvent.Action.SUGGEST_COMMAND,
-                    "/skytilshollowwaypoint name $x $y $z"
+                    "/skytilshollowwaypoint set name $x $y $z"
                 )
             ).setChatHoverEvent(
                 HoverEvent(
@@ -408,7 +409,9 @@ class MiningFeatures {
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
-        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMap) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode && deadCount == 0) {
+        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
+            && deadCount == 0 && mc.thePlayer != null
+        ) {
             when (SBInfo.location) {
                 "Lost Precursor City" -> cityLoc.set()
                 "Jungle Temple" -> templeLoc.set()
@@ -450,16 +453,21 @@ class MiningFeatures {
         }
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0), scale = 0.1f) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
+        val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
-            RenderUtil.renderTexture(ResourceLocation("skytils", "crystalhollowsmap.png"), 0, 0, 624, 624)
-            cityLoc.drawOnMap(50, Color.WHITE.rgb)
-            templeLoc.drawOnMap(50, Color.GREEN.rgb)
-            denLoc.drawOnMap(50, Color.YELLOW.rgb)
-            minesLoc.drawOnMap(50, Color.BLUE.rgb)
-            balLoc.drawOnMap(50, Color.RED.rgb)
-            fairyLoc.drawOnMap(25, Color.PINK.rgb)
+            UGraphics.scale(0.1, 0.1, 1.0)
+            UGraphics.disableLighting()
+            RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
+            if (Skytils.config.crystalHollowMapPlaces) {
+                cityLoc.drawOnMap(50, Color.WHITE.rgb)
+                templeLoc.drawOnMap(50, Color.GREEN.rgb)
+                denLoc.drawOnMap(50, Color.YELLOW.rgb)
+                minesLoc.drawOnMap(50, Color.BLUE.rgb)
+                balLoc.drawOnMap(50, Color.RED.rgb)
+                fairyLoc.drawOnMap(25, Color.PINK.rgb)
+            }
             val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
             val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
 
@@ -474,6 +482,8 @@ class MiningFeatures {
             UGraphics.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
             UGraphics.scale(1.5f, 1.5f, 1.5f)
             UGraphics.translate(-0.125f, 0.125f, 0.0f)
+            UGraphics.color4f(1f, 1f, 1f, 1f)
+            UGraphics.enableAlpha()
             val d1 = 0.0
             val d2 = 0.25
             wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
@@ -493,9 +503,9 @@ class MiningFeatures {
         override val toggled: Boolean
             get() = Skytils.config.crystalHollowMap && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
         override val height: Int
-            get() = 624
+            get() = 62 // should be 62.4 but oh well
         override val width: Int
-            get() = 624
+            get() = 62
 
         init {
             Skytils.guiManager.registerElement(this)
@@ -553,6 +563,16 @@ class MiningFeatures {
         fun drawOnMap(size: Int, color: Int) {
             if (exists())
                 RenderUtil.drawRect(locX!! - size, locZ!! - size, locX!! + size, locZ!! + size, color)
+        }
+
+        override fun toString(): String {
+            return String.format("%.0f", locX?.plus(200)) + " " + String.format(
+                "%.0f",
+                locY
+            ) + " " + String.format(
+                "%.0f",
+                locZ?.plus(200)
+            )
         }
     }
 

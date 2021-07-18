@@ -21,8 +21,12 @@ package skytils.skytilsmod.commands
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
+import net.minecraft.util.IChatComponent
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 
 object HollowWaypointCommand : CommandBase() {
@@ -31,7 +35,7 @@ object HollowWaypointCommand : CommandBase() {
     }
 
     override fun getCommandAliases(): List<String> {
-        return emptyList()
+        return listOf("sthw")
     }
 
     override fun getCommandUsage(sender: ICommandSender): String {
@@ -46,55 +50,156 @@ object HollowWaypointCommand : CommandBase() {
         return emptyList()
     }
 
-    override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.size < 3) {
-            if (args?.size == 1)
-                MiningFeatures.waypoints[args[0]] = BlockPos(
-                    Minecraft.getMinecraft().thePlayer.posX,
-                    Minecraft.getMinecraft().thePlayer.posY,
-                    Minecraft.getMinecraft().thePlayer.posZ
+    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+        if (args.isEmpty()) {
+            val message = ChatComponentText("§3Skytils > §eWaypoints:\n")
+            if (MiningFeatures.cityLoc.exists()) {
+                message.appendSibling(ChatComponentText("§fLost Precursor City "))
+                message.appendSibling(copyMessage("Lost Precursor City: " + MiningFeatures.cityLoc.toString()))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_city"))
+            }
+            if (MiningFeatures.templeLoc.exists()) {
+                message.appendSibling(ChatComponentText("§aJungle Temple "))
+                message.appendSibling(copyMessage("Jungle Temple: " + MiningFeatures.templeLoc.toString()))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_temple"))
+            }
+            if (MiningFeatures.denLoc.exists()) {
+                message.appendSibling(ChatComponentText("§eGoblin Queen's Den "))
+                message.appendSibling(copyMessage("Goblin Queen's Den: " + MiningFeatures.denLoc.toString()))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_den"))
+            }
+            if (MiningFeatures.minesLoc.exists()) {
+                message.appendSibling(ChatComponentText("§9Mines of Divan "))
+                message.appendSibling(copyMessage("Lost Precursor City: " + MiningFeatures.minesLoc.toString()))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_mines"))
+            }
+            if (MiningFeatures.balLoc.exists()) {
+                message.appendSibling(ChatComponentText("§cKhazad-dûm "))
+                message.appendSibling(copyMessage("Khazad-dûm: " + MiningFeatures.balLoc.toString()))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_bal"))
+            }
+            if (MiningFeatures.fairyLoc.exists()) {
+                message.appendSibling(ChatComponentText("§dFairy Grotto "))
+                message.appendSibling(copyMessage("Fairy Grotto: " + MiningFeatures.fairyLoc.toString()))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_fairy"))
+            }
+            for ((key, value) in MiningFeatures.waypoints) {
+                message.appendSibling(ChatComponentText("§e$key "))
+                message.appendSibling(copyMessage("$key: " + value.x + " " + value.y + " " + value.z))
+                message.appendSibling(removeMessage("/skytilshollowwaypoint remove $key"))
+            }
+            message.appendSibling(ChatComponentText("§eFor more info do /skytilshollowwaypoint help"))
+            Minecraft.getMinecraft().thePlayer.addChatMessage(message)
+        } else {
+            when (args[0]) {
+                "set", "add" -> {
+                    if (args.size == 2 || args.size >= 5) {
+                        val loc: String = args[1]
+                        val x: Double
+                        val y: Double
+                        val z: Double
+                        if (args.size == 2) {
+                            x = Minecraft.getMinecraft().thePlayer.posX
+                            y = Minecraft.getMinecraft().thePlayer.posY
+                            z = Minecraft.getMinecraft().thePlayer.posZ
+                        } else {
+                            x = args[2].toDouble()
+                            y = args[3].toDouble()
+                            z = args[4].toDouble()
+                        }
+                        when (loc) {
+                            "internal_city" -> {
+                                MiningFeatures.cityLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.cityLoc.locY = y
+                                MiningFeatures.cityLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
+                            "internal_temple" -> {
+                                MiningFeatures.templeLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.templeLoc.locY = y
+                                MiningFeatures.templeLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
+                            "internal_den" -> {
+                                MiningFeatures.denLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.denLoc.locY = y
+                                MiningFeatures.denLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
+                            "internal_mines" -> {
+                                MiningFeatures.minesLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.minesLoc.locY = y
+                                MiningFeatures.minesLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
+                            "internal_bal" -> {
+                                MiningFeatures.balLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.balLoc.locY = y
+                                MiningFeatures.balLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
+                            "internal_fairy" -> {
+                                MiningFeatures.fairyLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.fairyLoc.locY = y
+                                MiningFeatures.fairyLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
+                            else -> MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
+                        }
+                    } else
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint set name <x y z>"))
+                }
+                "remove", "delete" -> {
+                    if (args.size >= 2) {
+                        when (args[1]) {
+                            "internal_city" -> MiningFeatures.cityLoc.reset()
+                            "internal_temple" -> MiningFeatures.templeLoc.reset()
+                            "internal_den" -> MiningFeatures.denLoc.reset()
+                            "internal_mines" -> MiningFeatures.minesLoc.reset()
+                            "internal_bal" -> MiningFeatures.balLoc.reset()
+                            "internal_fairy" -> MiningFeatures.fairyLoc.reset()
+                            else -> MiningFeatures.waypoints.remove(args[1])
+                        }
+                    } else
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint remove name/clear"))
+                }
+                "clear" -> {
+                    MiningFeatures.cityLoc.reset()
+                    MiningFeatures.templeLoc.reset()
+                    MiningFeatures.denLoc.reset()
+                    MiningFeatures.minesLoc.reset()
+                    MiningFeatures.balLoc.reset()
+                    MiningFeatures.fairyLoc.reset()
+                    MiningFeatures.waypoints.clear()
+                }
+                else -> {
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(
+                        ChatComponentText(
+                            "§eusage: /skytilshollowwaypoint ➔ shows all waypoints\n" +
+                                    "§e/skytilshollowwaypoint set name ➔ sets waypoint at current location\n" +
+                                    "§e/skytilshollowwaypoint set name x y z ➔ sets waypoint at specified location\n" +
+                                    "§e/skytilshollowwaypoint remove name ➔ remove the specified waypoint\n" +
+                                    "§e/skytilshollowwaypoint clear ➔ removes all waypoints"
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun copyMessage(text: String): IChatComponent {
+        return ChatComponentText("§9[Copy] ").setChatStyle(
+            ChatStyle().setChatHoverEvent(
+                HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText("§9Copy the coordinates in chat box.")
                 )
-            else {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint location <x y z>"))
-            }
-            return
-        }
-        val loc: String = args[0]
-        val x: Double = args[1].toDouble()
-        val y: Double = args[2].toDouble()
-        val z: Double = args[3].toDouble()
-        when (loc) {
-            "internal_city" -> {
-                MiningFeatures.cityLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                MiningFeatures.cityLoc.locY = y
-                MiningFeatures.cityLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            }
-            "internal_temple" -> {
-                MiningFeatures.templeLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                MiningFeatures.templeLoc.locY = y
-                MiningFeatures.templeLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            }
-            "internal_den" -> {
-                MiningFeatures.denLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                MiningFeatures.denLoc.locY = y
-                MiningFeatures.denLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            }
-            "internal_mines" -> {
-                MiningFeatures.minesLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                MiningFeatures.minesLoc.locY = y
-                MiningFeatures.minesLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            }
-            "internal_bal" -> {
-                MiningFeatures.balLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                MiningFeatures.balLoc.locY = y
-                MiningFeatures.balLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            }
-            "internal_fairy" -> {
-                MiningFeatures.fairyLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                MiningFeatures.fairyLoc.locY = y
-                MiningFeatures.fairyLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            }
-            else -> MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
-        }
+            ).setChatClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, text))
+        )
+    }
+
+    private fun removeMessage(command: String): IChatComponent {
+        return ChatComponentText("§c[Remove]\n").setChatStyle(
+            ChatStyle().setChatHoverEvent(
+                HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    ChatComponentText("§cRemove the waypoint.")
+                )
+            ).setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
+        )
     }
 }
