@@ -23,9 +23,11 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.*
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
+import net.minecraft.util.IChatComponent
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
-import tv.twitch.chat.Chat
 
 object HollowWaypointCommand : CommandBase() {
     override fun getCommandName(): String {
@@ -48,8 +50,8 @@ object HollowWaypointCommand : CommandBase() {
         return emptyList()
     }
 
-    override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) {
+    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+        if (args.isEmpty()) {
             val message = ChatComponentText("§3Skytils > §eWaypoints:\n")
             if (MiningFeatures.cityLoc.exists()) {
                 message.appendSibling(ChatComponentText("§fLost Precursor City "))

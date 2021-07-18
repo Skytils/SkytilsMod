@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.mining
 
 import gg.essential.universal.UGraphics
-import kotlinx.coroutines.delay
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -58,7 +57,6 @@ import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
 import java.util.regex.Pattern
-import javax.print.DocFlavor
 
 class MiningFeatures {
     @SubscribeEvent
@@ -455,16 +453,13 @@ class MiningFeatures {
         }
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0), scale = 0.1f) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
+        val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
         override fun render() {
             if (!toggled || mc.thePlayer == null) return
-            //basic render function to render map because the one in RenderUtil renders dark
-            GlStateManager.pushMatrix()
-            GlStateManager.enableRescaleNormal()
-            mc.textureManager.bindTexture(ResourceLocation("skytils", "crystalhollowsmap.png"))
-            GlStateManager.color(1.0F, 1.0F, 1.0F);
-            Gui.drawModalRectWithCustomSizedTexture(0, 0, 0f, 0f, 624, 624, 624f, 624f)
-            GlStateManager.popMatrix()
+            UGraphics.scale(0.1, 0.1, 1.0)
+            UGraphics.disableLighting()
+            RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
             if (Skytils.config.crystalHollowMapPlaces) {
                 cityLoc.drawOnMap(50, Color.WHITE.rgb)
                 templeLoc.drawOnMap(50, Color.GREEN.rgb)
@@ -508,9 +503,9 @@ class MiningFeatures {
         override val toggled: Boolean
             get() = Skytils.config.crystalHollowMap && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
         override val height: Int
-            get() = 624
+            get() = 62 // should be 62.4 but oh well
         override val width: Int
-            get() = 624
+            get() = 62
 
         init {
             Skytils.guiManager.registerElement(this)
