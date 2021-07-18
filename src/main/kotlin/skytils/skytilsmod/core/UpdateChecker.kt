@@ -95,7 +95,7 @@ object UpdateChecker {
                 val url =
                     "https://cdn.discordapp.com/attachments/807303259902705685/864882597342740511/SkytilsInstaller-1.1-SNAPSHOT.jar"
                 val req = HttpGet(URL(url).toURI())
-                
+
                 val taskFile = File(taskDir, getJarNameFromUrl(url))
                 taskFile.createNewFile()
                 val res = client.execute(req)
