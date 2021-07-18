@@ -75,6 +75,8 @@ dependencies {
         exclude module: "kotlin-stdlib-jdk8"
     }
 
+    implementation "org.apache.httpcomponents.client5:httpclient5:5.1"
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -102,8 +104,14 @@ shadowJar {
 
     relocate("gg.essential", "skytils.essentialgg")
     relocate("kotlinx.coroutines", "skytils.kotlinx.coroutines")
+    relocate("org.apache.hc", "skytils.apacheorg.hc")
+    relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
 
     exclude "LICENSE.md"
+    exclude "LICENSE.txt"
+    exclude "LICENSE"
+    exclude "NOTICE"
+    exclude "NOTICE.txt"
     exclude "pack.mcmeta"
     exclude "dummyThing"
     exclude "**/module-info.class"

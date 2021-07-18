@@ -24,14 +24,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
-import org.apache.http.HttpRequest
-import org.apache.http.HttpResponse
-import org.apache.http.HttpVersion
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.protocol.HttpContext
-import org.apache.http.util.EntityUtils
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
+import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.ssl.SSLContexts
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -39,6 +38,7 @@ import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.cert.X509Certificate
 import java.util.*
 import javax.imageio.ImageIO
 
@@ -46,9 +46,21 @@ import javax.imageio.ImageIO
 object APIUtil {
     private val parser = JsonParser()
 
+    val sslContext = SSLContexts.custom()
+        .loadTrustMaterial { chain, authType ->
+            isValidCert(chain, authType)
+        }
+        .build()
+    val sslSocketFactory = SSLConnectionSocketFactoryBuilder.create()
+        .setSslContext(sslContext)
+        .build()
+
+    val cm = PoolingHttpClientConnectionManagerBuilder.create()
+        .setSSLSocketFactory(sslSocketFactory)
+
     val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
-            .addInterceptorFirst { request: HttpRequest, _: HttpContext? ->
+            .addRequestInterceptorFirst { request, entity, context ->
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
             }
@@ -69,14 +81,16 @@ object APIUtil {
     }
 
     fun getJSONResponse(urlString: String): JsonObject {
-        val client = builder.build()
+        val client = builder.setConnectionManager(cm.build()).build()
         try {
             val request = HttpGet(URL(urlString).toURI())
-            request.protocolVersion = HttpVersion.HTTP_1_1
-            val response: HttpResponse = client.execute(request)
+
+            val response = client.execute(request)
             val entity = response.entity
-            if (response.statusLine.statusCode == 200) {
-                return parser.parse(EntityUtils.toString(entity)).asJsonObject
+            if (response.code == 200) {
+                val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
+                EntityUtils.consume(entity)
+                return obj
             } else {
                 if (urlString.startsWithAny(
                         "https://api.ashcon.app/mojang/v2/user/",
@@ -90,6 +104,7 @@ object APIUtil {
                         scanner.useDelimiter("\\Z")
                         val error = scanner.next()
                         if (error.startsWith("{")) {
+                            EntityUtils.consume(entity)
                             return parser.parse(error).asJsonObject
                         }
                     }
@@ -105,16 +120,18 @@ object APIUtil {
     }
 
     fun getArrayResponse(urlString: String): JsonArray {
-        val client = builder.build()
+        val client = builder.setConnectionManager(cm.build()).build()
         try {
             val request = HttpGet(URL(urlString).toURI())
-            request.protocolVersion = HttpVersion.HTTP_1_1
-            val response: HttpResponse = client.execute(request)
+
+            val response = client.execute(request)
             val entity = response.entity
-            if (response.statusLine.statusCode == 200) {
-                return parser.parse(EntityUtils.toString(entity)).asJsonArray
+            if (response.code == 200) {
+                val arr = parser.parse(EntityUtils.toString(entity)).asJsonArray
+                EntityUtils.consume(entity)
+                return arr
             } else {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest to a resource failed. HTTP Error Code: ${response.statusLine.statusCode}"))
+                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest to a resource failed. HTTP Error Code: ${response.code}"))
             }
         } catch (ex: Throwable) {
             mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
@@ -266,4 +283,8 @@ object APIUtil {
         }
     }
     // end
+
+    private fun isValidCert(chain: Array<X509Certificate>, authType: String): Boolean {
+        return chain.any { it.issuerDN.name == "CN=R3, O=Let's Encrypt, C=US" }
+    }
 }

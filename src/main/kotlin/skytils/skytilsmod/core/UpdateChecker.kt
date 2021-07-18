@@ -24,12 +24,14 @@ import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
-import org.apache.http.HttpVersion
-import org.apache.http.client.methods.HttpGet
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.http.ssl.TLS
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.gui.UpdateGui
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.APIUtil.cm
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
 import java.io.*
@@ -88,20 +90,21 @@ object UpdateChecker {
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             if (taskDir.mkdirs() || taskDir.list()?.isEmpty() == true) {
                 println("Downloading Skytils delete task.")
-                val client = APIUtil.builder.build()
+                val client = APIUtil.builder.setConnectionManager(cm.build()).build()
                 // TODO Make this dynamic and fetch latest one or something
                 val url =
                     "https://cdn.discordapp.com/attachments/807303259902705685/864882597342740511/SkytilsInstaller-1.1-SNAPSHOT.jar"
                 val req = HttpGet(URL(url).toURI())
-                req.protocolVersion = HttpVersion.HTTP_1_1
+                
                 val taskFile = File(taskDir, getJarNameFromUrl(url))
                 taskFile.createNewFile()
                 val res = client.execute(req)
-                if (res.statusLine.statusCode != 200) {
+                if (res.code != 200) {
                     println("Downloading delete task failed!")
                 } else {
                     println("Writing Skytils delete task.")
                     res.entity.writeTo(taskFile.outputStream())
+                    EntityUtils.consume(res.entity)
                     client.close()
                     println("Delete task successfully downloaded!")
                 }
