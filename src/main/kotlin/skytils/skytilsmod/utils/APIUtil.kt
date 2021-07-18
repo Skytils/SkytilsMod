@@ -112,7 +112,7 @@ object APIUtil {
             }
         } catch (ex: Throwable) {
             ex.printStackTrace()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils ran into an error whilst fetching a resource. See logs for more details."))
         } finally {
             client.close()
         }
@@ -131,10 +131,10 @@ object APIUtil {
                 EntityUtils.consume(entity)
                 return arr
             } else {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest to a resource failed. HTTP Error Code: ${response.code}"))
+                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils failed to request a resource. HTTP Error Code: ${response.code}"))
             }
         } catch (ex: Throwable) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils ran into an error whilst fetching a resource. See logs for more details."))
             ex.printStackTrace()
         } finally {
             client.close()
@@ -145,7 +145,7 @@ object APIUtil {
     fun getUUID(username: String): String? {
         val uuidResponse = getJSONResponse("https://api.ashcon.app/mojang/v2/user/$username")
         if (uuidResponse.has("error")) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cFailed with error: ${uuidResponse["reason"].asString}"))
+            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils failed to get the UUID with error: ${uuidResponse["reason"].asString}"))
             return null
         }
         return uuidResponse["uuid"].asString.replace("-", "")
