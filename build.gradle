@@ -1,24 +1,13 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "https://files.minecraftforge.net/maven"
-        }
-        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
-        // search through the 'libs' folder
-        flatDir dirs: 'libs'
-    }
-    dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
-        classpath "org.spongepowered:mixingradle:0.6-SNAPSHOT"
-    }
+plugins {
+    id "net.minecraftforge.gradle.forge" version "6f5327"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "org.jetbrains.kotlin.jvm" version "1.5.21"
+    id "org.spongepowered.mixin" version "d5f9873d60"
+    id "java"
+    id "idea"
 }
 
-apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: "org.spongepowered.mixin"
-
-version = "0.3-pre4"
+version = "0.3.2"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
@@ -33,51 +22,32 @@ minecraft {
     runDir = "run"
     mappings = "stable_22"
     makeObfSourceJar = false
+    gitVersion = false
     clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.FMLLoadingPlugin"
     clientRunArgs += "--mixin mixins.skytils.json"
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven { url "https://repo.spongepowered.org/repository/maven-public/" }
 }
 
 configurations {
     packageLib
+    configurations.implementation.extendsFrom(configurations.packageLib)
 }
 
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile "com.mod-buildcraft:buildcraft:6.0.8:dev"  // adds buildcraft to the dev env
-    //compile "com.googlecode.efficient-java-matrix-library:ejml:0.24" // adds ejml to the dev env
-
-    // the "provided" configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided "com.mod-buildcraft:buildcraft:6.0.8:dev"
-
-    // the deobf configurations:  "deobfCompile" and "deobfProvided" are the same as the normal compile and provided,
-    // except that these dependencies get remapped to your current MCP mappings
-    //deobfCompile "com.mod-buildcraft:buildcraft:6.0.8:dev"
-    //deobfProvided "com.mod-buildcraft:buildcraft:6.0.8:dev"
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
     packageLib("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        exclude module: 'guava'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
+        transitive = false
     }
     provided files("libs/modcore.jar")
-    configurations.compile.extendsFrom(configurations.packageLib)
 }
 
 mixin {
+    disableRefMapWarning = true
+    defaultObfuscationEnv searge
     add sourceSets.main, "mixins.skytils.refmap.json"
 }
 
@@ -121,5 +91,5 @@ processResources {
 }
 
 sourceSets {
-    main { output.resourcesDir = output.classesDir }
+    main { output.resourcesDir = java.outputDir }
 }
