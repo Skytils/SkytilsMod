@@ -61,16 +61,25 @@ class RequestUpdateGui : WindowScreen(newGuiScale = 2) {
         SimpleButton("Update")
             .constrain {
                 x = CenterConstraint()
-                y = SiblingConstraint() + 20.pixels()
+                y = SiblingConstraint(5f)
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
-                Skytils.displayScreen = UpdateGui()
+                Skytils.displayScreen = UpdateGui(true)
+            } childOf window
+        SimpleButton("Update Later")
+            .constrain {
+                x = CenterConstraint()
+                y = SiblingConstraint(5f)
+                width = 100.pixels()
+                height = 20.pixels()
+            }.onMouseClick {
+                Skytils.displayScreen = UpdateGui(false)
             } childOf window
         SimpleButton("Main Menu")
             .constrain {
                 x = CenterConstraint()
-                y = SiblingConstraint() + 10.pixels()
+                y = SiblingConstraint(5f)
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {

@@ -32,16 +32,22 @@ import java.io.FileWriter
 
 class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     companion object {
-        private val enchantRegex = Regex("§[0-9a-fzl]([\\w \\-]+)(?:§[9d], )?")
+        private val enchantRegex =
+            Regex("(?<color>(?:§[0-9a-fzl]){1,2})(?<enchant> ?[\\w ]+[\\w \\-]*?)(?<level> [IVXLCDM0-9]{1,3})(?<suffix>§[9d], )?")
         val replacements = HashMap<String, String>()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        val newToolTip = event.toolTip.map {
+        event.toolTip.replaceAll {
             var newline = it
-            enchantRegex.findAll(it).forEach { result ->
-                val enchant = result.groups[1]!!.value.substringBeforeLast(",").substringBeforeLast(" ")
+            enchantRegex.findAll(
+                it
+            ).forEach { result ->
+                val color = result.groups["color"]!!.value
+                val enchant = result.groups["enchant"]!!.value
+                val level = result.groups["level"]!!.value
+                val suffix = result.groups["suffix"]?.value ?: ""
                 if (DevTools.getToggle("enchantNames")) {
                     println(enchant)
                     println(result.groups)
@@ -49,26 +55,20 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
                 newline = newline.replace(
                     result.value,
                     buildString {
-                        append(
-                            result.value.substring(
-                                0,
-                                2
-                            )
-                        )
+                        append(color)
                         if (DevTools.getToggle("enchantNames")) append("{")
                         if (replacements[enchant] != null)
                             append("§o${enchant.replaceEnchantNames()}")
                         else
                             append(enchant)
-                        append(result.value.substringAfterLast(enchant))
+                        append(level)
                         if (DevTools.getToggle("enchantNames")) append("}")
+                        append(suffix)
                     }
                 )
             }
             newline
         }
-        event.toolTip.clear()
-        event.toolTip.addAll(newToolTip)
     }
 
     private fun String.replaceEnchantNames(): String {

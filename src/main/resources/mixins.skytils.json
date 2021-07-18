@@ -34,6 +34,7 @@
     "neu.MixinGuiProfileViewer",
     "neu.MixinStorageManager",
     "neu.MixinTradeWindow",
+    "patcher.MixinFontRendererHook",
     "renderer.MixinBlockRendererDispatcher",
     "renderer.MixinEntityRenderer",
     "renderer.MixinInventoryEffectRenderer",

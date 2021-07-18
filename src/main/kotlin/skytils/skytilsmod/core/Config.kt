@@ -953,6 +953,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var hollowChatCoords = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Fix SBA Chroma",
+        description = "Fixes SBA chroma with Patcher 1.6",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    @JvmField
+    var fixSbaChroma = false
+
     /*
    @Property(
    type = PropertyType.SWITCH, name = "Block Useless Zombie Sword",

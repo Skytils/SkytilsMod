@@ -26,11 +26,15 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
+import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -43,6 +47,7 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.openGUI
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import kotlin.concurrent.thread
 
 object SkytilsCommand : CommandBase() {
 
@@ -226,6 +231,54 @@ object SkytilsCommand : CommandBase() {
                 }
             }
             "enchant" -> Skytils.displayScreen = EnchantNamesGui()
+            "update" -> {
+                try {
+                    thread(block = UpdateChecker.updateGetter::run).join()
+                    if (UpdateChecker.updateGetter.updateObj == null) {
+                        return player.addChatMessage(ChatComponentText("§b§lSkytils §r§8➡ §cNo new update found"))
+                    }
+                    val message = ChatComponentText(
+                        "§b§lSkytils §r§8➜ §7Update for version ${
+                            UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString
+                        } is available! "
+                    )
+                    message.appendSibling(
+                        ChatComponentText("§a[Update Now] ").setChatStyle(
+                            ChatStyle().setChatClickEvent(
+                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytils updateNow")
+                            ).setChatHoverEvent(
+                                HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    ChatComponentText("§eUpdates and restarts your game")
+                                )
+                            )
+                        )
+                    )
+                    message.appendSibling(
+                        ChatComponentText("§b[Update Later] ").setChatStyle(
+                            ChatStyle().setChatClickEvent(
+                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytils updateLater")
+                            ).setChatHoverEvent(
+                                HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    ChatComponentText("§eUpdates after you close your game")
+                                )
+                            )
+                        )
+                    )
+                    return player.addChatMessage(message)
+                } catch (ex: InterruptedException) {
+                    ex.printStackTrace()
+                }
+            }
+            "updatenow" -> {
+                Skytils.displayScreen = UpdateGui(true)
+                return
+            }
+            "updatelater" -> {
+                Skytils.displayScreen = UpdateGui(false)
+                return
+            }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
     }
