@@ -28,9 +28,9 @@ import skytils.skytilsmod.ModCoreInstaller;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion("1.8.9")
-public class FMLLoadingPlugin implements IFMLLoadingPlugin {
+public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
-    public FMLLoadingPlugin() {
+    public SkytilsLoadingPlugin() {
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.skytils.json");
         MixinEnvironment.getCurrentEnvironment().setObfuscationContext("searge");

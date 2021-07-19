@@ -3,8 +3,6 @@ plugins {
     id "com.github.johnrengelman.shadow" version "6.1.0"
     id "org.jetbrains.kotlin.jvm" version "1.5.21"
     id "org.spongepowered.mixin" version "d5f9873d60"
-    id "java"
-    id "idea"
 }
 
 version = "0.3.2"
@@ -23,7 +21,7 @@ minecraft {
     mappings = "stable_22"
     makeObfSourceJar = false
     gitVersion = false
-    clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.FMLLoadingPlugin"
+    clientJvmArgs += "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin"
     clientRunArgs += "--mixin mixins.skytils.json"
 }
 
@@ -39,6 +37,8 @@ configurations {
 
 
 dependencies {
+    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+
     packageLib("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         transitive = false
     }
@@ -58,7 +58,7 @@ jar {
 
     manifest.attributes(
             "Main-Class": "SkytilsInstallerFrame",
-            "FMLCorePlugin": "skytils.skytilsmod.tweaker.FMLLoadingPlugin",
+            "FMLCorePlugin": "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
             "FMLCorePluginContainsFMLMod": true,
             "ForceLoadAsMod": true,
             "MixinConfigs": "mixins.skytils.json",
@@ -67,7 +67,7 @@ jar {
             "TweakOrder": "0",
     )
 
-    enabled = false;
+    enabled = false
 }
 
 shadowJar {
