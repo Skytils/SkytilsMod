@@ -28,20 +28,18 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.DataFetcher
-import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.PacketEvent.SendEvent
+import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.ConcurrentHashSet
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_relics.json")) {
+class RelicWaypoints : Tracker("found_spiders_den_relics") {
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
@@ -138,6 +136,10 @@ class RelicWaypoints : PersistentSave(File(Skytils.modDir, "found_spiders_den_re
                 GlStateManager.enableCull()
             }
         }
+    }
+
+    override fun resetLoot() {
+        foundRelics.clear()
     }
 
     override fun read(reader: FileReader) {
