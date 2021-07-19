@@ -27,7 +27,7 @@ plugins {
 
 ext.kotlin_version = "1.5.21"
 
-version = "1.0-pre18.1"
+version = "1.0-pre19"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
