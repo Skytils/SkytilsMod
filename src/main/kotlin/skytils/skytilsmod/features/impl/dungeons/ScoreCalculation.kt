@@ -313,7 +313,7 @@ object ScoreCalculation {
             val leftAlign = actualX < sr.scaledWidth / 2f
             ScreenRenderer.fontRenderer.drawString(
                 "Crypts: 5",
-                0f,
+                if (leftAlign) 0f else width.toFloat(),
                 0f,
                 alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
                 customColor = CommonColors.LIGHT_GREEN
