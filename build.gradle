@@ -21,13 +21,11 @@ plugins {
     id "com.github.johnrengelman.shadow" version "6.1.0"
     id "org.jetbrains.kotlin.jvm" version "1.5.21"
     id "org.spongepowered.mixin" version "d5f9873d60"
-    id "java"
-    id "idea"
 }
 
 ext.kotlin_version = "1.5.21"
 
-version = "1.0-pre19"
+version = "1.0-pre19.1"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
