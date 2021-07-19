@@ -456,7 +456,7 @@ class MiningFeatures {
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
         override fun render() {
-            if (!toggled || mc.thePlayer == null) return
+            if (!toggled || SBInfo.mode != SBInfo.SkyblockIsland.CrystalHollows.mode || mc.thePlayer == null) return
             UGraphics.scale(0.1, 0.1, 1.0)
             UGraphics.disableLighting()
             RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
@@ -501,7 +501,7 @@ class MiningFeatures {
         }
 
         override val toggled: Boolean
-            get() = Skytils.config.crystalHollowMap && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
+            get() = Skytils.config.crystalHollowMap
         override val height: Int
             get() = 62 // should be 62.4 but oh well
         override val width: Int
