@@ -5,7 +5,7 @@ plugins {
     id "org.spongepowered.mixin" version "d5f9873d60"
 }
 
-version = "0.3.2"
+version = "0.3.3"
 group = "skytils.skytilsmod"
 archivesBaseName = "Skytils"
 
