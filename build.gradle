@@ -59,6 +59,7 @@ repositories {
     mavenCentral()
     maven { url "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url "https://repo.sk1er.club/repository/maven-public/" }
+    maven { url "https://repo.sk1er.club/repository/maven-releases/" }
 }
 
 dependencies {
@@ -68,7 +69,7 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("gg.essential:Vigilance:149-10809-SNAPSHOT") {
+    implementation("gg.essential:Vigilance:140-10809-SNAPSHOT") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
