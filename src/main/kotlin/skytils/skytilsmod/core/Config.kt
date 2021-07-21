@@ -1092,8 +1092,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         type = PropertyType.SWITCH, name = "Soul Eater Bonus",
         description = "Shows the current Soul Eater bonus from the last mob kill.",
         category = "Miscellaneous", subcategory = "Items"
-    )
-    var showSoulEaterBonus = false*/
+    )*/
+    var showSoulEaterBonus = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Radioactive Bonus",
