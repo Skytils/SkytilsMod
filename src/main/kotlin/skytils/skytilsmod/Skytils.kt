@@ -37,6 +37,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -283,6 +284,21 @@ class Skytils {
         MayorInfo.fetchMayorData()
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
+    }
+
+    @Mod.EventHandler
+    fun onPostStartup(event: FMLLoadCompleteEvent) {
+        if (config.lastLaunchedVersion != VERSION) {
+            when (config.lastLaunchedVersion) {
+                "0" -> {
+                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
+                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                        PersistentSave.markDirty<GuiManager>()
+                    }
+                }
+            }
+        }
+        config.lastLaunchedVersion = VERSION
     }
 
     @SubscribeEvent

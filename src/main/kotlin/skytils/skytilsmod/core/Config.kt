@@ -70,6 +70,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var firstLaunch = true
 
     @Property(
+        type = PropertyType.TEXT, name = "Last Launched Skytils Version",
+        category = "General", subcategory = "Other",
+        hidden = true
+    )
+    var lastLaunchedVersion = "0"
+
+    @Property(
         type = PropertyType.SWITCH, name = "Config Button on Pause",
         description = "Adds a button to configure Skytils to the pause menu.",
         category = "General", subcategory = "Other"
