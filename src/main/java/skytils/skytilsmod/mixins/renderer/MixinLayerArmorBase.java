@@ -26,16 +26,18 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import skytils.skytilsmod.Skytils;
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.colors.CustomColor;
+
+import static skytils.skytilsmod.Skytils.getMc;
+
 
 @Mixin(LayerArmorBase.class)
 public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerRenderer<EntityLivingBase> {
@@ -46,6 +48,27 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
     @Shadow @Final protected static ResourceLocation ENCHANTED_ITEM_GLINT_RES;
 
     @Shadow public abstract T getArmorModel(int armorSlot);
+
+    @Shadow private float alpha;
+
+    @Unique
+    private float prevAlpha = alpha;
+
+    @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemArmor;getColor(Lnet/minecraft/item/ItemStack;)I"))
+    private void setAlpha(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {
+        if (Utils.inSkyblock && entitylivingbaseIn == getMc().thePlayer) {
+            this.prevAlpha = this.alpha;
+            this.alpha = Skytils.config.transparentArmorLayer;
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        }
+    }
+
+    @Dynamic
+    @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", shift = At.Shift.AFTER, ordinal = 1))
+    private void resetAlpha(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {
+        if (Utils.inSkyblock && entitylivingbaseIn == getMc().thePlayer) this.alpha = prevAlpha;
+    }
 
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/LayerArmorBase;renderGlint(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/model/ModelBase;FFFFFFF)V"), cancellable = true)
     private void replaceArmorGlint(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {

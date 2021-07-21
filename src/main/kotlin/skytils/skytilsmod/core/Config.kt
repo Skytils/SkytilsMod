@@ -1174,6 +1174,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var summoningEyeDisplay = false
 
     @Property(
+        type = PropertyType.PERCENT_SLIDER, name = "Transparent Armor Layer",
+        description = "Changes the transparency of your armor layer.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    @JvmField
+    var transparentArmorLayer = 1f
+
+    @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Transparent Head Layer",
         description = "Changes the transparency of your head layer.",
         category = "Miscellaneous", subcategory = "Other"
