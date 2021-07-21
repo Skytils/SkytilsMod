@@ -59,8 +59,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             }
         }
         if (!obj["filter"].isJsonNull) {
+            val adapter = gson.getAdapter(Filter::class.java)
             obj["filter"].asJsonObject.entrySet().forEach { element ->
-                filters.add(gson.fromJson(element.value.asString, Filter::class.java))
+                filters.add(adapter.fromJsonTree(element.value))
             }
         }
     }
@@ -76,8 +77,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
         obj.add("default", defaultObj)
         val filterObj = JsonObject()
+        val adapter = gson.getAdapter(Filter::class.java)
         filters.forEach {
-            filterObj.addProperty(it.name, gson.toJson(it))
+            filterObj.add(it.name, adapter.toJsonTree(it))
         }
         obj.add("filter", filterObj)
         gson.toJson(obj, writer)
