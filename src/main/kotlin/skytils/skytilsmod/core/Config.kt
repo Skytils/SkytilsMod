@@ -199,7 +199,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR, name = "Score Calculation Method",
-        description = "New method requires Dungeon Rooms Mod version 2.",
+        description = "New method requires Dungeon Rooms Mod version 2.0",
         category = "Dungeons", subcategory = "Score Calculation",
         options = ["Old", "New"]
     )

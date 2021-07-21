@@ -80,6 +80,8 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.awt.Desktop
 import java.io.File
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.MethodType
 import java.net.URL
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
@@ -239,8 +241,13 @@ class Skytils {
 
         if (usingDungeonRooms && Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2")) {
             runCatching {
-                ScoreCalculation.drmRoomScanMethod =
-                    Class.forName("io.github.quantizr.utils.Utils").getDeclaredMethod("roomList")
+                Class.forName("io.github.quantizr.utils.Utils").also {
+                    ScoreCalculation.drmRoomScanMethod = MethodHandles.publicLookup().findStatic(
+                        it, "roomList", MethodType.methodType(
+                            List::class.java
+                        )
+                    )
+                }
             }
         }
 

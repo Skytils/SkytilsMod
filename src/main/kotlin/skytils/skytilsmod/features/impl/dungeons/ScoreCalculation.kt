@@ -46,7 +46,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.lang.reflect.Method
+import java.lang.invoke.MethodHandle
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 import kotlin.math.floor
@@ -78,7 +78,7 @@ object ScoreCalculation {
     var crypts = 0
     var mimicKilled = false
 
-    var drmRoomScanMethod: Method? = null
+    var drmRoomScanMethod: MethodHandle? = null
 
     fun roomScanCallback(list: List<String>) {
         if (Skytils.config.scoreCalculationMethod != 1) return
@@ -191,7 +191,7 @@ object ScoreCalculation {
                             Skytils.threadPool.submit {
                                 @Suppress("UNCHECKED_CAST")
                                 roomScanCallback(
-                                    drmRoomScanMethod!!.invoke(null) as List<String>
+                                    drmRoomScanMethod!!.invokeExact() as List<String>
                                 )
                             }
                             ticks = 0
