@@ -313,7 +313,8 @@ class Skytils {
         }
 
         if (mc.thePlayer != null && sendMessageQueue.size > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(sendMessageQueue.removeFirst())
+            val msg = sendMessageQueue.removeFirst()
+            if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(sendMessageQueue.removeFirst())
         }
 
         if (ticks % 20 == 0) {
@@ -329,7 +330,7 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent){
+    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         Utils.isOnHypixel = false
         Utils.inSkyblock = false
         Utils.inDungeons = false
