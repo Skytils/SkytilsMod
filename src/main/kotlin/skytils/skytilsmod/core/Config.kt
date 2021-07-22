@@ -199,9 +199,9 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR, name = "Score Calculation Method",
-        description = "New method requires Dungeon Rooms Mod version 2.0",
+        description = "\"Special\" method only works with Dungeon Rooms Mod v2.0.0, for ANY other version use \"Standard\"\n§c\"Special\" method is use at your own risk.",
         category = "Dungeons", subcategory = "Score Calculation",
-        options = ["Old", "New"]
+        options = ["Standard", "Special"]
     )
     var scoreCalculationMethod = 0
 
