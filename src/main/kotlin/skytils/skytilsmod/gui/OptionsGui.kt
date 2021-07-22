@@ -90,6 +90,14 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }.onMouseClick {
             mc.displayGuiScreen(EnchantNamesGui())
         }
+        SimpleButton("Open Config Folder").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            Desktop.getDesktop().open(Skytils.modDir)
+        }
         SimpleButton("Discord").childOf(window).constrain {
             x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
             y = basicYConstraint { window.getHeight() - this.getHeight() - 3 }
