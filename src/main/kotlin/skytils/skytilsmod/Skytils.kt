@@ -239,15 +239,19 @@ class Skytils {
         usingLabymod = Loader.isModLoaded("labymod")
         usingNEU = Loader.isModLoaded("notenoughupdates")
 
-        if (usingDungeonRooms && Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2")) {
-            runCatching {
-                Class.forName("io.github.quantizr.utils.Utils").also {
-                    ScoreCalculation.drmRoomScanMethod = MethodHandles.publicLookup().findStatic(
-                        it, "roomList", MethodType.methodType(
-                            List::class.java
+        if (usingDungeonRooms) {
+            if (Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2.0")) {
+                runCatching {
+                    Class.forName("io.github.quantizr.utils.Utils").also {
+                        ScoreCalculation.drmRoomScanMethod = MethodHandles.publicLookup().findStatic(
+                            it, "roomList", MethodType.methodType(
+                                List::class.java
+                            )
                         )
-                    )
+                    }
                 }
+            } else {
+                config.scoreCalculationMethod = 0;
             }
         }
 
