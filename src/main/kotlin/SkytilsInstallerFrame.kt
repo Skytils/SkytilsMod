@@ -547,24 +547,6 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
         }
     }
 
-    private fun getOperatingSystem(): OperatingSystem {
-        val osName = System.getProperty("os.name").lowercase()
-        if (osName.contains("win")) {
-            return OperatingSystem.WINDOWS
-
-        } else if (osName.contains("mac")) {
-            return OperatingSystem.MACOS
-
-        } else if (osName.contains("solaris") || osName.contains("sunos")) {
-
-            return OperatingSystem.SOLARIS
-        } else if (osName.contains("linux") || osName.contains("unix")) {
-
-            return OperatingSystem.LINUX
-        }
-        return OperatingSystem.UNKNOWN
-    }
-
     fun centerFrame(frame: JFrame) {
         val rectangle = frame.bounds
         val screenSize = Toolkit.getDefaultToolkit().screenSize
@@ -582,14 +564,6 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
 
     private fun showErrorMessage(message: String) {
         JOptionPane.showMessageDialog(null, message, "Skytils - Error", JOptionPane.ERROR_MESSAGE)
-    }
-
-    enum class OperatingSystem {
-        LINUX,
-        SOLARIS,
-        WINDOWS,
-        MACOS,
-        UNKNOWN
     }
 
     private fun getVersionFromMcmodInfo(): String {
@@ -669,6 +643,25 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
             }
         }
 
+        @JvmStatic
+        fun getOperatingSystem(): OperatingSystem {
+            val osName = System.getProperty("os.name").lowercase()
+            if (osName.contains("win")) {
+                return OperatingSystem.WINDOWS
+
+            } else if (osName.contains("mac")) {
+                return OperatingSystem.MACOS
+
+            } else if (osName.contains("solaris") || osName.contains("sunos")) {
+
+                return OperatingSystem.SOLARIS
+            } else if (osName.contains("linux") || osName.contains("unix")) {
+
+                return OperatingSystem.LINUX
+            }
+            return OperatingSystem.UNKNOWN
+        }
+
         private fun getStacktraceText(ex: Throwable): String {
             val stringWriter = StringWriter()
             ex.printStackTrace(PrintWriter(stringWriter))
@@ -688,5 +681,13 @@ class SkytilsInstallerFrame : JFrame(), ActionListener, MouseListener {
             errorScrollPane.preferredSize = Dimension(600, 400)
             JOptionPane.showMessageDialog(null, errorScrollPane, "Error", JOptionPane.ERROR_MESSAGE)
         }
+    }
+
+    enum class OperatingSystem {
+        LINUX,
+        SOLARIS,
+        WINDOWS,
+        MACOS,
+        UNKNOWN
     }
 }

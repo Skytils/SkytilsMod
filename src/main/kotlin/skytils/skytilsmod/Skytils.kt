@@ -32,7 +32,6 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
@@ -78,11 +77,9 @@ import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import java.awt.Desktop
 import java.io.File
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
-import java.net.URL
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 
@@ -143,16 +140,6 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
-        // Must use reflection otherwise the "constant" value will be inlined by compiler
-        val forgeVersion = runCatching {
-            ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
-        }.onFailure { it.printStackTrace() }.getOrDefault(2318)
-        // Asbyth's forge fork uses version 0
-        if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
-            Desktop.getDesktop()
-                .browse(URL("https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html").toURI())
-            throw RuntimeException("Skytils can't run on this Minecraft Forge version! Please use the latest Forge build 2318 for 1.8.9.")
-        }
         if (!modDir.exists()) modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()

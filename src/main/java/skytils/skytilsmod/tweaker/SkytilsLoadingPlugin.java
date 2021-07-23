@@ -81,6 +81,8 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "ask for support in the Discord." +
         "</p></html>";
 
+    private final SkytilsLoadingPluginKt kotlinPlugin;
+
     public SkytilsLoadingPlugin() {
         if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
             showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
@@ -103,31 +105,32 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             exit();
         } catch (ClassNotFoundException ignored) {
         }
+        kotlinPlugin = new SkytilsLoadingPluginKt();
     }
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return kotlinPlugin.getASMTransformerClass();
     }
 
     @Override
     public String getModContainerClass() {
-        return null;
+        return kotlinPlugin.getModContainerClass();
     }
 
     @Override
     public String getSetupClass() {
-        return null;
+        return kotlinPlugin.getSetupClass();
     }
 
     @Override
     public void injectData(Map<String, Object> data) {
-
+        kotlinPlugin.injectData(data);
     }
 
     @Override
     public String getAccessTransformerClass() {
-        return null;
+        return kotlinPlugin.getAccessTransformerClass();
     }
 
     private void showMessage(String errorMessage) {
@@ -191,7 +194,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     /**
      * Bypasses forges security manager to exit the jvm
      */
-    private void exit() {
+    public static void exit() {
         try {
             Class<?> clazz = Class.forName("java.lang.Shutdown");
             Method m_exit = clazz.getDeclaredMethod("exit", int.class);
