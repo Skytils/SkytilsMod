@@ -86,14 +86,14 @@ class MinionFeatures {
                                     val secondUpgrade = inventory.getStackInSlot(46)
                                     if (firstUpgrade != null) {
                                         if (firstUpgrade.displayName.stripControlCodes()
-                                                .contains("Super Compactor 3000")
+                                                .contains("Super Compactor")
                                         ) {
                                             blockUnenchanted = true
                                         }
                                     }
                                     if (secondUpgrade != null) {
                                         if (secondUpgrade.displayName.stripControlCodes()
-                                                .contains("Super Compactor 3000")
+                                                .contains("Super Compactor")
                                         ) {
                                             blockUnenchanted = true
                                         }
