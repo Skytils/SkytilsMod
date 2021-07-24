@@ -67,7 +67,10 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
     @Dynamic
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", shift = At.Shift.AFTER, ordinal = 1))
     private void resetAlpha(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {
-        if (modifiedAlpha) this.alpha = 1f;
+        if (modifiedAlpha) {
+            this.alpha = 1f;
+            modifiedAlpha = false;
+        }
     }
 
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/LayerArmorBase;renderGlint(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/model/ModelBase;FFFFFFF)V"), cancellable = true)
