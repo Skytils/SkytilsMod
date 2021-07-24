@@ -17,10 +17,7 @@
  */
 package skytils.skytilsmod.commands
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -71,17 +68,17 @@ object SkytilsCommand : CommandBase() {
         return emptyList()
     }
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(sender: ICommandSender, args: Array<String>): Unit = runBlocking {
         val player = sender as EntityPlayerSP
         if (args.isEmpty()) {
             Skytils.displayScreen = OptionsGui()
-            return
+            return@runBlocking
         }
         when (args[0].lowercase()) {
             "setkey" -> {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("§c§l[ERROR] §8» §cPlease provide your Hypixel API key!"))
-                    return
+                    return@runBlocking
                 }
                 Skytils.threadPool.submit {
                     val apiKey = args[1]
@@ -131,7 +128,7 @@ object SkytilsCommand : CommandBase() {
             "reload" -> {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("/skytils reload <aliases/data/slayer>"))
-                    return
+                    return@runBlocking
                 } else {
                     when (args[1].lowercase()) {
                         "data" -> {
@@ -187,7 +184,7 @@ object SkytilsCommand : CommandBase() {
                         """.trimMargin("#")
                     )
                 )
-                return
+                return@runBlocking
             }
             "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen =
                 CommandAliasesGui()
@@ -202,7 +199,7 @@ object SkytilsCommand : CommandBase() {
             "swaphub" -> {
                 if (Utils.inSkyblock) {
                     Skytils.sendMessageQueue.add("/warpforge")
-                    CoroutineScope(Dispatchers.Default).launch {
+                    withContext(Dispatchers.Default) {
                         delay(2000)
                         Skytils.sendMessageQueue.add("/warp ${args.getOrNull(1) ?: "hub"}")
                     }
@@ -214,7 +211,7 @@ object SkytilsCommand : CommandBase() {
             "dev" -> {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("/skytils dev <toggle>"))
-                    return
+                    return@runBlocking
                 } else {
                     DevTools.toggle(args[1])
                     player.addChatMessage(
@@ -235,7 +232,7 @@ object SkytilsCommand : CommandBase() {
                 try {
                     thread(block = UpdateChecker.updateGetter::run).join()
                     if (UpdateChecker.updateGetter.updateObj == null) {
-                        return player.addChatMessage(ChatComponentText("§b§lSkytils §r§8➡ §cNo new update found"))
+                        return@runBlocking player.addChatMessage(ChatComponentText("§b§lSkytils §r§8➡ §cNo new update found"))
                     }
                     val message = ChatComponentText(
                         "§b§lSkytils §r§8➜ §7Update for version ${
@@ -266,18 +263,18 @@ object SkytilsCommand : CommandBase() {
                             )
                         )
                     )
-                    return player.addChatMessage(message)
+                    return@runBlocking player.addChatMessage(message)
                 } catch (ex: InterruptedException) {
                     ex.printStackTrace()
                 }
             }
             "updatenow" -> {
                 Skytils.displayScreen = UpdateGui(true)
-                return
+                return@runBlocking
             }
             "updatelater" -> {
                 Skytils.displayScreen = UpdateGui(false)
-                return
+                return@runBlocking
             }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
