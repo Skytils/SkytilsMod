@@ -50,6 +50,12 @@ object DataFetcher {
                 FarmingFeatures.hungerHikerItems[key] = value.asString
             }
             val levelingData = APIUtil.getJSONResponse("${dataUrl}constants/levelingxp.json")
+            for ((key, value) in levelingData.get("default_skill_caps").asJsonObject.entrySet()) {
+                SkillUtils.maxSkillLevels[key] = value.asInt
+            }
+            for ((key, value) in levelingData.get("leveling_xp").asJsonObject.entrySet()) {
+                SkillUtils.skillXp[key.toInt()] = value.asLong
+            }
             for ((key, value) in levelingData.get("dungeoneering_xp").asJsonObject.entrySet()) {
                 SkillUtils.dungeoneeringXp[key.toInt()] = value.asLong
             }

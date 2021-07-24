@@ -27,3 +27,13 @@ fun String?.containsAny(vararg sequences: CharSequence?): Boolean {
     if (this == null) return false
     return sequences.any { it != null && this.contains(it) }
 }
+
+fun String.toDashedUUID(): String {
+    return buildString {
+        append(this@toDashedUUID)
+        insert(20, "-")
+        insert(16, "-")
+        insert(12, "-")
+        insert(8, "-")
+    }
+}
