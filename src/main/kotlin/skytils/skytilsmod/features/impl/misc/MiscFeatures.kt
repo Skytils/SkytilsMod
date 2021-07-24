@@ -546,4 +546,33 @@ class MiscFeatures {
             Skytils.guiManager.registerElement(this)
         }
     }
+
+    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", FloatPair(50, 60)) {
+        override fun render() {
+            //This is a placeholder
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "Item Name",
+                0f,
+                0f,
+                CommonColors.WHITE,
+                TextAlignment.MIDDLE,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = fr.FONT_HEIGHT
+        override val width: Int
+            get() = fr.getStringWidth("Item Name")
+
+        override val toggled: Boolean
+            get() = Skytils.config.moveableItemNameHighlight
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
 }

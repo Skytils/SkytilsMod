@@ -59,7 +59,7 @@ abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
         get() = width * scale
 
     companion object {
-        private val sr = ScaledResolution(Minecraft.getMinecraft())
+        val sr = ScaledResolution(Minecraft.getMinecraft())
         val fr = ScreenRenderer.fontRenderer
     }
 
