@@ -230,7 +230,7 @@ class SlayerFeatures {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
             val packet = event.packet
-            if (slayerEntity != null && Skytils.config.slayerMinibossSpawnAlert && packet.soundName == "random.explode" && packet.volume == 0.6f && packet.pitch == 9 / 7f && GuiManager.title != "§cMINIBOSS") {
+            if (slayerEntity == null && Skytils.config.slayerMinibossSpawnAlert && packet.soundName == "random.explode" && packet.volume == 0.6f && packet.pitch == 9 / 7f && GuiManager.title != "§cMINIBOSS") {
                 createTitle("§cMINIBOSS", 20)
             }
         }
