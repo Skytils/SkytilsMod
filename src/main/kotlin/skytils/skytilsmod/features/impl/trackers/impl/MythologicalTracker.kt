@@ -188,7 +188,7 @@ class MythologicalTracker : Tracker("mythological") {
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
                 if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
-                if (!extraAttr.hasKey("timestamp")) return
+                if (!extraAttr.hasKey("timestamp")) return printDevMessage("tracker", "$extraAttr")
                 val time = ZonedDateTime.from(
                     DateTimeFormatter.ofPattern("M/d/yy h:mm a").withZone(
                         ZoneId.of("America/New_York")
@@ -240,8 +240,9 @@ class MythologicalTracker : Tracker("mythological") {
     }
 
     override fun resetLoot() {
-        BurrowDrop.values().onEach { it.droppedTimes = 0L }
-        BurrowMob.values().onEach { it.dugTimes = 0L }
+        burrowsDug = 0L
+        BurrowDrop.values().forEach { it.droppedTimes = 0L }
+        BurrowMob.values().forEach { it.dugTimes = 0L }
     }
 
     override fun read(reader: FileReader) {
