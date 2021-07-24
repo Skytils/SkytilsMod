@@ -263,7 +263,7 @@ class MiscFeatures {
                         block.up(
                             it
                         )
-                    ).block != Blocks.air
+                    ).block.material.isSolid
                 }) {
                 val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
