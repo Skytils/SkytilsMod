@@ -35,6 +35,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 import kotlin.math.roundToInt
 
 class DungeonTimer {
@@ -42,6 +43,7 @@ class DungeonTimer {
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || event.type.toInt() == 2) return
         val message = event.message.formattedText
+        val unformatted = event.message.unformattedText.stripControlCodes()
         when {
             scoreShownAt == -1L && message.contains("§r§fTeam Score: §r") -> {
                 scoreShownAt = System.currentTimeMillis()
@@ -70,10 +72,15 @@ class DungeonTimer {
                     )
                 )
             }
-            bloodClearTime != -1L && bossEntryTime == -1L && (message.startsWith("§r§c[BOSS] ") && !message.contains(" The Watcher§r§f:") || message.startsWith(
-                "§r§4[BOSS] "
-            )) -> {
-                bossEntryTime = System.currentTimeMillis()
+            bloodClearTime != -1L && bossEntryTime == -1L && unformatted.startsWith("[BOSS] ") && unformatted.contains(":") -> {
+                val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
+                if (bossName != "The Watcher" && DungeonFeatures.dungeonFloor != null && Utils.checkBossName(
+                        DungeonFeatures.dungeonFloor!!,
+                        bossName
+                    )
+                ) {
+                    bossEntryTime = System.currentTimeMillis()
+                }
             }
             bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r") -> {
                 bossClearTime = System.currentTimeMillis()
