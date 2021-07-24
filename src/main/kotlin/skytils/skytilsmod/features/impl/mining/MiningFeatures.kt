@@ -83,7 +83,7 @@ class MiningFeatures {
     }
 
     private val xyzPattern: Pattern =
-        Pattern.compile(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}),? (?<y>[0-9]{1,3}),? (?<z>[0-9]{1,3}).*")
+        Pattern.compile(".*?(?<user>[a-zA-Z0-9_]{3,16}):.*?(?<x>[0-9]{1,3}),? (?:y: )?(?<y>[0-9]{1,3}),? (?:z: )?(?<z>[0-9]{1,3}).*?")
     private val xzPattern: Pattern =
         Pattern.compile(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}),? (?<z>[0-9]{1,3}).*")
 
