@@ -52,12 +52,12 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
     @Shadow private float alpha;
 
     @Unique
-    private float prevAlpha = alpha;
+    private boolean modifiedAlpha = false;
 
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemArmor;getColor(Lnet/minecraft/item/ItemStack;)I"))
     private void setAlpha(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {
         if (Utils.inSkyblock && entitylivingbaseIn == getMc().thePlayer) {
-            this.prevAlpha = this.alpha;
+            modifiedAlpha = true;
             this.alpha = Skytils.config.transparentArmorLayer;
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
@@ -67,7 +67,7 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
     @Dynamic
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", shift = At.Shift.AFTER, ordinal = 1))
     private void resetAlpha(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {
-        if (Utils.inSkyblock && entitylivingbaseIn == getMc().thePlayer) this.alpha = prevAlpha;
+        if (modifiedAlpha) this.alpha = 1f;
     }
 
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/LayerArmorBase;renderGlint(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/model/ModelBase;FFFFFFF)V"), cancellable = true)
