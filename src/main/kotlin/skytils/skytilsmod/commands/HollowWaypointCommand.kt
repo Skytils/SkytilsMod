@@ -70,7 +70,7 @@ object HollowWaypointCommand : CommandBase() {
             }
             if (MiningFeatures.minesLoc.exists()) {
                 message.appendSibling(ChatComponentText("§9Mines of Divan "))
-                message.appendSibling(copyMessage("Lost Precursor City: " + MiningFeatures.minesLoc.toString()))
+                message.appendSibling(copyMessage("Mines of Divan: " + MiningFeatures.minesLoc.toString()))
                 message.appendSibling(removeMessage("/skytilshollowwaypoint remove internal_mines"))
             }
             if (MiningFeatures.balLoc.exists()) {
