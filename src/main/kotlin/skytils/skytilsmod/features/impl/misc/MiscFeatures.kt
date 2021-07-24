@@ -575,4 +575,33 @@ class MiscFeatures {
             Skytils.guiManager.registerElement(this)
         }
     }
+
+    object ActionBarDummy : GuiElement("Action Bar", FloatPair(50, 70)) {
+        override fun render() {
+            //This is a placeholder
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "Action Bar",
+                0f,
+                0f,
+                CommonColors.WHITE,
+                TextAlignment.MIDDLE,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = fr.FONT_HEIGHT
+        override val width: Int
+            get() = fr.getStringWidth("Action Bar")
+
+        override val toggled: Boolean
+            get() = Skytils.config.moveableActionBar
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
 }

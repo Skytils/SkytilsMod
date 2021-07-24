@@ -53,4 +53,13 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
             args.set(2, element.getActualY());
         }
     }
+
+    @ModifyArgs(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"), remap = false)
+    private void modifyActionBarPosition(Args args) {
+        if (Skytils.config.moveableActionBar && Utils.inSkyblock) {
+            GuiElement element = MiscFeatures.ActionBarDummy.INSTANCE;
+            args.set(0, element.getActualX());
+            args.set(1, element.getActualY() + 4f);
+        }
+    }
 }

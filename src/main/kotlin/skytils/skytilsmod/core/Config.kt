@@ -1347,6 +1347,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var middleClickGUIItems = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Moveable Action Bar",
+        description = "Allows you to move the action bar as if it were a Skytils HUD element.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    @JvmField
+    var moveableActionBar = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Moveable Item Name Highlight",
         description = "Allows you to move the item name highlight as if it were a Skytils HUD element.",
         category = "Miscellaneous", subcategory = "Quality of Life"
