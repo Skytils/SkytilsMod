@@ -447,7 +447,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Combo
-                unformatted.contains("Combo") -> {
+                unformatted.contains(" Combo") -> {
                     when (Skytils.config.comboHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
                         3 -> {
@@ -518,7 +518,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Cooldown
-                unformatted.contains("cooldown") -> {
+                unformatted.contains(" cooldown") -> {
                     when (Skytils.config.cooldownHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.cooldownHider == 2)
                     }
