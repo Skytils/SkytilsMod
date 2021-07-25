@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.commands
 
+import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -140,6 +141,7 @@ object HollowWaypointCommand : CommandBase() {
                             }
                             else -> MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
                         }
+                        UChat.chat("§aSuccessfully created waypoint ${args[1]}")
                     } else
                         Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint set name <x y z>"))
                 }
@@ -154,6 +156,7 @@ object HollowWaypointCommand : CommandBase() {
                             "internal_fairy" -> MiningFeatures.fairyLoc.reset()
                             else -> MiningFeatures.waypoints.remove(args[1])
                         }
+                        UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
                     } else
                         Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint remove name/clear"))
                 }
@@ -165,6 +168,7 @@ object HollowWaypointCommand : CommandBase() {
                     MiningFeatures.balLoc.reset()
                     MiningFeatures.fairyLoc.reset()
                     MiningFeatures.waypoints.clear()
+                    UChat.chat("§aSuccessfully cleared all waypoints.")
                 }
                 else -> {
                     Minecraft.getMinecraft().thePlayer.addChatMessage(

@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.mining
 import gg.essential.universal.UGraphics
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -381,6 +382,9 @@ class MiningFeatures {
             if (Skytils.config.showGhosts && event.entity.maxHealth == 1024f && entity.powered) {
                 event.entity.isInvisible = false
             }
+        }
+        if (Skytils.config.crystalHollowWaypoints && event.entity is EntityOtherPlayerMP && event.entity.name == "Team Treasurite" && event.entity.baseMaxHealth == 1_000_000.0) {
+            waypoints["Corleone"] = event.entity.position
         }
     }
 
