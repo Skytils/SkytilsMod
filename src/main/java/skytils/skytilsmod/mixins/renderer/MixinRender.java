@@ -39,16 +39,6 @@ import skytils.skytilsmod.utils.Utils;
 
 @Mixin(Render.class)
 public abstract class MixinRender<T extends Entity> {
-    @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private void shouldRender(T livingEntity, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
-        try {
-            if (!(livingEntity instanceof EntityLiving)) if (MinecraftForge.EVENT_BUS.post(new CheckRenderEntityEvent<>(livingEntity, camera, camX, camY, camZ))) cir.setReturnValue(false);
-        } catch (Throwable e) {
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at CheckRenderEntityEvent. Please report this on the Discord server."));
-            e.printStackTrace();
-        }
-    }
-
     @Inject(method = "renderEntityOnFire", at = @At("HEAD"), cancellable = true)
     private void removeEntityOnFire(Entity entity, double x, double y, double z, float partialTicks, CallbackInfo ci) {
         if (Skytils.config.hideEntityFire && Utils.inSkyblock) {

@@ -19,13 +19,9 @@
 package skytils.skytilsmod.mixins.renderer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.monster.EntityGuardian;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,15 +30,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.events.CheckRenderEntityEvent;
 
-@Mixin(RenderLiving.class)
-public abstract class MixinRenderLiving<T extends EntityLiving> extends Render<T> {
-    protected MixinRenderLiving(RenderManager renderManager) {
-        super(renderManager);
-    }
+@Mixin(RenderManager.class)
+public class MixinRenderManager {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private void shouldRender(T livingEntity, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
+    private void shouldRender(Entity entityIn, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
         try {
-            if (!(livingEntity instanceof EntityGuardian)) if (MinecraftForge.EVENT_BUS.post(new CheckRenderEntityEvent<>(livingEntity, camera, camX, camY, camZ))) cir.setReturnValue(false);
+            if (MinecraftForge.EVENT_BUS.post(new CheckRenderEntityEvent<>(entityIn, camera, camX, camY, camZ))) cir.setReturnValue(false);
         } catch (Throwable e) {
             Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§cSkytils caught and logged an exception at CheckRenderEntityEvent. Please report this on the Discord server."));
             e.printStackTrace();

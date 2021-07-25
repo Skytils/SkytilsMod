@@ -108,22 +108,14 @@ shadowJar {
     relocate("org.apache.hc", "skytils.apacheorg.hc")
     relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
 
-    exclude "LICENSE.md"
-    exclude "LICENSE.txt"
-    exclude "LICENSE"
-    exclude "NOTICE"
-    exclude "NOTICE.txt"
+    exclude "**/LICENSE.md"
+    exclude "**/LICENSE.txt"
+    exclude "**/LICENSE"
+    exclude "**/NOTICE"
+    exclude "**/NOTICE.txt"
     exclude "pack.mcmeta"
     exclude "dummyThing"
     exclude "**/module-info.class"
-    exclude "*.so"
-    exclude "*.dylib"
-    exclude "*.dll"
-    exclude "*.jnilib"
-    exclude "ibxm/**"
-    exclude "com/jcraft/**"
-    exclude "org/lwjgl/**"
-    exclude "net/java/**"
 
     exclude "META-INF/proguard/**"
     exclude "META-INF/maven/**"
