@@ -2160,6 +2160,10 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
 
+        registerListener("apiKey") { key: String ->
+            Skytils.apiWrapper.key = key
+        }
+
         this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
 
         if (this.largerHeadScale > 2) {

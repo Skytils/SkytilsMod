@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.events
 
 import com.google.gson.JsonElement
+import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -33,6 +34,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.lang3.time.StopWatch
+import skytils.hylin.extension.getLatestProfileForMemberOrNull
+import skytils.hylin.extension.nonDashedString
+import skytils.hylin.request.HypixelAPIException
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -62,57 +66,45 @@ class GriffinBurrows {
         private val mc = Minecraft.getMinecraft()
         fun refreshBurrows(): Future<*> {
             return Skytils.threadPool.submit {
-                println("Finding burrows")
-                val uuid = mc.thePlayer.gameProfile.id.toString().replace("[\\-]".toRegex(), "")
-                val apiKey = Skytils.config.apiKey
-                if (apiKey.isEmpty()) {
-                    mc.thePlayer.addChatMessage(ChatComponentText("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>"))
-                    Skytils.config.showGriffinBurrows = false
-                    return@submit
+                try {
+                    println("Finding burrows")
+                    val uuid = mc.thePlayer.gameProfile.id
+                    val apiKey = Skytils.config.apiKey
+                    if (apiKey.isEmpty()) {
+                        UChat.chat("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>")
+                        Skytils.config.showGriffinBurrows = false
+                        return@submit
+                    }
+                    val burrowArray =
+                        Skytils.apiWrapper.getSkyblockProfilesSync(uuid).getLatestProfileForMemberOrNull(uuid)
+                    if (burrowArray == null) {
+                        UChat.chat("§c§lUnable to find your Skyblock Profile!")
+                        return@submit
+                    }
+                    val receivedBurrows = burrowArray.griffin.burrows.mapTo(ArrayList()) {
+                        Burrow(it.x, it.y, it.z, it.type, it.tier, it.chain)
+                    }
+
+                    dugBurrows.removeIf { dug: BlockPos ->
+                        receivedBurrows.none { burrow: Burrow -> burrow.blockPos == dug }
+                    }
+                    particleBurrows.removeIf { pb: ParticleBurrow? ->
+                        receivedBurrows.any { rb: Burrow -> rb.blockPos == pb!!.blockPos }
+                    }
+                    val removedDupes = receivedBurrows.removeIf { burrow: Burrow ->
+                        dugBurrows.contains(burrow.blockPos) || particleBurrows.any { pb: ParticleBurrow -> pb.dug && pb.blockPos == burrow.blockPos }
+                    }
+                    burrows.clear()
+                    burrows.addAll(receivedBurrows)
+                    particleBurrows.clear()
+                    if (receivedBurrows.size == 0) {
+                        if (!removedDupes) UChat.chat("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.") else UChat.chat(
+                            "§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."
+                        )
+                    } else UChat.chat("§aSkytils loaded §2${receivedBurrows.size}§a burrows!")
+                } catch (apiException: HypixelAPIException) {
+                    UChat.chat("Failed to get burrows with reason: ${apiException.message}")
                 }
-                val latestProfile = APIUtil.getLatestProfileID(uuid, apiKey) ?: return@submit
-                val profileResponse =
-                    APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$apiKey")
-                if (!profileResponse["success"].asBoolean) {
-                    val reason = profileResponse["cause"].asString
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed getting burrows with reason: " + reason))
-                    return@submit
-                }
-                val playerObject = profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid].asJsonObject
-                if (!playerObject.has("griffin")) {
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Failed getting burrows with reason: No griffin object."))
-                    return@submit
-                }
-                val burrowArray = playerObject["griffin"].asJsonObject["burrows"].asJsonArray
-                val receivedBurrows = ArrayList<Burrow>()
-                burrowArray.forEach { jsonElement: JsonElement ->
-                    val burrowObject = jsonElement.asJsonObject
-                    val x = burrowObject["x"].asInt
-                    val y = burrowObject["y"].asInt
-                    val z = burrowObject["z"].asInt
-                    val type = burrowObject["type"].asInt
-                    val tier = burrowObject["tier"].asInt
-                    val chain = burrowObject["chain"].asInt
-                    val burrow = Burrow(x, y, z, type, tier, chain)
-                    receivedBurrows.add(burrow)
-                }
-                dugBurrows.removeIf { dug: BlockPos ->
-                    receivedBurrows.none { burrow: Burrow -> burrow.blockPos == dug }
-                }
-                particleBurrows.removeIf { pb: ParticleBurrow? ->
-                    receivedBurrows.any { rb: Burrow -> rb.blockPos == pb!!.blockPos }
-                }
-                val removedDupes = receivedBurrows.removeIf { burrow: Burrow ->
-                    dugBurrows.contains(burrow.blockPos) || particleBurrows.any { pb: ParticleBurrow -> pb.dug && pb.blockPos == burrow.blockPos }
-                }
-                burrows.clear()
-                burrows.addAll(receivedBurrows)
-                particleBurrows.clear()
-                if (receivedBurrows.size == 0) {
-                    if (!removedDupes) mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.")) else mc.thePlayer.addChatMessage(
-                        ChatComponentText("§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs.")
-                    )
-                } else mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils loaded " + EnumChatFormatting.DARK_GREEN + receivedBurrows.size + EnumChatFormatting.GREEN + " burrows!"))
             }
         }
 
@@ -337,9 +329,8 @@ class GriffinBurrows {
         var z: Int,
         var hasFootstep: Boolean,
         var hasEnchant: Boolean,
-        type: Int
+        var type: Int
     ) {
-        var type = -1
         private var timestamp: Long
         var dug = false
 
@@ -404,7 +395,6 @@ class GriffinBurrows {
         }
 
         init {
-            this.type = type
             timestamp = System.currentTimeMillis()
         }
     }
