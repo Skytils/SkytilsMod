@@ -1647,6 +1647,38 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var hideOthersBrokenHeartRadiation = false
 
     @Property(
+        PropertyType.SWITCH, name = "Recolor Seraph Boss",
+        description = "Changes the color of your Seraph boss based on the phase it is in.\nBeacon takes priority over the other colors.",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    @JvmField
+    var recolorSeraphBoss = false
+
+    @Property(
+        PropertyType.COLOR, name = "Seraph Beacon Phase Color",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+        allowAlpha = false
+    )
+    @JvmField
+    var seraphBeaconPhaseColor = Color(255, 255, 255)
+
+    @Property(
+        PropertyType.COLOR, name = "Seraph Hits Phase Color",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+        allowAlpha = false
+    )
+    @JvmField
+    var seraphHitsPhaseColor = Color(255, 255, 255)
+
+    @Property(
+        PropertyType.COLOR, name = "Seraph Normal Phase Color",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+        allowAlpha = false
+    )
+    @JvmField
+    var seraphNormalPhaseColor = Color(255, 255, 255)
+
+    @Property(
         PropertyType.SWITCH, name = "Show Seraph Display",
         description = "§b[WIP] §rShows info about your current Voidgloom Seraph boss.",
         category = "Slayer", subcategory = "Voidgloom Seraph"
@@ -2117,6 +2149,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
         addDependency("yangGlyphColor", "highlightYangGlyph")
         addDependency("nukekebiHeadColor", "highlightNukekebiHeads")
+
+        listOf("seraphBeaconPhaseColor", "seraphHitsPhaseColor", "seraphNormalPhaseColor").forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         registerListener("protectItemBINThreshold") { threshold: String ->
             val numeric = threshold.replace(Regex("[^0-9]"), "")

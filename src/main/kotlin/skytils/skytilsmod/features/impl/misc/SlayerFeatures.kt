@@ -753,7 +753,7 @@ class SlayerFeatures {
         private var lastTickHasSlayerText = false
         var expectedMaxHp: Int? = null
         private val hitMap = HashMap<EntityEnderman, Int>()
-        private var yangGlyph: BlockPos? = null
+        var yangGlyph: BlockPos? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
 

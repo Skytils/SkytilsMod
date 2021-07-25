@@ -55,5 +55,8 @@
     "world.MixinChunk",
     "world.MixinWorld"
   ],
-  "verbose": true
+  "verbose": true,
+  "client": [
+    "renderer.MixinRendererLivingEntity"
+  ]
 }
