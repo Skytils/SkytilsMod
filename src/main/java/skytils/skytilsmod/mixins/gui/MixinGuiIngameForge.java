@@ -47,7 +47,7 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
 
             GuiElement element = MiscFeatures.ItemNameHighlightDummy.INSTANCE;
 
-            float x = ((element.getActualX() - element.getActualWidth() / 2)  - fr.getStringWidth(itemName)) / 2;
+            float x = element.getActualX() - fr.getStringWidth(itemName) / 2f;
 
             args.set(1, x);
             args.set(2, element.getActualY());
