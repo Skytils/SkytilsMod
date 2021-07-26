@@ -54,6 +54,7 @@ minecraft {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url "https://repo.sk1er.club/repository/maven-public/" }
@@ -74,7 +75,7 @@ dependencies {
     }
 
     implementation "org.apache.httpcomponents.client5:httpclient5:5.1"
-    implementation("com.github.Skytils:Hylin:dc8519502e279d6046b5ffcc7ac6f7f22a6a0efe") {
+    implementation("com.github.Skytils:Hylin:dc8519502e") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
         exclude module: "kotlinx-coroutines-core"
