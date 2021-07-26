@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = CrashReport.class, priority = 999)
+@Mixin(value = CrashReport.class, priority = 1001)
 public abstract class MixinCrashReport {
 
     public boolean isSkytilsCrash = false;

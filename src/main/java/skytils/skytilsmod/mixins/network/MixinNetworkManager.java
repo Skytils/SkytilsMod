@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.events.PacketEvent;
 
-@Mixin(value = NetworkManager.class, priority = 999)
+@Mixin(value = NetworkManager.class, priority = 1001)
 public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {

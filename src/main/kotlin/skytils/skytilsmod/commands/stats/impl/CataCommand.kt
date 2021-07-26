@@ -259,7 +259,7 @@ object CataCommand : StatCommand() {
                     .appendText(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
             )
         } catch (e: Throwable) {
-            printMessage("§Catacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
+            printMessage("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()
         }
     }

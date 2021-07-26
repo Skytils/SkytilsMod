@@ -49,7 +49,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
 
             if (SlayerFeatures.Companion.getYangGlyphEntity() != null || SlayerFeatures.Companion.getYangGlyph() != null) {
                 cir.setReturnValue(RenderUtilKt.withAlpha(Skytils.config.seraphBeaconPhaseColor, 169));
-            } else if (SlayerFeatures.Companion.getHasSlayerText() && Objects.requireNonNull(SlayerFeatures.Companion.getSlayerNameEntity()).getCustomNameTag().endsWith("Hits")) {
+            } else if (Objects.requireNonNull(SlayerFeatures.Companion.getSlayerNameEntity()).getCustomNameTag().endsWith("Hits")) {
                 cir.setReturnValue(RenderUtilKt.withAlpha(Skytils.config.seraphHitsPhaseColor, 169));
             } else cir.setReturnValue(RenderUtilKt.withAlpha(Skytils.config.seraphNormalPhaseColor, 169));
         }

@@ -75,7 +75,7 @@ dependencies {
     }
 
     implementation "org.apache.httpcomponents.client5:httpclient5:5.1"
-    implementation("com.github.Skytils:Hylin:6e070f7fde41e017543608dbca8708e267791513") {
+    implementation("com.github.Skytils:Hylin:6e070f7fde") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
         exclude module: "kotlinx-coroutines-core"

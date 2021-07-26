@@ -37,7 +37,7 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
         super(mcIn);
     }
 
-    @ModifyArgs(method = "renderToolHightlight", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/FontRenderer;drawStringWithShadow(Ljava/lang/String;FFI)I"), remap = false)
+    @ModifyArgs(method = "renderToolHightlight", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/FontRenderer;drawStringWithShadow(Ljava/lang/String;FFI)I"))
     private void modifyItemHighlightPosition(Args args) {
         if (Skytils.config.moveableItemNameHighlight && Utils.inSkyblock) {
             FontRenderer fr = highlightingItemStack.getItem().getFontRenderer(highlightingItemStack);
@@ -54,7 +54,7 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
         }
     }
 
-    @ModifyArgs(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"), remap = false)
+    @ModifyArgs(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"))
     private void modifyActionBarPosition(Args args) {
         if (Skytils.config.moveableActionBar && Utils.inSkyblock) {
             GuiElement element = MiscFeatures.ActionBarDummy.INSTANCE;
