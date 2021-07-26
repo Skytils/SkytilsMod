@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import net.minecraftforge.gradle.user.IReobfuscator
-import net.minecraftforge.gradle.user.TaskSingleReobf
 import net.minecraftforge.gradle.user.ReobfMappingType.SEARGE
+import net.minecraftforge.gradle.user.TaskSingleReobf
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("net.minecraftforge.gradle.forge") version "6f5327"
@@ -37,15 +37,19 @@ minecraft {
     mappings = "stable_22"
     makeObfSourceJar = false
     isGitVersion = false
-    clientJvmArgs.addAll(setOf(
-        "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-        "-Delementa.dev=true",
-        "-Delementa.debug=true"
-    ))
-    clientRunArgs.addAll(setOf(
-        "--tweakClass org.spongepowered.asm.launch.MixinTweaker",
-        "--mixin mixins.skytils.json"
-    ))
+    clientJvmArgs.addAll(
+        setOf(
+            "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+            "-Delementa.dev=true",
+            "-Delementa.debug=true"
+        )
+    )
+    clientRunArgs.addAll(
+        setOf(
+            "--tweakClass org.spongepowered.asm.launch.MixinTweaker",
+            "--mixin mixins.skytils.json"
+        )
+    )
 }
 
 repositories {
@@ -132,21 +136,21 @@ tasks {
         relocate("org.apache.hc", "skytils.apacheorg.hc")
         relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
 
-        exclude("**/LICENSE.md")
-        exclude("**/LICENSE.txt")
-        exclude("**/LICENSE")
-        exclude("**/NOTICE")
-        exclude("**/NOTICE.txt")
-        exclude("pack.mcmeta")
-        exclude("dummyThing")
-        exclude("**/module-info.class")
-
-        exclude("META-INF/proguard/**")
-        exclude("META-INF/maven/**")
-        exclude("META-INF/versions/**")
-        exclude("META-INF/com.android.tools/**")
-
-        exclude("fabric.mod.json")
+        exclude(
+            "**/LICENSE.md",
+            "**/LICENSE.txt",
+            "**/LICENSE",
+            "**/NOTICE",
+            "**/NOTICE.txt",
+            "pack.mcmeta",
+            "dummyThing",
+            "**/module-info.class",
+            "META-INF/proguard/**",
+            "META-INF/maven/**",
+            "META-INF/versions/**",
+            "META-INF/com.android.tools/**",
+            "fabric.mod.json"
+        )
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
