@@ -20,19 +20,32 @@ package skytils.skytilsmod.commands.stats.impl
 
 import com.google.gson.JsonObject
 import net.minecraft.util.ChatComponentText
+import skytils.hylin.extension.nonDashedString
+import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.commands.stats.StatCommand
+import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
+import java.util.*
 
 
-object SlayerCommand : StatCommand() {
+object SlayerCommand : StatCommand(needProfile = false) {
 
     override fun getCommandName(): String {
         return "skytilsslayer"
     }
 
-    override fun displayStats(username: String, uuid: String, profileData: JsonObject) {
-        val userData = profileData["profile"].asJsonObject["members"].asJsonObject[uuid].asJsonObject
+    override fun displayStats(username: String, uuid: UUID) {
+        val latestProfile: String = APIUtil.getLatestProfileID(uuid.nonDashedString(), key) ?: return
+
+        val profileResponse: JsonObject =
+            APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
+        if (!profileResponse["success"].asBoolean) {
+            printMessage("§cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
+            return
+        }
+
+        val userData = profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid.nonDashedString()].asJsonObject
         val slayersObject = userData["slayer_bosses"].asJsonObject
 
 

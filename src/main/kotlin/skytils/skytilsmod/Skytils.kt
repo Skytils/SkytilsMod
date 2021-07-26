@@ -21,7 +21,6 @@ package skytils.skytilsmod
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import gg.essential.vigilance.gui.SettingsGui
-import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiChat
@@ -44,8 +43,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import org.lwjgl.input.Mouse
-import skytils.hylin.HylinAPI
-import skytils.hylin.HylinAPI.Companion.NewHylinAPI
+import skytils.hylin.HylinAPI.Companion.createHylinAPI
 import skytils.skytilsmod.commands.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.commands.stats.impl.SlayerCommand
@@ -139,7 +137,7 @@ class Skytils {
         @JvmField
         val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
 
-        val apiWrapper = NewHylinAPI("")
+        val apiWrapper = createHylinAPI("", false)
     }
 
     @Mod.EventHandler

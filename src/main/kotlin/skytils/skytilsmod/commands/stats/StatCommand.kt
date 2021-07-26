@@ -17,14 +17,17 @@
  */
 package skytils.skytilsmod.commands.stats
 
-import com.google.gson.JsonObject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
+import skytils.hylin.extension.getLatestProfileForMemberOrNull
+import skytils.hylin.mojang.AshconException
+import skytils.hylin.request.HypixelAPIException
+import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.utils.APIUtil
+import java.util.*
 
 abstract class StatCommand(private val needApiKey: Boolean = true, private val needProfile: Boolean = true) :
     CommandBase() {
@@ -49,19 +52,20 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
         Skytils.threadPool.submit {
             val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
             printMessage("§aGetting data for ${username}...")
-            val uuid =
-                if (args.isEmpty()) mc.thePlayer.uniqueID.toString().replace("-", "") else APIUtil.getUUID(username)
-            if (uuid.isNullOrEmpty()) return@submit
+            val uuid = try {
+                (if (args.isEmpty()) mc.thePlayer.uniqueID else Skytils.apiWrapper.getUUIDSync(username))
+            } catch (e: AshconException) {
+                printMessage("§cFailed to get UUID, reason: ${e.message}")
+                return@submit
+            } ?: return@submit
             if (needProfile) {
-                val latestProfile: String = APIUtil.getLatestProfileID(uuid, key) ?: return@submit
-
-                val profileResponse: JsonObject =
-                    APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
-                if (!profileResponse["success"].asBoolean) {
-                    printMessage("§cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
+                val profile = try {
+                    Skytils.apiWrapper.getSkyblockProfilesSync(uuid).getLatestProfileForMemberOrNull(uuid)
+                } catch (e: HypixelAPIException) {
+                    printMessage("§cUnable to retrieve profile information: ${e.message}")
                     return@submit
-                }
-                displayStats(username, uuid, profileResponse)
+                } ?: return@submit
+                displayStats(username, uuid, profile)
             } else displayStats(username, uuid)
         }
     }
@@ -74,5 +78,11 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
         printMessage(ChatComponentText(msg))
     }
 
-    abstract fun displayStats(username: String, uuid: String, profileData: JsonObject = JsonObject())
+    protected open fun displayStats(username: String, uuid: UUID, profileData: Member) {
+        error("function displayStats for command ${this.commandName} is not initalized!")
+    }
+
+    protected open fun displayStats(username: String, uuid: UUID) {
+        error("function displayStats for command ${this.commandName} is not initalized!")
+    }
 }
