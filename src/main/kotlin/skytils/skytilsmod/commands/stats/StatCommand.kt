@@ -21,7 +21,6 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import skytils.hylin.extension.getLatestProfileForMemberOrNull
 import skytils.hylin.mojang.AshconException
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
@@ -60,7 +59,7 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
             } ?: return@submit
             if (needProfile) {
                 val profile = try {
-                    Skytils.apiWrapper.getSkyblockProfilesSync(uuid).getLatestProfileForMemberOrNull(uuid)
+                    Skytils.apiWrapper.getLatestSkyblockProfileForMemberSync(uuid)
                 } catch (e: HypixelAPIException) {
                     printMessage("§cUnable to retrieve profile information: ${e.message}")
                     return@submit

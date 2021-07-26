@@ -34,7 +34,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.lang3.time.StopWatch
-import skytils.hylin.extension.getLatestProfileForMemberOrNull
 import skytils.hylin.extension.nonDashedString
 import skytils.hylin.request.HypixelAPIException
 import skytils.skytilsmod.Skytils
@@ -76,7 +75,7 @@ class GriffinBurrows {
                         return@submit
                     }
                     val burrowArray =
-                        Skytils.apiWrapper.getSkyblockProfilesSync(uuid).getLatestProfileForMemberOrNull(uuid)
+                        Skytils.apiWrapper.getLatestSkyblockProfileForMemberSync(uuid)
                     if (burrowArray == null) {
                         UChat.chat("§c§lUnable to find your Skyblock Profile!")
                         return@submit
