@@ -69,7 +69,7 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("gg.essential:vigilance-1.8.9-forge:153") {
+    implementation("gg.essential:vigilance-1.8.9-forge:154") {
         exclude module: "kotlin-reflect"
         exclude module: "kotlin-stdlib-jdk8"
     }
