@@ -18,13 +18,11 @@
 
 package skytils.skytilsmod.mixins.patcher;
 
-import net.minecraft.client.gui.FontRenderer;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.Skytils;
 
@@ -36,11 +34,9 @@ import java.lang.invoke.MethodType;
 @Mixin(targets = "club.sk1er.patcher.hooks.FontRendererHook", remap = false)
 public class MixinFontRendererHook {
 
-    MethodHandle sbaOverridePatcher = null;
+    private static MethodHandle sbaOverridePatcher = null;
 
-    @Dynamic
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onCtor(FontRenderer fontRenderer, CallbackInfo ci) {
+    static {
         try {
             Class<?> sbaClass = Class.forName("codes.biscuit.skyblockaddons.asm.hooks.FontRendererHook");
             MethodType mt = MethodType.methodType(boolean.class, String.class);

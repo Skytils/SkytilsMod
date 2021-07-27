@@ -399,9 +399,18 @@ class Skytils {
             if (button != 0 && button != 1) return
             val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
             if (button == 0) {
-                val realText =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent?.formattedText
-                GuiScreen.setClipboardString(realText ?: chatLine.chatComponent.formattedText)
+                val component =
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent ?: chatLine.chatComponent
+                val realText = buildString {
+                    append(component.unformattedTextForChat)
+                    append("§r")
+                    component.siblings.forEach {
+                        append(it.unformattedTextForChat)
+                        append("§r")
+                    }
+                }
+
+                GuiScreen.setClipboardString(realText)
                 printDevMessage("Copied formatted message to clipboard!", "chat")
             } else {
                 val component =

@@ -55,10 +55,14 @@ minecraft {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url = uri("https://repo.spongepowered.org/repository/maven-public/") }
-    maven { url = uri("https://repo.sk1er.club/repository/maven-public/") }
-    maven { url = uri("https://repo.sk1er.club/repository/maven-releases/") }
-    maven { url = uri("https://jitpack.io") }
+    setOf(
+        "https://repo.spongepowered.org/repository/maven-public/",
+        "https://repo.sk1er.club/repository/maven-public/",
+        "https://repo.sk1er.club/repository/maven-releases/",
+        "https://jitpack.io"
+    ).forEach {
+        maven(it)
+    }
 }
 
 dependencies {
