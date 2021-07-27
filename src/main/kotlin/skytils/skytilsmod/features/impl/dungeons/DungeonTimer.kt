@@ -51,7 +51,7 @@ class DungeonTimer {
             (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
             }
-            message.endsWith("§r§ehas obtained §r§8Wither Key§r§e!§r") || message == "§r§eA §r§8Wither Key§r§e was picked up!§r" -> {
+            message.endsWith(" §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!§r") || message == "§r§eA §r§a§r§6§r§8Wither Key§r§e was picked up!§r" -> {
                 witherDoors++
             }
             bloodOpenTime == -1L && (message == "§r§cThe §r§lBLOOD DOOR§r§c has been opened!§r" || message.startsWith(
