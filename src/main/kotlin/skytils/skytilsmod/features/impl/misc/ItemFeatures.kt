@@ -384,6 +384,13 @@ class ItemFeatures {
             } else if (Skytils.config.showDungeonItemLevel && extraAttributes.hasKey("dungeon_item_level")) {
                 stackTip = extraAttributes.getInteger("dungeon_item_level").toString()
             }
+            if (extraAttributes.hasKey("pickonimbus_durability")) {
+                RenderUtil.drawDurabilityBar(
+                    event.x,
+                    event.y,
+                    extraAttributes.getInteger("pickonimbus_durability") / 5000.0
+                )
+            }
         }
         val lore = getItemLore(item)
         if (lore.isNotEmpty()) {

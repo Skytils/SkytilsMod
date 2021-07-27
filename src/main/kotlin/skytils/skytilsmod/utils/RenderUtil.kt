@@ -632,6 +632,36 @@ object RenderUtil {
             color.rgb
         )
     }
+
+    fun drawDurabilityBar(xPos: Int, yPos: Int, durability: Double) {
+        val j = (13.0 - durability * 13.0).roundToInt()
+        val i = (255.0 - durability * 255.0).roundToInt()
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableAlpha()
+        GlStateManager.disableBlend()
+        drawRect(xPos + 2, yPos + 13, 13, 2, 0, 0, 0, 255)
+        drawRect(xPos + 2, yPos + 13, 12, 1, (255 - i) / 4, 64, 0, 255)
+        drawRect(xPos + 2, yPos + 13, j, 1, 255 - i, i, 0, 255)
+        //GlStateManager.enableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
+    }
+
+    fun drawRect(x: Number, y: Number, width: Number, height: Number, red: Int, green: Int, blue: Int, alpha: Int) {
+        val tesselator = Tessellator.getInstance()
+        val renderer = tesselator.worldRenderer
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR)
+        renderer.pos(x.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
+        renderer.pos(x.toDouble(), y.toDouble() + height.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
+        renderer.pos(x.toDouble() + width.toDouble(), y.toDouble() + height.toDouble(), 0.0)
+            .color(red, green, blue, alpha).endVertex()
+        renderer.pos(x.toDouble() + width.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
+        tesselator.draw()
+    }
 }
 
 fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)

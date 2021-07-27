@@ -34,7 +34,6 @@ import skytils.skytilsmod.utils.Utils;
 @Mixin(SoundManager.class)
 public abstract class MixinSoundManager {
 
-
     @Inject(method = "getNormalizedVolume", at = @At("HEAD"), cancellable = true)
     private void bypassPlayerVolume(ISound sound, SoundPoolEntry entry, SoundCategory category, CallbackInfoReturnable<Float> cir) {
         if (Utils.shouldBypassVolume) cir.setReturnValue(1f);
