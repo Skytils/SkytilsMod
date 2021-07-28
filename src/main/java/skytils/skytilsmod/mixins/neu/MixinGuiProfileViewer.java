@@ -69,7 +69,7 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
 
     @Dynamic
     @Inject(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", remap = false, ordinal = 3), remap = false, locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void renderRarityOnInvPage3(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject inventoryInfo, int invNameIndex, ItemStack[][][] inventories, ItemStack[][] inventory, int inventoryRows, int invSizeY, int x, int y, boolean leftHovered, boolean rightHovered, ItemStack stackToRender, int overlay, int yIndex, int xIndex, ItemStack stack) {
+    private void renderRarityOnInvPage3(int mouseX, int mouseY, float partialTicks, CallbackInfo ci, JsonObject inventoryInfo, int invNameIndex, ItemStack[][][] inventories, ItemStack[][] inventory, int inventoryRows, int invSizeY, int x, int y, int staticSelectorHeight, boolean leftHovered, boolean rightHovered, ItemStack stackToRender, int overlay, int yIndex, int xIndex, ItemStack stack) {
         if (Skytils.config.showItemRarity) {
             RenderUtil.renderRarity(stack, x+8+xIndex*18, y+18+yIndex*18);
         }
