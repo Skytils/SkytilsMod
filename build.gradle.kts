@@ -28,7 +28,7 @@ plugins {
     id("org.spongepowered.mixin") version "d5f9873d60"
 }
 
-version = "1.0-pre20"
+version = "1.0-pre20.1"
 group = "skytils.skytilsmod"
 
 minecraft {

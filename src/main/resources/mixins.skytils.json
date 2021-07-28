@@ -51,6 +51,7 @@
     "renderer.MixinTileEntityChestRenderer",
     "renderer.MixinTileEntityItemStackRenderer",
     "renderer.MixinTileEntitySkullRenderer",
+    "util.MixinIChatComponent$Serializer",
     "util.MixinUtil",
     "world.MixinChunk",
     "world.MixinWorld"
