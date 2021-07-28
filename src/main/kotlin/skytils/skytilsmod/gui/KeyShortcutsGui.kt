@@ -31,11 +31,11 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
-import net.minecraft.client.settings.GameSettings
 import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.KeyShortcuts
 import skytils.skytilsmod.gui.components.SimpleButton
+import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 
 class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
@@ -108,7 +108,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
 
-        val keybindButton = SimpleButton(GameSettings.getKeyDisplayString(keyCode)).childOf(container).constrain {
+        val keybindButton = SimpleButton(Utils.getKeyDisplayStringSafe(keyCode)).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             height = 75.percent()
@@ -169,7 +169,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         for (item in components) {
             val button = item.value.button
             val keyCode = item.value.keyCode
-            button.text.setText(GameSettings.getKeyDisplayString(keyCode))
+            button.text.setText(Utils.getKeyDisplayStringSafe(keyCode))
             val pressed = clickedButton === item.value
             val reused =
                 keyCode != 0 && (mc.gameSettings.keyBindings.any { it.keyCode == keyCode } || components.any { it.value.keyCode != 0 && it !== item && it.value.keyCode == keyCode })

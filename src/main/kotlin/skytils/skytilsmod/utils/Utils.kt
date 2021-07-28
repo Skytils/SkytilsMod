@@ -23,6 +23,7 @@ import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.settings.GameSettings
 import net.minecraft.crash.CrashReportCategory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -270,6 +271,9 @@ object Utils {
                         """.trimMargin("#")
         }
     }
+
+    fun getKeyDisplayStringSafe(keyCode: Int) =
+        runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrElse { "#${keyCode}" }
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
