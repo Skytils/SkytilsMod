@@ -19,13 +19,18 @@
 package skytils.skytilsmod.mixins.crash;
 
 import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.utils.Utils;
 
 @Mixin(value = CrashReport.class, priority = 1001)
 public abstract class MixinCrashReport {
@@ -35,6 +40,8 @@ public abstract class MixinCrashReport {
     private boolean usingForCompleteReport = false;
 
     @Shadow public abstract String getCauseStackTraceOrString();
+
+    @Shadow @Final private CrashReportCategory theReportCategory;
 
     @Redirect(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 0))
     private StringBuilder blameSkytils(StringBuilder stringBuilder, String str) {
@@ -71,6 +78,11 @@ public abstract class MixinCrashReport {
             usingForCompleteReport = false;
             cir.setReturnValue("Skytils may have caused this crash. Please send the full report below by clicking \"View crash report\" to discord.gg/skytils in the #support channel. Taking a screenshot of this screen provides no information to any mod developers.\n\n" + getCauseStackTraceOrString());
         }
+    }
+
+    @Inject(method = "populateEnvironment", at = @At("RETURN"))
+    private void addDataToCrashReport(CallbackInfo ci) {
+        Utils.INSTANCE.generateDebugInfo(this.theReportCategory);
     }
 
 }

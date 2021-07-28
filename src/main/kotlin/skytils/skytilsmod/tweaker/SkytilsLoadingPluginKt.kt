@@ -20,6 +20,8 @@ package skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
 import net.minecraftforge.common.ForgeVersion
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.ICrashCallable
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.core5.http.io.entity.EntityUtils

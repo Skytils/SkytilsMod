@@ -23,6 +23,7 @@ import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.crash.CrashReportCategory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
@@ -32,6 +33,8 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.ICrashCallable
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -253,6 +256,19 @@ object Utils {
 
         // Livid has a prefix in front of the name, so we check ends with to cover all the livids
         return bossName.endsWith(correctBoss)
+    }
+
+    fun generateDebugInfo(crashReportCategory: CrashReportCategory) {
+        crashReportCategory.addCrashSectionCallable("Skytils Debug Info") {
+            val hasBetterFPS = runCatching {
+                Class.forName("me.guichaguri.betterfps.BetterFpsHelper").getDeclaredField("VERSION")
+                    .get(null) as String
+            }.getOrDefault("NONE")
+
+            return@addCrashSectionCallable """
+                            # BetterFPS: $hasBetterFPS
+                        """.trimMargin("#")
+        }
     }
 }
 
