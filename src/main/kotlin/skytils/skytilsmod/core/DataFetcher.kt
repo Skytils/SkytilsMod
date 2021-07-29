@@ -122,7 +122,7 @@ object DataFetcher {
                             "CONTAINS" -> SpamHider.FilterType.CONTAINS
                             "REGEX" -> SpamHider.FilterType.REGEX
                             else -> SpamHider.FilterType.CONTAINS
-                        }
+                        }, json["formatted"].asBoolean
                     )
                 )
             }

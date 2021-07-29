@@ -97,7 +97,8 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         var state: Int,
         var skyblockOnly: Boolean,
         private val initialPattern: String,
-        var type: FilterType
+        var type: FilterType,
+        var formatted: Boolean
     ) {
         var pattern: String = initialPattern
             set(value) {
@@ -225,7 +226,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
         filters.forEach {
             if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
-            if (it.check(formatted) && it.state > 0) {
+            if (it.check(if (it.formatted) formatted else unformatted) && it.state > 0) {
                 cancelChatPacket(event, it.state == 2)
                 return
             }
@@ -233,7 +234,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
         repoFilters.forEach {
             if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
-            if (it.check(formatted) && it.state > 0) {
+            if (it.check(if (it.formatted) formatted else unformatted) && it.state > 0) {
                 cancelChatPacket(event, it.state == 2)
                 return
             }

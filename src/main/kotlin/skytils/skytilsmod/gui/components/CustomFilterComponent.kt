@@ -127,6 +127,23 @@ class CustomFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UICo
                 x = basicXConstraint { skyblockOnly.getRight() + 5 }
                 y = basicYConstraint { skyblockOnly.getTop() + skyblockOnly.getHeight() / 2 - 5 }
             } childOf textBoundingBox
+
+        val formattedText by CheckboxComponent(filter.formatted)
+            .constrain {
+                x = 0.pixels()
+                y = SiblingConstraint(5f)
+
+            } childOf textBoundingBox
+
+        formattedText.onValueChange {
+            filter.formatted = it as Boolean
+        }
+
+        UIText("Formatted Text")
+            .constrain {
+                x = basicXConstraint { formattedText.getRight() + 5 }
+                y = basicYConstraint { formattedText.getTop() + formattedText.getHeight() / 2 - 5 }
+            } childOf textBoundingBox
     }
 
     init {
