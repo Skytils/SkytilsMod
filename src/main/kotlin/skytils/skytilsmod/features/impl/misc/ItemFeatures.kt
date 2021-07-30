@@ -388,7 +388,7 @@ class ItemFeatures {
                 RenderUtil.drawDurabilityBar(
                     event.x,
                     event.y,
-                    extraAttributes.getInteger("pickonimbus_durability") / 5000.0
+                    1 - extraAttributes.getInteger("pickonimbus_durability") / 5000.0
                 )
             }
         }
