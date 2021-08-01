@@ -1147,7 +1147,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH, name = "Auto Copy Rare Drops to Clipboard",
-        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
+        description = "Automatically copies rare drops to your clipboard.",
         category = "Miscellaneous", subcategory = "Other"
     )
     var autoCopyRareDrops = false
