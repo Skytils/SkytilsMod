@@ -128,13 +128,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var autoCopyFailToClipboard = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Copy Deaths to Clipboard",
-        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
-        category = "Dungeons", subcategory = "Miscellaneous"
-    )
-    var copyDeathToClipboard = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
         description = "Shows the amount of crypts destroyed on your HUD.",
         category = "Dungeons", subcategory = "HUD"
@@ -1144,6 +1137,20 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Miscellaneous", subcategory = "Minions"
     )
     var showMinionTier = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Copy Deaths to Clipboard",
+        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var copyDeathToClipboard = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Copy Rare Drops to Clipboard",
+        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var autoCopyRareDrops = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",

@@ -288,7 +288,7 @@ class DungeonFeatures {
                 if (deathFailMatcher.find()) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted)
-                        mc.thePlayer.addChatMessage(ChatComponentText("§aCopied death/fail to clipboard."))
+                        mc.thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied fail to clipboard."))
                     }
                     event.message.chatStyle
                         .setChatHoverEvent(

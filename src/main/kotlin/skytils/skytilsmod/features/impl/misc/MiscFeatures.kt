@@ -58,6 +58,7 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -147,6 +148,14 @@ class MiscFeatures {
                         ).chatClickEvent =
                         ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
 
+                }
+            }
+        }
+        if (Utils.inSkyblock) {
+            if (Skytils.config.autoCopyRareDrops) {
+                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.contains("§ehas obtained §r§7[Lvl 1] ")) {
+                    GuiScreen.setClipboardString(unformatted)
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied rare drop to clipboard."))
                 }
             }
         }

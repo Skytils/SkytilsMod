@@ -170,9 +170,11 @@ object SkytilsCommand : CommandBase() {
                             #  §3/skytils editlocations §l➡ §bOpens the location editing GUI.
                             #  §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
                             #  §3/skytils spamhider §l➡ §bOpens the command spam hider editing GUI.
+                            #  §3/skytils enchant §l➡ §bOpens a GUI allowing you to rename enchants.
                             # §9§l➜ Events:
                             #  §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯
                             #  §3/skytils fetchur §l➡ §bShows the item that Fetchur wants.
+                            #  §3/skytils resettracker §l➡ §bResets the specified tracker.
                             # §9§l➜ Color and Glint
                             #  §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)
                             #  §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item.
@@ -181,7 +183,8 @@ object SkytilsCommand : CommandBase() {
                             #  §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)
                             #  §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics. §a§o✯
                             #  §3/skytilsslayer <player> §l➡ §bShows information about a player's Slayer statistics. §a§o✯
-                            #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability." 
+                            #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability. §4Must have§c Item Cooldown Display§4 enabled to work"
+                            #  §3/skytilshollowwaypoint <set/remove/clear/help> <name> <x y z> §l➡ §bAllows to set waypoints while in the Crystal Hollows. §7(Alias: §f/sthw§7)"
                         """.trimMargin("#")
                     )
                 )
