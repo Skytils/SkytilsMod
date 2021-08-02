@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UChat
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -155,13 +156,13 @@ class MiscFeatures {
             if (Skytils.config.autoCopyRNGDrops) {
                 if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith("§r§6§lPET DROP! ") || formatted.contains("§ehas obtained §r§7[Lvl 1] ")) {
                     GuiScreen.setClipboardString(unformatted)
-                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied RNG drop to clipboard."))
+                    UChat.chat("§9§lSkytils §8» §aCopied RNG drop to clipboard.")
                 }
             }
             if (Skytils.config.autoCopyVeryRareDrops) {
                 if (formatted.startsWith("§r§9§lVERY RARE DROP! ")) {
                     GuiScreen.setClipboardString(unformatted)
-                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied very rare drop to clipboard."))
+                    UChat.chat("§9§lSkytils §8» §aCopied very rare drop to clipboard.")
                 }
             }
         }
