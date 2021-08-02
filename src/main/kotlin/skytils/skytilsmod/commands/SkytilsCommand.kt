@@ -183,7 +183,8 @@ object SkytilsCommand : CommandBase() {
                             #  §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)
                             #  §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics. §a§o✯
                             #  §3/skytilsslayer <player> §l➡ §bShows information about a player's Slayer statistics. §a§o✯
-                            #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability. §4Must have§c Item Cooldown Display§4 enabled to work"
+                            #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability.
+                            #  §4Must have§c Item Cooldown Display§4 enabled to work.
                             #  §3/skytilshollowwaypoint <set/remove/clear/help> <name> <x y z> §l➡ §bAllows to set waypoints while in the Crystal Hollows. §7(Alias: §f/sthw§7)"
                         """.trimMargin("#")
                     )
