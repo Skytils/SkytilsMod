@@ -154,7 +154,7 @@ class MiscFeatures {
         }
         if (Utils.inSkyblock) {
             if (Skytils.config.autoCopyRNGDrops) {
-                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith("§r§6§lPET DROP! ") || formatted.contains("§ehas obtained §r§7[Lvl 1] ")) {
+                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith("§r§6§lPET DROP! ") || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")) {
                     GuiScreen.setClipboardString(unformatted)
                     UChat.chat("§9§lSkytils §8» §aCopied RNG drop to clipboard.")
                 }
