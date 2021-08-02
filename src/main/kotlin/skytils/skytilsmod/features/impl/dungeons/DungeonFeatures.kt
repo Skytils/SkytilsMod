@@ -325,7 +325,7 @@ class DungeonFeatures {
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
-            mc.thePlayer.addChatMessage(ChatComponentText("§aCopied selected death/fail to clipboard."))
+            mc.thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied fail to clipboard."))
             GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length))
             event.isCanceled = true
         }
