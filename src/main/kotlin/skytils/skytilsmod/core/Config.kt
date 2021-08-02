@@ -1146,11 +1146,18 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var copyDeathToClipboard = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Auto Copy Rare Drops to Clipboard",
-        description = "Automatically copies rare drops to your clipboard.",
+        type = PropertyType.SWITCH, name = "Auto Copy RNG Drops to Clipboard",
+        description = "Automatically copies RNG drops to your clipboard.",
         category = "Miscellaneous", subcategory = "Other"
     )
-    var autoCopyRareDrops = false
+    var autoCopyRNGDrops = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Also Copy Very Rare Drops to Clipboard",
+        description = "Automatically copies very rare drops to your clipboard.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var autoCopyVeryRareDrops = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",
@@ -2112,6 +2119,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         initialize()
 
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
+
+        addDependency("autoCopyVeryRareDrops", "autoCopyRNGDrops")
 
         addDependency("itemRarityOpacity", "showItemRarity")
 

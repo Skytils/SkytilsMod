@@ -152,10 +152,16 @@ class MiscFeatures {
             }
         }
         if (Utils.inSkyblock) {
-            if (Skytils.config.autoCopyRareDrops) {
+            if (Skytils.config.autoCopyRNGDrops) {
                 if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith("§r§6§lPET DROP! ") || formatted.contains("§ehas obtained §r§7[Lvl 1] ")) {
                     GuiScreen.setClipboardString(unformatted)
-                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied rare drop to clipboard."))
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied RNG drop to clipboard."))
+                }
+            }
+            if (Skytils.config.autoCopyVeryRareDrops) {
+                if (formatted.startsWith("§r§9§lVERY RARE DROP! ")) {
+                    GuiScreen.setClipboardString(unformatted)
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied very rare drop to clipboard."))
                 }
             }
         }
