@@ -160,7 +160,7 @@ class MiscFeatures {
                 }
             }
             if (Skytils.config.autoCopyVeryRareDrops) {
-                if (formatted.startsWith("§r§9§lVERY RARE DROP! ")) {
+                if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
                     GuiScreen.setClipboardString(unformatted)
                     UChat.chat("§9§lSkytils §8» §aCopied very rare drop to clipboard.")
                 }
