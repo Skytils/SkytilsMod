@@ -25,6 +25,7 @@ import net.minecraft.command.WrongUsageException
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.Utils
 
 object RepartyCommand : CommandBase(), ICommand {
@@ -74,7 +75,7 @@ object RepartyCommand : CommandBase(), ICommand {
         if (!Utils.isOnHypixel) throw WrongUsageException("You must be on Hypixel to use this command.")
         if (args.isNotEmpty() && (args[0].startsWith("fail") || args[0] == "f")) {
             partyThread = Thread {
-                val player = Minecraft.getMinecraft().thePlayer
+                val player = mc.thePlayer
                 try {
                     Skytils.sendMessageQueue.add("/p " + java.lang.String.join(" ", repartyFailList))
                     val members = repartyFailList.joinToString(
@@ -126,7 +127,7 @@ ${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-------------------
         party.clear()
         repartyFailList.clear()
         partyThread = Thread {
-            val player = Minecraft.getMinecraft().thePlayer
+            val player = mc.thePlayer
             try {
                 Skytils.sendMessageQueue.add("/pl")
                 gettingParty = true

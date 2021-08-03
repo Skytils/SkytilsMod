@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.commands.stats.impl
 
+import gg.essential.universal.wrappers.message.UMessage
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import skytils.hylin.extension.getString
@@ -29,6 +30,7 @@ import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
 import skytils.skytilsmod.utils.Utils.timeFormat
+import skytils.skytilsmod.utils.append
 import java.util.*
 
 
@@ -88,22 +90,22 @@ object CataCommand : StatCommand() {
 
             val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
 
-            val component = ChatComponentText("§a➜ Catacombs Statistics Viewer\n")
-                .appendText(
+            val component = UMessage("§a➜ Catacombs Statistics Viewer\n")
+                .append(
                     "§2§l ❣ §7§oYou are looking at data for ${playerResponse.rankPrefix} ${
                         playerResponse.player.getString(
                             "displayname"
                         )
                     }§7§o.\n\n"
                 )
-                .appendText("§a§l➜ Catacombs Levels:\n")
-                .appendText("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
-                .appendText("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
-                .appendText("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n")
-                .appendText("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n")
-                .appendText("§b ✎ Mage Level: §l➡ §e${nf.format(mageLevel)}\n")
-                .appendText("§7 ❈ Tank Level: §l➡ §e${nf.format(tankLevel)}\n\n")
-                .appendText("§a§l➜ Floor Completions:\n")
+                .append("§a§l➜ Catacombs Levels:\n")
+                .append("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
+                .append("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
+                .append("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n")
+                .append("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n")
+                .append("§b ✎ Mage Level: §l➡ §e${nf.format(mageLevel)}\n")
+                .append("§7 ❈ Tank Level: §l➡ §e${nf.format(tankLevel)}\n\n")
+                .append("§a§l➜ Floor Completions:\n")
 
             val completionObj = cataData.completions
             val highestFloor = cataData.highestCompletion
@@ -126,7 +128,7 @@ object CataCommand : StatCommand() {
                     HoverEvent.Action.SHOW_TEXT,
                     ChatComponentText(completionsHoverString)
                 )
-                component.appendSibling(completions)
+                component.append(completions)
 
                 val fastestSTimes = cataData.fastestTimeS
                 if (fastestSTimes != null) {
@@ -145,7 +147,7 @@ object CataCommand : StatCommand() {
                         HoverEvent.Action.SHOW_TEXT,
                         ChatComponentText(fastestSHoverString)
                     )
-                    component.appendSibling(fastestS)
+                    component.append(fastestS)
                 }
 
 
@@ -166,7 +168,7 @@ object CataCommand : StatCommand() {
                         HoverEvent.Action.SHOW_TEXT,
                         ChatComponentText(fastestSPlusHoverString)
                     )
-                    component.appendSibling(fastestSPlus)
+                    component.append(fastestSPlus)
                 }
             }
 
@@ -177,7 +179,7 @@ object CataCommand : StatCommand() {
                 if (masterCompletionObj != null && highestMasterFloor != null) {
 
                     component
-                        .appendText("§a§l➜ Master Mode:\n")
+                        .append("§a§l➜ Master Mode:\n")
                     val masterCompletionsHoverString = buildString {
                         for (i in 1..highestMasterFloor) {
                             append("§2§l●§a ")
@@ -196,7 +198,7 @@ object CataCommand : StatCommand() {
                         ChatComponentText(masterCompletionsHoverString)
                     )
 
-                    component.appendSibling(masterCompletions)
+                    component.append(masterCompletions)
 
 
                     val masterFastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
@@ -222,7 +224,7 @@ object CataCommand : StatCommand() {
                             ChatComponentText("§cNo S Completions")
                         )
                     }
-                    component.appendSibling(masterFastestS)
+                    component.append(masterFastestS)
 
 
                     val masterFastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
@@ -249,15 +251,14 @@ object CataCommand : StatCommand() {
                             ChatComponentText("§cNo S+ Completions")
                         )
                     }
-                    component.appendSibling(masterFastestSPlus)
+                    component.append(masterFastestSPlus)
                 }
             }
 
-            printMessage(
-                component
-                    .appendText("§a§l➜ Secrets:\n")
-                    .appendText(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
-            )
+            component
+                .append("§a§l➜ Secrets:\n")
+                .append(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
+                .chat()
         } catch (e: Throwable) {
             printMessage("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()

@@ -17,10 +17,10 @@
  */
 package skytils.skytilsmod.utils
 
-import net.minecraft.util.StringUtils as MinecraftStringUtils
+import gg.essential.universal.wrappers.message.UTextComponent
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
-fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
+fun String?.stripControlCodes(): String = UTextComponent.stripFormatting(this ?: "")
 
 fun String?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
 fun String?.containsAny(vararg sequences: CharSequence?): Boolean {

@@ -22,9 +22,10 @@ import com.google.common.collect.Ordering
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.world.WorldSettings
+import skytils.skytilsmod.Skytils.Companion.mc
 
 val NetworkPlayerInfo.text: String
-    get() = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(this)
+    get() = mc.ingameGUI.tabList.getPlayerName(this)
 
 object TabListUtils {
     private val playerInfoOrdering = object : Ordering<NetworkPlayerInfo>() {
@@ -47,7 +48,7 @@ object TabListUtils {
         }
     }
     val tabEntries: List<NetworkPlayerInfo>
-        get() = if (Minecraft.getMinecraft().thePlayer == null) emptyList() else playerInfoOrdering.sortedCopy(
-            Minecraft.getMinecraft().thePlayer.sendQueue.playerInfoMap
+        get() = if (mc.thePlayer == null) emptyList() else playerInfoOrdering.sortedCopy(
+            mc.thePlayer.sendQueue.playerInfoMap
         )
 }

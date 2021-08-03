@@ -429,7 +429,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.superboomHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            val username = Minecraft.getMinecraft().thePlayer.name
+                            val username = mc.thePlayer.name
                             if (formatted.contains(username)) GuiManager.toastGui.add(SuperboomToast())
                         }
                     }
@@ -441,7 +441,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.reviveStoneHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            val username = Minecraft.getMinecraft().thePlayer.name
+                            val username = mc.thePlayer.name
                             if (formatted.contains(username)) GuiManager.toastGui.add(ReviveStoneToast())
                         }
                     }

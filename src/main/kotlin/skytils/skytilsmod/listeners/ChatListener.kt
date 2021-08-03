@@ -101,7 +101,7 @@ class ChatListener {
                     }
                 }
             } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")) {
-                val player = Minecraft.getMinecraft().thePlayer
+                val player = mc.thePlayer
                 val partyStart = party_start_pattern.matcher(unformatted)
                 val leader = leader_pattern.matcher(unformatted)
                 val members = members_pattern.matcher(unformatted)

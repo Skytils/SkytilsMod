@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.commands.stats
 
+import gg.essential.universal.wrappers.message.UMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
@@ -70,7 +71,7 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
     }
 
     protected fun printMessage(component: IChatComponent) {
-        mc.ingameGUI.chatGUI.printChatMessage(component)
+        UMessage(component).chat()
     }
 
     protected fun printMessage(msg: String) {

@@ -19,6 +19,9 @@
 package skytils.skytilsmod.commands.stats.impl
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UChat
+import gg.essential.universal.wrappers.message.UMessage
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.util.ChatComponentText
 import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.Member
@@ -27,6 +30,7 @@ import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
+import skytils.skytilsmod.utils.append
 import java.util.*
 
 
@@ -55,18 +59,16 @@ object SlayerCommand : StatCommand(needProfile = false) {
                 slayersObject[it].asJsonObject["xp"].asDouble
             }.getOrDefault(0.0)
         }
-
-        printMessage(
-            ChatComponentText("§a➜ Slayer Statistics Viewer\n")
-                .appendText("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
-                .appendText("§a§l➜ Slayer Levels:\n")
-                .appendText(
-                    xpMap.map { (slayer, xp) ->
-                        "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
-                            SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
-                        }:§e ${NumberUtil.nf.format(xp)} XP"
-                    }.joinToString(separator = "\n")
-                        .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" })
-        )
+        UMessage("§a➜ Slayer Statistics Viewer\n")
+            .append("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
+            .append("§a§l➜ Slayer Levels:\n")
+            .append(
+                xpMap.map { (slayer, xp) ->
+                    "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
+                        SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
+                    }:§e ${NumberUtil.nf.format(xp)} XP"
+                }.joinToString(separator = "\n")
+                    .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" }
+            ).chat()
     }
 }

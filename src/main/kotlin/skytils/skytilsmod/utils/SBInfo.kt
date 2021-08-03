@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.SendChatMessageEvent
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -111,14 +112,14 @@ object SBInfo {
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
         if (locraw == null && currentTime - joinedWorld > 1200 && currentTime - lastLocRaw > 15000) {
             lastLocRaw = System.currentTimeMillis()
             Skytils.sendMessageQueue.add("/locraw")
         }
         try {
-            val scoreboard = Minecraft.getMinecraft().thePlayer.worldScoreboard
+            val scoreboard = mc.thePlayer.worldScoreboard
             val sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1) //§707/14/20
             val scores: List<Score> = ArrayList(scoreboard.getSortedScores(sidebarObjective))
             val lines: MutableList<String> = ArrayList()

@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.vigilance.Vigilant
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
@@ -31,11 +32,12 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.MathHelper
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.ICrashCallable
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -313,3 +315,5 @@ fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
     }
     return null
 }
+
+fun UMessage.append(item: Any) = this.addTextComponent(item)
