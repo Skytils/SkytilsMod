@@ -2120,8 +2120,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
-        addDependency("autoCopyVeryRareDrops", "autoCopyRNGDrops")
-
         addDependency("itemRarityOpacity", "showItemRarity")
 
         listOf(
