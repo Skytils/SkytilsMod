@@ -297,7 +297,7 @@ class DungeonFeatures {
                                 ChatComponentText("§aClick to copy to clipboard.")
                             )
                         ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
                 }
             }
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]") && thornMissMessages.none { unformatted.contains(it, true) }
@@ -324,9 +324,9 @@ class DungeonFeatures {
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
-            mc.thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied fail to clipboard."))
-            GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length))
+        if (event.message.startsWith("/skytilscopy") && !event.addToChat) {
+            mc.thePlayer.addChatMessage(ChatComponentText("§9§lSkytils §8» §aCopied to clipboard."))
+            GuiScreen.setClipboardString(event.message.substring("/skytilscopy ".length))
             event.isCanceled = true
         }
     }
