@@ -2161,7 +2161,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
 
         registerListener("apiKey") { key: String ->
-            Skytils.apiWrapper.key = key
+            Skytils.hylinAPI.key = key
         }
 
         this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"

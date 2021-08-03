@@ -86,7 +86,7 @@ object SkytilsCommand : CommandBase() {
                             .asBoolean
                     ) {
                         Skytils.config.apiKey = apiKey
-                        Skytils.apiWrapper.key = Skytils.config.apiKey
+                        Skytils.hylinAPI.key = Skytils.config.apiKey
                         Skytils.config.markDirty()
                         player.addChatMessage(ChatComponentText("§a§l[SUCCESS] §8» §aYour Hypixel API key has been set to §f$apiKey§a."))
                     } else {

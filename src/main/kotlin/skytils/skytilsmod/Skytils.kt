@@ -137,7 +137,7 @@ class Skytils {
         @JvmField
         val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
 
-        val apiWrapper = createHylinAPI("", false)
+        val hylinAPI = createHylinAPI("", false)
     }
 
     @Mod.EventHandler
@@ -152,7 +152,7 @@ class Skytils {
     fun init(event: FMLInitializationEvent) {
         config = Config()
         config.preload()
-        apiWrapper.key = config.apiKey
+        hylinAPI.key = config.apiKey
 
         UpdateChecker.downloadDeleteTask()
 
@@ -241,7 +241,7 @@ class Skytils {
                     }
                 }
             } else {
-                config.scoreCalculationMethod = 0;
+                config.scoreCalculationMethod = 0
             }
         }
 

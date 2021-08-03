@@ -39,7 +39,7 @@ class ChatListener {
         if (unformatted.startsWith("Your new API key is ")) {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
             Skytils.config.apiKey = apiKey
-            Skytils.apiWrapper.key = Skytils.config.apiKey
+            Skytils.hylinAPI.key = Skytils.config.apiKey
             Skytils.config.markDirty()
             mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils updated your set Hypixel API key to " + EnumChatFormatting.DARK_GREEN + apiKey))
         }

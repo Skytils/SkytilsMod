@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.events
 
-import com.google.gson.JsonElement
 import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -34,7 +33,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.lang3.time.StopWatch
-import skytils.hylin.extension.nonDashedString
 import skytils.hylin.request.HypixelAPIException
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
@@ -75,7 +73,7 @@ class GriffinBurrows {
                         return@submit
                     }
                     val burrowArray =
-                        Skytils.apiWrapper.getLatestSkyblockProfileForMemberSync(uuid)
+                        Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                     if (burrowArray == null) {
                         UChat.chat("§c§lUnable to find your Skyblock Profile!")
                         return@submit

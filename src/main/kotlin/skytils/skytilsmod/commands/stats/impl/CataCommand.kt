@@ -40,7 +40,7 @@ object CataCommand : StatCommand() {
 
     override fun displayStats(username: String, uuid: UUID, profileData: Member) {
         val playerResponse = try {
-            Skytils.apiWrapper.getPlayerSync(uuid)
+            Skytils.hylinAPI.getPlayerSync(uuid)
         } catch (e: HypixelAPIException) {
             printMessage("§cFailed to get dungeon stats: ${e.message}")
             return

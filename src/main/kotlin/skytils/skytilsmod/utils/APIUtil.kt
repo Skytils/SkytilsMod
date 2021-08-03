@@ -142,42 +142,6 @@ object APIUtil {
         return JsonArray()
     }
 
-    /**
-     * Modified from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun getLatestProfileID(UUID: String, key: String): String? {
-        val player: EntityPlayer = Minecraft.getMinecraft().thePlayer
-
-        val profilesResponse = getJSONResponse("https://api.hypixel.net/skyblock/profiles?uuid=$UUID&key=$key")
-        if (!profilesResponse["success"].asBoolean) {
-            val reason = profilesResponse["cause"].asString
-            player.addChatMessage(ChatComponentText("§cFailed with reason: $reason"))
-            return null
-        }
-        if (profilesResponse["profiles"].isJsonNull) {
-            player.addChatMessage(ChatComponentText("§cThis player doesn't appear to have played SkyBlock."))
-            return null
-        }
-
-        var latestProfile = ""
-        var latestSave: Long = 0
-        val profilesArray = profilesResponse["profiles"].asJsonArray
-        for (profile in profilesArray) {
-            val profileJSON = profile.asJsonObject
-            var profileLastSave: Long = 1
-            if (profileJSON["members"].asJsonObject[UUID].asJsonObject.has("last_save")) {
-                profileLastSave = profileJSON["members"].asJsonObject[UUID].asJsonObject["last_save"].asLong
-            }
-            if (profileLastSave > latestSave) {
-                latestProfile = profileJSON["profile_id"].asString
-                latestSave = profileLastSave
-            }
-        }
-        return latestProfile
-    }
-
     private fun isValidCert(chain: Array<X509Certificate>, authType: String): Boolean {
         return chain.any { it.issuerDN.name == "CN=R3, O=Let's Encrypt, C=US" }
     }

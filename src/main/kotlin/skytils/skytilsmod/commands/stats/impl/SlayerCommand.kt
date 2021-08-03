@@ -22,6 +22,7 @@ import com.google.gson.JsonObject
 import net.minecraft.util.ChatComponentText
 import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.Member
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.NumberUtil
@@ -36,7 +37,7 @@ object SlayerCommand : StatCommand(needProfile = false) {
     }
 
     override fun displayStats(username: String, uuid: UUID) {
-        val latestProfile: String = APIUtil.getLatestProfileID(uuid.nonDashedString(), key) ?: return
+        val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
 
         val profileResponse: JsonObject =
             APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
