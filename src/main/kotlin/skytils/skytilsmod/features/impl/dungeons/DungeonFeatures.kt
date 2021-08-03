@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UChat
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -288,7 +289,7 @@ class DungeonFeatures {
                 if (deathFailMatcher.find()) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted)
-                        mc.thePlayer.addChatMessage(ChatComponentText("§aCopied death/fail to clipboard."))
+                        UChat.chat("§9§lSkytils §8» §aCopied fail to clipboard.")
                     }
                     event.message.chatStyle
                         .setChatHoverEvent(
@@ -297,7 +298,7 @@ class DungeonFeatures {
                                 ChatComponentText("§aClick to copy to clipboard.")
                             )
                         ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
                 }
             }
             if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]") && thornMissMessages.none { unformatted.contains(it, true) }
@@ -324,9 +325,9 @@ class DungeonFeatures {
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (event.message.startsWith("/skytilscopyfail") && !event.addToChat) {
-            mc.thePlayer.addChatMessage(ChatComponentText("§aCopied selected death/fail to clipboard."))
-            GuiScreen.setClipboardString(event.message.substring("/skytilscopyfail ".length))
+        if (event.message.startsWith("/skytilscopy") && !event.addToChat) {
+            UChat.chat("§9§lSkytils §8» §aCopied to clipboard.")
+            GuiScreen.setClipboardString(event.message.substring("/skytilscopy ".length))
             event.isCanceled = true
         }
     }
