@@ -26,6 +26,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.jetbrains.kotlin.jvm") version "1.5.21"
     id("org.spongepowered.mixin") version "d5f9873d60"
+    java
 }
 
 version = "1.0-pre20.1"
@@ -46,7 +47,7 @@ minecraft {
     )
     clientRunArgs.addAll(
         setOf(
-            "--tweakClass org.spongepowered.asm.launch.MixinTweaker",
+            "--tweakClass gg.essential.loader.stage0.EssentialSetupTweaker",
             "--mixin mixins.skytils.json"
         )
     )
@@ -65,30 +66,22 @@ repositories {
     }
 }
 
-dependencies {
-    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        isTransitive = false
-    }
+val shadowMe: Configuration by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
+}
 
+dependencies {
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    implementation("gg.essential:vigilance-1.8.9-forge:159") {
-        exclude(module = "kotlin-reflect")
-        exclude(module = "kotlin-stdlib-jdk8")
-    }
+    shadowMe("gg.essential:loader-launchwrapper:1.0.2")
+    implementation("gg.essential:essential-1.8.9-forge:1276")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.1")
-    implementation("com.github.Skytils:Hylin:6e070f7fde") {
+    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
+    shadowMe("com.github.Skytils:Hylin:6e070f7fde") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlinx-coroutines-core")
     }
-
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
 }
 
 mixin {
@@ -134,9 +127,8 @@ tasks {
     named<ShadowJar>("shadowJar") {
         archiveFileName.set(jar.get().archiveFileName)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations = listOf(shadowMe)
 
-        relocate("gg.essential", "skytils.essentialgg")
-        relocate("kotlinx.coroutines", "skytils.kotlinx.coroutines")
         relocate("org.apache.hc", "skytils.apacheorg.hc")
         relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
 
