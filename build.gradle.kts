@@ -117,7 +117,7 @@ tasks {
                     "ForceLoadAsMod" to true,
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
-                    "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+                    "TweakClass" to "gg.essential.loader.stage0.EssentialSetupTweaker",
                     "TweakOrder" to "0"
                 )
             )
