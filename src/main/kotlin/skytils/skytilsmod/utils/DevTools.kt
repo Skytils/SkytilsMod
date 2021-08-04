@@ -18,8 +18,7 @@
 
 package skytils.skytilsmod.utils
 
-import net.minecraft.util.ChatComponentText
-import skytils.skytilsmod.Skytils
+import gg.essential.universal.UChat
 
 object DevTools {
     private val toggles = HashMap<String, Boolean>()
@@ -46,11 +45,11 @@ object DevTools {
 }
 
 fun printDevMessage(string: String, toggle: String) {
-    if (DevTools.getToggle(toggle)) Skytils.mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
+    if (DevTools.getToggle(toggle)) UChat.chat(string)
 }
 
 fun printDevMessage(string: String, vararg toggles: String) {
     toggles.forEach {
-        if (DevTools.getToggle(it)) return Skytils.mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
+        if (DevTools.getToggle(it)) return UChat.chat(string)
     }
 }

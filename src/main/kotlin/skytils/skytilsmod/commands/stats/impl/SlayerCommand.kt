@@ -19,12 +19,8 @@
 package skytils.skytilsmod.commands.stats.impl
 
 import com.google.gson.JsonObject
-import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
-import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.util.ChatComponentText
 import skytils.hylin.extension.nonDashedString
-import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.APIUtil
