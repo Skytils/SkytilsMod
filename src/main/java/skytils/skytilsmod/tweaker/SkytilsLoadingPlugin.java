@@ -86,9 +86,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
     public SkytilsLoadingPlugin() {
-        if (Launch.blackboard.get("mixin.initialised") == null) {
-            MixinBootstrap.init();
-        }
         if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
             showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
             exit();

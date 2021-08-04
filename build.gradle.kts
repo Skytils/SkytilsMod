@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("net.minecraftforge.gradle.forge") version "6f5327"
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.jetbrains.kotlin.jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.21"
     id("org.spongepowered.mixin") version "d5f9873d60"
     java
 }
@@ -47,7 +47,7 @@ minecraft {
     )
     clientRunArgs.addAll(
         setOf(
-            "--tweakClass gg.essential.loader.stage0.EssentialSetupTweaker",
+            "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
             "--mixin mixins.skytils.json"
         )
     )
@@ -75,6 +75,9 @@ dependencies {
 
     shadowMe("gg.essential:loader-launchwrapper:1.0.2")
     implementation("gg.essential:essential-1.8.9-forge:1281")
+    shadowMe("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        isTransitive = false
+    }
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
     shadowMe("com.github.Skytils:Hylin:6e070f7fde") {
@@ -117,7 +120,7 @@ tasks {
                     "ForceLoadAsMod" to true,
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
-                    "TweakClass" to "gg.essential.loader.stage0.EssentialSetupTweaker",
+                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
                     "TweakOrder" to "0"
                 )
             )
@@ -147,6 +150,7 @@ tasks {
             "META-INF/com.android.tools/**",
             "fabric.mod.json"
         )
+        mergeServiceFiles()
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
