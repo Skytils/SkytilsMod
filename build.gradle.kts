@@ -75,9 +75,6 @@ dependencies {
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.0")
     implementation("gg.essential:essential-1.8.9-forge:1281")
-    shadowMe("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        isTransitive = false
-    }
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
     shadowMe("com.github.Skytils:Hylin:6e070f7fde") {
