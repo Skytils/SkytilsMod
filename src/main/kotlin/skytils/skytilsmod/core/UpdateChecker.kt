@@ -87,16 +87,15 @@ object UpdateChecker {
         Thread {
             println("Checking for Skytils install task...")
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
-            if (taskDir.mkdirs() || taskDir.list()?.isEmpty() == true) {
+            // TODO Make this dynamic and fetch latest one or something
+            val url =
+                "https://cdn.discordapp.com/attachments/807303259902705685/864882597342740511/SkytilsInstaller-1.1-SNAPSHOT.jar"
+            val taskFile = File(taskDir, getJarNameFromUrl(url))
+            if (taskDir.mkdirs() || taskFile.createNewFile()) {
                 println("Downloading Skytils delete task.")
                 val client = APIUtil.builder.setConnectionManager(cm.build()).build()
-                // TODO Make this dynamic and fetch latest one or something
-                val url =
-                    "https://cdn.discordapp.com/attachments/807303259902705685/864882597342740511/SkytilsInstaller-1.1-SNAPSHOT.jar"
+
                 val req = HttpGet(URL(url).toURI())
-                
-                val taskFile = File(taskDir, getJarNameFromUrl(url))
-                taskFile.createNewFile()
                 val res = client.execute(req)
                 if (res.code != 200) {
                     println("Downloading delete task failed!")
