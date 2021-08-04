@@ -32,6 +32,7 @@ A Hypixel Skyblock Utilities mod.
  - ~~Trick or Treat Chest Alert~~
  - Custom Key Shortcuts
  - Better Auction House Price Input
+ - Copy Deaths to Clipboard
  - Spam Hider for
      - Profile messages
      - Mort messages
@@ -55,20 +56,43 @@ A Hypixel Skyblock Utilities mod.
      - Combo messages
      - Blessing enchant and bait messages
      - Wither and Undead Essence unlock messages
-</details>
+     - Healing messages
+     - Sea Creature and Fishing Treasure messages
+     - Compact Enchantment messages
+     - Mining ability messages
+ - <details><summary>Custom Spam Hider</summary>
+   
+     - 3 modes: StartsWith, Contains, Regex
+     - Toggle for skyblock only
+     - Custom Name and Pattern
+     - Can use unformatted or formatted text
+     - Works with existing spam GUI element
+   </details>
+ - Custom Enchant Names
+ - <details> <summary>Moveable Item Highlight</summary>
+   The text for item name that shows up when you swap items</details>
+ - <details><summary>Moveable Action Bar</summary>
+   The text used to display skyblock information.
+   Doesn't show up when using anything that removes text.</details> 
+   </details>
+
 <details>
   <summary>Dungeons</summary>
 
 #### Dungeons
  - ~~Show Hidden Fels, Shadow Assassins, and blood room mobs~~
  - Blaze Solver Which Replaces The Skin Textures
- - Boulder Puzzle Solver [WIP]
- - Simon Says Solver [WIP]
+ - Boulder Puzzle Solver
+ - Simon Says Solver
  - Trivia Solver (updated with the latest answers)
  - Three Weirdo Solver
  - Spirit Leap Names
  - Click in Order Terminal Solver
  - Ice Path Solver
+ - Creeper Beams Solver
+ - Target Shooting Solver
+ - Alignment Device Solver
+ - Tic Tac Toe Solver
  - Select All Color Solver
  - Stop Dropping, Salvaging, and Selling Starred Dungeon Items
  - Bigger Bat Rendering and Bat Hitbox Display
@@ -81,6 +105,18 @@ A Hypixel Skyblock Utilities mod.
  - Skeleton Master Boxes
  - Correct Livid Finder (with M5 support)
  - Dungeon Chest Profit
+ - Simple Dungeon Map
+ - Guardian Respawn Timer
+ - Boxed Tanks and Protected Teammates
+ - Tank Range Display Circle
+ - Auto Reparty on Dungeon End
+ - Dungeon Death Counter
+ - Giant HP at the Giant's Feet
+ - Sadan Phase Timers
+ - Spirit Leap Highlights for Names and Classes
+ - Big Crypts Counter
+ - Highlight Spirit Bow
+
 </details>
 <details>
   <summary>Farming</summary>
@@ -105,12 +141,14 @@ A Hypixel Skyblock Utilities mod.
  - More Visible Ghosts
  - Recolor Carpets
  - Highlight Completed Comissions
+ - Crystal Hollows Map
+ - Crystal Hollows Waypoints
 </details>
 <details>
   <summary>Items</summary>
   
 ### Items
- - Soul Eater Bonus Strength
+ - ~~Soul Eater Bonus Strength~~
  - ~~Block Useless Zombie Sword Uses~~
  - ~~Prioritize Item Abilities~~
  - Pet Item Confirmation
@@ -119,7 +157,7 @@ A Hypixel Skyblock Utilities mod.
  - Hide Midas Staff Gold Blocks
  - Big Item Drops
  - Larger Heads
- - Show Enchanted Book, Potion, and Minion Tiers
+ - Show Enchanted Book, Potion, Minion Tiers, and Dungeon Stars
  - Show Pet Candies
  - Only Collect Enchanted Items
  - Dungeon Potion Lock
@@ -132,11 +170,35 @@ A Hypixel Skyblock Utilities mod.
  - Show Price of Items in the Experimentation Table
  - Jerry-chine Gun Sound Hider
  - Show Enchanted Book Abbreviation
+ - Show Radioactive Bonus
+ - Block Zapper Fatigue Timer
+ - Etherwarp Teleport Display
+</details>
+<details>
+    <summary>Slayers</summary>
+
+### Slayers
+ - Show Slayer RNG Progress as the Boss Bar
+ - <details><summary>Soulflow Display</summary>
+   Requires your Soulflow talisman to be in your inventory
+   </details>
+ - <details><summary>Low Soulflow Ping</summary>
+   Requires your Soulflow talisman to be in your inventory
+   </details>
+ - Slayer display
+ - Yang Glyph Ping and Highlight
+ - Nukekebi Skull Highlight
+ - Seraph Display
+ - Broken Heart Radiation Hider for Others' Bosses
+ - Slayer Time to Kill
+- <details><summary>Re-color seraph boss</summary>
+  This shows different phases such as Malevolent Hitshield and Yang Glyph</details>
+
 </details>
 <details>
   <summary>Miscellaneous</summary>
 
-## Miscellaneous
+### Miscellaneous
  - Hide Witherborn Boss Bars
  - Hide Fire and Lightning
  - Custom Damage Splash
@@ -149,6 +211,19 @@ A Hypixel Skyblock Utilities mod.
  - Placed Summoning Eye Display
  - Spider's Den Rain Timer
  - Stop Dropping Valuable Items (customizable BIN value)
+ - Trapper cooldown alarm + Click anywhere to accept Trapper Task
+ - Rare drop sounds for mythological event drops
+ - Highlight disabled potion effects in cookie menu
+ - Hidden Jerry Timer
+ - Hidden Jerry & Jerry Box Tracker
+ - Jerry Perk Display
+ - Remove Left Over Bleeds from Minotaurs
+ - Hide Dying Mobs
+ - Cooldown Tracker
+ - /g leave confirmation
+ - SBA Chroma fix with Optimized Font Renderer from Patcher
+ - Prehistoric Egg Blocks Walked
+ - Auto Copy Rare Drops
 </details>
 
 And more to come!
@@ -160,17 +235,23 @@ And more to come!
 - /skytils config - Opens the GUI to edit the config.
 - /skytils help - Displays the various commands and their usages
 - /skytils setkey <apikey> - Sets your api key (will also grab it from /api new).
-- /skytils reload <aliases/data> - Forces Skytils to re-fetch your command aliases or solutions from the data repository.
+- /skytils reload <data/mayor/slayer> - Forces Skytils to refresh of data.
 - /skytils fetchur - Displays the current Fetchur item for the day.
 - /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
 - /skytils aliases - Opens the GUI to edit command aliases.
 - /skytils editlocations (/skytils editlocation, gui, loc) - Opens the GUI to modify HUD element locations.
 - /skytils shortcuts - Opens the GUI to modify keybind shortcuts.
+- /skytils spam - Opens the GUI to modify spam filters.
+- /skytils enchant - Opens the GUI to customize enchant names.
+- /skytilscata <player> - Shows information about a player's Catacombs statistics.
+- /skytilsslayer <player> - Shows information about a player's Slayer statistics.
 - /armorcolor <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided. (can also be accessed by /skytils armorcolor)
 - ~~/blockability [clearall] - Block using the ability on the currently held item~~
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 - /glintcustomize override <on/off/clear/clearall> - Change the visibility of enchantment glints for the item.
 - /glintcustomize color <set/clear/clearall> - Change the enchant glint color for the item.
+- /trackcooldown <cooldown in seconds> <item ability> - Set a cooldown for an item ability to track
+- /skytilshollowwaypoint <set/remove/clear/help> <name> <x y z> - Allows to set waypoints while in the Crystal Hollows.
 </details>
 
 ### Credits to Open Source Software

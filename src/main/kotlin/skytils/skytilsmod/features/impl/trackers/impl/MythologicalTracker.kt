@@ -203,7 +203,7 @@ class MythologicalTracker : Tracker("mythological") {
                         SoundQueue.QueuedSound(
                             "note.pling",
                             2.0.pow(-9.0 / 12).toFloat(),
-                            isLoud = true
+                            volume = 0.5f
                         )
                     )
                     SoundQueue.addToQueue(
@@ -211,7 +211,7 @@ class MythologicalTracker : Tracker("mythological") {
                             "note.pling",
                             2.0.pow(-2.0 / 12).toFloat(),
                             ticks = 4,
-                            isLoud = true
+                            volume = 0.5f
                         )
                     )
                     SoundQueue.addToQueue(
@@ -219,7 +219,7 @@ class MythologicalTracker : Tracker("mythological") {
                             "note.pling",
                             2.0.pow(1.0 / 12).toFloat(),
                             ticks = 8,
-                            isLoud = true
+                            volume = 0.5f
                         )
                     )
                     SoundQueue.addToQueue(
@@ -227,7 +227,7 @@ class MythologicalTracker : Tracker("mythological") {
                             "note.pling",
                             2.0.pow(3.0 / 12).toFloat(),
                             ticks = 12,
-                            isLoud = true
+                            volume = 0.5f
                         )
                     )
                 }
