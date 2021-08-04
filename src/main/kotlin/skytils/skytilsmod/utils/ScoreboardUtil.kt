@@ -23,9 +23,7 @@ import net.minecraft.scoreboard.ScorePlayerTeam
 import skytils.skytilsmod.Skytils.Companion.mc
 
 /**
- * Taken from Danker's Skyblock Mod under GPL 3.0 license
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
+ * Taken from https://gist.github.com/aaron1998ish/33c4e1836bd5cf79501d163a1b5c8304
  */
 object ScoreboardUtil {
     @JvmStatic

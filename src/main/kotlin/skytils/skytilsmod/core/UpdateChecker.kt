@@ -26,7 +26,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.core5.http.io.entity.EntityUtils
-import org.apache.hc.core5.http.ssl.TLS
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.gui.UpdateGui
@@ -175,23 +174,51 @@ object UpdateChecker {
             val latestTag = latestRelease["tag_name"].asString
             val currentTag = Skytils.VERSION
 
-            val currentVersion = DefaultArtifactVersion(currentTag.substringBefore("-"))
-            val latestVersion = DefaultArtifactVersion(latestTag.substringAfter("v").substringBefore("-"))
-            if (latestTag.contains("pre") || (currentTag.contains("pre") && currentVersion >= latestVersion)) {
-                var currentPre = 0.0
-                var latestPre = 0.0
-                if (currentTag.contains("pre")) {
-                    currentPre = currentTag.substringAfter("pre").toDouble()
-                }
-                if (latestTag.contains("pre")) {
-                    latestPre = latestTag.substringAfter("pre").toDouble()
-                }
-                if ((latestPre > currentPre) || (latestPre == 0.0 && currentVersion.compareTo(latestVersion) == 0)) {
-                    updateObj = latestRelease
-                }
-            } else if (currentVersion < latestVersion) {
+            val currentVersion = SkytilsVersion(currentTag)
+            val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))
+            if (currentVersion < latestVersion) {
                 updateObj = latestRelease
             }
         }
+    }
+
+    class SkytilsVersion(val versionString: String) : Comparable<SkytilsVersion> {
+
+        companion object {
+            val regex = Regex("^(?<version>[\\d.]+)-?(?<type>\\D+)?(?<typever>\\d+\\.?\\d*)?\$")
+        }
+
+        private val matched by lazy {
+            regex.find(versionString)
+        }
+        val isSafe = matched != null
+
+        val version = matched!!.groups["version"]!!.value
+        val versionArtifact = DefaultArtifactVersion(matched!!.groups["version"]!!.value)
+        val specialVersionType by lazy {
+            val typeString = matched!!.groups["type"]?.value ?: return@lazy UpdateType.RELEASE
+
+            return@lazy UpdateType.values().find { typeString == it.prefix } ?: UpdateType.UNKNOWN
+        }
+        val specialVersion by lazy {
+            if (specialVersionType == UpdateType.RELEASE) return@lazy null
+            return@lazy matched!!.groups["typever"]?.value?.toDoubleOrNull()
+        }
+
+        override fun compareTo(other: SkytilsVersion): Int {
+            if (!isSafe || !other.isSafe) return -1
+            return if (versionArtifact.compareTo(other.versionArtifact) == 0) {
+                if (specialVersionType.ordinal == other.specialVersionType.ordinal) {
+                    specialVersion!!.compareTo(other.specialVersion!!)
+                } else other.specialVersionType.ordinal - specialVersionType.ordinal
+            } else versionArtifact.compareTo(other.versionArtifact)
+        }
+    }
+
+    enum class UpdateType(val prefix: String) {
+        UNKNOWN("unknown"),
+        RELEASE(""),
+        RELEASECANDIDATE("RC"),
+        PRERELEASE("pre"),
     }
 }
