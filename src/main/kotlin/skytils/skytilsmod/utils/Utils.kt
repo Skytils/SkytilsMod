@@ -269,7 +269,7 @@ object Utils {
             }.getOrDefault("NONE")
 
             return@addCrashSectionCallable """
-                            # BetterFPS: $hasBetterFPS
+                            # BetterFPS: ${hasBetterFPS != "NONE"} version: $hasBetterFPS
                         """.trimMargin("#")
         }
     }
