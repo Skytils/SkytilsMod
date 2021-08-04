@@ -42,7 +42,7 @@ object ScoreboardUtil {
                     .startsWith("#")
             }
             scores = if (list.size > 15) {
-                Iterables.skip(list, scores.size - 15).toList()
+                list.drop(15)
             } else {
                 list
             }
