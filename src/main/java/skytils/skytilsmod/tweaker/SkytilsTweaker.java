@@ -18,75 +18,36 @@
 
 package skytils.skytilsmod.tweaker;
 
-import net.minecraft.launchwrapper.ITweaker;
-import net.minecraft.launchwrapper.Launch;
+import gg.essential.loader.stage0.EssentialSetupTweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import net.minecraft.launchwrapper.LogWrapper;
-import org.apache.logging.log4j.Level;
-import org.spongepowered.asm.launch.MixinBootstrap;
+import org.spongepowered.asm.launch.MixinTweaker;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
-public class SkytilsTweaker implements ITweaker {
+@SuppressWarnings("unused")
+public class SkytilsTweaker extends EssentialSetupTweaker {
 
-    private static boolean alreadyRan = false;
+    private final MixinTweaker mixinTweaker;
 
-    @SuppressWarnings("unchecked")
     public SkytilsTweaker() {
-        init();
+        mixinTweaker = new MixinTweaker();
     }
-
-    private void init() {
-        if (!alreadyRan) {
-            alreadyRan = true;
-            ArrayList<String> tweakClassNames = (ArrayList<String>) Launch.blackboard.get("TweakClasses");
-            ArrayList<ITweaker> tweakers = (ArrayList<ITweaker>) Launch.blackboard.get("Tweaks");
-            if (!tweakClassNames.contains("gg.essential.loader.stage0.EssentialSetupTweaker")) {
-                try {
-                    Class.forName("gg.essential.loader.stage1.EssentialSetupTweaker", false, Launch.classLoader.getClass().getClassLoader());
-                    LogWrapper.log(Level.INFO, "Skytils found Essential Stage 1 Tweaker, skipping!");
-                } catch (Throwable e) {
-                    LogWrapper.log(Level.INFO, "Skytils injecting Essential tweaker");
-                    injectEssentialTweaker(tweakers);
-                }
-            } else {
-                LogWrapper.log(Level.INFO, "Skytils found another mod uses Essential tweaker -- will not inject");
-            }
-            if (Launch.blackboard.get("mixin.initialised") == null) {
-                LogWrapper.log(Level.INFO, "Mixin was not loaded yet, Skytils will bootstrap it");
-                MixinBootstrap.init();
-            } else {
-                LogWrapper.log(Level.INFO, "Mixin was already bootstrapped, Skytils is skipping");
-            }
-        }
-    }
-
-    private void injectEssentialTweaker(ArrayList<ITweaker> tweakers) {
-        try {
-            Launch.classLoader.addClassLoaderExclusion("gg.essential.loader.stage0");
-            ITweaker tweaker = (ITweaker) Class.forName("gg.essential.loader.stage0.EssentialSetupTweaker", true, Launch.classLoader)
-                    .newInstance();
-            tweakers.add(tweaker);
-        } catch(ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            LogWrapper.log(Level.ERROR, e, "Skytils ran into an error during the tweaker stage!");
-        }
-    }
-
     @Override
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-
+        super.acceptOptions(args, gameDir, assetsDir, profile);
+        mixinTweaker.acceptOptions(args, gameDir, assetsDir, profile);
     }
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-
+        super.injectIntoClassLoader(classLoader);
+        mixinTweaker.injectIntoClassLoader(classLoader);
     }
 
     @Override
     public String getLaunchTarget() {
-        return "net.minecraft.client.main.Main";
+        return mixinTweaker.getLaunchTarget();
     }
 
     @Override

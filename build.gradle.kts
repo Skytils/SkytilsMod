@@ -75,7 +75,7 @@ dependencies {
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.0")
     implementation("gg.essential:essential-1.8.9-forge:1281")
-    shadowMe("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
 
