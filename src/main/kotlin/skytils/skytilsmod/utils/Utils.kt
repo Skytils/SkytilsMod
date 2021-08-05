@@ -18,6 +18,7 @@
 package skytils.skytilsmod.utils
 
 import gg.essential.universal.wrappers.message.UMessage
+import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
@@ -29,6 +30,7 @@ import net.minecraft.crash.CrashReportCategory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.event.HoverEvent
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
@@ -317,3 +319,8 @@ fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
 }
 
 fun UMessage.append(item: Any) = this.addTextComponent(item)
+fun UTextComponent.setHoverText(text: String): UTextComponent {
+    hoverAction = HoverEvent.Action.SHOW_TEXT
+    hoverValue = text
+    return this
+}

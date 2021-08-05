@@ -19,8 +19,7 @@
 package skytils.skytilsmod.commands.stats.impl
 
 import gg.essential.universal.wrappers.message.UMessage
-import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
+import gg.essential.universal.wrappers.message.UTextComponent
 import skytils.hylin.extension.getString
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
@@ -31,6 +30,7 @@ import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
 import skytils.skytilsmod.utils.Utils.timeFormat
 import skytils.skytilsmod.utils.append
+import skytils.skytilsmod.utils.setHoverText
 import java.util.*
 
 
@@ -111,7 +111,7 @@ object CataCommand : StatCommand() {
             val highestFloor = cataData.highestCompletion
 
             if (completionObj != null && highestFloor != null) {
-                val completionsHoverString = buildString {
+                component.append(UTextComponent(" §aFloor Completions: §7(Hover)\n").setHoverText(buildString {
                     for (i in 0..highestFloor) {
                         append("§2§l●§a ")
                         append(if (i == 0) "Entrance: " else "Floor $i: ")
@@ -119,56 +119,39 @@ object CataCommand : StatCommand() {
                         append(completionObj[i.toString()])
                         append(if (i < highestFloor) "\n" else "")
                     }
-                }
-
-                val completions =
-                    ChatComponentText(" §aFloor Completions: §7(Hover)\n")
-
-                completions.chatStyle.chatHoverEvent = HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    ChatComponentText(completionsHoverString)
-                )
-                component.append(completions)
+                }))
 
                 val fastestSTimes = cataData.fastestTimeS
                 if (fastestSTimes != null) {
-                    val fastestSHoverString = buildString {
-                        for (i in 0..highestFloor) {
-                            append("§2§l●§a ")
-                            append(if (i == 0) "Entrance: " else "Floor $i: ")
-                            append("§e")
-                            append(if (i.toString() in fastestSTimes) timeFormat(fastestSTimes[i.toString()]!! / 1000.0) else "§cNo S Completion")
-                            append(if (i < highestFloor) "\n" else "")
+                    component.append(UTextComponent(" §aFastest §2S §aCompletions: §7(Hover)\n").setHoverText(
+                        buildString {
+                            for (i in 0..highestFloor) {
+                                append("§2§l●§a ")
+                                append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                append("§e")
+                                append(if (i.toString() in fastestSTimes) timeFormat(fastestSTimes[i.toString()]!! / 1000.0) else "§cNo S Completion")
+                                append(if (i < highestFloor) "\n" else "")
+                            }
                         }
-                    }
-
-                    val fastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
-                    fastestS.chatStyle.chatHoverEvent = HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText(fastestSHoverString)
-                    )
-                    component.append(fastestS)
+                    ))
                 }
 
 
                 val fastestSPlusTimes = cataData.fastestTimeSPlus
                 if (fastestSPlusTimes != null) {
-                    val fastestSPlusHoverString = buildString {
-                        for (i in 0..highestFloor) {
-                            append("§2§l●§a ")
-                            append(if (i == 0) "Entrance: " else "Floor $i: ")
-                            append("§e")
-                            append(if (i.toString() in fastestSPlusTimes) timeFormat(fastestSPlusTimes[i.toString()]!! / 1000.0) else "§cNo S+ Completion")
-                            append(if (i < highestFloor) "\n" else "")
-                        }
-                    }
-
-                    val fastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
-                    fastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText(fastestSPlusHoverString)
+                    component.append(
+                        UTextComponent(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n").setHoverText(
+                            buildString {
+                                for (i in 0..highestFloor) {
+                                    append("§2§l●§a ")
+                                    append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                    append("§e")
+                                    append(if (i.toString() in fastestSPlusTimes) timeFormat(fastestSPlusTimes[i.toString()]!! / 1000.0) else "§cNo S+ Completion")
+                                    append(if (i < highestFloor) "\n" else "")
+                                }
+                            }
+                        )
                     )
-                    component.append(fastestSPlus)
                 }
             }
 
@@ -180,7 +163,8 @@ object CataCommand : StatCommand() {
 
                     component
                         .append("§a§l➜ Master Mode:\n")
-                    val masterCompletionsHoverString = buildString {
+
+                    component.append(UTextComponent(" §aFloor Completions: §7(Hover)\n").setHoverText(buildString {
                         for (i in 1..highestMasterFloor) {
                             append("§2§l●§a ")
                             append("Floor $i: ")
@@ -188,24 +172,14 @@ object CataCommand : StatCommand() {
                             append(if (i.toString() in masterCompletionObj) masterCompletionObj[i.toString()] else "§cDNF")
                             append(if (i < highestMasterFloor) "\n" else "")
                         }
-                    }
-
-                    val masterCompletions =
-                        ChatComponentText(" §aFloor Completions: §7(Hover)\n")
-
-                    masterCompletions.chatStyle.chatHoverEvent = HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText(masterCompletionsHoverString)
-                    )
-
-                    component.append(masterCompletions)
+                    }))
 
 
-                    val masterFastestS = ChatComponentText(" §aFastest §2S §aCompletions: §7(Hover)\n")
+                    val masterFastestS = UTextComponent(" §aFastest §2S §aCompletions: §7(Hover)\n")
 
                     if (masterCataData.fastestTimeS != null) {
                         val masterFastestSTimes = masterCataData.fastestTimeS!!
-                        val fastestSHoverString = buildString {
+                        masterFastestS.setHoverText(buildString {
                             for (i in 1..highestMasterFloor) {
                                 append("§2§l●§a ")
                                 append("Floor $i: ")
@@ -213,25 +187,18 @@ object CataCommand : StatCommand() {
                                 append(if (i.toString() in masterFastestSTimes) timeFormat(masterFastestSTimes[i.toString()]!! / 1000.0) else "§cNo S Completion")
                                 append(if (i < highestMasterFloor) "\n" else "")
                             }
-                        }
-                        masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            ChatComponentText(fastestSHoverString)
-                        )
+                        })
                     } else {
-                        masterFastestS.chatStyle.chatHoverEvent = HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            ChatComponentText("§cNo S Completions")
-                        )
+                        masterFastestS.setHoverText("§cNo S Completions")
                     }
                     component.append(masterFastestS)
 
 
-                    val masterFastestSPlus = ChatComponentText(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
+                    val masterFastestSPlus = UTextComponent(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
 
                     if (masterCataData.fastestTimeSPlus != null) {
                         val masterFastestSPlusTimes = masterCataData.fastestTimeSPlus!!
-                        val fastestSPlusHoverString1 = buildString {
+                        masterFastestSPlus.setHoverText(buildString {
                             for (i in 1..highestMasterFloor) {
                                 append("§2§l●§a ")
                                 append("Floor $i: ")
@@ -239,16 +206,10 @@ object CataCommand : StatCommand() {
                                 append(if (i.toString() in masterFastestSPlusTimes) timeFormat(masterFastestSPlusTimes[i.toString()]!! / 1000.0) else "§cNo S+ Completion")
                                 append(if (i < highestMasterFloor) "\n" else "")
                             }
-                        }
-
-                        masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            ChatComponentText(fastestSPlusHoverString1)
-                        )
+                        })
                     } else {
-                        masterFastestSPlus.chatStyle.chatHoverEvent = HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            ChatComponentText("§cNo S+ Completions")
+                        masterFastestSPlus.setHoverText(
+                            "§cNo S+ Completions"
                         )
                     }
                     component.append(masterFastestSPlus)
