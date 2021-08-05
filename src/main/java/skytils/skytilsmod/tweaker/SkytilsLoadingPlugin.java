@@ -74,10 +74,22 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "VoidChat breaks many of my features!<br>" +
         "In order to resolve this conflict you must remove<br>" +
         "VoidChat from your Minecraft mods folder.<br>" +
-        "A good alternative is Patcher at sk1er.club/mods/Patcher.<br>" +
+        "A good alternative is Patcher at https://sk1er.club/mods/Patcher.<br>" +
         "If you have already done this and are still getting this error,<br>" +
         "ask for support in the Discord." +
         "</p></html>";
+
+    private static final String betterFPSMessage =
+            "<html><p>" +
+            "Skytils has detected that you are using BetterFPS.<br>" +
+            "BetterFPS breaks my core plugins, and also breaks the game!<br>" +
+            "In order to resolve this conflict you must remove<br>" +
+            "BetterFPS from your Minecraft mods folder.<br>" +
+            "You probably will not notice a change in your FPS.<br>" +
+            "Video showcasing breaking changes: https://streamable.com/q4ip5u.<br>" +
+            "If you have already done this and are still getting this error,<br>" +
+            "ask for support in the Discord." +
+            "</p></html>";
 
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
@@ -89,6 +101,9 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         try {
             Class.forName("com.sky.voidchat.EDFMLLoadingPlugin");
             showMessage(voidChatMessage);
+            exit();
+            Class.forName("me.guichaguri.betterfps.BetterFpsHelper");
+            showMessage(betterFPSMessage);
             exit();
         } catch (ClassNotFoundException ignored) {
         }
