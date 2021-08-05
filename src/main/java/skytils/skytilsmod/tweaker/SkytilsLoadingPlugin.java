@@ -19,11 +19,7 @@
 package skytils.skytilsmod.tweaker;
 
 import kotlin.KotlinVersion;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.MixinEnvironment;
-import skytils.skytilsmod.utils.StringUtilsKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +33,7 @@ import java.util.Map;
 
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
-    private static final String kotlinErrorMessage =
+    public static final String kotlinErrorMessage =
         "<html><p>" +
         "Skytils has detected a mod with an older version of Kotlin.<br>" +
         "The most common culprit is the ChatTriggers mod.<br>" +
@@ -51,7 +47,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "If you have already done this and are still getting this error,<br>" +
         "ask for support in the Discord.";
 
-    private static final String badMixinVersionMessage =
+    public static final String badMixinVersionMessage =
         "<html><p>" +
         "Skytils has detected an older version of Mixin.<br>" +
         "Many of my features require Mixin 0.7 or later!<br>" +
@@ -62,7 +58,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "If you have already done this and are still getting this error,<br>" +
         "ask for support in the Discord.";
 
-    private static final String liteloaderUserMessage =
+    public static final String liteloaderUserMessage =
         "<html><p>" +
         "Skytils has detected that you are using LiteLoader.<br>" +
         "LiteLoader bundles an older, incompatible version of Mixin.<br>" +
@@ -90,17 +86,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
             exit();
         }
-        if (!StringUtilsKt.startsWithAny(MixinEnvironment.getCurrentEnvironment().getVersion(), "0.7", "0.8")) {
-            try {
-                Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker");
-                showMessage(liteloaderUserMessage);
-                exit();
-            } catch (ClassNotFoundException ignored) {
-                showMessage(badMixinVersionMessage + "<br>The culprit seems to be " + new File(MixinEnvironment.class.getProtectionDomain().getCodeSource().getLocation().toString()).getName() + "</p></html>");
-                exit();
-            }
-        }
-
         try {
             Class.forName("com.sky.voidchat.EDFMLLoadingPlugin");
             showMessage(voidChatMessage);

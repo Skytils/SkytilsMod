@@ -20,13 +20,14 @@ package skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
 import net.minecraftforge.common.ForgeVersion
-import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.ICrashCallable
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.spongepowered.asm.launch.MixinBootstrap
+import org.spongepowered.asm.mixin.MixinEnvironment
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.startsWithAny
 import java.awt.Desktop
 import java.awt.Image
 import java.awt.Toolkit
@@ -44,6 +45,23 @@ import javax.swing.*
 class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
     init {
+        // Must use reflection otherwise the "constant" value will be inlined by compiler
+        if (!runCatching {
+                MixinBootstrap::class.java.getDeclaredField("VERSION").get(null) as String
+            }.getOrDefault("unknown").startsWithAny("0.7", "0.8")) {
+            try {
+                Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
+                showMessage(SkytilsLoadingPlugin.liteloaderUserMessage)
+                SkytilsLoadingPlugin.exit()
+            } catch (ignored: ClassNotFoundException) {
+                showMessage(
+                    SkytilsLoadingPlugin.badMixinVersionMessage + "<br>The culprit seems to be " + File(
+                        MixinEnvironment::class.java.protectionDomain.codeSource.location.toString()
+                    ).name + "</p></html>"
+                )
+                SkytilsLoadingPlugin.exit()
+            }
+        }
         // Must use reflection otherwise the "constant" value will be inlined by compiler
         val forgeVersion = runCatching {
             ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
