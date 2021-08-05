@@ -33,6 +33,14 @@ import java.util.Map;
 
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
+    public static final String noKotlinMessage =
+            "<html><p>" +
+            "Skytils has detected a possible missing dependency<br>" +
+            "The most likely reason is Essential failed to load.<br>" +
+            "Check the Discord for any announcements, and<br>" +
+            "if there are none, ask for support." +
+            "</p></html>";
+
     public static final String kotlinErrorMessage =
         "<html><p>" +
         "Skytils has detected a mod with an older version of Kotlin.<br>" +
@@ -94,45 +102,32 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
     public SkytilsLoadingPlugin() {
+        if (!checkForClass("kotlin.KotlinVersion")) {
+            showMessage(noKotlinMessage);
+            exit();
+        }
         if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
             showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
             exit();
         }
-        try {
-            Class.forName("com.sky.voidchat.EDFMLLoadingPlugin");
+        if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
             showMessage(voidChatMessage);
             exit();
-            Class.forName("me.guichaguri.betterfps.BetterFpsHelper");
+        }
+        if (checkForClass("me.guichaguri.betterfps.BetterFpsHelper")) {
             showMessage(betterFPSMessage);
             exit();
-        } catch (ClassNotFoundException ignored) {
         }
         kotlinPlugin = new SkytilsLoadingPluginKt();
     }
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return kotlinPlugin.getASMTransformerClass();
-    }
-
-    @Override
-    public String getModContainerClass() {
-        return kotlinPlugin.getModContainerClass();
-    }
-
-    @Override
-    public String getSetupClass() {
-        return kotlinPlugin.getSetupClass();
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-        kotlinPlugin.injectData(data);
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return kotlinPlugin.getAccessTransformerClass();
+    private boolean checkForClass(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
     }
 
     private void showMessage(String errorMessage) {
@@ -206,5 +201,30 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    @Override
+    public String[] getASMTransformerClass() {
+        return kotlinPlugin.getASMTransformerClass();
+    }
+
+    @Override
+    public String getModContainerClass() {
+        return kotlinPlugin.getModContainerClass();
+    }
+
+    @Override
+    public String getSetupClass() {
+        return kotlinPlugin.getSetupClass();
+    }
+
+    @Override
+    public void injectData(Map<String, Object> data) {
+        kotlinPlugin.injectData(data);
+    }
+
+    @Override
+    public String getAccessTransformerClass() {
+        return kotlinPlugin.getAccessTransformerClass();
     }
 }
