@@ -136,7 +136,7 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             y = CenterConstraint()
             height = 75.percent()
         }.onLeftClick {
-            container.parent.removeChild(container)
+            scrollComponent.removeChild(container)
         }
     }
 
