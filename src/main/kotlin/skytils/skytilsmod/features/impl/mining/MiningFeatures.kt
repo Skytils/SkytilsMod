@@ -53,6 +53,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -383,7 +384,11 @@ class MiningFeatures {
                 event.entity.isInvisible = false
             }
         }
-        if (Skytils.config.crystalHollowWaypoints && event.entity is EntityOtherPlayerMP && event.entity.name == "Team Treasurite" && event.entity.baseMaxHealth == 1_000_000.0) {
+        if (Skytils.config.crystalHollowWaypoints && event.entity is EntityOtherPlayerMP && event.entity.name == "Team Treasurite" && event.entity.baseMaxHealth == if (MayorInfo.mayorPerks.contains(
+                    "DOUBLE MOBS HP!!!"
+                )
+            ) 2_000_000.0 else 1_000_000.0
+        ) {
             waypoints["Corleone"] = event.entity.position
         }
     }

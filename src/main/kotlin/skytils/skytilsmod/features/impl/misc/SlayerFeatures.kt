@@ -62,6 +62,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BlockChangeEvent
 import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.drawFilledBoundingBox
@@ -333,7 +334,12 @@ class SlayerFeatures {
                     for (item in e.inventory) {
                         if (item == null) continue
                         if (item.item == Item.getItemFromBlock(Blocks.beacon)) {
-                            printDevMessage("Beacon armor stand is close to slayer entity", "slayer", "seraph", "seraphGlyph")
+                            printDevMessage(
+                                "Beacon armor stand is close to slayer entity",
+                                "slayer",
+                                "seraph",
+                                "seraphGlyph"
+                            )
                             yangGlyphEntity = e
                         } else if (item.item == Items.skull) {
                             if (ItemUtil.getSkullTexture(item) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0=") {
@@ -356,7 +362,7 @@ class SlayerFeatures {
     fun onAttack(event: AttackEntityEvent) {
         if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityEnderman || !Skytils.config.useSlayerHitMethod) return
         val enderman = event.target as EntityEnderman
-        if (floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
+        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
             printDevMessage("A valid enderman was attacked", "slayer", "seraph", "seraphHit")
             hitMap.compute(enderman) { _, int ->
                 return@compute (int ?: 0).inc()
@@ -784,7 +790,7 @@ class SlayerFeatures {
                             val currentTier =
                                 sidebarLines.map { cleanSB(it) }.find { it.startsWith("Revenant Horror ") }
                                     ?.substringAfter("Revenant Horror ") ?: ""
-                            if (BossHealths["Revenant"]?.get(currentTier)?.asInt
+                            if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) *( BossHealths["Revenant"]?.get(currentTier)?.asInt ?: 0)
                                 == entity.baseMaxHealth.toInt()
                             ) {
                                 slayerNameEntity = nearby as EntityArmorStand
@@ -840,8 +846,13 @@ class SlayerFeatures {
                         val currentTier =
                             sidebarLines.map { cleanSB(it) }.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
                                 ?: ""
-                        printDevMessage("expected tier $currentTier - spawned hp ${floor(entity.baseMaxHealth).toInt()}", "slayer")
-                        if (BossHealths[name.substringBefore(" ")]?.get(currentTier)?.asInt
+                        printDevMessage(
+                            "expected tier $currentTier - spawned hp ${entity.baseMaxHealth}",
+                            "slayer"
+                        )
+                        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
+                                " "
+                            )]?.get(currentTier)?.asInt ?: 0)
                             == floor(entity.baseMaxHealth).toInt()
                         ) {
                             printDevMessage("hp matched", "slayer")
