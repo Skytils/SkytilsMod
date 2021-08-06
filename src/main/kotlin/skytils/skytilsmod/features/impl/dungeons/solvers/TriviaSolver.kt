@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -36,13 +37,16 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.stripControlCodes
 import kotlin.math.floor
 
 class TriviaSolver {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
+        if (event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
+        val formatted = event.message.formattedText
         if (Skytils.config.triviaSolver && Utils.inDungeons) {
             if (unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && unformatted.contains("answered Question #") && unformatted.endsWith(
                     "correctly!"
@@ -66,20 +70,12 @@ class TriviaSolver {
                 }
             }
 
-            if (triviaAnswers != null && (unformatted.contains("ⓐ") || unformatted.contains("ⓑ") || unformatted.contains(
-                    "ⓒ"
-                ))
-            ) {
+            if (triviaAnswers != null && formatted.trim().startsWithAny("§r§6 ⓐ", "§r§6 ⓑ", "§r§6 ⓒ")) {
                 triviaAnswers!!.find {
-                    unformatted.contains(it)
+                    formatted.endsWith("§a$it§r")
                 }.also {
                     if (it == null) {
-                        event.message.chatStyle.chatHoverEvent = null
-                        event.message.chatStyle.chatClickEvent = null
-                        event.message.siblings.forEach { c ->
-                            if (c.chatStyle.color == EnumChatFormatting.GREEN) c.chatStyle.color =
-                                EnumChatFormatting.RED
-                        }
+                        event.message = ChatComponentText(formatted.replace("§a", "§c"))
                     } else {
                         triviaAnswer = it
                     }
