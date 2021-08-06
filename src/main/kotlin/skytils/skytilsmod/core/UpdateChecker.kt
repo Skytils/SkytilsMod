@@ -60,7 +60,7 @@ object UpdateChecker {
                 println("Copying to mod folder")
                 val newLocation = File(oldJar.parent, "${if (oldJar.name.startsWith("!")) "!" else ""}${jarName}")
                 newLocation.createNewFile()
-                copyFile(newJar, newLocation)
+                newJar.copyTo(newLocation, true)
                 newJar.delete()
                 println("Running delete task")
                 val taskFile = File(File(Skytils.modDir, "updates"), "tasks").listFiles()?.last()
@@ -108,40 +108,6 @@ object UpdateChecker {
                 }
             }
         }.start()
-    }
-
-    /**
-     * Taken from Wynntils under GNU Affero General Public License v3.0
-     * Modified to perform faster
-     * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
-     * @author Wynntils
-     * Copy a file from a location to another
-     *
-     * @param sourceFile The source file
-     * @param destFile Where it will be
-     */
-
-    private fun copyFile(sourceFile: File, destFile: File?) {
-        var destFileModifiable = destFile
-        if (destFileModifiable == null || !destFileModifiable.exists()) {
-            destFileModifiable = File(File(sourceFile.parentFile, "mods"), "Skytils.jar")
-            sourceFile.renameTo(destFileModifiable)
-            return
-        }
-        var source: InputStream? = null
-        var dest: OutputStream? = null
-        try {
-            source = FileInputStream(sourceFile)
-            dest = FileOutputStream(destFileModifiable)
-            val buffer = ByteArray(1024)
-            var length: Int
-            while (source.read(buffer).also { length = it } > 0) {
-                dest.write(buffer, 0, length)
-            }
-        } finally {
-            source!!.close()
-            dest!!.close()
-        }
     }
 
     init {

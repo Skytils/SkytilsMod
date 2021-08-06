@@ -84,66 +84,6 @@ object Utils {
     @JvmStatic
     var random = Random()
 
-
-    fun checkForHypixel() {
-        isOnHypixel = run {
-            try {
-                if (mc.theWorld != null && !mc.isSingleplayer) {
-                    if (mc.thePlayer != null && mc.thePlayer.clientBrand != null) {
-                        if (mc.thePlayer.clientBrand.lowercase().contains("hypixel")) return@run true
-                    }
-                    if (mc.currentServerData != null) return@run mc.currentServerData.serverIP.lowercase()
-                        .contains("hypixel")
-                }
-                return@run false
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return@run false
-            }
-        }
-    }
-
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun checkForSkyblock() {
-        if (isOnHypixel) {
-            val scoreboardObj = mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
-            if (scoreboardObj != null) {
-                val scObjName = ScoreboardUtil.cleanSB(scoreboardObj.displayName)
-                if (scObjName.contains("SKYBLOCK")) {
-                    inSkyblock = true
-                    return
-                }
-            }
-        }
-        inSkyblock = false
-    }
-
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun checkForDungeons() {
-        if (inSkyblock) {
-            if (ScoreboardUtil.sidebarLines.any {
-                    val sCleaned = ScoreboardUtil.cleanSB(it)
-                    sCleaned.contains("The Catacombs") && !sCleaned.contains("Queue") || sCleaned.contains("Dungeon Cleared:")
-                }) {
-                inDungeons = true
-                return
-            }
-        }
-        inDungeons = false
-    }
-
-    fun getSlotUnderMouse(gui: GuiContainer): Slot {
-        return ObfuscationReflectionHelper.getPrivateValue(GuiContainer::class.java, gui, "theSlot", "field_147006_u")
-    }
-
     fun getBlocksWithinRangeAtSameY(center: BlockPos, radius: Int, y: Int): Iterable<BlockPos> {
         val corner1 = BlockPos(center.x - radius, y, center.z - radius)
         val corner2 = BlockPos(center.x + radius, y, center.z + radius)

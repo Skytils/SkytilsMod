@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.utils
 
-import com.google.common.collect.Iterables
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import skytils.skytilsmod.Skytils.Companion.mc

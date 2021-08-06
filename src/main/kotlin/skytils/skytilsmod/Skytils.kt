@@ -320,9 +320,16 @@ class Skytils {
 
         if (ticks % 20 == 0) {
             if (mc.thePlayer != null) {
-                Utils.checkForHypixel()
-                Utils.checkForSkyblock()
-                Utils.checkForDungeons()
+                Utils.isOnHypixel = mc.runCatching {
+                    theWorld != null && !isSingleplayer && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel") ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
+                }.onFailure { it.printStackTrace() }.getOrDefault(false)
+                Utils.inSkyblock = Utils.isOnHypixel && mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
+                    ?.let { ScoreboardUtil.cleanSB(it.displayName).contains("SKYBLOCK") } ?: false
+                Utils.inDungeons = Utils.inSkyblock && ScoreboardUtil.sidebarLines.any {
+                    ScoreboardUtil.cleanSB(it).run {
+                        contains("The Catacombs") && !contains("Queue") || contains("Dungeon Cleared:")
+                    }
+                }
             }
             ticks = 0
         }
