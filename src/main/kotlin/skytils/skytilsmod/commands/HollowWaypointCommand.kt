@@ -20,16 +20,16 @@ package skytils.skytilsmod.commands
 
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
+import skytils.skytilsmod.utils.setHoverText
 
 object HollowWaypointCommand : CommandBase() {
     override fun getCommandName(): String {
@@ -56,41 +56,41 @@ object HollowWaypointCommand : CommandBase() {
         if (args.isEmpty()) {
             val message = UMessage("§3Skytils > §eWaypoints:\n")
             if (MiningFeatures.cityLoc.exists()) {
-                message.append(ChatComponentText("§fLost Precursor City "))
+                message.append(UTextComponent("§fLost Precursor City "))
                 message.append(copyMessage("Lost Precursor City: " + MiningFeatures.cityLoc.toString()))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_city"))
             }
             if (MiningFeatures.templeLoc.exists()) {
-                message.append(ChatComponentText("§aJungle Temple "))
+                message.append(UTextComponent("§aJungle Temple "))
                 message.append(copyMessage("Jungle Temple: " + MiningFeatures.templeLoc.toString()))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_temple"))
             }
             if (MiningFeatures.denLoc.exists()) {
-                message.append(ChatComponentText("§eGoblin Queen's Den "))
+                message.append(UTextComponent("§eGoblin Queen's Den "))
                 message.append(copyMessage("Goblin Queen's Den: " + MiningFeatures.denLoc.toString()))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_den"))
             }
             if (MiningFeatures.minesLoc.exists()) {
-                message.append(ChatComponentText("§9Mines of Divan "))
+                message.append(UTextComponent("§9Mines of Divan "))
                 message.append(copyMessage("Mines of Divan: " + MiningFeatures.minesLoc.toString()))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_mines"))
             }
             if (MiningFeatures.balLoc.exists()) {
-                message.append(ChatComponentText("§cKhazad-dûm "))
+                message.append(UTextComponent("§cKhazad-dûm "))
                 message.append(copyMessage("Khazad-dûm: " + MiningFeatures.balLoc.toString()))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_bal"))
             }
             if (MiningFeatures.fairyLoc.exists()) {
-                message.append(ChatComponentText("§dFairy Grotto "))
+                message.append(UTextComponent("§dFairy Grotto "))
                 message.append(copyMessage("Fairy Grotto: " + MiningFeatures.fairyLoc.toString()))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_fairy"))
             }
             for ((key, value) in MiningFeatures.waypoints) {
-                message.append(ChatComponentText("§e$key "))
+                message.append(UTextComponent("§e$key "))
                 message.append(copyMessage("$key: " + value.x + " " + value.y + " " + value.z))
                 message.append(removeMessage("/skytilshollowwaypoint remove $key"))
             }
-            message.append(ChatComponentText("§eFor more info do /skytilshollowwaypoint help"))
+            message.append(UTextComponent("§eFor more info do /skytilshollowwaypoint help"))
             message.chat()
         } else {
             when (args[0]) {
@@ -144,7 +144,7 @@ object HollowWaypointCommand : CommandBase() {
                         }
                         UChat.chat("§aSuccessfully created waypoint ${args[1]}")
                     } else
-                        mc.thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint set name <x y z>"))
+                        UChat.chat("§cCorrect usage: /skytilshollowwaypoint set name <x y z>")
                 }
                 "remove", "delete" -> {
                     if (args.size >= 2) {
@@ -159,7 +159,7 @@ object HollowWaypointCommand : CommandBase() {
                         }
                         UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
                     } else
-                        mc.thePlayer.addChatMessage(ChatComponentText("§cCorrect usage: /skytilshollowwaypoint remove name/clear"))
+                        UChat.chat("§cCorrect usage: /skytilshollowwaypoint remove name/clear")
                 }
                 "clear" -> {
                     MiningFeatures.cityLoc.reset()
@@ -172,14 +172,12 @@ object HollowWaypointCommand : CommandBase() {
                     UChat.chat("§aSuccessfully cleared all waypoints.")
                 }
                 else -> {
-                    mc.thePlayer.addChatMessage(
-                        ChatComponentText(
-                            "§eusage: /skytilshollowwaypoint ➔ shows all waypoints\n" +
-                                    "§e/skytilshollowwaypoint set name ➔ sets waypoint at current location\n" +
-                                    "§e/skytilshollowwaypoint set name x y z ➔ sets waypoint at specified location\n" +
-                                    "§e/skytilshollowwaypoint remove name ➔ remove the specified waypoint\n" +
-                                    "§e/skytilshollowwaypoint clear ➔ removes all waypoints"
-                        )
+                    UChat.chat(
+                        "§eusage: /skytilshollowwaypoint ➔ shows all waypoints\n" +
+                                "§e/skytilshollowwaypoint set name ➔ sets waypoint at current location\n" +
+                                "§e/skytilshollowwaypoint set name x y z ➔ sets waypoint at specified location\n" +
+                                "§e/skytilshollowwaypoint remove name ➔ remove the specified waypoint\n" +
+                                "§e/skytilshollowwaypoint clear ➔ removes all waypoints"
                     )
                 }
             }
@@ -187,26 +185,18 @@ object HollowWaypointCommand : CommandBase() {
     }
 
     private fun copyMessage(text: String): IChatComponent {
-        return ChatComponentText("§9[Copy] ").apply {
-            with(chatStyle) {
-                chatHoverEvent = HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    ChatComponentText("§9Copy the coordinates in chat box.")
-                )
-                chatClickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, text)
-            }
+        return UTextComponent("§9[Copy] ").apply {
+            setHoverText("§9Copy the coordinates in chat box.")
+            clickAction = ClickEvent.Action.SUGGEST_COMMAND
+            clickValue = text
         }
     }
 
     private fun removeMessage(command: String): IChatComponent {
-        return ChatComponentText("§c[Remove]\n").apply {
-            with(chatStyle) {
-                chatHoverEvent = HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    ChatComponentText("§cRemove the waypoint.")
-                )
-                chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, command)
-            }
+        return UTextComponent("§c[Remove]\n").apply {
+            setHoverText("§cRemove the waypoint.")
+            clickAction = ClickEvent.Action.RUN_COMMAND
+            clickValue = command
         }
     }
 }

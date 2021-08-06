@@ -76,14 +76,9 @@ object MayorInfo {
                 fetchMayorData()
             }
             if (System.currentTimeMillis() - lastCheckedElectionOver > 60 * 60 * 1000) {
-                var elected = currentMayor
-                for (pi in TabListUtils.tabEntries) {
-                    val name = pi.text
-                    if (name.startsWith("§r §r§fWinner: §r§a")) {
-                        elected = name.substring(19, name.length - 2)
-                        break
-                    }
-                }
+                val elected = TabListUtils.tabEntries.find {
+                    it.text.startsWith("§r §r§fWinner: §r§a")
+                }.run { this?.text?.substring(19, this.text.length - 2) } ?: currentMayor
                 if (currentMayor != elected) {
                     isLocal = true
                     currentMayor = elected
