@@ -24,14 +24,12 @@ import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.crash.CrashReportCategory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.HoverEvent
-import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.AxisAlignedBB
@@ -40,7 +38,6 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
