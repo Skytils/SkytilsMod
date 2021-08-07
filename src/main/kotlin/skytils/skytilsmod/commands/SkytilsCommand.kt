@@ -167,6 +167,7 @@ object SkytilsCommand : CommandBase() {
                             #  §3/skytils setkey §l➡ §bSets your Hypixel API key.
                             #  §3/skytils help §l➡ §bShows this help menu.
                             #  §3/skytils reload <data/mayor/slayer> §l➡ §bForces a refresh of data.
+                            #  §3/skytils update §l➡ §bChecks for updates in-game.
                             #  §3/skytils editlocations §l➡ §bOpens the location editing GUI.
                             #  §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
                             #  §3/skytils spamhider §l➡ §bOpens the command spam hider editing GUI.
