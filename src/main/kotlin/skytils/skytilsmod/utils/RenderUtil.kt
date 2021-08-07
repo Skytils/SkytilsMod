@@ -30,6 +30,7 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GLContext
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.mixins.accessors.AccessorMinecraft
@@ -484,10 +485,16 @@ object RenderUtil {
     private fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity?) {
         if (rarity != null) {
             val alpha = Skytils.config.itemRarityOpacity
-            GlStateManager.disableLighting()
-            GlStateManager.disableDepth()
+
+            // save the states
+            val lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING)
+            val depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
+            val alphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
+
+            if (lightingEnabled) GlStateManager.disableLighting()
+            if (depthEnabled) GlStateManager.disableDepth()
             GlStateManager.enableBlend()
-            GlStateManager.enableAlpha()
+            if (!alphaEnabled) GlStateManager.enableAlpha()
             Minecraft.getMinecraft().textureManager.bindTexture(RARITY)
             GlStateManager.color(
                 rarity.color.red / 255.0f,
@@ -499,9 +506,9 @@ object RenderUtil {
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND)
             Gui.drawModalRectWithCustomSizedTexture(xPos, yPos, 0f, 0f, 16, 16, 16f, 16f)
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE)
-            GlStateManager.enableLighting()
-            GlStateManager.enableDepth()
-            GlStateManager.disableAlpha()
+            if (lightingEnabled) GlStateManager.enableLighting()
+            if (depthEnabled) GlStateManager.enableDepth()
+            if (!alphaEnabled) GlStateManager.disableAlpha()
         }
     }
 

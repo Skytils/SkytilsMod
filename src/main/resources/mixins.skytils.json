@@ -58,6 +58,7 @@
   ],
   "verbose": true,
   "client": [
+    "neu.MixinCustomAH",
     "renderer.MixinRendererLivingEntity"
   ]
 }

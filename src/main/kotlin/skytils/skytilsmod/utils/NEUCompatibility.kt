@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 
 object NEUCompatibility {
+    var isCustomAHActive = false
     var isStorageMenuActive = false
     var isTradeWindowActive = false
 
