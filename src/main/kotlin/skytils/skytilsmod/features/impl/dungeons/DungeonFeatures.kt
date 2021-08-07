@@ -61,6 +61,7 @@ import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -301,7 +302,12 @@ class DungeonFeatures {
                         ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
                 }
             }
-            if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]") && thornMissMessages.none { unformatted.contains(it, true) }
+            if (Skytils.config.hideF4Spam && unformatted.startsWith("[CROWD]") && thornMissMessages.none {
+                    unformatted.contains(
+                        it,
+                        true
+                    )
+                }
             ) {
                 event.isCanceled = true
             }
@@ -404,11 +410,17 @@ class DungeonFeatures {
                     ) mc.theWorld.removeEntity(event.entity)
                 }
             }
-            if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned && Utils.equalsOneOf(
+            if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
+                if (MayorInfo.currentMayor == "Derpy") Utils.equalsOneOf(
+                    event.entity.maxHealth,
+                    200f,
+                    800f
+                ) else Utils.equalsOneOf(
                     event.entity.maxHealth,
                     100f,
                     400f
-                ) && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible
+                )
+                        && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible
             ) {
                 RenderUtil.drawOutlinedBoundingBox(
                     event.entity.entityBoundingBox,

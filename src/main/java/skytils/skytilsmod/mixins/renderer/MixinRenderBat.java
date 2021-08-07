@@ -26,14 +26,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.features.impl.handlers.MayorInfo;
 import skytils.skytilsmod.utils.Utils;
+
+import java.util.Objects;
 
 @Mixin(RenderBat.class)
 public abstract class MixinRenderBat {
 
     @Inject(method = "preRenderCallback", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;scale(FFF)V", shift = At.Shift.AFTER))
     private void preRender(EntityBat bat, float partialTicks, CallbackInfo ci) {
-        if (Utils.inDungeons && Skytils.config.biggerBatModels && Utils.equalsOneOf(bat.getMaxHealth(), 100, 400)) {
+        if (Utils.inDungeons && Skytils.config.biggerBatModels &&
+                (Objects.equals(MayorInfo.INSTANCE.getCurrentMayor(), "Derpy") ?
+                        Utils.equalsOneOf(bat.getMaxHealth(), 200, 800) :
+                        Utils.equalsOneOf(bat.getMaxHealth(), 100, 400)
+                )
+        ) {
             GlStateManager.scale(3, 3, 3);
         }
     }
