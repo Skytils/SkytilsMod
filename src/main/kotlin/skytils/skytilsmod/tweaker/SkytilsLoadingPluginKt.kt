@@ -45,86 +45,88 @@ import javax.swing.*
 class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
     init {
-        // Must use reflection otherwise the "constant" value will be inlined by compiler
-        if (!runCatching {
-                MixinBootstrap::class.java.getDeclaredField("VERSION").get(null) as String
-            }.getOrDefault("unknown").startsWithAny("0.7", "0.8")) {
-            try {
-                Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
-                showMessage(SkytilsLoadingPlugin.liteloaderUserMessage)
-                SkytilsLoadingPlugin.exit()
-            } catch (ignored: ClassNotFoundException) {
-                showMessage(
-                    SkytilsLoadingPlugin.badMixinVersionMessage + "<br>The culprit seems to be " + File(
-                        MixinEnvironment::class.java.protectionDomain.codeSource.location.toString()
-                    ).name + "</p></html>"
-                )
-                SkytilsLoadingPlugin.exit()
+        if (System.getProperty("skytils.skipStartChecks") == null) {
+            // Must use reflection otherwise the "constant" value will be inlined by compiler
+            if (!runCatching {
+                    MixinBootstrap::class.java.getDeclaredField("VERSION").get(null) as String
+                }.getOrDefault("unknown").startsWithAny("0.7", "0.8")) {
+                try {
+                    Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
+                    showMessage(SkytilsLoadingPlugin.liteloaderUserMessage)
+                    SkytilsLoadingPlugin.exit()
+                } catch (ignored: ClassNotFoundException) {
+                    showMessage(
+                        SkytilsLoadingPlugin.badMixinVersionMessage + "<br>The culprit seems to be " + File(
+                            MixinEnvironment::class.java.protectionDomain.codeSource.location.toString()
+                        ).name + "</p></html>"
+                    )
+                    SkytilsLoadingPlugin.exit()
+                }
             }
-        }
 
-        if (this::class.java.classLoader.getResource("patcher.mixins.json") == null && runCatching {
-                Class.forName("club.sk1er.patcher.tweaker.other.ModClassTransformer")
-            }.isSuccess) {
-            val sk1erClubButton = createButton("Go to Sk1er.Club") {
-                Desktop.getDesktop().browse(URL("https://sk1er.club/mods/patcher").toURI())
-            }
-            showMessage(
-                """
+            if (this::class.java.classLoader.getResource("patcher.mixins.json") == null && runCatching {
+                    Class.forName("club.sk1er.patcher.tweaker.other.ModClassTransformer")
+                }.isSuccess) {
+                val sk1erClubButton = createButton("Go to Sk1er.Club") {
+                    Desktop.getDesktop().browse(URL("https://sk1er.club/mods/patcher").toURI())
+                }
+                showMessage(
+                    """
                 #Skytils has detected that you are using an old version of Patcher.
                 #You must update Patcher in order for your game to launch.
                 #You can do so at https://sk1er.club/mods/patcher
                 #If you have already done this and are still getting this error,
                 #ask for support in the Discord.
                 """.trimMargin("#"), sk1erClubButton
-            )
-            SkytilsLoadingPlugin.exit()
-        }
-        // Must use reflection otherwise the "constant" value will be inlined by compiler
-        val forgeVersion = runCatching {
-            ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
-        }.onFailure { it.printStackTrace() }.getOrDefault(2318)
-        // Asbyth's forge fork uses version 0
-        if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
-            val forgeUrl =
-                URL("https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
-            val forgeButton = createButton("Get Forge") {
-                if (SkytilsInstallerFrame.getOperatingSystem() == SkytilsInstallerFrame.OperatingSystem.WINDOWS) {
-                    runCatching {
-                        val tempDir = System.getenv("TEMP")
-                        val forgeFile = File(tempDir, "forge-1.8.9-11.15.1.2318-1.8.9-installer.jar")
-
-                        val runtime = Utils.getJavaRuntime()
-
-                        val client = APIUtil.builder.build()
-                        client.execute(HttpGet(forgeUrl)) {
-                            if (it.code == 200) {
-                                it.entity.writeTo(forgeFile.outputStream())
-                                EntityUtils.consume(it.entity)
-                                client.close()
-                                Runtime.getRuntime()
-                                    .exec("\"$runtime\" -jar \"${forgeFile.canonicalPath}\"")
-                                exit()
-                            } else {
-                                Desktop.getDesktop().browse(forgeUrl)
-                            }
-                        }
-                    }.onFailure {
-                        it.printStackTrace()
-                        Desktop.getDesktop().browse(forgeUrl)
-                    }
-                } else Desktop.getDesktop().browse(forgeUrl)
+                )
+                SkytilsLoadingPlugin.exit()
             }
-            showMessage(
-                """
+            // Must use reflection otherwise the "constant" value will be inlined by compiler
+            val forgeVersion = runCatching {
+                ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
+            }.onFailure { it.printStackTrace() }.getOrDefault(2318)
+            // Asbyth's forge fork uses version 0
+            if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
+                val forgeUrl =
+                    URL("https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
+                val forgeButton = createButton("Get Forge") {
+                    if (SkytilsInstallerFrame.getOperatingSystem() == SkytilsInstallerFrame.OperatingSystem.WINDOWS) {
+                        runCatching {
+                            val tempDir = System.getenv("TEMP")
+                            val forgeFile = File(tempDir, "forge-1.8.9-11.15.1.2318-1.8.9-installer.jar")
+
+                            val runtime = Utils.getJavaRuntime()
+
+                            val client = APIUtil.builder.build()
+                            client.execute(HttpGet(forgeUrl)) {
+                                if (it.code == 200) {
+                                    it.entity.writeTo(forgeFile.outputStream())
+                                    EntityUtils.consume(it.entity)
+                                    client.close()
+                                    Runtime.getRuntime()
+                                        .exec("\"$runtime\" -jar \"${forgeFile.canonicalPath}\"")
+                                    exit()
+                                } else {
+                                    Desktop.getDesktop().browse(forgeUrl)
+                                }
+                            }
+                        }.onFailure {
+                            it.printStackTrace()
+                            Desktop.getDesktop().browse(forgeUrl)
+                        }
+                    } else Desktop.getDesktop().browse(forgeUrl)
+                }
+                showMessage(
+                    """
                 #Skytils has detected that you are using an old version of Forge (build ${forgeVersion}).
                 #In order to resolve this issue and launch the game,
                 #please install Minecraft Forge build 2318 for Minecraft 1.8.9.
                 #If you have already done this and are still getting this error,
                 #ask for support in the Discord.
                 """.trimMargin("#"),
-                forgeButton
-            )
+                    forgeButton
+                )
+            }
         }
     }
 

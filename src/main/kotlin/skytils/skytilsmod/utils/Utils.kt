@@ -208,7 +208,11 @@ object Utils {
             }.getOrDefault("NONE")
 
             return@addCrashSectionCallable """
-                            # BetterFPS: ${hasBetterFPS != "NONE"} version: $hasBetterFPS
+                            # BetterFPS: ${hasBetterFPS != "NONE"} version: $hasBetterFPS; Disabled Startup Check: ${
+                System.getProperty(
+                    "skytils.skipStartChecks"
+                ) != null
+            }
                         """.trimMargin("#")
         }
     }

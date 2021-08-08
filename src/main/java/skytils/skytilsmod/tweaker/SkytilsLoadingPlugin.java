@@ -102,21 +102,23 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
     public SkytilsLoadingPlugin() {
-        if (!checkForClass("kotlin.KotlinVersion")) {
-            showMessage(noKotlinMessage);
-            exit();
-        }
-        if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
-            showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
-            exit();
-        }
-        if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
-            showMessage(voidChatMessage);
-            exit();
-        }
-        if (checkForClass("me.guichaguri.betterfps.BetterFpsHelper")) {
-            showMessage(betterFPSMessage);
-            exit();
+        if (System.getProperty("skytils.skipStartChecks") == null) {
+            if (!checkForClass("kotlin.KotlinVersion")) {
+                showMessage(noKotlinMessage);
+                exit();
+            }
+            if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
+                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
+                exit();
+            }
+            if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
+                showMessage(voidChatMessage);
+                exit();
+            }
+            if (checkForClass("me.guichaguri.betterfps.BetterFpsHelper")) {
+                showMessage(betterFPSMessage);
+                exit();
+            }
         }
         kotlinPlugin = new SkytilsLoadingPluginKt();
     }
