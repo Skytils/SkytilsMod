@@ -43,7 +43,7 @@ fun addGlintToSkull(
     face: EnumFacing,
     rotation: Float,
     type: Int,
-    profile: GameProfile,
+    profile: GameProfile?,
     p_180543_8_: Int,
     ci: CallbackInfo,
     model: ModelBase

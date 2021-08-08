@@ -45,7 +45,6 @@ val RES_ITEM_GLINT = ResourceLocation("textures/misc/enchanted_item_glint.png")
 fun renderRarity(stack: ItemStack, x: Int, y: Int, ci: CallbackInfo) {
     if (Utils.inSkyblock && Skytils.config.showItemRarity) {
         if (mc.currentScreen != null) {
-            val name = mc.currentScreen.javaClass.name
             if (isStorageMenuActive || isTradeWindowActive || isCustomAHActive) {
                 renderRarity(stack, x, y)
             }
@@ -55,10 +54,10 @@ fun renderRarity(stack: ItemStack, x: Int, y: Int, ci: CallbackInfo) {
 
 fun renderItemOverlayPost(
     fr: FontRenderer,
-    stack: ItemStack,
+    stack: ItemStack?,
     xPosition: Int,
     yPosition: Int,
-    text: String,
+    text: String?,
     ci: CallbackInfo
 ) {
     try {

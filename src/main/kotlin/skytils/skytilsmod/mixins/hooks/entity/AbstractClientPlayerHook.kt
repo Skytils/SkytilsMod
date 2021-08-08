@@ -72,7 +72,7 @@ class AbstractClientPlayerHook(player: Any) {
         return@lazy null
     }
 
-    fun replaceSkin(cir: CallbackInfoReturnable<ResourceLocation?>) {
+    fun replaceSkin(cir: CallbackInfoReturnable<ResourceLocation>) {
         if (isSummonMob) {
             if (Skytils.config.fixSummonSkin) {
                 if (correctSkin == null) {

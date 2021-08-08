@@ -86,7 +86,7 @@ class GuiContainerHook(guiAny: Any) {
         }
     }
 
-    fun onMouseClick(slot: Slot, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
+    fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
         try {
             if (MinecraftForge.EVENT_BUS.post(
                     SlotClickEvent(

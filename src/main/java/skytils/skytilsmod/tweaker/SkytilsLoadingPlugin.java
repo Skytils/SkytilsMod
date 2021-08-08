@@ -126,7 +126,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
     private boolean checkForClass(String className) {
         try {
-            Class.forName(className);
+            Class.forName(className, false, getClass().getClassLoader());
             return true;
         } catch (ClassNotFoundException ignored) {
             return false;
