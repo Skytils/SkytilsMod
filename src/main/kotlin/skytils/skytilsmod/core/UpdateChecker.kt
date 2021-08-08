@@ -139,7 +139,7 @@ object UpdateChecker {
                 1 -> APIUtil.getArrayResponse(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases"
                 )[0].asJsonObject
-                else -> return
+                else -> return println("Channel set as none")
             }
             val latestTag = latestRelease["tag_name"].asString
             val currentTag = Skytils.VERSION
