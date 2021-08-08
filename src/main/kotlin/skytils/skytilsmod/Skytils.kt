@@ -73,9 +73,9 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.ReopenableGUI
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
-import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
-import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.io.File

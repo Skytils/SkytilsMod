@@ -1,8 +1,8 @@
 {
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.7",
-  "plugin": "skytils.skytilsmod.tweaker.SkytilsMixinPlugin",
-  "package": "skytils.skytilsmod.mixins",
+  "plugin": "skytils.skytilsmod.mixins.SkytilsMixinPlugin",
+  "package": "skytils.skytilsmod.mixins.transformers",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "MixinMinecraft",
@@ -12,6 +12,7 @@
     "accessors.AccessorGuiEditSign",
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorMinecraft",
+    "accessors.AccessorRenderItem",
     "accessors.AccessorSettingsGui",
     "audio.MixinSoundManager",
     "crash.MixinCrashReport",

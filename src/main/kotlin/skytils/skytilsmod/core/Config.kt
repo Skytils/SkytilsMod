@@ -302,7 +302,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Increases the size of bat models.\nThe hitbox of the bat may be offset from what is shown.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    @JvmField
     var biggerBatModels = false
 
     @Property(
@@ -399,7 +398,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Changes the color of the blaze to shoot on Higher or Lower.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var blazeSolver = false
 
     @Property(
@@ -407,7 +405,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Colors the next blaze to shoot in Higher or Lower yellow.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var showNextBlaze = false
 
     @Property(
@@ -415,7 +412,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color used to highlight the lowest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var lowestBlazeColor = Color(255, 0, 0, 200)
 
     @Property(
@@ -423,7 +419,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color used to highlight the highest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var highestBlazeColor = Color(0, 255, 0, 200)
 
     @Property(
@@ -431,7 +426,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color used to highlight the next blaze in.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var nextBlazeColor = Color(255, 255, 0, 200)
 
     @Property(
@@ -859,7 +853,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Makes ghosts more visible in the Dwarven Mines.\nThis is allowed on the Hypixel network and can be done in Vanilla.",
         category = "Mining", subcategory = "Quality of Life"
     )
-    @JvmField
     var moreVisibleGhosts = false
 
     @Property(
@@ -958,7 +951,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Fixes SBA chroma with Patcher 1.6",
         category = "Miscellaneous", subcategory = "Fixes"
     )
-    @JvmField
     var fixSbaChroma = false
 
     /*
@@ -981,7 +973,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Shortens item names with stars in them.",
         category = "Miscellaneous", subcategory = "Items"
     )
-    @JvmField
     var compactStars = false
 
     @Property(
@@ -1005,7 +996,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         maxF = 5f,
         decimalPlaces = 2
     )
-    @JvmField
     var itemDropScale = 1f
 
     @Property(
@@ -1022,7 +1012,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         maxF = 2f,
         decimalPlaces = 2
     )
-    @JvmField
     var largerHeadScale = 1f
 
     @Property(
@@ -1107,7 +1096,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Shows the rarity of an item in the color",
         category = "Miscellaneous", subcategory = "Item Rarity"
     )
-    @JvmField
     var showItemRarity = false
 
     @Property(
@@ -1192,7 +1180,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Changes the transparency of your armor layer.",
         category = "Miscellaneous", subcategory = "Other"
     )
-    @JvmField
     var transparentArmorLayer = 1f
 
     @Property(
@@ -1200,7 +1187,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Changes the transparency of your head layer.",
         category = "Miscellaneous", subcategory = "Other"
     )
-    @JvmField
     var transparentHeadLayer = 1f
 
     /*@Property(
@@ -1208,7 +1194,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
         category = "Miscellaneous", subcategory = "Other"
     )*/
-    @JvmField
+    
     var fixSummonSkin = false
 
     @Property(
@@ -1216,7 +1202,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Uses the player's skin for necromancy mobs.",
         category = "Miscellaneous", subcategory = "Other"
     )
-    @JvmField
     var usePlayerSkin = false
 
     @Property(
@@ -1245,7 +1230,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Removes the vanilla effects of Night Vision.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var disableNightVision = false
 
     @Property(
@@ -1261,7 +1245,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Fixes some items not having the enchantment glint.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var enchantGlintFix = false
 
     @Property(
@@ -1276,7 +1259,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
    description = "Stops the Creeper Veil from blocking interaction with NPCs.",
    category = "Miscellaneous", subcategory = "Quality of Life"
    )*/
-    @JvmField
+    
     var hideCreeperVeilNearNPCs = false
 
     @Property(
@@ -1291,7 +1274,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents the game from rendering fire on burning entities.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hideEntityFire = false
 
     @Property(
@@ -1313,7 +1295,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents all lightning from rendering.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hideLightning = false
 
     @Property(
@@ -1321,7 +1302,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Hides the smoke particles created when mobs die.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hideDeathParticles = false
 
     @Property(
@@ -1329,7 +1309,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hidePotionEffects = false
 
     @Property(
@@ -1365,7 +1344,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Allows you to move the action bar as if it were a Skytils HUD element.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var moveableActionBar = false
 
     @Property(
@@ -1373,7 +1351,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Allows you to move the item name highlight as if it were a Skytils HUD element.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var moveableItemNameHighlight = false
 
     @Property(
@@ -1388,7 +1365,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Removes the screen shake when you are hurt.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var noHurtcam = false
 
     @Property(
@@ -1403,7 +1379,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var preventLogSpam = false
 
     /* @Property(
@@ -1411,7 +1386,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
    description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
    category = "Miscellaneous", subcategory = "Quality of Life"
    )*/
-    @JvmField
+    
     var prioritizeItemAbilities = false
 
     // TODO get Sk1er LLC to make a number text box
@@ -1490,7 +1465,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Lowers the health and nametag of endermen so it's easier to see.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var lowerEndermanNametags = false
 
     @Property(
@@ -1665,7 +1639,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Changes the color of your Seraph boss based on the phase it is in.\nBeacon takes priority over the other colors.",
         category = "Slayer", subcategory = "Voidgloom Seraph"
     )
-    @JvmField
     var recolorSeraphBoss = false
 
     @Property(
@@ -1673,7 +1646,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Slayer", subcategory = "Voidgloom Seraph",
         allowAlpha = false
     )
-    @JvmField
     var seraphBeaconPhaseColor = Color(255, 255, 255)
 
     @Property(
@@ -1681,7 +1653,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Slayer", subcategory = "Voidgloom Seraph",
         allowAlpha = false
     )
-    @JvmField
     var seraphHitsPhaseColor = Color(255, 255, 255)
 
     @Property(
@@ -1689,7 +1660,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Slayer", subcategory = "Voidgloom Seraph",
         allowAlpha = false
     )
-    @JvmField
     var seraphNormalPhaseColor = Color(255, 255, 255)
 
     @Property(

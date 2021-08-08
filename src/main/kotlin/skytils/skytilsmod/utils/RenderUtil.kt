@@ -30,10 +30,9 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GLContext
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.mixins.accessors.AccessorMinecraft
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.roundToInt

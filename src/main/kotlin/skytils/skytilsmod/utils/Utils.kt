@@ -41,7 +41,7 @@ import net.minecraftforge.common.MinecraftForge
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString

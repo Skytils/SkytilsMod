@@ -20,10 +20,12 @@ package skytils.skytilsmod.utils
 import gg.essential.universal.wrappers.message.UTextComponent
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
+fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils.countMatches(this, subString)
+
 fun String?.stripControlCodes(): String = UTextComponent.stripFormatting(this ?: "")
 
-fun String?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
-fun String?.containsAny(vararg sequences: CharSequence?): Boolean {
+fun CharSequence?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
+fun CharSequence?.containsAny(vararg sequences: CharSequence?): Boolean {
     if (this == null) return false
     return sequences.any { it != null && this.contains(it) }
 }

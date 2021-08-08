@@ -117,7 +117,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
             }
             showMessage(
                 """
-                #Skytils has detected that you are using an old version of Forge.
+                #Skytils has detected that you are using an old version of Forge (build ${forgeVersion}).
                 #In order to resolve this issue and launch the game,
                 #please install Minecraft Forge build 2318 for Minecraft 1.8.9.
                 #If you have already done this and are still getting this error,
