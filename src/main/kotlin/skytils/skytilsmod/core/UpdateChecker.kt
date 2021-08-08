@@ -132,10 +132,15 @@ object UpdateChecker {
 
         override fun run() {
             println("Checking for updates...")
-            val latestRelease =
-                if (Skytils.config.updateChannel == 1) APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases")[0].asJsonObject else APIUtil.getJSONResponse(
+            val latestRelease = when(Skytils.config.updateChannel) {
+                2 -> APIUtil.getJSONResponse(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases/latest"
                 )
+                1 -> APIUtil.getArrayResponse(
+                    "https://api.github.com/repos/Skytils/SkytilsMod/releases"
+                )[0].asJsonObject
+                else -> return
+            }
             val latestTag = latestRelease["tag_name"].asString
             val currentTag = Skytils.VERSION
 
