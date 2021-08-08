@@ -33,11 +33,12 @@ import java.util.Map;
 
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
-    public static final String noKotlinMessage =
+    public static final String missingDependency =
             "<html><p>" +
             "Skytils has detected a possible missing dependency<br>" +
             "The most likely reason is Essential failed to load.<br>" +
-            "Check the Discord for any announcements, and<br>" +
+            "Essential might also not work in your country.<br>" +
+            "Check the Skytils Discord for any announcements, and<br>" +
             "if there are none, ask for support." +
             "</p></html>";
 
@@ -103,8 +104,8 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
     public SkytilsLoadingPlugin() {
         if (System.getProperty("skytils.skipStartChecks") == null) {
-            if (!checkForClass("kotlin.KotlinVersion")) {
-                showMessage(noKotlinMessage);
+            if (!checkForClass("kotlin.KotlinVersion") || !checkForClass("gg.essential.api.EssentialAPI")) {
+                showMessage(missingDependency);
                 exit();
             }
             if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
