@@ -30,9 +30,9 @@ import skytils.skytilsmod.events.RenderBlockInWorldEvent
 
 fun modifyGetModelFromBlockState(
     blockRendererDispatcher: Any,
-    state: IBlockState,
+    state: IBlockState?,
     worldIn: IBlockAccess,
-    pos: BlockPos,
+    pos: BlockPos?,
     cir: CallbackInfoReturnable<IBakedModel>
 ) {
     (blockRendererDispatcher as BlockRendererDispatcher).apply {
