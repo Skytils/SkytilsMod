@@ -74,7 +74,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.0")
-    implementation("gg.essential:essential-1.8.9-forge:1286")
+    implementation("gg.essential:essential-1.8.9-forge:1291")
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
     shadowMe("com.github.Skytils:Hylin:6e070f7fde") {
