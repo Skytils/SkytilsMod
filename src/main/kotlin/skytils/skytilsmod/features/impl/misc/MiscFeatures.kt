@@ -129,12 +129,12 @@ class MiscFeatures {
             if (unformatted == "Your zapper is temporarily fatigued!") {
                 val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
                 printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
-                if (duration.isPositive()) event.message.appendText(
-                    " §eThis will expire in${
+                if (duration.isPositive()) {
+                    UChat.chat("§3Skytils > §eThis will expire in${
                         duration
                             .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
-                    }"
-                )
+                    }")
+                }
             }
         }
         if (!Utils.inDungeons) {

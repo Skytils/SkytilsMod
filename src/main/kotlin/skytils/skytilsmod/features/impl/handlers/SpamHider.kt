@@ -557,11 +557,11 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Compact Building Tools
-                (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
+                (Skytils.config.compactBuildingTools && formatted.startsWith("§3Skytils > §eThis will expire in") && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
                     "place"
                 ) || formatted.contains("zap"))
                         ) -> {
-                    if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
+                    if (formatted.startsWith("§3Skytils > §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
                         val chatGui = mc.ingameGUI.chatGUI
                         val lines = (chatGui as AccessorGuiNewChat).chatLines
                         val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
