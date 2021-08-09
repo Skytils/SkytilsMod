@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.effect.EntityLightningBolt
@@ -46,6 +47,7 @@ import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -369,6 +371,28 @@ class MiscFeatures {
                         return
                     }
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onTooltip(event: ItemTooltipEvent) {
+        if (!Utils.inSkyblock) return
+        if (!Skytils.config.hideTooltipsOnStorage) return
+        if (event.toolTip == null) return
+        if (mc.currentScreen is GuiChest) {
+            val player = Minecraft.getMinecraft().thePlayer
+            val chest = player.openContainer as ContainerChest
+            val inventory = chest.lowerChestInventory
+            val chestName = inventory.displayName.unformattedText
+            if (chestName.equals("Storage")) {
+                if (ItemUtil.getDisplayName(event.itemStack).containsAny(
+                        "Backpack",
+                        "Ender Chest",
+                        "Locked Page"
+                    )
+                )
+                    event.toolTip.clear()
             }
         }
     }

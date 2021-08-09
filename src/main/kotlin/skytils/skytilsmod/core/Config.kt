@@ -1127,6 +1127,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showMinionTier = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Tooltips while on Storage",
+        description = "Hides the tooltips of backpacks and ender chest while on the Storage GUI",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var hideTooltipsOnStorage = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Copy Deaths to Clipboard",
         description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
         category = "Miscellaneous", subcategory = "Other"
