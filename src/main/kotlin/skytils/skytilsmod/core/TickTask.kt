@@ -18,23 +18,29 @@
 
 package skytils.skytilsmod.core
 
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import skytils.skytilsmod.utils.Utils
 
-class TickTask(private var ticks: Int = 0, private val task: () -> Unit) {
+class TickTask(var ticks: Int = 0, val task: () -> Unit) {
+    init {
+        Utils.checkThreadAndQueue {
+            TickTaskManager.tasks.add(this)
+        }
+    }
+}
+
+object TickTaskManager {
+    val tasks = arrayListOf<TickTask>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (ticks <= 0) {
-            task()
-            MinecraftForge.EVENT_BUS.unregister(this)
+        if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
+        tasks.removeAll {
+            if (it.ticks-- <= 0) {
+                it.task()
+                return@removeAll true
+            } else return@removeAll false
         }
-        ticks--
-    }
-
-    init {
-        MinecraftForge.EVENT_BUS.register(this)
     }
 }

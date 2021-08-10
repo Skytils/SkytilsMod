@@ -163,6 +163,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MayorInfo)
         MinecraftForge.EVENT_BUS.register(SBInfo)
         MinecraftForge.EVENT_BUS.register(SoundQueue)
+        MinecraftForge.EVENT_BUS.register(TickTaskManager)
         MinecraftForge.EVENT_BUS.register(UpdateChecker)
 
         MinecraftForge.EVENT_BUS.register(AlignmentTaskSolver())
