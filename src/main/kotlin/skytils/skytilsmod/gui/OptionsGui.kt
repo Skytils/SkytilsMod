@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
@@ -25,7 +26,6 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
-import gg.essential.universal.GuiScale
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -33,7 +33,7 @@ import skytils.skytilsmod.utils.openGUI
 import java.awt.Desktop
 import java.net.URI
 
-class OptionsGui : WindowScreen(newGuiScale = GuiScale.scaleForScreenSize().ordinal) {
+class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
         x = CenterConstraint()
