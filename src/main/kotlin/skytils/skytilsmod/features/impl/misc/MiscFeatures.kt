@@ -136,6 +136,10 @@ class MiscFeatures {
                         duration
                             .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
                     }")
+                } else {
+                    blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
+                    blockZapperUses = 0
+                    printDevMessage("fallback: $blockZapperCooldownExpiration", "zapper")
                 }
             }
         }
