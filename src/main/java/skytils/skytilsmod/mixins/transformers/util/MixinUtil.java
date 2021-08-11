@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import skytils.skytilsmod.Skytils;
+import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.utils.Utils;
 
 import java.util.concurrent.FutureTask;
@@ -33,7 +33,7 @@ import java.util.concurrent.FutureTask;
 public abstract class MixinUtil {
     @Inject(method = "runTask", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;fatal(Ljava/lang/String;Ljava/lang/Throwable;)V", remap = false), cancellable = true)
     private static <V> void interceptTaskExceptions(FutureTask<V> task, Logger logger, CallbackInfoReturnable<V> cir) {
-        if (Skytils.config.getPreventLogSpam() && Utils.isOnHypixel) {
+        if (Config.INSTANCE.getPreventLogSpam() && Utils.isOnHypixel) {
             cir.setReturnValue(null);
         }
     }
