@@ -28,7 +28,7 @@ import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import java.awt.Color
 import java.io.File
 
-class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
+object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
     @Property(
         type = PropertyType.TEXT, name = "Skytils Data",
@@ -1077,7 +1077,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var showPetCandies = false
 
-/*    @Property(
+    /*    @Property(
         type = PropertyType.SWITCH, name = "Soul Eater Bonus",
         description = "Shows the current Soul Eater bonus from the last mob kill.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1201,7 +1201,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
         category = "Miscellaneous", subcategory = "Other"
     )*/
-    
+
     var fixSummonSkin = false
 
     @Property(
@@ -1266,7 +1266,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
    description = "Stops the Creeper Veil from blocking interaction with NPCs.",
    category = "Miscellaneous", subcategory = "Quality of Life"
    )*/
-    
+
     var hideCreeperVeilNearNPCs = false
 
     @Property(
@@ -1393,7 +1393,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
    description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
    category = "Miscellaneous", subcategory = "Quality of Life"
    )*/
-    
+
     var prioritizeItemAbilities = false
 
     // TODO get Sk1er LLC to make a number text box
@@ -2093,8 +2093,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var compactHider = 0
 
     init {
-        initialize()
-
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
         addDependency("itemRarityOpacity", "showItemRarity")
@@ -2141,7 +2139,11 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         addDependency("yangGlyphColor", "highlightYangGlyph")
         addDependency("nukekebiHeadColor", "highlightNukekebiHeads")
 
-        listOf("seraphBeaconPhaseColor", "seraphHitsPhaseColor", "seraphNormalPhaseColor").forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
+        listOf(
+            "seraphBeaconPhaseColor",
+            "seraphHitsPhaseColor",
+            "seraphNormalPhaseColor"
+        ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         registerListener("protectItemBINThreshold") { threshold: String ->
             val numeric = threshold.replace(Regex("[^0-9]"), "")

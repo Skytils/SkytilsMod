@@ -37,7 +37,7 @@ val sbaOverridePatcher: MethodHandle? by lazy {
 
 fun overridePatcherFontRendererHook(text: String, shadow: Boolean, cir: CallbackInfoReturnable<Boolean>) {
     try {
-        if (sbaOverridePatcher != null && Skytils.config != null && Skytils.config.fixSbaChroma) {
+        if (sbaOverridePatcher != null && Skytils.config.fixSbaChroma) {
             if (sbaOverridePatcher!!.invokeExact(text) as Boolean) cir.returnValue = false
         }
     } catch (e: Throwable) {

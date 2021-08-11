@@ -106,7 +106,7 @@ class Skytils {
         val mc: Minecraft
             get() = Minecraft.getMinecraft()
 
-        lateinit var config: Config
+        val config = Config
 
         @JvmField
         val modDir = File(File(mc.mcDataDir, "config"), "skytils")
@@ -150,8 +150,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        config = Config()
-        config.preload()
+        config.initialize()
         hylinAPI.key = config.apiKey
 
         UpdateChecker.downloadDeleteTask()
@@ -322,7 +321,8 @@ class Skytils {
         if (ticks % 20 == 0) {
             if (mc.thePlayer != null) {
                 Utils.isOnHypixel = mc.runCatching {
-                    theWorld != null && !isSingleplayer && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel") ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
+                    theWorld != null && !isSingleplayer && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
+                        ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
                 }.onFailure { it.printStackTrace() }.getOrDefault(false)
                 Utils.inSkyblock = Utils.isOnHypixel && mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
                     ?.let { ScoreboardUtil.cleanSB(it.displayName).contains("SKYBLOCK") } ?: false
@@ -408,7 +408,8 @@ class Skytils {
             val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
             if (button == 0) {
                 val component =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent ?: chatLine.chatComponent
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent
+                        ?: chatLine.chatComponent
                 val realText = buildString {
                     append(component.unformattedTextForChat)
                     append("§r")
