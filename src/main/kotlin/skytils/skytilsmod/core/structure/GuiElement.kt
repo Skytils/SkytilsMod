@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.core.structure
 
+import gg.essential.universal.UResolution
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 

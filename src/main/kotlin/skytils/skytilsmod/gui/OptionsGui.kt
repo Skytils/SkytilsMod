@@ -121,7 +121,7 @@ class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiSc
         animate()
     }
 
-    fun animate() {
+    private fun animate() {
         skytilsText.animate {
             setColorAnimation(Animations.IN_OUT_SIN, 1f, RainbowColorConstraint())
                 .onComplete {

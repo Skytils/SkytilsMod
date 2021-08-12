@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils.graphics
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -811,7 +812,7 @@ class ScreenRenderer {
         @JvmField
         var fontRenderer: SmartFontRenderer = SmartFontRenderer()
         var mc: Minecraft = Minecraft.getMinecraft()
-        private var screen: ScaledResolution? = null
+        private var screen: UResolution? = null
         var isRendering = false
         var scale = 1.0f
         var rotation = 0f

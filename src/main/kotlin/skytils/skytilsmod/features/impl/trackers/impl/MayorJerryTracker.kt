@@ -19,6 +19,7 @@
 package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UResolution
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

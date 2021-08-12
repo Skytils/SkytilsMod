@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World

@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiChest

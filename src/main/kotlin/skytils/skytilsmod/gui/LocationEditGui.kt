@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.gui
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager

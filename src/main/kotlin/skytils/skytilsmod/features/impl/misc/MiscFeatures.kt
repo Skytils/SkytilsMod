@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UResolution
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP

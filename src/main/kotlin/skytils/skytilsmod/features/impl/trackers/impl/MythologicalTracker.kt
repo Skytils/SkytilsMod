@@ -19,6 +19,7 @@
 package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UResolution
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot

@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.EventPriority

@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import com.google.common.base.Predicate
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand

@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.overlays
 
 import com.google.common.collect.Lists
+import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
