@@ -17,11 +17,8 @@
  */
 package skytils.skytilsmod.mixins.hooks.renderer
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.events.CheckRenderEntityEvent
 
@@ -33,19 +30,13 @@ fun shouldRender(
     camZ: Double,
     cir: CallbackInfoReturnable<Boolean>
 ) {
-    try {
-        if (MinecraftForge.EVENT_BUS.post(
-                CheckRenderEntityEvent(
-                    entityIn,
-                    camera,
-                    camX,
-                    camY,
-                    camZ
-                )
-            )
-        ) cir.returnValue = false
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at CheckRenderEntityEvent. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    if (
+        CheckRenderEntityEvent(
+            entityIn,
+            camera,
+            camX,
+            camY,
+            camZ
+        ).postAndCatch()
+    ) cir.returnValue = false
 }

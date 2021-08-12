@@ -17,20 +17,9 @@
  */
 package skytils.skytilsmod.mixins.hooks.gui
 
-import net.minecraft.client.Minecraft
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.events.SendChatMessageEvent
 
 fun onSendChatMessage(message: String, addToChat: Boolean, ci: CallbackInfo) {
-    try {
-        val event = SendChatMessageEvent(message, addToChat)
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            ci.cancel()
-        }
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at SendChatMessageEvent. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    if (SendChatMessageEvent(message, addToChat).postAndCatch()) ci.cancel()
 }

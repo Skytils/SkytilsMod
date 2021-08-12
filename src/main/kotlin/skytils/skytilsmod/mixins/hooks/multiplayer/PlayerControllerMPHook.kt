@@ -17,17 +17,12 @@
  */
 package skytils.skytilsmod.mixins.hooks.multiplayer
 
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.common.MinecraftForge
-import org.spongepowered.asm.mixin.injection.At
-import org.spongepowered.asm.mixin.injection.Inject
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.DamageBlockEvent
@@ -50,10 +45,5 @@ fun handleRightClickEntity(
 }
 
 fun onPlayerDamageBlock(pos: BlockPos, directionFacing: EnumFacing, cir: CallbackInfoReturnable<Boolean>) {
-    try {
-        if (MinecraftForge.EVENT_BUS.post(DamageBlockEvent(pos, directionFacing))) cir.cancel()
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at DamageBlockEvent. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    if (DamageBlockEvent(pos, directionFacing).postAndCatch()) cir.cancel()
 }

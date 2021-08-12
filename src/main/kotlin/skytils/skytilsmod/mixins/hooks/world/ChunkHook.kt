@@ -18,11 +18,8 @@
 package skytils.skytilsmod.mixins.hooks.world
 
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.world.chunk.Chunk
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.events.BlockChangeEvent
 
@@ -30,12 +27,7 @@ fun onBlockChange(chunk: Any, pos: BlockPos, state: IBlockState, cir: CallbackIn
     (chunk as Chunk).apply {
         val old = chunk.getBlockState(pos)
         if (old != state) {
-            try {
-                MinecraftForge.EVENT_BUS.post(BlockChangeEvent(pos, old, state))
-            } catch (e: Throwable) {
-                Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at BlockChangeEvent. Please report this on the Discord server."))
-                e.printStackTrace()
-            }
+            BlockChangeEvent(pos, old, state).postAndCatch()
         }
     }
 }

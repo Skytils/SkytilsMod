@@ -20,7 +20,6 @@ package skytils.skytilsmod.events
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class DamageBlockEvent(val pos: BlockPos, val facing: EnumFacing) : Event()
+class DamageBlockEvent(val pos: BlockPos, val facing: EnumFacing) : SkytilsEvent()

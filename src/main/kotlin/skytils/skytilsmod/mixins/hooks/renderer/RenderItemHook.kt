@@ -24,9 +24,7 @@ import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.resources.model.IBakedModel
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -60,20 +58,13 @@ fun renderItemOverlayPost(
     text: String?,
     ci: CallbackInfo
 ) {
-    try {
-        MinecraftForge.EVENT_BUS.post(
-            GuiRenderItemEvent.RenderOverlayEvent.Post(
-                fr,
-                stack,
-                xPosition,
-                yPosition,
-                text
-            )
-        )
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at GuiRenderItemEvent.RenderOverlayEvent.Post. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    GuiRenderItemEvent.RenderOverlayEvent.Post(
+        fr,
+        stack,
+        xPosition,
+        yPosition,
+        text
+    ).postAndCatch()
 }
 
 fun renderItemPre(stack: ItemStack, model: IBakedModel, ci: CallbackInfo) {

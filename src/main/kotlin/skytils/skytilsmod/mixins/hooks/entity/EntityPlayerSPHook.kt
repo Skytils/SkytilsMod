@@ -18,9 +18,7 @@
 package skytils.skytilsmod.mixins.hooks.entity
 
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -28,20 +26,10 @@ import skytils.skytilsmod.events.AddChatMessageEvent
 import skytils.skytilsmod.events.ItemTossEvent
 
 fun onAddChatMessage(message: IChatComponent, ci: CallbackInfo) {
-    try {
-        if (MinecraftForge.EVENT_BUS.post(AddChatMessageEvent(message))) ci.cancel()
-    } catch (e: Throwable) {
-        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at AddChatMessageEvent. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    if (AddChatMessageEvent(message).postAndCatch()) ci.cancel()
 }
 
 fun onDropItem(dropAll: Boolean, cir: CallbackInfoReturnable<EntityItem?>) {
-    try {
-        val stack = mc.thePlayer.inventory.getCurrentItem()
-        if (stack != null && MinecraftForge.EVENT_BUS.post(ItemTossEvent(stack, dropAll))) cir.returnValue = null
-    } catch (e: Throwable) {
-        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at PlayerDropItemEvent. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    val stack = mc.thePlayer.inventory.getCurrentItem()
+    if (stack != null && ItemTossEvent(stack, dropAll).postAndCatch()) cir.returnValue = null
 }

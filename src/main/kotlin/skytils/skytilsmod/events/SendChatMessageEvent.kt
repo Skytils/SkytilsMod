@@ -18,7 +18,6 @@
 package skytils.skytilsmod.events
 
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class SendChatMessageEvent(val message: String, val addToChat: Boolean) : Event()
+class SendChatMessageEvent(val message: String, val addToChat: Boolean) : SkytilsEvent()

@@ -36,15 +36,10 @@ fun modifyGetModelFromBlockState(
     cir: CallbackInfoReturnable<IBakedModel>
 ) {
     (blockRendererDispatcher as BlockRendererDispatcher).apply {
-        try {
-            val event = RenderBlockInWorldEvent(state, worldIn, pos)
-            MinecraftForge.EVENT_BUS.post(event)
-            if (event.state !== state) {
-                cir.returnValue = blockModelShapes.getModelForState(event.state)
-            }
-        } catch (e: Throwable) {
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at RenderBlockInWorldEvent. Please report this on the Discord server."))
-            e.printStackTrace()
+        val event = RenderBlockInWorldEvent(state, worldIn, pos)
+        event.postAndCatch()
+        if (event.state !== state) {
+            cir.returnValue = blockModelShapes.getModelForState(event.state)
         }
     }
 }

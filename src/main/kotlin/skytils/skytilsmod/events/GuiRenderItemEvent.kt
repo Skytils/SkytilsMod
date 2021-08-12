@@ -19,9 +19,8 @@ package skytils.skytilsmod.events
 
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Event
 
-open class GuiRenderItemEvent : Event() {
+open class GuiRenderItemEvent : SkytilsEvent() {
     open class RenderOverlayEvent(
         val fr: FontRenderer,
         val stack: ItemStack?,

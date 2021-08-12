@@ -36,72 +36,42 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun closeWindowPressed(ci: CallbackInfo) {
-        try {
-            MinecraftForge.EVENT_BUS.post(CloseWindowEvent(gui, gui.inventorySlots))
-        } catch (e: Throwable) {
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.CloseWindowEvent. Please report this on the Discord server."))
-            e.printStackTrace()
-        }
+        CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
-        try {
-            MinecraftForge.EVENT_BUS.post(
-                GuiContainerEvent.BackgroundDrawnEvent(
-                    gui,
-                    gui.inventorySlots,
-                    mouseX,
-                    mouseY,
-                    partialTicks
-                )
-            )
-        } catch (e: Throwable) {
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.BackgroundDrawnEvent. Please report this on the Discord server."))
-            e.printStackTrace()
-        }
+        GuiContainerEvent.BackgroundDrawnEvent(
+            gui,
+            gui.inventorySlots,
+            mouseX,
+            mouseY,
+            partialTicks
+        ).postAndCatch()
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
-        try {
-            if (MinecraftForge.EVENT_BUS.post(
-                    GuiContainerEvent.DrawSlotEvent.Pre(
-                        gui,
-                        gui.inventorySlots,
-                        slot
-                    )
-                )
-            ) ci.cancel()
-        } catch (e: Throwable) {
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.DrawSlotEvent.Pre. Please report this on the Discord server."))
-            e.printStackTrace()
-        }
+        if (GuiContainerEvent.DrawSlotEvent.Pre(
+                gui,
+                gui.inventorySlots,
+                slot
+            ).postAndCatch()
+        ) ci.cancel()
     }
 
     fun onDrawSlotPost(slot: Slot, ci: CallbackInfo) {
-        try {
-            MinecraftForge.EVENT_BUS.post(GuiContainerEvent.DrawSlotEvent.Post(gui, gui.inventorySlots, slot))
-        } catch (e: Throwable) {
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.DrawSlotEvent.Post. Please report this on the Discord server."))
-            e.printStackTrace()
-        }
+        GuiContainerEvent.DrawSlotEvent.Post(gui, gui.inventorySlots, slot).postAndCatch()
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        try {
-            if (MinecraftForge.EVENT_BUS.post(
-                    SlotClickEvent(
-                        gui,
-                        gui.inventorySlots,
-                        slot,
-                        slotId,
-                        clickedButton,
-                        clickType
-                    )
-                )
-            ) ci.cancel()
-        } catch (e: Throwable) {
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at GuiContainerEvent.SlotClickEvent. Please report this on the Discord server."))
-            e.printStackTrace()
-        }
+        if (
+            SlotClickEvent(
+                gui,
+                gui.inventorySlots,
+                slot,
+                slotId,
+                clickedButton,
+                clickType
+            ).postAndCatch()
+        ) ci.cancel()
     }
 }

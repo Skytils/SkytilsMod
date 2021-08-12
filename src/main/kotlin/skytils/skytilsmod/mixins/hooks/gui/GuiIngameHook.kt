@@ -33,22 +33,17 @@ var recordPlayingUpFor: Int = 0
 var recordIsPlaying: Boolean = false
 
 fun onSetActionBar(message: String, isPlaying: Boolean, ci: CallbackInfo): Boolean {
-    try {
-        val event = SetActionBarEvent(message, isPlaying)
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            ci.cancel()
-            return false
-        }
-        if (message != event.message || isPlaying != event.isPlaying) {
-            ci.cancel()
-            recordPlaying = event.message
-            recordPlayingUpFor = 60
-            recordIsPlaying = event.isPlaying
-            return true
-        }
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at SetActionBarEvent. Please report this on the Discord server."))
-        e.printStackTrace()
+    val event = SetActionBarEvent(message, isPlaying)
+    if (event.postAndCatch()) {
+        ci.cancel()
+        return false
+    }
+    if (message != event.message || isPlaying != event.isPlaying) {
+        ci.cancel()
+        recordPlaying = event.message
+        recordPlayingUpFor = 60
+        recordIsPlaying = event.isPlaying
+        return true
     }
     return false
 }

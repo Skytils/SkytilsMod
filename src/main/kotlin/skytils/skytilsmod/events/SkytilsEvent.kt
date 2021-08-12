@@ -18,8 +18,21 @@
 
 package skytils.skytilsmod.events
 
-import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Cancelable
+import gg.essential.universal.UChat
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.eventhandler.Event
 
-@Cancelable
-class ItemTossEvent(val item: ItemStack, val dropStack: Boolean) : SkytilsEvent()
+abstract class SkytilsEvent : Event() {
+    val eventName by lazy {
+        this::class.simpleName
+    }
+
+    fun postAndCatch(): Boolean {
+        return runCatching {
+            MinecraftForge.EVENT_BUS.post(this)
+        }.onFailure {
+            it.printStackTrace()
+            UChat.chat("§cSkytils caught and logged an exception at ${eventName}. Please report this on the Discord server at discord.gg/skytils.")
+        }.getOrDefault(false)
+    }
+}

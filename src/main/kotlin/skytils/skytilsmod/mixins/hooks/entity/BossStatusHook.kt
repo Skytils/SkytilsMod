@@ -17,19 +17,11 @@
  */
 package skytils.skytilsmod.mixins.hooks.entity
 
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.boss.IBossDisplayData
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.events.BossBarEvent
 
 
 fun onSetBossStatus(displayData: IBossDisplayData, hasColorModifierIn: Boolean, ci: CallbackInfo) {
-    try {
-        if (MinecraftForge.EVENT_BUS.post(BossBarEvent.Set(displayData, hasColorModifierIn))) ci.cancel()
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at BossBarEvent.Set. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    if (BossBarEvent.Set(displayData, hasColorModifierIn).postAndCatch()) ci.cancel()
 }

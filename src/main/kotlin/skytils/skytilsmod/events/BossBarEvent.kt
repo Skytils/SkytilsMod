@@ -19,9 +19,8 @@ package skytils.skytilsmod.events
 
 import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
-open class BossBarEvent : Event() {
+open class BossBarEvent : SkytilsEvent() {
     @Cancelable
     class Set(val displayData: IBossDisplayData, val hasColorModifier: Boolean) : BossBarEvent()
 }

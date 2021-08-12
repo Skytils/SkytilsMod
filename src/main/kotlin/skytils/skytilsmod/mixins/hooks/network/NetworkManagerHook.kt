@@ -18,18 +18,10 @@
 package skytils.skytilsmod.mixins.hooks.network
 
 import io.netty.channel.ChannelHandlerContext
-import net.minecraft.client.Minecraft
 import net.minecraft.network.Packet
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 
 fun onReceivePacket(context: ChannelHandlerContext, packet: Packet<*>, ci: CallbackInfo) {
-    try {
-        if (MinecraftForge.EVENT_BUS.post(ReceiveEvent(packet))) ci.cancel()
-    } catch (e: Throwable) {
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils caught and logged an exception at PacketEvent.ReceiveEvent. Please report this on the Discord server."))
-        e.printStackTrace()
-    }
+    if (ReceiveEvent(packet).postAndCatch()) ci.cancel()
 }
