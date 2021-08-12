@@ -164,7 +164,7 @@ class CustomFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UICo
         }
         dropDown.constrain {
             x = INNER_PADDING.pixels(true)
-            y = CenterConstraint()
+            y = basicYConstraint { it.getHeight() / 2f - 10f }
             width = 25.percent()
         }
         dropDown childOf boundingBox
