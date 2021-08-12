@@ -109,10 +109,6 @@ object DataFetcher {
             for ((key, value) in slayerHealthData.entrySet()) {
                 SlayerFeatures.BossHealths[key] = value.asJsonObject
             }
-            APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {
-                SummonSkins.skinMap[it.key] = it.value.asString
-            }
-            SummonSkins.loadSkins()
             for (value in APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json")) {
                 val json = value.asJsonObject
                 SpamHider.repoFilters.add(
@@ -126,6 +122,10 @@ object DataFetcher {
                     )
                 )
             }
+            APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {
+                SummonSkins.skinMap[it.key] = it.value.asString
+            }
+            SummonSkins.loadSkins()
         }
     }
 
