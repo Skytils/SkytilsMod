@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.listeners
 
-import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.StringUtils.stripControlCodes
@@ -26,6 +25,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.RepartyCommand
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
@@ -204,7 +204,6 @@ class ChatListener {
     }
 
     companion object {
-        var mc = Minecraft.getMinecraft()!!
         private var rejoinThread: Thread? = null
         private var lastPartyDisbander = ""
         private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")

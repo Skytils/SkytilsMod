@@ -19,8 +19,8 @@ package skytils.skytilsmod.features.impl.dungeons
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
@@ -54,9 +54,9 @@ import kotlin.math.pow
 
 object ScoreCalculation {
 
-    val partyAssistSecretsPattern: Pattern =
+    private val partyAssistSecretsPattern: Pattern =
         Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
-    var rooms = ConcurrentHashMap<String, Int>()
+    private var rooms = ConcurrentHashMap<String, Int>()
     private val mc = Minecraft.getMinecraft()
     private var ticks = 0
     private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
@@ -80,7 +80,7 @@ object ScoreCalculation {
 
     var drmRoomScanMethod: MethodHandle? = null
 
-    fun roomScanCallback(list: List<String>) {
+    private fun roomScanCallback(list: List<String>) {
         if (Skytils.config.scoreCalculationMethod != 1) return
         Utils.checkThreadAndQueue {
             for (room in list) {
@@ -296,7 +296,7 @@ object ScoreCalculation {
     class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 ScreenRenderer.fontRenderer.drawString(
                     "Crypts: $crypts",
@@ -309,7 +309,7 @@ object ScoreCalculation {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             ScreenRenderer.fontRenderer.drawString(
                 "Crypts: 5",
@@ -337,7 +337,7 @@ object ScoreCalculation {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
 
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val text = ArrayList<String>()
@@ -427,7 +427,7 @@ object ScoreCalculation {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val text = ArrayList<String>()
             text.add("§6Secrets Found: 99")

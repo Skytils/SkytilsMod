@@ -18,8 +18,8 @@
 package skytils.skytilsmod.features.impl.spidersden
 
 import com.google.common.base.Predicate
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.BlockPos
@@ -33,12 +33,12 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 
 class SpidersDenFeatures {
     @SubscribeEvent
@@ -99,7 +99,7 @@ class SpidersDenFeatures {
                         }
                         false
                     })
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 for (i in arachneNames.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -116,7 +116,7 @@ class SpidersDenFeatures {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val text = "§8[§7Lv500§8] §cArachne §a17.6M§f/§a20M§c❤§r"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT

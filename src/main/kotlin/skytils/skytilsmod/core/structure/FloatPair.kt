@@ -17,8 +17,7 @@
  */
 package skytils.skytilsmod.core.structure
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
+import gg.essential.universal.UResolution
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.mutable.MutableFloat
@@ -80,7 +79,7 @@ class FloatPair(x: Float, y: Float) {
     }
 
     companion object {
-        private val sr = ScaledResolution(Minecraft.getMinecraft())
+        private val sr = UResolution
     }
 
 }

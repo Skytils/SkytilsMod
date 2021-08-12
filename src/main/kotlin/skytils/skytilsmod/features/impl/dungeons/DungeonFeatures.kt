@@ -18,11 +18,11 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
@@ -556,7 +556,7 @@ class DungeonFeatures {
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
                 if (lividTag == null) return
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -571,7 +571,7 @@ class DungeonFeatures {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT

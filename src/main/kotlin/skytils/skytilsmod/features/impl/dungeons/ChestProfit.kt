@@ -17,8 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
+import gg.essential.universal.UResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
@@ -32,13 +31,13 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
+import skytils.skytilsmod.utils.stripControlCodes
 
 
 /**
@@ -84,7 +83,7 @@ class ChestProfit {
                         }
                     }
                     if (chestType.items.size > 0) {
-                        val sr = ScaledResolution(Minecraft.getMinecraft())
+                        val sr = UResolution
                         val leftAlign = element.actualX < sr.scaledWidth / 2f
                         val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                         GlStateManager.color(1f, 1f, 1f, 1f)
@@ -162,7 +161,7 @@ class ChestProfit {
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
@@ -188,7 +187,7 @@ class ChestProfit {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             for (i in DungeonChest.values().indices) {
                 val chest = DungeonChest.values()[i]

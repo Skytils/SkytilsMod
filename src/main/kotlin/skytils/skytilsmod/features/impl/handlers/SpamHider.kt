@@ -19,7 +19,6 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -45,7 +44,6 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
 import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
@@ -119,7 +117,6 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         val spamMessages = ArrayList<SpamMessage>()
         private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
             if (ReceivePacketEvent.packet !is S02PacketChat) return
@@ -557,11 +554,16 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Compact Building Tools
-                (Skytils.config.compactBuildingTools && formatted.startsWith("§3Skytils > §eThis will expire in") && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
+                (Skytils.config.compactBuildingTools && formatted.startsWith("§3Skytils > §eThis will expire in") && (formatted.contains(
+                    "blocks"
+                ) || formatted.contains("build") || formatted.contains(
                     "place"
                 ) || formatted.contains("zap"))
                         ) -> {
-                    if (formatted.startsWith("§3Skytils > §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
+                    if (formatted.startsWith("§3Skytils > §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(
+                            formatted
+                        ).matches()
+                    ) {
                         val chatGui = mc.ingameGUI.chatGUI
                         val lines = (chatGui as AccessorGuiNewChat).chatLines
                         val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
@@ -663,7 +665,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         override fun render() {
             val now = System.currentTimeMillis()
             val timePassed = now - lastTimeRender
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val animDiv = timePassed.toDouble() / 1000.0
             lastTimeRender = now
             var i = 0

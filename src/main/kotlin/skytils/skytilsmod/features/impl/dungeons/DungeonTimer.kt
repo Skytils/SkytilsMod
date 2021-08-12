@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -51,7 +50,9 @@ class DungeonTimer {
             (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
             }
-            message.endsWith(" §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!§r") || unformatted == "A Wither Key was picked up!" || message.endsWith("§r§ehas obtained §r§8Wither Key§r§e!§r") -> {
+            message.endsWith(" §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!§r") || unformatted == "A Wither Key was picked up!" || message.endsWith(
+                "§r§ehas obtained §r§8Wither Key§r§e!§r"
+            ) -> {
                 witherDoors++
             }
             bloodOpenTime == -1L && (unformatted == "The BLOOD DOOR has been opened!" || message.startsWith(
@@ -194,7 +195,7 @@ class DungeonTimer {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = """
                     §aReal Time: ${if (dungeonStartTime == -1L) "0s" else (((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime).toDouble() / 1000f).toString() + "s"}
@@ -220,7 +221,7 @@ class DungeonTimer {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val displayText = """
                 §aReal Time: 0s
@@ -263,7 +264,7 @@ class DungeonTimer {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && DungeonFeatures.dungeonFloor == "F7") {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = """
                     §bPhase 1: ${timeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime).toDouble() / 1000f)}
@@ -286,7 +287,7 @@ class DungeonTimer {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val displayText = """
                 §bPhase 1: 0s
@@ -331,7 +332,7 @@ class DungeonTimer {
                     "M6"
                 )
             ) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = """
                     §dTerracotta: ${timeFormat(((if (terraClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else terraClearTime) - bossEntryTime).toDouble() / 1000f)}
@@ -353,7 +354,7 @@ class DungeonTimer {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val displayText = """
                 §dTerracotta: 0s

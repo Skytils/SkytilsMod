@@ -21,7 +21,6 @@ import com.google.common.collect.Lists
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
@@ -248,7 +247,7 @@ class AuctionPriceOverlay {
         }
 
         private fun onMouseMove() {
-            val sr = ScaledResolution(mc)
+            val sr = UResolution
             val minecraftScale = sr.scaleFactor.toFloat()
             val floatMouseX = Mouse.getX() / minecraftScale
             val floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale
@@ -265,7 +264,7 @@ class AuctionPriceOverlay {
                 sign.signText[0] = ChatComponentText(input ?: "Invalid Value")
             } else if (button.id == 999) {
                 dragging = true
-                val sr = ScaledResolution(mc)
+                val sr = UResolution
                 val minecraftScale = sr.scaleFactor.toFloat()
                 val floatMouseX = Mouse.getX() / minecraftScale
                 val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale

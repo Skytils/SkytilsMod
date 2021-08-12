@@ -19,7 +19,6 @@ package skytils.skytilsmod.features.impl.misc
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.projectile.EntityFishHook
@@ -490,10 +489,10 @@ class ItemFeatures {
                         }
                         if (toggled) {
                             val alignment =
-                                if (actualX < ScaledResolution(mc).scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                             ScreenRenderer.fontRenderer.drawString(
                                 str.substring(16),
-                                if (actualX < ScaledResolution(mc).scaledWidth / 2f) 0f else width.toFloat(),
+                                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                                 0f,
                                 CommonColors.WHITE,
                                 alignment,
@@ -507,10 +506,10 @@ class ItemFeatures {
 
         override fun demoRender() {
             val alignment =
-                if (actualX < ScaledResolution(mc).scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§3100⸎ Soulflow",
-                if (actualX < ScaledResolution(mc).scaledWidth / 2f) 0f else width.toFloat(),
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.WHITE,
                 alignment,

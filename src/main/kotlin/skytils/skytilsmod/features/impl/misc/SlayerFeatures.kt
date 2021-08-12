@@ -18,10 +18,10 @@
 package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
@@ -431,7 +431,7 @@ class SlayerFeatures {
     class SlayerDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
         override fun render() {
             if (Utils.inSkyblock) {
-                val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+                val leftAlign = actualX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 if (slayerTimerEntity != null) {
@@ -512,7 +512,7 @@ class SlayerFeatures {
     class SeraphDisplayElement : GuiElement("Seraph Display", FloatPair(20, 20)) {
         override fun render() {
             if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
-                val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+                val leftAlign = actualX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 if (slayerNameEntity != null) {
@@ -598,7 +598,7 @@ class SlayerFeatures {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+            val leftAlign = actualX < UResolution.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -641,7 +641,7 @@ class SlayerFeatures {
     }
 
     class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", FloatPair(150, 20)) {
-        val upgradeBonusRegex =
+        private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 
         override fun render() {
@@ -672,10 +672,10 @@ class SlayerFeatures {
                     }
 
                     if (armors.isNotEmpty()) {
-                        val leftAlign = actualX < ScaledResolution(SlayerFeatures.mc).scaledWidth / 2f
+                        val leftAlign = actualX < UResolution.scaledWidth / 2f
                         if (!leftAlign) {
-                            val longest = fontRenderer.getStringWidth((armors.maxByOrNull { it.second.length }
-                                ?: null to "").second)
+                            val longest = fontRenderer.getStringWidth(((armors.maxByOrNull { it.second.length }
+                                ?: (null to ""))).second)
                             armors.forEachIndexed { index, pair ->
                                 RenderUtil.renderItem(pair.first, longest + 2, index * 16)
                                 fontRenderer.drawString(
@@ -700,7 +700,7 @@ class SlayerFeatures {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < ScaledResolution(mc).scaledWidth / 2f
+            val leftAlign = actualX < UResolution.scaledWidth / 2f
             val text = "§e99.9% §b(§f199§b)"
             if (leftAlign) {
                 RenderUtil.renderItem(ItemStack(Items.leather_chestplate), 0, 0)
@@ -790,7 +790,9 @@ class SlayerFeatures {
                             val currentTier =
                                 sidebarLines.map { cleanSB(it) }.find { it.startsWith("Revenant Horror ") }
                                     ?.substringAfter("Revenant Horror ") ?: ""
-                            if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) *( BossHealths["Revenant"]?.get(currentTier)?.asInt ?: 0)
+                            if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths["Revenant"]?.get(
+                                    currentTier
+                                )?.asInt ?: 0)
                                 == entity.baseMaxHealth.toInt()
                             ) {
                                 slayerNameEntity = nearby as EntityArmorStand

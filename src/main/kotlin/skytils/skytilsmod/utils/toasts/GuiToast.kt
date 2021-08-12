@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils.toasts
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -146,9 +147,9 @@ class GuiToast(val mc: Minecraft) : Gui() {
                     x = backward
                 }
             }
-            val res = ScaledResolution(toastGui.mc)
+            val res = UResolution
             val height = res.scaledHeight.toDouble()
-            val scale = res.scaleFactor.toDouble()
+            val scale = res.scaleFactor
             val trans = FloatArray(16)
             buffer.clear()
             GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buffer)

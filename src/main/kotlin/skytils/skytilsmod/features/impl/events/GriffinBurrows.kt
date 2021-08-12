@@ -18,8 +18,8 @@
 package skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
@@ -228,7 +228,7 @@ class GriffinBurrows {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && hasSpadeInHotbar) {
                 val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -328,7 +328,7 @@ class GriffinBurrows {
         var hasEnchant: Boolean,
         var type: Int
     ) {
-        private var timestamp: Long
+        private var timestamp: Long = System.currentTimeMillis()
         var dug = false
 
         constructor(vec3: Vec3i, hasFootstep: Boolean, hasEnchant: Boolean, type: Int) : this(
@@ -391,9 +391,6 @@ class GriffinBurrows {
             GlStateManager.enableCull()
         }
 
-        init {
-            timestamp = System.currentTimeMillis()
-        }
     }
 
     class Burrow(

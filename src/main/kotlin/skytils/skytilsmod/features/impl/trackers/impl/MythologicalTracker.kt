@@ -19,16 +19,13 @@
 package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -41,7 +38,6 @@ import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.time.ZoneId
@@ -289,7 +285,7 @@ class MythologicalTracker : Tracker("mythological") {
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
             if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
@@ -330,7 +326,7 @@ class MythologicalTracker : Tracker("mythological") {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT

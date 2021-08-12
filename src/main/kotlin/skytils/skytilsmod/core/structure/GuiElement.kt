@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.core.structure
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 
@@ -43,12 +41,12 @@ abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
 
     val actualX: Float
         get() {
-            val maxX = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+            val maxX = UResolution.scaledWidth
             return maxX * pos.getX()
         }
     val actualY: Float
         get() {
-            val maxY = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+            val maxY = UResolution.scaledHeight
             return maxY * pos.getY()
         }
     abstract val height: Int
@@ -59,7 +57,7 @@ abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
         get() = width * scale
 
     companion object {
-        val sr = ScaledResolution(Minecraft.getMinecraft())
+        val sr = UResolution
         val fr = ScreenRenderer.fontRenderer
     }
 

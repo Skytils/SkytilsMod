@@ -17,13 +17,13 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.crash.CrashReportCategory
 import net.minecraft.entity.EntityLivingBase
@@ -48,8 +48,6 @@ import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromStrin
 import java.awt.Color
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
-import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.Future
 import kotlin.math.floor
@@ -165,9 +163,6 @@ object Utils {
         }
     }
 
-    fun InputStream.readTextAndClose(charset: Charset = Charsets.UTF_8): String =
-        this.bufferedReader(charset).use { it.readText() }
-
     /**
      * @link https://stackoverflow.com/a/47925649
      */
@@ -217,7 +212,7 @@ object Utils {
         }
     }
 
-    fun getKeyDisplayStringSafe(keyCode: Int) =
+    fun getKeyDisplayStringSafe(keyCode: Int): String =
         runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrElse { "#${keyCode}" }
 }
 
@@ -238,11 +233,11 @@ val EntityLivingBase.baseMaxHealth: Double
 fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
     if (this is AccessorGuiNewChat) {
         if (this.chatOpen) {
-            val scaledresolution = ScaledResolution(mc)
+            val scaledresolution = UResolution
             val scaleFactor = scaledresolution.scaleFactor
             val chatScale = this.chatScale
-            var xPos = mouseX / scaleFactor - 3
-            var yPos = mouseY / scaleFactor - 27
+            var xPos = mouseX / scaleFactor.toInt() - 3
+            var yPos = mouseY / scaleFactor.toInt() - 27
             xPos = MathHelper.floor_float(xPos.toFloat() / chatScale)
             yPos = MathHelper.floor_float(yPos.toFloat() / chatScale)
             if (xPos >= 0 && yPos >= 0) {

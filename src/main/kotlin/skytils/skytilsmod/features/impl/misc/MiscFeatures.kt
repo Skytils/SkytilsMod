@@ -22,7 +22,6 @@ import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
@@ -61,7 +60,6 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
-import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -160,7 +158,10 @@ class MiscFeatures {
         }
         if (Utils.inSkyblock) {
             if (Skytils.config.autoCopyRNGDrops) {
-                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith("§r§6§lPET DROP! ") || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")) {
+                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith(
+                        "§r§6§lPET DROP! "
+                    ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
+                ) {
                     GuiScreen.setClipboardString(unformatted)
                     UChat.chat("§9§lSkytils §8» §aCopied RNG drop to clipboard.")
                     event.message.chatStyle
@@ -438,7 +439,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
-                val sr = ScaledResolution(mc)
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val text =
                     "§cGolem spawn in: §a" + ((golemSpawnTime - System.currentTimeMillis()) / 1000.0).roundToPrecision(1) + "s"

@@ -19,7 +19,6 @@ package skytils.skytilsmod.gui
 
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
@@ -80,7 +79,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
     }
 
     public override fun actionPerformed(button: GuiButton) {
-        val sr = ScaledResolution(mc)
+        val sr = UResolution
         val minecraftScale = sr.scaleFactor.toFloat()
         val floatMouseX = Mouse.getX() / minecraftScale
         val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
@@ -112,7 +111,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
      * Set the coordinates when the mouse moves.
      */
     private fun onMouseMove(mouseX: Int, mouseY: Int) {
-        val sr = ScaledResolution(mc)
+        val sr = UResolution
         val minecraftScale = sr.scaleFactor.toFloat()
         val floatMouseX = Mouse.getX() / minecraftScale
         val floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale

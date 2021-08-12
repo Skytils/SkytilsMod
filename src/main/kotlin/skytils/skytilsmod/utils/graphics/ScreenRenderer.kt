@@ -838,7 +838,7 @@ class ScreenRenderer {
          */
         @JvmStatic
         fun refresh() {
-            screen = ScaledResolution(mc)
+            screen = UResolution
         }
 
         @JvmStatic

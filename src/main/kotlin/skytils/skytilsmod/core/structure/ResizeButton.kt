@@ -18,9 +18,9 @@
 
 package skytils.skytilsmod.core.structure
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
-import net.minecraft.client.gui.ScaledResolution
 import org.lwjgl.input.Mouse
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -37,7 +37,7 @@ class ResizeButton(var x: Float, var y: Float, var element: GuiElement, val corn
     }
 
     override fun mousePressed(mc: Minecraft, mouseX: Int, mouseY: Int): Boolean {
-        val sr = ScaledResolution(mc)
+        val sr = UResolution
         val minecraftScale = sr.scaleFactor.toFloat()
         val floatMouseX = Mouse.getX() / minecraftScale
         val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
