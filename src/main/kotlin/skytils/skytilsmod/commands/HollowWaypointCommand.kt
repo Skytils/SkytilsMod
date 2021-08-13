@@ -30,14 +30,8 @@ import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 
-object HollowWaypointCommand : BaseCommand() {
-    override fun getCommandName(): String = "skytilshollowwaypoint"
-
-    override fun getCommandAliases(): List<String> = listOf("sthw")
-
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/skytilshollowwaypoint location x y z"
-    }
+object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw")) {
+    override fun getCommandUsage(sender: ICommandSender): String = "/skytilshollowwaypoint location x y z"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (args.isEmpty()) {

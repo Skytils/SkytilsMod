@@ -24,11 +24,7 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.utils.ItemUtil
 
-object BlockAbilityCommand : BaseCommand() {
-    override fun getCommandName(): String = "blockability"
-
-    override fun getCommandAliases(): List<String> = listOf("disableability")
-
+object BlockAbilityCommand : BaseCommand("blockability", listOf("disableability")) {
     override fun getCommandUsage(sender: ICommandSender): String = "/blockability [clearall]"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {

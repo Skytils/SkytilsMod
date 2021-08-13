@@ -29,11 +29,7 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 
-object ArmorColorCommand : BaseCommand() {
-    override fun getCommandName(): String =" armorcolor"
-
-    override fun getCommandAliases(): List<String> = listOf("armourcolour", "armorcolour", "armourcolor")
-
+object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "armorcolour", "armourcolor")) {
     override fun getCommandUsage(sender: ICommandSender): String = "/armorcolor <clearall/clear/set>"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {

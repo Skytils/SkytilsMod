@@ -34,9 +34,7 @@ import skytils.skytilsmod.utils.setHoverText
 import java.util.*
 
 
-object CataCommand : StatCommand() {
-
-    override fun getCommandName(): String = "skytilscata"
+object CataCommand : StatCommand("skytilscata") {
 
     override fun displayStats(username: String, uuid: UUID, profileData: Member) {
         val playerResponse = try {

@@ -30,10 +30,7 @@ import skytils.skytilsmod.utils.append
 import java.util.*
 
 
-object SlayerCommand : StatCommand(needProfile = false) {
-
-    override fun getCommandName(): String = "skytilsslayer"
-
+object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
     override fun displayStats(username: String, uuid: UUID) {
         val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
 

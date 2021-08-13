@@ -25,7 +25,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.Utils
 
-object RepartyCommand : BaseCommand() {
+object RepartyCommand : BaseCommand("reparty", listOf("rp")) {
 
     @JvmField
     var gettingParty = false
@@ -50,11 +50,6 @@ object RepartyCommand : BaseCommand() {
 
     @JvmField
     var partyThread: Thread? = null
-
-    override fun getCommandName(): String = "reparty"
-
-    override fun getCommandAliases(): List<String> = listOf("rp")
-
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.isOnHypixel) throw WrongUsageException("You must be on Hypixel to use this command.")

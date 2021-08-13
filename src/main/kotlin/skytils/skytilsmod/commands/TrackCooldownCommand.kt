@@ -23,18 +23,8 @@ import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
 
-object TrackCooldownCommand : BaseCommand() {
-    override fun getCommandName(): String {
-        return "trackcooldown"
-    }
-
-    override fun getCommandAliases(): List<String> {
-        return listOf("cooldowntracker")
-    }
-
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/trackcooldown <cooldown> <ability>"
-    }
+object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntracker")) {
+    override fun getCommandUsage(sender: ICommandSender): String = "/trackcooldown <cooldown> <ability>"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (args.size < 2) throw WrongUsageException("You must specify valid arguments.")

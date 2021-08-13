@@ -27,14 +27,8 @@ import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
-object GlintCustomizeCommand : BaseCommand() {
-    override fun getCommandName(): String = "glintcustomize"
-
-    override fun getCommandAliases(): List<String> = listOf("customizeglint")
-
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "glintcustomize <override/color>"
-    }
+object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizeglint")) {
+    override fun getCommandUsage(sender: ICommandSender) = "glintcustomize <override/color>"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")

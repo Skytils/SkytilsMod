@@ -29,11 +29,8 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import kotlin.math.abs
-import kotlin.time.ExperimentalTime
 
-object PingCommand : BaseCommand() {
-    override fun getCommandName(): String = "skytilsping"
-    override fun getCommandUsage(sender: ICommandSender): String = "/$commandName"
+object PingCommand : BaseCommand("skytilsping") {
 
     var pingedAt = -1L
 

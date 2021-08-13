@@ -47,12 +47,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.concurrent.thread
 
-object SkytilsCommand : BaseCommand() {
-
-    override fun getCommandName(): String = "skytils"
-
-    override fun getCommandAliases(): List<String> = listOf("st")
-
+object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val player = sender as EntityPlayerSP
         if (args.isEmpty()) {

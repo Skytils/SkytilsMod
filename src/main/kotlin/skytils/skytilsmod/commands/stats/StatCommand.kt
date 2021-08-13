@@ -29,8 +29,13 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.BaseCommand
 import java.util.*
 
-abstract class StatCommand(private val needApiKey: Boolean = true, private val needProfile: Boolean = true) :
-    BaseCommand() {
+abstract class StatCommand(
+    name: String,
+    private val needApiKey: Boolean = true,
+    private val needProfile: Boolean = true,
+    aliases: List<String> = emptyList()
+) :
+    BaseCommand(name, aliases) {
 
     val key: String
         get() = Skytils.config.apiKey

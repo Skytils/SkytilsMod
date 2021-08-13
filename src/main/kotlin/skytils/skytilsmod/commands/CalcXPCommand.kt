@@ -23,9 +23,7 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import skytils.skytilsmod.utils.SkillUtils
 
-object CalcXPCommand : BaseCommand() {
-
-    override fun getCommandName(): String = "skytilscalcxp"
+object CalcXPCommand : BaseCommand("skytilscalcxp") {
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (args.size != 3) throw SyntaxErrorException("invalid arguments")
