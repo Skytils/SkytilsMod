@@ -19,9 +19,14 @@
 package skytils.skytilsmod.gui.components
 
 import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.*
+import gg.essential.elementa.components.UIBlock
+import gg.essential.elementa.components.UIContainer
+import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.input.UITextInput
-import gg.essential.elementa.constraints.*
+import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
+import gg.essential.elementa.constraints.ChildBasedSizeConstraint
+import gg.essential.elementa.constraints.RelativeConstraint
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
@@ -31,6 +36,7 @@ import gg.essential.vigilance.gui.VigilancePalette
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import skytils.skytilsmod.features.impl.handlers.SpamHider
+import skytils.skytilsmod.utils.toTitleCase
 
 /**
  * Based on Vigilance under LGPL 3.0 license
@@ -77,12 +83,12 @@ class CustomFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UICo
     init {
         val filterType = DropDown(
             SpamHider.FilterType.values().indexOf(filter.type),
-            SpamHider.FilterType.values().map { it.name.lowercase().replaceFirstChar { it.uppercase() } })
+            SpamHider.FilterType.values().map { it.name.toTitleCase() })
             .constrain {
                 y = SiblingConstraint() + 3.pixels()
                 width = basicWidthConstraint {
                     fontProvider.getStringWidth(
-                        SpamHider.FilterType.values().map { it.name.lowercase().replaceFirstChar { it.uppercase() } }
+                        SpamHider.FilterType.values().map { it.name.toTitleCase() }
                             .maxByOrNull { it.length }!!,
                         this.getTextScale()
                     ) * 1.5f

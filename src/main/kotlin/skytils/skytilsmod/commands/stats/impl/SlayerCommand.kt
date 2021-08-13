@@ -23,10 +23,7 @@ import gg.essential.universal.wrappers.message.UMessage
 import skytils.hylin.extension.nonDashedString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.stats.StatCommand
-import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.SkillUtils
-import skytils.skytilsmod.utils.append
+import skytils.skytilsmod.utils.*
 import java.util.*
 
 
@@ -55,7 +52,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
             .append("§a§l➜ Slayer Levels:\n")
             .append(
                 xpMap.map { (slayer, xp) ->
-                    "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
+                    "§b${slayer.toTitleCase()} Slayer ${
                         SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
                     }:§e ${NumberUtil.nf.format(xp)} XP"
                 }.joinToString(separator = "\n")

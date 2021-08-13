@@ -257,6 +257,15 @@ class ItemFeatures {
             event.toolTip.add((event.toolTip.indexOfFirst { it.contains("Legendary Armadillo") } + 1),
                 "§7Blocks Walked: §c${extraAttr.getInteger("blocks_walked")}")
         }
+        if (Skytils.config.showGemstones && extraAttr?.hasKey("gems") == true) {
+            val gems = extraAttr.getCompoundTag("gems")
+            event.toolTip.add("§bGemstones: ")
+            event.toolTip.addAll(gems.keySet.map {
+                "  §6- ${
+                    gems.getString(it).toTitleCase()
+                } ${it.substringBeforeLast("_").toTitleCase()}"
+            })
+        }
     }
 
     @SubscribeEvent
@@ -356,8 +365,7 @@ class ItemFeatures {
                             if (parts.size > 1) {
                                 parts.joinToString("") { s -> s.substring(0, 1).uppercase() }
                             } else {
-                                parts[0].substring(0, parts[0].length.coerceAtMost(3))
-                                    .replaceFirstChar { it.titlecase() } + "."
+                                parts[0].substring(0, parts[0].length.coerceAtMost(3)).toTitleCase() + "."
                             }
                         }
                         GlStateManager.disableLighting()

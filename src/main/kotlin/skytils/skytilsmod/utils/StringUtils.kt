@@ -39,3 +39,5 @@ fun String.toDashedUUID(): String {
         insert(8, "-")
     }
 }
+
+fun String.toTitleCase(): String = this.lowercase().replaceFirstChar { c -> c.titlecase() }

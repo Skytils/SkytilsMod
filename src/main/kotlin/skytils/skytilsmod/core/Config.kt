@@ -1057,6 +1057,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showEtherwarpTeleportPosColor = Color(0, 0, 255, 204)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Gemstones",
+        description = "Shows the added gemstones on items.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showGemstones = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
         description = "Shows the NPC Sell Price on certain items.",
         category = "Miscellaneous", subcategory = "Items"
