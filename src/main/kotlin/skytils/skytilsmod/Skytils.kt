@@ -252,6 +252,7 @@ class Skytils {
             cch.registerCommand(SkytilsCommand)
 
             cch.registerCommand(CataCommand)
+            cch.registerCommand(CalcXPCommand)
             cch.registerCommand(HollowWaypointCommand)
             cch.registerCommand(PingCommand)
             cch.registerCommand(SlayerCommand)
