@@ -21,7 +21,6 @@ package skytils.skytilsmod.commands
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
@@ -31,25 +30,13 @@ import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 
-object HollowWaypointCommand : CommandBase() {
-    override fun getCommandName(): String {
-        return "skytilshollowwaypoint"
-    }
+object HollowWaypointCommand : BaseCommand() {
+    override fun getCommandName(): String = "skytilshollowwaypoint"
 
-    override fun getCommandAliases(): List<String> {
-        return listOf("sthw")
-    }
+    override fun getCommandAliases(): List<String> = listOf("sthw")
 
     override fun getCommandUsage(sender: ICommandSender): String {
         return "/skytilshollowwaypoint location x y z"
-    }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
-        return emptyList()
     }
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {

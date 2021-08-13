@@ -17,15 +17,16 @@
  */
 package skytils.skytilsmod.commands
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import skytils.skytilsmod.Skytils
@@ -46,27 +47,11 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.concurrent.thread
 
-object SkytilsCommand : CommandBase() {
+object SkytilsCommand : BaseCommand() {
 
-    override fun getCommandName(): String {
-        return "skytils"
-    }
+    override fun getCommandName(): String = "skytils"
 
-    override fun getCommandAliases(): MutableList<String> {
-        return mutableListOf("st")
-    }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/$commandName"
-    }
-
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
-        return emptyList()
-    }
+    override fun getCommandAliases(): List<String> = listOf("st")
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val player = sender as EntityPlayerSP

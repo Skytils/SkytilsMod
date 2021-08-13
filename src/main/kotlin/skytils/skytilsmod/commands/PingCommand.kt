@@ -19,7 +19,6 @@
 package skytils.skytilsmod.commands
 
 import gg.essential.universal.UChat
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
@@ -32,14 +31,13 @@ import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import kotlin.math.abs
 import kotlin.time.ExperimentalTime
 
-object PingCommand : CommandBase() {
+object PingCommand : BaseCommand() {
     override fun getCommandName(): String = "skytilsping"
     override fun getCommandUsage(sender: ICommandSender): String = "/$commandName"
-    override fun getRequiredPermissionLevel(): Int = 0
 
     var pingedAt = -1L
 
-    override fun processCommand(sender: ICommandSender, args: Array<out String>) {
+    override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (pingedAt != -1L) return UChat.chat("§cAlready pinging!")
         UChat.chat("§aSkytils is sending a request...")
         mc.thePlayer.sendQueue.networkManager.sendPacket(

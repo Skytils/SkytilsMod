@@ -17,15 +17,13 @@
  */
 package skytils.skytilsmod.commands
 
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
 
-object TrackCooldownCommand : CommandBase() {
+object TrackCooldownCommand : BaseCommand() {
     override fun getCommandName(): String {
         return "trackcooldown"
     }
@@ -37,15 +35,6 @@ object TrackCooldownCommand : CommandBase() {
     override fun getCommandUsage(sender: ICommandSender): String {
         return "/trackcooldown <cooldown> <ability>"
     }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
-        return emptyList()
-    }
-
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (args.size < 2) throw WrongUsageException("You must specify valid arguments.")

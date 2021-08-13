@@ -18,38 +18,23 @@
 package skytils.skytilsmod.commands
 
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
-object GlintCustomizeCommand : CommandBase() {
-    override fun getCommandName(): String {
-        return "glintcustomize"
-    }
+object GlintCustomizeCommand : BaseCommand() {
+    override fun getCommandName(): String = "glintcustomize"
 
-    override fun getCommandAliases(): List<String> {
-        return listOf("customizeglint")
-    }
+    override fun getCommandAliases(): List<String> = listOf("customizeglint")
 
     override fun getCommandUsage(sender: ICommandSender): String {
         return "glintcustomize <override/color>"
     }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
-        return emptyList()
-    }
-
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")

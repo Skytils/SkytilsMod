@@ -32,9 +32,7 @@ import java.util.*
 
 object SlayerCommand : StatCommand(needProfile = false) {
 
-    override fun getCommandName(): String {
-        return "skytilsslayer"
-    }
+    override fun getCommandName(): String = "skytilsslayer"
 
     override fun displayStats(username: String, uuid: UUID) {
         val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return

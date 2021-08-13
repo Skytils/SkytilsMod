@@ -18,7 +18,6 @@
 package skytils.skytilsmod.commands.stats
 
 import gg.essential.universal.wrappers.message.UMessage
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
@@ -27,22 +26,16 @@ import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.commands.BaseCommand
 import java.util.*
 
 abstract class StatCommand(private val needApiKey: Boolean = true, private val needProfile: Boolean = true) :
-    CommandBase() {
+    BaseCommand() {
 
     val key: String
         get() = Skytils.config.apiKey
 
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/${this.commandName} [player]"
-    }
-
-    final override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
+    override fun getCommandUsage(sender: ICommandSender): String = "/${this.commandName} [player]"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (needApiKey && key.isEmpty()) {

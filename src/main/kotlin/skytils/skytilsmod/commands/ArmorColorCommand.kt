@@ -17,14 +17,11 @@
  */
 package skytils.skytilsmod.commands
 
-import com.google.common.collect.Lists
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.ArmorColor
@@ -32,27 +29,12 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 
-object ArmorColorCommand : CommandBase() {
-    override fun getCommandName(): String {
-        return "armorcolor"
-    }
+object ArmorColorCommand : BaseCommand() {
+    override fun getCommandName(): String =" armorcolor"
 
-    override fun getCommandAliases(): List<String> {
-        return Lists.newArrayList("armourcolour", "armorcolour", "armourcolor")
-    }
+    override fun getCommandAliases(): List<String> = listOf("armourcolour", "armorcolour", "armourcolor")
 
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/armorcolor <clearall/clear/set>"
-    }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
-        return emptyList()
-    }
-
+    override fun getCommandUsage(sender: ICommandSender): String = "/armorcolor <clearall/clear/set>"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val player = sender as EntityPlayerSP

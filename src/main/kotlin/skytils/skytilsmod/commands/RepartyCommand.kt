@@ -17,9 +17,6 @@
  */
 package skytils.skytilsmod.commands
 
-import net.minecraft.client.Minecraft
-import net.minecraft.command.CommandBase
-import net.minecraft.command.ICommand
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.util.ChatComponentText
@@ -28,7 +25,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.Utils
 
-object RepartyCommand : CommandBase(), ICommand {
+object RepartyCommand : BaseCommand() {
 
     @JvmField
     var gettingParty = false
@@ -54,21 +51,9 @@ object RepartyCommand : CommandBase(), ICommand {
     @JvmField
     var partyThread: Thread? = null
 
-    override fun getCommandName(): String {
-        return "reparty"
-    }
+    override fun getCommandName(): String = "reparty"
 
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/$commandName"
-    }
-
-    override fun getCommandAliases(): List<String> {
-        return listOf("rp")
-    }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
+    override fun getCommandAliases(): List<String> = listOf("rp")
 
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {

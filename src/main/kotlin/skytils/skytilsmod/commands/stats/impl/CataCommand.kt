@@ -36,9 +36,7 @@ import java.util.*
 
 object CataCommand : StatCommand() {
 
-    override fun getCommandName(): String {
-        return "skytilscata"
-    }
+    override fun getCommandName(): String = "skytilscata"
 
     override fun displayStats(username: String, uuid: UUID, profileData: Member) {
         val playerResponse = try {

@@ -18,35 +18,18 @@
 package skytils.skytilsmod.commands
 
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.utils.ItemUtil
 
-object BlockAbilityCommand : CommandBase() {
-    override fun getCommandName(): String {
-        return "blockability"
-    }
+object BlockAbilityCommand : BaseCommand() {
+    override fun getCommandName(): String = "blockability"
 
-    override fun getCommandAliases(): List<String> {
-        return listOf("disableability")
-    }
+    override fun getCommandAliases(): List<String> = listOf("disableability")
 
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/blockability [clearall]"
-    }
-
-    override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
-        return emptyList()
-    }
-
+    override fun getCommandUsage(sender: ICommandSender): String = "/blockability [clearall]"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val player = sender as EntityPlayerSP
