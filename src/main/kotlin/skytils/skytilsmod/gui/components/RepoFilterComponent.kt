@@ -95,7 +95,7 @@ class RepoFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UIComp
         }
         dropDown.constrain {
             x = INNER_PADDING.pixels(true)
-            y = CenterConstraint()
+            y = basicYConstraint { it.getHeight() / 2f - 10f }
             width = 25.percent()
         }
         dropDown childOf boundingBox

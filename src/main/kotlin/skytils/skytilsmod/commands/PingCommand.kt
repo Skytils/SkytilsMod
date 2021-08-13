@@ -47,7 +47,6 @@ object PingCommand : BaseCommand() {
             })
     }
 
-    @OptIn(ExperimentalTime::class)
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (pingedAt != -1L) {
