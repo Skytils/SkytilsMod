@@ -64,23 +64,6 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 }
             }
 
-            if (this::class.java.classLoader.getResource("patcher.mixins.json") == null && runCatching {
-                    Class.forName("club.sk1er.patcher.tweaker.other.ModClassTransformer")
-                }.isSuccess) {
-                val sk1erClubButton = createButton("Go to Sk1er.Club") {
-                    Desktop.getDesktop().browse(URL("https://sk1er.club/mods/patcher").toURI())
-                }
-                showMessage(
-                    """
-                #Skytils has detected that you are using an old version of Patcher.
-                #You must update Patcher in order for your game to launch.
-                #You can do so at https://sk1er.club/mods/patcher
-                #If you have already done this and are still getting this error,
-                #ask for support in the Discord.
-                """.trimMargin("#"), sk1erClubButton
-                )
-                SkytilsLoadingPlugin.exit()
-            }
             // Must use reflection otherwise the "constant" value will be inlined by compiler
             val forgeVersion = runCatching {
                 ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
@@ -126,6 +109,23 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 """.trimMargin("#"),
                     forgeButton
                 )
+            }
+            if (this::class.java.classLoader.getResource("patcher.mixins.json") == null && Package.getPackages()
+                    .any { it.name.startsWith("club.sk1er.patcher") }
+            ) {
+                val sk1erClubButton = createButton("Go to Sk1er.Club") {
+                    Desktop.getDesktop().browse(URL("https://sk1er.club/mods/patcher").toURI())
+                }
+                showMessage(
+                    """
+                #Skytils has detected that you are using an old version of Patcher.
+                #You must update Patcher in order for your game to launch.
+                #You can do so at https://sk1er.club/mods/patcher
+                #If you have already done this and are still getting this error,
+                #ask for support in the Discord.
+                """.trimMargin("#"), sk1erClubButton
+                )
+                SkytilsLoadingPlugin.exit()
             }
         }
     }

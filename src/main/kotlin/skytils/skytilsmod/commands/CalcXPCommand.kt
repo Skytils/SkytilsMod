@@ -21,6 +21,7 @@ package skytils.skytilsmod.commands
 import gg.essential.universal.UChat
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
+import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
 
 object CalcXPCommand : BaseCommand("skytilscalcxp") {
@@ -28,25 +29,20 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (args.size != 3) throw SyntaxErrorException("invalid arguments")
         val type = args[0].lowercase()
-        val starting = (args[1].toIntOrNull() ?: 0).inc()
-        val ending = args[2].toIntOrNull() ?: 0
-        val xp: Long
-        when {
-            type.endsWith("_slayer") -> {
-                val slayer = SkillUtils.slayerXp[type.substringBefore("_slayer")] ?: return
-                xp = (starting..ending).sumOf { slayer[it] ?: 0 }
-            }
-            type == "dungeons" -> {
-                xp = (starting..ending).sumOf { SkillUtils.dungeoneeringXp[it] ?: 0 }
-            }
-            type == "skill" -> {
-                xp = (starting..ending).sumOf { SkillUtils.skillXp[it] ?: 0 }
-            }
+        var starting = (args[1].toIntOrNull() ?: 0).inc()
+        var ending = args[2].toIntOrNull() ?: 0
+        val xpMap = when {
+            type.endsWith("_slayer") -> SkillUtils.slayerXp[type.substringBefore("_slayer")]
+            type == "dungeons" -> SkillUtils.dungeoneeringXp
+            type == "skill" -> SkillUtils.skillXp
             else -> {
-                UChat.chat("§cThat skill is unknown to me!")
+                UChat.chat("§9§lSkytils ➜ §cThat skill is unknown to me!")
                 return
             }
         }
-        UChat.chat("§bYou need §6$xp§b to get from §6$type§b level §6${starting.dec()}§b to level §6$ending§b!")
+        ending = ending.coerceIn(starting, xpMap?.keys?.last())
+        starting = starting.coerceIn(0, ending)
+        val xp = (starting.inc()..ending).sumOf { xpMap?.get(it) ?: 0 }
+        UChat.chat("§9§lSkytils ➜ §bYou need §6${NumberUtil.nf.format(xp)}§b to get from §6$type§b level §6${starting.dec()}§b to level §6$ending§b!")
     }
 }
