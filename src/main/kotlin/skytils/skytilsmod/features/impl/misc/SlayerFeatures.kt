@@ -382,7 +382,6 @@ class SlayerFeatures {
     fun onDeath(event: LivingDeathEvent) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityEnderman) {
-            printDevMessage("An Enderman died", "slayer", "seraph", "seraphHit")
             hitMap.remove(event.entity)
         }
     }
@@ -848,15 +847,15 @@ class SlayerFeatures {
                         val currentTier =
                             sidebarLines.map { cleanSB(it) }.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
                                 ?: ""
-                        printDevMessage(
-                            "expected tier $currentTier - spawned hp ${entity.baseMaxHealth}",
-                            "slayer"
-                        )
-                        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
+                        val expectedHealth =
+                            (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
                                 " "
                             )]?.get(currentTier)?.asInt ?: 0)
-                            == floor(entity.baseMaxHealth).toInt()
-                        ) {
+                        printDevMessage(
+                            "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth}",
+                            "slayer"
+                        )
+                        if (expectedHealth == floor(entity.baseMaxHealth).toInt()) {
                             printDevMessage("hp matched", "slayer")
                             potentialNameEntities.add(nearby as EntityArmorStand)
                         }
