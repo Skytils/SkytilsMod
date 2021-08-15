@@ -19,16 +19,21 @@
 package skytils.skytilsmod.mixins.transformers.gui;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiNewChat;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.client.gui.GuiOverlayDebug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo;
 
-@Mixin(value = GuiNewChat.class, priority = 999)
-public abstract class MixinGuiNewChat extends Gui {
-    @Redirect(method = "printChatMessageWithOptionalDeletion", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/IChatComponent;getUnformattedText()Ljava/lang/String;"))
-    private String printFormattedText(IChatComponent iChatComponent) {
-        return iChatComponent.getFormattedText();
+import static skytils.skytilsmod.Skytils.getMc;
+
+@Mixin(GuiOverlayDebug.class)
+public class MixinGuiOverlayDebug extends Gui {
+    @ModifyArgs(method = "call", at = @At(value = "INVOKE", target = "Ljava/lang/String;format(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", remap = false))
+    private void returnRealWorldTime(Args args) {
+        if (args.get(0).equals("Local Difficulty: %.2f (Day %d)")) {
+            args.set(2, ((AccessorWorldInfo)getMc().theWorld.getWorldInfo()).getRealWorldTime());
+        }
     }
 }

@@ -16,19 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.mixins.transformers.gui;
+package skytils.skytilsmod.mixins.transformers.accessors;
 
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiNewChat;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(value = GuiNewChat.class, priority = 999)
-public abstract class MixinGuiNewChat extends Gui {
-    @Redirect(method = "printChatMessageWithOptionalDeletion", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/IChatComponent;getUnformattedText()Ljava/lang/String;"))
-    private String printFormattedText(IChatComponent iChatComponent) {
-        return iChatComponent.getFormattedText();
-    }
+@Mixin(WorldInfo.class)
+public interface AccessorWorldInfo {
+    @Accessor("worldTime")
+    long getRealWorldTime();
 }
