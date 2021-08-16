@@ -41,9 +41,6 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.io.FileReader
 import java.io.FileWriter
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import kotlin.math.pow
 
@@ -185,52 +182,46 @@ class MythologicalTracker : Tracker("mythological") {
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
                 if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
-                if (!extraAttr.hasKey("timestamp")) return printDevMessage("tracker", "$extraAttr")
-                val time = ZonedDateTime.from(
-                    DateTimeFormatter.ofPattern("M/d/yy h:mm a").withZone(
-                        ZoneId.of("America/New_York")
-                    ).parse(extraAttr.getString("timestamp"))
-                )
-                if (ZonedDateTime.now().withSecond(0).withNano(0).toEpochSecond() - time.toEpochSecond() > 60) return
+                if (!extraAttr.hasKey("timestamp")) {
+                    if (Skytils.config.broadcastMythCreatureDrop) {
+                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"))
 
-                if (Skytils.config.broadcastMythCreatureDrop) {
-                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"))
-
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(-9.0 / 12).toFloat(),
-                            volume = 0.5f
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(-9.0 / 12).toFloat(),
+                                volume = 0.5f
+                            )
                         )
-                    )
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(-2.0 / 12).toFloat(),
-                            ticks = 4,
-                            volume = 0.5f
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(-2.0 / 12).toFloat(),
+                                ticks = 4,
+                                volume = 0.5f
+                            )
                         )
-                    )
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(1.0 / 12).toFloat(),
-                            ticks = 8,
-                            volume = 0.5f
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(1.0 / 12).toFloat(),
+                                ticks = 8,
+                                volume = 0.5f
+                            )
                         )
-                    )
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(3.0 / 12).toFloat(),
-                            ticks = 12,
-                            volume = 0.5f
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(3.0 / 12).toFloat(),
+                                ticks = 12,
+                                volume = 0.5f
+                            )
                         )
-                    )
-                }
-                if (Skytils.config.trackMythEvent) {
-                    drop.droppedTimes++
-                    markDirty<MythologicalTracker>()
+                    }
+                    if (Skytils.config.trackMythEvent) {
+                        drop.droppedTimes++
+                        markDirty<MythologicalTracker>()
+                    }
                 }
             }
         }
