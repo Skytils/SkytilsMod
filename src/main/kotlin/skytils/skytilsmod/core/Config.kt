@@ -2172,23 +2172,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         }
 
         this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
-
-        if (this.largerHeadScale > 2) {
-            this.largerHeadScale /= 100
-            markDirty()
-        }
-        if (this.itemDropScale > 5) {
-            this.itemDropScale /= 100f
-            markDirty()
-        }
-        if (this.itemRarityOpacity > 1) {
-            this.itemRarityOpacity /= 100f
-            markDirty()
-        }
-        if (this.transparentHeadLayer > 1) {
-            this.transparentHeadLayer /= 100f
-            markDirty()
-        }
     }
 
     private object ConfigSorting : SortingBehavior() {

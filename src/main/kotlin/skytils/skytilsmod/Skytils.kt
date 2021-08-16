@@ -299,10 +299,23 @@ class Skytils {
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()
                     }
+                    if (config.largerHeadScale > 2) {
+                        config.largerHeadScale /= 100
+                    }
+                    if (config.itemDropScale > 5) {
+                        config.itemDropScale /= 100f
+                    }
+                    if (config.itemRarityOpacity > 1) {
+                        config.itemRarityOpacity /= 100f
+                    }
+                    if (config.transparentHeadLayer > 1) {
+                        config.transparentHeadLayer /= 100f
+                    }
                 }
             }
         }
         config.lastLaunchedVersion = VERSION
+        config.markDirty()
     }
 
     @SubscribeEvent
