@@ -276,6 +276,7 @@ class DungeonFeatures {
         if (!Utils.inSkyblock) return
         if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime > 0 && event.entityLiving.name == "Terracotta ") {
             //for some reason this event fires twice for players
+            printDevMessage("terracotta died", "terracotta")
             terracottaEndTime -= 1
         }
     }
