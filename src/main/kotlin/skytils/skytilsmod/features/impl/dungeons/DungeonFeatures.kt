@@ -133,7 +133,7 @@ class DungeonFeatures {
                     }
                 }
             }
-            if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
+            if (isInTerracottaPhase && terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
                 val timeLeft = terracottaEndTime - System.currentTimeMillis()
                     .toDouble() / 1000f
                 if (timeLeft >= 0) {
