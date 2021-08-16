@@ -260,10 +260,14 @@ class ItemFeatures {
         if (Skytils.config.showGemstones && extraAttr?.hasKey("gems") == true) {
             val gems = extraAttr.getCompoundTag("gems")
             event.toolTip.add("§bGemstones: ")
-            event.toolTip.addAll(gems.keySet.map {
+            event.toolTip.addAll(gems.keySet.filter {
+                !(it.startsWith("UNIVERSAL_") && it.endsWith("_gem"))
+            }.map {
                 "  §6- ${
                     gems.getString(it).toTitleCase()
-                } ${it.substringBeforeLast("_").toTitleCase()}"
+                } ${
+                    if (it.startsWith("UNIVERSAL_")) gems.getString("${it}_gem") else it.substringBeforeLast("_").toTitleCase()
+                }"
             })
         }
     }
