@@ -18,9 +18,18 @@
 package skytils.skytilsmod.mixins.hooks.world
 
 import net.minecraft.world.World
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import skytils.skytilsmod.utils.Utils
 
 fun lightningSkyColor(world: World): Int {
     return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else world.lastLightningBolt
+}
+
+fun fixTime(world: Any, cir: CallbackInfoReturnable<Long>) {
+    if (Utils.isOnHypixel && Skytils.config.fixWorldTime) {
+        world as World
+        cir.returnValue = (world.worldInfo as AccessorWorldInfo).realWorldTime
+    }
 }

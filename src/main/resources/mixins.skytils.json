@@ -27,7 +27,6 @@
     "gui.MixinGuiIngame",
     "gui.MixinGuiIngameForge",
     "gui.MixinGuiNewChat",
-    "gui.MixinGuiOverlayDebug",
     "gui.MixinGuiScreen",
     "inventory.MixinSlot",
     "item.MixinItemArmor",

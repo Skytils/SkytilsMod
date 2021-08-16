@@ -953,6 +953,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var fixSbaChroma = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Fix World Time",
+        description = "Fixes world time on other mods being messed up due to certain mods.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var fixWorldTime = false
+
     /*
    @Property(
    type = PropertyType.SWITCH, name = "Block Useless Zombie Sword",
