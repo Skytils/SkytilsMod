@@ -72,13 +72,13 @@ class GriffinBurrows {
                         Skytils.config.showGriffinBurrows = false
                         return@submit
                     }
-                    val burrowArray =
+                    val profileData =
                         Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
-                    if (burrowArray == null) {
+                    if (profileData == null) {
                         UChat.chat("§c§lUnable to find your Skyblock Profile!")
                         return@submit
                     }
-                    val receivedBurrows = burrowArray.griffin.burrows.mapTo(ArrayList()) {
+                    val receivedBurrows = profileData.griffin.burrows.mapTo(ArrayList()) {
                         Burrow(it.x, it.y, it.z, it.type, it.tier, it.chain)
                     }
 
@@ -100,7 +100,10 @@ class GriffinBurrows {
                         )
                     } else UChat.chat("§aSkytils loaded §2${receivedBurrows.size}§a burrows!")
                 } catch (apiException: HypixelAPIException) {
-                    UChat.chat("Failed to get burrows with reason: ${apiException.message}")
+                    UChat.chat("§cFailed to get burrows with reason: ${apiException.message}")
+                } catch (e: Exception) {
+                    UChat.chat("§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${e.message}")
+                    e.printStackTrace()
                 }
             }
         }
