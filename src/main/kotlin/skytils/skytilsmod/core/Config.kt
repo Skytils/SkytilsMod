@@ -1204,11 +1204,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var summoningEyeDisplay = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Ping Display",
+        type = PropertyType.SELECTOR, name = "Ping Display",
         description = "Shows your ping to the current server, similar to the /skytils ping command.\nYou must be in a GUI or not moving in order to queue a ping.\nThere is a tiny chance that this will cause you to be punished.",
-        category = "Miscellaneous", subcategory = "Other"
+        category = "Miscellaneous", subcategory = "Other",
+        options = ["Off", "Server List", "Packet"]
     )
-    var pingDisplay = false
+    var pingDisplay = 0
 
     @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Transparent Armor Layer",

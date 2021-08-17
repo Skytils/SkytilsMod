@@ -19,6 +19,7 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
+import net.minecraft.client.network.OldServerPinger
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S37PacketStatistics
@@ -28,6 +29,8 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorServerListEntryNormal
+import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -40,10 +43,12 @@ object Ping {
 
     var lastPingAt = -1L
 
-    var pingCache = 0.0
+    var pingCache = -1.0
 
     var invokedCommand = false
 
+    val oldServerPinger = OldServerPinger()
+    var lastOldServerPing = 0L
 
     fun sendPing() {
         if (lastPingAt > 0) {
@@ -67,7 +72,7 @@ object Ping {
                     invokedCommand = false
                 }
                 is S37PacketStatistics -> {
-                    val diff = (abs(System.nanoTime() - lastPingAt) / 1_000_000.0).roundToPrecision(2)
+                    val diff = (abs(System.nanoTime() - lastPingAt) / 1_000_000.0)
                     lastPingAt *= -1
                     pingCache = diff
                     if (invokedCommand) {
@@ -79,7 +84,7 @@ object Ping {
                                     diff < 249 -> "6"
                                     else -> "c"
                                 }
-                            }$diff §7ms"
+                            }${diff.roundToPrecision(2)} §7ms"
                         )
                     }
                 }
@@ -90,14 +95,28 @@ object Ping {
     class PingDisplayElement : GuiElement(name = "Ping Display", fp = FloatPair(10, 10)) {
         override fun render() {
             if (Utils.isOnHypixel && toggled && mc.thePlayer != null) {
-                if (lastPingAt < 0 && (mc.currentScreen != null || !mc.thePlayer.hasMoved) && System.nanoTime()
-                    - lastPingAt.absoluteValue > 1_000_000L * 5_000
-                ) {
-                    sendPing()
+                when (Skytils.config.pingDisplay) {
+                    1 -> {
+                        if (System.currentTimeMillis() - lastOldServerPing > 5000) {
+                            lastOldServerPing = System.currentTimeMillis()
+                            AccessorServerListEntryNormal.getPingerPool().submit {
+                                oldServerPinger.ping(mc.currentServerData)
+                            }
+                        }
+                        if (mc.currentServerData.pingToServer != -1L) pingCache =
+                            mc.currentServerData.pingToServer.toDouble()
+                    }
+                    2 -> {
+                        if (lastPingAt < 0 && (mc.currentScreen != null || !mc.thePlayer.hasMoved) && System.nanoTime()
+                            - lastPingAt.absoluteValue > 1_000_000L * 5_000
+                        ) {
+                            sendPing()
+                        }
+                    }
                 }
-                if (lastPingAt != -1L) {
+                if (pingCache != -1.0) {
                     fr.drawString(
-                        "${pingCache}ms",
+                        "${NumberUtil.nf.format(pingCache.roundToPrecision(2))}ms",
                         0f,
                         0f,
                         when {
@@ -124,7 +143,7 @@ object Ping {
         }
 
         override val toggled: Boolean
-            get() = true
+            get() = Skytils.config.pingDisplay != 0
         override val height: Int
             get() = fr.FONT_HEIGHT
         override val width: Int

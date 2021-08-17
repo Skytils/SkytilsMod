@@ -13,6 +13,7 @@
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorMinecraft",
     "accessors.AccessorRenderItem",
+    "accessors.AccessorServerListEntryNormal",
     "accessors.AccessorSettingsGui",
     "accessors.AccessorWorldInfo",
     "audio.MixinSoundManager",
