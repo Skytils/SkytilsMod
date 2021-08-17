@@ -200,7 +200,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
         MinecraftForge.EVENT_BUS.register(MythologicalTracker())
         MinecraftForge.EVENT_BUS.register(PetFeatures())
-        MinecraftForge.EVENT_BUS.register(PingCommand)
+        MinecraftForge.EVENT_BUS.register(Ping)
         MinecraftForge.EVENT_BUS.register(ProtectItems())
         MinecraftForge.EVENT_BUS.register(RainTimer())
         MinecraftForge.EVENT_BUS.register(RelicWaypoints())
@@ -253,7 +253,6 @@ class Skytils {
             cch.registerCommand(CataCommand)
             cch.registerCommand(CalcXPCommand)
             cch.registerCommand(HollowWaypointCommand)
-            cch.registerCommand(PingCommand)
             cch.registerCommand(SlayerCommand)
 
             if (!cch.commands.containsKey("armorcolor")) {

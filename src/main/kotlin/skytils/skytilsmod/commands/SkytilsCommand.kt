@@ -36,6 +36,7 @@ import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.misc.Ping
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.*
@@ -261,6 +262,10 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "updatelater" -> {
                 Skytils.displayScreen = UpdateGui(false)
                 return
+            }
+            "ping" -> {
+                Ping.invokedCommand = true
+                Ping.sendPing()
             }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }

@@ -267,3 +267,6 @@ fun Entity.getXZDistSq(other: Entity): Double {
     val zDelta = this.posZ - other.posZ
     return xDelta * xDelta + zDelta * zDelta
 }
+
+val Entity.hasMoved
+    get() = this.posX != this.prevPosX || this.posY != this.prevPosY || this.posZ != this.prevPosZ
