@@ -199,7 +199,7 @@ object Utils {
     fun generateDebugInfo(crashReportCategory: CrashReportCategory) {
         crashReportCategory.addCrashSectionCallable("Skytils Debug Info") {
             val hasBetterFPS = runCatching {
-                Class.forName("me.guichaguri.betterfps.BetterFpsHelper").getDeclaredField("VERSION")
+                Class.forName("me.guichaguri.betterfps.BetterFpsHelper").getDeclaredField("VERSION").also { it.isAccessible = true }
                     .get(null) as String
             }.getOrDefault("NONE")
 

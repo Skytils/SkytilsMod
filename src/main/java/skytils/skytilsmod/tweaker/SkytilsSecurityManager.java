@@ -21,6 +21,11 @@ package skytils.skytilsmod.tweaker;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.security.Permission;
 
 public class SkytilsSecurityManager extends FMLSecurityManager {
@@ -30,13 +35,69 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
         if (permName.startsWith("exitVM") && Minecraft.getMinecraft() == null) {
             Class<?>[] classContexts = getClassContext();
             String callingClass = classContexts.length > 3 ? classContexts[4].getName() : "none";
+            // Skytils: allow Skytils tweaker classes to close the game
+            if (callingClass.startsWith("skytils.skytilsmod.tweaker.")) return;
+
             // Skytils: allow the LaunchWrapper to close the game
             if (callingClass.equals("net.minecraft.launchwrapper.Launch")) {
+                showMessage();
                 return;
             }
         } else if ("setSecurityManager".equals(permName)) {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
         }
         super.checkPermission(perm);
+    }
+
+    private void showMessage() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // This makes the JOptionPane show on taskbar and stay on top
+        JFrame frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.setAlwaysOnTop(true);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+        JButton openLogs = new JButton("Open Logs Folder");
+        openLogs.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                try {
+                    Desktop.getDesktop().open(new File("./logs"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        JButton openLatestLog = new JButton("Open Latest Log");
+        openLatestLog.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                try {
+                    Desktop.getDesktop().open(new File("./logs/latest.log"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        Object[] options = new Object[]{openLogs};
+        JOptionPane.showOptionDialog(
+                frame,
+                "The game crashed whilst launching:\n",
+                "Minecraft Crash",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
     }
 }

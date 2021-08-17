@@ -48,7 +48,8 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
         if (System.getProperty("skytils.skipStartChecks") == null) {
             // Must use reflection otherwise the "constant" value will be inlined by compiler
             if (!runCatching {
-                    MixinBootstrap::class.java.getDeclaredField("VERSION").get(null) as String
+                    MixinBootstrap::class.java.getDeclaredField("VERSION").also { it.isAccessible = true }
+                        .get(null) as String
                 }.getOrDefault("unknown").startsWithAny("0.7", "0.8")) {
                 try {
                     Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
@@ -66,12 +67,13 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
             // Must use reflection otherwise the "constant" value will be inlined by compiler
             val forgeVersion = runCatching {
-                ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
+                ForgeVersion::class.java.getDeclaredField("buildVersion").also { it.isAccessible = true }
+                    .get(null) as Int
             }.onFailure { it.printStackTrace() }.getOrDefault(2318)
             // Asbyth's forge fork uses version 0
             if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
                 val forgeUrl =
-                    URL("https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
+                    URL("https://cdn.discordapp.com/attachments/807303575549116418/877275074598699118/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
                 val forgeButton = createButton("Get Forge") {
                     if (SkytilsInstallerFrame.getOperatingSystem() == SkytilsInstallerFrame.OperatingSystem.WINDOWS) {
                         runCatching {
