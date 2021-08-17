@@ -19,6 +19,7 @@
 package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
@@ -113,19 +114,20 @@ class MythologicalTracker : Tracker("mythological") {
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(
+        if (lastMinosChamp != 0L && Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && event.entity.getXZDistSq(
                 mc.thePlayer
-            ) < 5.5 * 5.5
+            ) < 5.5 * 5.5 && System.currentTimeMillis() - lastMinosChamp <= 2500
         ) {
             if (event.entity.name == "Minos Champion") {
                 println("Dug is: Minos Champion")
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
+                UChat.chat("§bSkytils: §eConfirmed, you dug up a §2Minos Champion§e!")
             } else if (event.entity.name == "Minos Inquisitor") {
                 println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
-                mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!"))
+                UChat.chat("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!")
             }
         }
     }

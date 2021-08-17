@@ -26,6 +26,7 @@ import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.crash.CrashReportCategory
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
@@ -259,4 +260,10 @@ fun UTextComponent.setHoverText(text: String): UTextComponent {
     hoverAction = HoverEvent.Action.SHOW_TEXT
     hoverValue = text
     return this
+}
+
+fun Entity.getXZDistSq(other: Entity): Double {
+    val xDelta = this.posX - other.posX
+    val zDelta = this.posZ - other.posZ
+    return xDelta * xDelta + zDelta * zDelta
 }
