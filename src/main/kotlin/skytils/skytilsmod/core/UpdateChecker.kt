@@ -33,7 +33,7 @@ import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.APIUtil.cm
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
-import java.io.*
+import java.io.File
 import java.net.URL
 import kotlin.concurrent.thread
 
@@ -62,6 +62,10 @@ object UpdateChecker {
                 newLocation.createNewFile()
                 newJar.copyTo(newLocation, true)
                 newJar.delete()
+                if (oldJar.delete()) {
+                    println("successfully deleted the files. skipping install tasks")
+                    return@Thread
+                }
                 println("Running delete task")
                 val taskFile = File(File(Skytils.modDir, "updates"), "tasks").listFiles()?.last()
                 if (taskFile == null) {
@@ -70,8 +74,14 @@ object UpdateChecker {
                 }
                 val runtime = Utils.getJavaRuntime()
                 if (Util.getOSType() == Util.EnumOS.OSX) {
-                    println("On Mac, trying to open mods folder")
-                    Desktop.getDesktop().open(oldJar.parentFile)
+                    val sipStatus = Runtime.getRuntime().exec("csrutil status")
+                    sipStatus.waitFor()
+                    if (!sipStatus.inputStream.use { it.bufferedReader().readText() }
+                            .contains("System Integrity Protection status: disabled.")) {
+                        println("SIP is NOT disabled, opening Finder.")
+                        Desktop.getDesktop().open(oldJar.parentFile)
+                        return@Thread
+                    }
                 }
                 println("Using runtime $runtime")
                 Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" \"${oldJar.absolutePath}\"")
@@ -132,7 +142,7 @@ object UpdateChecker {
 
         override fun run() {
             println("Checking for updates...")
-            val latestRelease = when(Skytils.config.updateChannel) {
+            val latestRelease = when (Skytils.config.updateChannel) {
                 2 -> APIUtil.getJSONResponse(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases/latest"
                 )
