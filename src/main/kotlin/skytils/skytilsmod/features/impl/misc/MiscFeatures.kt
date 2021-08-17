@@ -86,7 +86,7 @@ class MiscFeatures {
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (!event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
+        if (!Skytils.config.guildLeaveConfirmation || !event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
         if (System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
             event.isCanceled = true
             lastGLeaveCommand = System.currentTimeMillis()
