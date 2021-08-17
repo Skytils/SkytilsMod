@@ -2174,6 +2174,37 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
     }
 
+    fun init() {
+        initialize()
+        if (Skytils.config.lastLaunchedVersion != Skytils.VERSION) {
+            val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
+            when {
+                !ver.isSafe -> {
+                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
+                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                        PersistentSave.markDirty<GuiManager>()
+                    }
+                }
+                ver < UpdateChecker.SkytilsVersion("1.0.3") -> {
+                    if (largerHeadScale > 2) {
+                        largerHeadScale /= 100
+                    }
+                    if (itemDropScale > 5) {
+                        itemDropScale /= 100f
+                    }
+                    if (itemRarityOpacity > 1) {
+                        itemRarityOpacity /= 100f
+                    }
+                    if (transparentHeadLayer > 1) {
+                        transparentHeadLayer /= 100f
+                    }
+                }
+            }
+        }
+        Skytils.config.lastLaunchedVersion = Skytils.VERSION
+        Skytils.config.markDirty()
+    }
+
     private object ConfigSorting : SortingBehavior() {
         override fun getCategoryComparator(): Comparator<in Category> {
             return Comparator { o1, o2 ->
