@@ -47,7 +47,7 @@ minecraft {
     )
     clientRunArgs.addAll(
         setOf(
-            "--tweakClass gg.essential.loader.stage0.EssentialSetupTweaker",
+            "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
             "--mixin mixins.skytils.json"
         )
     )
@@ -117,7 +117,7 @@ tasks {
                     "ForceLoadAsMod" to true,
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
-                    "TweakClass" to "gg.essential.loader.stage0.EssentialSetupTweaker",
+                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
                     "TweakOrder" to "0"
                 )
             )
