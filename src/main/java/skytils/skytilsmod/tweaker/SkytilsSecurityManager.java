@@ -27,7 +27,7 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
     @Override
     public void checkPermission(Permission perm) {
         String permName = perm.getName() != null ? perm.getName() : "missing";
-        if (permName.startsWith("exitVM") && Minecraft.getMinecraft() == null ) {
+        if (permName.startsWith("exitVM") && Minecraft.getMinecraft() == null) {
             Class<?>[] classContexts = getClassContext();
             String callingClass = classContexts.length > 3 ? classContexts[4].getName() : "none";
             // Skytils: allow the LaunchWrapper to close the game

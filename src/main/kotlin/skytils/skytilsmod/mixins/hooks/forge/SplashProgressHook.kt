@@ -19,8 +19,18 @@ package skytils.skytilsmod.mixins.hooks.forge
 
 import net.minecraft.util.ResourceLocation
 import skytils.skytilsmod.utils.Utils
+import kotlin.random.Random
 
+val gifs = mapOf(
+    0.0 to ResourceLocation("skytils", "sychicpet.gif"),
+    90.0 to ResourceLocation("skytils", "sychiccat.png"),
+    96.0 to ResourceLocation("skytils", "azoopet.gif"),
+    99.0 to ResourceLocation("skytils", "abdpfp.gif")
+)
 
 fun setForgeGif(resourceLocation: ResourceLocation): ResourceLocation {
-    return if (Utils.noSychic) resourceLocation else ResourceLocation("skytils", "sychicpet.gif")
+    return if (Utils.noSychic) resourceLocation else {
+        val weight = Random.nextDouble() * 100
+        gifs.entries.reversed().find { weight > it.key }?.value ?: ResourceLocation("skytils", "sychicpet.gif")
+    }
 }
