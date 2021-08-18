@@ -74,7 +74,7 @@ class MayorJerry {
     class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", FloatPair(10, 10)) {
         @OptIn(ExperimentalTime::class)
         override fun render() {
-            if (Utils.inSkyblock && toggled) {
+            if (Utils.inSkyblock && toggled && MayorInfo.currentMayor == "Jerry") {
                 if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
                     ScreenRenderer.fontRenderer.drawString("Visit Jerry!", 0f, 0f, CommonColors.RED)
                 } else {

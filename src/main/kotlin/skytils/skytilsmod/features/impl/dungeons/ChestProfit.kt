@@ -147,12 +147,10 @@ class ChestProfit {
 
         companion object {
             fun getFromName(name: String?): DungeonChest? {
-                for (chest in values()) {
-                    if (chest.displayText == name) {
-                        return chest
-                    }
+                if (name.isNullOrBlank()) return null
+                return values().find {
+                    it.displayText == name
                 }
-                return null
             }
         }
     }
