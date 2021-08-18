@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.tweaker;
 
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
 import javax.swing.*;
