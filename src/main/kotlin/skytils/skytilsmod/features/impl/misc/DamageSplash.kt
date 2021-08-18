@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -46,17 +45,17 @@ class DamageSplash {
     }
 
     @SubscribeEvent
-    fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
+    fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!Utils.inSkyblock || !Skytils.config.customDamageSplash) return
-        val entity: Entity = e.entity
-        if (e.entity !is EntityArmorStand) return
+        val entity = e.entity
+        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
-        if (e.entity.isDead) return
+        if (entity.isDead) return
         val strippedName = entity.customNameTag.stripControlCodes()
         val damageMatcher = damagePattern.matcher(strippedName)
         if (damageMatcher.matches()) {
             e.isCanceled = true
-            e.entity.worldObj.removeEntity(e.entity)
+            entity.worldObj.removeEntity(e.entity)
             if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
             val name = entity.customNameTag
             val damage = damageMatcher.group(1).run {
@@ -78,6 +77,6 @@ class DamageSplash {
     }
 
     companion object {
-        private val damagePattern = Pattern.compile("✧*(\\d+[⚔+✧❤♞☄✷]*)")
+        private val damagePattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷]*)")
     }
 }

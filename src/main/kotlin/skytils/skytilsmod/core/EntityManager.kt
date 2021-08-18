@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.core
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -88,7 +87,7 @@ object EntityManager {
                 next.livingTicks += 1
                 next.tick(partialTicks, Random(), player)
                 GlStateManager.pushMatrix()
-                // translates to the correctly entity position
+                // translates to the correct entity position
                 // subtracting the viewer position offset
                 GlStateManager.translate(
                     next.currentLocation.x - renderManager.viewerPosX,

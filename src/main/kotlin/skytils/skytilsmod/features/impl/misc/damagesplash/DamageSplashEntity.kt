@@ -46,7 +46,7 @@ class DamageSplashEntity(private var damage: String, currentLocation: Location) 
     override val name: String
         get() = "EntityDamageSplash"
 
-    override fun tick(partialTicks: Float, r: Random?, player: EntityPlayerSP?) {
+    override fun tick(partialTicks: Float, r: Random, player: EntityPlayerSP?) {
         val maxLiving = 150
         if (livingTicks > maxLiving) {
             remove()
