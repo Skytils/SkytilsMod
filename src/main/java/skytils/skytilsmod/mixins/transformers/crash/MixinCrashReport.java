@@ -40,7 +40,7 @@ public abstract class MixinCrashReport {
 
     @Shadow @Final private CrashReportCategory theReportCategory;
 
-    @Inject(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", args = "ldc=// ;captureargs=true", remap = false, ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", args = "ldc=---- Minecraft Crash Report ----\n;captureargs=true", shift = At.Shift.AFTER, remap = false, ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void thereIsNoOtherWay(CallbackInfoReturnable<String> cir, StringBuilder stringbuilder) {
         String cause = getCauseStackTraceOrString();
         if (cause.contains("skytils.skytilsmod") && !cause.contains("use the latest Forge")) {
