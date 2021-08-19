@@ -48,13 +48,10 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "The most common culprit is the ChatTriggers mod.<br>" +
         "If you do have ChatTriggers, you can update to 1.3.2<br>" +
         "or later to fix the issue. https://www.chattriggers.com/<br>" +
-        "In order to resolve this conflict you must make Skytils be<br>" +
-        "above this mod alphabetically in your mods folder.<br>" +
-        "This tricks Forge into loading Skytils first.<br>" +
-        "You can do this by renaming your Skytils jar to !Skytils.jar,<br>" +
-        "or by renaming the other mod's jar to start with a Z.<br>" +
+        "In order to resolve this conflict you must<br>" +
+        "deleted the outdated mods.<br>" +
         "If you have already done this and are still getting this error,<br>" +
-        "ask for support in the Discord.";
+        "or need assistance, ask for support in the Discord.";
 
     public static final String badMixinVersionMessage =
         "<html><p>" +
@@ -89,16 +86,16 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "</p></html>";
 
     private static final String betterFPSMessage =
-            "<html><p>" +
-            "Skytils has detected that you are using BetterFPS.<br>" +
-            "BetterFPS breaks my core plugins, and also breaks the game!<br>" +
-            "In order to resolve this conflict you must remove<br>" +
-            "BetterFPS from your Minecraft mods folder.<br>" +
-            "You probably will not notice a change in your FPS.<br>" +
-            "Video showcasing breaking changes: https://streamable.com/q4ip5u.<br>" +
-            "If you have already done this and are still getting this error,<br>" +
-            "ask for support in the Discord." +
-            "</p></html>";
+        "<html><p>" +
+        "Skytils has detected that you are using BetterFPS.<br>" +
+        "BetterFPS breaks my core plugins, and also breaks the game!<br>" +
+        "In order to resolve this conflict you must remove<br>" +
+        "BetterFPS from your Minecraft mods folder.<br>" +
+        "You probably will not notice a change in your FPS.<br>" +
+        "Video showcasing breaking changes: https://streamable.com/q4ip5u.<br>" +
+        "If you have already done this and are still getting this error,<br>" +
+        "ask for support in the Discord." +
+        "</p></html>";
 
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
@@ -109,7 +106,14 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 exit();
             }
             if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
-                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
+                File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString());
+                for (int i = 0; i < 5; i++) {
+                    if (!file.getName().endsWith("jar!") || file.getName().endsWith("jar")) {
+                        file = file.getParentFile();
+                    } else break;
+                }
+
+                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + file.getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
                 exit();
             }
             if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
