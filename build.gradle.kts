@@ -77,7 +77,7 @@ dependencies {
     implementation("gg.essential:essential-1.8.9-forge:1305")
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
-    shadowMe("com.github.Skytils:Hylin:bb8c9cc0ad") {
+    shadowMe("com.github.Skytils:Hylin:a9899c8c03") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlinx-coroutines-core")
