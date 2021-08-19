@@ -130,9 +130,15 @@ class MythologicalTracker : Tracker("mythological") {
                 UChat.chat("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!")
             }
         }
+        if (lastMinosChamp != 0L && System.currentTimeMillis() - lastMinosChamp > 2500) {
+            println("Dug is: Unknown")
+            lastMinosChamp = 0L
+            BurrowMob.CHAMP.dugTimes++
+            UChat.chat("§bSkytils: §eNo idea what you dug, counting as §2Minos Champion§e!")
+        }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(receiveCanceled = true)
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
         when (event.packet) {
@@ -156,6 +162,7 @@ class MythologicalTracker : Tracker("mythological") {
                         val mob = BurrowMob.getFromName(matcher.group(1)) ?: return
                         //for some reason, minos inquisitors say minos champion in the chat
                         if (mob == BurrowMob.CHAMP) {
+                            Utils.cancelChatPacket(event)
                             lastMinosChamp = System.currentTimeMillis()
                         } else {
                             mob.dugTimes++
