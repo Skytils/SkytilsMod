@@ -19,6 +19,7 @@
 package skytils.skytilsmod.tweaker;
 
 import kotlin.KotlinVersion;
+import kotlin.text.StringsKt;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import javax.swing.*;
@@ -106,14 +107,23 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 exit();
             }
             if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
-                File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString());
+                final File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString());
+                File realFile = file;
                 for (int i = 0; i < 5; i++) {
-                    if (!file.getName().endsWith("jar!") || file.getName().endsWith("jar")) {
-                        file = file.getParentFile();
+                    if (realFile == null) {
+                        realFile = file;
+                        break;
+                    }
+                    if (!realFile.getName().endsWith(".jar!") && !realFile.getName().endsWith(".jar")) {
+                        realFile = realFile.getParentFile();
                     } else break;
                 }
 
-                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + file.getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
+                String name = realFile.getName().contains(".jar") ? realFile.getName() : StringsKt.substringAfterLast(StringsKt.substringBeforeLast(file.getAbsolutePath(), ".jar", "unknown"), "/", "Unknown");
+
+                if (name.endsWith("!")) name = name.substring(0, name.length() - 1);
+
+                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
                 exit();
             }
             if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
