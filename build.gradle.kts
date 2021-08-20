@@ -56,14 +56,10 @@ minecraft {
 repositories {
     mavenLocal()
     mavenCentral()
-    setOf(
-        "https://repo.spongepowered.org/repository/maven-public/",
-        "https://repo.sk1er.club/repository/maven-public/",
-        "https://repo.sk1er.club/repository/maven-releases/",
-        "https://jitpack.io"
-    ).forEach {
-        maven(it)
-    }
+    maven("https://repo.spongepowered.org/repository/maven-public/")
+    maven("https://repo.sk1er.club/repository/maven-public/")
+    maven("https://repo.sk1er.club/repository/maven-releases/")
+    maven("https://jitpack.io")
 }
 
 val shadowMe: Configuration by configurations.creating {
