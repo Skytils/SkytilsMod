@@ -137,7 +137,7 @@ class DungeonFeatures {
                 val timeLeft = terracottaEndTime - System.currentTimeMillis()
                     .toDouble() / 1000f
                 if (timeLeft >= 0) {
-                    BossStatus.healthScale = timeLeft.toFloat() / if (dungeonFloor == "F6") 105 else 125
+                    BossStatus.healthScale = timeLeft.toFloat() / if (dungeonFloor == "F6") 105 else 115
                     BossStatus.statusBarTime = 100
                     BossStatus.bossName = "§r§c§lSadan's Interest: §r§6" + timeLeft.toInt() + "s"
                     BossStatus.hasColorModifier = false
@@ -262,7 +262,7 @@ class DungeonFeatures {
         if (Utils.equalsOneOf(dungeonFloor, "F6", "M6")) {
             if (terracottaEndTime == -1.0) {
                 if (unformatted.contains("Sadan's Interest Level")) {
-                    val length = if (dungeonFloor == "F6") 105 else 125
+                    val length = if (dungeonFloor == "F6") 105 else 115
                     terracottaEndTime = System.currentTimeMillis().toDouble() / 1000f + length
                 }
             } else if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
