@@ -52,7 +52,7 @@ public abstract class MixinCrashReport {
     @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 10, args = "matches=method::getCauseStackTraceOrString"))
     private String otherReplaceCauseForLauncher(String theCauseStackTraceOrString) {
         if (isSkytilsCrash) {
-            return "Skytils may have caused this crash. Please send the full report below by clicking \"View crash report\" to discord.gg/skytils in the #support channel. Taking a screenshot of this screen provides no information to any mod developers.\n\n";
+            return "Skytils may have caused this crash. Please send the full report below by clicking \"View crash report\" to discord.gg/skytils in the #support channel. Taking a screenshot of this screen provides no information to any mod developers.\n\n" + theCauseStackTraceOrString;
         }
         return theCauseStackTraceOrString;
     }
