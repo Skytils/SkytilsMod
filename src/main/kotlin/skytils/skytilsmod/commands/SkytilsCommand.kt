@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.commands
 
+import gg.essential.universal.UChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -90,8 +91,12 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     "refresh" -> {
                         GriffinBurrows.particleBurrows.removeIf { pb -> !pb.dug }
                         GriffinBurrows.burrows.clear()
-                        GriffinBurrows.burrowRefreshTimer.reset()
-                        GriffinBurrows.shouldRefreshBurrows = true
+                        if (System.currentTimeMillis() - GriffinBurrows.lastManualRefresh <= 2500) {
+                            UChat.chat("§cSlow down! Did not refresh your burrows to prevent a rate limit!")
+                            GriffinBurrows.burrowRefreshTimer.reset()
+                            GriffinBurrows.shouldRefreshBurrows = true
+                            GriffinBurrows.lastManualRefresh = System.currentTimeMillis()
+                        }
                     }
                     else -> player.addChatMessage(ChatComponentText("/skytils griffin <refresh>"))
                 }

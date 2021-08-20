@@ -50,6 +50,8 @@ import kotlin.math.roundToInt
 
 class GriffinBurrows {
     companion object {
+        var lastManualRefresh = 0L
+
         var burrows = arrayListOf<Burrow>()
         var dugBurrows = arrayListOf<BlockPos>()
         var lastDugBurrow: BlockPos? = null
