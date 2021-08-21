@@ -189,7 +189,7 @@ object UpdateChecker {
             if (!isSafe || !other.isSafe) return -1
             return if (versionArtifact.compareTo(other.versionArtifact) == 0) {
                 if (specialVersionType.ordinal == other.specialVersionType.ordinal) {
-                    specialVersion!!.compareTo(other.specialVersion!!)
+                    specialVersion?.compareTo(other.specialVersion ?: 0.0) ?: 0
                 } else other.specialVersionType.ordinal - specialVersionType.ordinal
             } else versionArtifact.compareTo(other.versionArtifact)
         }
