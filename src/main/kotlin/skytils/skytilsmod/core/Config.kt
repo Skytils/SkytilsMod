@@ -1212,6 +1212,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var pingDisplay = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show World Age",
+        description = "Displays the day count of the current server.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showWorldAge = false
+
+    @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Transparent Armor Layer",
         description = "Changes the transparency of your armor layer.",
         category = "Miscellaneous", subcategory = "Other"

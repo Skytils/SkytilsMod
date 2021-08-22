@@ -48,6 +48,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -61,6 +62,7 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -433,6 +435,7 @@ class MiscFeatures {
             GolemSpawnTimerElement()
             LegionPlayerDisplay()
             PlacedSummoningEyeDisplay()
+            WorldAgeDisplay()
         }
     }
 
@@ -603,6 +606,67 @@ class MiscFeatures {
             )
             private val ICON = ResourceLocation("skytils", "icons/SUMMONING_EYE.png")
         }
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class WorldAgeDisplay : GuiElement("World Age Display", FloatPair(50, 60)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock && mc.theWorld != null) {
+                if (Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "Incompatible Time Changer detected.",
+                        0f,
+                        0f,
+                        CommonColors.RED,
+                        TextAlignment.LEFT_RIGHT,
+                        TextShadow.NORMAL
+                    )
+                    return
+                }
+                val day = (mc.theWorld.worldInfo as AccessorWorldInfo).realWorldTime / 24000
+                ScreenRenderer.fontRenderer.drawString(
+                    "Day ${NumberUtil.nf.format(day)}",
+                    0f,
+                    0f,
+                    CommonColors.RED,
+                    TextAlignment.LEFT_RIGHT,
+                    TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            if (Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }) {
+                ScreenRenderer.fontRenderer.drawString(
+                    "Incompatible Time Changer detected.",
+                    0f,
+                    0f,
+                    CommonColors.RED,
+                    TextAlignment.LEFT_RIGHT,
+                    TextShadow.NORMAL
+                )
+                return
+            }
+            ScreenRenderer.fontRenderer.drawString(
+                "Day 0",
+                0f,
+                0f,
+                CommonColors.ORANGE,
+                TextAlignment.LEFT_RIGHT,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Day 0")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showWorldAge
 
         init {
             Skytils.guiManager.registerElement(this)
