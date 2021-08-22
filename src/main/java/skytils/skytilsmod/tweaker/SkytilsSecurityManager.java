@@ -95,7 +95,7 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
             }
         });
 
-        Object[] options = new Object[]{openLogs, openLatestLog};
+        Object[] options = new Object[]{openLatestLog, openLogs};
         JOptionPane.showOptionDialog(
                 frame,
                 "The game crashed whilst launching.",
