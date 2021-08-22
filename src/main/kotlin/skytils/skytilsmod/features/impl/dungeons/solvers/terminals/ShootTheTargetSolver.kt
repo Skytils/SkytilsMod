@@ -54,7 +54,7 @@ class ShootTheTargetSolver {
                 shot.add(pos)
             }
         } else if (pos == plate && state.block is BlockPressurePlateWeighted) {
-            if (state.getValue(BlockPressurePlateWeighted.POWER) == 0 || old.getValue(BlockPressurePlateWeighted.POWER) == 0) {
+            if (state.getValue(BlockPressurePlateWeighted.POWER) == 0 || old !is BlockPressurePlateWeighted || old.getValue(BlockPressurePlateWeighted.POWER) == 0) {
                 shot.clear()
             }
         }
