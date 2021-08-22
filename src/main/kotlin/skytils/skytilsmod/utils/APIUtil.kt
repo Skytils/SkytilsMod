@@ -20,10 +20,7 @@ package skytils.skytilsmod.utils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
+import gg.essential.universal.UChat
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
@@ -32,7 +29,6 @@ import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.ssl.SSLContexts
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import java.awt.image.BufferedImage
@@ -86,33 +82,37 @@ object APIUtil {
             val request = HttpGet(URL(urlString).toURI())
 
             val response = client.execute(request)
-            val entity = response.entity
-            if (response.code == 200) {
-                val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
-                EntityUtils.consume(entity)
-                return obj
-            } else {
-                if (urlString.startsWithAny(
-                        "https://api.ashcon.app/mojang/v2/user/",
-                        "https://api.hypixel.net/",
-                        MayorInfo.baseURL,
-                        AuctionData.dataURL
-                    )
-                ) {
-                    val errorStream = entity.content
-                    Scanner(errorStream).use { scanner ->
-                        scanner.useDelimiter("\\Z")
-                        val error = scanner.next()
-                        if (error.startsWith("{")) {
-                            EntityUtils.consume(entity)
-                            return parser.parse(error).asJsonObject
+            response.use {
+                val entity = response.entity
+                entity.use {
+                    if (response.code == 200) {
+                        val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
+                        EntityUtils.consume(entity)
+                        return obj
+                    } else {
+                        if (urlString.startsWithAny(
+                                "https://api.ashcon.app/mojang/v2/user/",
+                                "https://api.hypixel.net/",
+                                MayorInfo.baseURL,
+                                AuctionData.dataURL
+                            )
+                        ) {
+                            val errorStream = entity.content
+                            Scanner(errorStream).use { scanner ->
+                                scanner.useDelimiter("\\Z")
+                                val error = scanner.next()
+                                if (error.startsWith("{")) {
+                                    EntityUtils.consume(entity)
+                                    return parser.parse(error).asJsonObject
+                                }
+                            }
                         }
                     }
                 }
             }
         } catch (ex: Throwable) {
             ex.printStackTrace()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils ran into an error whilst fetching a resource. See logs for more details."))
+            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
         } finally {
             client.close()
         }
@@ -125,16 +125,20 @@ object APIUtil {
             val request = HttpGet(URL(urlString).toURI())
 
             val response = client.execute(request)
-            val entity = response.entity
-            if (response.code == 200) {
-                val arr = parser.parse(EntityUtils.toString(entity)).asJsonArray
-                EntityUtils.consume(entity)
-                return arr
-            } else {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils failed to request a resource. HTTP Error Code: ${response.code}"))
+            response.use {
+                val entity = response.entity
+                entity.use {
+                    if (response.code == 200) {
+                        val arr = parser.parse(EntityUtils.toString(entity)).asJsonArray
+                        EntityUtils.consume(entity)
+                        return arr
+                    } else {
+                        UChat.chat("§cSkytils failed to request a resource. HTTP Error Code: ${response.code}")
+                    }
+                }
             }
         } catch (ex: Throwable) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils ran into an error whilst fetching a resource. See logs for more details."))
+            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
             ex.printStackTrace()
         } finally {
             client.close()
