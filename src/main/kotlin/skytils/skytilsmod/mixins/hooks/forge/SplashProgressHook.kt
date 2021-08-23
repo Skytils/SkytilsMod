@@ -25,7 +25,9 @@ val gifs = mapOf(
     0.0 to ResourceLocation("skytils", "sychicpet.gif"),
     90.0 to ResourceLocation("skytils", "sychiccat.png"),
     96.0 to ResourceLocation("skytils", "azoopet.gif"),
-    99.0 to ResourceLocation("skytils", "abdpfp.gif")
+    99.0 to ResourceLocation("skytils", "abdpfp.gif"),
+    // this is the chance of winning the jackpot on the lottery
+    100 - 1 / 13_983_816.0 to ResourceLocation("skytils", "jamcat.gif")
 )
 
 fun setForgeGif(resourceLocation: ResourceLocation): ResourceLocation {
