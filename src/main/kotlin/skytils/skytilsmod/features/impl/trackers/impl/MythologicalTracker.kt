@@ -122,12 +122,12 @@ class MythologicalTracker : Tracker("mythological") {
                 println("Dug is: Minos Champion")
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
-                UChat.chat("§bSkytils: §eConfirmed, you dug up a §2Minos Champion§e!")
+                UChat.chat("§bSkytils: §eYou dug up a §2Minos Champion§e!")
             } else if (event.entity.name == "Minos Inquisitor") {
                 println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
-                UChat.chat("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!")
+                UChat.chat("§bSkytils: §eYou dug up a §2Minos Inquisitor§e!")
             }
         }
         if (lastMinosChamp != 0L && System.currentTimeMillis() - lastMinosChamp > 2500) {
