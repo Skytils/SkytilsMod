@@ -74,7 +74,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
             // Asbyth's forge fork uses version 0
             if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
                 val forgeUrl =
-                    URL("https://cdn.discordapp.com/attachments/807303575549116418/877275074598699118/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
+                    URL("https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
                 val forgeButton = createButton("Get Forge") {
                     if (SkytilsInstallerFrame.getOperatingSystem() == SkytilsInstallerFrame.OperatingSystem.WINDOWS) {
                         runCatching {
@@ -83,7 +83,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
                             val runtime = Utils.getJavaRuntime()
 
-                            val client = APIUtil.builder.build()
+                            val client = APIUtil.builder.setConnectionManager(APIUtil.cm.build()).build()
                             client.execute(HttpGet(forgeUrl)) {
                                 if (it.code == 200) {
                                     it.entity.writeTo(forgeFile.outputStream())

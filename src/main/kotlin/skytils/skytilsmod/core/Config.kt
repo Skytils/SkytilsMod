@@ -184,6 +184,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var necronPhaseTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Decimal Seconds on Timers",
+        description = "Adds decimals to the amount of seconds on the dungeon timers.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var showMillisOnDungeonTimer = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Sadan Phase Timer",
         description = "Shows the time taken for each phase in the Sadan boss fight.",
         category = "Dungeons", subcategory = "Miscellaneous"

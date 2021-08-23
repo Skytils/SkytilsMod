@@ -295,7 +295,7 @@ object ScoreCalculation {
 
     class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
         override fun render() {
-            if (toggled && Utils.inDungeons) {
+            if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
                 val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 ScreenRenderer.fontRenderer.drawString(
