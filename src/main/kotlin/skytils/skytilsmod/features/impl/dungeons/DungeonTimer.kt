@@ -93,14 +93,14 @@ class DungeonTimer {
                             add("§9Boss entry was ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
                         }
                         if (Skytils.config.sadanPhaseTimer && (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6")) {
-                            add("§bTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds.")
-                            add("§bGiants took ${diff(giantsClearTime, terraClearTime)} seconds.")
-                            add("§bSadan took ${diff(bossClearTime, giantsClearTime)} seconds.")
+                            add("§dTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds.")
+                            add("§aGiants took ${diff(giantsClearTime, terraClearTime)} seconds.")
+                            add("§cSadan took ${diff(bossClearTime, giantsClearTime)} seconds.")
                         } else if (Skytils.config.necronPhaseTimer && DungeonFeatures.dungeonFloor == "F7") {
                             add("§bPhase 1 took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
-                            add("§bPhase 2 took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
-                            add("§bPhase 3 took ${diff(phase3ClearTime, phase2ClearTime)} seconds.}.")
-                            add("§bPhase 4 took ${diff(bossClearTime, phase3ClearTime)} seconds.}.")
+                            add("§cPhase 2 took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
+                            add("§6Phase 3 took ${diff(phase3ClearTime, phase2ClearTime)} seconds.}.")
+                            add("§4Phase 4 took ${diff(bossClearTime, phase3ClearTime)} seconds.}.")
                         }
                         if (Skytils.config.dungeonTimer) {
                             add("§bDungeon finished in ${diff(bossClearTime, dungeonStartTime)} seconds.")
@@ -200,14 +200,20 @@ class DungeonTimer {
                     "§aTime Elapsed: ${if (dungeonStartTime == -1L) "0s" else dungeonTimeFormat(time)}",
                     "§7Wither Doors: $witherDoors",
                     "§4Blood Open: ${
-                        if (bloodOpenTime == -1L) "${time.roundToPrecision(2)}s" else diff(
-                            bloodOpenTime,
-                            dungeonStartTime
+                        if (bloodOpenTime == -1L) "${time.roundToPrecision(2)}" else dungeonTimeFormat(
+                            (bloodOpenTime - dungeonStartTime) / 1000.0
                         )
                     }s",
                 ).apply {
                     if (bloodOpenTime != -1L)
-                        add("§cWatcher Clear: ${dungeonTimeFormat(((if (bloodClearTime == -1L) System.currentTimeMillis() else bloodClearTime) - bloodOpenTime) / 1000.0)}")
+                        add(
+                            "§cWatcher Clear: ${
+                                diff(
+                                    if (bloodClearTime == -1L) System.currentTimeMillis() else bloodClearTime,
+                                    bloodOpenTime
+                                )
+                            }"
+                        )
                     add("§9Boss Entry: ${if (bossEntryTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}")
                     if (bossEntryTime != -1L)
                         add("§bBoss Clear: ${dungeonTimeFormat(((if (bossClearTime == -1L) System.currentTimeMillis() else bossClearTime) - bossEntryTime) / 1000.0)}")
