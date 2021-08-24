@@ -69,7 +69,7 @@ val shadowMe: Configuration by configurations.creating {
 dependencies {
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    shadowMe("gg.essential:loader-launchwrapper:1.1.0")
+    shadowMe("gg.essential:loader-launchwrapper:1.1.1")
     implementation("gg.essential:essential-1.8.9-forge:1317")
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
