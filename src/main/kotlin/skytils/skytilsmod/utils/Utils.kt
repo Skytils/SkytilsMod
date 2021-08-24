@@ -214,7 +214,7 @@ object Utils {
     }
 
     fun getKeyDisplayStringSafe(keyCode: Int): String =
-        runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrElse { "#${keyCode}" }
+        runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrNull() ?: "Key $keyCode"
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
