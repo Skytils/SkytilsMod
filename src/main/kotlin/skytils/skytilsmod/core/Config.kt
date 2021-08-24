@@ -997,6 +997,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var compactStars = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Disable Block Animation",
+        description = "Removes the block animation on swords.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var disableBlockAnimation = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Implosion Particles",
         description = "Removes the explosion created by the Implosion ability.",
         category = "Miscellaneous", subcategory = "Items"
