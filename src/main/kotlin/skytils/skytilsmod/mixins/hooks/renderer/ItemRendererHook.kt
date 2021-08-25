@@ -25,6 +25,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
 
 fun getItemInUseCountForFirstPerson(player: AbstractClientPlayer, item: ItemStack): Int {
-    if (Skytils.config.disableBlockAnimation && Utils.inSkyblock && item.item is ItemSword && player.itemInUseDuration < 5) return 0
+    if (Skytils.config.disableBlockAnimation && Utils.inSkyblock && item.item is ItemSword && player.itemInUseDuration <= 7) return 0
     return player.itemInUseCount
 }

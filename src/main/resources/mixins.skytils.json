@@ -55,6 +55,7 @@
     "renderer.MixinTileEntityChestRenderer",
     "renderer.MixinTileEntityItemStackRenderer",
     "renderer.MixinTileEntitySkullRenderer",
+    "sk1eroam.MixinAnimationHandler",
     "util.MixinIChatComponent$Serializer",
     "util.MixinUtil",
     "world.MixinChunk",

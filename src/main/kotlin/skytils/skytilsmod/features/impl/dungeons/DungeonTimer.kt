@@ -99,8 +99,8 @@ class DungeonTimer {
                         } else if (Skytils.config.necronPhaseTimer && DungeonFeatures.dungeonFloor == "F7") {
                             add("§bPhase 1 took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
                             add("§cPhase 2 took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
-                            add("§6Phase 3 took ${diff(phase3ClearTime, phase2ClearTime)} seconds.}.")
-                            add("§4Phase 4 took ${diff(bossClearTime, phase3ClearTime)} seconds.}.")
+                            add("§6Phase 3 took ${diff(phase3ClearTime, phase2ClearTime)} seconds..")
+                            add("§4Phase 4 took ${diff(bossClearTime, phase3ClearTime)} seconds..")
                         }
                         if (Skytils.config.dungeonTimer) {
                             add("§bDungeon finished in ${diff(bossClearTime, dungeonStartTime)} seconds.")
@@ -200,10 +200,10 @@ class DungeonTimer {
                     "§aTime Elapsed: ${if (dungeonStartTime == -1L) "0s" else dungeonTimeFormat(time)}",
                     "§7Wither Doors: $witherDoors",
                     "§4Blood Open: ${
-                        if (bloodOpenTime == -1L) "${time.roundToPrecision(2)}" else dungeonTimeFormat(
+                        if (bloodOpenTime == -1L) "${time.roundToPrecision(2)}s" else dungeonTimeFormat(
                             (bloodOpenTime - dungeonStartTime) / 1000.0
                         )
-                    }s",
+                    }",
                 ).apply {
                     if (bloodOpenTime != -1L)
                         add(
