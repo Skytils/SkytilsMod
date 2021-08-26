@@ -29,6 +29,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
@@ -100,14 +101,14 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
-    public SkytilsLoadingPlugin() {
+    public SkytilsLoadingPlugin() throws URISyntaxException {
         if (System.getProperty("skytils.skipStartChecks") == null) {
             if (!checkForClass("kotlin.KotlinVersion") || !checkForClass("gg.essential.api.EssentialAPI")) {
                 showMessage(missingDependency);
                 exit();
             }
             if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
-                final File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString());
+                final File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 File realFile = file;
                 for (int i = 0; i < 5; i++) {
                     if (realFile == null) {

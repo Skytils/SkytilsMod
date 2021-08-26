@@ -35,6 +35,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.potion.Potion
@@ -55,9 +56,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
+import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
@@ -114,6 +117,8 @@ class DungeonFeatures {
         private var livid: Entity? = null
         private var lividTag: Entity? = null
         private var lividJob: Future<*>? = null
+        private var alertedSpiritPet = false
+        private const val SPIRIT_PET_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
 
         init {
             LividGuiElement()
@@ -145,6 +150,20 @@ class DungeonFeatures {
                     terracottaEndTime = -2.0
                 }
             }
+
+            if (Skytils.config.spiritPetWarning && !alertedSpiritPet && DungeonTimer.dungeonStartTime == -1L && mc.theWorld.loadedEntityList.any {
+                    if (it !is EntityArmorStand || it.hasCustomName()) return@any false
+                    val item = it.heldItem ?: return@any false
+                    if (item.item !is ItemSkull) return@any false
+                    return@any ItemUtil.getSkullTexture(item) == SPIRIT_PET_TEXTURE
+                }) {
+                UChat.chat(
+                    "Someone in your party has a Spirit Pet equipped!"
+                )
+                GuiManager.createTitle("Spirit Pet", 20)
+                alertedSpiritPet = true
+            }
+
             if (Skytils.config.findCorrectLivid && !foundLivid) {
                 if (Utils.equalsOneOf(dungeonFloor, "F5", "M5")) {
                     when (Skytils.config.lividFinderType) {
@@ -550,6 +569,7 @@ class DungeonFeatures {
         lividTag = null
         livid = null
         foundLivid = false
+        alertedSpiritPet = false
     }
 
     internal class LividGuiElement : GuiElement("Livid HP", FloatPair(0.05f, 0.4f)) {

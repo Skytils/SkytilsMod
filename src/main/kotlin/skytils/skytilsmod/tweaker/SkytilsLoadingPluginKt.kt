@@ -59,7 +59,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 } catch (ignored: ClassNotFoundException) {
                     showMessage(
                         SkytilsLoadingPlugin.badMixinVersionMessage + "<br>The culprit seems to be " + File(
-                            MixinEnvironment::class.java.protectionDomain.codeSource.location.toString()
+                            MixinEnvironment::class.java.protectionDomain.codeSource.location.toURI()
                         ).name + "</p></html>"
                     )
                     SkytilsLoadingPlugin.exit()
