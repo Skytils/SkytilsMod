@@ -29,9 +29,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.mixins.hooks.entity.EntityLivingBaseHookKt;
-import skytils.skytilsmod.utils.Utils;
-
-import java.util.Objects;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends Entity {
@@ -53,12 +50,5 @@ public abstract class MixinEntityLivingBase extends Entity {
     @Redirect(method = "onDeathUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDDDD[I)V"))
     private void spawnParticle(World world, EnumParticleTypes particleType, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int[] p_175688_14_) {
         EntityLivingBaseHookKt.removeDeathParticle(world, particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, p_175688_14_);
-    }
-
-    @Inject(method = "isChild", at = @At("HEAD"), cancellable = true)
-    private void setChildState(CallbackInfoReturnable<Boolean> cir) {
-        if (Utils.inSkyblock && Objects.equals(this.getName(), "Breefing")) {
-            cir.setReturnValue(true);
-        }
     }
 }
