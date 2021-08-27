@@ -19,9 +19,9 @@ package skytils.skytilsmod.utils
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -111,10 +112,19 @@ object SBInfo {
     }
 
     @SubscribeEvent
+    fun onPacket(event: PacketEvent.SendEvent) {
+        if (Utils.isOnHypixel && event.packet is C01PacketChatMessage) {
+            if (event.packet.message.startsWith("/locraw")) {
+                lastLocRaw = System.currentTimeMillis()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
-        if (locraw == null && currentTime - joinedWorld > 1200 && currentTime - lastLocRaw > 15000) {
+        if (locraw == null && currentTime - joinedWorld > 1300 && currentTime - lastLocRaw > 15000) {
             lastLocRaw = System.currentTimeMillis()
             Skytils.sendMessageQueue.add("/locraw")
         }
