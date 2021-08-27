@@ -212,7 +212,7 @@ class DungeonTimer {
                                     if (bloodClearTime == -1L) System.currentTimeMillis() else bloodClearTime,
                                     bloodOpenTime
                                 )
-                            }"
+                            }s"
                         )
                     add("§9Boss Entry: ${if (bossEntryTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}")
                     if (bossEntryTime != -1L)

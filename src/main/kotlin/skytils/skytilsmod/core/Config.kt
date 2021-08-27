@@ -2223,12 +2223,9 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
                 !ver.isSafe -> {
-                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
-                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
-                        PersistentSave.markDirty<GuiManager>()
-                    }
+
                 }
-                ver < UpdateChecker.SkytilsVersion("1.0.3") -> {
+                ver < UpdateChecker.SkytilsVersion("1.0.6") -> {
                     if (largerHeadScale > 2) {
                         largerHeadScale /= 100
                     }
@@ -2240,6 +2237,10 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                     }
                     if (transparentHeadLayer > 1) {
                         transparentHeadLayer /= 100f
+                    }
+                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
+                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                        PersistentSave.markDirty<GuiManager>()
                     }
                 }
             }

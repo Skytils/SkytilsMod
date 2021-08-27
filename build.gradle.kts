@@ -22,7 +22,7 @@ import net.minecraftforge.gradle.user.TaskSingleReobf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.30-RC"
+    kotlin("jvm") version "1.5.30"
     id("net.minecraftforge.gradle.forge") version "6f5327"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.spongepowered.mixin") version "d5f9873d60"
@@ -70,7 +70,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.1")
-    implementation("gg.essential:essential-1.8.9-forge:1318")
+    implementation("gg.essential:essential-1.8.9-forge:1320")
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
     shadowMe("com.github.Skytils:Hylin:a9899c8c03") {

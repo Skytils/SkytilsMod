@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.tileentity.TileEntitySkullRenderer
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
-import org.spongepowered.asm.mixin.*
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
