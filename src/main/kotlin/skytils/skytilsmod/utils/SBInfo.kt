@@ -183,9 +183,11 @@ enum class SkyblockIsland(val formattedName: String, val mode: String) {
     DeepCaverns("Deep Caverns", "mining_2"),
     DwarvenMines("Dwarven Mines", "mining_3"),
     CrystalHollows("Crystal Hollows", "crystal_hollows"),
-    FarmingIsland("Farming Island", "farming_1"),
+    FarmingIsland("The Farming Islands", "farming_1"),
     ThePark("The Park", "foraging_1"),
     Dungeon("Dungeon", "dungeon"),
     DungeonHub("Dungeon Hub", "dungeon_hub"),
-    Hub("Hub", "hub")
+    Hub("Hub", "hub"),
+    DarkAuction("Dark Auction", "dark_auction"),
+    JerryWorkshop("Jerry's Workshop", "winter")
 }
