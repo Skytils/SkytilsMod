@@ -21,6 +21,7 @@ import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
+import gg.essential.vigilance.gui.settings.CheckboxComponent
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -270,3 +271,11 @@ fun Entity.getXZDistSq(other: Entity): Double {
 
 val Entity.hasMoved
     get() = this.posX != this.prevPosX || this.posY != this.prevPosY || this.posZ != this.prevPosZ
+
+fun CheckboxComponent.toggle() {
+    this.mouseClick(this.getLeft().toDouble(), this.getTop().toDouble(), 0)
+}
+
+fun CheckboxComponent.setState(checked: Boolean) {
+    if (this.checked != checked) this.toggle()
+}

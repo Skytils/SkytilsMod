@@ -18,11 +18,13 @@
 
 package skytils.skytilsmod.gui
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
-import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
@@ -33,6 +35,7 @@ import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
+import org.apache.commons.codec.binary.Base64
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.TickTask
@@ -41,9 +44,11 @@ import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
+import skytils.skytilsmod.utils.setState
+import skytils.skytilsmod.utils.toggle
 import java.awt.Color
 
-class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class WaypointShareGui : WindowScreen(newGuiScale = 2) {
 
     private val scrollComponent: ScrollComponent
 
@@ -86,71 +91,116 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = ChildBasedSizeConstraint()
         }
 
-        SimpleButton("Save and Exit").childOf(bottomButtons).constrain {
+        SimpleButton("Back").childOf(bottomButtons).constrain {
             x = 0.pixels()
             y = 0.pixels()
         }.onLeftClick {
             if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
         }
 
-        SimpleButton("New Waypoints").childOf(bottomButtons).constrain {
+        SimpleButton("Import from Clipboard").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
         }.onLeftClick {
-            addNewWaypoint()
+            importFromClipboard()
         }
 
-        SimpleButton("Share").childOf(window).constrain {
+        SimpleButton("Export Selected to Clipboard").childOf(bottomButtons).constrain {
+            x = SiblingConstraint(5f)
+            y = 0.pixels()
+        }.onLeftClick {
+            exportSelectedWaypoints()
+        }
+
+        SimpleButton("Select All").childOf(window).constrain {
             x = 5.pixels()
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
-            TickTask(2) {
-                Skytils.displayScreen = WaypointShareGui()
+            if (entries.values.all {
+                    it.selected.checked
+                }) {
+                entries.values.forEach {
+                    it.selected.setState(false)
+                }
+            } else {
+                entries.values.forEach {
+                    it.selected.setState(true)
+                }
             }
         }
 
-        loadWaypointsForSelection(islandDropdown.getValue(), savePrev = false)
+        loadWaypointsForSelection(islandDropdown.getValue())
     }
 
-    private fun loadWaypointsForSelection(selection: Int, savePrev: Boolean = true, isClosing: Boolean = false) {
-        if (savePrev) {
-            val current = SkyblockIsland.values().find {
-                it.formattedName == islandDropdown.childrenOfType<UIText>()
-                    .find { it.componentName == "currentSelectionText" }?.getText()
-            } ?: error("previous selected island not found")
-            Waypoints.waypoints.removeAll {
-                it.island == current
-            }
-            for (entry in entries.values) {
-                Waypoints.waypoints.add(
-                    Waypoint(
-                        entry.name.getText(),
-                        BlockPos(
-                            entry.x.getText().toInt(),
-                            entry.y.getText().toInt(),
-                            entry.z.getText().toInt()
-                        ),
-                        current,
-                        entry.enabled.checked
-                    )
+    private fun importFromClipboard() {
+        runCatching {
+            val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
+
+            val arr = Skytils.gson.fromJson(decoded, JsonArray::class.java)
+            val results = arr.mapNotNull { e ->
+                e as JsonObject
+                Waypoint(
+                    e["name"].asString,
+                    BlockPos(
+                        e["x"].asInt,
+                        e["y"].asInt,
+                        e["z"].asInt
+                    ),
+                    SkyblockIsland.values().find {
+                        it.mode == e["island"].asString
+                    } ?: return@mapNotNull null,
+                    e["enabled"].asBoolean
                 )
             }
+            Waypoints.waypoints.addAll(results)
             PersistentSave.markDirty<Waypoints>()
-        }
-        entries.clear()
-        scrollComponent.clearChildren()
-        if (!isClosing) {
-            val island = SkyblockIsland.values()[selection]
-            Waypoints.waypoints.filter {
-                it.island == island
-            }.forEach {
-                addNewWaypoint(it.name, it.pos, it.enabled)
-            }
+            loadWaypointsForSelection(islandDropdown.getValue())
+            EssentialAPI.getNotifications()
+                .push("Waypoints Imported", "Successfully imported ${results.size} waypoints!", 2.5f)
+        }.onFailure {
+            it.printStackTrace()
+            EssentialAPI.getNotifications()
+                .push("Error", "Failed to import waypoints, reason: ${it::class.simpleName}: ${it.message}")
         }
     }
 
-    private fun addNewWaypoint(name: String = "", pos: BlockPos = mc.thePlayer.position, enabled: Boolean = true) {
+    private fun exportSelectedWaypoints() {
+        val island = SkyblockIsland.values()[islandDropdown.getValue()]
+
+        val arr = JsonArray()
+        entries.values.filter {
+            it.selected.checked
+        }.forEach {
+            arr.add(JsonObject().apply {
+                addProperty("name", it.name.getText())
+                addProperty("x", it.x.getText().toInt())
+                addProperty("y", it.y.getText().toInt())
+                addProperty("z", it.z.getText().toInt())
+                addProperty("island", island.mode)
+                addProperty("enabled", true)
+            })
+        }
+        setClipboardString(Base64.encodeBase64String(Skytils.gson.toJson(arr).encodeToByteArray()))
+        EssentialAPI.getNotifications()
+            .push(
+                "Waypoints Exported",
+                "${arr.size()} ${island.formattedName} waypoints were copied to your clipboard!",
+                2.5f
+            )
+    }
+
+    private fun loadWaypointsForSelection(selection: Int) {
+        entries.clear()
+        scrollComponent.clearChildren()
+        val island = SkyblockIsland.values()[selection]
+        Waypoints.waypoints.filter {
+            it.island == island
+        }.forEach {
+            addNewWaypoint(it.name, it.pos, it.enabled)
+        }
+    }
+
+    private fun addNewWaypoint(name: String = "", pos: BlockPos = mc.thePlayer.position, selected: Boolean = false) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -158,82 +208,45 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val enabled = CheckboxComponent(enabled).childOf(container).constrain {
+        val selected = CheckboxComponent(selected).childOf(container).constrain {
             x = 7.5.pixels()
             y = CenterConstraint()
         }
 
-        val nameComponent = (UITextInput("Waypoint Name").childOf(container).constrain {
+        val nameComponent = UIText(name).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 30.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(name)
         }
 
-        val xComponent = (UITextInput("X").childOf(container).constrain {
+        val xComponent = UIText(pos.x.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.x.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(Char::isDigit))
-            }
         }
 
-        val yComponent = (UITextInput("Y").childOf(container).constrain {
+        val yComponent = UIText(pos.y.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.y.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(Char::isDigit))
-            }
         }
 
-        val zComponent = (UITextInput("Z").childOf(container).constrain {
+        val zComponent = UIText(pos.z.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.z.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(Char::isDigit))
-            }
         }
 
-        SimpleButton("Remove").childOf(container).constrain {
-            x = 85.percent()
-            y = CenterConstraint()
-            height = 75.percent()
-        }.onLeftClick {
-            scrollComponent.removeChild(container)
-            entries.remove(container)
-        }
-
-        entries[container] = Entry(enabled, nameComponent, xComponent, yComponent, zComponent)
+        entries[container] = Entry(selected, nameComponent, xComponent, yComponent, zComponent)
     }
+
 
     override fun onScreenClose() {
         super.onScreenClose()
-        loadWaypointsForSelection(-1, isClosing = true)
+        Skytils.displayScreen = WaypointsGui()
     }
 
     private data class Entry(
-        val enabled: CheckboxComponent,
-        val name: UITextInput,
-        val x: UITextInput,
-        val y: UITextInput,
-        val z: UITextInput
+        val selected: CheckboxComponent,
+        val name: UIText,
+        val x: UIText,
+        val y: UIText,
+        val z: UIText
     )
 }
