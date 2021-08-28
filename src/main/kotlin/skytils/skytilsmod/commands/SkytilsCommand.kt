@@ -272,6 +272,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 Ping.invokedCommand = true
                 Ping.sendPing()
             }
+            "waypoint" -> {
+                Skytils.displayScreen = WaypointsGui()
+            }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
     }

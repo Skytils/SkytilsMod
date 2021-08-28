@@ -200,7 +200,7 @@ class DungeonTimer {
                     "§aTime Elapsed: ${if (dungeonStartTime == -1L) "0s" else dungeonTimeFormat(time)}",
                     "§7Wither Doors: $witherDoors",
                     "§4Blood Open: ${
-                        if (bloodOpenTime == -1L) "${time.roundToPrecision(2)}s" else dungeonTimeFormat(
+                        if (bloodOpenTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat(
                             (bloodOpenTime - dungeonStartTime) / 1000.0
                         )
                     }",

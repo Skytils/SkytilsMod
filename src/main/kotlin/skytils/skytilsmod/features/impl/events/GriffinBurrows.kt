@@ -123,7 +123,7 @@ class GriffinBurrows {
             val hotbarItem = player.inventory.getStackInSlot(it) ?: return@any false
             return@any ItemUtil.getDisplayName(hotbarItem).contains("Ancestral Spade")
         }
-        if (!Utils.inSkyblock || player == null || !Skytils.config.showGriffinBurrows || SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
+        if (!Utils.inSkyblock || player == null || !Skytils.config.showGriffinBurrows || SBInfo.mode != SkyblockIsland.Hub.mode) return
         if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
         if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
             burrowRefreshTimer.reset()
@@ -229,7 +229,7 @@ class GriffinBurrows {
 
     class GriffinGuiElement : GuiElement("Griffin Timer", FloatPair(100, 10)) {
         override fun render() {
-            if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return
+            if (SBInfo.mode != SkyblockIsland.Hub.mode) return
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && hasSpadeInHotbar) {
                 val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
@@ -275,7 +275,7 @@ class GriffinBurrows {
         if (!Utils.inSkyblock) return
         Utils.checkThreadAndQueue {
             if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
-                if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode) return@checkThreadAndQueue
+                if (SBInfo.mode != SkyblockIsland.Hub.mode) return@checkThreadAndQueue
                 val packet = event.packet
                 val type = packet.particleType
                 val longDistance = packet.isLongDistance

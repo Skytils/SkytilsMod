@@ -31,10 +31,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.PacketEvent.SendEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.utils.ConcurrentHashSet
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 import java.io.FileReader
 import java.io.FileWriter
@@ -68,7 +65,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
     @SubscribeEvent
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIsland.SpiderDen.mode) return
+        if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
             val packet = event.packet as C08PacketPlayerBlockPlacement?
             if (relicLocations.contains(packet!!.position)) {
@@ -82,7 +79,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIsland.SpiderDen.mode) return
+        if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         if (Skytils.config.relicWaypoints) {

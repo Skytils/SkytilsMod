@@ -27,10 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.stripControlCodes
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 
 
@@ -67,7 +64,7 @@ class TreasureHunter {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SBInfo.SkyblockIsland.FarmingIsland.mode) return
+        if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         val pos = treasureLocation!!

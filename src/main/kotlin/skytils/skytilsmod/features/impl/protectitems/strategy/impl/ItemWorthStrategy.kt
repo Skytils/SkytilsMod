@@ -24,6 +24,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.SkyblockIsland
 
 class ItemWorthStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
@@ -36,7 +37,7 @@ class ItemWorthStrategy : ItemProtectStrategy() {
                 return value >= threshold
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (SBInfo.mode != SBInfo.SkyblockIsland.Dungeon.mode) {
+                if (SBInfo.mode != SkyblockIsland.Dungeon.mode) {
                     return value >= threshold
                 }
             }

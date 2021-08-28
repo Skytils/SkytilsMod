@@ -172,20 +172,20 @@ object SBInfo {
             e.printStackTrace()
         }
     }
+}
 
-    sealed class SkyblockIsland(val name: String, val mode: String) {
-        object PrivateIsland : SkyblockIsland("Private Island", "dynamic")
-        object SpiderDen : SkyblockIsland("Spider's Den", "combat_1")
-        object BlazingFortress : SkyblockIsland("Blazing Fortress", "combat_2")
-        object TheEnd : SkyblockIsland("The End", "combat_3")
-        object GoldMine : SkyblockIsland("Gold Mine", "mining_1")
-        object DeepCaverns : SkyblockIsland("Deep Caverns", "mining_2")
-        object DwarvenMines : SkyblockIsland("Dwarven Mines", "mining_3")
-        object CrystalHollows : SkyblockIsland("Crystal Hollows", "crystal_hollows")
-        object FarmingIsland : SkyblockIsland("Farming Island", "farming_1")
-        object ThePark : SkyblockIsland("The Park", "foraging_1")
-        object Dungeon : SkyblockIsland("Dungeon", "dungeon")
-        object DungeonHub : SkyblockIsland("Dungeon Hub", "dungeon_hub")
-        object Hub : SkyblockIsland("Hub", "hub")
-    }
+enum class SkyblockIsland(val formattedName: String, val mode: String) {
+    PrivateIsland("Private Island", "dynamic"),
+    SpiderDen("Spider's Den", "combat_1"),
+    BlazingFortress("Blazing Fortress", "combat_2"),
+    TheEnd("The End", "combat_3"),
+    GoldMine("Gold Mine", "mining_1"),
+    DeepCaverns("Deep Caverns", "mining_2"),
+    DwarvenMines("Dwarven Mines", "mining_3"),
+    CrystalHollows("Crystal Hollows", "crystal_hollows"),
+    FarmingIsland("Farming Island", "farming_1"),
+    ThePark("The Park", "foraging_1"),
+    Dungeon("Dungeon", "dungeon"),
+    DungeonHub("Dungeon Hub", "dungeon_hub"),
+    Hub("Hub", "hub")
 }

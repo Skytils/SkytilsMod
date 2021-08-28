@@ -33,10 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.stripControlCodes
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 
 class TechnoMayor {
@@ -64,7 +61,7 @@ class TechnoMayor {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode && SBInfo.mode != SBInfo.SkyblockIsland.FarmingIsland.mode) return
+        if (SBInfo.mode != SkyblockIsland.Hub.mode && SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)

@@ -116,7 +116,7 @@ class MiningFeatures {
                     "▲"
                 ) && !unformatted.contains("◀") && !unformatted.contains("▼")
             ) return
-            if (SBInfo.mode == SBInfo.SkyblockIsland.DwarvenMines.mode) {
+            if (SBInfo.mode == SkyblockIsland.DwarvenMines.mode) {
                 puzzlerSolution = BlockPos(181, 195, 135)
                 val msg = unformatted.substring(15).trim { it <= ' ' }
                 val matcher = Pattern.compile("([▶▲◀▼]+)").matcher(unformatted)
@@ -168,7 +168,7 @@ class MiningFeatures {
                 }
             }
         }
-        if (Skytils.config.hollowChatCoords && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
+        if (Skytils.config.hollowChatCoords && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             val xyzMatcher = xyzPattern.matcher(unformatted)
             val xzMatcher = xzPattern.matcher(unformatted)
             if (xyzMatcher.matches())
@@ -362,7 +362,7 @@ class MiningFeatures {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
-        if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode) {
+        if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             cityLoc.drawWaypoint("Lost Precursor City", event.partialTicks)
             templeLoc.drawWaypoint("Jungle Temple", event.partialTicks)
             denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
@@ -414,11 +414,11 @@ class MiningFeatures {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (Skytils.config.skymallReminder && SBInfo.mode == SBInfo.SkyblockIsland.DwarvenMines.mode && SBInfo.time == "12:00am" && GuiManager.title != "§cSKYMALL RESET"
+        if (Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode && SBInfo.time == "12:00am" && GuiManager.title != "§cSKYMALL RESET"
         ) {
             createTitle("§cSKYMALL RESET", 20)
         }
-        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SBInfo.SkyblockIsland.CrystalHollows.mode
+        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && deadCount == 0 && mc.thePlayer != null
         ) {
             when (SBInfo.location) {
@@ -450,7 +450,7 @@ class MiningFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
-        if (!Utils.inSkyblock || SBInfo.mode != SBInfo.SkyblockIsland.DwarvenMines.mode || event.state == null) return
+        if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.DwarvenMines.mode || event.state == null) return
         val state = event.state!!
         if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
                 state.getValue(
@@ -465,7 +465,7 @@ class MiningFeatures {
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
         override fun render() {
-            if (!toggled || SBInfo.mode != SBInfo.SkyblockIsland.CrystalHollows.mode || mc.thePlayer == null) return
+            if (!toggled || SBInfo.mode != SkyblockIsland.CrystalHollows.mode || mc.thePlayer == null) return
             UGraphics.scale(0.1, 0.1, 1.0)
             UGraphics.disableLighting()
             RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)

@@ -31,14 +31,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import skytils.skytilsmod.utils.stripControlCodes
 
 class SpidersDenFeatures {
     @SubscribeEvent
@@ -88,7 +85,7 @@ class SpidersDenFeatures {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inSkyblock && player != null && world != null) {
-                if (SBInfo.mode != SBInfo.SkyblockIsland.SpiderDen.mode) return
+                if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
                 val arachneNames =
                     world.getEntities(EntityArmorStand::class.java, Predicate getEntities@{ entity: EntityArmorStand? ->
                         val name = entity!!.displayName.formattedText

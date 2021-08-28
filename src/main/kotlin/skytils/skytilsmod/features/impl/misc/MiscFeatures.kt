@@ -548,7 +548,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (SBInfo.mode != SBInfo.SkyblockIsland.TheEnd.mode) return
+                if (SBInfo.mode != SkyblockIsland.TheEnd.mode) return
                 var invalid = false
                 var placedEyes = 0
                 for (pos in SUMMONING_EYE_FRAMES) {

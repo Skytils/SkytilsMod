@@ -285,7 +285,7 @@ class MythologicalTracker : Tracker("mythological") {
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
+            if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SkyblockIsland.Hub.mode) {
                 val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =

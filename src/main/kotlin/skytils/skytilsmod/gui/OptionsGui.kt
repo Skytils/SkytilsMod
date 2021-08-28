@@ -82,6 +82,14 @@ class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiSc
         }.onMouseClick {
             mc.displayGuiScreen(SpamHiderGui())
         }
+        SimpleButton("Edit Waypoints").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(WaypointsGui())
+        }
         SimpleButton("Edit Enchantment Names").childOf(window).constrain {
             x = CenterConstraint()
             y = SiblingConstraint() + 2.pixels()

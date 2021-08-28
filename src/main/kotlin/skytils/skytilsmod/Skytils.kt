@@ -221,6 +221,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(TreasureHunter())
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
         MinecraftForge.EVENT_BUS.register(WaterBoardSolver())
+        MinecraftForge.EVENT_BUS.register(Waypoints())
     }
 
     @Mod.EventHandler
