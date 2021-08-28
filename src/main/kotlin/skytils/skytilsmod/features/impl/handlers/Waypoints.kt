@@ -78,6 +78,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 addProperty("enabled", it.enabled)
             })
         }
+        gson.toJson(arr, writer)
     }
 
     override fun setDefault(writer: FileWriter) {
