@@ -26,14 +26,17 @@ val gifs = mapOf(
     90.0 to ResourceLocation("skytils", "sychiccat.png"),
     96.0 to ResourceLocation("skytils", "azoopet.gif"),
     99.0 to ResourceLocation("skytils", "abdpfp.gif"),
-    // this is the chance of winning the jackpot on the lottery
-    100 - 1 / 13_983_816.0 to ResourceLocation("skytils", "jamcat.gif")
+    // this is the chance of winning the jackpot on the lottery, but even less due to a loss of precision
+    100 - 100 * 1 / 302_575_350.0 to ResourceLocation("skytils", "jamcat.gif")
 )
 
 fun setForgeGif(resourceLocation: ResourceLocation): ResourceLocation {
     return if (Utils.noSychic) resourceLocation else {
         val weight = Random.nextDouble() * 100
-        (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation("skytils", "sychicpet.gif")).also {
+        (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
+            "skytils",
+            "sychicpet.gif"
+        )).also {
             println("Rolled a $weight, displaying ${it.resourcePath}")
         }
     }
