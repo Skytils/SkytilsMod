@@ -182,7 +182,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         } as UITextInput).also {
             it.setText(pos.x.toString())
             it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(Char::isDigit))
+                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
             }
         }
 
@@ -195,7 +195,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         } as UITextInput).also {
             it.setText(pos.y.toString())
             it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(Char::isDigit))
+                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
             }
         }
 
@@ -208,7 +208,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         } as UITextInput).also {
             it.setText(pos.z.toString())
             it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(Char::isDigit))
+                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
             }
         }
 
