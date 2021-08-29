@@ -83,7 +83,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
                             val runtime = Utils.getJavaRuntime()
 
-                            val client = APIUtil.builder.setConnectionManager(APIUtil.cm.build()).build()
+                            val client = APIUtil.builder.build()
                             client.execute(HttpGet(forgeUrl)) {
                                 if (it.code == 200) {
                                     it.entity.writeTo(forgeFile.outputStream())

@@ -29,13 +29,10 @@ import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.ssl.SSLContexts
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.cert.X509Certificate
-import java.util.*
 import javax.imageio.ImageIO
 
 
@@ -60,6 +57,8 @@ object APIUtil {
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
             }
+            .setConnectionManagerShared(true)
+            .setConnectionManager(cm.build())
 
     /**
      * Taken from Elementa under MIT License
@@ -77,7 +76,7 @@ object APIUtil {
     }
 
     fun getJSONResponse(urlString: String): JsonObject {
-        val client = builder.setConnectionManager(cm.build()).build()
+        val client = builder.build()
         try {
             val request = HttpGet(URL(urlString).toURI())
 
@@ -85,29 +84,9 @@ object APIUtil {
             response.use {
                 val entity = response.entity
                 entity.use {
-                    if (response.code == 200) {
-                        val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
-                        EntityUtils.consume(entity)
-                        return obj
-                    } else {
-                        if (urlString.startsWithAny(
-                                "https://api.ashcon.app/mojang/v2/user/",
-                                "https://api.hypixel.net/",
-                                MayorInfo.baseURL,
-                                AuctionData.dataURL
-                            )
-                        ) {
-                            val errorStream = entity.content
-                            Scanner(errorStream).use { scanner ->
-                                scanner.useDelimiter("\\Z")
-                                val error = scanner.next()
-                                if (error.startsWith("{")) {
-                                    EntityUtils.consume(entity)
-                                    return parser.parse(error).asJsonObject
-                                }
-                            }
-                        }
-                    }
+                    val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
+                    EntityUtils.consume(entity)
+                    return obj
                 }
             }
         } catch (ex: Throwable) {
@@ -120,7 +99,7 @@ object APIUtil {
     }
 
     fun getArrayResponse(urlString: String): JsonArray {
-        val client = builder.setConnectionManager(cm.build()).build()
+        val client = builder.build()
         try {
             val request = HttpGet(URL(urlString).toURI())
 
@@ -128,13 +107,9 @@ object APIUtil {
             response.use {
                 val entity = response.entity
                 entity.use {
-                    if (response.code == 200) {
-                        val arr = parser.parse(EntityUtils.toString(entity)).asJsonArray
-                        EntityUtils.consume(entity)
-                        return arr
-                    } else {
-                        UChat.chat("§cSkytils failed to request a resource. HTTP Error Code: ${response.code}")
-                    }
+                    val arr = parser.parse(EntityUtils.toString(entity)).asJsonArray
+                    EntityUtils.consume(entity)
+                    return arr
                 }
             }
         } catch (ex: Throwable) {

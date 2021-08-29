@@ -103,7 +103,7 @@ object UpdateChecker {
             val taskFile = File(taskDir, getJarNameFromUrl(url))
             if (taskDir.mkdirs() || taskFile.createNewFile()) {
                 println("Downloading Skytils delete task.")
-                val client = APIUtil.builder.setConnectionManager(cm.build()).build()
+                val client = APIUtil.builder.build()
 
                 val req = HttpGet(URL(url).toURI())
                 val res = client.execute(req)
