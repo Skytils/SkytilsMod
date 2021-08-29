@@ -18,6 +18,8 @@
 
 package skytils.skytilsmod.gui
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.api.EssentialAPI
@@ -38,17 +40,19 @@ import net.minecraft.util.BlockPos
 import org.apache.commons.codec.binary.Base64
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.setState
-import skytils.skytilsmod.utils.toggle
 import java.awt.Color
 
 class WaypointShareGui : WindowScreen(newGuiScale = 2) {
+    
+    companion object {
+        val gson: Gson = GsonBuilder().create()
+    }
 
     private val scrollComponent: ScrollComponent
 
@@ -136,7 +140,7 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
         runCatching {
             val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
 
-            val arr = Skytils.gson.fromJson(decoded, JsonArray::class.java)
+            val arr = gson.fromJson(decoded, JsonArray::class.java)
             val results = arr.mapNotNull { e ->
                 e as JsonObject
                 Waypoint(
@@ -180,7 +184,7 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
                 addProperty("enabled", true)
             })
         }
-        setClipboardString(Base64.encodeBase64String(Skytils.gson.toJson(arr).encodeToByteArray()))
+        setClipboardString(Base64.encodeBase64String(gson.toJson(arr).encodeToByteArray()))
         EssentialAPI.getNotifications()
             .push(
                 "Waypoints Exported",
