@@ -240,9 +240,11 @@ class SlayerFeatures {
             if (unformatted.trim().startsWith("RNGesus Meter")) {
                 val rngMeter =
                     unformatted.filter { it.isDigit() || it == '.' }.toFloat()
-                for (index in 0 until sidebarLines.size - 1) {
-                    if (cleanSB(sidebarLines[index]) == "Slayer Quest") {
-                        val boss = cleanSB(sidebarLines[(index - 1).coerceAtLeast(0)].stripControlCodes())
+                val lines = sidebarLines.map { cleanSB(it) }
+
+                for ((index, line) in lines.withIndex()) {
+                    if (line == "Slayer Quest") {
+                        val boss = lines.elementAtOrNull(index + 1) ?: continue
                         if (boss.startsWith("Revenant Horror")) {
                             Skytils.config.revRNG = rngMeter
                             break
