@@ -31,37 +31,29 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
-import java.awt.Color
 
 class TeleportMazeSolver {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
-        if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.posY < 68) return
+        if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.posY < 68 || mc.thePlayer.posY > 75) return
         val groundBlock = BlockPos(mc.thePlayer.posX, 69.0, mc.thePlayer.posZ)
         val state = mc.theWorld.getBlockState(groundBlock)
         if (state.block == Blocks.stone_slab) {
             if (lastTpPos != null) {
-                var inNewCell = false
-                for (routeTrace in BlockPos.getAllInBox(lastTpPos, groundBlock)) {
-                    if (mc.theWorld.getBlockState(routeTrace).block === Blocks.iron_bars) {
-                        inNewCell = true
-                        break
+                if (BlockPos.getAllInBox(lastTpPos, groundBlock).any {
+                        mc.theWorld.getBlockState(it).block === Blocks.iron_bars
+                    }) {
+                    Utils.getBlocksWithinRangeAtSameY(lastTpPos!!, 1, 69).find {
+                        mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
+                    }?.let {
+                        steppedPads.add(it)
                     }
-                }
-                if (inNewCell) {
-                    for (pad in Utils.getBlocksWithinRangeAtSameY(lastTpPos!!, 1, 69)) {
-                        if (mc.theWorld.getBlockState(pad).block === Blocks.end_portal_frame) {
-                            steppedPads.add(pad)
-                            break
-                        }
-                    }
-                    for (pad in Utils.getBlocksWithinRangeAtSameY(groundBlock, 1, 69)) {
-                        if (mc.theWorld.getBlockState(pad).block === Blocks.end_portal_frame) {
-                            steppedPads.add(pad)
-                            break
-                        }
+                    Utils.getBlocksWithinRangeAtSameY(groundBlock, 1, 69).find {
+                        mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
+                    }?.let {
+                        steppedPads.add(it)
                     }
                 }
             }
@@ -71,7 +63,7 @@ class TeleportMazeSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Skytils.config.teleportMazeSolver) return
+        if (!Skytils.config.teleportMazeSolver || steppedPads.isEmpty() || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         for (pos in steppedPads) {
@@ -89,7 +81,7 @@ class TeleportMazeSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         steppedPads.clear()
         lastTpPos = null
     }
