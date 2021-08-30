@@ -158,6 +158,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             #  §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
                             #  §3/skytils spamhider §l➡ §bOpens the command spam hider editing GUI.
                             #  §3/skytils enchant §l➡ §bOpens a GUI allowing you to rename enchants.
+                            #  §3/skytils waypoints §l➡ §bOpens a GUI allowing you to modify waypoints.
                             # §9§l➜ Events:
                             #  §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯
                             #  §3/skytils fetchur §l➡ §bShows the item that Fetchur wants.
@@ -272,7 +273,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 Ping.invokedCommand = true
                 Ping.sendPing()
             }
-            "waypoint" -> {
+            "waypoint", "waypoints" -> {
                 Skytils.displayScreen = WaypointsGui()
             }
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))

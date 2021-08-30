@@ -418,17 +418,11 @@ class SlayerFeatures {
 
     private class RNGMeter(val max: Float, val current: Float, val name: IChatComponent) : IBossDisplayData {
 
-        override fun getMaxHealth(): Float {
-            return max
-        }
+        override fun getMaxHealth(): Float = max
 
-        override fun getHealth(): Float {
-            return current
-        }
+        override fun getHealth(): Float = current
 
-        override fun getDisplayName(): IChatComponent {
-            return name
-        }
+        override fun getDisplayName() = name
 
     }
 
