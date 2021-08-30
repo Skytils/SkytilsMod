@@ -49,7 +49,7 @@ import skytils.skytilsmod.utils.setState
 import java.awt.Color
 
 class WaypointShareGui : WindowScreen(newGuiScale = 2) {
-    
+
     companion object {
         val gson: Gson = GsonBuilder().create()
     }

@@ -32,7 +32,7 @@ abstract class SkytilsEvent : Event() {
             MinecraftForge.EVENT_BUS.post(this)
         }.onFailure {
             it.printStackTrace()
-            UChat.chat("§cSkytils caught and logged an exception at ${eventName}. Please report this on the Discord server at discord.gg/skytils.")
+            UChat.chat("§cSkytils caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}. Please report this on the Discord server at discord.gg/skytils.")
         }.getOrDefault(false)
     }
 }

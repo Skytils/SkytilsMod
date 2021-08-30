@@ -236,9 +236,10 @@ class SlayerFeatures {
             }
         }
         if (event.packet is S02PacketChat) {
-            if (event.packet.chatComponent.unformattedText.stripControlCodes().trim().startsWith("RNGesus Meter")) {
+            val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
+            if (unformatted.trim().startsWith("RNGesus Meter")) {
                 val rngMeter =
-                    event.packet.chatComponent.unformattedText.stripControlCodes().replace(RNGRegex, "").toFloat()
+                    unformatted.filter { it.isDigit() || it == '.' }.toFloat()
                 for (index in 0 until sidebarLines.size - 1) {
                     if (cleanSB(sidebarLines[index]) == "Slayer Quest") {
                         val boss = cleanSB(sidebarLines[(index - 1).coerceAtLeast(0)].stripControlCodes())
@@ -748,7 +749,6 @@ class SlayerFeatures {
         private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
         private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
         private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
-        private val RNGRegex = Regex("[^0-9.]")
         private val timerRegex = Regex("§c\\d+:\\d+§r")
         var slayerEntity: Entity? = null
         var slayerNameEntity: EntityArmorStand? = null
