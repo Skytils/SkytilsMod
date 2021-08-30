@@ -1755,7 +1755,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SELECTOR, name = "Text Shadow",
-        description = "Changes the shadow type for the text displayed.",
+        description = "Changes the shadow type for the text displayed in the spam hider element.",
         category = "Spam", subcategory = "Display",
         options = ["Normal", "None", "Outline"]
     )
