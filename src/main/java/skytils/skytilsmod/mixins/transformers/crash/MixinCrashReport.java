@@ -23,51 +23,41 @@ import net.minecraft.crash.CrashReportCategory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import skytils.skytilsmod.utils.Utils;
+import skytils.skytilsmod.mixins.hooks.crash.CrashReportHook;
 
 @Mixin(value = CrashReport.class, priority = 988)
 public abstract class MixinCrashReport {
 
-    public boolean isSkytilsCrash = false;
-
-    @Shadow public abstract String getCauseStackTraceOrString();
-
     @Shadow @Final private CrashReportCategory theReportCategory;
+
+    @Unique
+    private final CrashReportHook hook = new CrashReportHook((CrashReport) (Object) this, theReportCategory);
 
     @Inject(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", args = "ldc=---- Minecraft Crash Report ----\n;captureargs=true", shift = At.Shift.AFTER, remap = false, ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void thereIsNoOtherWay(CallbackInfoReturnable<String> cir, StringBuilder stringbuilder) {
-        String cause = getCauseStackTraceOrString();
-        if ((cause.contains("skytils.skytilsmod") || cause.contains("skytils/skytilsmod")) && !cause.contains("SkytilsSecurityManager")) {
-            isSkytilsCrash = true;
-            stringbuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n");
-        }
+        hook.checkSkytilsCrash(cir, stringbuilder);
     }
 
     @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 10, args = "matches=method::getCauseStackTraceOrString"))
     private String otherReplaceCauseForLauncher(String theCauseStackTraceOrString) {
-        if (isSkytilsCrash) {
-            return "Skytils may have caused this crash. Please send the full report below by clicking \"View crash report\" to discord.gg/skytils in the #support channel. Taking a screenshot of this screen provides no information to any mod developers.\n\n" + theCauseStackTraceOrString;
-        }
-        return theCauseStackTraceOrString;
+        return hook.generateCauseForLauncher(theCauseStackTraceOrString);
     }
 
     @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", ordinal = 2, remap = false, args = "matches=method::getWittyComment"))
     private String replaceWittyComment(String comment) {
-        if (isSkytilsCrash) {
-            comment = "Did Sychic do that?";
-        }
-        return comment;
+        return hook.generateWittyComment(comment);
     }
 
 
     @Inject(method = "populateEnvironment", at = @At("RETURN"))
     private void addDataToCrashReport(CallbackInfo ci) {
-        Utils.INSTANCE.generateDebugInfo(this.theReportCategory);
+        hook.addDataToCrashReport();
     }
 }
