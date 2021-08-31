@@ -23,7 +23,7 @@ import net.minecraft.crash.CrashReportCategory
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.utils.Utils.generateDebugInfo
 
-class CrashReportHook(private val crash: CrashReport, private val theReportCategory: CrashReportCategory) {
+class CrashReportHook(private val crash: CrashReport) {
 
     private var isSkytilsCrash = false
 
@@ -48,7 +48,7 @@ class CrashReportHook(private val crash: CrashReport, private val theReportCateg
         return if (isSkytilsCrash) "Did Sychic do that?" else comment
     }
 
-    fun addDataToCrashReport() {
+    fun addDataToCrashReport(theReportCategory: CrashReportCategory) {
         generateDebugInfo(theReportCategory)
     }
 }

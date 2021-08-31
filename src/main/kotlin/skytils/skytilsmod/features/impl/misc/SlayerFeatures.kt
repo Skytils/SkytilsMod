@@ -131,7 +131,7 @@ class SlayerFeatures {
 
                 for ((index, line) in lines.withIndex()) {
                     if (line == "Slayer Quest") {
-                        val boss = lines.elementAtOrNull(index + 1) ?: continue
+                        val boss = lines.elementAtOrNull(index - 1) ?: continue
                         if (boss.startsWith("Revenant Horror")) {
                             BossStatus.setBossStatus(
                                 RNGMeter(
@@ -246,7 +246,7 @@ class SlayerFeatures {
 
                 for ((index, line) in lines.withIndex()) {
                     if (line == "Slayer Quest") {
-                        val boss = lines.elementAtOrNull(index + 1) ?: continue
+                        val boss = lines.elementAtOrNull(index - 1) ?: continue
                         if (boss.startsWith("Revenant Horror")) {
                             Skytils.config.revRNG = rngMeter
                             break
