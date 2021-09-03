@@ -20,21 +20,64 @@ package skytils.skytilsmod.mixins.hooks.crash
 
 import net.minecraft.crash.CrashReport
 import net.minecraft.crash.CrashReportCategory
+import org.spongepowered.asm.mixin.Mixins
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.utils.Utils.generateDebugInfo
+import org.spongepowered.asm.mixin.transformer.meta.MixinMerged
+import skytils.skytilsmod.utils.countMatches
+import skytils.skytilsmod.utils.startsWithAny
 
 class CrashReportHook(private val crash: CrashReport) {
 
     private var isSkytilsCrash = false
 
     fun checkSkytilsCrash(cir: CallbackInfoReturnable<String>, stringbuilder: StringBuilder) {
-        if (crash.causeStackTraceOrString.split("\n").any { line ->
-                (line.contains("skytils.skytilsmod") || line.contains("skytils/skytilsmod")) && !line.contains("SkytilsSecurityManager") && !line.contains(
-                    "SkytilsTweaker"
+        runCatching {
+            if (!isSkytilsCrash && crash.causeStackTraceOrString.split("\n").any { line ->
+                    (line.contains("skytils.skytilsmod") || line.contains("skytils/skytilsmod")) && !line.contains("SkytilsSecurityManager") && !line.contains(
+                        "SkytilsTweaker"
+                    )
+                }) {
+                isSkytilsCrash = true
+            }
+
+            if (isSkytilsCrash) stringbuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n")
+
+            crash.crashCause.stackTrace.filter {
+                it.methodName.countMatches("$") == 2 && it.methodName.startsWithAny(
+                    "modify$",
+                    "args$",
+                    "redirect$",
+                    "localvar$",
+                    "constant$",
+                    "handler$"
                 )
-            }) {
-            isSkytilsCrash = true
-            stringbuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n")
+            }.mapNotNull {
+                val clazz = Class.forName(it.className)
+                val method = clazz.declaredMethods.find { m ->
+                    it.methodName == m.name
+                } ?: return@mapNotNull null
+                method.isAccessible = true
+                if (!method.isAnnotationPresent(MixinMerged::class.java)) return@mapNotNull null
+                val annotation = method.getDeclaredAnnotation(MixinMerged::class.java)
+                return@mapNotNull it to annotation.mixin
+            }.distinct().also { l ->
+                if (l.isNotEmpty()) {
+                    stringbuilder.append(buildString {
+                        append("***Skytils detected Mixins in this crash***\n")
+                        l.forEach { (e, c) ->
+                            Mixins.getConfigs().find { c.startsWith(it.config.mixinPackage) }.also {
+                                if (it != null) {
+                                    append("Mixin registrant ${it.config.name}, class $c, transformed ${e.className}.${e.methodName}\n")
+                                } else {
+                                    append("Mixin Class $c, transformed ${e.className}.${e.methodName}\n")
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+        }.onFailure {
+            it.printStackTrace()
         }
     }
 
