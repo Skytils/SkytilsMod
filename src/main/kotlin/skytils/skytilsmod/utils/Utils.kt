@@ -197,23 +197,6 @@ object Utils {
         return bossName.endsWith(correctBoss)
     }
 
-    fun generateDebugInfo(crashReportCategory: CrashReportCategory) {
-        crashReportCategory.addCrashSectionCallable("Skytils Debug Info") {
-            val hasBetterFPS = runCatching {
-                Class.forName("me.guichaguri.betterfps.BetterFpsHelper").getDeclaredField("VERSION").also { it.isAccessible = true }
-                    .get(null) as String
-            }.getOrDefault("NONE")
-
-            return@addCrashSectionCallable """
-                            # BetterFPS: ${hasBetterFPS != "NONE"} version: $hasBetterFPS; Disabled Startup Check: ${
-                System.getProperty(
-                    "skytils.skipStartChecks"
-                ) != null
-            }
-                        """.trimMargin("#")
-        }
-    }
-
     fun getKeyDisplayStringSafe(keyCode: Int): String =
         runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrNull() ?: "Key $keyCode"
 }

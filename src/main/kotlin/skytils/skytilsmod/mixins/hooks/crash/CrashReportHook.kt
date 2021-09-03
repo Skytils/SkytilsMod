@@ -48,7 +48,21 @@ class CrashReportHook(private val crash: CrashReport) {
         return if (isSkytilsCrash) "Did Sychic do that?" else comment
     }
 
-    fun addDataToCrashReport(theReportCategory: CrashReportCategory) {
-        generateDebugInfo(theReportCategory)
+    fun addDataToCrashReport(crashReportCategory: CrashReportCategory) {
+        crashReportCategory.addCrashSectionCallable("Skytils Debug Info") {
+            val hasBetterFPS = runCatching {
+                Class.forName("me.guichaguri.betterfps.BetterFpsHelper").getDeclaredField("VERSION")
+                    .also { it.isAccessible = true }
+                    .get(null) as String
+            }.getOrDefault("NONE")
+
+            return@addCrashSectionCallable """
+                            # BetterFPS: ${hasBetterFPS != "NONE"} version: $hasBetterFPS; Disabled Startup Check: ${
+                System.getProperty(
+                    "skytils.skipStartChecks"
+                ) != null
+            }
+                        """.trimMargin("#")
+        }
     }
 }

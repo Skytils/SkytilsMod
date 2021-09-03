@@ -346,8 +346,8 @@ class ItemFeatures {
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        val item = event.stack
-        if (!Utils.inSkyblock || item == null || item.stackSize != 1) return
+        val item = event.stack ?: return
+        if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound.hasKey("SkytilsNoItemOverlay")) return
         var stackTip = ""
         val extraAttributes = getExtraAttributes(item)
         if (extraAttributes != null) {
