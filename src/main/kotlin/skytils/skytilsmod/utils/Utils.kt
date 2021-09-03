@@ -235,13 +235,10 @@ val EntityLivingBase.baseMaxHealth: Double
 fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
     if (this is AccessorGuiNewChat) {
         if (this.chatOpen) {
-            val scaledresolution = UResolution
-            val scaleFactor = scaledresolution.scaleFactor
+            val scaleFactor = UResolution.scaleFactor
             val chatScale = this.chatScale
-            var xPos = mouseX / scaleFactor.toInt() - 3
-            var yPos = mouseY / scaleFactor.toInt() - 27
-            xPos = MathHelper.floor_float(xPos.toFloat() / chatScale)
-            yPos = MathHelper.floor_float(yPos.toFloat() / chatScale)
+            val xPos = MathHelper.floor_float((mouseX / scaleFactor.toInt() - 3).toFloat() / chatScale)
+            val yPos = MathHelper.floor_float((mouseY / scaleFactor.toInt() - 27).toFloat() / chatScale)
             if (xPos >= 0 && yPos >= 0) {
                 val lineCount: Int = this.lineCount.coerceAtMost(this.drawnChatLines.size)
                 if (xPos <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && yPos < mc.fontRendererObj.FONT_HEIGHT * lineCount + lineCount) {

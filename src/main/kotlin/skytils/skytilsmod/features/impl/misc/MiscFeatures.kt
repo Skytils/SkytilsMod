@@ -631,7 +631,7 @@ class MiscFeatures {
                     "Day ${NumberUtil.nf.format(day)}",
                     0f,
                     0f,
-                    CommonColors.RED,
+                    CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
                     TextShadow.NORMAL
                 )
