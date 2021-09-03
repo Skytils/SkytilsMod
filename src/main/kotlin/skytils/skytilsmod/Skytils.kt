@@ -395,7 +395,7 @@ class Skytils {
             val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
             if (button == 0) {
                 val component =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatLineID == chatLine.chatLineID }?.chatComponent
                         ?: chatLine.chatComponent
                 val realText = buildString {
                     append(component.unformattedTextForChat)
@@ -410,12 +410,13 @@ class Skytils {
                 printDevMessage("Copied formatted message to clipboard!", "chat")
             } else {
                 val component =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatLineID == chatLine.chatLineID }?.chatComponent
+                        ?: chatLine.chatComponent
 
                 printDevMessage("Copied serialized message to clipboard!", "chat")
                 GuiScreen.setClipboardString(
                     IChatComponent.Serializer.componentToJson(
-                        component ?: chatLine.chatComponent
+                        component
                     )
                 )
             }
