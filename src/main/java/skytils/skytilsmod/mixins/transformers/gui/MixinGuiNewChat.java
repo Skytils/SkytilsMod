@@ -18,15 +18,27 @@
 
 package skytils.skytilsmod.mixins.transformers.gui;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiNewChat;
+import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import skytils.skytilsmod.features.impl.handlers.ChatTabs;
+
+import java.util.Collections;
+import java.util.List;
 
 @Mixin(value = GuiNewChat.class, priority = 999)
 public abstract class MixinGuiNewChat extends Gui {
+
+    @Redirect(method = "setChatLine", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiUtilRenderComponents;splitText(Lnet/minecraft/util/IChatComponent;ILnet/minecraft/client/gui/FontRenderer;ZZ)Ljava/util/List;"))
+    private List<IChatComponent> filterDrawnTextComponents(IChatComponent p_178908_0_, int p_178908_1_, FontRenderer p_178908_2_, boolean p_178908_3_, boolean p_178908_4_) {
+        return ChatTabs.INSTANCE.shouldAllow(p_178908_0_) ? GuiUtilRenderComponents.splitText(p_178908_0_, p_178908_1_, p_178908_2_, p_178908_3_, p_178908_4_) : Collections.emptyList();
+    }
+
     @Redirect(method = "printChatMessageWithOptionalDeletion", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/IChatComponent;getUnformattedText()Ljava/lang/String;"))
     private String printFormattedText(IChatComponent iChatComponent) {
         return iChatComponent.getFormattedText();

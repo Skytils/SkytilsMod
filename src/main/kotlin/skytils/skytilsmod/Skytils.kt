@@ -172,6 +172,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(BlockAbility())
         MinecraftForge.EVENT_BUS.register(BossHPDisplays())
         MinecraftForge.EVENT_BUS.register(BoulderSolver())
+        MinecraftForge.EVENT_BUS.register(ChatTabs)
         MinecraftForge.EVENT_BUS.register(ChestProfit())
         MinecraftForge.EVENT_BUS.register(ClickInOrderSolver())
         MinecraftForge.EVENT_BUS.register(CreeperSolver())
