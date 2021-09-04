@@ -71,16 +71,16 @@ object ChatTabs {
     }
 
     enum class ChatTab(val button: CleanButton, val isValid: (IChatComponent) -> Boolean) {
-        ALL(CleanButton(-690, 2, 0, 20, 20, "A"), { true }),
-        PARTY(CleanButton(-691, 24, 0, 20, 20, "P"), {
+        ALL(CleanButton(-69420, 2, 0, 20, 20, "A"), { true }),
+        PARTY(CleanButton(-69420, 24, 0, 20, 20, "P"), {
             val formatted = it.formattedText
             formatted.startsWith("§r§9Party §8> ") || formatted.startsWith("§r§9P §8> ")
         }),
-        GUILD(CleanButton(-692, 46, 0, 20, 20, "G"), {
+        GUILD(CleanButton(-69420, 46, 0, 20, 20, "G"), {
             val formatted = it.formattedText
             formatted.startsWith("§r§2Guild > ") || formatted.startsWith("§r§2G > ")
         }),
-        PRIVATE(CleanButton(-693, 68, 0, 20, 20, "PM"), {
+        PRIVATE(CleanButton(-69420, 68, 0, 20, 20, "PM"), {
             val formatted = it.formattedText
             formatted.startsWith("§dTo ") || formatted.startsWith("§dFrom ")
         });
