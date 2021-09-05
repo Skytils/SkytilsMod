@@ -108,18 +108,16 @@ class SlayerFeatures {
                     }
                     if (under != null) {
                         val blockUnder = mc.theWorld.getBlockState(under)
-                        var isDanger = false
-                        if (blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ) {
-                            isDanger = true
-                        } else if (blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs) {
-                            isDanger = true
-                        } else if (blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA) {
-                            isDanger = true
-                        } else if (blockUnder.block === Blocks.stained_hardened_clay) {
-                            val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
-                            if (color == 0 || color == 8 || color == 14) isDanger = true
-                        } else if (blockUnder.block === Blocks.bedrock) {
-                            isDanger = true
+                        val isDanger = when {
+                            blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
+                            blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
+                            blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
+                            blockUnder.block === Blocks.stained_hardened_clay -> {
+                                val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
+                                color == 0 || color == 8 || color == 14
+                            }
+                            blockUnder.block === Blocks.bedrock -> true
+                            else -> false
                         }
                         if (isDanger) {
                             mc.thePlayer.playSound("random.orb", 1f, 1f)

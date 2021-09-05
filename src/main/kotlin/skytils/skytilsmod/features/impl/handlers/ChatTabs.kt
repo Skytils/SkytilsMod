@@ -20,22 +20,42 @@ package skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.gui.elements.CleanButton
+import skytils.skytilsmod.mixins.extensions.ExtensionChatStyle
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 
 object ChatTabs {
     var selectedTab = ChatTab.ALL
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onChat(event: PacketEvent.ReceiveEvent) {
+        if (!Utils.isOnHypixel || !Skytils.config.chatTabs || event.packet !is S02PacketChat) return
+
+        val style = event.packet.chatComponent.chatStyle
+        style as ExtensionChatStyle
+        if (style.chatTabType == null) {
+            style.chatTabType = ChatTab.values().filter { it.isValid(event.packet.chatComponent) }.toTypedArray()
+        }
+    }
+
     fun shouldAllow(component: IChatComponent): Boolean {
         if (!Utils.isOnHypixel || !Skytils.config.chatTabs) return true
-        return selectedTab.isValid(component)
+        val style = component.chatStyle
+        style as ExtensionChatStyle
+        if (style.chatTabType == null) {
+            style.chatTabType = ChatTab.values().filter { it.isValid(component) }.toTypedArray()
+        }
+        return style.chatTabType!!.contains(selectedTab)
     }
 
     @SubscribeEvent
