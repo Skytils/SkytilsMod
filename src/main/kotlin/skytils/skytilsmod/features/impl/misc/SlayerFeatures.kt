@@ -39,6 +39,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -231,14 +232,30 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
-        if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet
+        val packet = event.packet
+        if (packet is S1CPacketEntityMetadata) {
+            if (packet.entityId == slayerEntity?.entityId && slayerEntity is EntityEnderman) {
+                (slayerEntity as EntityEnderman).apply {
+                    if (Skytils.config.yangGlyphPing && heldBlockState?.block == Blocks.beacon && ((packet.func_149376_c()
+                            .find { it.dataValueId == 16 } ?: return@apply).`object` as Short).toInt().and(65535)
+                            .and(4095) == 0
+                    ) {
+                        lastYangGlyphSwitch = System.currentTimeMillis()
+                        thrownBoundingBox = entityBoundingBox
+                        createTitle("§cYang Glyph!", 30)
+                    }
+                }
+            }
+        }
+
+        if (packet is S29PacketSoundEffect) {
             if (slayerEntity == null && Skytils.config.slayerMinibossSpawnAlert && packet.soundName == "random.explode" && packet.volume == 0.6f && packet.pitch == 9 / 7f && GuiManager.title != "§cMINIBOSS") {
                 createTitle("§cMINIBOSS", 20)
             }
         }
-        if (event.packet is S02PacketChat) {
-            val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
+
+        if (packet is S02PacketChat) {
+            val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
             if (unformatted.trim().startsWith("RNGesus Meter")) {
                 val rngMeter =
                     unformatted.filter { it.isDigit() || it == '.' }.toFloat()
@@ -282,9 +299,6 @@ class SlayerFeatures {
                 printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
                 yangGlyph = event.pos
                 yangGlyphEntity = null
-                if (Skytils.config.yangGlyphPing) {
-                    createTitle("§cYang Glyph!", 30)
-                }
             }
         }
     }
@@ -332,13 +346,22 @@ class SlayerFeatures {
         if (event.entity is EntityArmorStand && slayerEntity != null) {
             TickTask(1) {
                 val e = event.entity as EntityArmorStand
-                if (slayerEntity != null && e.entityBoundingBox.expand(2.0, 3.0, 2.0)
-                        .intersectsWith(slayerEntity!!.entityBoundingBox)
-                ) {
-                    printDevMessage("Found nearby armor stand", "slayer", "seraph", "seraphGlyph", "seraphFixation")
-                    for (item in e.inventory) {
-                        if (item == null) continue
-                        if (item.item == Item.getItemFromBlock(Blocks.beacon)) {
+                if (slayerEntity != null) {
+                    if (e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)) {
+                        val time = System.currentTimeMillis() - 50
+                        printDevMessage(
+                            "Found beacon armor stand, time diff ${time - lastYangGlyphSwitch}",
+                            "slayer",
+                            "seraph",
+                            "seraphGlyph"
+                        )
+                        if (lastYangGlyphSwitch != -1L && time - lastYangGlyphSwitch < 300 && e.entityBoundingBox.expand(
+                                4.5,
+                                4.0,
+                                4.5
+                            )
+                                .intersectsWith(thrownBoundingBox ?: e.entityBoundingBox)
+                        ) {
                             printDevMessage(
                                 "Beacon armor stand is close to slayer entity",
                                 "slayer",
@@ -346,9 +369,19 @@ class SlayerFeatures {
                                 "seraphGlyph"
                             )
                             yangGlyphEntity = e
-                        } else if (item.item == Items.skull) {
-                            if (ItemUtil.getSkullTexture(item) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0=") {
-                                nukekebiHeads.add(e)
+                            lastYangGlyphSwitch = -1L
+                        }
+                    } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
+                            .intersectsWith(slayerEntity!!.entityBoundingBox)
+                    ) {
+                        printDevMessage("Found nearby armor stand", "slayer", "seraph", "seraphGlyph", "seraphFixation")
+                        for (item in e.inventory) {
+                            if (item == null) continue
+                            if (item.item == Items.skull) {
+                                if (ItemUtil.getSkullTexture(item) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0=") {
+                                    nukekebiHeads.add(e)
+                                }
+                                break
                             }
                         }
                     }
@@ -757,6 +790,8 @@ class SlayerFeatures {
         var expectedMaxHp: Int? = null
         private val hitMap = HashMap<EntityEnderman, Int>()
         var yangGlyph: BlockPos? = null
+        var lastYangGlyphSwitch: Long = -1L
+        var thrownBoundingBox: AxisAlignedBB? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
 
