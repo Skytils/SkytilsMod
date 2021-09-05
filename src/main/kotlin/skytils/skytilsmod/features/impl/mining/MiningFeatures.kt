@@ -21,7 +21,6 @@ import gg.essential.universal.UGraphics
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
@@ -32,6 +31,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -52,11 +52,11 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
 import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -412,12 +412,34 @@ class MiningFeatures {
     }
 
     @SubscribeEvent
+    fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
+        if (
+            !Utils.inSkyblock ||
+            event.packet !is S3EPacketTeams
+        ) return
+        if (event.packet.action != 2) return
+        if (
+            event.packet.players.joinToString(
+                " ",
+                prefix = event.packet.prefix,
+                postfix = event.packet.suffix
+            ).contains("12:00am") &&
+                    Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode
+        ){
+            val message = ChatComponentText("§cSkymall reset ")
+            val hotm = ChatComponentText("§b[HOTM]")
+            hotm.chatStyle.chatClickEvent = ClickEvent(
+                ClickEvent.Action.RUN_COMMAND,
+                "/hotm"
+            )
+            message.appendSibling(hotm)
+            Skytils.mc.thePlayer.addChatMessage(message)
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode && SBInfo.time == "12:00am" && GuiManager.title != "§cSKYMALL RESET"
-        ) {
-            createTitle("§cSKYMALL RESET", 20)
-        }
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && deadCount == 0 && mc.thePlayer != null
         ) {
