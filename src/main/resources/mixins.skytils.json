@@ -18,6 +18,7 @@
     "accessors.AccessorWorldInfo",
     "audio.MixinSoundManager",
     "crash.MixinCrashReport",
+    "dsm.MixinColoredNames",
     "entity.MixinAbstractClientPlayer",
     "entity.MixinBossStatus",
     "entity.MixinEntityBlaze",
