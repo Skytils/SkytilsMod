@@ -98,13 +98,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var overrideReparty = true
 
     @Property(
-        type = PropertyType.SWITCH, name = "Chat Tabs",
-        description = "Creates various tabs to organize chat.",
-        category = "General", subcategory = "Hypixel"
-    )
-    var chatTabs = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Guild Leave Confirmation",
         description = "Requires you to run the /g leave command twice to leave your guild.",
         category = "General", subcategory = "Hypixel"
@@ -973,6 +966,27 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Crystal Hollows"
     )
     var hollowChatCoords = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Chat Tabs",
+        description = "Creates various tabs to organize chat.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var chatTabs = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Pre-fill Chat Commands",
+        description = "Auto fills the respective command for each tab.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var preFillChatTabCommands = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Switch Chat Channel",
+        description = "Automatically types the command to switch to a certain channel.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var autoSwitchChatChannel = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix SBA Chroma",

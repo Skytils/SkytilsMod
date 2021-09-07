@@ -65,6 +65,7 @@
   ],
   "verbose": true,
   "client": [
+    "accessors.AccessorGuiChat",
     "neu.MixinCustomAH",
     "renderer.MixinItemRenderer",
     "renderer.MixinRendererLivingEntity"
