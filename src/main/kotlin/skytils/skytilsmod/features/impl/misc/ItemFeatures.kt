@@ -365,7 +365,7 @@ class ItemFeatures {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val item = event.stack ?: return
-        if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound.hasKey("SkytilsNoItemOverlay")) return
+        if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
         var stackTip = ""
         val extraAttributes = getExtraAttributes(item)
         if (extraAttributes != null) {
@@ -552,7 +552,7 @@ class ItemFeatures {
     class SoulflowGuiElement : GuiElement("Soulflow Display", FloatPair(0.65f, 0.85f)) {
         override fun render() {
             if (Utils.inSkyblock) {
-                for (i in Skytils.mc.thePlayer.inventory.mainInventory) {
+                for (i in mc.thePlayer.inventory.mainInventory) {
                     if (i == null) continue
                     if (!i.displayName.containsAny("Soulflow Pile", "Soulflow Battery", "Soulflow Supercell")) continue
                     for (str in getItemLore(i)) {

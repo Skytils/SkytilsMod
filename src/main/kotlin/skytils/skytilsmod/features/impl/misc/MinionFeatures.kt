@@ -114,7 +114,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val item = event.stack ?: return
-        if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound.hasKey("SkytilsNoItemOverlay")) return
+        if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
         val extraAttributes = getExtraAttributes(item)
         if (Skytils.config.showMinionTier && extraAttributes != null && extraAttributes.hasKey("generator_tier")) {
             val s = extraAttributes.getInteger("generator_tier").toString()

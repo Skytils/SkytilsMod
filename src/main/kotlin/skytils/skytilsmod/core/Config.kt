@@ -97,13 +97,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var overrideReparty = true
 
-
     @Property(
         type = PropertyType.SWITCH, name = "Chat Tabs",
         description = "Creates various tabs to organize chat.",
         category = "General", subcategory = "Hypixel"
     )
-    var chatTabs = true
+    var chatTabs = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Guild Leave Confirmation",
