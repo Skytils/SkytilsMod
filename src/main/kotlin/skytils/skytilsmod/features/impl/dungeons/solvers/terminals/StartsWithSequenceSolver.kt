@@ -27,7 +27,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
@@ -66,20 +65,6 @@ class StartsWithSequenceSolver {
             } else {
                 shouldClick.clear()
                 sequenceNeeded = null
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.middleClickTerminals) return
-        if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName.startsWith("What starts with:")) {
-                event.isCanceled = true
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
             }
         }
     }

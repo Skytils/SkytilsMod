@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.startsWithAny
 
 class TerminalFeatures {
     @SubscribeEvent
@@ -35,7 +36,16 @@ class TerminalFeatures {
         if (event.container is ContainerChest) {
             val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {
+            if (Utils.equalsOneOf(
+                    chestName,
+                    "Navigate the maze!",
+                    "Correct all the panes!",
+                    "Click in order!"
+                ) || chestName.startsWithAny(
+                    "What starts with:",
+                    "Select all the"
+                )
+            ) {
                 event.isCanceled = true
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
             }

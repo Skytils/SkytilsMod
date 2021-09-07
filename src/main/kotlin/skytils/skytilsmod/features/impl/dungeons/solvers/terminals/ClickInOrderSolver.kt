@@ -32,7 +32,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
 
@@ -119,20 +118,6 @@ class ClickInOrderSolver {
                         event.isCanceled = true
                     }
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.middleClickTerminals) return
-        if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-            if (chestName == "Click in order!") {
-                event.isCanceled = true
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
             }
         }
     }
