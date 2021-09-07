@@ -1241,6 +1241,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var pingDisplay = 0
 
     @Property(
+        PropertyType.SWITCH, name = "Show Selected Arrow",
+        description = "Shows your current selected arrow.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showSelectedArrowDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show World Age",
         description = "Displays the day count of the current server.",
         category = "Miscellaneous", subcategory = "Other"
@@ -2258,13 +2265,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     }
 
     private object ConfigSorting : SortingBehavior() {
-        override fun getCategoryComparator(): Comparator<in Category> {
-            return Comparator { o1, o2 ->
-                if (o1.name == "General") return@Comparator -1
-                if (o2.name == "General") return@Comparator 1
-                else compareValuesBy(o1, o2) {
-                    it.name
-                }
+        override fun getCategoryComparator(): Comparator<in Category> = Comparator { o1, o2 ->
+            if (o1.name == "General") return@Comparator -1
+            if (o2.name == "General") return@Comparator 1
+            else compareValuesBy(o1, o2) {
+                it.name
             }
         }
     }

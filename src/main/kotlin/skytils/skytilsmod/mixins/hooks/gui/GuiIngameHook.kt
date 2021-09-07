@@ -17,10 +17,7 @@
  */
 package skytils.skytilsmod.mixins.hooks.gui
 
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.SetActionBarEvent

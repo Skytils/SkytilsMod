@@ -443,6 +443,7 @@ class ItemFeatures {
         val bitCosts = HashMap<String, Int>()
 
         init {
+            SelectedArrowDisplay()
             SoulStrengthGuiElement()
             SoulflowGuiElement()
         }
@@ -482,6 +483,53 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§cSoul Strength: §a1000")
         override val toggled: Boolean
             get() = Skytils.config.showSoulEaterBonus
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", FloatPair(0.65f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock) {
+                mc.thePlayer.inventory.mainInventory.find {
+                    getSkyBlockItemID(it) == "ARROW_SWAPPER"
+                }?.let { item ->
+                    val alignment =
+                        if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    ScreenRenderer.fontRenderer.drawString(
+                        getItemLore(item).find {
+                            it.startsWith("§aSelected: §")
+                        }?.substringAfter("§aSelected: "),
+                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        0f,
+                        CommonColors.WHITE,
+                        alignment,
+                        TextShadow.NORMAL
+                    )
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§aSelected: §zSkytils Arrow",
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§aSelected: §zSkytils Arrow")
+        override val toggled: Boolean
+            get() = Skytils.config.showSelectedArrowDisplay
 
         init {
             Skytils.guiManager.registerElement(this)
