@@ -570,6 +570,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var tankRadiusDisplayColor = Color(100, 255, 0, 50)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Middle Click on Terminals",
+        description = "Replaces left clicks while on terminals with middle clicks.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var middleClickTerminals = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
         description = "Shows the items to click on the Click in Order terminal.",
         category = "Dungeons", subcategory = "Terminal Solvers"
