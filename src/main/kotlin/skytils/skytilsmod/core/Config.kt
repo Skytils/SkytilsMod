@@ -353,20 +353,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var showGuardianRespawnTimer = false
 
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Hidden Fels",
-   description = "Make Fels in dungeons visible.",
-   category = "Dungeons", subcategory = "Quality of Life"
-   )*/
-    var showHiddenFels = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Hidden Shadow Assassins",
-   description = "Make Shadow Assassins in dungeons visible.",
-   category = "Dungeons", subcategory = "Quality of Life"
-   )*/
-    var showHiddenShadowAssassins = false
-
     @Property(
         type = PropertyType.SWITCH, name = "Show Sadan's Interest",
         description = "Replace Sadan's interest display with Skytils' own.",
@@ -381,13 +367,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["None", "HP", "Percentage Health"]
     )
     var necronHealth = 0
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Stealthy Watcher Undeads",
-   description = "Makes stealthy undeads spawned by The Watcher visible.",
-   category = "Dungeons", subcategory = "Quality of Life"
-   )*/
-    var showStealthyBloodMobs = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Spirit Leap Names",
@@ -540,14 +519,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["Block", "Entity"]
     )
     var lividFinderType = 0
-
-    /*
-   @Property(
-   type = PropertyType.SWITCH, name = "Block Incorrect Terminal Clicks",
-   description = "Blocks incorrect clicks on terminals.",
-   category = "Dungeons", subcategory = "Terminal Solvers"
-   )*/
-    var blockIncorrectTerminalClicks = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Boxed Tanks",
@@ -799,13 +770,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var shinyOrbWaypoints = false
 
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Block Mathematical Hoe Right Clicks",
-   description = "Prevents accidentally viewing the recipe for the Mathematical Hoes.",
-   category = "Farming", subcategory = "Quality of Life"
-   )*/
-    var blockMathHoeClicks = false
-
     @Property(
         type = PropertyType.SWITCH, name = "Hide Farming RNG Titles",
         description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
@@ -826,13 +790,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Farming", subcategory = "Solvers"
     )
     var treasureHunterSolver = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Prevent Breaking Farms",
-   description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
-   category = "Farming", subcategory = "Quality of Life"
-   )*/
-    var preventBreakingFarms = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Click to Accept Trapper Task",
@@ -861,13 +818,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Quality of Life"
     )
     var highlightCompletedComissions = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Disable Pickaxe Ability on Private Island",
-   description = "Prevents you from using pickaxe abilities on your island.",
-   category = "Mining", subcategory = "Quality of Life"
-   )*/
-    var noPickaxeAbilityOnPrivateIsland = false
 
     @Property(
         type = PropertyType.SWITCH, name = "More Visible Ghosts",
@@ -903,20 +853,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Quality of Life"
     )
     var recolorCarpets = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Ghosts",
-   description = "Makes the ghosts in The Mist visible.",
-   category = "Mining", subcategory = "Quality of Life"
-   )*/
-    var showGhosts = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Ghosts' Health",
-   description = "Displays the health bar of ghosts in The Mist.",
-   category = "Mining", subcategory = "Quality of Life"
-   )*/
-    var showGhostHealth = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Skymall Reminder",
@@ -1001,14 +937,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Fixes"
     )
     var fixWorldTime = false
-
-    /*
-   @Property(
-   type = PropertyType.SWITCH, name = "Block Useless Zombie Sword",
-   description = "Prevents you from using the Zombie Sword when at full health.",
-   category = "Miscellaneous", subcategory = "Items"
-   )*/
-    var blockUselessZombieSword = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Block Zapper Fatigue Timer",
@@ -1139,13 +1067,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Items"
     )
     var showPetCandies = false
-
-    /*    @Property(
-        type = PropertyType.SWITCH, name = "Soul Eater Bonus",
-        description = "Shows the current Soul Eater bonus from the last mob kill.",
-        category = "Miscellaneous", subcategory = "Items"
-    )*/
-    var showSoulEaterBonus = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Radioactive Bonus",
@@ -1286,7 +1207,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
         category = "Miscellaneous", subcategory = "Other"
     )*/
-
     var fixSummonSkin = false
 
     @Property(
@@ -1345,14 +1265,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hideAirDisplay = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Hide Creeper Veil Near NPCs",
-   description = "Stops the Creeper Veil from blocking interaction with NPCs.",
-   category = "Miscellaneous", subcategory = "Quality of Life"
-   )*/
-
-    var hideCreeperVeilNearNPCs = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Dying Mobs",
@@ -1472,14 +1384,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var preventLogSpam = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Prioritize Item Abilities",
-   description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
-   category = "Miscellaneous", subcategory = "Quality of Life"
-   )*/
-
-    var prioritizeItemAbilities = false
 
     // TODO get Sk1er LLC to make a number text box
     @Property(

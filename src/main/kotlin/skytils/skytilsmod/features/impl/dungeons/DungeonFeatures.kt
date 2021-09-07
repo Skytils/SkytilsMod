@@ -27,10 +27,8 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.passive.EntityBat
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
@@ -60,7 +58,6 @@ import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BossBarEvent
-import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
@@ -363,25 +360,6 @@ class DungeonFeatures {
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
-            if (event.entity.isInvisible) {
-                if (Skytils.config.showHiddenFels && event.entity is EntityEnderman) {
-                    event.entity.isInvisible = false
-                }
-                if (Skytils.config.showHiddenShadowAssassins && event.entity is EntityPlayer && event.entity.name.contains(
-                        "Shadow Assassin"
-                    )
-                ) {
-                    event.entity.isInvisible = false
-                }
-                if (Skytils.config.showStealthyBloodMobs && event.entity is EntityPlayer) {
-                    for (name in WATCHER_MOBS) {
-                        if (event.entity.name.trim { it <= ' ' } == name) {
-                            event.entity.isInvisible = false
-                            break
-                        }
-                    }
-                }
-            }
             if (Skytils.config.boxSpiritBow && Utils.equalsOneOf(
                     dungeonFloor,
                     "F4",

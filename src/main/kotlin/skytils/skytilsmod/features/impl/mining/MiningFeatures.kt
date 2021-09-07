@@ -24,7 +24,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
@@ -318,20 +317,7 @@ class MiningFeatures {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (!Utils.inSkyblock) return
         if (event.entity !== mc.thePlayer) return
-        val item = event.entityPlayer.heldItem
-        val itemId = ItemUtil.getSkyBlockItemID(item)
         if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
-            if (SBInfo.mode?.startsWith("dynamic") == true) {
-                if (Skytils.config.noPickaxeAbilityOnPrivateIsland && itemId != null && (itemId.contains("PICKAXE") || itemId.contains(
-                        "DRILL"
-                    ))
-                ) {
-                    event.isCanceled =
-                        event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.pos == null || mc.theWorld.getBlockState(
-                            event.pos
-                        ).block !== Blocks.chest && mc.theWorld.getBlockState(event.pos).block !== Blocks.trapped_chest
-                }
-            }
             if (Skytils.config.raffleWaypoint && inRaffle && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
                 val block = event.world.getBlockState(event.pos)
                 if (block.block === Blocks.jukebox) {
@@ -378,36 +364,12 @@ class MiningFeatures {
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase?>) {
         if (!Utils.inSkyblock) return
-        if (event.entity is EntityCreeper && event.entity.isInvisible) {
-            val entity = event.entity as EntityCreeper
-            if (Skytils.config.showGhosts && event.entity.maxHealth == 1024f && entity.powered) {
-                event.entity.isInvisible = false
-            }
-        }
         if (Skytils.config.crystalHollowWaypoints && event.entity is EntityOtherPlayerMP && event.entity.name == "Team Treasurite" && event.entity.baseMaxHealth == if (MayorInfo.mayorPerks.contains(
                     "DOUBLE MOBS HP!!!"
                 )
             ) 2_000_000.0 else 1_000_000.0
         ) {
             waypoints["Corleone"] = event.entity.position
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderLivingPost(event: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
-        if (!Utils.inSkyblock) return
-        if (Skytils.config.showGhostHealth && event.entity is EntityCreeper && event.entity.maxHealth == 1024f) {
-            val entity = event.entity as EntityCreeper
-            if (entity.powered) {
-                val healthText = "§cGhost §a" + NumberUtil.format(event.entity.health.toLong()) + "§f/§a1M§c ❤"
-                RenderUtil.draw3DString(
-                    Vec3(
-                        event.entity.posX,
-                        event.entity.posY + event.entity.eyeHeight + 0.5,
-                        event.entity.posZ
-                    ), healthText, Color(255, 255, 255), 1f
-                )
-            }
         }
     }
 

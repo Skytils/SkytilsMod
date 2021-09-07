@@ -17,32 +17,10 @@
  */
 package skytils.skytilsmod.mixins.hooks.multiplayer
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.MovingObjectPosition
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.DamageBlockEvent
-import skytils.skytilsmod.utils.ItemUtil.hasRightClickAbility
-import skytils.skytilsmod.utils.Utils
-
-fun handleRightClickEntity(
-    player: EntityPlayer,
-    target: Entity,
-    movingObject: MovingObjectPosition?,
-    cir: CallbackInfoReturnable<Boolean>
-) {
-    if (!Skytils.config.prioritizeItemAbilities || !Utils.inSkyblock || Utils.inDungeons) return
-    val item = player.heldItem
-    if (item != null && target !is EntityArmorStand) {
-        if (hasRightClickAbility(item)) {
-            cir.returnValue = false
-        }
-    }
-}
 
 fun onPlayerDamageBlock(pos: BlockPos, directionFacing: EnumFacing, cir: CallbackInfoReturnable<Boolean>) {
     if (DamageBlockEvent(pos, directionFacing).postAndCatch()) cir.cancel()

@@ -30,7 +30,6 @@ import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -203,18 +202,6 @@ class MiscFeatures {
         if (!Utils.inSkyblock) return
         if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
             event.isCanceled = true
-        } else if (event.entity is EntityCreeper) {
-            val entity = event.entity
-            if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.maxHealth == 20f && entity.health == 20f && entity.powered) {
-                if (mc.theWorld.playerEntities.any { p: EntityPlayer ->
-                        p is EntityOtherPlayerMP && p.getUniqueID()
-                            .version() == 2 && p.getHealth() == 20f && !p.isPlayerSleeping() && p.getDistanceSqToEntity(
-                            event.entity
-                        ) <= 49
-                    }) {
-                    event.isCanceled = true
-                }
-            }
         } else if (event.entity is EntityFallingBlock) {
             val entity = event.entity
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.block.block === Blocks.gold_block) {

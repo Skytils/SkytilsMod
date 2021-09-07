@@ -75,16 +75,9 @@ class SelectAllColorSolver {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (chestName.startsWith("Select all the")) {
                 event.isCanceled = true
-                if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
-                    if (shouldClick.size > 0) {
-                        if (shouldClick.none { slotNum: Int -> slotNum == event.slot.slotNumber }) {
-                            return
-                        }
-                    }
-                }
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
             }
         }

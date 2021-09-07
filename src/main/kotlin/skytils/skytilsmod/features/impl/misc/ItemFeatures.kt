@@ -47,7 +47,6 @@ import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -75,9 +74,44 @@ class ItemFeatures {
 
         init {
             SelectedArrowDisplay()
-            SoulStrengthGuiElement()
             SoulflowGuiElement()
         }
+
+        val interactables = setOf(
+            Blocks.acacia_door,
+            Blocks.anvil,
+            Blocks.beacon,
+            Blocks.bed,
+            Blocks.birch_door,
+            Blocks.brewing_stand,
+            Blocks.command_block,
+            Blocks.crafting_table,
+            Blocks.chest,
+            Blocks.dark_oak_door,
+            Blocks.daylight_detector,
+            Blocks.daylight_detector_inverted,
+            Blocks.dispenser,
+            Blocks.dropper,
+            Blocks.enchanting_table,
+            Blocks.ender_chest,
+            Blocks.furnace,
+            Blocks.hopper,
+            Blocks.jungle_door,
+            Blocks.lever,
+            Blocks.noteblock,
+            Blocks.powered_comparator,
+            Blocks.unpowered_comparator,
+            Blocks.powered_repeater,
+            Blocks.unpowered_repeater,
+            Blocks.standing_sign,
+            Blocks.wall_sign,
+            Blocks.trapdoor,
+            Blocks.trapped_chest,
+            Blocks.wooden_button,
+            Blocks.stone_button,
+            Blocks.oak_door,
+            Blocks.skull
+        )
     }
 
     @SubscribeEvent
@@ -274,27 +308,6 @@ class ItemFeatures {
                 )
             }
         }
-        if (Skytils.config.showSoulEaterBonus) {
-            if (extraAttr != null) {
-                if (extraAttr.hasKey("ultimateSoulEaterData")) {
-                    val bonus = extraAttr.getInteger("ultimateSoulEaterData")
-                    var foundStrength = false
-                    for (i in event.toolTip.indices) {
-                        val line = event.toolTip[i]
-                        if (line.contains("§7Strength:")) {
-                            event.toolTip.add(i + 1, "§4 Soul Eater Bonus: §a$bonus")
-                            foundStrength = true
-                            break
-                        }
-                    }
-                    if (!foundStrength) {
-                        val index = if (event.showAdvancedItemTooltips) 4 else 2
-                        event.toolTip.add(event.toolTip.size - index, "")
-                        event.toolTip.add(event.toolTip.size - index, "§4 Soul Eater Bonus: §a$bonus")
-                    }
-                }
-            }
-        }
         if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
             val bonus = try {
                 (TabListUtils.tabEntries[68].text.substringAfter("❁").removeSuffix("§r").toInt()
@@ -399,7 +412,7 @@ class ItemFeatures {
             ))
         ) {
             val block = mc.theWorld.getBlockState(event.pos)
-            if (!BlockAbility.interactables.contains(block.block) || Utils.inDungeons && (block.block === Blocks.coal_block || block.block === Blocks.stained_hardened_clay)) {
+            if (!interactables.contains(block.block) || Utils.inDungeons && (block.block === Blocks.coal_block || block.block === Blocks.stained_hardened_clay)) {
                 event.isCanceled = true
             }
         }
@@ -489,46 +502,6 @@ class ItemFeatures {
             )
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
-        }
-    }
-
-    class SoulStrengthGuiElement : GuiElement("Soul Eater Strength", FloatPair(200, 10)) {
-        override fun render() {
-            val player = mc.thePlayer
-            if (toggled && Utils.inSkyblock && player != null) {
-                val item = mc.thePlayer.heldItem
-                if (item != null) {
-                    val extraAttr = getExtraAttributes(item)
-                    if (extraAttr != null) {
-                        if (extraAttr.hasKey("ultimateSoulEaterData")) {
-                            val bonus = extraAttr.getDouble("ultimateSoulEaterData")
-                            mc.fontRendererObj.drawString("§cSoul Strength: §a$bonus", 0f, 0f, 0xFFFFFF, true)
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun demoRender() {
-            ScreenRenderer.fontRenderer.drawString(
-                "§cSoul Strength: §a1000",
-                0f,
-                0f,
-                CommonColors.WHITE,
-                TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§cSoul Strength: §a1000")
-        override val toggled: Boolean
-            get() = Skytils.config.showSoulEaterBonus
-
-        init {
-            Skytils.guiManager.registerElement(this)
         }
     }
 

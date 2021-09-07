@@ -169,7 +169,6 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(AuctionData())
         MinecraftForge.EVENT_BUS.register(AuctionPriceOverlay())
         MinecraftForge.EVENT_BUS.register(BlazeSolver())
-        MinecraftForge.EVENT_BUS.register(BlockAbility())
         MinecraftForge.EVENT_BUS.register(BossHPDisplays())
         MinecraftForge.EVENT_BUS.register(BoulderSolver())
         MinecraftForge.EVENT_BUS.register(ChatTabs)
@@ -259,10 +258,6 @@ class Skytils {
 
             if (!cch.commands.containsKey("armorcolor")) {
                 cch.registerCommand(ArmorColorCommand)
-            }
-
-            if (!cch.commands.containsKey("blockability")) {
-                //cch.registerCommand(BlockAbilityCommand);
             }
 
             if (!cch.commands.containsKey("glintcustomize")) {
