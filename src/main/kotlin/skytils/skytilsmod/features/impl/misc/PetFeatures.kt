@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -32,26 +31,27 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.PacketEvent.SendEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
-import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.isInTablist
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
 class PetFeatures {
@@ -167,14 +167,29 @@ class PetFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
+
+        if (Skytils.config.dolphinPetDisplay && lastPet == "Dolphin") {
+            dolphinPlayers = mc.theWorld.getPlayers<EntityPlayer>(
+                EntityOtherPlayerMP::class.java
+            ) { p: EntityPlayer? ->
+                p != null && p !== mc.thePlayer && p.getDistanceSqToEntity(mc.thePlayer) <= 10 * 10 && p.uniqueID.version() != 2 && isInTablist(
+                    p
+                )
+            }.size
+        }
+    }
+
     companion object {
-        private val mc = Minecraft.getMinecraft()
         private var lastPetConfirmation: Long = 0
         private var lastPetLockNotif: Long = 0
         var lastPet: String? = null
         private val SUMMON_PATTERN = Pattern.compile("§r§aYou summoned your §r(?<pet>.+)§r§a!§r")
         private val AUTOPET_PATTERN =
             Pattern.compile("§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?<pet>.+)§e! §a§lVIEW RULE§r")
+        var dolphinPlayers = 0
 
         init {
             DolphinPetDisplay()
@@ -187,15 +202,8 @@ class PetFeatures {
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 if (lastPet != "Dolphin") return
                 renderTexture(ICON, 0, 0)
-                val players = mc.theWorld.getPlayers<EntityPlayer>(
-                    EntityOtherPlayerMP::class.java
-                ) { p: EntityPlayer? ->
-                    p!!.getDistanceSqToEntity(player) <= 10 * 10 && p.uniqueID.version() != 2 && p !== player && isInTablist(
-                        p
-                    )
-                }
                 ScreenRenderer.fontRenderer.drawString(
-                    if (Skytils.config.dolphinCap && players.size > 5) "5" else players.size.toString(),
+                    if (Skytils.config.dolphinCap && dolphinPlayers > 5) "5" else dolphinPlayers.toString(),
                     20f,
                     5f,
                     CommonColors.ORANGE,

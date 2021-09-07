@@ -64,6 +64,22 @@ import java.util.regex.Pattern
 
 class ItemFeatures {
 
+    companion object {
+        private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+        val sellPrices = HashMap<String, Double>()
+        val bitCosts = HashMap<String, Int>()
+        val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
+        var selectedArrow = ""
+        var soulflowAmount = ""
+        var lowSoulFlowPinged = false
+
+        init {
+            SelectedArrowDisplay()
+            SoulStrengthGuiElement()
+            SoulflowGuiElement()
+        }
+    }
+
     @SubscribeEvent
     fun onSlotChanged(event: SlotChangedEvent) {
         if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return
@@ -71,6 +87,33 @@ class ItemFeatures {
 
         if (slot.inventory == mc.thePlayer.inventory && slot.slotIndex in 0..8) {
             hotbarRarityCache[slot.slotIndex] = ItemUtil.getRarity(slot.stack)
+        }
+
+        val item = slot.stack ?: return
+        val extraAttr = getExtraAttributes(item) ?: return
+        val itemId = getSkyBlockItemID(extraAttr) ?: return
+
+        if (itemId == "ARROW_SWAPPER") {
+            selectedArrow = getItemLore(item).find {
+                it.startsWith("§aSelected: §")
+            }?.substringAfter("§aSelected: ") ?: "§cUnknown"
+        }
+        if (Utils.equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
+            getItemLore(item).find {
+                it.startsWith("§7Internalized: ")
+            }?.substringAfter("§7Internalized: ")?.let { s ->
+                soulflowAmount = s
+                s.drop(2).filter { it.isDigit() }.toIntOrNull()?.let {
+                    if (Skytils.config.lowSoulflowPing > 0) {
+                        if (it <= Skytils.config.lowSoulflowPing && !lowSoulFlowPinged) {
+                            GuiManager.createTitle("§cLow Soulflow", 20)
+                            lowSoulFlowPinged = true
+                        } else if (it > Skytils.config.lowSoulflowPing) {
+                            lowSoulFlowPinged = false
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -449,19 +492,6 @@ class ItemFeatures {
         }
     }
 
-    companion object {
-        private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
-        val sellPrices = HashMap<String, Double>()
-        val bitCosts = HashMap<String, Int>()
-        val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
-
-        init {
-            SelectedArrowDisplay()
-            SoulStrengthGuiElement()
-            SoulflowGuiElement()
-        }
-    }
-
     class SoulStrengthGuiElement : GuiElement("Soul Eater Strength", FloatPair(200, 10)) {
         override fun render() {
             val player = mc.thePlayer
@@ -505,22 +535,16 @@ class ItemFeatures {
     class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", FloatPair(0.65f, 0.85f)) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
-                mc.thePlayer.inventory.mainInventory.find {
-                    getSkyBlockItemID(it) == "ARROW_SWAPPER"
-                }?.let { item ->
-                    val alignment =
-                        if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        getItemLore(item).find {
-                            it.startsWith("§aSelected: §")
-                        }?.substringAfter("§aSelected: "),
-                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
-                        0f,
-                        CommonColors.WHITE,
-                        alignment,
-                        TextShadow.NORMAL
-                    )
-                }
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    selectedArrow,
+                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    TextShadow.NORMAL
+                )
             }
         }
 
@@ -551,35 +575,17 @@ class ItemFeatures {
 
     class SoulflowGuiElement : GuiElement("Soulflow Display", FloatPair(0.65f, 0.85f)) {
         override fun render() {
-            if (Utils.inSkyblock) {
-                for (i in mc.thePlayer.inventory.mainInventory) {
-                    if (i == null) continue
-                    if (!i.displayName.containsAny("Soulflow Pile", "Soulflow Battery", "Soulflow Supercell")) continue
-                    for (str in getItemLore(i)) {
-                        if (!str.startsWith("§7Internalized: ")) continue
-                        if (Skytils.config.lowSoulflowPing > 0) {
-                            val soulflow = (str.substring(18).filter { it.isDigit() }).toInt()
-                            if (soulflow <= Skytils.config.lowSoulflowPing && !pinged) {
-                                GuiManager.createTitle("§cLow Soulflow", 20)
-                                pinged = true
-                            } else if (soulflow > Skytils.config.lowSoulflowPing) {
-                                pinged = false
-                            }
-                        }
-                        if (toggled) {
-                            val alignment =
-                                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                            ScreenRenderer.fontRenderer.drawString(
-                                str.substring(16),
-                                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
-                                0f,
-                                CommonColors.WHITE,
-                                alignment,
-                                TextShadow.NORMAL
-                            )
-                        }
-                    }
-                }
+            if (Utils.inSkyblock && toggled) {
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    soulflowAmount,
+                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    TextShadow.NORMAL
+                )
             }
         }
 
