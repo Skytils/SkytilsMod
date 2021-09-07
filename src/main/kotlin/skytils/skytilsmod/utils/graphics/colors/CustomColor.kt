@@ -162,8 +162,8 @@ open class CustomColor {
     companion object {
         fun fromString(string: String?, a: Float): CustomColor {
             if (string == null) return CustomColor(0F, 0F, 0F, a)
-            var withoutHash = string.trim { it <= ' ' }
-            if (withoutHash.startsWith("#")) withoutHash = withoutHash.substring(1).trim { it <= ' ' }
+            var withoutHash = string.trim()
+            if (withoutHash.startsWith("#")) withoutHash = withoutHash.substring(1).trim()
             if (withoutHash == "") return CustomColor(0F, 0F, 0F, a)
             when (withoutHash.length) {
                 6 -> {

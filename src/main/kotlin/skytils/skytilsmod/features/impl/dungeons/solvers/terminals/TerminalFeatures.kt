@@ -20,41 +20,21 @@ package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 
 class TerminalFeatures {
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onGUIMouseInput(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (!Utils.inDungeons) return
-        // Skytils doesn't use this event, so it must be another mod that cancelled it
-        if (event.isCanceled && Skytils.config.blockIncorrectTerminalClicks) {
-            if (mc.thePlayer.openContainer != null && mc.thePlayer.openContainer is ContainerChest) {
-                val chest = mc.thePlayer.openContainer as ContainerChest
-                val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
-                if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!" || chestName.startsWith("Select all the") && Skytils.config.selectAllColorTerminalSolver || chestName.startsWith(
-                        "What starts with"
-                    ) && Skytils.config.startsWithSequenceTerminalSolver || chestName == "Click in order!" && Skytils.config.clickInOrderTerminalSolver
-                ) {
-                    event.isCanceled = false
-                }
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {
                 event.isCanceled = true
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)

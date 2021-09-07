@@ -39,7 +39,7 @@ class SelectAllColorSolver {
         if (mc.currentScreen is GuiChest) {
             val chest = mc.thePlayer.openContainer as ContainerChest
             val invSlots = (mc.currentScreen as GuiChest).inventorySlots.inventorySlots
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName.startsWith("Select all the")) {
                 val promptColor = EnumDyeColor.values().find {
                     chestName.contains(it.getName().replace("_", " ").uppercase())
@@ -76,7 +76,7 @@ class SelectAllColorSolver {
         if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (chestName.startsWith("Select all the")) {
                 event.isCanceled = true
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
@@ -91,7 +91,7 @@ class SelectAllColorSolver {
         if (event.container is ContainerChest) {
             val slot = event.slot
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName.startsWith("Select all the")) {
                 if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
                     event.isCanceled = true

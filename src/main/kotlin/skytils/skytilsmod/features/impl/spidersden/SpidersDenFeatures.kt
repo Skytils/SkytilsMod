@@ -48,7 +48,7 @@ class SpidersDenFeatures {
         ) {
             shouldShowArachneSpawn = true
         }
-        if (unformatted.trim { it <= ' ' }.startsWith("ARACHNE DOWN!")) {
+        if (unformatted.trim().startsWith("ARACHNE DOWN!")) {
             shouldShowArachneSpawn = false
         }
     }

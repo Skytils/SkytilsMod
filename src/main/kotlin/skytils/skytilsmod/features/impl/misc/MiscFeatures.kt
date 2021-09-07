@@ -30,7 +30,6 @@ import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -41,7 +40,10 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemMonsterPlacer
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -51,6 +53,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
@@ -111,7 +114,7 @@ class MiscFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
-        val unformatted = event.message.unformattedText.stripControlCodes().trim { it <= ' ' }
+        val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
         if (unformatted == "The ground begins to shake as an Endstone Protector rises from below!") {
             golemSpawnTime = System.currentTimeMillis() + 20000
@@ -199,18 +202,6 @@ class MiscFeatures {
         if (!Utils.inSkyblock) return
         if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
             event.isCanceled = true
-        } else if (event.entity is EntityCreeper) {
-            val entity = event.entity
-            if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.maxHealth == 20f && entity.health == 20f && entity.powered) {
-                if (mc.theWorld.playerEntities.any { p: EntityPlayer ->
-                        p is EntityOtherPlayerMP && p.getUniqueID()
-                            .version() == 2 && p.getHealth() == 20f && !p.isPlayerSleeping() && p.getDistanceSqToEntity(
-                            event.entity
-                        ) <= 49
-                    }) {
-                    event.isCanceled = true
-                }
-            }
         } else if (event.entity is EntityFallingBlock) {
             val entity = event.entity
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.block.block === Blocks.gold_block) {
@@ -427,9 +418,42 @@ class MiscFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
+
+        if (Skytils.config.legionPlayerDisplay) {
+            hasLegion = mc.thePlayer.inventory.armorInventory.any {
+                getExtraAttributes(it).run {
+                    this != null && this.hasKey("enchantments") && this.getCompoundTag("enchantments")
+                        .hasKey("ultimate_legion")
+                }
+            }
+            if (hasLegion) {
+                legionPlayers = mc.theWorld.getPlayers<EntityPlayer>(
+                    EntityOtherPlayerMP::class.java
+                ) { p: EntityPlayer? ->
+                    p != null && p !== mc.thePlayer && p.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30 && p.uniqueID.version() != 2 && isInTablist(
+                        p
+                    )
+                }.size
+            }
+        }
+        if (Skytils.config.summoningEyeDisplay && SBInfo.mode != SkyblockIsland.TheEnd.mode) {
+            placedEyes = PlacedSummoningEyeDisplay.SUMMONING_EYE_FRAMES.count {
+                mc.theWorld.getBlockState(it).run {
+                    block === Blocks.end_portal_frame && this.getValue(BlockEndPortalFrame.EYE)
+                }
+            }
+        }
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
         private var golemSpawnTime: Long = 0
+        var legionPlayers = 0
+        var hasLegion = false
+        var placedEyes = 0
 
         init {
             GolemSpawnTimerElement()
@@ -485,29 +509,10 @@ class MiscFeatures {
 
     class LegionPlayerDisplay : GuiElement("Legion Player Display", FloatPair(50, 50)) {
         override fun render() {
-            val player = mc.thePlayer
-            if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                var hasLegion = false
-                for (armor in player.inventory.armorInventory) {
-                    val extraAttr = getExtraAttributes(armor)
-                    if (extraAttr != null && extraAttr.hasKey("enchantments") && extraAttr.getCompoundTag("enchantments")
-                            .hasKey("ultimate_legion")
-                    ) {
-                        hasLegion = true
-                        break
-                    }
-                }
-                if (!hasLegion) return
+            if (hasLegion && toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
-                val players = mc.theWorld.getPlayers<EntityPlayer>(
-                    EntityOtherPlayerMP::class.java
-                ) { p: EntityPlayer? ->
-                    p!!.getDistanceSqToEntity(player) <= 30 * 30 && p.uniqueID.version() != 2 && p !== player && isInTablist(
-                        p
-                    )
-                }
                 ScreenRenderer.fontRenderer.drawString(
-                    if (Skytils.config.legionCap && players.size > 20) "20" else players.size.toString(),
+                    if (Skytils.config.legionCap && legionPlayers > 20) "20" else legionPlayers.toString(),
                     20f,
                     5f,
                     CommonColors.ORANGE,
@@ -522,7 +527,7 @@ class MiscFeatures {
             val y = 0f
             renderItem(ItemStack(Items.enchanted_book), x.toInt(), y.toInt())
             ScreenRenderer.fontRenderer.drawString(
-                "30",
+                "69",
                 x + 20,
                 y + 5,
                 CommonColors.ORANGE,
@@ -534,7 +539,7 @@ class MiscFeatures {
         override val height: Int
             get() = 16
         override val width: Int
-            get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("30")
+            get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("69")
 
         override val toggled: Boolean
             get() = Skytils.config.legionPlayerDisplay
@@ -549,18 +554,6 @@ class MiscFeatures {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 if (SBInfo.mode != SkyblockIsland.TheEnd.mode) return
-                var invalid = false
-                var placedEyes = 0
-                for (pos in SUMMONING_EYE_FRAMES) {
-                    val block = mc.theWorld.getBlockState(pos)
-                    if (block.block !== Blocks.end_portal_frame) {
-                        invalid = true
-                        break
-                    } else if (block.getValue(BlockEndPortalFrame.EYE)) {
-                        placedEyes++
-                    }
-                }
-                if (invalid) return
                 renderTexture(ICON, 0, 0)
                 ScreenRenderer.fontRenderer.drawString(
                     "$placedEyes/8",
@@ -594,7 +587,7 @@ class MiscFeatures {
             get() = Skytils.config.summoningEyeDisplay
 
         companion object {
-            private val SUMMONING_EYE_FRAMES = arrayOf(
+            val SUMMONING_EYE_FRAMES = arrayOf(
                 BlockPos(-669, 9, -275),
                 BlockPos(-669, 9, -277),
                 BlockPos(-670, 9, -278),

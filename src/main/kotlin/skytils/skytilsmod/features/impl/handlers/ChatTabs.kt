@@ -22,6 +22,7 @@ import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.IChatComponent
+import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,6 +32,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.gui.elements.CleanButton
 import skytils.skytilsmod.mixins.extensions.ExtensionChatStyle
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiChat
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 
@@ -59,6 +61,19 @@ object ChatTabs {
     }
 
     @SubscribeEvent
+    fun onOpenGui(event: GuiOpenEvent) {
+        if (!Skytils.config.chatTabs || !Skytils.config.preFillChatTabCommands || !Utils.isOnHypixel || event.gui !is GuiChat) return
+        if ((event.gui as AccessorGuiChat).defaultInputFieldText.isBlank()) {
+            (event.gui as AccessorGuiChat).defaultInputFieldText = when (selectedTab) {
+                ChatTab.ALL -> "/ac "
+                ChatTab.PARTY -> "/pc "
+                ChatTab.GUILD -> "/gc "
+                ChatTab.PRIVATE -> "/r "
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onScreenEvent(event: GuiScreenEvent) {
         if (!Skytils.config.chatTabs || !Utils.isOnHypixel || event.gui !is GuiChat) return
         val chat = mc.ingameGUI.chatGUI
@@ -73,6 +88,16 @@ object ChatTabs {
                 }?.let {
                     selectedTab = it.key
                     mc.ingameGUI.chatGUI.refreshChat()
+                    if (Skytils.config.autoSwitchChatChannel) {
+                        Skytils.sendMessageQueue.addFirst(
+                            when (selectedTab) {
+                                ChatTab.ALL -> "/chat a"
+                                ChatTab.PARTY -> "/chat p"
+                                ChatTab.GUILD -> "/chat g"
+                                else -> ""
+                            }
+                        )
+                    }
                 }
             }
             is GuiScreenEvent.DrawScreenEvent.Pre -> {
@@ -90,20 +115,22 @@ object ChatTabs {
         mc.ingameGUI.chatGUI.refreshChat()
     }
 
-    enum class ChatTab(val button: CleanButton, val isValid: (IChatComponent) -> Boolean) {
-        ALL(CleanButton(-69420, 2, 0, 20, 20, "A"), { true }),
-        PARTY(CleanButton(-69420, 24, 0, 20, 20, "P"), {
+    enum class ChatTab(text: String, val isValid: (IChatComponent) -> Boolean) {
+        ALL("A", { true }),
+        PARTY("P", {
             val formatted = it.formattedText
             formatted.startsWith("§r§9Party §8> ") || formatted.startsWith("§r§9P §8> ")
         }),
-        GUILD(CleanButton(-69420, 46, 0, 20, 20, "G"), {
+        GUILD("G", {
             val formatted = it.formattedText
             formatted.startsWith("§r§2Guild > ") || formatted.startsWith("§r§2G > ")
         }),
-        PRIVATE(CleanButton(-69420, 68, 0, 20, 20, "PM"), {
+        PRIVATE("PM", {
             val formatted = it.formattedText
             formatted.startsWith("§dTo ") || formatted.startsWith("§dFrom ")
         });
+
+        val button = CleanButton(-69420, 2 + 20 * ordinal, 0, 20, 20, text)
 
         companion object {
             val buttons by lazy { values().associateWith { it.button } }

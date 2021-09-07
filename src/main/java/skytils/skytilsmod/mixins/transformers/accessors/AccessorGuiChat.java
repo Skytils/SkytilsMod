@@ -15,13 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.mixins.hooks.multiplayer
 
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.DamageBlockEvent
+package skytils.skytilsmod.mixins.transformers.accessors;
 
-fun onPlayerDamageBlock(pos: BlockPos, directionFacing: EnumFacing, cir: CallbackInfoReturnable<Boolean>) {
-    if (DamageBlockEvent(pos, directionFacing).postAndCatch()) cir.cancel()
+import net.minecraft.client.gui.GuiChat;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
+
+@Mixin(GuiChat.class)
+public interface AccessorGuiChat {
+    @Accessor
+    String getDefaultInputFieldText();
+
+    @Accessor
+    void setDefaultInputFieldText(String text);
 }
