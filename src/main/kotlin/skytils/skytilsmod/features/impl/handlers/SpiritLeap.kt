@@ -77,7 +77,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
             val containerChest = event.container
             val fr = ScreenRenderer.fontRenderer
             val invSlots = containerChest.inventorySlots
-            val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim()
             if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap" || Skytils.config.reviveStoneNames && displayName == "Revive A Teammate") {
                 var people = 0
                 for (slot in invSlots) {

@@ -160,7 +160,7 @@ class ItemFeatures {
             val gui = event.gui
             val chest = gui.inventorySlots as ContainerChest
             val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = inv.displayName.unformattedText.trim()
             if (chestName.startsWithAny("Salvage", "Ender Chest") || Utils.equalsOneOf(
                     chestName,
                     "Ophelia",
@@ -215,7 +215,7 @@ class ItemFeatures {
         if (event.container is ContainerChest) {
             val chest = event.container
             val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = inv.displayName.unformattedText.trim()
             if (event.slot != null && event.slot.hasStack) {
                 val item: ItemStack = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)

@@ -114,7 +114,7 @@ class MiscFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
-        val unformatted = event.message.unformattedText.stripControlCodes().trim { it <= ' ' }
+        val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
         if (unformatted == "The ground begins to shake as an Endstone Protector rises from below!") {
             golemSpawnTime = System.currentTimeMillis() + 20000

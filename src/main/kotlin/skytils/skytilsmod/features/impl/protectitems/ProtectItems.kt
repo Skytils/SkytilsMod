@@ -71,7 +71,7 @@ class ProtectItems {
         if (event.container is ContainerChest && ItemProtectStrategy.isAnyToggled()) {
             val chest = event.container
             val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = inv.displayName.unformattedText.trim()
             if (event.slot != null && event.slot.hasStack) {
                 var item: ItemStack = event.slot.stack ?: return
                 var extraAttr = ItemUtil.getExtraAttributes(item)

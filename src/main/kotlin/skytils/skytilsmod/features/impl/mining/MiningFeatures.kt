@@ -102,7 +102,7 @@ class MiningFeatures {
             if ((formatted.startsWith("§r§eYou registered §r§a") && formatted.endsWith("§r§ein the raffle event!§r")) || formatted == "§r§7No tickets to put in the box...§r") {
                 raffleBox = lastJukebox
             }
-            if (unformatted.trim { it <= ' ' }.startsWith("RAFFLE ENDED!")) {
+            if (unformatted.trim().startsWith("RAFFLE ENDED!")) {
                 inRaffle = false
             }
         }
@@ -117,10 +117,10 @@ class MiningFeatures {
             ) return
             if (SBInfo.mode == SkyblockIsland.DwarvenMines.mode) {
                 puzzlerSolution = BlockPos(181, 195, 135)
-                val msg = unformatted.substring(15).trim { it <= ' ' }
+                val msg = unformatted.substring(15).trim()
                 val matcher = Pattern.compile("([▶▲◀▼]+)").matcher(unformatted)
                 if (matcher.find()) {
-                    val sequence = matcher.group(1).trim { it <= ' ' }
+                    val sequence = matcher.group(1).trim()
                     if (sequence.length != msg.length) {
                         println(String.format("%s - %s | %s - %s", sequence, msg, sequence.length, unformatted.length))
                     }

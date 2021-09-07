@@ -38,7 +38,7 @@ class MinionFeatures {
     fun onGuiOpen(event: GuiOpenEvent) {
         if (event.gui is GuiChest) {
             val chest = (event.gui as GuiChest).inventorySlots as ContainerChest
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName == "Minion Chest") return
         }
         blockUnenchanted = false
