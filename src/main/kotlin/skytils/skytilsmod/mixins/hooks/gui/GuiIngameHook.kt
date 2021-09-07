@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.SetActionBarEvent
+import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.Utils
 
@@ -54,6 +55,6 @@ fun renderRarityOnHotbar(
     ci: CallbackInfo
 ) {
     if (Utils.inSkyblock && Skytils.config.showItemRarity) {
-        renderRarity(player.inventory.mainInventory[index], xPos, yPos)
+        renderRarity(xPos, yPos, ItemFeatures.hotbarRarityCache[index])
     }
 }

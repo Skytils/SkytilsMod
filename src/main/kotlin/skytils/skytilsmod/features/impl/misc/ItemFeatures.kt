@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UResolution
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -38,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -45,6 +45,7 @@ import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.handlers.BlockAbility
 import skytils.skytilsmod.utils.*
@@ -62,6 +63,17 @@ import java.awt.Color
 import java.util.regex.Pattern
 
 class ItemFeatures {
+
+    @SubscribeEvent
+    fun onSlotChanged(event: SlotChangedEvent) {
+        if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return
+        val slot = event.slot
+
+        if (slot.inventory == mc.thePlayer.inventory && slot.slotIndex in 0..8) {
+            hotbarRarityCache[slot.slotIndex] = ItemUtil.getRarity(slot.stack)
+        }
+    }
+
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.hasStack) {
@@ -268,7 +280,8 @@ class ItemFeatures {
                 "  §6- ${
                     gems.getString(it).toTitleCase()
                 } ${
-                    if (it.startsWith("UNIVERSAL_")) gems.getString("${it}_gem") else it.substringBeforeLast("_").toTitleCase()
+                    if (it.startsWith("UNIVERSAL_")) gems.getString("${it}_gem") else it.substringBeforeLast("_")
+                        .toTitleCase()
                 }"
             })
         }
@@ -437,10 +450,10 @@ class ItemFeatures {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
         val sellPrices = HashMap<String, Double>()
         val bitCosts = HashMap<String, Int>()
+        val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
 
         init {
             SelectedArrowDisplay()

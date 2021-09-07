@@ -153,7 +153,7 @@ object ItemUtil {
         val name = display.getString("Name")
 
         // Determine the item's rarity
-        for (i in 0 until lore.tagCount()) {
+        for (i in (lore.tagCount() - 1) downTo 0) {
             val currentLine = lore.getStringTagAt(i)
             val rarityMatcher = RARITY_PATTERN.find(currentLine)
             val petRarityMatcher = PET_PATTERN.find(name)

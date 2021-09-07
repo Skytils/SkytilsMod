@@ -481,7 +481,7 @@ object RenderUtil {
      * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
      * @author SteveKunG
      */
-    private fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity?) {
+    fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity?) {
         if (rarity != null) {
             val alpha = Skytils.config.itemRarityOpacity
 

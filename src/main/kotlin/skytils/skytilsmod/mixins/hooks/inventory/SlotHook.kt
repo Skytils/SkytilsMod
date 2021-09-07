@@ -21,29 +21,26 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.StartsWithSequenceSolver
 import skytils.skytilsmod.utils.Utils
 
-class SlotHook(slotC: Any) {
-    val slot: Slot
+fun onSlotChange(slot: Slot) {
+    SlotChangedEvent(slot).postAndCatch()
+}
 
-    init {
-        slot = slotC as Slot
-    }
-
-    fun markTerminalItems(cir: CallbackInfoReturnable<ItemStack?>) {
-        if (!Utils.inSkyblock) return
-        val item: ItemStack = (slot.inventory.getStackInSlot(slot.slotIndex) ?: return).copy()
-        if (!item.isItemEnchanted && (SelectAllColorSolver.shouldClick.contains(slot.slotNumber) || StartsWithSequenceSolver.shouldClick.contains(
-                slot.slotNumber
-            ))
-        ) {
-            if (item.tagCompound == null) {
-                item.tagCompound = NBTTagCompound()
-            }
-            item.tagCompound.setBoolean("SkytilsForceGlint", true)
-            cir.returnValue = item
+fun markTerminalItems(slot: Slot, cir: CallbackInfoReturnable<ItemStack?>) {
+    if (!Utils.inSkyblock) return
+    val item: ItemStack = (slot.inventory.getStackInSlot(slot.slotIndex) ?: return).copy()
+    if (!item.isItemEnchanted && (SelectAllColorSolver.shouldClick.contains(slot.slotNumber) || StartsWithSequenceSolver.shouldClick.contains(
+            slot.slotNumber
+        ))
+    ) {
+        if (item.tagCompound == null) {
+            item.tagCompound = NBTTagCompound()
         }
+        item.tagCompound.setBoolean("SkytilsForceGlint", true)
+        cir.returnValue = item
     }
 }
