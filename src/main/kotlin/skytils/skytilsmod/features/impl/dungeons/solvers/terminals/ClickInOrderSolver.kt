@@ -126,7 +126,7 @@ class ClickInOrderSolver {
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
-        if (!Skytils.config.clickInOrderTerminalSolver) return
+        if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
             val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
