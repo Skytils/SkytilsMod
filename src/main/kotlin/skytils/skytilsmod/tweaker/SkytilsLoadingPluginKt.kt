@@ -134,7 +134,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 
     override fun getASMTransformerClass(): Array<String> {
-        return emptyArray()
+        return arrayOf("skytils.skytilsmod.asm.SkytilsTransformer")
     }
 
     override fun getModContainerClass(): String? {

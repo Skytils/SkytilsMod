@@ -42,7 +42,8 @@ minecraft {
         setOf(
             "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
             "-Delementa.dev=true",
-            "-Delementa.debug=true"
+            "-Delementa.debug=true",
+            "-Dasmhelper.verbose=true"
         )
     )
     clientRunArgs.addAll(
@@ -76,6 +77,15 @@ dependencies {
     shadowMe("com.github.Skytils:Hylin:a9899c8c03") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
+        exclude(module = "kotlin-stdlib-jdk7")
+        exclude(module = "kotlin-stdlib")
+        exclude(module = "kotlinx-coroutines-core")
+    }
+    shadowMe("com.github.Skytils:AsmHelper:5e61aebfae") {
+        exclude(module = "kotlin-reflect")
+        exclude(module = "kotlin-stdlib-jdk8")
+        exclude(module = "kotlin-stdlib-jdk7")
+        exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
 }
@@ -127,6 +137,7 @@ tasks {
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
         relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
+        relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
 
         exclude(
             "**/LICENSE.md",

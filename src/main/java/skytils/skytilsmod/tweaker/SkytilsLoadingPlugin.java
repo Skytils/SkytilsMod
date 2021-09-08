@@ -33,6 +33,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
+@IFMLLoadingPlugin.Name("Skytils On Top")
+@IFMLLoadingPlugin.SortingIndex(69)
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
     public static final String missingDependency =
