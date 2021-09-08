@@ -127,7 +127,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
 
             JLabel version = new JLabel("Skytils v" + getVersionFromMcmodInfo() + " for MC 1.8.9");
             version.setName("Mod Version");
-            version.setFont(new Font(Font.DIALOG, Font.BOLD, height / 13));
+            version.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             version.setHorizontalAlignment(SwingConstants.CENTER);
 
             this.add(logo);
