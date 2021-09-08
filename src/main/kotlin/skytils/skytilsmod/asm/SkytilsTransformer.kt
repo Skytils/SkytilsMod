@@ -20,6 +20,7 @@ package skytils.skytilsmod.asm
 
 import dev.falsehonesty.asmhelper.BaseClassTransformer
 import skytils.skytilsmod.asm.transformers.addColoredNamesCheck
+import skytils.skytilsmod.asm.transformers.injectSplashProgressTransformer
 
 class SkytilsTransformer : BaseClassTransformer() {
     var transformed = false
@@ -28,6 +29,7 @@ class SkytilsTransformer : BaseClassTransformer() {
         if (!transformed) {
             transformed = true
             addColoredNamesCheck()
+            injectSplashProgressTransformer()
         }
     }
 }

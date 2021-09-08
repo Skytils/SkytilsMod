@@ -23,7 +23,6 @@
     "entity.MixinEntityBlaze",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayerSP",
-    "forge.MixinSplashProgress",
     "gui.MixinGuiContainer",
     "gui.MixinGuiIngame",
     "gui.MixinGuiIngameForge",
