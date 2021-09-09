@@ -22,10 +22,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraftforge.common.util.Constants
+import skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
 import java.util.*
 
 object ItemUtil {
-    private val RARITY_PATTERN = "(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)".toRegex()
     private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
     const val NBT_INTEGER = 3
     private const val NBT_STRING = 8
