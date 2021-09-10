@@ -18,14 +18,17 @@
 
 package skytils.skytilsmod.mixins.transformers.gui;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiNewChat;
-import net.minecraft.client.gui.GuiUtilRenderComponents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.*;
 import net.minecraft.util.IChatComponent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import skytils.skytilsmod.features.impl.handlers.ChatTabs;
 
 import java.util.Collections;
@@ -33,6 +36,13 @@ import java.util.List;
 
 @Mixin(value = GuiNewChat.class, priority = 999)
 public abstract class MixinGuiNewChat extends Gui {
+
+    @Shadow @Final private Minecraft mc;
+
+    @Shadow private int scrollPos;
+
+    @Shadow
+    public abstract int getLineCount();
 
     @Redirect(method = "setChatLine", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiUtilRenderComponents;splitText(Lnet/minecraft/util/IChatComponent;ILnet/minecraft/client/gui/FontRenderer;ZZ)Ljava/util/List;"))
     private List<IChatComponent> filterDrawnTextComponents(IChatComponent p_178908_0_, int p_178908_1_, FontRenderer p_178908_2_, boolean p_178908_3_, boolean p_178908_4_) {
@@ -42,5 +52,11 @@ public abstract class MixinGuiNewChat extends Gui {
     @Redirect(method = "printChatMessageWithOptionalDeletion", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/IChatComponent;getUnformattedText()Ljava/lang/String;"))
     private String printFormattedText(IChatComponent iChatComponent) {
         return iChatComponent.getFormattedText();
+    }
+
+    @Inject(method = "getChatComponent", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/GuiNewChat;scrollPos:I"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void stopOutsideWindow(int mouseX, int mouseY, CallbackInfoReturnable<IChatComponent> cir, ScaledResolution scaledresolution, int i, float f, int j, int k, int l) {
+        int line = k / mc.fontRendererObj.FONT_HEIGHT + scrollPos;
+        if (line >= getLineCount()) cir.setReturnValue(null);
     }
 }

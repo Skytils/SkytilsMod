@@ -31,7 +31,7 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
     findMethod("start", "()V").apply {
         val v = localVariables.find {
             it.name == "forgeLoc" && it.desc == "Lnet/minecraft/util/ResourceLocation;"
-        } ?: return@modify
+        } ?: return@modify println("unable to find localvar")
         var index = -1
         for (insn in instructions) {
             if (insn is MethodInsnNode) {
