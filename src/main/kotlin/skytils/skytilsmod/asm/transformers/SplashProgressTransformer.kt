@@ -30,7 +30,7 @@ import kotlin.random.Random
 fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.SplashProgress") {
     findMethod("start", "()V").apply {
         val v = localVariables.find {
-            it.name == "forgeLoc" && it.desc == "Lnet/minecraft/util/ResourceLocation;"
+            it.name == "forgeLoc" && (it.desc == "Ljy;" || it.desc == "Lnet/minecraft/util/ResourceLocation;")
         } ?: return@modify println("unable to find localvar")
         var index = -1
         for (insn in instructions) {
