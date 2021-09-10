@@ -75,6 +75,8 @@ dependencies {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
+        exclude(module = "gson")
+        exclude(module = "guava")
     }
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1")
