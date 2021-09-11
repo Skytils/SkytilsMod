@@ -33,12 +33,14 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.GuiContainerEvent
@@ -112,6 +114,17 @@ class ItemFeatures {
             Blocks.oak_door,
             Blocks.skull
         )
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        TickTask(20) {
+            if (mc.thePlayer != null && Utils.inSkyblock) {
+                for (i in 0..8) {
+                    hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
+                }
+            }
+        }
     }
 
     @SubscribeEvent
