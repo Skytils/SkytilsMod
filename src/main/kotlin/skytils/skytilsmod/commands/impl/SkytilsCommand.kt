@@ -268,6 +268,13 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
             "waypoint", "waypoints" -> Skytils.displayScreen = WaypointsGui()
             "notifications" -> Skytils.displayScreen = CustomNotificationsGui()
+            "pv" -> {
+                if (args.size == 1) {
+                    Skytils.displayScreen = ProfileGui(mc.thePlayer.uniqueID)
+                } else {
+                    Skytils.displayScreen = ProfileGui(Skytils.hylinAPI.getUUIDSync(args[1]))
+                }
+            }
             else -> UChat.chat("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
         }
     }
