@@ -33,7 +33,7 @@ enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting,
     EPIC("EPIC", EnumChatFormatting.DARK_PURPLE, Color(151, 0, 151)),
     LEGENDARY("LEGENDARY", EnumChatFormatting.GOLD, Color(255, 170, 0)),
     MYTHIC("MYTHIC", EnumChatFormatting.LIGHT_PURPLE, Color(255, 85, 255)),
-    DIVINE("DIVINE", EnumChatFormatting.DARK_RED, Color(170, 0, 0)),
+    DIVINE("DIVINE", EnumChatFormatting.AQUA, Color(85, 255, 255)),
     SUPREME("SUPREME", EnumChatFormatting.DARK_RED, Color(170, 0, 0)),
     SPECIAL("SPECIAL", EnumChatFormatting.RED, Color(255, 85, 85)),
     VERY_SPECIAL("VERY SPECIAL", EnumChatFormatting.RED, Color(170, 0, 0));
