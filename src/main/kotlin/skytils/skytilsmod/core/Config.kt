@@ -932,6 +932,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var autoSwitchChatChannel = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
+        description = "Adds a check to rendering in order to prevent crashes.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var fixFallingSandRendering = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Fix SBA Chroma",
         description = "Fixes SBA chroma with Patcher 1.6",
         category = "Miscellaneous", subcategory = "Fixes"

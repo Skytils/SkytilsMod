@@ -17,6 +17,8 @@
     "accessors.AccessorSettingsGui",
     "accessors.AccessorWorldInfo",
     "audio.MixinSoundManager",
+    "block.MixinBlockSlab",
+    "block.MixinBlockStairs",
     "crash.MixinCrashReport",
     "entity.MixinAbstractClientPlayer",
     "entity.MixinBossStatus",
