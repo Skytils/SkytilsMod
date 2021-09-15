@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.handlers
 
+import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.network.play.server.S02PacketChat
@@ -87,7 +88,12 @@ object ChatTabs {
                     it.value == event.button
                 }?.let {
                     selectedTab = it.key
-                    mc.ingameGUI.chatGUI.refreshChat()
+                    runCatching {
+                        mc.ingameGUI.chatGUI.refreshChat()
+                    }.onFailure { e ->
+                        e.printStackTrace()
+                        UChat.chat("§cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
+                    }
                     if (Skytils.config.autoSwitchChatChannel) {
                         Skytils.sendMessageQueue.addFirst(
                             when (selectedTab) {
@@ -112,14 +118,30 @@ object ChatTabs {
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        mc.ingameGUI.chatGUI.refreshChat()
+        runCatching {
+            mc.ingameGUI.chatGUI.refreshChat()
+        }.onFailure {
+            it.printStackTrace()
+            UChat.chat("§cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
+        }
     }
 
     enum class ChatTab(text: String, val isValid: (IChatComponent) -> Boolean) {
         ALL("A", { true }),
         PARTY("P", {
             val formatted = it.formattedText
-            formatted.startsWith("§r§9Party §8> ") || formatted.startsWith("§r§9P §8> ")
+            formatted.startsWith("§r§9Party §8> ") ||
+            formatted.startsWith("§r§9P §8> ") ||
+            formatted.endsWith("§r§ehas invited you to join their party!") ||
+            formatted.endsWith("§r§eto the party! They have §r§c60 §r§eseconds to accept.§r") ||
+            formatted == "§cThe party was disbanded because all invites expired and the party was empty§r" ||
+            formatted.endsWith("§r§ehas disbanded the party!§r") ||
+            formatted.endsWith("§r§ehas disconnected, they have §r§c5 §r§eminutes to rejoin before they are removed from the party.§r") ||
+            formatted.endsWith(" §r§ejoined the party.§r") ||
+            formatted.endsWith(" §r§ehas left the party.§r") ||
+            formatted.endsWith(" §r§ehas been removed from the party.§r") ||
+            formatted.startsWith("§eThe party was transferred to §r") ||
+            (formatted.startsWith("§eKicked §r") && formatted.endsWith("§r§e because they were offline.§r"))
         }),
         GUILD("G", {
             val formatted = it.formattedText
@@ -130,7 +152,7 @@ object ChatTabs {
             formatted.startsWith("§dTo ") || formatted.startsWith("§dFrom ")
         });
 
-        val button = CleanButton(-69420, 2 + 20 * ordinal, 0, 20, 20, text)
+        val button = CleanButton(-69420, 2 + 22 * ordinal, 0, 20, 20, text)
 
         companion object {
             val buttons by lazy { values().associateWith { it.button } }
