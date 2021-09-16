@@ -76,29 +76,6 @@ class DungeonFeatures {
         private val mc = Minecraft.getMinecraft()
         private val deathOrPuzzleFail =
             Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
-        private val WATCHER_MOBS = arrayOf(
-            "Revoker",
-            "Psycho",
-            "Reaper",
-            "Cannibal",
-            "Mute",
-            "Ooze",
-            "Putrid",
-            "Freak",
-            "Leech",
-            "Tear",
-            "Parasite",
-            "Flamer",
-            "Skull",
-            "Mr. Dead",
-            "Vader",
-            "Frost",
-            "Walker",
-            "Wandering Soul",
-            "Bonzo",
-            "Scarf",
-            "Livid"
-        )
         private val thornMissMessages = arrayOf(
             "chickens",
             "shot",
