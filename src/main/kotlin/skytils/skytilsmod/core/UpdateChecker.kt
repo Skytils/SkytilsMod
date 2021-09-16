@@ -99,7 +99,7 @@ object UpdateChecker {
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             // TODO Make this dynamic and fetch latest one or something
             val url =
-                "https://cdn.discordapp.com/attachments/807303259902705685/864882597342740511/SkytilsInstaller-1.1-SNAPSHOT.jar"
+                "https://cdn.discordapp.com/attachments/881403326938353684/888153558321594438/SkytilsInstaller-1.1.1.jar"
             val taskFile = File(taskDir, getJarNameFromUrl(url))
             if (taskDir.mkdirs() || taskFile.createNewFile()) {
                 println("Downloading Skytils delete task.")
