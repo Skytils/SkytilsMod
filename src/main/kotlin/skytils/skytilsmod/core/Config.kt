@@ -2178,8 +2178,10 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         registerListener("protectItemBINThreshold") { threshold: String ->
-            val numeric = threshold.replace(Regex("[^0-9]"), "")
-            protectItemBINThreshold = numeric.ifEmpty { "0" }
+            TickTask(1) {
+                val numeric = threshold.replace(Regex("[^0-9]"), "")
+                protectItemBINThreshold = numeric.ifEmpty { "0" }
+            }
         }
 
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
@@ -2188,8 +2190,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         registerListener("apiKey") { key: String ->
             Skytils.hylinAPI.key = key
         }
-
-        this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
     }
 
     fun init() {
@@ -2217,6 +2217,9 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()
                     }
+                }
+                ver < UpdateChecker.SkytilsVersion("1.0.7") -> {
+                    this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
                 }
             }
         }
