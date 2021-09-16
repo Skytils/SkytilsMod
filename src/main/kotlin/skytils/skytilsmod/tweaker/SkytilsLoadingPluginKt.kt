@@ -25,7 +25,6 @@ import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.spongepowered.asm.launch.MixinBootstrap
 import org.spongepowered.asm.mixin.MixinEnvironment
-import skytils.skytilsmod.core.Config
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.startsWithAny
@@ -131,7 +130,6 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 SkytilsLoadingPlugin.exit()
             }
         }
-        Config.startup()
     }
 
     override fun getASMTransformerClass(): Array<String> {

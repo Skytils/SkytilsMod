@@ -20,7 +20,6 @@ package skytils.skytilsmod
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import gg.essential.vigilance.Vigilance
 import gg.essential.vigilance.gui.SettingsGui
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -108,10 +107,8 @@ class Skytils {
 
         val config = Config
 
-        @JvmStatic
-        val modDir by lazy {
-            File(File(mc.mcDataDir, "config"), "skytils")
-        }
+        @JvmField
+        val modDir = File(File(mc.mcDataDir, "config"), "skytils")
 
         @JvmStatic
         lateinit var guiManager: GuiManager
