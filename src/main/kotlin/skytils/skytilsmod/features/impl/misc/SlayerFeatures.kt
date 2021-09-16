@@ -18,11 +18,14 @@
 package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -41,10 +44,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.IChatComponent
+import net.minecraft.util.*
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -54,6 +54,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
@@ -63,6 +64,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.BlockChangeEvent
 import skytils.skytilsmod.events.CheckRenderEntityEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.RenderHUDEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -444,6 +446,41 @@ class SlayerFeatures {
                 printDevMessage("Slayer not riding, removing guardian", "slayer", "seraph", "seraphRadiation")
                 event.isCanceled = true
             }
+        }
+    }
+
+
+    @SubscribeEvent
+    fun onRenderHud(event: RenderHUDEvent) {
+        if (!Utils.inSkyblock) return
+        if (Skytils.config.highlightYangGlyph) {
+            val pos = Vec3(yangGlyph).addVector(0.5, 0.5, 0.5) ?: yangGlyphEntity?.positionVector ?: return
+            val x = UResolution.scaledWidth / 2.0
+            val y = UResolution.scaledHeight / 2.0
+            val angle: Double = -(MathHelper.atan2(
+                pos.xCoord - mc.thePlayer.posX,
+                pos.zCoord - mc.thePlayer.posZ
+            ) * 57.29577951308232) - mc.thePlayer.rotationYaw
+            GlStateManager.pushMatrix()
+            GlStateManager.translate(x, y, 0.0)
+            GlStateManager.rotate(angle.toFloat(), 0f, 0f, 1f)
+            GlStateManager.translate(-x, -y, 0.0)
+            GlStateManager.enableBlend()
+            GlStateManager.disableTexture2D()
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+            val tes = Tessellator.getInstance()
+            val wr = tes.worldRenderer
+            Skytils.config.yangGlyphColor.withAlpha(255).bindColor()
+            GL11.glLineWidth(5f)
+            wr.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
+            wr.pos(x + 10, y + 45, 0.0).endVertex()
+            wr.pos(x, y, 0.0).endVertex()
+            wr.pos(x - 10, y + 45, 0.0).endVertex()
+            tes.draw()
+
+            GlStateManager.enableTexture2D()
+            GlStateManager.disableBlend()
+            GlStateManager.popMatrix()
         }
     }
 
