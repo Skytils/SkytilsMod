@@ -680,21 +680,24 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     @Property(
         type = PropertyType.SWITCH, name = "Show Griffin Burrows",
         description = "Shows the location of burrows during the event.\n§cThis feature requires your API key to be set in general settings.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow", "Waypoint", "ESP"]
     )
     var showGriffinBurrows = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Burrow Particle Add-on",
         description = "Uses particles in addition to the API in order to locate burrows.\nThis feature will help find burrows when the API isn't working.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow", "Waypoint", "ESP"]
     )
     var particleBurrows = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Time Until Burrow Refresh",
         description = "Displays the amount of time until the next refresh.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var showGriffinCountdown = false
 
@@ -702,84 +705,95 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Castle",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Castle warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowCastleFastTravel = false
 
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Crypts",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Crypts warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowCryptsFastTravel = false
 
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Dark Auction",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the DA warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowDarkAuctionFastTravel = false
 
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Hub",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Hub warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowHubFastTravel = false
 
     @Property(
         type = PropertyType.COLOR, name = "Empty/Start Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var emptyBurrowColor = Color(173, 216, 230)
 
     @Property(
         type = PropertyType.COLOR, name = "Mob Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var mobBurrowColor = Color(173, 216, 230)
 
     @Property(
         type = PropertyType.COLOR, name = "Treasure Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var treasureBurrowColor = Color(173, 216, 230)
 
     @Property(
         type = PropertyType.SWITCH, name = "Broadcast Rare Drop Notifications",
         description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Tracker"]
     )
     var broadcastMythCreatureDrop = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Display Gaia Construct Hits",
         description = "Tracks the amount of times a Gaia Construct has been hit.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth"]
     )
     var trackGaiaHits = false
 
-    @Property(
+/*    @Property(
         type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
         description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
         category = "Events", subcategory = "Mythological"
-    )
+    )*/
     var removeLeftOverBleeds = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Track Mythological Creatures",
         description = "Tracks and saves drops from Mythological Creatures.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Tracker"]
     )
     var trackMythEvent = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Trick or Treat Chest Alert",
         description = "Displays a title when any trick or treat chest spawns near you.",
-        category = "Events", subcategory = "Spooky"
+        category = "Events", subcategory = "Spooky",
+        searchTags = ["Spooky Chest", "Spooky"]
     )
     var trickOrTreatChestAlert = false
 
@@ -1413,18 +1427,19 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var preventLogSpam = false
 
-    // TODO get Sk1er LLC to make a number text box
     @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
         description = "Prevents you from dropping, salvaging, or selling items worth more than this value. Based on Lowest BIN price.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock"]
     )
     var protectItemBINThreshold = "0"
 
     @Property(
         type = PropertyType.SWITCH, name = "Protect Starred Items",
         description = "Prevents you from dropping, salvaging, or selling starred dungeon items.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock"]
     )
     var protectStarredItems = false
 
