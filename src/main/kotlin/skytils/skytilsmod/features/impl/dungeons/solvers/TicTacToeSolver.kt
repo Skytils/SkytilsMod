@@ -54,7 +54,7 @@ class TicTacToeSolver {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (ticks % 20 == 0) {
             ticks = 0
-            if (DungeonListener.missingPuzzles.contains("Tic Tac Toe")) {
+            if (DungeonListener.missingPuzzles.contains("Tic Tac Toe") || Utils.azooPuzzoo) {
                 val frames = mc.theWorld.loadedEntityList.filter {
                     if (it !is EntityItemFrame) return@filter false
                     val realPos = it.position.down()

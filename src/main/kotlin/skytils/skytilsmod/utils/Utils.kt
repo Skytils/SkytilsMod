@@ -56,6 +56,11 @@ import kotlin.math.roundToInt
 
 
 object Utils {
+
+    val azooPuzzoo by lazy {
+        File(Skytils.modDir, "azoopuzzoo").exists()
+    }
+
     @JvmField
     var noSychic = false
 
