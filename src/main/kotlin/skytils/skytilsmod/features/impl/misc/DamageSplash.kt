@@ -69,6 +69,7 @@ class DamageSplash {
             }
             spawnEntity(
                 DamageSplashEntity(
+                    entity,
                     damage,
                     Location(entity.posX, entity.posY + 1.5, entity.posZ)
                 )
