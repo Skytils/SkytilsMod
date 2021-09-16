@@ -24,14 +24,18 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import skytils.skytilsmod.mixins.hooks.entity.EntityLivingBaseHookKt;
+import skytils.skytilsmod.mixins.hooks.entity.EntityLivingBaseHook;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends Entity {
+
+    @Unique
+    private final EntityLivingBaseHook hook = new EntityLivingBaseHook((EntityLivingBase) (Object) this);
 
     public MixinEntityLivingBase(World worldIn) {
         super(worldIn);
@@ -39,16 +43,21 @@ public abstract class MixinEntityLivingBase extends Entity {
 
     @Inject(method = "isPotionActive(Lnet/minecraft/potion/Potion;)Z", at = @At("HEAD"), cancellable = true)
     private void modifyPotionActive(Potion potion, CallbackInfoReturnable<Boolean> cir) {
-        EntityLivingBaseHookKt.modifyPotionActive(potion, cir);
+        hook.modifyPotionActive(potion.id, cir);
     }
 
     @Inject(method = "isPotionActive(I)Z", at = @At("HEAD"), cancellable = true)
     private void modifyPotionActive(int potionId, CallbackInfoReturnable<Boolean> cir) {
-        EntityLivingBaseHookKt.modifyPotionActive(potionId, cir);
+        hook.modifyPotionActive(potionId, cir);
     }
 
     @Redirect(method = "onDeathUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDDDD[I)V"))
     private void spawnParticle(World world, EnumParticleTypes particleType, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int[] p_175688_14_) {
-        EntityLivingBaseHookKt.removeDeathParticle(world, particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, p_175688_14_);
+        hook.removeDeathParticle(world, particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, p_175688_14_);
+    }
+
+    @Inject(method = "isChild", at = @At("HEAD"), cancellable = true)
+    private void setChildState(CallbackInfoReturnable<Boolean> cir) {
+        hook.isChild(cir);
     }
 }

@@ -17,43 +17,47 @@
  */
 package skytils.skytilsmod.mixins.hooks.entity
 
-import skytils.skytilsmod.Skytils
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import net.minecraft.world.World
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.Entity
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.potion.Potion
-import org.spongepowered.asm.mixin.Mixin
-import org.spongepowered.asm.mixin.injection.*
-import skytils.skytilsmod.utils.*
+import net.minecraft.util.EnumParticleTypes
+import net.minecraft.world.World
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.Utils
+import kotlin.random.Random
 
-fun modifyPotionActive(potion: Potion, cir: CallbackInfoReturnable<Boolean>) {
-    if (!Utils.inSkyblock) return
-    if (Skytils.config.disableNightVision && potion === Potion.nightVision) {
-        cir.returnValue = false
+class EntityLivingBaseHook(val entity: EntityLivingBase) {
+
+    val isBreefing by lazy {
+        Utils.inSkyblock && entity.name == "Breefing" && entity is EntityPlayer && Random.nextInt(100) < 3
     }
-}
 
-fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {
-    if (!Utils.inSkyblock) return
-    if (Skytils.config.disableNightVision && potionId == Potion.nightVision.id) {
-        cir.returnValue = false
+    fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {
+        if (!Utils.inSkyblock) return
+        if (Skytils.config.disableNightVision && potionId == Potion.nightVision.id && entity is EntityPlayerSP) {
+            cir.returnValue = false
+        }
     }
-}
 
-fun removeDeathParticle(
-    world: World,
-    particleType: EnumParticleTypes,
-    xCoord: Double,
-    yCoord: Double,
-    zCoord: Double,
-    xOffset: Double,
-    yOffset: Double,
-    zOffset: Double,
-    p_175688_14_: IntArray
-) {
-    if (!(Skytils.config.hideDeathParticles && particleType == EnumParticleTypes.EXPLOSION_NORMAL)) {
-        world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
+    fun removeDeathParticle(
+        world: World,
+        particleType: EnumParticleTypes,
+        xCoord: Double,
+        yCoord: Double,
+        zCoord: Double,
+        xOffset: Double,
+        yOffset: Double,
+        zOffset: Double,
+        p_175688_14_: IntArray
+    ) {
+        if (!(Skytils.config.hideDeathParticles && particleType == EnumParticleTypes.EXPLOSION_NORMAL)) {
+            world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
+        }
+    }
+
+    fun isChild(cir: CallbackInfoReturnable<Boolean>) {
+        cir.returnValue = isBreefing
     }
 }

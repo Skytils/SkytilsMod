@@ -65,7 +65,8 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
 object SplashProgressTransformer {
     val gifs = mapOf(
         0.0 to ResourceLocation("skytils", "sychicpet.gif"),
-        90.0 to ResourceLocation("skytils", "sychiccat.png"),
+        88.5 to ResourceLocation("skytils", "sychiccat.png"),
+        94.5 to ResourceLocation("skytils", "breefingdog.png"),
         96.0 to ResourceLocation("skytils", "azoopet.gif"),
         99.0 to ResourceLocation("skytils", "abdpfp.gif"),
         // this is the chance of winning the jackpot on the lottery, but even less due to a loss of precision
