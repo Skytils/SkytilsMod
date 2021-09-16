@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import gg.essential.universal.UDesktop
+import gg.essential.vigilance.Vigilance
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
@@ -29,6 +30,7 @@ import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import java.awt.Color
 import java.io.File
 import java.net.URI
+import kotlin.concurrent.fixedRateTimer
 
 object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
@@ -774,11 +776,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var trackGaiaHits = false
 
-/*    @Property(
-        type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
-        description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
-        category = "Events", subcategory = "Mythological"
-    )*/
+    /*    @Property(
+            type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
+            description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
+            category = "Events", subcategory = "Mythological"
+        )*/
     var removeLeftOverBleeds = false
 
     @Property(
@@ -2176,24 +2178,38 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "seraphHitsPhaseColor",
             "seraphNormalPhaseColor"
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
+    }
 
+    fun startup() {
+        try {
+            this::class.java.superclass.getDeclaredMethod("readData").apply {
+                isAccessible = true
+                invoke(this@Config)
+            }
+        } catch (e: Throwable) {
+            writeData()
+            println("Failed to read Skytils config data")
+            e.printStackTrace()
+        }
+
+        fixedRateTimer(period = 30 * 1000L) { writeData() }
+
+        Runtime.getRuntime().addShutdownHook(Thread { writeData() })
+    }
+
+    fun init() {
+        Vigilance.initialize()
         registerListener("protectItemBINThreshold") { threshold: String ->
             TickTask(1) {
                 val numeric = threshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
             }
         }
-
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
-
         registerListener("apiKey") { key: String ->
             Skytils.hylinAPI.key = key
         }
-    }
-
-    fun init() {
-        initialize()
         if (Skytils.config.lastLaunchedVersion != Skytils.VERSION) {
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
@@ -2217,14 +2233,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()
                     }
-                }
-                ver < UpdateChecker.SkytilsVersion("1.0.7") -> {
                     this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
+
                 }
             }
+            Skytils.config.lastLaunchedVersion = Skytils.VERSION
+            Skytils.config.markDirty()
         }
-        Skytils.config.lastLaunchedVersion = Skytils.VERSION
-        Skytils.config.markDirty()
     }
 
     private object ConfigSorting : SortingBehavior() {
