@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import skytils.skytilsmod.core.Config;
 
 @Mixin(BlockStairs.class)
@@ -37,7 +38,7 @@ abstract public class MixinBlockStairs extends Block {
         super(materialIn);
     }
 
-    @Inject(method = "doesSideBlockRendering", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/state/IBlockState;getValue(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;", ordinal = 0), cancellable = true)
+    @Inject(method = "doesSideBlockRendering", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/state/IBlockState;getValue(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;", ordinal = 0), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void checkRendering(IBlockAccess world, BlockPos pos, EnumFacing face, CallbackInfoReturnable<Boolean> cir, IBlockState iblockstate) {
         if (Config.INSTANCE.getFixFallingSandRendering() && !(iblockstate.getBlock() instanceof BlockStairs)) cir.setReturnValue(true);
     }
