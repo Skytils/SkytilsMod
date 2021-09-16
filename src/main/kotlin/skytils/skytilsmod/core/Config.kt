@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.core
 
+import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
@@ -27,6 +28,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import java.awt.Color
 import java.io.File
+import java.net.URI
 
 object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
@@ -60,6 +62,17 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["Simple", "Advanced"]
     )
     var commandAliasMode = 0
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Join the Skytils Discord",
+        description = "Join the Skytils Discord server for help using any of the features.",
+        category = "General", subcategory = "Other",
+        placeholder = "Join"
+    )
+    @Suppress("unused")
+    fun openDiscordLink() {
+        UDesktop.browse(URI.create("https://discord.gg/skytils"));
+    }
 
     @Property(
         type = PropertyType.SWITCH, name = "First Launch",
@@ -998,8 +1011,9 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Item Cooldown Display",
-        description = "Displays the cooldowns for your items.",
-        category = "Miscellaneous", subcategory = "Items"
+        description = "Displays the cooldowns for your items. Items must be whitelisted with the /trackcooldown command.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["Wither Impact", "Hyperion", "Wither Shield"]
     )
     var itemCooldownDisplay = false
 
