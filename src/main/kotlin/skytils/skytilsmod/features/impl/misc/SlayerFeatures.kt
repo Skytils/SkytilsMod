@@ -454,7 +454,7 @@ class SlayerFeatures {
     fun onRenderHud(event: RenderHUDEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.highlightYangGlyph) {
-            val pos = Vec3(yangGlyph).addVector(0.5, 0.5, 0.5) ?: yangGlyphEntity?.positionVector ?: return
+            val pos = yangGlyph.toVec3()?.addVector(0.5, 0.5, 0.5) ?: yangGlyphEntity?.positionVector ?: return
             val x = UResolution.scaledWidth / 2.0
             val y = UResolution.scaledHeight / 2.0
             val angle: Double = -(MathHelper.atan2(

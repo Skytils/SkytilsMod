@@ -263,3 +263,5 @@ fun CheckboxComponent.toggle() {
 fun CheckboxComponent.setState(checked: Boolean) {
     if (this.checked != checked) this.toggle()
 }
+
+fun BlockPos?.toVec3() = if (this == null) null else Vec3(this)
