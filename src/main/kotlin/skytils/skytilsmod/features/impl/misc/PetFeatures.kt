@@ -55,6 +55,8 @@ import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
 class PetFeatures {
+    val petItems = HashMap<String, Boolean>()
+
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
@@ -109,50 +111,39 @@ class PetFeatures {
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.petItemConfirmation && (event.packet is C02PacketUseEntity || event.packet is C08PacketPlayerBlockPlacement)) {
-            val item = mc.thePlayer.heldItem
-            if (item != null) {
-                val itemId = getSkyBlockItemID(item)
-                if (itemId != null) {
-                    var isPetItem =
-                        (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY") || itemId.startsWith(
-                            "PET_SKIN_"
-                        )
-                    if (!isPetItem) {
-                        val lore = getItemLore(item)
-                        for (i in lore.size - 1 downTo 1) {
-                            val line = lore[i]
-                            if (line.contains("PET ITEM")) {
-                                isPetItem = true
-                                break
-                            }
-                        }
+            val item = mc.thePlayer.heldItem ?: return
+            val itemId = getSkyBlockItemID(item) ?: return
+            if (itemId !in petItems) {
+                val isPetItem =
+                    (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY") || itemId.startsWith(
+                        "PET_SKIN_"
+                    ) || getItemLore(item).asReversed().any {
+                        it.contains("PET ITEM")
                     }
-                    if (isPetItem) {
-                        if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
-                            event.isCanceled = true
-                            if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
-                                lastPetLockNotif = System.currentTimeMillis()
-                                val cc =
-                                    ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.")
-                                cc.chatStyle = cc.chatStyle
-                                    .setChatClickEvent(
-                                        ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
-                                            "/disableskytilspetitemlock"
-                                        )
-                                    )
-                                    .setChatHoverEvent(
-                                        HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
-                                            ChatComponentText("Click to disable the pet item lock for 5 seconds.")
-                                        )
-                                    )
-                                mc.thePlayer.addChatMessage(cc)
-                            }
-                        } else {
-                            lastPetConfirmation = 0
+                petItems[itemId] = isPetItem
+            }
+            if (petItems[itemId] == true) {
+                if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
+                    event.isCanceled = true
+                    if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
+                        lastPetLockNotif = System.currentTimeMillis()
+                        val cc =
+                            ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.")
+                        cc.chatStyle.also {
+                            it.chatClickEvent =
+                                ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/disableskytilspetitemlock"
+                                )
+                            it.chatHoverEvent = HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("Click to disable the pet item lock for 5 seconds.")
+                            )
                         }
+                        mc.thePlayer.addChatMessage(cc)
                     }
+                } else {
+                    lastPetConfirmation = 0
                 }
             }
         }
