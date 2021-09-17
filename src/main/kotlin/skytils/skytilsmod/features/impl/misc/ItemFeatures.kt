@@ -132,8 +132,10 @@ class ItemFeatures {
         if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return
         val slot = event.slot
 
-        if (slot.inventory == mc.thePlayer.inventory && slot.slotIndex in 0..8) {
-            hotbarRarityCache[slot.slotIndex] = ItemUtil.getRarity(slot.stack)
+        if (mc.thePlayer.inventory === slot.inventory && slot.slotIndex in 0..8) {
+            for (i in 0..8) {
+                hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
+            }
         }
 
         val item = slot.stack ?: return
