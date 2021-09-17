@@ -311,7 +311,7 @@ class Skytils {
                     ?.let { ScoreboardUtil.cleanSB(it.displayName).contains("SKYBLOCK") } ?: false
                 Utils.inDungeons = Utils.inSkyblock && ScoreboardUtil.sidebarLines.any {
                     ScoreboardUtil.cleanSB(it).run {
-                        contains("The Catacombs") && !contains("Queue") || contains("Dungeon Cleared:")
+                        (contains("The Catacombs") && !contains("Queue")) || contains("Dungeon Cleared:")
                     }
                 }
             }
