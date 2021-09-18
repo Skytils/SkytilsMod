@@ -222,21 +222,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             }
         }
 
-        filters.forEach {
-            if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
-            if (it.check(if (it.formatted) formatted else unformatted) && it.state > 0) {
-                cancelChatPacket(event, it.state == 2)
-                return
-            }
-        }
-
-        repoFilters.forEach {
-            if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
-            if (it.check(if (it.formatted) formatted else unformatted) && it.state > 0) {
-                cancelChatPacket(event, it.state == 2)
-                return
-            }
-        }
+        if (filters.any {
+                checkFilter(it, formatted, unformatted, event)
+            } || repoFilters.any { checkFilter(it, formatted, unformatted, event) }) return
 
         if (!Utils.inSkyblock) return
         try {
@@ -653,6 +641,15 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun checkFilter(filter: Filter, formatted: String, unformatted: String, event: ReceiveEvent): Boolean {
+        if (filter.skyblockOnly && !Utils.inSkyblock) return false
+        if (filter.check(if (filter.formatted) formatted else unformatted) && filter.state > 0) {
+            cancelChatPacket(event, filter.state == 2)
+            return true
+        }
+        return false
     }
 
     class SpamMessage(var message: String, var time: Long, var height: Double)
