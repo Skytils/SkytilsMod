@@ -22,7 +22,6 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -56,6 +55,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
@@ -76,6 +76,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
+import kotlin.math.abs
 import kotlin.math.floor
 
 
@@ -92,6 +93,28 @@ class SlayerFeatures {
                     ?.substringAfter("Voidgloom Seraph")?.drop(1)
                     ?: ""
             expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
+        }
+        if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
+        if (Skytils.config.experimentalYangGlyphDetection && yangGlyphEntity == null && yangGlyph == null && slayerEntity != null) {
+            val suspect = mc.theWorld.getEntitiesWithinAABB(
+                EntityArmorStand::class.java,
+                slayerEntity!!.entityBoundingBox.expand(20.69, 20.69, 20.69)
+            ) { e ->
+                e as EntityArmorStand
+                e.ticksExisted <= 300 && lastYangGlyphSwitchTicks + 5 > e.ticksExisted && e.inventory[4]?.item == Item.getItemFromBlock(
+                    Blocks.beacon
+                )
+            }.minByOrNull { abs(lastYangGlyphSwitchTicks - it.ticksExisted) + slayerEntity!!.getDistanceSqToEntity(it) }
+            if (suspect != null) {
+                printDevMessage(
+                    "Found suspect glyph, ${lastYangGlyphSwitchTicks} switched, ${suspect.ticksExisted} existed, ${
+                        slayerEntity!!.getDistanceSqToEntity(
+                            suspect
+                        )
+                    } distance", "slayer", "seraph", "seraphGlyph"
+                )
+                yangGlyphEntity = suspect
+            }
         }
         if (ticks % 4 == 0) {
             if (Skytils.config.rev5TNTPing) {
@@ -241,6 +264,7 @@ class SlayerFeatures {
                             .and(4095) == 0
                     ) {
                         lastYangGlyphSwitch = System.currentTimeMillis()
+                        lastYangGlyphSwitchTicks = 0
                         thrownBoundingBox = entityBoundingBox
                         createTitle("§cYang Glyph!", 30)
                     }
@@ -293,12 +317,22 @@ class SlayerFeatures {
             return
         }
         if (slayerEntity == null) return
-        if (yangGlyphEntity != null) {
-            printDevMessage("Glyph Entity exists", "slayer", "seraph", "seraphGlyph")
-            if (event.update.block is BlockBeacon && yangGlyphEntity!!.position.distanceSq(event.pos) < 9) {
-                printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
-                yangGlyph = event.pos
-                yangGlyphEntity = null
+        if (event.update.block is BlockBeacon) {
+            if (yangGlyphEntity != null) {
+                printDevMessage("Glyph Entity exists", "slayer", "seraph", "seraphGlyph")
+                if (event.update.block is BlockBeacon && yangGlyphEntity!!.position.distanceSq(event.pos) <= 3.5 * 3.5) {
+                    printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
+                    yangGlyph = event.pos
+                    yangGlyphEntity = null
+                }
+            }
+            if (Skytils.config.experimentalYangGlyphDetection && yangGlyph == null && slayerEntity != null) {
+                if (lastYangGlyphSwitchTicks <= 5 && slayerEntity!!.getDistanceSq(event.pos) <= 5 * 5) {
+                    printDevMessage(
+                        "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
+                    )
+                    yangGlyph = event.pos
+                }
             }
         }
     }
@@ -370,6 +404,7 @@ class SlayerFeatures {
                             )
                             yangGlyphEntity = e
                             lastYangGlyphSwitch = -1L
+                            lastYangGlyphSwitchTicks = -1
                         }
                     } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
                             .intersectsWith(slayerEntity!!.entityBoundingBox)
@@ -538,6 +573,8 @@ class SlayerFeatures {
                         }
                         slayerEntity = null
                         nukekebiHeads.clear()
+                        lastYangGlyphSwitch = -1L
+                        lastYangGlyphSwitchTicks = -1
                     }
                 }
             }
@@ -803,7 +840,6 @@ class SlayerFeatures {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         private var ticks = 0
         private val ZOMBIE_MINIBOSSES = arrayOf(
             "§cRevenant Sycophant",
@@ -826,6 +862,7 @@ class SlayerFeatures {
         private val hitMap = HashMap<EntityEnderman, Int>()
         var yangGlyph: BlockPos? = null
         var lastYangGlyphSwitch: Long = -1L
+        var lastYangGlyphSwitchTicks = -1
         var thrownBoundingBox: AxisAlignedBB? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()

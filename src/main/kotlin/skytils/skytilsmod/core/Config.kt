@@ -1708,6 +1708,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var showSeraphDisplay = false
 
+
+    @Property(
+        PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
+        description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var experimentalYangGlyphDetection = false
+
     @Property(
         PropertyType.SWITCH, name = "Yang Glyph Ping",
         description = "Alerts you when the Voidgloom Seraph throws down a Yang Glyph(beacon).",
