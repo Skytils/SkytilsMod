@@ -24,7 +24,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 
 fun addColoredNamesCheck() = modify("me.Danker.features.ColouredNames") {
-    findMethod("onRenderLiving", "(Lnet.minecraftforge.client.event.RenderLivingEvent.Specials.Pre;)V").also { n ->
+    classNode.methods.firstOrNull { it.name == "onRenderLiving" }?.let { n ->
         for (insn in n.instructions) {
             if (insn is MethodInsnNode) {
                 if (insn.owner == "net/minecraft/entity/Entity" && insn.name == "func_145818_k_" && insn.desc == "()Z") {
