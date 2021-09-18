@@ -55,7 +55,7 @@ class SpamHiderGui : WindowScreen() {
 
     init {
         saveButton.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
         }
     }
 

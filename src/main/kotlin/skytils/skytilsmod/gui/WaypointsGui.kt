@@ -90,7 +90,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = 0.pixels()
             y = 0.pixels()
         }.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
         }
 
         SimpleButton("New Waypoints").childOf(bottomButtons).constrain {
@@ -104,7 +104,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = 5.pixels()
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
             TickTask(2) {
                 Skytils.displayScreen = WaypointShareGui()
             }

@@ -99,7 +99,7 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
             x = 0.pixels()
             y = 0.pixels()
         }.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
         }
 
         SimpleButton("Import from Clipboard").childOf(bottomButtons).constrain {
