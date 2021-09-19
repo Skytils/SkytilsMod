@@ -49,7 +49,7 @@ object DSMColoredNamesTransformer {
     @JvmStatic
     fun modifyColoredNamesCheck(entity: Entity): Boolean {
         val customName = entity.customNameTag
-        return customName.isNotEmpty() && !customName.endsWith("§c❤") && !customName
-            .endsWith(" Hits")
+        return customName.isNotEmpty() && !customName.endsWith("§c❤") && !customName.dropLastWhile { it == 's' }
+            .endsWith(" Hit")
     }
 }

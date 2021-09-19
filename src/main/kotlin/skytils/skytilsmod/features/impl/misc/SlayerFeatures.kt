@@ -626,7 +626,8 @@ class SlayerFeatures {
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 if (slayerNameEntity != null) {
-                    if (slayerNameEntity!!.displayName.formattedText.contains("Hits")) {
+                    if (slayerNameEntity!!.displayName.formattedText.dropLastWhile { it == 's' }
+                            .endsWith(" Hit")) {
                         ScreenRenderer.fontRenderer.drawString(
                             "§dShield Phase",
                             if (leftAlign) 0f else width.toFloat(),

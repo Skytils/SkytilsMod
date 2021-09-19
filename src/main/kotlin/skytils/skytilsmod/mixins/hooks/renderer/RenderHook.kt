@@ -47,7 +47,8 @@ fun renderLivingLabel(
     maxDistance: Int,
     ci: CallbackInfo
 ) {
-    if (Skytils.config.lowerEndermanNametags && (str.contains("❤") || str.contains("Hits")) && (str.contains("Enderman") || str.contains(
+    if (Skytils.config.lowerEndermanNametags && (str.contains("❤") || str.dropLastWhile { it == 's' }
+            .endsWith(" Hit")) && (str.contains("Enderman") || str.contains(
             "Zealot"
         ) || str.contains("Voidling") || str.contains("Voidgloom"))
     ) {

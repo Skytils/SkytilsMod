@@ -38,7 +38,9 @@ fun setColorMultiplier(
         entity.hurtTime = 0
         if (yangGlyphEntity != null || yangGlyph != null) {
             cir.setReturnValue(Skytils.config.seraphBeaconPhaseColor.withAlpha(169))
-        } else if (slayerNameEntity != null && slayerNameEntity!!.customNameTag.endsWith("Hits")) {
+        } else if (slayerNameEntity != null && (slayerNameEntity!!.customNameTag.dropLastWhile { it == 's' }
+                .endsWith(" Hit"))
+        ) {
             cir.setReturnValue(Skytils.config.seraphHitsPhaseColor.withAlpha(169))
         } else cir.setReturnValue(Skytils.config.seraphNormalPhaseColor.withAlpha(169))
     }
