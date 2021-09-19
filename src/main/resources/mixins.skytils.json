@@ -28,6 +28,7 @@
     "gui.MixinGuiContainer",
     "gui.MixinGuiIngame",
     "gui.MixinGuiIngameForge",
+    "gui.MixinGuiMainMenu",
     "gui.MixinGuiNewChat",
     "gui.MixinGuiScreen",
     "inventory.MixinSlot",
@@ -66,6 +67,7 @@
   "verbose": true,
   "client": [
     "accessors.AccessorGuiChat",
+    "accessors.AccessorGuiMainMenu",
     "neu.MixinCustomAH",
     "renderer.MixinItemRenderer",
     "renderer.MixinRendererLivingEntity"
