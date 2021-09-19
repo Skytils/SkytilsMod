@@ -95,7 +95,7 @@ class SlayerFeatures {
             expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
         }
         if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
-        if (Skytils.config.experimentalYangGlyphDetection && yangGlyphEntity == null && yangGlyph == null && slayerEntity != null) {
+        if (Skytils.config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && yangGlyphEntity == null && yangGlyph == null && slayerEntity != null) {
             val suspect = mc.theWorld.getEntitiesWithinAABB(
                 EntityArmorStand::class.java,
                 slayerEntity!!.entityBoundingBox.expand(20.69, 20.69, 20.69)
@@ -107,7 +107,7 @@ class SlayerFeatures {
             }.minByOrNull { abs(lastYangGlyphSwitchTicks - it.ticksExisted) + slayerEntity!!.getDistanceSqToEntity(it) }
             if (suspect != null) {
                 printDevMessage(
-                    "Found suspect glyph, ${lastYangGlyphSwitchTicks} switched, ${suspect.ticksExisted} existed, ${
+                    "Found suspect glyph, $lastYangGlyphSwitchTicks switched, ${suspect.ticksExisted} existed, ${
                         slayerEntity!!.getDistanceSqToEntity(
                             suspect
                         )
@@ -314,6 +314,7 @@ class SlayerFeatures {
     fun onBlockChange(event: BlockChangeEvent) {
         if (yangGlyph != null && event.pos == yangGlyph && event.old.block is BlockBeacon && event.update.block is BlockAir) {
             yangGlyph = null
+            yangGlyphEntity = null
             return
         }
         if (slayerEntity == null) return
@@ -327,11 +328,12 @@ class SlayerFeatures {
                 }
             }
             if (Skytils.config.experimentalYangGlyphDetection && yangGlyph == null && slayerEntity != null) {
-                if (lastYangGlyphSwitchTicks <= 5 && slayerEntity!!.getDistanceSq(event.pos) <= 5 * 5) {
+                if (lastYangGlyphSwitchTicks in 0..5 && slayerEntity!!.getDistanceSq(event.pos) <= 5 * 5) {
                     printDevMessage(
                         "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
                     )
                     yangGlyph = event.pos
+                    lastYangGlyphSwitchTicks = -1
                 }
             }
         }
@@ -465,6 +467,10 @@ class SlayerFeatures {
         slayerNameEntity = null
         slayerTimerEntity = null
         hitMap.clear()
+        yangGlyph = null
+        yangGlyphEntity = null
+        lastYangGlyphSwitch = -1
+        lastYangGlyphSwitchTicks = -1
     }
 
     @SubscribeEvent
@@ -489,7 +495,8 @@ class SlayerFeatures {
     fun onRenderHud(event: RenderHUDEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.highlightYangGlyph) {
-            val pos = yangGlyph.toVec3()?.addVector(0.5, 0.5, 0.5) ?: yangGlyphEntity?.positionVector ?: return
+            val pos = yangGlyph.toVec3()?.addVector(0.5, 0.5, 0.5)
+                ?: yangGlyphEntity?.run { if (this.isEntityAlive) this else null }?.positionVector ?: return
             val x = UResolution.scaledWidth / 2.0
             val y = UResolution.scaledHeight / 2.0
             val angle: Double = -(MathHelper.atan2(
