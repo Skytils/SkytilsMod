@@ -31,7 +31,9 @@ import kotlin.random.Random
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
     val isBreefing by lazy {
-        Utils.inSkyblock && entity.name == "Breefing" && entity is EntityPlayer && Random.nextInt(100) < 3
+        Utils.inSkyblock && entity.name == "Breefing" && entity is EntityPlayer && (Utils.breefingdog || Random.nextInt(
+            100
+        ) < 3)
     }
 
     fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {

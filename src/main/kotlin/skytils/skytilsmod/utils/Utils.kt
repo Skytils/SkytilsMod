@@ -61,6 +61,10 @@ object Utils {
         File(Skytils.modDir, "azoopuzzoo").exists()
     }
 
+    val breefingdog by lazy {
+        File(Skytils.modDir, "breefingdog").exists()
+    }
+
     @JvmField
     var noSychic = false
 

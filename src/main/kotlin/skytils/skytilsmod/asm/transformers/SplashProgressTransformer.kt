@@ -75,9 +75,12 @@ object SplashProgressTransformer {
 
     @JvmStatic
     fun setForgeGif(resourceLocation: ResourceLocation): ResourceLocation {
-        return if (Utils.noSychic) resourceLocation else {
+        if (Utils.noSychic) return resourceLocation
+
+        if (Utils.breefingdog) return ResourceLocation("skytils", "breefingdog.png")
+        else {
             val weight = Random.nextDouble() * 100
-            (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
+            return (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
                 "skytils",
                 "sychicpet.gif"
             )).also {
