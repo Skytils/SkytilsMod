@@ -1731,6 +1731,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var highlightYangGlyph = false
 
     @Property(
+        PropertyType.SWITCH, name = "Point to Yang Glyph",
+        description = "Draws an arrow in the direction of the Yang Glyph Block.",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var pointYangGlyph = false
+
+    @Property(
         PropertyType.COLOR, name = "Yang Glyph Highlight Color",
         description = "Changes the color for the Yang Glyph block",
         category = "Slayer", subcategory = "Voidgloom Seraph"
