@@ -53,7 +53,7 @@ class MayorJerry {
         ) {
             val match = jerryType.find(formatted)
             if (match != null) {
-                if (Skytils.config.hiddenJerryTimer) UChat.chat("§bIt has been ${NumberUtil.nf.format((System.currentTimeMillis() - lastJerry) / 1000.0)} seconds since the last Jerry.")
+                if (Skytils.config.hiddenJerryTimer && lastJerry != -1L) UChat.chat("§bIt has been ${NumberUtil.nf.format((System.currentTimeMillis() - lastJerry) / 1000.0)} seconds since the last Jerry.")
                 lastJerry = System.currentTimeMillis()
                 val color = match.groups[1]!!.value
                 MayorJerryTracker.onJerry("§$color Jerry")
