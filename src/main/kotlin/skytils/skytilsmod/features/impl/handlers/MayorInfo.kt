@@ -36,6 +36,7 @@ import java.io.IOException
 import java.net.URLEncoder
 import java.time.ZonedDateTime
 import java.util.*
+import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -189,7 +190,7 @@ object MayorInfo {
                     Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
                 val nextPerks = (ZonedDateTime.now().withSecond(59).withNano(999999999)
                     .toEpochSecond() * 1000) + timeLeft.inWholeMilliseconds
-                if (jerryMayor != mayor || nextPerks != newJerryPerks) {
+                if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 10000) {
                     println("Jerry has ${mayor.name}'s perks ($perks) and is ending in $newJerryPerks ($${endingIn.stripControlCodes()})")
                     sendJerryData(mayor, nextPerks)
                 }
@@ -262,7 +263,7 @@ object MayorInfo {
     }
 
     fun sendJerryData(mayor: Mayor?, nextSwitch: Long) {
-        if (nextSwitch <= 0 || mayor == null) return
+        if (mayor == null || nextSwitch <= System.currentTimeMillis()) return
         Skytils.threadPool.submit {
             try {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
