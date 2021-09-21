@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S02PacketChat
@@ -644,10 +645,19 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     private fun checkFilter(filter: Filter, formatted: String, unformatted: String, event: ReceiveEvent): Boolean {
-        if (filter.skyblockOnly && !Utils.inSkyblock) return false
-        if (filter.check(if (filter.formatted) formatted else unformatted) && filter.state > 0) {
-            cancelChatPacket(event, filter.state == 2)
-            return true
+        runCatching {
+            if (filter.skyblockOnly && !Utils.inSkyblock) return false
+            if (filter.check(if (filter.formatted) formatted else unformatted) && filter.state > 0) {
+                cancelChatPacket(event, filter.state == 2)
+                return true
+            }
+        }.onFailure {
+            UChat.chat("§cSkytils ran into an error whilst checking your Spam Hider filters. Please send your logs to discord.gg/skytils.")
+            println("A ${it::class.simpleName} was thrown while checking Spam Hider Filter:")
+            println("Spam Filter: ${filter}")
+            println("Formatted Text: ${formatted}")
+            println("Unformatted Text: ${unformatted}")
+            it.printStackTrace()
         }
         return false
     }
