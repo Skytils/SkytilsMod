@@ -89,10 +89,21 @@ object ChatTabs {
                 }?.let {
                     selectedTab = it.key
                     runCatching {
-                        mc.ingameGUI.chatGUI.refreshChat()
+                        chat.refreshChat()
                     }.onFailure { e ->
                         e.printStackTrace()
                         UChat.chat("§cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
+                        chat.drawnChatLines.clear()
+                        chat.resetScroll()
+                        for (line in chat.chatLines.asReversed()) {
+                            if (line?.chatComponent == null) println("Null line found.")
+                            chat.invokeSetChatLine(
+                                line.chatComponent ?: continue,
+                                line.chatLineID,
+                                line.updatedCounter,
+                                true
+                            )
+                        }
                     }
                     if (Skytils.config.autoSwitchChatChannel) {
                         Skytils.sendMessageQueue.addFirst(
