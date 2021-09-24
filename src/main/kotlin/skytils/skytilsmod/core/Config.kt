@@ -847,11 +847,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var darkModeMist = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Highlight Completed Comissions",
-        description = "Marks completed comissions in the menu with a red background.",
+        type = PropertyType.SWITCH, name = "Highlight Completed Commissionss",
+        description = "Marks completed commissionss in the menu with a red background.",
         category = "Mining", subcategory = "Quality of Life"
     )
-    var highlightCompletedComissions = false
+    var highlightCompletedCommissions = false
 
     @Property(
         type = PropertyType.SWITCH, name = "More Visible Ghosts",
@@ -1515,7 +1515,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Cap Dolphin Pet Display",
-        description = "Caps the doplhin pet display to the effective maximum(5)",
+        description = "Caps the dolphin pet display to the effective maximum (5)",
         category = "Pets", subcategory = "Displays"
     )
     var dolphinCap = true

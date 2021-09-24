@@ -301,7 +301,7 @@ class MiningFeatures {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (event.slot.hasStack && SBInfo.lastOpenContainerName.equals("Commissions") && Skytils.config.highlightCompletedComissions) {
+        if (event.slot.hasStack && SBInfo.lastOpenContainerName.equals("Commissions") && Skytils.config.highlightCompletedCommissions) {
             val item = event.slot.stack
             if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
                 if (ItemUtil.getItemLore(item).any {

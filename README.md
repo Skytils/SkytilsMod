@@ -140,7 +140,7 @@ A Hypixel Skyblock Utilities mod.
  - Dark Mode Mist
  - More Visible Ghosts
  - Recolor Carpets
- - Highlight Completed Comissions
+ - Highlight Completed Commissionss
  - Crystal Hollows Map
  - Crystal Hollows Waypoints
 </details>
