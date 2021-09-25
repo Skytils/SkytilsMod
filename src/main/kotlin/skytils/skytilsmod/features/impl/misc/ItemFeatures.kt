@@ -568,14 +568,14 @@ class ItemFeatures {
         return mc.theWorld.getBlockState(pos).block.material.isSolid && (1..2).all {
             val newPos = pos.up(it)
             val newBlock = mc.theWorld.getBlockState(newPos)
-            if (sideHit === EnumFacing.UP && Utils.equalsOneOf(
+            if (sideHit === EnumFacing.UP && (Utils.equalsOneOf(
                     newBlock.block,
                     Blocks.fire,
                     Blocks.skull
-                )
+                ) || newBlock.block is BlockLiquid)
             ) return@all false
             if (sideHit !== EnumFacing.UP && newBlock.block is BlockSign) return@all false
-            if (newBlock.block is BlockLadder || newBlock.block is BlockDoor || newBlock.block is BlockLiquid) return@all false
+            if (newBlock.block is BlockLadder || newBlock.block is BlockDoor) return@all false
             return@all newBlock.block.isPassable(mc.theWorld, newPos)
         }
     }
