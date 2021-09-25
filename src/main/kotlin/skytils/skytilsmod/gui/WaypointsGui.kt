@@ -144,7 +144,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val island = SkyblockIsland.values()[selection]
             Waypoints.waypoints.filter {
                 it.island == island
-            }.forEach {
+            }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
                 addNewWaypoint(it.name, it.pos, it.enabled)
             }
         }
