@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UResolution
+import net.minecraft.block.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -28,8 +29,9 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.EnumParticleTypes
-import net.minecraft.util.Vec3
+import net.minecraft.pathfinding.PathNavigateGround
+import net.minecraft.util.*
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -49,6 +51,7 @@ import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
+import skytils.skytilsmod.mixins.hooks.renderer.instance
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -514,6 +517,63 @@ class ItemFeatures {
             )
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!Utils.inSkyblock) return
+        if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
+            val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
+            if (!extraAttr.getBoolean("ethermerge")) return
+            val dist = 57.0 + extraAttr.getInteger("tuned_transmission")
+            val vec3 = mc.thePlayer.getPositionEyes(event.partialTicks)
+            val vec31 = mc.thePlayer.getLook(event.partialTicks)
+            val vec32 = vec3.addVector(
+                vec31.xCoord * dist,
+                vec31.yCoord * dist,
+                vec31.zCoord * dist
+            )
+            val obj = mc.theWorld.rayTraceBlocks(vec3, vec32, true, false, true) ?: return
+            val block = obj.blockPos ?: return
+            if (isValidEtherwarpPos(obj)) {
+                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+
+                val x = block.x - viewerX
+                val y = block.y - viewerY
+                val z = block.z - viewerZ
+
+                GlStateManager.disableCull()
+                GlStateManager.disableDepth()
+                GlStateManager.enableBlend()
+                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+                RenderUtil.drawFilledBoundingBox(
+                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                    Skytils.config.showEtherwarpTeleportPosColor
+                )
+                GlStateManager.disableBlend()
+                GlStateManager.enableCull()
+                GlStateManager.enableDepth()
+            }
+        }
+    }
+
+    private fun isValidEtherwarpPos(obj: MovingObjectPosition): Boolean {
+        val pos = obj.blockPos
+        val sideHit = obj.sideHit
+
+        return mc.theWorld.getBlockState(pos).block.material.isSolid && (1..2).all {
+            val newPos = pos.up(it)
+            val newBlock = mc.theWorld.getBlockState(newPos)
+            if (sideHit === EnumFacing.UP && Utils.equalsOneOf(
+                    newBlock.block,
+                    Blocks.fire,
+                    Blocks.skull
+                )
+            ) return false
+            if (sideHit !== EnumFacing.UP && newBlock.block is BlockSign) return false
+            if (newBlock.block is BlockLadder || newBlock.block is BlockDoor || newBlock.block is BlockLiquid) return false
+            return newBlock.block.isPassable(mc.theWorld, newPos)
         }
     }
 
