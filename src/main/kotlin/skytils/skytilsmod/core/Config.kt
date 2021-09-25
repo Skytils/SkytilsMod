@@ -1081,7 +1081,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Color the thing that shows the block you will teleport to with the Etherwarp Transmission ability.",
         category = "Miscellaneous", subcategory = "Items"
     )
-    var showEtherwarpTeleportPosColor = Color(0, 0, 255, 204)
+    var showEtherwarpTeleportPosColor = Color(0, 0, 255, 69)
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Gemstones",

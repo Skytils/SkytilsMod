@@ -17,9 +17,11 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
-import net.minecraft.block.*
+import net.minecraft.block.BlockDoor
+import net.minecraft.block.BlockLadder
+import net.minecraft.block.BlockLiquid
+import net.minecraft.block.BlockSign
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -30,8 +32,10 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.pathfinding.PathNavigateGround
-import net.minecraft.util.*
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.MovingObjectPosition
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -52,7 +56,6 @@ import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.mixins.hooks.renderer.instance
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -537,19 +540,18 @@ class ItemFeatures {
             )
             val obj = mc.theWorld.rayTraceBlocks(vec3, vec32, true, false, true) ?: return
             val block = obj.blockPos ?: return
+            val state = mc.theWorld.getBlockState(block)
             if (isValidEtherwarpPos(obj)) {
                 val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-
-                val x = block.x - viewerX
-                val y = block.y - viewerY
-                val z = block.z - viewerZ
-
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
                 GlStateManager.enableBlend()
                 GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+                state.block.setBlockBoundsBasedOnState(mc.theWorld, block)
                 RenderUtil.drawFilledBoundingBox(
-                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                    state.block.getSelectedBoundingBox(mc.theWorld, block)
+                        .expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
+                        .offset(-viewerX, -viewerY, -viewerZ),
                     Skytils.config.showEtherwarpTeleportPosColor
                 )
                 GlStateManager.disableBlend()
