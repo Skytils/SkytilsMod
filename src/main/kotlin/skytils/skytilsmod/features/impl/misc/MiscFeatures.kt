@@ -24,7 +24,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
@@ -40,14 +39,12 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemMonsterPlacer
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Loader
@@ -277,49 +274,6 @@ class MiscFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Utils.inSkyblock) return
-        if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
-            val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
-            if (!extraAttr.getBoolean("ethermerge")) return
-            val dist = 57.0 + extraAttr.getInteger("tuned_transmission")
-            val vec3 = mc.thePlayer.getPositionEyes(event.partialTicks)
-            val vec31 = mc.thePlayer.getLook(event.partialTicks)
-            val vec32 = vec3.addVector(
-                vec31.xCoord * dist,
-                vec31.yCoord * dist,
-                vec31.zCoord * dist
-            )
-            val block = (mc.theWorld.rayTraceBlocks(vec3, vec32, true, false, true) ?: return).blockPos
-            if (mc.theWorld.getBlockState(block).block.material.isSolid && (1..2).none {
-                    mc.theWorld.getBlockState(
-                        block.up(
-                            it
-                        )
-                    ).block != Blocks.air
-                }) {
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-
-                val x = block.x - viewerX
-                val y = block.y - viewerY
-                val z = block.z - viewerZ
-
-                GlStateManager.disableCull()
-                GlStateManager.disableDepth()
-                GlStateManager.enableBlend()
-                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                RenderUtil.drawFilledBoundingBox(
-                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-                    Skytils.config.showEtherwarpTeleportPosColor
-                )
-                GlStateManager.disableBlend()
-                GlStateManager.enableCull()
-                GlStateManager.enableDepth()
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
@@ -439,7 +393,7 @@ class MiscFeatures {
                 }.size
             }
         }
-        if (Skytils.config.summoningEyeDisplay && SBInfo.mode != SkyblockIsland.TheEnd.mode) {
+        if (Skytils.config.summoningEyeDisplay && SBInfo.mode == SkyblockIsland.TheEnd.mode) {
             placedEyes = PlacedSummoningEyeDisplay.SUMMONING_EYE_FRAMES.count {
                 mc.theWorld.getBlockState(it).run {
                     block === Blocks.end_portal_frame && this.getValue(BlockEndPortalFrame.EYE)
