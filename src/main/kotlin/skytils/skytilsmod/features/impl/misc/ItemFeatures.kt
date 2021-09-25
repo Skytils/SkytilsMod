@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -570,10 +571,10 @@ class ItemFeatures {
                     Blocks.fire,
                     Blocks.skull
                 )
-            ) return false
-            if (sideHit !== EnumFacing.UP && newBlock.block is BlockSign) return false
-            if (newBlock.block is BlockLadder || newBlock.block is BlockDoor || newBlock.block is BlockLiquid) return false
-            return newBlock.block.isPassable(mc.theWorld, newPos)
+            ) return@all false
+            if (sideHit !== EnumFacing.UP && newBlock.block is BlockSign) return@all false
+            if (newBlock.block is BlockLadder || newBlock.block is BlockDoor || newBlock.block is BlockLiquid) return@all false
+            return@all newBlock.block.isPassable(mc.theWorld, newPos)
         }
     }
 
