@@ -259,14 +259,14 @@ class SlayerFeatures {
         if (packet is S1CPacketEntityMetadata) {
             if (packet.entityId == slayerEntity?.entityId && slayerEntity is EntityEnderman) {
                 (slayerEntity as EntityEnderman).apply {
-                    if (Skytils.config.yangGlyphPing && heldBlockState?.block == Blocks.beacon && ((packet.func_149376_c()
+                    if (heldBlockState?.block == Blocks.beacon && ((packet.func_149376_c()
                             .find { it.dataValueId == 16 } ?: return@apply).`object` as Short).toInt().and(65535)
                             .and(4095) == 0
                     ) {
                         lastYangGlyphSwitch = System.currentTimeMillis()
                         lastYangGlyphSwitchTicks = 0
                         thrownBoundingBox = entityBoundingBox
-                        createTitle("§cYang Glyph!", 30)
+                        if (Skytils.config.yangGlyphPing && !Skytils.config.yangGlyphPingOnLand) createTitle("§cYang Glyph!", 30)
                     }
                 }
             }
@@ -329,10 +329,12 @@ class SlayerFeatures {
                     printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
                     yangGlyph = event.pos
                     yangGlyphEntity = null
+                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle("§cYang Glyph!", 30)
                 }
             }
             if (Skytils.config.experimentalYangGlyphDetection && yangGlyph == null && slayerEntity != null) {
                 if (lastYangGlyphSwitchTicks in 0..5 && slayerEntity!!.getDistanceSq(event.pos) <= 5 * 5) {
+                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle("§cYang Glyph!", 30)
                     printDevMessage(
                         "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
                     )

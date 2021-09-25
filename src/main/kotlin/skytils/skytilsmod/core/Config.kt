@@ -1725,6 +1725,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var yangGlyphPing = false
 
     @Property(
+        PropertyType.SWITCH, name = "Yang Glyph Ping on Land",
+        description = "Changes the Yang Glyph ping to ping on land rather than on throw.",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var yangGlyphPingOnLand = false
+
+    @Property(
         PropertyType.SWITCH, name = "Highlight Yang Glyph",
         description = "Highlights the Yang Glyph block.",
         category = "Slayer", subcategory = "Voidgloom Seraph"
