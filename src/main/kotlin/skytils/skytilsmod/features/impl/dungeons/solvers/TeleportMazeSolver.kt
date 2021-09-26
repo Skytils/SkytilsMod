@@ -17,7 +17,8 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import net.minecraft.client.Minecraft
+import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.UChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
@@ -28,11 +29,32 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.listeners.DungeonListener
+import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
+import java.awt.Color
 
 class TeleportMazeSolver {
+
+    companion object {
+        private val steppedPads = ArrayList<BlockPos>()
+        private var lastTpPos: BlockPos? = null
+        val poss = HashSet<BlockPos>()
+    }
+
+    @SubscribeEvent
+    fun onSendMsg(event: SendChatMessageEvent) {
+        if (DevTools.getToggle("tpmaze") && event.message == "/resettp") {
+            lastTpPos = null
+            steppedPads.clear()
+            poss.clear()
+            event.isCanceled = true
+        }
+    }
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
@@ -48,12 +70,36 @@ class TeleportMazeSolver {
                     Utils.getBlocksWithinRangeAtSameY(lastTpPos!!, 1, 69).find {
                         mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
                     }?.let {
-                        steppedPads.add(it)
+                        if (!steppedPads.contains(it)) steppedPads.add(it)
                     }
                     Utils.getBlocksWithinRangeAtSameY(groundBlock, 1, 69).find {
                         mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
-                    }?.let {
-                        steppedPads.add(it)
+                    }?.let { pos ->
+                        if (!steppedPads.contains(pos)) {
+                            steppedPads.add(pos)
+                            val vec = mc.thePlayer.lookVec.normalize()
+                            val valid = HashSet<BlockPos>()
+                            for (i in 4..23) {
+                                val bp = BlockPos(
+                                    mc.thePlayer.posX + vec.xCoord * i,
+                                    69.0,
+                                    mc.thePlayer.posZ + vec.zCoord * i
+                                )
+                                val allDir = Utils.getBlocksWithinRangeAtSameY(bp, 2, 69)
+
+                                if (allDir.none { it == mc.thePlayer.position }) {
+                                    valid.addAll(allDir.filter { it !in steppedPads && mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame })
+                                }
+                            }
+                            if (DevTools.getToggle("tpmaze")) UChat.chat(valid.joinToString { it.toString() })
+                            if (poss.isEmpty()) {
+                                poss.addAll(valid)
+                            } else {
+                                poss.removeAll {
+                                    it !in valid
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -78,17 +124,25 @@ class TeleportMazeSolver {
             )
             GlStateManager.enableCull()
         }
+
+        for (pos in poss) {
+            val x = pos.x - viewerX
+            val y = pos.y - viewerY
+            val z = pos.z - viewerZ
+            GlStateManager.disableCull()
+            RenderUtil.drawFilledBoundingBox(
+                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
+                Color.GREEN.withAlpha(69),
+                1f
+            )
+            GlStateManager.enableCull()
+        }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         steppedPads.clear()
         lastTpPos = null
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-        private val steppedPads = HashSet<BlockPos>()
-        private var lastTpPos: BlockPos? = null
+        poss.clear()
     }
 }
