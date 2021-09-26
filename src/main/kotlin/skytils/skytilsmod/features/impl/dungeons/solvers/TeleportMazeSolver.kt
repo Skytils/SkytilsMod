@@ -21,8 +21,11 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MathHelper
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,6 +33,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.DevTools
@@ -56,6 +60,64 @@ class TeleportMazeSolver {
     }
 
     @SubscribeEvent
+    fun onPacket(event: PacketEvent.ReceiveEvent) {
+        if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
+        if (mc.thePlayer == null || mc.theWorld == null) return
+        event.packet.apply {
+            when (this) {
+                is S08PacketPlayerPosLook -> {
+                    if (y == 69.5 && Utils.equalsOneOf(
+                            mc.thePlayer.posY,
+                            69.5,
+                            69.8125
+                        ) && x % 1 == 0.5 && z % 1 == 0.5
+                    ) {
+                        val pos = BlockPos(x, y, z)
+                        val tpPad = Utils.getBlocksWithinRangeAtSameY(pos, 1, 69).find {
+                            it !in steppedPads && mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
+                        }
+                        if (tpPad != null) {
+                            val f = MathHelper.cos(-yaw * 0.017453292f - Math.PI.toFloat())
+                            val f1 = MathHelper.sin(-yaw * 0.017453292f - Math.PI.toFloat())
+                            val f2 = -MathHelper.cos(-pitch * 0.017453292f)
+                            val f3 = MathHelper.sin(-pitch * 0.017453292f)
+                            val vec = Vec3((f1 * f2).toDouble(), f3.toDouble(), (f * f2).toDouble())
+                            val valid = HashSet<BlockPos>()
+                            for (i in 4..23) {
+                                val bp = BlockPos(
+                                    x + vec.xCoord * i,
+                                    69.0,
+                                    z + vec.zCoord * i
+                                )
+                                val allDir = Utils.getBlocksWithinRangeAtSameY(bp, 2, 69)
+
+                                valid.addAll(allDir.filter {
+                                    it !in steppedPads && it != tpPad && mc.theWorld.getBlockState(
+                                        it
+                                    ).block === Blocks.end_portal_frame
+                                })
+                            }
+                            if (DevTools.getToggle("tpmaze")) UChat.chat(valid.joinToString { it.toString() })
+                            if (poss.isEmpty()) {
+                                poss.addAll(valid)
+                            } else {
+                                poss.removeAll {
+                                    it !in valid
+                                }
+                            }
+                        }
+                        if (DevTools.getToggle("tpmaze")) UChat.chat(
+                            "current: ${mc.thePlayer.positionVector}, ${mc.thePlayer.rotationPitch} ${mc.thePlayer.rotationYaw} new: ${this.x} ${this.y} ${this.z} - ${this.pitch} ${this.yaw} - ${
+                                this.func_179834_f().joinToString { it.name }
+                            }"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
@@ -77,28 +139,6 @@ class TeleportMazeSolver {
                     }?.let { pos ->
                         if (!steppedPads.contains(pos)) {
                             steppedPads.add(pos)
-                            val vec = mc.thePlayer.lookVec.normalize()
-                            val valid = HashSet<BlockPos>()
-                            for (i in 4..23) {
-                                val bp = BlockPos(
-                                    mc.thePlayer.posX + vec.xCoord * i,
-                                    69.0,
-                                    mc.thePlayer.posZ + vec.zCoord * i
-                                )
-                                val allDir = Utils.getBlocksWithinRangeAtSameY(bp, 2, 69)
-
-                                if (allDir.none { it == mc.thePlayer.position }) {
-                                    valid.addAll(allDir.filter { it !in steppedPads && mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame })
-                                }
-                            }
-                            if (DevTools.getToggle("tpmaze")) UChat.chat(valid.joinToString { it.toString() })
-                            if (poss.isEmpty()) {
-                                poss.addAll(valid)
-                            } else {
-                                poss.removeAll {
-                                    it !in valid
-                                }
-                            }
                         }
                     }
                 }
