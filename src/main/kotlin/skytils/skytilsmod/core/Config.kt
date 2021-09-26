@@ -473,7 +473,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Teleport Maze Solver",
-        description = "Shows which pads you've stepped on in the Teleport Maze puzzle.",
+        description = "Shows which pads you've stepped on, and which pads to step on in the Teleport Maze puzzle.",
         category = "Dungeons", subcategory = "Solvers"
     )
     var teleportMazeSolver = false
