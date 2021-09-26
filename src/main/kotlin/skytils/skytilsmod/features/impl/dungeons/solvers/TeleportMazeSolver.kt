@@ -29,8 +29,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent
@@ -44,15 +42,13 @@ import java.awt.Color
 class TeleportMazeSolver {
 
     companion object {
-        private val steppedPads = ArrayList<BlockPos>()
-        private var lastTpPos: BlockPos? = null
+        private val steppedPads = HashSet<BlockPos>()
         val poss = HashSet<BlockPos>()
     }
 
     @SubscribeEvent
     fun onSendMsg(event: SendChatMessageEvent) {
         if (DevTools.getToggle("tpmaze") && event.message == "/resettp") {
-            lastTpPos = null
             steppedPads.clear()
             poss.clear()
             event.isCanceled = true
@@ -72,11 +68,17 @@ class TeleportMazeSolver {
                             69.8125
                         ) && x % 1 == 0.5 && z % 1 == 0.5
                     ) {
+                        val currPos = mc.thePlayer.position
                         val pos = BlockPos(x, y, z)
+                        val oldTpPad = Utils.getBlocksWithinRangeAtSameY(currPos, 1, 69).find {
+                            mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
+                        } ?: return
                         val tpPad = Utils.getBlocksWithinRangeAtSameY(pos, 1, 69).find {
-                            it !in steppedPads && mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
-                        }
-                        if (tpPad != null) {
+                            mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
+                        } ?: return
+                        steppedPads.add(oldTpPad)
+                        if (tpPad !in steppedPads) {
+                            steppedPads.add(tpPad)
                             val f = MathHelper.cos(-yaw * 0.017453292f - Math.PI.toFloat())
                             val f1 = MathHelper.sin(-yaw * 0.017453292f - Math.PI.toFloat())
                             val f2 = -MathHelper.cos(-pitch * 0.017453292f)
@@ -92,7 +94,7 @@ class TeleportMazeSolver {
                                 val allDir = Utils.getBlocksWithinRangeAtSameY(bp, 2, 69)
 
                                 valid.addAll(allDir.filter {
-                                    it !in steppedPads && it != tpPad && mc.theWorld.getBlockState(
+                                    it !in steppedPads && mc.theWorld.getBlockState(
                                         it
                                     ).block === Blocks.end_portal_frame
                                 })
@@ -114,36 +116,6 @@ class TeleportMazeSolver {
                     }
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
-        if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.posY < 68 || mc.thePlayer.posY > 75) return
-        val groundBlock = BlockPos(mc.thePlayer.posX, 69.0, mc.thePlayer.posZ)
-        val state = mc.theWorld.getBlockState(groundBlock)
-        if (state.block == Blocks.stone_slab) {
-            if (lastTpPos != null) {
-                if (BlockPos.getAllInBox(lastTpPos, groundBlock).any {
-                        mc.theWorld.getBlockState(it).block === Blocks.iron_bars
-                    }) {
-                    Utils.getBlocksWithinRangeAtSameY(lastTpPos!!, 1, 69).find {
-                        mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
-                    }?.let {
-                        if (!steppedPads.contains(it)) steppedPads.add(it)
-                    }
-                    Utils.getBlocksWithinRangeAtSameY(groundBlock, 1, 69).find {
-                        mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
-                    }?.let { pos ->
-                        if (!steppedPads.contains(pos)) {
-                            steppedPads.add(pos)
-                        }
-                    }
-                }
-            }
-            lastTpPos = groundBlock
         }
     }
 
@@ -182,7 +154,6 @@ class TeleportMazeSolver {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         steppedPads.clear()
-        lastTpPos = null
         poss.clear()
     }
 }
