@@ -79,16 +79,16 @@ class TeleportMazeSolver {
                         steppedPads.add(oldTpPad)
                         if (tpPad !in steppedPads) {
                             steppedPads.add(tpPad)
-                            val f = MathHelper.cos(-yaw * 0.017453292f - Math.PI.toFloat())
-                            val f1 = MathHelper.sin(-yaw * 0.017453292f - Math.PI.toFloat())
-                            val f2 = -MathHelper.cos(-pitch * 0.017453292f)
-                            val f3 = MathHelper.sin(-pitch * 0.017453292f)
-                            val vec = Vec3((f1 * f2).toDouble(), f3.toDouble(), (f * f2).toDouble())
+                            val magicYaw = -yaw * 0.017453292f - Math.PI.toFloat()
+                            val yawX = MathHelper.sin(magicYaw)
+                            val yawZ = MathHelper.cos(magicYaw)
+                            val pitchVal = -MathHelper.cos(-pitch * 0.017453292f)
+                            val vec = Vec3((yawX * pitchVal).toDouble(), 69.0, (yawZ * pitchVal).toDouble())
                             val valid = HashSet<BlockPos>()
                             for (i in 4..23) {
                                 val bp = BlockPos(
                                     x + vec.xCoord * i,
-                                    69.0,
+                                    vec.yCoord,
                                     z + vec.zCoord * i
                                 )
                                 val allDir = Utils.getBlocksWithinRangeAtSameY(bp, 2, 69)
@@ -100,12 +100,9 @@ class TeleportMazeSolver {
                                 })
                             }
                             if (DevTools.getToggle("tpmaze")) UChat.chat(valid.joinToString { it.toString() })
-                            if (poss.isEmpty()) {
-                                poss.addAll(valid)
-                            } else {
-                                poss.removeAll {
-                                    it !in valid
-                                }
+                            if (poss.isEmpty()) poss.addAll(valid)
+                            else poss.removeAll {
+                                it !in valid
                             }
                         }
                         if (DevTools.getToggle("tpmaze")) UChat.chat(
