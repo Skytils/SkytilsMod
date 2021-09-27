@@ -142,19 +142,23 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
 
             val arr = gson.fromJson(decoded, JsonArray::class.java)
             val results = arr.mapNotNull { e ->
-                e as JsonObject
-                Waypoint(
-                    e["name"].asString,
-                    BlockPos(
-                        e["x"].asInt,
-                        e["y"].asInt,
-                        e["z"].asInt
-                    ),
-                    SkyblockIsland.values().find {
-                        it.mode == e["island"].asString
-                    } ?: return@mapNotNull null,
-                    e["enabled"].asBoolean
-                )
+                return@mapNotNull runCatching {
+                    e as JsonObject
+                    return@runCatching Waypoint(
+                        e["name"].asString,
+                        BlockPos(
+                            e["x"].asInt,
+                            e["y"].asInt,
+                            e["z"].asInt
+                        ),
+                        SkyblockIsland.values().find {
+                            it.mode == e["island"].asString
+                        } ?: return@mapNotNull null,
+                        e["enabled"].asBoolean
+                    )
+                }.onFailure {
+                    it.printStackTrace()
+                }.getOrNull()
             }
             Waypoints.waypoints.addAll(results)
             PersistentSave.markDirty<Waypoints>()
@@ -175,14 +179,18 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
         entries.values.filter {
             it.selected.checked
         }.forEach {
-            arr.add(JsonObject().apply {
-                addProperty("name", it.name.getText())
-                addProperty("x", it.x.getText().toInt())
-                addProperty("y", it.y.getText().toInt())
-                addProperty("z", it.z.getText().toInt())
-                addProperty("island", island.mode)
-                addProperty("enabled", true)
-            })
+            runCatching {
+                arr.add(JsonObject().apply {
+                    addProperty("name", it.name.getText())
+                    addProperty("x", it.x.getText().toInt())
+                    addProperty("y", it.y.getText().toInt())
+                    addProperty("z", it.z.getText().toInt())
+                    addProperty("island", island.mode)
+                    addProperty("enabled", true)
+                })
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
         setClipboardString(Base64.encodeBase64String(gson.toJson(arr).encodeToByteArray()))
         EssentialAPI.getNotifications()

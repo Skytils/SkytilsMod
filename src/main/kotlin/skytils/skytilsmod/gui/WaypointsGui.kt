@@ -123,18 +123,22 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
                 it.island == current
             }
             for (entry in entries.values) {
-                Waypoints.waypoints.add(
-                    Waypoint(
-                        entry.name.getText(),
-                        BlockPos(
-                            entry.x.getText().toInt(),
-                            entry.y.getText().toInt(),
-                            entry.z.getText().toInt()
-                        ),
-                        current,
-                        entry.enabled.checked
+                runCatching {
+                    Waypoints.waypoints.add(
+                        Waypoint(
+                            entry.name.getText(),
+                            BlockPos(
+                                entry.x.getText().toInt(),
+                                entry.y.getText().toInt(),
+                                entry.z.getText().toInt()
+                            ),
+                            current,
+                            entry.enabled.checked
+                        )
                     )
-                )
+                }.onFailure {
+                    it.printStackTrace()
+                }
             }
             PersistentSave.markDirty<Waypoints>()
         }
