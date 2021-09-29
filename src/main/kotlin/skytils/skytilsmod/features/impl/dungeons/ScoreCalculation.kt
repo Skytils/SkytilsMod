@@ -219,7 +219,7 @@ object ScoreCalculation {
                         val matcher = partyAssistSecretsPattern.matcher(unformatted)
                         if (matcher.find()) {
                             val name = matcher.group("name")
-                            val secrets = matcher.group("secrets").toInt()
+                            val secrets = matcher.group("secrets").toIntOrNull() ?: return
                             if (!rooms.containsKey(name)) {
                                 rooms[name] = secrets
                             }

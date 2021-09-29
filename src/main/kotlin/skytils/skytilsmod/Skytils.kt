@@ -248,36 +248,35 @@ class Skytils {
 
         val cch = ClientCommandHandler.instance
 
-        if (cch is AccessorCommandHandler) {
-            cch.registerCommand(SkytilsCommand)
+        if (cch !is AccessorCommandHandler) throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
+        cch.registerCommand(SkytilsCommand)
 
-            cch.registerCommand(CataCommand)
-            cch.registerCommand(CalcXPCommand)
-            cch.registerCommand(HollowWaypointCommand)
-            cch.registerCommand(SlayerCommand)
+        cch.registerCommand(CataCommand)
+        cch.registerCommand(CalcXPCommand)
+        cch.registerCommand(HollowWaypointCommand)
+        cch.registerCommand(SlayerCommand)
 
-            if (!cch.commands.containsKey("armorcolor")) {
-                cch.registerCommand(ArmorColorCommand)
-            }
+        if (!cch.commands.containsKey("armorcolor")) {
+            cch.registerCommand(ArmorColorCommand)
+        }
 
-            if (!cch.commands.containsKey("glintcustomize")) {
-                cch.registerCommand(GlintCustomizeCommand)
-            }
+        if (!cch.commands.containsKey("glintcustomize")) {
+            cch.registerCommand(GlintCustomizeCommand)
+        }
 
-            if (!cch.commands.containsKey("trackcooldown")) {
-                cch.registerCommand(TrackCooldownCommand)
-            }
+        if (!cch.commands.containsKey("trackcooldown")) {
+            cch.registerCommand(TrackCooldownCommand)
+        }
 
-            if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
-                cch.commandSet.add(RepartyCommand)
-                cch.commandMap["reparty"] = RepartyCommand
-            }
+        if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
+            cch.commandSet.add(RepartyCommand)
+            cch.commandMap["reparty"] = RepartyCommand
+        }
 
-            if (config.overrideReparty || !cch.commands.containsKey("rp")) {
-                cch.commandSet.add(RepartyCommand)
-                cch.commandMap["rp"] = RepartyCommand
-            }
-        } else throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
+        if (config.overrideReparty || !cch.commands.containsKey("rp")) {
+            cch.commandSet.add(RepartyCommand)
+            cch.commandMap["rp"] = RepartyCommand
+        }
 
         DataFetcher.preload()
         MayorInfo.fetchMayorData()
