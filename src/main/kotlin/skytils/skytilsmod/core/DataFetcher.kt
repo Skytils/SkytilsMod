@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.core
 
+import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
@@ -109,17 +110,15 @@ object DataFetcher {
             for ((key, value) in slayerHealthData.entrySet()) {
                 SlayerFeatures.BossHealths[key] = value.asJsonObject
             }
-            for (value in APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json")) {
-                val json = value.asJsonObject
-                SpamHider.repoFilters.add(
-                    SpamHider.Filter(
-                        json["name"].asString, 0, true, json["pattern"].asString, when (json["type"].asString) {
-                            "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
-                            "CONTAINS" -> SpamHider.FilterType.CONTAINS
-                            "REGEX" -> SpamHider.FilterType.REGEX
-                            else -> SpamHider.FilterType.CONTAINS
-                        }, json["formatted"].asBoolean
-                    )
+            APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").mapNotNullTo(SpamHider.repoFilters) {
+                it as JsonObject
+                SpamHider.Filter(
+                    it["name"].asString, 0, true, it["pattern"].asString, when (it["type"].asString) {
+                        "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
+                        "CONTAINS" -> SpamHider.FilterType.CONTAINS
+                        "REGEX" -> SpamHider.FilterType.REGEX
+                        else -> SpamHider.FilterType.CONTAINS
+                    }, it["formatted"].asBoolean
                 )
             }
             APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {

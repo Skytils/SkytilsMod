@@ -38,19 +38,15 @@ minecraft {
     mappings = "stable_22"
     makeObfSourceJar = false
     isGitVersion = false
-    clientJvmArgs.addAll(
-        setOf(
-            "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-            "-Delementa.dev=true",
-            "-Delementa.debug=true",
-            "-Dasmhelper.verbose=true"
-        )
+    clientJvmArgs + arrayOf(
+        "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+        "-Delementa.dev=true",
+        "-Delementa.debug=true",
+        "-Dasmhelper.verbose=true"
     )
-    clientRunArgs.addAll(
-        setOf(
-            "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
-            "--mixin mixins.skytils.json"
-        )
+    clientRunArgs + arrayOf(
+        "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
+        "--mixin mixins.skytils.json"
     )
 }
 
