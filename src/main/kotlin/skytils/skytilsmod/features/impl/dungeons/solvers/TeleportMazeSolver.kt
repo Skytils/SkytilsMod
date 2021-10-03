@@ -34,6 +34,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.listeners.DungeonListener
+import skytils.skytilsmod.utils.ConcurrentHashSet
 import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -42,9 +43,9 @@ import java.awt.Color
 class TeleportMazeSolver {
 
     companion object {
-        private val steppedPads = HashSet<BlockPos>()
-        val poss = HashSet<BlockPos>()
-        val valid = HashSet<BlockPos>()
+        private val steppedPads = ConcurrentHashSet<BlockPos>()
+        val poss = ConcurrentHashSet<BlockPos>()
+        val valid = ConcurrentHashSet<BlockPos>()
     }
 
     @SubscribeEvent
