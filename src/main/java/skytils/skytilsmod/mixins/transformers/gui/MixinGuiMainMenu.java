@@ -32,7 +32,7 @@ import java.util.Calendar;
 
 @Mixin(GuiMainMenu.class)
 public class MixinGuiMainMenu extends GuiScreen implements GuiYesNoCallback {
-    @Inject(method = "initGui", at = @At(value = "INVOKE", target = "Ljava/util/Calendar;setTime(Ljava/util/Date;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "initGui", at = @At(value = "INVOKE", target = "Ljava/util/Calendar;setTime(Ljava/util/Date;)V", shift = At.Shift.AFTER, remap = false), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void setSplashText(CallbackInfo ci, Calendar calendar) {
         GuiMainMenuHookKt.setSplashText((GuiMainMenu)(Object)this, calendar);
     }
