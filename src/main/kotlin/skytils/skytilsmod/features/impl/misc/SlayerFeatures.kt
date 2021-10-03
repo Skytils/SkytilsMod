@@ -95,6 +95,7 @@ class SlayerFeatures {
             expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
         }
         if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
+        if (lastYangGlyphSwitchTicks > 100) lastYangGlyphSwitchTicks = 0
         if (Skytils.config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && yangGlyphEntity == null && yangGlyph == null && slayerEntity != null) {
             val suspect = mc.theWorld.getEntitiesWithinAABB(
                 EntityArmorStand::class.java,
@@ -104,7 +105,9 @@ class SlayerFeatures {
                 e.ticksExisted <= 300 && lastYangGlyphSwitchTicks + 5 > e.ticksExisted && e.inventory[4]?.item == Item.getItemFromBlock(
                     Blocks.beacon
                 )
-            }.minByOrNull { abs(lastYangGlyphSwitchTicks - it.ticksExisted) + slayerEntity!!.getDistanceSqToEntity(it) }
+            }.minByOrNull {
+                (abs(lastYangGlyphSwitchTicks - it.ticksExisted) * 10) + slayerEntity!!.getDistanceSqToEntity(it)
+            }
             if (suspect != null) {
                 printDevMessage(
                     "Found suspect glyph, $lastYangGlyphSwitchTicks switched, ${suspect.ticksExisted} existed, ${
@@ -266,7 +269,10 @@ class SlayerFeatures {
                         lastYangGlyphSwitch = System.currentTimeMillis()
                         lastYangGlyphSwitchTicks = 0
                         thrownBoundingBox = entityBoundingBox
-                        if (Skytils.config.yangGlyphPing && !Skytils.config.yangGlyphPingOnLand) createTitle("§cYang Glyph!", 30)
+                        if (Skytils.config.yangGlyphPing && !Skytils.config.yangGlyphPingOnLand) createTitle(
+                            "§cYang Glyph!",
+                            30
+                        )
                     }
                 }
             }
@@ -329,12 +335,19 @@ class SlayerFeatures {
                     printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
                     yangGlyph = event.pos
                     yangGlyphEntity = null
-                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle("§cYang Glyph!", 30)
+                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
+                        "§cYang Glyph!",
+                        30
+                    )
+                    lastYangGlyphSwitchTicks = -1
                 }
             }
             if (Skytils.config.experimentalYangGlyphDetection && yangGlyph == null && slayerEntity != null) {
                 if (lastYangGlyphSwitchTicks in 0..5 && slayerEntity!!.getDistanceSq(event.pos) <= 5 * 5) {
-                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle("§cYang Glyph!", 30)
+                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
+                        "§cYang Glyph!",
+                        30
+                    )
                     printDevMessage(
                         "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
                     )

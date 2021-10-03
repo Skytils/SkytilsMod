@@ -40,7 +40,7 @@ import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
     private fun loadData(): Future<*> {
-        val dataUrl: String = Skytils.config.dataURL
+        val dataUrl = Skytils.config.dataURL
         return Skytils.threadPool.submit {
             val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
             for ((key, value) in fetchurData.entrySet()) {
