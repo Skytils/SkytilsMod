@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins.hooks.crash
 
+import com.google.common.base.Objects
 import net.minecraft.crash.CrashReport
 import net.minecraft.crash.CrashReportCategory
 import org.spongepowered.asm.mixin.Mixins
@@ -98,14 +99,16 @@ class CrashReportHook(private val crash: CrashReport) {
                     .also { it.isAccessible = true }
                     .get(null) as String
             }.getOrDefault("NONE")
-
-            return@addCrashSectionCallable """
-                            # BetterFPS: ${hasBetterFPS != "NONE"} version: $hasBetterFPS; Disabled Startup Check: ${
-                System.getProperty(
-                    "skytils.skipStartChecks"
-                ) != null
-            }
-                        """.trimMargin("#")
+            return@addCrashSectionCallable Objects
+                .toStringHelper("")
+                .add("HasBetterFPS", hasBetterFPS != "NONE")
+                .add("BetterFPS Version", hasBetterFPS)
+                .add(
+                    "Disabled Start Checks", System.getProperty(
+                        "skytils.skipStartChecks"
+                    ) != null
+                )
+                .toString()
         }
     }
 }
