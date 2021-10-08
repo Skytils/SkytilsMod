@@ -848,8 +848,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var darkModeMist = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Highlight Completed Commissionss",
-        description = "Marks completed commissionss in the menu with a red background.",
+        type = PropertyType.SWITCH, name = "Highlight Completed Commissions",
+        description = "Marks completed commissions in the menu with a red background.",
         category = "Mining", subcategory = "Quality of Life"
     )
     var highlightCompletedCommissions = false
