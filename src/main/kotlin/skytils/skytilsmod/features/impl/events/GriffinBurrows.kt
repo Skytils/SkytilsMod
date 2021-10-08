@@ -52,10 +52,10 @@ class GriffinBurrows {
     companion object {
         var lastManualRefresh = 0L
 
-        var burrows = arrayListOf<Burrow>()
-        var dugBurrows = arrayListOf<BlockPos>()
+        var burrows = HashSet<Burrow>()
+        var dugBurrows = HashSet<BlockPos>()
         var lastDugBurrow: BlockPos? = null
-        var particleBurrows = arrayListOf<ParticleBurrow>()
+        var particleBurrows = HashSet<ParticleBurrow>()
         var lastDugParticleBurrow: BlockPos? = null
         var burrowRefreshTimer = StopWatch()
         var shouldRefreshBurrows = false
@@ -84,13 +84,13 @@ class GriffinBurrows {
                         Burrow(it.x, it.y, it.z, it.type, it.tier, it.chain)
                     }
 
-                    dugBurrows.removeIf { dug: BlockPos ->
+                    dugBurrows.removeAll { dug: BlockPos ->
                         receivedBurrows.none { burrow: Burrow -> burrow.blockPos == dug }
                     }
-                    particleBurrows.removeIf { pb: ParticleBurrow? ->
+                    particleBurrows.removeAll { pb: ParticleBurrow? ->
                         receivedBurrows.any { rb: Burrow -> rb.blockPos == pb!!.blockPos }
                     }
-                    val removedDupes = receivedBurrows.removeIf { burrow: Burrow ->
+                    val removedDupes = receivedBurrows.removeAll { burrow: Burrow ->
                         dugBurrows.contains(burrow.blockPos) || particleBurrows.any { pb: ParticleBurrow -> pb.dug && pb.blockPos == burrow.blockPos }
                     }
                     burrows.clear()
@@ -325,10 +325,10 @@ class GriffinBurrows {
         }
     }
 
-    class ParticleBurrow(
-        var x: Int,
-        var y: Int,
-        var z: Int,
+    data class ParticleBurrow(
+        val x: Int,
+        val y: Int,
+        val z: Int,
         var hasFootstep: Boolean,
         var hasEnchant: Boolean,
         var type: Int
@@ -345,8 +345,10 @@ class GriffinBurrows {
             type
         )
 
-        val blockPos: BlockPos
-            get() = BlockPos(x, y, z)
+        val blockPos by lazy {
+            BlockPos(x, y, z)
+        }
+
         private val waypointText: String
             get() {
                 var type = "Burrow"
@@ -398,23 +400,24 @@ class GriffinBurrows {
 
     }
 
-    class Burrow(
-        var x: Int, var y: Int, var z: Int,
+    data class Burrow(
+        val x: Int, val y: Int, val z: Int,
         /**
          * This variable seems to hold whether or not the burrow is the start/empty, a mob, or treasure
          */
-        var type: Int,
+        val type: Int,
         /**
          * This variable holds the Griffin used, -1 means no Griffin, 0 means Common, etc.
          */
-        var tier: Int,
+        val tier: Int,
         /**
          * This variable appears to hold what order the burrow is in the chain
          */
-        private var chain: Int
+        private val chain: Int
     ) {
-        val blockPos: BlockPos
-            get() = BlockPos(x, y, z)
+        val blockPos by lazy {
+            BlockPos(x, y, z)
+        }
         private val waypointText: String
             get() {
                 var type = "Burrow"

@@ -560,9 +560,12 @@ class MiscFeatures {
     }
 
     class WorldAgeDisplay : GuiElement("World Age Display", FloatPair(50, 60)) {
+
+        var usesBaldTimeChanger = false
+
         override fun render() {
             if (toggled && Utils.inSkyblock && mc.theWorld != null) {
-                if (Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }) {
+                if (usesBaldTimeChanger) {
                     ScreenRenderer.fontRenderer.drawString(
                         "Incompatible Time Changer detected.",
                         0f,
@@ -586,7 +589,8 @@ class MiscFeatures {
         }
 
         override fun demoRender() {
-            if (Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }) {
+            usesBaldTimeChanger = Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }
+            if (usesBaldTimeChanger) {
                 ScreenRenderer.fontRenderer.drawString(
                     "Incompatible Time Changer detected.",
                     0f,
