@@ -269,3 +269,8 @@ fun CheckboxComponent.setState(checked: Boolean) {
 }
 
 fun BlockPos?.toVec3() = if (this == null) null else Vec3(this)
+
+fun <T : Any> T?.ifNull(run: () -> Unit): T? {
+    if (this == null) run()
+    return this
+}

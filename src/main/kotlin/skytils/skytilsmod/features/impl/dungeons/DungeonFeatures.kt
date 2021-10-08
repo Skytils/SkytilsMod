@@ -33,6 +33,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S45PacketTitle
@@ -62,6 +63,7 @@ import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -92,7 +94,8 @@ class DungeonFeatures {
         private var lividTag: Entity? = null
         private var lividJob: Future<*>? = null
         private var alertedSpiritPet = false
-        private const val SPIRIT_PET_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
+        private const val SPIRIT_PET_TEXTURE =
+            "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
 
         init {
             LividGuiElement()
@@ -174,21 +177,30 @@ class DungeonFeatures {
                                         Thread.sleep(10)
                                     }
                                     val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
-                                    val a = when (state.getValue(BlockStainedGlass.COLOR).name.lowercase()) {
-                                        "white" -> EnumChatFormatting.WHITE
-                                        "pink" -> EnumChatFormatting.LIGHT_PURPLE
-                                        "red" -> EnumChatFormatting.RED
-                                        "silver" -> EnumChatFormatting.GRAY
-                                        "gray" -> EnumChatFormatting.GRAY
-                                        "green" -> EnumChatFormatting.DARK_GREEN
-                                        "lime" -> EnumChatFormatting.GREEN
-                                        "blue" -> EnumChatFormatting.BLUE
-                                        "purple" -> EnumChatFormatting.DARK_PURPLE
-                                        "yellow" -> EnumChatFormatting.YELLOW
+                                    val color = state.getValue(BlockStainedGlass.COLOR)
+                                    color as AccessorEnumDyeColor
+                                    UChat.chat("§bLivid block is ${color.name}")
+                                    val a = when (color) {
+                                        EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
+                                        EnumDyeColor.PINK -> EnumChatFormatting.LIGHT_PURPLE
+                                        EnumDyeColor.RED -> EnumChatFormatting.RED
+                                        EnumDyeColor.SILVER -> EnumChatFormatting.GRAY
+                                        EnumDyeColor.GRAY -> EnumChatFormatting.GRAY
+                                        EnumDyeColor.GREEN -> EnumChatFormatting.DARK_GREEN
+                                        EnumDyeColor.LIME -> EnumChatFormatting.GREEN
+                                        EnumDyeColor.BLUE -> EnumChatFormatting.BLUE
+                                        EnumDyeColor.PURPLE -> EnumChatFormatting.DARK_PURPLE
+                                        EnumDyeColor.YELLOW -> EnumChatFormatting.YELLOW
                                         else -> null
-                                    } ?: return@submit
+                                    }
+                                    val otherColor = color.chatColor
                                     for (entity in mc.theWorld.loadedEntityList) {
-                                        if (entity.name.startsWith("$a﴾ $a§lLivid")) {
+                                        if (entity !is EntityArmorStand) continue
+                                        val fallBackColor = entity.name.startsWith("$otherColor﴾ $otherColor§lLivid")
+                                        if ((a != null && entity.name.startsWith("$a﴾ $a§lLivid")) || fallBackColor) {
+                                            if (fallBackColor) {
+                                                UChat.chat("§bBlock color ${color.name} should be mapped to ${otherColor}. Please report this to discord.gg/skytils")
+                                            }
                                             lividTag = entity
                                             val aabb = AxisAlignedBB(
                                                 lividTag!!.posX - 0.5,
