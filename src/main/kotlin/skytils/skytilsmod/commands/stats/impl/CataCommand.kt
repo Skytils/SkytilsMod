@@ -57,32 +57,32 @@ object CataCommand : StatCommand("skytilscata") {
 
             val cataLevel =
                 SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
-                    .coerceAtMost(50.0)
+
             val archLevel =
                 SkillUtils.calcXpWithProgress(
                     dungeonsData.classExperiences?.get(Dungeon.DungeonClass.archer) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
-                ).coerceAtMost(50.0)
+                )
             val bersLevel =
                 SkillUtils.calcXpWithProgress(
                     dungeonsData.classExperiences?.get(Dungeon.DungeonClass.berserk) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
-                ).coerceAtMost(50.0)
+                )
             val healerLevel =
                 SkillUtils.calcXpWithProgress(
                     dungeonsData.classExperiences?.get(Dungeon.DungeonClass.healer) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
-                ).coerceAtMost(50.0)
+                )
             val mageLevel =
                 SkillUtils.calcXpWithProgress(
                     dungeonsData.classExperiences?.get(Dungeon.DungeonClass.mage) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
-                ).coerceAtMost(50.0)
+                )
             val tankLevel =
                 SkillUtils.calcXpWithProgress(
                     dungeonsData.classExperiences?.get(Dungeon.DungeonClass.tank) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
-                ).coerceAtMost(50.0)
+                )
 
             val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
 
