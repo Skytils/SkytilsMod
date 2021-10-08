@@ -63,6 +63,7 @@ import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -294,7 +295,12 @@ class DungeonFeatures {
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
                 val deathFailMatcher = deathOrPuzzleFail.matcher(unformatted)
-                if (deathFailMatcher.find()) {
+                if (deathFailMatcher.find() || (unformatted.startsWith("[CROWD]") && thornMissMessages.any {
+                        unformatted.contains(
+                            it,
+                            true
+                        )
+                    } && DungeonListener.team.any { unformatted.contains(it.playerName) })) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted)
                         UChat.chat("§9§lSkytils §8» §aCopied fail to clipboard.")
