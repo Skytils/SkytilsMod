@@ -29,7 +29,7 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (args.size != 3) throw SyntaxErrorException("invalid arguments")
         val type = args[0].lowercase()
-        var starting = (args[1].toIntOrNull() ?: 0).inc()
+        var starting = args[1].toIntOrNull() ?: 0
         var ending = args[2].toIntOrNull() ?: 0
         val xpMap = when {
             type.endsWith("_slayer") -> SkillUtils.slayerXp[type.substringBefore("_slayer")]
@@ -42,7 +42,9 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
         }
         ending = ending.coerceIn(starting, xpMap?.keys?.last())
         starting = starting.coerceIn(0, ending)
-        val xp = (starting.inc()..ending).sumOf { xpMap?.get(it) ?: 0 }
-        UChat.chat("§9§lSkytils ➜ §bYou need §6${NumberUtil.nf.format(xp)}§b to get from §6$type§b level §6${starting.dec()}§b to level §6$ending§b!")
+        val xp = (starting.inc()..ending).sumOf {
+            xpMap?.get(it) ?: 0
+        }
+        UChat.chat("§9§lSkytils ➜ §bYou need §6${NumberUtil.nf.format(xp)}§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
     }
 }
