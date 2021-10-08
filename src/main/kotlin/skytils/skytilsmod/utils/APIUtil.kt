@@ -22,12 +22,15 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.essential.universal.UChat
 import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
 import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.http.message.BasicHeader
 import org.apache.hc.core5.ssl.SSLContexts
+import org.apache.hc.core5.util.Timeout
 import skytils.skytilsmod.Skytils
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
@@ -53,12 +56,21 @@ object APIUtil {
 
     val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
-            .addRequestInterceptorFirst { request, entity, context ->
-                if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
-                if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
-            }
             .setConnectionManagerShared(true)
             .setConnectionManager(cm.build())
+            .setDefaultHeaders(
+                mutableListOf(
+                    BasicHeader("Pragma", "no-cache"),
+                    BasicHeader("Cache-Control", "no-cache")
+                )
+            )
+            .setDefaultRequestConfig(
+                RequestConfig.custom()
+                    .setConnectTimeout(Timeout.ofMinutes(1))
+                    .setResponseTimeout(Timeout.ofMinutes(1))
+                    .build()
+            )
+            .useSystemProperties()
 
     /**
      * Taken from Elementa under MIT License
@@ -78,12 +90,8 @@ object APIUtil {
     fun getJSONResponse(urlString: String): JsonObject {
         val client = builder.build()
         try {
-            val request = HttpGet(URL(urlString).toURI())
-
-            val response = client.execute(request)
-            response.use {
-                val entity = response.entity
-                entity.use {
+            client.execute(HttpGet(urlString)).use { response ->
+                response.entity.use { entity ->
                     val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
                     EntityUtils.consume(entity)
                     return obj
@@ -101,15 +109,11 @@ object APIUtil {
     fun getArrayResponse(urlString: String): JsonArray {
         val client = builder.build()
         try {
-            val request = HttpGet(URL(urlString).toURI())
-
-            val response = client.execute(request)
-            response.use {
-                val entity = response.entity
-                entity.use {
-                    val arr = parser.parse(EntityUtils.toString(entity)).asJsonArray
+            client.execute(HttpGet(urlString)).use { response ->
+                response.entity.use { entity ->
+                    val obj = parser.parse(EntityUtils.toString(entity)).asJsonArray
                     EntityUtils.consume(entity)
-                    return arr
+                    return obj
                 }
             }
         } catch (ex: Throwable) {
