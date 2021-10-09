@@ -383,6 +383,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var necronHealth = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Spirit Bear Timer",
+        description = "Shows the time it takes for the Spirit Bears to spawn.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var spiritBearTimer = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Spirit Leap Names",
         description = "Shows names next to the heads on the Spirit Leap menu.",
         category = "Dungeons", subcategory = "Quality of Life"

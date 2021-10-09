@@ -31,12 +31,12 @@ import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
-import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.network.play.server.S45PacketTitle
+import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -97,9 +97,40 @@ class DungeonFeatures {
         private var alertedSpiritPet = false
         private const val SPIRIT_PET_TEXTURE =
             "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
+        private var lastLitUpTime = -1L
+        private val lastBlockPos = BlockPos(207, 77, 234)
 
         init {
             LividGuiElement()
+            SpiritBearSpawnTimer()
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onReceivePacketHighest(event: ReceiveEvent) {
+        event.apply {
+            if (hasBossSpawned && Skytils.config.spiritBearTimer && dungeonFloor?.endsWith('4') == true) {
+                when (packet) {
+                    is S23PacketBlockChange -> {
+                        if (packet.blockPosition == lastBlockPos) {
+                            val time = System.currentTimeMillis()
+                            lastLitUpTime = if (packet.blockState.block === Blocks.sea_lantern) time else -1L
+                            printDevMessage("light $lastLitUpTime", "spiritbear")
+                        }
+                    }
+                    is S02PacketChat -> {
+                        if (lastLitUpTime != -1L && DevTools.getToggle("spiritbear") && packet.chatComponent.formattedText == "§r§a§lA §r§5§lSpirit Bear §r§a§lhas appeared!§r") {
+                            UChat.chat("chat ${System.currentTimeMillis() - lastLitUpTime}")
+                            lastLitUpTime = -1L
+                        }
+                    }
+                    is S0CPacketSpawnPlayer -> {
+                        if (lastLitUpTime != -1L) {
+                            printDevMessage("spawn ${System.currentTimeMillis() - lastLitUpTime}", "spiritbear")
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -543,6 +574,51 @@ class DungeonFeatures {
         livid = null
         foundLivid = false
         alertedSpiritPet = false
+        lastLitUpTime = -1L
+    }
+
+    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
+        override fun render() {
+            if (toggled && hasBossSpawned && dungeonFloor?.endsWith('4') == true) {
+                val sr = UResolution
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    "Spirit Bear ${System.currentTimeMillis() - lastLitUpTime + 3400}",
+                    if (leftAlign) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.PURPLE,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val sr = UResolution
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Spirit Bear: 3400ms",
+                if (leftAlign) 0f else 0f + width,
+                0f,
+                CommonColors.PURPLE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Spirit Bear: 3400ms")
+
+        override val toggled: Boolean
+            get() = Skytils.config.spiritBearTimer
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
     }
 
     internal class LividGuiElement : GuiElement("Livid HP", FloatPair(0.05f, 0.4f)) {
