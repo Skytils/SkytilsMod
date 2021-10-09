@@ -1225,6 +1225,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var pingDisplay = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Bestiary Level",
+        description = "Shows the bestiary level as the stack size.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showBestiaryLevel = false
+
+    @Property(
         PropertyType.SWITCH, name = "Show Selected Arrow",
         description = "Shows your current selected arrow.",
         category = "Miscellaneous", subcategory = "Other"

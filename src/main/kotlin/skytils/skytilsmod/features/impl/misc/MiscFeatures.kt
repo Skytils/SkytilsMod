@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
@@ -56,16 +57,14 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.BossBarEvent
-import skytils.skytilsmod.events.CheckRenderEntityEvent
-import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.*
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.SendChatMessageEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderItem
@@ -402,6 +401,48 @@ class MiscFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
+        val item = event.stack ?: return
+        if (!Utils.inSkyblock || mc.thePlayer == null || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
+        var stackTip = ""
+
+        val c = mc.thePlayer.openContainer
+        if (c is ContainerChest) {
+            val name = c.lowerChestInventory.name
+            if (Skytils.config.showBestiaryLevel && name.startsWithAny(
+                    "Bestiary ➜ ",
+                    "Search Results"
+                ) && item.item != Item.getItemFromBlock(Blocks.stained_glass_pane)
+            ) {
+                val arrowSlot = c.inventorySlots.getOrNull(48)?.stack
+                if (arrowSlot != null && arrowSlot.item == Items.arrow && ItemUtil.getItemLore(item)
+                        .lastOrNull() == "§eClick to view!" /* && ItemUtil.getDisplayName(arrowSlot) == "§aGo Back" && ItemUtil.getItemLore(
+                        arrowSlot
+                    ).firstOrNull() == "§7To Bestiary"*/
+                ) {
+                    var ending = ItemUtil.getDisplayName(item).substringAfterLast(" ", "")
+                    if (ending.any { !it.isUpperCase() }) ending = ""
+                    stackTip = ending.romanToDecimal().toString()
+                }
+            }
+        }
+
+        if (stackTip.isNotBlank()) {
+            GlStateManager.disableLighting()
+            GlStateManager.disableDepth()
+            GlStateManager.disableBlend()
+            event.fr.drawStringWithShadow(
+                stackTip,
+                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
+                (event.y + 9).toFloat(),
+                16777215
+            )
+            GlStateManager.enableLighting()
+            GlStateManager.enableDepth()
+        }
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
         private var golemSpawnTime: Long = 0
@@ -589,7 +630,8 @@ class MiscFeatures {
         }
 
         override fun demoRender() {
-            usesBaldTimeChanger = Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }
+            usesBaldTimeChanger =
+                Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }
             if (usesBaldTimeChanger) {
                 ScreenRenderer.fontRenderer.drawString(
                     "Incompatible Time Changer detected.",
