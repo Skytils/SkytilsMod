@@ -46,7 +46,8 @@ enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting,
 
         init {
             values().forEach { rarity -> VALUES[rarity.ordinal] = rarity }
-            RARITY_PATTERN = Regex("(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>${VALUES.joinToString("|") { it.rarityName }})")
+            RARITY_PATTERN =
+                Regex("(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>${VALUES.joinToString("|") { it.rarityName }})")
         }
     }
 

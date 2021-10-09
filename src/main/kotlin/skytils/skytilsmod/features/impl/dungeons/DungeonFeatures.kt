@@ -579,12 +579,12 @@ class DungeonFeatures {
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
         override fun render() {
-            if (toggled && hasBossSpawned && dungeonFloor?.endsWith('4') == true) {
+            if (toggled && lastLitUpTime != -1L) {
                 val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
-                    "Spirit Bear ${System.currentTimeMillis() - lastLitUpTime + 3400}",
+                    "Spirit Bear ${lastLitUpTime + 3400 - System.currentTimeMillis()}",
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     CommonColors.PURPLE,
