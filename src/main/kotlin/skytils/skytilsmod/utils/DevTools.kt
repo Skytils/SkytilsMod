@@ -49,7 +49,5 @@ fun printDevMessage(string: String, toggle: String) {
 }
 
 fun printDevMessage(string: String, vararg toggles: String) {
-    toggles.forEach {
-        if (DevTools.getToggle(it)) return UChat.chat(string)
-    }
+    if (toggles.any { DevTools.getToggle(it) }) UChat.chat(string)
 }

@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.ClientCommandHandler
@@ -313,6 +314,8 @@ class Skytils {
                         (contains("The Catacombs") && !contains("Queue")) || contains("Dungeon Cleared:")
                     }
                 }
+                if (DevTools.getToggle("sprint"))
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
             }
             ticks = 0
         }
