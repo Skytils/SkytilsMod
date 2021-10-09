@@ -119,8 +119,8 @@ class DungeonFeatures {
                         }
                     }
                     is S02PacketChat -> {
-                        if (lastLitUpTime != -1L && DevTools.getToggle("spiritbear") && packet.chatComponent.formattedText == "§r§a§lA §r§5§lSpirit Bear §r§a§lhas appeared!§r") {
-                            UChat.chat("chat ${System.currentTimeMillis() - lastLitUpTime}")
+                        if (lastLitUpTime != -1L && packet.chatComponent.formattedText == "§r§a§lA §r§5§lSpirit Bear §r§a§lhas appeared!§r") {
+                            printDevMessage("chat ${System.currentTimeMillis() - lastLitUpTime}")
                             lastLitUpTime = -1L
                         }
                     }
