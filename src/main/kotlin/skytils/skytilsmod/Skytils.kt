@@ -61,6 +61,7 @@ import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.handlers.*
 import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
 import skytils.skytilsmod.features.impl.misc.*
 import skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
 import skytils.skytilsmod.features.impl.protectitems.ProtectItems
@@ -213,6 +214,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SpidersDenFeatures())
         MinecraftForge.EVENT_BUS.register(SpiritLeap())
         MinecraftForge.EVENT_BUS.register(StartsWithSequenceSolver())
+        MinecraftForge.EVENT_BUS.register(StupidTreasureChestOpeningThing)
         MinecraftForge.EVENT_BUS.register(TankDisplayStuff())
         MinecraftForge.EVENT_BUS.register(TechnoMayor())
         MinecraftForge.EVENT_BUS.register(TeleportMazeSolver())
