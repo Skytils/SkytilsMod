@@ -21,14 +21,9 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.StartsWithSequenceSolver
 import skytils.skytilsmod.utils.Utils
-
-fun onSlotChange(slot: Slot) {
-    SlotChangedEvent(slot).postAndCatch()
-}
 
 fun markTerminalItems(slot: Slot, cir: CallbackInfoReturnable<ItemStack?>) {
     if (!Utils.inSkyblock) return

@@ -32,6 +32,7 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
@@ -40,21 +41,19 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
-import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.GuiContainerEvent
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.GuiRenderItemEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.SlotChangedEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
@@ -121,56 +120,21 @@ class ItemFeatures {
             Blocks.oak_door,
             Blocks.skull
         )
+
+        var ticks = 0
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        TickTask(20) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (ticks % 4 == 0) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
                 for (i in 0..8) {
                     hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
                 }
             }
+            ticks = 0
         }
-    }
-
-    @SubscribeEvent
-    fun onSlotChanged(event: SlotChangedEvent) {
-        if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return
-        val slot = event.slot
-
-        if (mc.thePlayer.inventory === slot.inventory && slot.slotIndex in 0..8) {
-            for (i in 0..8) {
-                hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
-            }
-        }
-
-        val item = slot.stack ?: return
-        val extraAttr = getExtraAttributes(item) ?: return
-        val itemId = getSkyBlockItemID(extraAttr) ?: return
-
-        if (itemId == "ARROW_SWAPPER") {
-            selectedArrow = getItemLore(item).find {
-                it.startsWith("§aSelected: §")
-            }?.substringAfter("§aSelected: ") ?: "§cUnknown"
-        }
-        if (Utils.equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
-            getItemLore(item).find {
-                it.startsWith("§7Internalized: ")
-            }?.substringAfter("§7Internalized: ")?.let { s ->
-                soulflowAmount = s
-                s.drop(2).filter { it.isDigit() }.toIntOrNull()?.let {
-                    if (Skytils.config.lowSoulflowPing > 0) {
-                        if (it <= Skytils.config.lowSoulflowPing && !lowSoulFlowPinged) {
-                            GuiManager.createTitle("§cLow Soulflow", 20)
-                            lowSoulFlowPinged = true
-                        } else if (it > Skytils.config.lowSoulflowPing) {
-                            lowSoulFlowPinged = false
-                        }
-                    }
-                }
-            }
-        }
+        ticks++
     }
 
     @SubscribeEvent
@@ -404,6 +368,42 @@ class ItemFeatures {
             }
         } catch (e: ConcurrentModificationException) {
             e.printStackTrace()
+        }
+        if (event.packet is S2FPacketSetSlot && event.packet.func_149175_c() == 0) {
+            Utils.checkThreadAndQueue {
+                if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return@checkThreadAndQueue
+                val slot = event.packet.func_149173_d()
+
+                if (slot in 0..8) {
+                    hotbarRarityCache[slot] = ItemUtil.getRarity(event.packet.func_149174_e())
+                }
+                val item = event.packet.func_149174_e() ?: return@checkThreadAndQueue
+                val extraAttr = getExtraAttributes(item) ?: return@checkThreadAndQueue
+                val itemId = getSkyBlockItemID(extraAttr) ?: return@checkThreadAndQueue
+
+                if (itemId == "ARROW_SWAPPER") {
+                    selectedArrow = getItemLore(item).find {
+                        it.startsWith("§aSelected: §")
+                    }?.substringAfter("§aSelected: ") ?: "§cUnknown"
+                }
+                if (Utils.equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
+                    getItemLore(item).find {
+                        it.startsWith("§7Internalized: ")
+                    }?.substringAfter("§7Internalized: ")?.let { s ->
+                        soulflowAmount = s
+                        s.drop(2).filter { it.isDigit() }.toIntOrNull()?.let {
+                            if (Skytils.config.lowSoulflowPing > 0) {
+                                if (it <= Skytils.config.lowSoulflowPing && !lowSoulFlowPinged) {
+                                    GuiManager.createTitle("§cLow Soulflow", 20)
+                                    lowSoulFlowPinged = true
+                                } else if (it > Skytils.config.lowSoulflowPing) {
+                                    lowSoulFlowPinged = false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

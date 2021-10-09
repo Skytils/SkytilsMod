@@ -36,10 +36,4 @@ public abstract class MixinSlot {
     private void markTerminalItems(CallbackInfoReturnable<ItemStack> cir) {
         SlotHookKt.markTerminalItems($this, cir);
     }
-
-    @Inject(method = "onSlotChanged", at = @At("HEAD"))
-    private void onSlotChange(CallbackInfo ci) {
-        SlotHookKt.onSlotChange($this);
-    }
-
 }
