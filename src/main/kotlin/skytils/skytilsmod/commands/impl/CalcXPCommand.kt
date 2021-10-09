@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.commands
+package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
+import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
 

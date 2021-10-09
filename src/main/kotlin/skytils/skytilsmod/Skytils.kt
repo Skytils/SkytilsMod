@@ -43,7 +43,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import org.lwjgl.input.Mouse
 import skytils.hylin.HylinAPI.Companion.createHylinAPI
-import skytils.skytilsmod.commands.*
+import skytils.skytilsmod.commands.impl.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import skytils.skytilsmod.core.*

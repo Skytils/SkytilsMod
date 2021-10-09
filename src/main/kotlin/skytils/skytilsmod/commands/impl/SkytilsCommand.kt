@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.commands
+package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +32,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.features.impl.events.GriffinBurrows

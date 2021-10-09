@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.commands.RepartyCommand
+import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern

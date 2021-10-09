@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.commands
+package skytils.skytilsmod.commands.impl
 
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.ICommandSender
@@ -23,6 +23,7 @@ import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
 import net.minecraft.util.ChatComponentText
+import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.ArmorColor
 import skytils.skytilsmod.utils.ItemUtil

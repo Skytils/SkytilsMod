@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.commands
+package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
@@ -26,6 +26,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
