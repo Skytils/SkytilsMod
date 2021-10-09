@@ -374,9 +374,6 @@ class ItemFeatures {
                 if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return@checkThreadAndQueue
                 val slot = event.packet.func_149173_d()
 
-                if (slot in 0..8) {
-                    hotbarRarityCache[slot] = ItemUtil.getRarity(event.packet.func_149174_e())
-                }
                 val item = event.packet.func_149174_e() ?: return@checkThreadAndQueue
                 val extraAttr = getExtraAttributes(item) ?: return@checkThreadAndQueue
                 val itemId = getSkyBlockItemID(extraAttr) ?: return@checkThreadAndQueue
@@ -656,7 +653,6 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§3100⸎ Soulflow")
         override val toggled: Boolean
             get() = Skytils.config.showSoulflowDisplay
-        private var pinged = false
 
         init {
             Skytils.guiManager.registerElement(this)
