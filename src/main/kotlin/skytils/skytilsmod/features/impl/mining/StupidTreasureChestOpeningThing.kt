@@ -115,7 +115,8 @@ object StupidTreasureChestOpeningThing {
                         it.key.distanceSq(x, y, z)
                     } ?: return
 
-                    if (probable.key.distanceSq(x, y, z) < 2.5 * 2.5) {
+                    UChat.chat("$sound distance from chest ${probable.key.distanceSq(x, y, z)}")
+                    if (probable.key.distanceSq(x, y, z) < 6.9 * 6.9) {
                         probable.value.progress += if (sound == "random.orb") 1 else -1
                         UChat.chat("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z")
                     }
