@@ -26,14 +26,25 @@ import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
+import java.io.File
 import kotlin.random.Random
 
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
+    companion object {
+        val smolPeople by lazy {
+            File(Skytils.modDir, "smolpeople").exists()
+        }
+    }
+
     val isBreefing by lazy {
-        Utils.inSkyblock && entity.name == "Breefing" && entity is EntityPlayer && (Utils.breefingdog || Random.nextInt(
+        entity.name == "Breefing" && (Utils.breefingdog || Random.nextInt(
             100
         ) < 3)
+    }
+
+    val isSmol by lazy {
+        Utils.inSkyblock && entity is EntityPlayer && (smolPeople || isBreefing)
     }
 
     fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {
@@ -60,6 +71,6 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
     }
 
     fun isChild(cir: CallbackInfoReturnable<Boolean>) {
-        cir.returnValue = isBreefing
+        cir.returnValue = isSmol
     }
 }

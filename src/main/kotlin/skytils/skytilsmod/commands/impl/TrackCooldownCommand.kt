@@ -17,9 +17,11 @@
  */
 package skytils.skytilsmod.commands.impl
 
+import gg.essential.universal.UChat
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.util.ChatComponentText
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -28,6 +30,7 @@ object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntrack
     override fun getCommandUsage(sender: ICommandSender): String = "/trackcooldown <cooldown> <ability>"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
+        if (!Skytils.config.itemCooldownDisplay) return UChat.chat("You must turn on Item Cooldown Display to use this command!")
         if (args.size < 2) throw WrongUsageException(getCommandUsage(sender))
         val seconds = args[0].toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
         val ability = args.drop(1).joinToString(" ")
