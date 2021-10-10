@@ -31,13 +31,11 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.BlockChangeEvent
 import skytils.skytilsmod.events.PacketEvent
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 
 object StupidTreasureChestOpeningThing {
@@ -55,15 +53,15 @@ object StupidTreasureChestOpeningThing {
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
-        if (mc.thePlayer == null || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+        if (!Skytils.config.chTreasureHelper || mc.thePlayer == null || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         if ((event.old.block == Blocks.air || event.old.block == Blocks.stone) && event.update.block == Blocks.chest) {
-            UChat.chat("Distance ${event.pos} ${mc.thePlayer.getDistanceSq(event.pos)}")
+            printDevMessage("Distance ${event.pos} ${mc.thePlayer.getDistanceSq(event.pos)}", "chtreasure")
             if (mc.thePlayer.entityBoundingBox.expand(5.0, 5.0, 5.0).isVecInside(Vec3(event.pos))) {
                 val diff = System.currentTimeMillis() - lastFoundChest
                 if (diff < 1000) {
                     lastFoundChest = -1L
-                    UChat.chat("chest found at $diff")
                     sendHelpPlease[event.pos] = StupidChest(event.pos)
+                    printDevMessage("chest found at $diff", "chtreasure")
                 }
             }
         } else if (event.old.block == Blocks.chest && event.update.block == Blocks.air) {
@@ -73,7 +71,7 @@ object StupidTreasureChestOpeningThing {
 
     @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
-        if (SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+        if (!Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
 
         when (val packet = event.packet) {
             is S02PacketChat -> {
@@ -99,7 +97,10 @@ object StupidTreasureChestOpeningThing {
 
                     if (probable.key.distanceSqToCenter(x, y, z) < 2.5) {
                         probable.value.particle = Vec3(x, y, z)
-                        UChat.chat("$count ${if (longDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset")
+                        printDevMessage(
+                            "$count ${if (longDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
+                            "chtreasure"
+                        )
                     }
                 }
             }
@@ -115,11 +116,11 @@ object StupidTreasureChestOpeningThing {
                         it.key.distanceSq(x, y, z)
                     } ?: return
 
-                    UChat.chat("$sound distance from chest ${probable.key.distanceSq(x, y, z)}")
+                    printDevMessage("$sound distance from chest ${probable.key.distanceSq(x, y, z)}", "chtreasure")
                     if (probable.key.distanceSq(x, y, z) < 6.9 * 6.9) {
                         if (sound == "random.orb") probable.value.progress++
                         else probable.value.progress = 0
-                        UChat.chat("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z")
+                        printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
                     }
                 }
             }
@@ -128,7 +129,7 @@ object StupidTreasureChestOpeningThing {
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
-        if (SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+        if (!Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         for ((pos, chest) in sendHelpPlease) {

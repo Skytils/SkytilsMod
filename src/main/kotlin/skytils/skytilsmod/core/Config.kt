@@ -946,6 +946,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hollowChatCoords = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows Treasure Helper",
+        description = "Helps you open treasure chests in the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var chTreasureHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Chat Tabs",
         description = "Creates various tabs to organize chat.",
         category = "Miscellaneous", subcategory = "Chat Tabs"
