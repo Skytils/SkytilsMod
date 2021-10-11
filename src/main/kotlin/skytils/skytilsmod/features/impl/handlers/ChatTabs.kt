@@ -96,9 +96,9 @@ object ChatTabs {
                         chat.drawnChatLines.clear()
                         chat.resetScroll()
                         for (line in chat.chatLines.asReversed()) {
-                            if (line?.chatComponent == null) println("Null line found.")
+                            if (line?.chatComponent == null) continue
                             chat.invokeSetChatLine(
-                                line.chatComponent ?: continue,
+                                line.chatComponent,
                                 line.chatLineID,
                                 line.updatedCounter,
                                 true
