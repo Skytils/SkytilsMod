@@ -154,7 +154,8 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
                         SkyblockIsland.values().find {
                             it.mode == e["island"].asString
                         } ?: return@mapNotNull null,
-                        e["enabled"].asBoolean
+                        e["enabled"].asBoolean,
+                        e["color"]?.let{Color(it.asInt)} ?: Color.RED
                     )
                 }.onFailure {
                     it.printStackTrace()
@@ -187,6 +188,7 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
                     addProperty("z", it.z.getText().toInt())
                     addProperty("island", island.mode)
                     addProperty("enabled", true)
+                    addProperty("color", Color.RED.rgb)
                 })
             }.onFailure {
                 it.printStackTrace()

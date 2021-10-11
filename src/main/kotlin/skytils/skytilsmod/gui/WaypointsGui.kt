@@ -23,13 +23,11 @@ import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.input.UITextInput
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.RelativeConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
+import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.vigilance.gui.settings.CheckboxComponent
+import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
@@ -133,7 +131,8 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
                                 entry.z.getText().toInt()
                             ),
                             current,
-                            entry.enabled.checked
+                            entry.enabled.checked,
+                            entry.color
                         )
                     )
                 }.onFailure {
@@ -149,17 +148,22 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             Waypoints.waypoints.filter {
                 it.island == island
             }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-                addNewWaypoint(it.name, it.pos, it.enabled)
+                addNewWaypoint(it.name, it.pos, it.enabled, it.color)
             }
         }
     }
 
-    private fun addNewWaypoint(name: String = "", pos: BlockPos = mc.thePlayer.position, enabled: Boolean = true) {
+    private fun addNewWaypoint(
+        name: String = "",
+        pos: BlockPos = mc.thePlayer.position,
+        enabled: Boolean = true,
+        color: Color = Color.RED
+    ) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 80.percent()
-            height = 9.5.percent()
+            height = 30.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
         val enabled = CheckboxComponent(enabled).childOf(container).constrain {
@@ -216,6 +220,14 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
 
+        val colorComponent = ColorComponent(color, false).childOf(container).constrain {
+            x = SiblingConstraint(5f)
+            y = CenterConstraint()
+            width = AspectConstraint()
+        }.also {
+            it.setColor(color)
+        }
+
         SimpleButton("Remove").childOf(container).constrain {
             x = 85.percent()
             y = CenterConstraint()
@@ -225,7 +237,12 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             entries.remove(container)
         }
 
-        entries[container] = Entry(enabled, nameComponent, xComponent, yComponent, zComponent)
+        entries[container] =
+            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent.getColor()).also { entry ->
+                colorComponent.onValueChange { newColor ->
+                    entry.color = newColor as Color
+                }
+            }
     }
 
     override fun onScreenClose() {
@@ -238,6 +255,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         val name: UITextInput,
         val x: UITextInput,
         val y: UITextInput,
-        val z: UITextInput
+        val z: UITextInput,
+        var color: Color
     )
 }

@@ -61,7 +61,8 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 SkyblockIsland.values().find {
                     it.mode == e["island"].asString
                 } ?: return@mapNotNullTo null,
-                e["enabled"].asBoolean
+                e["enabled"].asBoolean,
+                e["color"]?.let { Color(it.asInt) } ?: Color.RED
             )
         }
     }
@@ -76,6 +77,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 addProperty("z", it.pos.z)
                 addProperty("island", it.island.mode)
                 addProperty("enabled", it.enabled)
+                addProperty("color", it.color.rgb)
             })
         }
         gson.toJson(arr, writer)
@@ -91,7 +93,13 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     }
 }
 
-data class Waypoint(var name: String, var pos: BlockPos, var island: SkyblockIsland, var enabled: Boolean) {
+data class Waypoint(
+    var name: String,
+    var pos: BlockPos,
+    var island: SkyblockIsland,
+    var enabled: Boolean,
+    val color: Color
+) {
     fun draw(partialTicks: Float) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
         val x = pos.x - viewerX
@@ -99,7 +107,7 @@ data class Waypoint(var name: String, var pos: BlockPos, var island: SkyblockIsl
         val z = pos.z - viewerZ
         RenderUtil.drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-            Color.RED,
+            color,
             0.5f
         )
         GlStateManager.disableDepth()
