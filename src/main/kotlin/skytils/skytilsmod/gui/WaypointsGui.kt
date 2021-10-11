@@ -220,10 +220,10 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
 
-        val colorComponent = ColorComponent(color, false).childOf(container).constrain {
-            x = SiblingConstraint(5f)
+        val colorComponent = ColorComponent(color, true).childOf(container).constrain {
+            x = SiblingConstraint(25f)
             y = CenterConstraint()
-            width = AspectConstraint()
+            width = CoerceAtLeastConstraint(AspectConstraint(), 20.percent)
         }.also {
             it.setColor(color)
         }

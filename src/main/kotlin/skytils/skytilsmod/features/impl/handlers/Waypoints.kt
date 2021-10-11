@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import gg.essential.elementa.utils.withAlpha
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -107,8 +108,8 @@ data class Waypoint(
         val z = pos.z - viewerZ
         RenderUtil.drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-            color,
-            0.5f
+            color.withAlpha(color.alpha.coerceAtMost(128)),
+            1f
         )
         GlStateManager.disableDepth()
         GlStateManager.disableTexture2D()
