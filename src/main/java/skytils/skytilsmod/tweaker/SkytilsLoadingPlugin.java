@@ -19,9 +19,8 @@
 package skytils.skytilsmod.tweaker;
 
 import kotlin.KotlinVersion;
+import kotlin.text.StringsKt;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.spongepowered.asm.mixin.MixinEnvironment;
-import skytils.skytilsmod.utils.StringUtilsKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,24 +29,35 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
+@IFMLLoadingPlugin.Name("Skytils On Top")
+@IFMLLoadingPlugin.SortingIndex(69)
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
-    private static final String kotlinErrorMessage =
+    public static final String missingDependency =
+            "<html><p>" +
+            "Skytils has detected a possible missing dependency<br>" +
+            "The most likely reason is Essential failed to load.<br>" +
+            "Essential might also not work in your country.<br>" +
+            "Check the Skytils Discord for any announcements, and<br>" +
+            "if there are none, ask for support." +
+            "</p></html>";
+
+    public static final String kotlinErrorMessage =
         "<html><p>" +
         "Skytils has detected a mod with an older version of Kotlin.<br>" +
         "The most common culprit is the ChatTriggers mod.<br>" +
-        "In order to resolve this conflict you must make Skytils be<br>" +
-        "above this mod alphabetically in your mods folder.<br>" +
-        "This tricks Forge into loading Skytils first.<br>" +
-        "You can do this by renaming your Skytils jar to !Skytils.jar,<br>" +
-        "or by renaming the other mod's jar to start with a Z.<br>" +
+        "If you do have ChatTriggers, you can update to 1.3.2<br>" +
+        "or later to fix the issue. https://www.chattriggers.com/<br>" +
+        "In order to resolve this conflict you must<br>" +
+        "deleted the outdated mods.<br>" +
         "If you have already done this and are still getting this error,<br>" +
-        "ask for support in the Discord.";
+        "or need assistance, ask for support in the Discord.";
 
-    private static final String badMixinVersionMessage =
+    public static final String badMixinVersionMessage =
         "<html><p>" +
         "Skytils has detected an older version of Mixin.<br>" +
         "Many of my features require Mixin 0.7 or later!<br>" +
@@ -58,7 +68,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "If you have already done this and are still getting this error,<br>" +
         "ask for support in the Discord.";
 
-    private static final String liteloaderUserMessage =
+    public static final String liteloaderUserMessage =
         "<html><p>" +
         "Skytils has detected that you are using LiteLoader.<br>" +
         "LiteLoader bundles an older, incompatible version of Mixin.<br>" +
@@ -74,58 +84,70 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "VoidChat breaks many of my features!<br>" +
         "In order to resolve this conflict you must remove<br>" +
         "VoidChat from your Minecraft mods folder.<br>" +
-        "A good alternative is Patcher at sk1er.club/mods/Patcher.<br>" +
+        "A good alternative is Patcher at https://sk1er.club/mods/Patcher.<br>" +
         "If you have already done this and are still getting this error,<br>" +
         "ask for support in the Discord." +
         "</p></html>";
 
-    public SkytilsLoadingPlugin() {
-        if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
-            showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toString()).getParentFile().getParentFile().getName() + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
-            exit();
-        }
-        if (!StringUtilsKt.startsWithAny(MixinEnvironment.getCurrentEnvironment().getVersion(), "0.7", "0.8")) {
-            try {
-                Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker");
-                showMessage(liteloaderUserMessage);
+    private static final String betterFPSMessage =
+        "<html><p>" +
+        "Skytils has detected that you are using BetterFPS.<br>" +
+        "BetterFPS breaks my core plugins, and also breaks the game!<br>" +
+        "In order to resolve this conflict you must remove<br>" +
+        "BetterFPS from your Minecraft mods folder.<br>" +
+        "You probably will not notice a change in your FPS.<br>" +
+        "Video showcasing breaking changes: https://streamable.com/q4ip5u.<br>" +
+        "If you have already done this and are still getting this error,<br>" +
+        "ask for support in the Discord." +
+        "</p></html>";
+
+    private final SkytilsLoadingPluginKt kotlinPlugin;
+
+    public SkytilsLoadingPlugin() throws URISyntaxException {
+        if (System.getProperty("skytils.skipStartChecks") == null) {
+            if (!checkForClass("kotlin.KotlinVersion") || !checkForClass("gg.essential.api.EssentialAPI")) {
+                showMessage(missingDependency);
                 exit();
-            } catch (ClassNotFoundException ignored) {
-                showMessage(badMixinVersionMessage + "<br>The culprit seems to be " + new File(MixinEnvironment.class.getProtectionDomain().getCodeSource().getLocation().toString()).getName() + "</p></html>");
+            }
+            if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
+                final File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                File realFile = file;
+                for (int i = 0; i < 5; i++) {
+                    if (realFile == null) {
+                        realFile = file;
+                        break;
+                    }
+                    if (!realFile.getName().endsWith(".jar!") && !realFile.getName().endsWith(".jar")) {
+                        realFile = realFile.getParentFile();
+                    } else break;
+                }
+
+                String name = realFile.getName().contains(".jar") ? realFile.getName() : StringsKt.substringAfterLast(StringsKt.substringBeforeLast(file.getAbsolutePath(), ".jar", "unknown"), "/", "Unknown");
+
+                if (name.endsWith("!")) name = name.substring(0, name.length() - 1);
+
+                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
+                exit();
+            }
+            if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
+                showMessage(voidChatMessage);
+                exit();
+            }
+            if (checkForClass("me.guichaguri.betterfps.BetterFpsHelper")) {
+                showMessage(betterFPSMessage);
                 exit();
             }
         }
+        kotlinPlugin = new SkytilsLoadingPluginKt();
+    }
 
+    private boolean checkForClass(String className) {
         try {
-            Class.forName("com.sky.voidchat.EDFMLLoadingPlugin");
-            showMessage(voidChatMessage);
-            exit();
+            Class.forName(className, false, getClass().getClassLoader());
+            return true;
         } catch (ClassNotFoundException ignored) {
+            return false;
         }
-    }
-
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[0];
-    }
-
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
-
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
     }
 
     private void showMessage(String errorMessage) {
@@ -189,7 +211,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     /**
      * Bypasses forges security manager to exit the jvm
      */
-    private void exit() {
+    public static void exit() {
         try {
             Class<?> clazz = Class.forName("java.lang.Shutdown");
             Method m_exit = clazz.getDeclaredMethod("exit", int.class);
@@ -199,5 +221,30 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    @Override
+    public String[] getASMTransformerClass() {
+        return kotlinPlugin.getASMTransformerClass();
+    }
+
+    @Override
+    public String getModContainerClass() {
+        return kotlinPlugin.getModContainerClass();
+    }
+
+    @Override
+    public String getSetupClass() {
+        return kotlinPlugin.getSetupClass();
+    }
+
+    @Override
+    public void injectData(Map<String, Object> data) {
+        kotlinPlugin.injectData(data);
+    }
+
+    @Override
+    public String getAccessTransformerClass() {
+        return kotlinPlugin.getAccessTransformerClass();
     }
 }

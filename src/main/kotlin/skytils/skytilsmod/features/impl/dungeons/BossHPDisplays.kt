@@ -18,8 +18,8 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import com.google.common.base.Predicate
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.world.World
@@ -138,7 +138,7 @@ class BossHPDisplays {
                         }
                     }
                 }
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 var i = 0
                 for ((name, timer) in respawnTimers.entries) {
@@ -157,7 +157,7 @@ class BossHPDisplays {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -211,7 +211,7 @@ class BossHPDisplays {
                         "Sadan"
                     ) && giantNames.size > 1
                 }
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 for (i in giantNames.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -228,7 +228,7 @@ class BossHPDisplays {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             for (i in GIANT_NAMES.indices) {
                 val text = GIANT_NAMES[i] + " §a20M§c❤"

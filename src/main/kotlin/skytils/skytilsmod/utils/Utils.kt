@@ -17,34 +17,38 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.universal.UResolution
+import gg.essential.universal.wrappers.message.UMessage
+import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
+import gg.essential.vigilance.gui.settings.CheckboxComponent
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.settings.GameSettings
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.inventory.Slot
+import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.MathHelper
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
 import java.awt.Color
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
-import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.Future
 import kotlin.math.floor
@@ -52,6 +56,15 @@ import kotlin.math.roundToInt
 
 
 object Utils {
+
+    val azooPuzzoo by lazy {
+        File(Skytils.modDir, "azoopuzzoo").exists()
+    }
+
+    val breefingdog by lazy {
+        File(Skytils.modDir, "breefingdog").exists()
+    }
+
     @JvmField
     var noSychic = false
 
@@ -75,66 +88,6 @@ object Utils {
 
     @JvmStatic
     var random = Random()
-
-
-    fun checkForHypixel() {
-        isOnHypixel = run {
-            try {
-                if (mc.theWorld != null && !mc.isSingleplayer) {
-                    if (mc.thePlayer != null && mc.thePlayer.clientBrand != null) {
-                        if (mc.thePlayer.clientBrand.lowercase().contains("hypixel")) return@run true
-                    }
-                    if (mc.currentServerData != null) return@run mc.currentServerData.serverIP.lowercase()
-                        .contains("hypixel")
-                }
-                return@run false
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return@run false
-            }
-        }
-    }
-
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun checkForSkyblock() {
-        if (isOnHypixel) {
-            val scoreboardObj = mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
-            if (scoreboardObj != null) {
-                val scObjName = ScoreboardUtil.cleanSB(scoreboardObj.displayName)
-                if (scObjName.contains("SKYBLOCK")) {
-                    inSkyblock = true
-                    return
-                }
-            }
-        }
-        inSkyblock = false
-    }
-
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun checkForDungeons() {
-        if (inSkyblock) {
-            if (ScoreboardUtil.sidebarLines.any {
-                    val sCleaned = ScoreboardUtil.cleanSB(it)
-                    sCleaned.contains("The Catacombs") && !sCleaned.contains("Queue") || sCleaned.contains("Dungeon Cleared:")
-                }) {
-                inDungeons = true
-                return
-            }
-        }
-        inDungeons = false
-    }
-
-    fun getSlotUnderMouse(gui: GuiContainer): Slot {
-        return ObfuscationReflectionHelper.getPrivateValue(GuiContainer::class.java, gui, "theSlot", "field_147006_u")
-    }
 
     fun getBlocksWithinRangeAtSameY(center: BlockPos, radius: Int, y: Int): Iterable<BlockPos> {
         val corner1 = BlockPos(center.x - radius, y, center.z - radius)
@@ -220,9 +173,6 @@ object Utils {
         }
     }
 
-    fun InputStream.readTextAndClose(charset: Charset = Charsets.UTF_8): String =
-        this.bufferedReader(charset).use { it.readText() }
-
     /**
      * @link https://stackoverflow.com/a/47925649
      */
@@ -255,13 +205,8 @@ object Utils {
         return bossName.endsWith(correctBoss)
     }
 
-    fun printDebugMessage(component: IChatComponent) {
-        if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(component)
-    }
-
-    fun printDebugMessage(string: String) {
-        if (Skytils.config.debugMode) mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText(string))
-    }
+    fun getKeyDisplayStringSafe(keyCode: Int): String =
+        runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrNull() ?: "Key $keyCode"
 }
 
 typealias ConcurrentHashSet<T> = ConcurrentSet<T>
@@ -281,13 +226,10 @@ val EntityLivingBase.baseMaxHealth: Double
 fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
     if (this is AccessorGuiNewChat) {
         if (this.chatOpen) {
-            val scaledresolution = ScaledResolution(mc)
-            val scaleFactor = scaledresolution.scaleFactor
+            val scaleFactor = UResolution.scaleFactor
             val chatScale = this.chatScale
-            var xPos = mouseX / scaleFactor - 3
-            var yPos = mouseY / scaleFactor - 27
-            xPos = MathHelper.floor_float(xPos.toFloat() / chatScale)
-            yPos = MathHelper.floor_float(yPos.toFloat() / chatScale)
+            val xPos = MathHelper.floor_float((mouseX / scaleFactor.toInt() - 3).toFloat() / chatScale)
+            val yPos = MathHelper.floor_float((mouseY / scaleFactor.toInt() - 27).toFloat() / chatScale)
             if (xPos >= 0 && yPos >= 0) {
                 val lineCount: Int = this.lineCount.coerceAtMost(this.drawnChatLines.size)
                 if (xPos <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && yPos < mc.fontRendererObj.FONT_HEIGHT * lineCount + lineCount) {
@@ -300,4 +242,35 @@ fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
         }
     }
     return null
+}
+
+fun UMessage.append(item: Any) = this.addTextComponent(item)
+fun UTextComponent.setHoverText(text: String): UTextComponent {
+    hoverAction = HoverEvent.Action.SHOW_TEXT
+    hoverValue = text
+    return this
+}
+
+fun Entity.getXZDistSq(other: Entity): Double {
+    val xDelta = this.posX - other.posX
+    val zDelta = this.posZ - other.posZ
+    return xDelta * xDelta + zDelta * zDelta
+}
+
+val Entity.hasMoved
+    get() = this.posX != this.prevPosX || this.posY != this.prevPosY || this.posZ != this.prevPosZ
+
+fun CheckboxComponent.toggle() {
+    this.mouseClick(this.getLeft().toDouble(), this.getTop().toDouble(), 0)
+}
+
+fun CheckboxComponent.setState(checked: Boolean) {
+    if (this.checked != checked) this.toggle()
+}
+
+fun BlockPos?.toVec3() = if (this == null) null else Vec3(this)
+
+fun <T : Any> T?.ifNull(run: () -> Unit): T? {
+    if (this == null) run()
+    return this
 }

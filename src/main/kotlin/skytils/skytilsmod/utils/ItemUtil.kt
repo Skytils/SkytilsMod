@@ -22,10 +22,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraftforge.common.util.Constants
+import skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
 import java.util.*
 
 object ItemUtil {
-    private val RARITY_PATTERN = "(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>[A-Z]+)".toRegex()
     private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
     const val NBT_INTEGER = 3
     private const val NBT_STRING = 8
@@ -153,16 +153,16 @@ object ItemUtil {
         val name = display.getString("Name")
 
         // Determine the item's rarity
-        for (i in 0 until lore.tagCount()) {
+        for (i in (lore.tagCount() - 1) downTo 0) {
             val currentLine = lore.getStringTagAt(i)
             val rarityMatcher = RARITY_PATTERN.find(currentLine)
             val petRarityMatcher = PET_PATTERN.find(name)
             if (rarityMatcher != null) {
                 val rarity = rarityMatcher.groupValues.getOrNull(3) ?: continue
-                for (itemRarity in ItemRarity.values()) {
-                    if (rarity.startsWith(itemRarity.rarityName)) {
-                        return itemRarity
-                    }
+                ItemRarity.values().find {
+                    it.rarityName == rarity
+                }?.let {
+                    return it
                 }
             } else if (petRarityMatcher != null) {
                 val color = petRarityMatcher.groupValues.getOrNull(1) ?: continue

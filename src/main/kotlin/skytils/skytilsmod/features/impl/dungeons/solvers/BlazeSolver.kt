@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
@@ -24,7 +25,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -134,7 +134,10 @@ class BlazeSolver {
                     val compare = blaze1.health.compareTo(blaze2.health)
                     if (compare == 0 && !impossible) {
                         impossible = true
-                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§c[§f§lWARNING§c] Skytils detected two blazes with the exact same amount of health!"))
+                        UChat.chat("§c[§f§lWARNING§c] Skytils detected two blazes with the exact same amount of health!")
+                        val first = blaze1.blaze.health
+                        val second = blaze2.blaze.health
+                        if (first.toInt() == second.toInt()) return@sortWith first.compareTo(second)
                     }
                     return@sortWith compare
                 }

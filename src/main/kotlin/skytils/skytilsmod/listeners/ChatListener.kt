@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.listeners
 
-import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.StringUtils.stripControlCodes
@@ -26,8 +25,9 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.commands.RepartyCommand
-import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.commands.impl.RepartyCommand
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import java.util.regex.Pattern
 
@@ -39,6 +39,7 @@ class ChatListener {
         if (unformatted.startsWith("Your new API key is ")) {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
             Skytils.config.apiKey = apiKey
+            Skytils.hylinAPI.key = Skytils.config.apiKey
             Skytils.config.markDirty()
             mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils updated your set Hypixel API key to " + EnumChatFormatting.DARK_GREEN + apiKey))
         }
@@ -100,7 +101,7 @@ class ChatListener {
                     }
                 }
             } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")) {
-                val player = Minecraft.getMinecraft().thePlayer
+                val player = mc.thePlayer
                 val partyStart = party_start_pattern.matcher(unformatted)
                 val leader = leader_pattern.matcher(unformatted)
                 val members = members_pattern.matcher(unformatted)
@@ -203,7 +204,6 @@ class ChatListener {
     }
 
     companion object {
-        var mc = Minecraft.getMinecraft()!!
         private var rejoinThread: Thread? = null
         private var lastPartyDisbander = ""
         private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")

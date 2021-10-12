@@ -17,18 +17,19 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UChat
+import gg.essential.universal.UResolution
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -39,28 +40,31 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemMonsterPlacer
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.*
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.BossBarEvent
-import skytils.skytilsmod.events.CheckRenderEntityEvent
-import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.*
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderItem
@@ -83,7 +87,7 @@ class MiscFeatures {
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (!event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
+        if (!Skytils.config.guildLeaveConfirmation || !event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
         if (System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
             event.isCanceled = true
             lastGLeaveCommand = System.currentTimeMillis()
@@ -106,7 +110,7 @@ class MiscFeatures {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
-        val unformatted = event.message.unformattedText.stripControlCodes().trim { it <= ' ' }
+        val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
         if (unformatted == "The ground begins to shake as an Endstone Protector rises from below!") {
             golemSpawnTime = System.currentTimeMillis() + 20000
@@ -116,23 +120,27 @@ class MiscFeatures {
             if (formatted.startsWith("§eZapped §a") && formatted.endsWith("§a§lUNDO§r")) {
                 blockZapperCooldownExpiration = 0L
                 blockZapperUses++
-                Utils.printDebugMessage("$blockZapperUses")
+                printDevMessage("$blockZapperUses", "zapper")
 
                 if (blockZapperUses >= 20) {
                     blockZapperUses = 0
                     blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
-                    Utils.printDebugMessage("$blockZapperCooldownExpiration")
+                    printDevMessage("$blockZapperCooldownExpiration", "zapper")
                 }
             }
             if (unformatted == "Your zapper is temporarily fatigued!") {
                 val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
-                Utils.printDebugMessage("$blockZapperUses ${duration.inWholeSeconds}")
-                if (duration.isPositive()) event.message.appendText(
-                    " §eThis will expire in${
+                printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
+                if (duration.isPositive()) {
+                    UChat.chat("§3Skytils > §eThis will expire in${
                         duration
                             .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
-                    }"
-                )
+                    }")
+                } else {
+                    blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
+                    blockZapperUses = 0
+                    printDevMessage("fallback: $blockZapperCooldownExpiration", "zapper")
+                }
             }
         }
         if (!Utils.inDungeons) {
@@ -145,8 +153,41 @@ class MiscFeatures {
                                 ChatComponentText("§aClick to copy to clipboard.")
                             )
                         ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopyfail $unformatted")
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
 
+                }
+            }
+        }
+        if (Utils.inSkyblock) {
+            if (Skytils.config.autoCopyRNGDrops) {
+                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith(
+                        "§r§6§lPET DROP! "
+                    ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
+                ) {
+                    GuiScreen.setClipboardString(unformatted)
+                    UChat.chat("§9§lSkytils §8» §aCopied RNG drop to clipboard.")
+                    event.message.chatStyle
+                        .setChatHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("§aClick to copy to clipboard.")
+                            )
+                        ).chatClickEvent =
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
+                }
+            }
+            if (Skytils.config.autoCopyVeryRareDrops) {
+                if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
+                    GuiScreen.setClipboardString(unformatted)
+                    UChat.chat("§9§lSkytils §8» §aCopied very rare drop to clipboard.")
+                    event.message.chatStyle
+                        .setChatHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("§aClick to copy to clipboard.")
+                            )
+                        ).chatClickEvent =
+                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
                 }
             }
         }
@@ -157,18 +198,6 @@ class MiscFeatures {
         if (!Utils.inSkyblock) return
         if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
             event.isCanceled = true
-        } else if (event.entity is EntityCreeper) {
-            val entity = event.entity
-            if (!Utils.inDungeons && Skytils.config.hideCreeperVeilNearNPCs && entity.maxHealth == 20f && entity.health == 20f && entity.powered) {
-                if (mc.theWorld.playerEntities.any { p: EntityPlayer ->
-                        p is EntityOtherPlayerMP && p.getUniqueID()
-                            .version() == 2 && p.getHealth() == 20f && !p.isPlayerSleeping() && p.getDistanceSqToEntity(
-                            event.entity
-                        ) <= 49
-                    }) {
-                    event.isCanceled = true
-                }
-            }
         } else if (event.entity is EntityFallingBlock) {
             val entity = event.entity
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.block.block === Blocks.gold_block) {
@@ -244,49 +273,6 @@ class MiscFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Utils.inSkyblock) return
-        if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
-            val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
-            if (!extraAttr.getBoolean("ethermerge")) return
-            val dist = 57.0 + extraAttr.getInteger("tuned_transmission")
-            val vec3 = mc.thePlayer.getPositionEyes(event.partialTicks)
-            val vec31 = mc.thePlayer.getLook(event.partialTicks)
-            val vec32 = vec3.addVector(
-                vec31.xCoord * dist,
-                vec31.yCoord * dist,
-                vec31.zCoord * dist
-            )
-            val block = (mc.theWorld.rayTraceBlocks(vec3, vec32, true, false, true) ?: return).blockPos
-            if (mc.theWorld.getBlockState(block).block.material.isSolid && (1..2).none {
-                    mc.theWorld.getBlockState(
-                        block.up(
-                            it
-                        )
-                    ).block != Blocks.air
-                }) {
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-
-                val x = block.x - viewerX
-                val y = block.y - viewerY
-                val z = block.z - viewerZ
-
-                GlStateManager.disableCull()
-                GlStateManager.disableDepth()
-                GlStateManager.enableBlend()
-                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                RenderUtil.drawFilledBoundingBox(
-                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-                    Skytils.config.showEtherwarpTeleportPosColor
-                )
-                GlStateManager.disableBlend()
-                GlStateManager.enableCull()
-                GlStateManager.enableDepth()
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
@@ -341,6 +327,28 @@ class MiscFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onTooltip(event: ItemTooltipEvent) {
+        if (!Utils.inSkyblock) return
+        if (!Skytils.config.hideTooltipsOnStorage) return
+        if (event.toolTip == null) return
+        if (mc.currentScreen is GuiChest) {
+            val player = Minecraft.getMinecraft().thePlayer
+            val chest = player.openContainer as ContainerChest
+            val inventory = chest.lowerChestInventory
+            val chestName = inventory.displayName.unformattedText
+            if (chestName.equals("Storage")) {
+                if (ItemUtil.getDisplayName(event.itemStack).containsAny(
+                        "Backpack",
+                        "Ender Chest",
+                        "Locked Page"
+                    )
+                )
+                    event.toolTip.clear()
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onSlotClickLow(event: SlotClickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.middleClickGUIItems) return
@@ -356,21 +364,97 @@ class MiscFeatures {
                 ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
             ) return
             if (ItemUtil.getItemLore(item).any {
-                    it.startsWith("§bRight-Click")
+                    it.contains("§bRight-Click")
                 }) return
             event.isCanceled = true
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer)
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
+
+        if (Skytils.config.legionPlayerDisplay) {
+            hasLegion = mc.thePlayer.inventory.armorInventory.any {
+                getExtraAttributes(it).run {
+                    this != null && this.hasKey("enchantments") && this.getCompoundTag("enchantments")
+                        .hasKey("ultimate_legion")
+                }
+            }
+            if (hasLegion) {
+                legionPlayers = mc.theWorld.getPlayers<EntityPlayer>(
+                    EntityOtherPlayerMP::class.java
+                ) { p: EntityPlayer? ->
+                    p != null && p !== mc.thePlayer && p.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30 && p.uniqueID.version() != 2 && isInTablist(
+                        p
+                    )
+                }.size
+            }
+        }
+        if (Skytils.config.summoningEyeDisplay && SBInfo.mode == SkyblockIsland.TheEnd.mode) {
+            placedEyes = PlacedSummoningEyeDisplay.SUMMONING_EYE_FRAMES.count {
+                mc.theWorld.getBlockState(it).run {
+                    block === Blocks.end_portal_frame && this.getValue(BlockEndPortalFrame.EYE)
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
+        val item = event.stack ?: return
+        if (!Utils.inSkyblock || mc.thePlayer == null || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
+        var stackTip = ""
+
+        val c = mc.thePlayer.openContainer
+        if (c is ContainerChest) {
+            val name = c.lowerChestInventory.name
+            if (Skytils.config.showBestiaryLevel && name.startsWithAny(
+                    "Bestiary ➜ ",
+                    "Search Results"
+                ) && item.item != Item.getItemFromBlock(Blocks.stained_glass_pane)
+            ) {
+                val arrowSlot = c.inventorySlots.getOrNull(48)?.stack
+                if (arrowSlot != null && arrowSlot.item == Items.arrow && ItemUtil.getItemLore(item)
+                        .lastOrNull() == "§eClick to view!" /* && ItemUtil.getDisplayName(arrowSlot) == "§aGo Back" && ItemUtil.getItemLore(
+                        arrowSlot
+                    ).firstOrNull() == "§7To Bestiary"*/
+                ) {
+                    var ending = ItemUtil.getDisplayName(item).substringAfterLast(" ", "")
+                    if (ending.any { !it.isUpperCase() }) ending = ""
+                    stackTip = ending.romanToDecimal().toString()
+                }
+            }
+        }
+
+        if (stackTip.isNotBlank()) {
+            GlStateManager.disableLighting()
+            GlStateManager.disableDepth()
+            GlStateManager.disableBlend()
+            event.fr.drawStringWithShadow(
+                stackTip,
+                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
+                (event.y + 9).toFloat(),
+                16777215
+            )
+            GlStateManager.enableLighting()
+            GlStateManager.enableDepth()
+        }
+    }
+
     companion object {
         private val mc = Minecraft.getMinecraft()
         private var golemSpawnTime: Long = 0
+        var legionPlayers = 0
+        var hasLegion = false
+        var placedEyes = 0
 
         init {
             GolemSpawnTimerElement()
             LegionPlayerDisplay()
             PlacedSummoningEyeDisplay()
+            WorldAgeDisplay()
         }
     }
 
@@ -378,7 +462,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
-                val sr = ScaledResolution(mc)
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val text =
                     "§cGolem spawn in: §a" + ((golemSpawnTime - System.currentTimeMillis()) / 1000.0).roundToPrecision(1) + "s"
@@ -420,29 +504,10 @@ class MiscFeatures {
 
     class LegionPlayerDisplay : GuiElement("Legion Player Display", FloatPair(50, 50)) {
         override fun render() {
-            val player = mc.thePlayer
-            if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                var hasLegion = false
-                for (armor in player.inventory.armorInventory) {
-                    val extraAttr = getExtraAttributes(armor)
-                    if (extraAttr != null && extraAttr.hasKey("enchantments") && extraAttr.getCompoundTag("enchantments")
-                            .hasKey("ultimate_legion")
-                    ) {
-                        hasLegion = true
-                        break
-                    }
-                }
-                if (!hasLegion) return
+            if (hasLegion && toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
-                val players = mc.theWorld.getPlayers<EntityPlayer>(
-                    EntityOtherPlayerMP::class.java
-                ) { p: EntityPlayer? ->
-                    p!!.getDistanceSqToEntity(player) <= 30 * 30 && p.uniqueID.version() != 2 && p !== player && isInTablist(
-                        p
-                    )
-                }
                 ScreenRenderer.fontRenderer.drawString(
-                    if (Skytils.config.legionCap && players.size > 20) "20" else players.size.toString(),
+                    if (Skytils.config.legionCap && legionPlayers > 20) "20" else legionPlayers.toString(),
                     20f,
                     5f,
                     CommonColors.ORANGE,
@@ -457,7 +522,7 @@ class MiscFeatures {
             val y = 0f
             renderItem(ItemStack(Items.enchanted_book), x.toInt(), y.toInt())
             ScreenRenderer.fontRenderer.drawString(
-                "30",
+                "69",
                 x + 20,
                 y + 5,
                 CommonColors.ORANGE,
@@ -469,7 +534,7 @@ class MiscFeatures {
         override val height: Int
             get() = 16
         override val width: Int
-            get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("30")
+            get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("69")
 
         override val toggled: Boolean
             get() = Skytils.config.legionPlayerDisplay
@@ -483,19 +548,7 @@ class MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (SBInfo.mode != SBInfo.SkyblockIsland.TheEnd.mode) return
-                var invalid = false
-                var placedEyes = 0
-                for (pos in SUMMONING_EYE_FRAMES) {
-                    val block = mc.theWorld.getBlockState(pos)
-                    if (block.block !== Blocks.end_portal_frame) {
-                        invalid = true
-                        break
-                    } else if (block.getValue(BlockEndPortalFrame.EYE)) {
-                        placedEyes++
-                    }
-                }
-                if (invalid) return
+                if (SBInfo.mode != SkyblockIsland.TheEnd.mode) return
                 renderTexture(ICON, 0, 0)
                 ScreenRenderer.fontRenderer.drawString(
                     "$placedEyes/8",
@@ -529,7 +582,7 @@ class MiscFeatures {
             get() = Skytils.config.summoningEyeDisplay
 
         companion object {
-            private val SUMMONING_EYE_FRAMES = arrayOf(
+            val SUMMONING_EYE_FRAMES = arrayOf(
                 BlockPos(-669, 9, -275),
                 BlockPos(-669, 9, -277),
                 BlockPos(-670, 9, -278),
@@ -541,6 +594,130 @@ class MiscFeatures {
             )
             private val ICON = ResourceLocation("skytils", "icons/SUMMONING_EYE.png")
         }
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class WorldAgeDisplay : GuiElement("World Age Display", FloatPair(50, 60)) {
+
+        var usesBaldTimeChanger = false
+
+        override fun render() {
+            if (toggled && Utils.inSkyblock && mc.theWorld != null) {
+                if (usesBaldTimeChanger) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "Incompatible Time Changer detected.",
+                        0f,
+                        0f,
+                        CommonColors.RED,
+                        TextAlignment.LEFT_RIGHT,
+                        TextShadow.NORMAL
+                    )
+                    return
+                }
+                val day = (mc.theWorld.worldInfo as AccessorWorldInfo).realWorldTime / 24000
+                ScreenRenderer.fontRenderer.drawString(
+                    "Day ${NumberUtil.nf.format(day)}",
+                    0f,
+                    0f,
+                    CommonColors.ORANGE,
+                    TextAlignment.LEFT_RIGHT,
+                    TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            usesBaldTimeChanger =
+                Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }
+            if (usesBaldTimeChanger) {
+                ScreenRenderer.fontRenderer.drawString(
+                    "Incompatible Time Changer detected.",
+                    0f,
+                    0f,
+                    CommonColors.RED,
+                    TextAlignment.LEFT_RIGHT,
+                    TextShadow.NORMAL
+                )
+                return
+            }
+            ScreenRenderer.fontRenderer.drawString(
+                "Day 0",
+                0f,
+                0f,
+                CommonColors.ORANGE,
+                TextAlignment.LEFT_RIGHT,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Day 0")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showWorldAge
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", FloatPair(50, 60)) {
+        override fun render() {
+            //This is a placeholder
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "Item Name",
+                0f,
+                0f,
+                CommonColors.WHITE,
+                TextAlignment.MIDDLE,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = fr.FONT_HEIGHT
+        override val width: Int
+            get() = fr.getStringWidth("Item Name")
+
+        override val toggled: Boolean
+            get() = Skytils.config.moveableItemNameHighlight
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    object ActionBarDummy : GuiElement("Action Bar", FloatPair(50, 70)) {
+        override fun render() {
+            //This is a placeholder
+        }
+
+        override fun demoRender() {
+            ScreenRenderer.fontRenderer.drawString(
+                "Action Bar",
+                0f,
+                0f,
+                CommonColors.WHITE,
+                TextAlignment.MIDDLE,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = fr.FONT_HEIGHT
+        override val width: Int
+            get() = fr.getStringWidth("Action Bar")
+
+        override val toggled: Boolean
+            get() = Skytils.config.moveableActionBar
 
         init {
             Skytils.guiManager.registerElement(this)

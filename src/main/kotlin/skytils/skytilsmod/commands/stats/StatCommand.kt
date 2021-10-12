@@ -17,29 +17,30 @@
  */
 package skytils.skytilsmod.commands.stats
 
-import com.google.gson.JsonObject
-import net.minecraft.command.CommandBase
+import gg.essential.universal.wrappers.message.UMessage
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
+import skytils.hylin.mojang.AshconException
+import skytils.hylin.request.HypixelAPIException
+import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.commands.BaseCommand
+import java.util.*
 
-abstract class StatCommand(private val needApiKey: Boolean = true, private val needProfile: Boolean = true) :
-    CommandBase() {
+abstract class StatCommand(
+    name: String,
+    private val needApiKey: Boolean = true,
+    private val needProfile: Boolean = true,
+    aliases: List<String> = emptyList()
+) :
+    BaseCommand(name, aliases) {
 
     val key: String
         get() = Skytils.config.apiKey
 
-    override fun getCommandUsage(sender: ICommandSender): String {
-        return "/${this.commandName} [player]"
-    }
-
-    final override fun getRequiredPermissionLevel(): Int {
-        return 0
-    }
-
+    override fun getCommandUsage(sender: ICommandSender): String = "/${this.commandName} [player]"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         if (needApiKey && key.isEmpty()) {
@@ -49,30 +50,37 @@ abstract class StatCommand(private val needApiKey: Boolean = true, private val n
         Skytils.threadPool.submit {
             val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
             printMessage("§aGetting data for ${username}...")
-            val uuid =
-                if (args.isEmpty()) mc.thePlayer.uniqueID.toString().replace("-", "") else APIUtil.getUUID(username)
-            if (uuid.isNullOrEmpty()) return@submit
+            val uuid = try {
+                (if (args.isEmpty()) mc.thePlayer.uniqueID else Skytils.hylinAPI.getUUIDSync(username))
+            } catch (e: AshconException) {
+                printMessage("§cFailed to get UUID, reason: ${e.message}")
+                return@submit
+            } ?: return@submit
             if (needProfile) {
-                val latestProfile: String = APIUtil.getLatestProfileID(uuid, key) ?: return@submit
-
-                val profileResponse: JsonObject =
-                    APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
-                if (!profileResponse["success"].asBoolean) {
-                    printMessage("§cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
+                val profile = try {
+                    Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
+                } catch (e: HypixelAPIException) {
+                    printMessage("§cUnable to retrieve profile information: ${e.message}")
                     return@submit
-                }
-                displayStats(username, uuid, profileResponse)
+                } ?: return@submit
+                displayStats(username, uuid, profile)
             } else displayStats(username, uuid)
         }
     }
 
     protected fun printMessage(component: IChatComponent) {
-        mc.ingameGUI.chatGUI.printChatMessage(component)
+        UMessage(component).chat()
     }
 
     protected fun printMessage(msg: String) {
         printMessage(ChatComponentText(msg))
     }
 
-    abstract fun displayStats(username: String, uuid: String, profileData: JsonObject = JsonObject())
+    protected open fun displayStats(username: String, uuid: UUID, profileData: Member) {
+        error("function displayStats for command ${this.commandName} is not initalized!")
+    }
+
+    protected open fun displayStats(username: String, uuid: UUID) {
+        error("function displayStats for command ${this.commandName} is not initalized!")
+    }
 }

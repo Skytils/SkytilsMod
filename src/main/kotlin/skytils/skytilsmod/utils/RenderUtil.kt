@@ -32,7 +32,7 @@ import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.mixins.accessors.AccessorMinecraft
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -266,8 +266,15 @@ object RenderUtil {
      * @author SteveKunG
      */
     @JvmStatic
-    fun renderTexture(texture: ResourceLocation?, x: Int, y: Int, width: Int = 16, height: Int = 16) {
-        RenderHelper.enableGUIStandardItemLighting()
+    fun renderTexture(
+        texture: ResourceLocation?,
+        x: Int,
+        y: Int,
+        width: Int = 16,
+        height: Int = 16,
+        enableLighting: Boolean = true
+    ) {
+        if (enableLighting) RenderHelper.enableGUIStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.enableBlend()
         GlStateManager.enableDepth()
@@ -478,13 +485,19 @@ object RenderUtil {
      * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
      * @author SteveKunG
      */
-    private fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity?) {
+    fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity?) {
         if (rarity != null) {
             val alpha = Skytils.config.itemRarityOpacity
-            GlStateManager.disableLighting()
-            GlStateManager.disableDepth()
+
+            // save the states
+            val lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING)
+            val depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
+            val alphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
+
+            if (lightingEnabled) GlStateManager.disableLighting()
+            if (depthEnabled) GlStateManager.disableDepth()
             GlStateManager.enableBlend()
-            GlStateManager.enableAlpha()
+            if (!alphaEnabled) GlStateManager.enableAlpha()
             when {
                 (Skytils.config.itemRarityShape == 0) -> {
                     Minecraft.getMinecraft().textureManager.bindTexture(RARITY)
@@ -512,9 +525,9 @@ object RenderUtil {
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND)
             Gui.drawModalRectWithCustomSizedTexture(xPos, yPos, 0f, 0f, 16, 16, 16f, 16f)
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE)
-            GlStateManager.enableLighting()
-            GlStateManager.enableDepth()
-            GlStateManager.disableAlpha()
+            if (lightingEnabled) GlStateManager.enableLighting()
+            if (depthEnabled) GlStateManager.enableDepth()
+            if (!alphaEnabled) GlStateManager.disableAlpha()
         }
     }
 
@@ -645,6 +658,37 @@ object RenderUtil {
             color.rgb
         )
     }
+
+    fun drawDurabilityBar(xPos: Int, yPos: Int, durability: Double) {
+        val j = (13.0 - durability * 13.0).roundToInt()
+        val i = (255.0 - durability * 255.0).roundToInt()
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableAlpha()
+        GlStateManager.disableBlend()
+        drawRect(xPos + 2, yPos + 13, 13, 2, 0, 0, 0, 255)
+        drawRect(xPos + 2, yPos + 13, 12, 1, (255 - i) / 4, 64, 0, 255)
+        drawRect(xPos + 2, yPos + 13, j, 1, 255 - i, i, 0, 255)
+        //GlStateManager.enableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
+    }
+
+    fun drawRect(x: Number, y: Number, width: Number, height: Number, red: Int, green: Int, blue: Int, alpha: Int) {
+        val tesselator = Tessellator.getInstance()
+        val renderer = tesselator.worldRenderer
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR)
+        renderer.pos(x.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
+        renderer.pos(x.toDouble(), y.toDouble() + height.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
+        renderer.pos(x.toDouble() + width.toDouble(), y.toDouble() + height.toDouble(), 0.0)
+            .color(red, green, blue, alpha).endVertex()
+        renderer.pos(x.toDouble() + width.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
+        tesselator.draw()
+    }
 }
 
 fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
+fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)

@@ -19,9 +19,9 @@ package skytils.skytilsmod.utils
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -32,6 +32,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.events.SendChatMessageEvent
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -110,15 +112,24 @@ object SBInfo {
     }
 
     @SubscribeEvent
+    fun onPacket(event: PacketEvent.SendEvent) {
+        if (Utils.isOnHypixel && event.packet is C01PacketChatMessage) {
+            if (event.packet.message.startsWith("/locraw")) {
+                lastLocRaw = System.currentTimeMillis()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null || !Utils.inSkyblock) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
-        if (locraw == null && currentTime - joinedWorld > 1200 && currentTime - lastLocRaw > 15000) {
+        if (locraw == null && currentTime - joinedWorld > 1300 && currentTime - lastLocRaw > 15000) {
             lastLocRaw = System.currentTimeMillis()
             Skytils.sendMessageQueue.add("/locraw")
         }
         try {
-            val scoreboard = Minecraft.getMinecraft().thePlayer.worldScoreboard
+            val scoreboard = mc.thePlayer.worldScoreboard
             val sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1) //§707/14/20
             val scores: List<Score> = ArrayList(scoreboard.getSortedScores(sidebarObjective))
             val lines: MutableList<String> = ArrayList()
@@ -142,8 +153,12 @@ object SBInfo {
                     } catch (e: ParseException) {
                     }
                 }
-                location =
-                    lines[4].stripControlCodes().replace("[^A-Za-z0-9() ]".toRegex(), "").trim { it <= ' ' }
+                for (loc in lines) {
+                    if (loc.contains('⏣')) {
+                        location = loc.stripControlCodes().replace("[^A-Za-z0-9() -]".toRegex(), "").trim()
+                        break
+                    }
+                }
             }
             objective = null
             var objTextLast = false
@@ -157,20 +172,22 @@ object SBInfo {
             e.printStackTrace()
         }
     }
+}
 
-    sealed class SkyblockIsland(val mode: String) {
-        object BlazingFortress : SkyblockIsland("combat_2")
-        object CrystalHollows : SkyblockIsland("crystal_hollows")
-        object DeepCaverns : SkyblockIsland("mining_2")
-        object Dungeon : SkyblockIsland("dungeon")
-        object DungeonHub : SkyblockIsland("dungeon_hub")
-        object DwarvenMines : SkyblockIsland("mining_3")
-        object FarmingIsland : SkyblockIsland("farming_1")
-        object GoldMine : SkyblockIsland("mining_1")
-        object Hub : SkyblockIsland("hub")
-        object TheEnd : SkyblockIsland("combat_3")
-        object ThePark : SkyblockIsland("foraging_1")
-        object PrivateIsland : SkyblockIsland("dynamic")
-        object SpiderDen : SkyblockIsland("combat_1")
-    }
+enum class SkyblockIsland(val formattedName: String, val mode: String) {
+    PrivateIsland("Private Island", "dynamic"),
+    SpiderDen("Spider's Den", "combat_1"),
+    BlazingFortress("Blazing Fortress", "combat_2"),
+    TheEnd("The End", "combat_3"),
+    GoldMine("Gold Mine", "mining_1"),
+    DeepCaverns("Deep Caverns", "mining_2"),
+    DwarvenMines("Dwarven Mines", "mining_3"),
+    CrystalHollows("Crystal Hollows", "crystal_hollows"),
+    FarmingIsland("The Farming Islands", "farming_1"),
+    ThePark("The Park", "foraging_1"),
+    Dungeon("Dungeon", "dungeon"),
+    DungeonHub("Dungeon Hub", "dungeon_hub"),
+    Hub("Hub", "hub"),
+    DarkAuction("Dark Auction", "dark_auction"),
+    JerryWorkshop("Jerry's Workshop", "winter")
 }

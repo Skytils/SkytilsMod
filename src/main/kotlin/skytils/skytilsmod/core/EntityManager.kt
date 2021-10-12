@@ -17,9 +17,9 @@
  */
 package skytils.skytilsmod.core
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.misc.damagesplash.FakeEntity
 import java.util.*
 
@@ -60,7 +60,7 @@ object EntityManager {
     @JvmStatic
     fun tickEntities(partialTicks: Float, context: RenderGlobal?) {
         if (entityList.isEmpty() && toSpawn.isEmpty()) return
-        Minecraft.getMinecraft().mcProfiler.startSection("fakeEntities")
+        mc.mcProfiler.startSection("fakeEntities")
         run {
 
             // adds all new entities to the set
@@ -69,9 +69,9 @@ object EntityManager {
                 entityList.add(it.next())
                 it.remove()
             }
-            val renderManager = Minecraft.getMinecraft().renderManager
+            val renderManager = mc.renderManager
             if (renderManager?.options == null) return
-            val player = Minecraft.getMinecraft().thePlayer
+            val player = mc.thePlayer
             // ticks each entity
             it = entityList.iterator()
             while (it.hasNext()) {
@@ -82,12 +82,12 @@ object EntityManager {
                     it.remove()
                     continue
                 }
-                Minecraft.getMinecraft().mcProfiler.startSection(next.name)
+                mc.mcProfiler.startSection(next.name)
                 // render
                 next.livingTicks += 1
                 next.tick(partialTicks, Random(), player)
                 GlStateManager.pushMatrix()
-                // translates to the correctly entity position
+                // translates to the correct entity position
                 // subtracting the viewer position offset
                 GlStateManager.translate(
                     next.currentLocation.x - renderManager.viewerPosX,
@@ -96,9 +96,9 @@ object EntityManager {
                 )
                 next.render(partialTicks, context, renderManager)
                 GlStateManager.popMatrix()
-                Minecraft.getMinecraft().mcProfiler.endSection()
+                mc.mcProfiler.endSection()
             }
         }
-        Minecraft.getMinecraft().mcProfiler.endSection()
+        mc.mcProfiler.endSection()
     }
 }

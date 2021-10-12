@@ -27,35 +27,27 @@ import java.awt.Color
  * @author SteveKunG
  */
 enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting, val color: Color) {
-    COMMON("COMMON", EnumChatFormatting.WHITE, Color(255, 255, 255)), UNCOMMON(
-        "UNCOMMON",
-        EnumChatFormatting.GREEN,
-        Color(85, 255, 85)
-    ),
-    RARE("RARE", EnumChatFormatting.BLUE, Color(85, 85, 255)), EPIC(
-        "EPIC",
-        EnumChatFormatting.DARK_PURPLE,
-        Color(190, 0, 190)
-    ),
-    LEGENDARY("LEGENDARY", EnumChatFormatting.GOLD, Color(255, 170, 0)), MYTHIC(
-        "MYTHIC",
-        EnumChatFormatting.LIGHT_PURPLE,
-        Color(255, 85, 255)
-    ),
-    SUPREME("SUPREME", EnumChatFormatting.DARK_RED, Color(170, 0, 0)), SPECIAL(
-        "SPECIAL",
-        EnumChatFormatting.RED,
-        Color(255, 85, 85)
-    ),
+    COMMON("COMMON", EnumChatFormatting.WHITE, Color(255, 255, 255)),
+    UNCOMMON("UNCOMMON", EnumChatFormatting.GREEN, Color(77, 231, 77)),
+    RARE("RARE", EnumChatFormatting.BLUE, Color(85, 85, 255)),
+    EPIC("EPIC", EnumChatFormatting.DARK_PURPLE, Color(151, 0, 151)),
+    LEGENDARY("LEGENDARY", EnumChatFormatting.GOLD, Color(255, 170, 0)),
+    MYTHIC("MYTHIC", EnumChatFormatting.LIGHT_PURPLE, Color(255, 85, 255)),
+    DIVINE("DIVINE", EnumChatFormatting.AQUA, Color(85, 255, 255)),
+    SUPREME("SUPREME", EnumChatFormatting.DARK_RED, Color(170, 0, 0)),
+    SPECIAL("SPECIAL", EnumChatFormatting.RED, Color(255, 85, 85)),
     VERY_SPECIAL("VERY SPECIAL", EnumChatFormatting.RED, Color(170, 0, 0));
 
     companion object {
         private val VALUES = values().sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()
+        val RARITY_PATTERN: Regex
 
         fun byBaseColor(color: String) = values().find { rarity -> rarity.baseColor.toString() == color }
 
         init {
             values().forEach { rarity -> VALUES[rarity.ordinal] = rarity }
+            RARITY_PATTERN =
+                Regex("(§[0-9a-f]§l§ka§r )?([§0-9a-fk-or]+)(?<rarity>${VALUES.joinToString("|") { it.rarityName }})")
         }
     }
 

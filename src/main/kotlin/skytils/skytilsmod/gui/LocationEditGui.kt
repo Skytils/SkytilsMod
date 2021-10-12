@@ -17,15 +17,16 @@
  */
 package skytils.skytilsmod.gui
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.core.structure.LocationButton
 import skytils.skytilsmod.core.structure.ResizeButton
@@ -79,33 +80,39 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
     }
 
     public override fun actionPerformed(button: GuiButton) {
+        val sr = UResolution
+        val minecraftScale = sr.scaleFactor.toFloat()
+        val floatMouseX = Mouse.getX() / minecraftScale
+        val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
         if (button is LocationButton) {
             dragging = button.element
-            val sr = ScaledResolution(mc)
-            val minecraftScale = sr.scaleFactor.toFloat()
-            val floatMouseX = Mouse.getX() / minecraftScale
-            val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
             xOffset = floatMouseX - dragging!!.actualX
             yOffset = floatMouseY - dragging!!.actualY
         } else if (button is ResizeButton) {
             dragging = button.element
             resizing = true
             scaleCache = button.element.scale
-            val sr = ScaledResolution(mc)
-            val minecraftScale = sr.scaleFactor.toFloat()
-            val floatMouseX = Mouse.getX() / minecraftScale
-            val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
             xOffset = floatMouseX - button.x
             yOffset = floatMouseY - button.y
             resizingCorner = button.corner
         }
     }
 
+    override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
+        if (mouseButton == 1) {
+            buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
+                it.element.pos = FloatPair(10, 10)
+                it.element.scale = 1f
+            }
+        }
+        super.mouseClicked(mouseX, mouseY, mouseButton)
+    }
+
     /**
      * Set the coordinates when the mouse moves.
      */
     private fun onMouseMove(mouseX: Int, mouseY: Int) {
-        val sr = ScaledResolution(mc)
+        val sr = UResolution
         val minecraftScale = sr.scaleFactor.toFloat()
         val floatMouseX = Mouse.getX() / minecraftScale
         val floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale

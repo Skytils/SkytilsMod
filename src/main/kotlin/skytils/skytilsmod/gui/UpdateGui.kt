@@ -38,13 +38,18 @@ import kotlin.math.floor
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
-class UpdateGui : GuiScreen() {
-    private var failed = false
-    private var complete = false
+class UpdateGui(restartNow: Boolean) : GuiScreen() {
+    companion object {
+        private val DOTS = arrayOf(".", "..", "...", "...", "...")
+        private const val DOT_TIME = 200 // ms between "." -> ".." -> "..."
+        var failed = false
+        var complete = false
+    }
+
     private var backButton: GuiButton? = null
     private var progress = 0f
     override fun initGui() {
-        buttonList.add(GuiButton(0, width / 2 - 100, height / 4 + 132, 200, 20, "").also { backButton = it })
+        buttonList.add(GuiButton(0, width / 2 - 100, height / 3 * 2, 200, 20, "").also { backButton = it })
         updateText()
     }
 
@@ -182,12 +187,7 @@ class UpdateGui : GuiScreen() {
         super.drawScreen(mouseX, mouseY, partialTicks)
     }
 
-    companion object {
-        private val DOTS = arrayOf(".", "..", "...", "...", "...")
-        private const val DOT_TIME = 200 // ms between "." -> ".." -> "..."
-    }
-
     init {
-        doUpdate(true)
+        doUpdate(restartNow)
     }
 }

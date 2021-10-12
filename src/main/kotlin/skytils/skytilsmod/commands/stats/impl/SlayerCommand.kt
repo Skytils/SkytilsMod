@@ -19,20 +19,26 @@
 package skytils.skytilsmod.commands.stats.impl
 
 import com.google.gson.JsonObject
-import net.minecraft.util.ChatComponentText
+import gg.essential.universal.wrappers.message.UMessage
+import skytils.hylin.extension.nonDashedString
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.stats.StatCommand
-import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.SkillUtils
+import skytils.skytilsmod.utils.*
+import java.util.*
 
 
-object SlayerCommand : StatCommand() {
+object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
+    override fun displayStats(username: String, uuid: UUID) {
+        val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
 
-    override fun getCommandName(): String {
-        return "skytilsslayer"
-    }
+        val profileResponse: JsonObject =
+            APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
+        if (!profileResponse["success"].asBoolean) {
+            printMessage("§cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
+            return
+        }
 
-    override fun displayStats(username: String, uuid: String, profileData: JsonObject) {
-        val userData = profileData["profile"].asJsonObject["members"].asJsonObject[uuid].asJsonObject
+        val userData = profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid.nonDashedString()].asJsonObject
         val slayersObject = userData["slayer_bosses"].asJsonObject
 
 
@@ -41,18 +47,16 @@ object SlayerCommand : StatCommand() {
                 slayersObject[it].asJsonObject["xp"].asDouble
             }.getOrDefault(0.0)
         }
-
-        printMessage(
-            ChatComponentText("§a➜ Slayer Statistics Viewer\n")
-                .appendText("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
-                .appendText("§a§l➜ Slayer Levels:\n")
-                .appendText(
-                    xpMap.map { (slayer, xp) ->
-                        "§b${slayer.replaceFirstChar { it.uppercase() }} Slayer ${
-                            SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
-                        }:§e ${NumberUtil.nf.format(xp)} XP"
-                    }.joinToString(separator = "\n")
-                        .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" })
-        )
+        UMessage("§a➜ Slayer Statistics Viewer\n")
+            .append("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")
+            .append("§a§l➜ Slayer Levels:\n")
+            .append(
+                xpMap.map { (slayer, xp) ->
+                    "§b${slayer.toTitleCase()} Slayer ${
+                        SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
+                    }:§e ${NumberUtil.nf.format(xp)} XP"
+                }.joinToString(separator = "\n")
+                    .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" }
+            ).chat()
     }
 }

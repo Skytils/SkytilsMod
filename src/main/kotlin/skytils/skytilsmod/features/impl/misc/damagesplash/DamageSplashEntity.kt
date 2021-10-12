@@ -17,10 +17,12 @@
  */
 package skytils.skytilsmod.features.impl.misc.damagesplash
 
+import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.entity.RenderManager
+import net.minecraft.entity.item.EntityArmorStand
 import skytils.skytilsmod.utils.NumberUtil.format
 import skytils.skytilsmod.utils.Utils.random
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -36,7 +38,11 @@ import java.util.regex.Pattern
  * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
  * @author Wynntils
  */
-class DamageSplashEntity(private var damage: String, currentLocation: Location) : FakeEntity(currentLocation) {
+class DamageSplashEntity(
+    private val boundEntity: EntityArmorStand,
+    private var damage: String,
+    currentLocation: Location
+) : FakeEntity(currentLocation) {
     private var displayText: String
     private var scale = 1f
     private var color: CustomColor? = null
@@ -46,7 +52,13 @@ class DamageSplashEntity(private var damage: String, currentLocation: Location) 
     override val name: String
         get() = "EntityDamageSplash"
 
-    override fun tick(partialTicks: Float, r: Random?, player: EntityPlayerSP?) {
+    override fun tick(partialTicks: Float, r: Random, player: EntityPlayerSP?) {
+        if (color == null) {
+            println("Failed to parse color for DamageSplashEntity, bound entity '${boundEntity.customNameTag}' | parse string '$damage'")
+            UChat.chat("§cSkytils ran into a problem while rendering damage, please report this on our Discord with your log file attached.")
+            remove()
+            return
+        }
         val maxLiving = 150
         if (livingTicks > maxLiving) {
             remove()
@@ -60,6 +72,7 @@ class DamageSplashEntity(private var damage: String, currentLocation: Location) 
     }
 
     override fun render(partialTicks: Float, context: RenderGlobal?, render: RenderManager) {
+        if (color == null) return
         val thirdPerson = render.options.thirdPersonView == 2
         ScreenRenderer.isRendering = true
         run {

@@ -17,11 +17,15 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UChat
 import net.minecraft.block.BlockButtonStone
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import net.minecraft.util.*
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.EnumChatFormatting
+import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -31,63 +35,50 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.DataFetcher
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.stripControlCodes
 import kotlin.math.floor
 
-/**
- * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 class TriviaSolver {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
+        if (event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
+        val formatted = event.message.formattedText
         if (Skytils.config.triviaSolver && Utils.inDungeons) {
             if (unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && unformatted.contains("answered Question #") && unformatted.endsWith(
                     "correctly!"
                 )
             ) triviaAnswer = null
             if (unformatted == "[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know." && triviaSolutions.size == 0) {
-                mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to load solutions for Trivia."))
+                UChat.chat("§cSkytils failed to load solutions for Trivia.")
                 DataFetcher.reloadData()
             }
-            if (unformatted.contains("What SkyBlock year is it?")) {
-                val currentTime = System.currentTimeMillis() / 1000.0
+            if (unformatted.trim() == "What SkyBlock year is it?") {
+                val currentTime =
+                    (if (DungeonTimer.dungeonStartTime > 0L) DungeonTimer.dungeonStartTime else System.currentTimeMillis()) / 1000.0
                 val diff = floor(currentTime - 1560276000)
                 val year = (diff / 446400 + 1).toInt()
                 triviaAnswers = arrayOf("Year $year")
             } else {
-                for (question in triviaSolutions.keys) {
-                    if (unformatted.contains(question)) {
-                        triviaAnswers = triviaSolutions[question]
-                        break
-                    }
+                triviaSolutions.entries.find {
+                    unformatted.contains(it.key)
+                }.also {
+                    if (it != null) triviaAnswers = it.value
                 }
             }
-            // Set wrong answers to red and remove click events
-            if (triviaAnswers != null && (unformatted.contains("ⓐ") || unformatted.contains("ⓑ") || unformatted.contains(
-                    "ⓒ"
-                ))
-            ) {
-                var answer: String? = null
-                var isSolution = false
-                for (solution in triviaAnswers!!) {
-                    if (unformatted.contains(solution)) {
-                        isSolution = true
-                        answer = solution
-                        break
+
+            if (triviaAnswers != null && formatted.trim().startsWithAny("§r§6 ⓐ", "§r§6 ⓑ", "§r§6 ⓒ")) {
+                triviaAnswers!!.find {
+                    formatted.endsWith("§a$it§r")
+                }.also {
+                    if (it == null) {
+                        event.message = ChatComponentText(formatted.replace("§a", "§c"))
+                    } else {
+                        triviaAnswer = it
                     }
-                }
-                if (!isSolution) {
-                    val letter = unformatted[5]
-                    val option = unformatted.substring(6)
-                    event.message =
-                        ChatComponentText("     " + EnumChatFormatting.GOLD + letter + EnumChatFormatting.RED + option)
-                    return
-                } else {
-                    triviaAnswer = answer
                 }
             }
         }

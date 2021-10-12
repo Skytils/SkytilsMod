@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.core
 
+import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
@@ -27,8 +28,9 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import java.awt.Color
 import java.io.File
+import java.net.URI
 
-class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
+object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
     @Property(
         type = PropertyType.TEXT, name = "Skytils Data",
@@ -41,7 +43,8 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
-        category = "General", subcategory = "API"
+        category = "General", subcategory = "API",
+        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit"]
     )
     var fetchLowestBINPrices = false
 
@@ -62,6 +65,17 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var commandAliasMode = 0
 
     @Property(
+        type = PropertyType.BUTTON, name = "Join the Skytils Discord",
+        description = "Join the Skytils Discord server for help using any of the features.",
+        category = "General", subcategory = "Other",
+        placeholder = "Join"
+    )
+    @Suppress("unused")
+    fun openDiscordLink() {
+        UDesktop.browse(URI.create("https://discord.gg/skytils"));
+    }
+
+    @Property(
         type = PropertyType.SWITCH, name = "First Launch",
         description = "Used to see if the user is a new user of Skytils.",
         category = "General", subcategory = "Other",
@@ -70,19 +84,18 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var firstLaunch = true
 
     @Property(
+        type = PropertyType.TEXT, name = "Last Launched Skytils Version",
+        category = "General", subcategory = "Other",
+        hidden = true
+    )
+    var lastLaunchedVersion = "0"
+
+    @Property(
         type = PropertyType.SWITCH, name = "Config Button on Pause",
         description = "Adds a button to configure Skytils to the pause menu.",
         category = "General", subcategory = "Other"
     )
     var configButtonOnPause = true
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Debug Mode",
-        description = "Will do weird things to your game. You probably don't want this on.",
-        category = "General", subcategory = "Other",
-        hidden = true
-    )
-    var debugMode = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Reopen Options Menu",
@@ -97,6 +110,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "General", subcategory = "Reparty"
     )
     var overrideReparty = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Guild Leave Confirmation",
+        description = "Requires you to run the /g leave command twice to leave your guild.",
+        category = "General", subcategory = "Hypixel"
+    )
+    var guildLeaveConfirmation = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Auto-Accept Reparty",
@@ -129,11 +149,11 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var autoCopyFailToClipboard = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Copy Deaths to Clipboard",
-        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
-        category = "Dungeons", subcategory = "Miscellaneous"
+        type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
+        description = "Shows the amount of crypts destroyed on your HUD.",
+        category = "Dungeons", subcategory = "HUD"
     )
-    var copyDeathToClipboard = false
+    var bigCryptsCounter = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Auto-Reparty on Dungeon Ending",
@@ -178,6 +198,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var necronPhaseTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Decimal Seconds on Timers",
+        description = "Adds decimals to the amount of seconds on the dungeon timers.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var showMillisOnDungeonTimer = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Sadan Phase Timer",
         description = "Shows the time taken for each phase in the Sadan boss fight.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -193,9 +220,9 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR, name = "Score Calculation Method",
-        description = "New method requires Dungeon Rooms Mod version 2.",
+        description = "\"Special\" method only works with Dungeon Rooms Mod v2.0.0, for ANY other version use \"Standard\"\n§c\"Special\" method is use at your own risk.",
         category = "Dungeons", subcategory = "Score Calculation",
-        options = ["Old", "New"]
+        options = ["Standard", "Special"]
     )
     var scoreCalculationMethod = 0
 
@@ -226,6 +253,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var boxSkeletonMasters = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Box Spirit Bow",
+        description = "Draws a box around the Spirit Bow.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxSpiritBow = false
 
     @Property(
         type = PropertyType.NUMBER, name = "Dungeon Chest Reroll Confirmation",
@@ -296,7 +330,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Increases the size of bat models.\nThe hitbox of the bat may be offset from what is shown.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    @JvmField
     var biggerBatModels = false
 
     @Property(
@@ -334,20 +367,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var showGuardianRespawnTimer = false
 
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Hidden Fels",
-   description = "Make Fels in dungeons visible.",
-   category = "Dungeons", subcategory = "Quality of Life"
-   )*/
-    var showHiddenFels = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Hidden Shadow Assassins",
-   description = "Make Shadow Assassins in dungeons visible.",
-   category = "Dungeons", subcategory = "Quality of Life"
-   )*/
-    var showHiddenShadowAssassins = false
-
     @Property(
         type = PropertyType.SWITCH, name = "Show Sadan's Interest",
         description = "Replace Sadan's interest display with Skytils' own.",
@@ -363,12 +382,12 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var necronHealth = 0
 
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Stealthy Watcher Undeads",
-   description = "Makes stealthy undeads spawned by The Watcher visible.",
-   category = "Dungeons", subcategory = "Quality of Life"
-   )*/
-    var showStealthyBloodMobs = false
+    @Property(
+        type = PropertyType.SWITCH, name = "Spirit Bear Timer",
+        description = "Shows the time it takes for the Spirit Bears to spawn.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var spiritBearTimer = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Spirit Leap Names",
@@ -389,11 +408,17 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     }
 
     @Property(
+        type = PropertyType.SWITCH, name = "Spirit Pet Warning",
+        description = "Lets you know if someone in your party has a Spirit pet equipped before the dungeon starts.\n§cYou must have pet visibility on in Skyblock.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var spiritPetWarning = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Blaze Solver",
         description = "Changes the color of the blaze to shoot on Higher or Lower.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var blazeSolver = false
 
     @Property(
@@ -401,7 +426,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Colors the next blaze to shoot in Higher or Lower yellow.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var showNextBlaze = false
 
     @Property(
@@ -409,7 +433,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color used to highlight the lowest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var lowestBlazeColor = Color(255, 0, 0, 200)
 
     @Property(
@@ -417,7 +440,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color used to highlight the highest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var highestBlazeColor = Color(0, 255, 0, 200)
 
     @Property(
@@ -425,7 +447,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color used to highlight the next blaze in.",
         category = "Dungeons", subcategory = "Solvers"
     )
-    @JvmField
     var nextBlazeColor = Color(255, 255, 0, 200)
 
     @Property(
@@ -459,7 +480,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH, name = "Teleport Maze Solver",
-        description = "Shows which pads you've stepped on in the Teleport Maze puzzle.",
+        description = "Shows which pads you've stepped on, and which pads to step on in the Teleport Maze puzzle.",
         category = "Dungeons", subcategory = "Solvers"
     )
     var teleportMazeSolver = false
@@ -520,14 +541,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var lividFinderType = 0
 
-    /*
-   @Property(
-   type = PropertyType.SWITCH, name = "Block Incorrect Terminal Clicks",
-   description = "Blocks incorrect clicks on terminals.",
-   category = "Dungeons", subcategory = "Terminal Solvers"
-   )*/
-    var blockIncorrectTerminalClicks = false
-
     @Property(
         type = PropertyType.SWITCH, name = "Boxed Tanks",
         description = "Shows the bounding box of all tanks through walls.",
@@ -576,6 +589,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Dungeons", subcategory = "Tank Helper Tools"
     )
     var tankRadiusDisplayColor = Color(100, 255, 0, 50)
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Middle Click on Terminals",
+        description = "Replaces left clicks while on terminals with middle clicks.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var middleClickTerminals = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
@@ -668,21 +688,24 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.SWITCH, name = "Show Griffin Burrows",
         description = "Shows the location of burrows during the event.\n§cThis feature requires your API key to be set in general settings.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow", "Waypoint", "ESP"]
     )
     var showGriffinBurrows = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Burrow Particle Add-on",
         description = "Uses particles in addition to the API in order to locate burrows.\nThis feature will help find burrows when the API isn't working.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow", "Waypoint", "ESP"]
     )
     var particleBurrows = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Time Until Burrow Refresh",
         description = "Displays the amount of time until the next refresh.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var showGriffinCountdown = false
 
@@ -690,84 +713,95 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Castle",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Castle warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowCastleFastTravel = false
 
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Crypts",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Crypts warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowCryptsFastTravel = false
 
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Dark Auction",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the DA warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowDarkAuctionFastTravel = false
 
     @Property(
         type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Hub",
         description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Hub warp.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var burrowHubFastTravel = false
 
     @Property(
         type = PropertyType.COLOR, name = "Empty/Start Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var emptyBurrowColor = Color(173, 216, 230)
 
     @Property(
         type = PropertyType.COLOR, name = "Mob Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var mobBurrowColor = Color(173, 216, 230)
 
     @Property(
         type = PropertyType.COLOR, name = "Treasure Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
     )
     var treasureBurrowColor = Color(173, 216, 230)
 
     @Property(
         type = PropertyType.SWITCH, name = "Broadcast Rare Drop Notifications",
         description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Tracker"]
     )
     var broadcastMythCreatureDrop = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Display Gaia Construct Hits",
         description = "Tracks the amount of times a Gaia Construct has been hit.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth"]
     )
     var trackGaiaHits = false
 
-    @Property(
+/*    @Property(
         type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
         description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
         category = "Events", subcategory = "Mythological"
-    )
+    )*/
     var removeLeftOverBleeds = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Track Mythological Creatures",
         description = "Tracks and saves drops from Mythological Creatures.",
-        category = "Events", subcategory = "Mythological"
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Tracker"]
     )
     var trackMythEvent = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Trick or Treat Chest Alert",
         description = "Displays a title when any trick or treat chest spawns near you.",
-        category = "Events", subcategory = "Spooky"
+        category = "Events", subcategory = "Spooky",
+        searchTags = ["Spooky Chest", "Spooky"]
     )
     var trickOrTreatChestAlert = false
 
@@ -777,13 +811,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Events", subcategory = "Technoblade"
     )
     var shinyOrbWaypoints = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Block Mathematical Hoe Right Clicks",
-   description = "Prevents accidentally viewing the recipe for the Mathematical Hoes.",
-   category = "Farming", subcategory = "Quality of Life"
-   )*/
-    var blockMathHoeClicks = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Farming RNG Titles",
@@ -805,13 +832,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Farming", subcategory = "Solvers"
     )
     var treasureHunterSolver = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Prevent Breaking Farms",
-   description = "Prevents you from breaking parts of your farm while holding an axe or a hoe.",
-   category = "Farming", subcategory = "Quality of Life"
-   )*/
-    var preventBreakingFarms = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Click to Accept Trapper Task",
@@ -835,25 +855,17 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var darkModeMist = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Highlight Completed Comissions",
-        description = "Marks completed comissions in the menu with a red background.",
+        type = PropertyType.SWITCH, name = "Highlight Completed Commissions",
+        description = "Marks completed commissions in the menu with a red background.",
         category = "Mining", subcategory = "Quality of Life"
     )
-    var highlightCompletedComissions = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Disable Pickaxe Ability on Private Island",
-   description = "Prevents you from using pickaxe abilities on your island.",
-   category = "Mining", subcategory = "Quality of Life"
-   )*/
-    var noPickaxeAbilityOnPrivateIsland = false
+    var highlightCompletedCommissions = false
 
     @Property(
         type = PropertyType.SWITCH, name = "More Visible Ghosts",
         description = "Makes ghosts more visible in the Dwarven Mines.\nThis is allowed on the Hypixel network and can be done in Vanilla.",
         category = "Mining", subcategory = "Quality of Life"
     )
-    @JvmField
     var moreVisibleGhosts = false
 
     @Property(
@@ -884,20 +896,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var recolorCarpets = false
 
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Ghosts",
-   description = "Makes the ghosts in The Mist visible.",
-   category = "Mining", subcategory = "Quality of Life"
-   )*/
-    var showGhosts = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Show Ghosts' Health",
-   description = "Displays the health bar of ghosts in The Mist.",
-   category = "Mining", subcategory = "Quality of Life"
-   )*/
-    var showGhostHealth = false
-
     @Property(
         type = PropertyType.SWITCH, name = "Skymall Reminder",
         description = "Reminds you every Skyblock day to check your Skymall perk while in the Dwarven Mines.",
@@ -919,13 +917,82 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     )
     var puzzlerSolver = false
 
-    /*
-   @Property(
-   type = PropertyType.SWITCH, name = "Block Useless Zombie Sword",
-   description = "Prevents you from using the Zombie Sword when at full health.",
-   category = "Miscellaneous", subcategory = "Items"
-   )*/
-    var blockUselessZombieSword = false
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows map",
+        description = "Shows a map to see in which part of the crystal hollows you are and saves locations of special places.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowMap = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows map special places",
+        description = "Show special places on the map (like Lost Precusor City).",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowMapPlaces = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
+        description = "Shows waypoints to special places inside the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowWaypoints = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows chat coordinates grabber",
+        description = "When coordinates are shared in chat asks which one it is and displays a waypoint there and shows it on the map.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var hollowChatCoords = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows Treasure Helper",
+        description = "Helps you open treasure chests in the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var chTreasureHelper = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Chat Tabs",
+        description = "Creates various tabs to organize chat.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var chatTabs = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Pre-fill Chat Commands",
+        description = "Auto fills the respective command for each tab.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var preFillChatTabCommands = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Switch Chat Channel",
+        description = "Automatically types the command to switch to a certain channel.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var autoSwitchChatChannel = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
+        description = "Adds a check to rendering in order to prevent crashes.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var fixFallingSandRendering = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Fix SBA Chroma",
+        description = "Fixes SBA chroma with Patcher 1.6",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var fixSbaChroma = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Fix World Time",
+        description = "Fixes world time on other mods being messed up due to certain mods.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var fixWorldTime = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Block Zapper Fatigue Timer",
@@ -939,8 +1006,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Shortens item names with stars in them.",
         category = "Miscellaneous", subcategory = "Items"
     )
-    @JvmField
     var compactStars = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Disable Block Animation",
+        description = "Removes the block animation on swords.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var disableBlockAnimation = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Implosion Particles",
@@ -963,13 +1036,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         maxF = 5f,
         decimalPlaces = 2
     )
-    @JvmField
     var itemDropScale = 1f
 
     @Property(
         type = PropertyType.SWITCH, name = "Item Cooldown Display",
-        description = "Displays the cooldowns for your items.",
-        category = "Miscellaneous", subcategory = "Items"
+        description = "Displays the cooldowns for your items. Items must be whitelisted with the /trackcooldown command.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["Wither Impact", "Hyperion", "Wither Shield"]
     )
     var itemCooldownDisplay = false
 
@@ -980,7 +1053,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         maxF = 2f,
         decimalPlaces = 2
     )
-    @JvmField
     var largerHeadScale = 1f
 
     @Property(
@@ -1023,7 +1095,14 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Color the thing that shows the block you will teleport to with the Etherwarp Transmission ability.",
         category = "Miscellaneous", subcategory = "Items"
     )
-    var showEtherwarpTeleportPosColor = Color(0, 0, 255, 204)
+    var showEtherwarpTeleportPosColor = Color(0, 0, 255, 69)
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Gemstones",
+        description = "Shows the added gemstones on items.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showGemstones = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
@@ -1047,11 +1126,11 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showPetCandies = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Soul Eater Bonus",
-        description = "Shows the current Soul Eater bonus from the last mob kill.",
+        type = PropertyType.SWITCH, name = "Stacking Enchant Progress Display",
+        description = "Displays the progress for the held item's stacking enchant.",
         category = "Miscellaneous", subcategory = "Items"
     )
-    var showSoulEaterBonus = false
+    var stackingEnchantProgressDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Radioactive Bonus",
@@ -1065,7 +1144,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Shows the rarity of an item in the color",
         category = "Miscellaneous", subcategory = "Item Rarity"
     )
-    @JvmField
     var showItemRarity = false
 
     @Property(
@@ -1107,6 +1185,34 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showMinionTier = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Tooltips while on Storage",
+        description = "Hides the tooltips of backpacks and ender chest while on the Storage GUI",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var hideTooltipsOnStorage = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Copy Deaths to Clipboard",
+        description = "Copies the deaths outside dungeons to your clipboard after clicking them in the chat.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var copyDeathToClipboard = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Copy RNG Drops to Clipboard",
+        description = "Automatically copies RNG drops to your clipboard.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var autoCopyRNGDrops = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Also Copy Very Rare Drops to Clipboard",
+        description = "Automatically copies very rare drops to your clipboard.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var autoCopyVeryRareDrops = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",
         description = "Counts down the time until the Endstone Protector spawns.",
         category = "Miscellaneous", subcategory = "Other"
@@ -1135,19 +1241,60 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var summoningEyeDisplay = false
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Ping Display",
+        description = "Shows your ping to the current server, similar to the /skytils ping command.\nYou must be in a GUI or not moving in order to queue a ping.\nThere is a tiny chance that this will cause you to be punished.",
+        category = "Miscellaneous", subcategory = "Other",
+        options = ["Off", "Server List", "Packet"]
+    )
+    var pingDisplay = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Bestiary Level",
+        description = "Shows the bestiary level as the stack size.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showBestiaryLevel = false
+
+    @Property(
+        PropertyType.SWITCH, name = "Show Selected Arrow",
+        description = "Shows your current selected arrow.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showSelectedArrowDisplay = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show World Age",
+        description = "Displays the day count of the current server.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showWorldAge = false
+
+    @Property(
+        type = PropertyType.PERCENT_SLIDER, name = "Transparent Armor Layer",
+        description = "Changes the transparency of your armor layer.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var transparentArmorLayer = 1f
+
+    @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Transparent Head Layer",
         description = "Changes the transparency of your head layer.",
         category = "Miscellaneous", subcategory = "Other"
     )
-    @JvmField
     var transparentHeadLayer = 1f
+
+    /*@Property(
+        type = PropertyType.SWITCH, name = "Fix Summon Skin",
+        description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
+        category = "Miscellaneous", subcategory = "Other"
+    )*/
+    var fixSummonSkin = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Use Player Skin",
-        description = "Uses the player's skin for necromancy mobs",
+        description = "Uses the player's skin for necromancy mobs.",
         category = "Miscellaneous", subcategory = "Other"
     )
-    @JvmField
     var usePlayerSkin = false
 
     @Property(
@@ -1176,7 +1323,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Removes the vanilla effects of Night Vision.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var disableNightVision = false
 
     @Property(
@@ -1192,7 +1338,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Fixes some items not having the enchantment glint.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var enchantGlintFix = false
 
     @Property(
@@ -1201,14 +1346,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hideAirDisplay = false
-
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Hide Creeper Veil Near NPCs",
-   description = "Stops the Creeper Veil from blocking interaction with NPCs.",
-   category = "Miscellaneous", subcategory = "Quality of Life"
-   )*/
-    @JvmField
-    var hideCreeperVeilNearNPCs = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Dying Mobs",
@@ -1222,7 +1359,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents the game from rendering fire on burning entities.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hideEntityFire = false
 
     @Property(
@@ -1244,7 +1380,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents all lightning from rendering.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hideLightning = false
 
     @Property(
@@ -1252,7 +1387,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Hides the smoke particles created when mobs die.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hideDeathParticles = false
 
     @Property(
@@ -1260,7 +1394,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var hidePotionEffects = false
 
     @Property(
@@ -1292,6 +1425,20 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var middleClickGUIItems = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Moveable Action Bar",
+        description = "Allows you to move the action bar as if it were a Skytils HUD element.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var moveableActionBar = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Moveable Item Name Highlight",
+        description = "Allows you to move the item name highlight as if it were a Skytils HUD element.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var moveableItemNameHighlight = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "No Fire",
         description = "Removes first-person fire overlay when you are burning.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1303,7 +1450,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Removes the screen shake when you are hurt.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var noHurtcam = false
 
     @Property(
@@ -1318,29 +1464,21 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var preventLogSpam = false
 
-    /* @Property(
-   type = PropertyType.SWITCH, name = "Prioritize Item Abilities",
-   description = "Prioritize right click abilities over the profile viewer.\n§cThis feature is use at your own risk and may be removed later!",
-   category = "Miscellaneous", subcategory = "Quality of Life"
-   )*/
-    @JvmField
-    var prioritizeItemAbilities = false
-
-    // TODO get Sk1er LLC to make a number text box
     @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
         description = "Prevents you from dropping, salvaging, or selling items worth more than this value. Based on Lowest BIN price.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock"]
     )
     var protectItemBINThreshold = "0"
 
     @Property(
         type = PropertyType.SWITCH, name = "Protect Starred Items",
         description = "Prevents you from dropping, salvaging, or selling starred dungeon items.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock"]
     )
     var protectStarredItems = false
 
@@ -1405,7 +1543,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         description = "Lowers the health and nametag of endermen so it's easier to see.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    @JvmField
     var lowerEndermanNametags = false
 
     @Property(
@@ -1417,7 +1554,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SWITCH, name = "Cap Dolphin Pet Display",
-        description = "Caps the doplhin pet display to the effective maximum(5)",
+        description = "Caps the dolphin pet display to the effective maximum (5)",
         category = "Pets", subcategory = "Displays"
     )
     var dolphinCap = true
@@ -1562,6 +1699,13 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var showSlayerDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Slayer Time to Kill",
+        description = "Shows the amount of time used to kill the slayer",
+        category = "Slayer", subcategory = "Quality of Life"
+    )
+    var slayerTimeToKill = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Others' Broken Heart Radiation",
         description = "Removes Broken Heart Radiation from other slayer's while yours is spawned",
         category = "Slayer", subcategory = "Voidgloom Seraph",
@@ -1569,11 +1713,47 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var hideOthersBrokenHeartRadiation = false
 
     @Property(
+        PropertyType.SWITCH, name = "Recolor Seraph Boss",
+        description = "Changes the color of your Seraph boss based on the phase it is in.\nBeacon takes priority over the other colors.",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var recolorSeraphBoss = false
+
+    @Property(
+        PropertyType.COLOR, name = "Seraph Beacon Phase Color",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+        allowAlpha = false
+    )
+    var seraphBeaconPhaseColor = Color(255, 255, 255)
+
+    @Property(
+        PropertyType.COLOR, name = "Seraph Hits Phase Color",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+        allowAlpha = false
+    )
+    var seraphHitsPhaseColor = Color(255, 255, 255)
+
+    @Property(
+        PropertyType.COLOR, name = "Seraph Normal Phase Color",
+        category = "Slayer", subcategory = "Voidgloom Seraph",
+        allowAlpha = false
+    )
+    var seraphNormalPhaseColor = Color(255, 255, 255)
+
+    @Property(
         PropertyType.SWITCH, name = "Show Seraph Display",
         description = "§b[WIP] §rShows info about your current Voidgloom Seraph boss.",
         category = "Slayer", subcategory = "Voidgloom Seraph"
     )
     var showSeraphDisplay = false
+
+
+    @Property(
+        PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
+        description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var experimentalYangGlyphDetection = false
 
     @Property(
         PropertyType.SWITCH, name = "Yang Glyph Ping",
@@ -1583,11 +1763,25 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var yangGlyphPing = false
 
     @Property(
+        PropertyType.SWITCH, name = "Yang Glyph Ping on Land",
+        description = "Changes the Yang Glyph ping to ping on land rather than on throw.",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var yangGlyphPingOnLand = false
+
+    @Property(
         PropertyType.SWITCH, name = "Highlight Yang Glyph",
         description = "Highlights the Yang Glyph block.",
         category = "Slayer", subcategory = "Voidgloom Seraph"
     )
     var highlightYangGlyph = false
+
+    @Property(
+        PropertyType.SWITCH, name = "Point to Yang Glyph",
+        description = "Draws an arrow in the direction of the Yang Glyph Block.",
+        category = "Slayer", subcategory = "Voidgloom Seraph"
+    )
+    var pointYangGlyph = false
 
     @Property(
         PropertyType.COLOR, name = "Yang Glyph Highlight Color",
@@ -1658,7 +1852,7 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
 
     @Property(
         type = PropertyType.SELECTOR, name = "Text Shadow",
-        description = "Changes the shadow type for the text displayed.",
+        description = "Changes the shadow type for the text displayed in the spam hider element.",
         category = "Spam", subcategory = "Display",
         options = ["Normal", "None", "Outline"]
     )
@@ -1992,8 +2186,6 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
     var compactHider = 0
 
     init {
-        initialize()
-
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
         addDependency("itemRarityOpacity", "showItemRarity")
@@ -2041,42 +2233,68 @@ class Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sorting
         addDependency("yangGlyphColor", "highlightYangGlyph")
         addDependency("nukekebiHeadColor", "highlightNukekebiHeads")
 
+        listOf(
+            "seraphBeaconPhaseColor",
+            "seraphHitsPhaseColor",
+            "seraphNormalPhaseColor"
+        ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
+
         registerListener("protectItemBINThreshold") { threshold: String ->
-            val numeric = threshold.replace(Regex("[^0-9]"), "")
-            protectItemBINThreshold = numeric.ifEmpty { "0" }
+            TickTask(1) {
+                val numeric = threshold.replace(Regex("[^0-9]"), "")
+                protectItemBINThreshold = numeric.ifEmpty { "0" }
+            }
         }
 
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
 
-        this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
-
-        if (this.largerHeadScale > 2) {
-            this.largerHeadScale /= 100
-            markDirty()
-        }
-        if (this.itemDropScale > 5) {
-            this.itemDropScale /= 100f
-            markDirty()
-        }
-        if (this.itemRarityOpacity > 1) {
-            this.itemRarityOpacity /= 100f
-            markDirty()
-        }
-        if (this.transparentHeadLayer > 1) {
-            this.transparentHeadLayer /= 100f
-            markDirty()
+        registerListener("apiKey") { key: String ->
+            Skytils.hylinAPI.key = key
         }
     }
 
-    private object ConfigSorting : SortingBehavior() {
-        override fun getCategoryComparator(): Comparator<in Category> {
-            return Comparator { o1, o2 ->
-                if (o1.name == "General") return@Comparator -1
-                if (o2.name == "General") return@Comparator 1
-                else compareValuesBy(o1, o2) {
-                    it.name
+    fun init() {
+        initialize()
+        if (Skytils.config.lastLaunchedVersion != Skytils.VERSION) {
+            val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
+            when {
+                !ver.isSafe -> {
+
                 }
+                ver < UpdateChecker.SkytilsVersion("1.0.6") -> {
+                    if (largerHeadScale > 2) {
+                        largerHeadScale /= 100
+                    }
+                    if (itemDropScale > 5) {
+                        itemDropScale /= 100f
+                    }
+                    if (itemRarityOpacity > 1) {
+                        itemRarityOpacity /= 100f
+                    }
+                    if (transparentHeadLayer > 1) {
+                        transparentHeadLayer /= 100f
+                    }
+                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
+                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                        PersistentSave.markDirty<GuiManager>()
+                    }
+                }
+                ver < UpdateChecker.SkytilsVersion("1.0.7") -> {
+                    this.dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
+                }
+            }
+        }
+        Skytils.config.lastLaunchedVersion = Skytils.VERSION
+        Skytils.config.markDirty()
+    }
+
+    private object ConfigSorting : SortingBehavior() {
+        override fun getCategoryComparator(): Comparator<in Category> = Comparator { o1, o2 ->
+            if (o1.name == "General") return@Comparator -1
+            if (o2.name == "General") return@Comparator 1
+            else compareValuesBy(o1, o2) {
+                it.name
             }
         }
     }

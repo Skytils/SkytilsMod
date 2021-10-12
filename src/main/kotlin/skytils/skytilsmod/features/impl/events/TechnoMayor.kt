@@ -18,9 +18,7 @@
 package skytils.skytilsmod.features.impl.events
 
 import com.google.common.collect.ImmutableList
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S02PacketChat
@@ -33,40 +31,37 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.stripControlCodes
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 
 class TechnoMayor {
     @SubscribeEvent
     fun onRenderSpecialLivingPre(event: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
         if (!Utils.inSkyblock) return
-        val entity: Entity = event.entity
-        if (event.entity !is EntityArmorStand || !entity.hasCustomName() || event.entity.isDead) return
-        val e = entity as EntityArmorStand
+        val e = event.entity
+        if (e !is EntityArmorStand || !e.hasCustomName() || e.isDead) return
         if (e.customNameTag != "§6§lSHINY ORB") return
-        val origin = e.position
-        val nearbyEntities = mc.theWorld.getEntitiesWithinAABBExcludingEntity(
+        val pos = e.position
+        mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             e,
-            AxisAlignedBB(origin, BlockPos(origin.x + 1, origin.y + 1, origin.z + 1))
-        )
-        for (ent in nearbyEntities) {
-            if (ent is EntityArmorStand && ent.hasCustomName() && ent.getCustomNameTag().contains(mc.thePlayer.name)) {
-                ent.worldObj.removeEntity(ent)
+            AxisAlignedBB(pos, BlockPos(pos.x + 1, pos.y + 1, pos.z + 1))
+        ).find {
+            if (it is EntityArmorStand && it.hasCustomName() && it.getCustomNameTag().contains(mc.thePlayer.name)) {
+                it.worldObj.removeEntity(it)
                 e.worldObj.removeEntity(e)
-                orbLocations.add(Vec3(origin.x + 0.5, (origin.y - 2).toDouble(), origin.z + 0.5))
-                break
+                orbLocations.add(Vec3(pos.x + 0.5, (pos.y - 2).toDouble(), pos.z + 0.5))
+                return@find true
             }
+            return@find false
         }
     }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
-        if (SBInfo.mode != SBInfo.SkyblockIsland.Hub.mode && SBInfo.mode != SBInfo.SkyblockIsland.FarmingIsland.mode) return
+        if (SBInfo.mode != SkyblockIsland.Hub.mode && SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
@@ -110,7 +105,6 @@ class TechnoMayor {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         private val orbLocations: MutableList<Vec3> = ArrayList()
     }
 }

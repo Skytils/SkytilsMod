@@ -18,8 +18,9 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UChat
+import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,7 +31,7 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.SetActionBarEvent
-import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -45,7 +46,6 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
 import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
@@ -59,8 +59,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             }
         }
         if (!obj["filter"].isJsonNull) {
+            val adapter = gson.getAdapter(Filter::class.java)
             obj["filter"].asJsonObject.entrySet().forEach { element ->
-                filters.add(gson.fromJson(element.value.asString, Filter::class.java))
+                filters.add(adapter.fromJsonTree(element.value))
             }
         }
     }
@@ -76,8 +77,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
         obj.add("default", defaultObj)
         val filterObj = JsonObject()
+        val adapter = gson.getAdapter(Filter::class.java)
         filters.forEach {
-            filterObj.addProperty(it.name, gson.toJson(it))
+            filterObj.add(it.name, adapter.toJsonTree(it))
         }
         obj.add("filter", filterObj)
         gson.toJson(obj, writer)
@@ -95,7 +97,8 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         var state: Int,
         var skyblockOnly: Boolean,
         private val initialPattern: String,
-        var type: FilterType
+        var type: FilterType,
+        var formatted: Boolean
     ) {
         var pattern: String = initialPattern
             set(value) {
@@ -116,7 +119,6 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         val spamMessages = ArrayList<SpamMessage>()
         private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
             if (ReceivePacketEvent.packet !is S02PacketChat) return
@@ -221,21 +223,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             }
         }
 
-        filters.forEach {
-            if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
-            if (it.check(formatted) && it.state > 0) {
-                cancelChatPacket(event, it.state == 2)
-                return
-            }
-        }
-
-        repoFilters.forEach {
-            if (it.skyblockOnly && !Utils.inSkyblock) return@forEach
-            if (it.check(formatted) && it.state > 0) {
-                cancelChatPacket(event, it.state == 2)
-                return
-            }
-        }
+        if (filters.any {
+                checkFilter(it, formatted, unformatted, event)
+            } || repoFilters.any { checkFilter(it, formatted, unformatted, event) }) return
 
         if (!Utils.inSkyblock) return
         try {
@@ -426,7 +416,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.superboomHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            val username = Minecraft.getMinecraft().thePlayer.name
+                            val username = mc.thePlayer.name
                             if (formatted.contains(username)) GuiManager.toastGui.add(SuperboomToast())
                         }
                     }
@@ -438,19 +428,19 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.reviveStoneHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            val username = Minecraft.getMinecraft().thePlayer.name
+                            val username = mc.thePlayer.name
                             if (formatted.contains(username)) GuiManager.toastGui.add(ReviveStoneToast())
                         }
                     }
                 }
 
                 // Combo
-                unformatted.contains("Combo") -> {
+                unformatted.contains(" Combo") -> {
                     when (Skytils.config.comboHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
                         3 -> {
                             if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                                GuiManager.toastGui.add(ComboEndToast())
+                                GuiManager.toastGui.add(ComboEndToast(unformatted))
                             } else {
                                 GuiManager.toastGui.add(ComboToast(formatted))
                             }
@@ -516,7 +506,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Cooldown
-                unformatted.contains("cooldown") -> {
+                unformatted.contains(" cooldown") -> {
                     when (Skytils.config.cooldownHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.cooldownHider == 2)
                     }
@@ -554,11 +544,16 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Compact Building Tools
-                (Skytils.config.compactBuildingTools && (formatted.contains("blocks") || formatted.contains("build") || formatted.contains(
+                (Skytils.config.compactBuildingTools && formatted.startsWith("§3Skytils > §eThis will expire in") && (formatted.contains(
+                    "blocks"
+                ) || formatted.contains("build") || formatted.contains(
                     "place"
                 ) || formatted.contains("zap"))
                         ) -> {
-                    if (Regexs.BUILDINGTOOLS.pattern.matcher(formatted).matches()) {
+                    if (formatted.startsWith("§3Skytils > §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(
+                            formatted
+                        ).matches()
+                    ) {
                         val chatGui = mc.ingameGUI.chatGUI
                         val lines = (chatGui as AccessorGuiNewChat).chatLines
                         val drawnLines = (chatGui as AccessorGuiNewChat).drawnChatLines
@@ -649,6 +644,24 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
+    private fun checkFilter(filter: Filter, formatted: String, unformatted: String, event: ReceiveEvent): Boolean {
+        runCatching {
+            if (filter.skyblockOnly && !Utils.inSkyblock) return false
+            if (filter.check(if (filter.formatted) formatted else unformatted) && filter.state > 0) {
+                cancelChatPacket(event, filter.state == 2)
+                return true
+            }
+        }.onFailure {
+            UChat.chat("§cSkytils ran into an error whilst checking your Spam Hider filters. Please send your logs to discord.gg/skytils.")
+            println("A ${it::class.simpleName} was thrown while checking Spam Hider Filter:")
+            println("Spam Filter: ${filter}")
+            println("Formatted Text: ${formatted}")
+            println("Unformatted Text: ${unformatted}")
+            it.printStackTrace()
+        }
+        return false
+    }
+
     class SpamMessage(var message: String, var time: Long, var height: Double)
     class SpamGuiElement : GuiElement("Spam Gui", 1.0f, FloatPair(0.65f, 0.925f)) {
         /**
@@ -660,7 +673,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         override fun render() {
             val now = System.currentTimeMillis()
             val timePassed = now - lastTimeRender
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val animDiv = timePassed.toDouble() / 1000.0
             lastTimeRender = now
             var i = 0

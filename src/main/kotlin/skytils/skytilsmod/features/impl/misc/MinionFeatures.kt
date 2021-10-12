@@ -38,7 +38,7 @@ class MinionFeatures {
     fun onGuiOpen(event: GuiOpenEvent) {
         if (event.gui is GuiChest) {
             val chest = (event.gui as GuiChest).inventorySlots as ContainerChest
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName == "Minion Chest") return
         }
         blockUnenchanted = false
@@ -86,14 +86,14 @@ class MinionFeatures {
                                     val secondUpgrade = inventory.getStackInSlot(46)
                                     if (firstUpgrade != null) {
                                         if (firstUpgrade.displayName.stripControlCodes()
-                                                .contains("Super Compactor 3000")
+                                                .contains("Super Compactor")
                                         ) {
                                             blockUnenchanted = true
                                         }
                                     }
                                     if (secondUpgrade != null) {
                                         if (secondUpgrade.displayName.stripControlCodes()
-                                                .contains("Super Compactor 3000")
+                                                .contains("Super Compactor")
                                         ) {
                                             blockUnenchanted = true
                                         }
@@ -113,8 +113,8 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        val item = event.stack
-        if (!Utils.inSkyblock || item == null || item.stackSize != 1) return
+        val item = event.stack ?: return
+        if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
         val extraAttributes = getExtraAttributes(item)
         if (Skytils.config.showMinionTier && extraAttributes != null && extraAttributes.hasKey("generator_tier")) {
             val s = extraAttributes.getInteger("generator_tier").toString()

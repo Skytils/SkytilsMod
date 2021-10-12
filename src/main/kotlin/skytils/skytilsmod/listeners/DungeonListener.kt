@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.commands.RepartyCommand
+import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
@@ -107,7 +107,7 @@ object DungeonListener {
             ticks = 0
         }
         if (ticks % 2 == 0) {
-            if (DungeonTimer.scoreShownAt == -1L) {
+            if (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1000) {
                 val tabEntries = TabListUtils.tabEntries
                 for (teammate in team) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
@@ -116,7 +116,7 @@ object DungeonListener {
                     teammate.player = mc.theWorld.playerEntities.find {
                         it.name == teammate.playerName && it.uniqueID.version() == 4
                     }
-                    teammate.dead = entry.contains("§r§f(§r§cDEAD§r§f)§r")
+                    teammate.dead = entry.endsWith("§r§cDEAD§r§f)§r")
                     if (teammate.dead) {
                         if (deads.add(teammate)) {
                             teammate.deaths++

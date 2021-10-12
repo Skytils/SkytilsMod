@@ -437,11 +437,11 @@ object ColorFactory {
     private fun parseComponent(color: String, off: Int, end: Int, type: Int): Double {
         var color1 = color
         var type1 = type
-        color1 = color1.substring(off, end).trim { it <= ' ' }
+        color1 = color1.substring(off, end).trim()
         if (color1.endsWith("%")) {
             require(type1 <= PARSE_PERCENT) { "Invalid color specification" }
             type1 = PARSE_PERCENT
-            color1 = color1.substring(0, color1.length - 1).trim { it <= ' ' }
+            color1 = color1.substring(0, color1.length - 1).trim()
         } else require(type1 != PARSE_PERCENT) { "Invalid color specification" }
         val c = if (type1 == PARSE_COMPONENT) color1.toInt().toDouble() else color1.toDouble()
         when (type1) {

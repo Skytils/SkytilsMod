@@ -19,16 +19,15 @@
 package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
+import gg.essential.universal.UChat
+import gg.essential.universal.UResolution
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -37,15 +36,12 @@ import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import kotlin.math.pow
 
@@ -69,7 +65,7 @@ class MythologicalTracker : Tracker("mythological") {
         REMEDIES("ANTIQUE_REMEDIES", "Antique Remedies", ItemRarity.EPIC),
 
         // this does have a chat message but it's just Enchanted Book
-        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera 1", ItemRarity.COMMON),
+        CHIMERA("ENCHANTED_BOOK-ULTIMATE_CHIMERA-1", "Chimera", ItemRarity.COMMON),
         COINS("COINS", "Coins", ItemRarity.LEGENDARY, isChat = true),
         PLUSHIE("CROCHET_TIGER_PLUSHIE", "Crochet Tiger Plushie", ItemRarity.EPIC),
         COG("CROWN_OF_GREED", "Crown of Greed", ItemRarity.LEGENDARY, true),
@@ -118,24 +114,31 @@ class MythologicalTracker : Tracker("mythological") {
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && System.currentTimeMillis() - lastMinosChamp <= 2500 && event.entity.getDistanceSqToEntity(
+        if (lastMinosChamp != 0L && Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && event.entity.getXZDistSq(
                 mc.thePlayer
-            ) < 5.5 * 5.5
+            ) < 5.5 * 5.5 && System.currentTimeMillis() - lastMinosChamp <= 2500
         ) {
             if (event.entity.name == "Minos Champion") {
                 println("Dug is: Minos Champion")
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
+                UChat.chat("§bSkytils: §eYou dug up a §2Minos Champion§e!")
             } else if (event.entity.name == "Minos Inquisitor") {
                 println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
-                mc.thePlayer.addChatMessage(ChatComponentText("§bSkytils: §eActually, you dug up a §2Minos Inquisitor§e!"))
+                UChat.chat("§bSkytils: §eYou dug up a §2Minos Inquisitor§e!")
             }
+        }
+        if (lastMinosChamp != 0L && System.currentTimeMillis() - lastMinosChamp > 2500) {
+            println("Dug is: Unknown")
+            lastMinosChamp = 0L
+            BurrowMob.CHAMP.dugTimes++
+            UChat.chat("§bSkytils: §eNo idea what you dug, counting as §2Minos Champion§e!")
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(receiveCanceled = true)
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
         when (event.packet) {
@@ -159,6 +162,7 @@ class MythologicalTracker : Tracker("mythological") {
                         val mob = BurrowMob.getFromName(matcher.group(1)) ?: return
                         //for some reason, minos inquisitors say minos champion in the chat
                         if (mob == BurrowMob.CHAMP) {
+                            Utils.cancelChatPacket(event)
                             lastMinosChamp = System.currentTimeMillis()
                         } else {
                             mob.dugTimes++
@@ -187,60 +191,55 @@ class MythologicalTracker : Tracker("mythological") {
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
                 if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
-                if (!extraAttr.hasKey("timestamp")) return
-                val time = ZonedDateTime.from(
-                    DateTimeFormatter.ofPattern("M/d/yy h:mm a").withZone(
-                        ZoneId.of("America/New_York")
-                    ).parse(extraAttr.getString("timestamp"))
-                )
-                if (ZonedDateTime.now().withSecond(0).withNano(0).toEpochSecond() - time.toEpochSecond() > 60) return
+                if (!extraAttr.hasKey("timestamp")) {
+                    if (Skytils.config.broadcastMythCreatureDrop) {
+                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"))
 
-                if (Skytils.config.broadcastMythCreatureDrop) {
-                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"))
-
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(-9.0 / 12).toFloat(),
-                            isLoud = true
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(-9.0 / 12).toFloat(),
+                                volume = 0.5f
+                            )
                         )
-                    )
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(-2.0 / 12).toFloat(),
-                            ticks = 4,
-                            isLoud = true
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(-2.0 / 12).toFloat(),
+                                ticks = 4,
+                                volume = 0.5f
+                            )
                         )
-                    )
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(1.0 / 12).toFloat(),
-                            ticks = 8,
-                            isLoud = true
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(1.0 / 12).toFloat(),
+                                ticks = 8,
+                                volume = 0.5f
+                            )
                         )
-                    )
-                    SoundQueue.addToQueue(
-                        SoundQueue.QueuedSound(
-                            "note.pling",
-                            2.0.pow(3.0 / 12).toFloat(),
-                            ticks = 12,
-                            isLoud = true
+                        SoundQueue.addToQueue(
+                            SoundQueue.QueuedSound(
+                                "note.pling",
+                                2.0.pow(3.0 / 12).toFloat(),
+                                ticks = 12,
+                                volume = 0.5f
+                            )
                         )
-                    )
-                }
-                if (Skytils.config.trackMythEvent) {
-                    drop.droppedTimes++
-                    markDirty<MythologicalTracker>()
+                    }
+                    if (Skytils.config.trackMythEvent) {
+                        drop.droppedTimes++
+                        markDirty<MythologicalTracker>()
+                    }
                 }
             }
         }
     }
 
     override fun resetLoot() {
-        BurrowDrop.values().onEach { it.droppedTimes = 0L }
-        BurrowMob.values().onEach { it.dugTimes = 0L }
+        burrowsDug = 0L
+        BurrowDrop.values().forEach { it.droppedTimes = 0L }
+        BurrowMob.values().forEach { it.dugTimes = 0L }
     }
 
     override fun read(reader: FileReader) {
@@ -286,13 +285,13 @@ class MythologicalTracker : Tracker("mythological") {
 
     class MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
-            if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SBInfo.SkyblockIsland.Hub.mode) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+            if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SkyblockIsland.Hub.mode) {
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
-                    "Burrows Dug§f: $burrowsDug",
+                    "Burrows Dug§f: ${nf.format(burrowsDug)}",
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     CommonColors.YELLOW,
@@ -303,7 +302,7 @@ class MythologicalTracker : Tracker("mythological") {
                 for (mob in BurrowMob.values()) {
                     if (mob.dugTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
-                        "${mob.mobName}§f: ${mob.dugTimes}",
+                        "${mob.mobName}§f: ${nf.format(mob.dugTimes)}",
                         if (leftAlign) 0f else width.toFloat(),
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
@@ -315,7 +314,7 @@ class MythologicalTracker : Tracker("mythological") {
                 for (item in BurrowDrop.values()) {
                     if (item.droppedTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
-                        "${item.rarity.baseColor}${item.itemName}§f: §r${item.droppedTimes}",
+                        "${item.rarity.baseColor}${item.itemName}§f: §r${nf.format(item.droppedTimes)}",
                         if (leftAlign) 0f else width.toFloat(),
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
@@ -328,7 +327,7 @@ class MythologicalTracker : Tracker("mythological") {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT

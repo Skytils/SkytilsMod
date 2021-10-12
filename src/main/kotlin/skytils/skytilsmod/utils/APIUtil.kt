@@ -20,66 +20,86 @@ package skytils.skytilsmod.utils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
-import org.apache.http.HttpRequest
-import org.apache.http.HttpResponse
-import org.apache.http.HttpVersion
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.protocol.HttpContext
-import org.apache.http.util.EntityUtils
+import gg.essential.universal.UChat
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
+import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.http.message.BasicHeader
+import org.apache.hc.core5.ssl.SSLContexts
+import org.apache.hc.core5.util.Timeout
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import java.awt.image.BufferedImage
+import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
+import java.security.cert.X509Certificate
+import javax.imageio.ImageIO
 
 
 object APIUtil {
     private val parser = JsonParser()
 
+    val sslContext = SSLContexts.custom()
+        .loadTrustMaterial { chain, authType ->
+            isValidCert(chain, authType)
+        }
+        .build()
+    val sslSocketFactory = SSLConnectionSocketFactoryBuilder.create()
+        .setSslContext(sslContext)
+        .build()
+
+    val cm = PoolingHttpClientConnectionManagerBuilder.create()
+        .setSSLSocketFactory(sslSocketFactory)
+
     val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("Skytils/" + Skytils.VERSION)
-            .addInterceptorFirst { request: HttpRequest, _: HttpContext? ->
-                if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache")
-                if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache")
-            }
+        HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
+            .setConnectionManagerShared(true)
+            .setConnectionManager(cm.build())
+            .setDefaultHeaders(
+                mutableListOf(
+                    BasicHeader("Pragma", "no-cache"),
+                    BasicHeader("Cache-Control", "no-cache")
+                )
+            )
+            .setDefaultRequestConfig(
+                RequestConfig.custom()
+                    .setConnectTimeout(Timeout.ofMinutes(1))
+                    .setResponseTimeout(Timeout.ofMinutes(1))
+                    .build()
+            )
+            .useSystemProperties()
+
+    /**
+     * Taken from Elementa under MIT License
+     * @link https://github.com/Sk1erLLC/Elementa/blob/master/LICENSE
+     */
+    fun URL.getImage(): BufferedImage {
+        val connection = this.openConnection() as HttpURLConnection
+
+        connection.requestMethod = "GET"
+        connection.useCaches = true
+        connection.addRequestProperty("User-Agent", "Skytils/${Skytils.VERSION}")
+        connection.doOutput = true
+
+        return ImageIO.read(connection.inputStream)
+    }
 
     fun getJSONResponse(urlString: String): JsonObject {
         val client = builder.build()
         try {
-            val request = HttpGet(URL(urlString).toURI())
-            request.protocolVersion = HttpVersion.HTTP_1_1
-            val response: HttpResponse = client.execute(request)
-            val entity = response.entity
-            if (response.statusLine.statusCode == 200) {
-                return parser.parse(EntityUtils.toString(entity)).asJsonObject
-            } else {
-                if (urlString.startsWithAny(
-                        "https://api.ashcon.app/mojang/v2/user/",
-                        "https://api.hypixel.net/",
-                        MayorInfo.baseURL,
-                        AuctionData.dataURL
-                    )
-                ) {
-                    val errorStream = entity.content
-                    Scanner(errorStream).use { scanner ->
-                        scanner.useDelimiter("\\Z")
-                        val error = scanner.next()
-                        if (error.startsWith("{")) {
-                            return parser.parse(error).asJsonObject
-                        }
-                    }
+            client.execute(HttpGet(urlString)).use { response ->
+                response.entity.use { entity ->
+                    val obj = parser.parse(EntityUtils.toString(entity)).asJsonObject
+                    EntityUtils.consume(entity)
+                    return obj
                 }
             }
         } catch (ex: Throwable) {
             ex.printStackTrace()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
+            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
         } finally {
             client.close()
         }
@@ -89,17 +109,15 @@ object APIUtil {
     fun getArrayResponse(urlString: String): JsonArray {
         val client = builder.build()
         try {
-            val request = HttpGet(URL(urlString).toURI())
-            request.protocolVersion = HttpVersion.HTTP_1_1
-            val response: HttpResponse = client.execute(request)
-            val entity = response.entity
-            if (response.statusLine.statusCode == 200) {
-                return parser.parse(EntityUtils.toString(entity)).asJsonArray
-            } else {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cRequest to a resource failed. HTTP Error Code: ${response.statusLine.statusCode}"))
+            client.execute(HttpGet(urlString)).use { response ->
+                response.entity.use { entity ->
+                    val obj = parser.parse(EntityUtils.toString(entity)).asJsonArray
+                    EntityUtils.consume(entity)
+                    return obj
+                }
             }
         } catch (ex: Throwable) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cAn error has occured whilst fetching a resource. See logs for more details."))
+            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
             ex.printStackTrace()
         } finally {
             client.close()
@@ -107,145 +125,7 @@ object APIUtil {
         return JsonArray()
     }
 
-    fun getUUID(username: String): String? {
-        val uuidResponse = getJSONResponse("https://api.ashcon.app/mojang/v2/user/$username")
-        if (uuidResponse.has("error")) {
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cFailed with error: ${uuidResponse["reason"].asString}"))
-            return null
-        }
-        return uuidResponse["uuid"].asString.replace("-", "")
+    private fun isValidCert(chain: Array<X509Certificate>, authType: String): Boolean {
+        return chain.any { it.issuerDN.name == "CN=R3, O=Let's Encrypt, C=US" }
     }
-
-    /**
-     * Modified from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun getLatestProfileID(UUID: String, key: String): String? {
-        val player: EntityPlayer = Minecraft.getMinecraft().thePlayer
-
-        val profilesResponse = getJSONResponse("https://api.hypixel.net/skyblock/profiles?uuid=$UUID&key=$key")
-        if (!profilesResponse["success"].asBoolean) {
-            val reason = profilesResponse["cause"].asString
-            player.addChatMessage(ChatComponentText("§cFailed with reason: $reason"))
-            return null
-        }
-        if (profilesResponse["profiles"].isJsonNull) {
-            player.addChatMessage(ChatComponentText("§cThis player doesn't appear to have played SkyBlock."))
-            return null
-        }
-
-        var latestProfile = ""
-        var latestSave: Long = 0
-        val profilesArray = profilesResponse["profiles"].asJsonArray
-        for (profile in profilesArray) {
-            val profileJSON = profile.asJsonObject
-            var profileLastSave: Long = 1
-            if (profileJSON["members"].asJsonObject[UUID].asJsonObject.has("last_save")) {
-                profileLastSave = profileJSON["members"].asJsonObject[UUID].asJsonObject["last_save"].asLong
-            }
-            if (profileLastSave > latestSave) {
-                latestProfile = profileJSON["profile_id"].asString
-                latestSave = profileLastSave
-            }
-        }
-        return latestProfile
-    }
-
-
-    fun getRankFromResponse(obj: JsonObject): String {
-        val rank = try {
-            obj["rank"].asString
-        } catch (ex: Throwable) {
-            null
-        }
-        val packageRank = try {
-            obj["packageRank"].asString
-        } catch (ex: Throwable) {
-            null
-        }
-        val newPackageRank = try {
-            obj["newPackageRank"].asString
-        } catch (ex: Throwable) {
-            null
-        }
-        val monthlyPackageRank = try {
-            obj["monthlyPackageRank"].asString
-        } catch (ex: Throwable) {
-            null
-        }
-        val newRank = getPlayerRank(
-            rank,
-            packageRank,
-            newPackageRank,
-            monthlyPackageRank
-        )
-        val rankPlusColor = try {
-            obj["rankPlusColor"].asString
-        } catch (ex: Throwable) {
-            "RED"
-        }
-        val newRankPlusColor =
-            EnumChatFormatting.getValueByName(rankPlusColor.lowercase().replace(Regex("[^a-z]"), ""))
-                .toString()
-        val prefix = try {
-            obj["prefix"].asString
-        } catch (ex: Throwable) {
-            null
-        }
-        val monthlyRankColor = try {
-            obj["monthlyRankColor"].asString
-        } catch (ex: Throwable) {
-            "GOLD"
-        }
-        val rankPlusPlusColor =
-            EnumChatFormatting.getValueByName(monthlyRankColor.lowercase().replace(Regex("[^a-z]"), ""))
-                .toString()
-        return getFormattedRank(newRank, newRankPlusColor, prefix, rankPlusPlusColor)
-    }
-
-    // Kotlin-ified SlothPixel functions, MIT LICENSE https://github.com/slothpixel/core/blob/master/LICENSE
-    fun getPlayerRank(
-        rank: String?,
-        packageRank: String?,
-        newPackageRank: String?,
-        monthlyPackageRank: String?
-    ): String? {
-        var playerRank: String?
-        playerRank = if (rank == "NORMAL") {
-            newPackageRank ?: packageRank
-        } else {
-            rank ?: newPackageRank ?: packageRank
-        }
-
-        if (playerRank == "MVP_PLUS" && monthlyPackageRank == "SUPERSTAR") {
-            playerRank = "MVP_PLUS_PLUS"
-        }
-
-        if (rank == "NONE") {
-            playerRank = null
-        }
-
-        return playerRank
-    }
-
-    fun getFormattedRank(rankCode: String?, plusColor: String?, prefix: String?, plusPlusColor: String?): String {
-        if (prefix != null) {
-            return prefix
-        }
-        return when (rankCode) {
-            "VIP" -> "§a[VIP]"
-            "VIP_PLUS" -> "§a[VIP§6+§a]"
-            "MVP" -> "§b[MVP]"
-            "MVP_PLUS" -> "§b[MVP${plusColor}+§b]"
-            "MVP_PLUS_PLUS" -> "${plusPlusColor}[MVP${plusColor}++${plusPlusColor}]"
-            "HELPER" -> "§9[HELPER]"
-            "MODERATOR" -> "§2[MOD]"
-            "GAME_MASTER" -> "§2[GM]"
-            "ADMIN" -> "§c[ADMIN]"
-            "YOUTUBER" -> "§c[§fYOUTUBE§c]"
-            else -> "§7"
-        }
-    }
-    // end
 }

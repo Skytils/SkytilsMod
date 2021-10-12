@@ -66,7 +66,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = 0.pixels()
             y = 0.pixels()
         }.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
         }
 
         SimpleButton("Add Username").childOf(bottomButtons).constrain {

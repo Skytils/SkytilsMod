@@ -32,7 +32,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
 
@@ -44,7 +43,7 @@ class ClickInOrderSolver {
         if (mc.currentScreen is GuiChest) {
             val chest = mc.thePlayer.openContainer as ContainerChest
             val invSlots = (mc.currentScreen as GuiChest).inventorySlots.inventorySlots
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName == "Click in order!") {
                 for (i in 10..25) {
                     if (i == 17 || i == 18) continue
@@ -100,7 +99,7 @@ class ClickInOrderSolver {
             val fr = mc.fontRendererObj
             val slot = event.slot
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName == "Click in order!") {
                 if (slot.hasStack && slot.inventory !== mc.thePlayer.inventory) {
                     val item = slot.stack
@@ -119,20 +118,6 @@ class ClickInOrderSolver {
                         event.isCanceled = true
                     }
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.clickInOrderTerminalSolver) return
-        if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
-            if (chestName == "Click in order!") {
-                event.isCanceled = true
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
             }
         }
     }

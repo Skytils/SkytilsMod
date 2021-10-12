@@ -20,7 +20,6 @@ package skytils.skytilsmod.events
 import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
 class CheckRenderEntityEvent<T : Entity>(
@@ -29,4 +28,4 @@ class CheckRenderEntityEvent<T : Entity>(
     val camX: Double,
     val camY: Double,
     val camZ: Double
-) : Event()
+) : SkytilsEvent()

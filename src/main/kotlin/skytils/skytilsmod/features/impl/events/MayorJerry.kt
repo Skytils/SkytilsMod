@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.events
 
+import gg.essential.universal.UChat
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -28,6 +29,7 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
+import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.RenderUtil.renderItem
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -51,6 +53,13 @@ class MayorJerry {
         ) {
             val match = jerryType.find(formatted)
             if (match != null) {
+                if (Skytils.config.hiddenJerryTimer && lastJerry != -1L) UChat.chat(
+                    "§bIt has been ${
+                        NumberUtil.nf.format(
+                            (System.currentTimeMillis() - lastJerry) / 1000.0
+                        )
+                    } seconds since the last Jerry."
+                )
                 lastJerry = System.currentTimeMillis()
                 val color = match.groups[1]!!.value
                 MayorJerryTracker.onJerry("§$color Jerry")
@@ -74,7 +83,7 @@ class MayorJerry {
     class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", FloatPair(10, 10)) {
         @OptIn(ExperimentalTime::class)
         override fun render() {
-            if (Utils.inSkyblock && toggled) {
+            if (Utils.inSkyblock && toggled && MayorInfo.currentMayor == "Jerry") {
                 if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
                     ScreenRenderer.fontRenderer.drawString("Visit Jerry!", 0f, 0f, CommonColors.RED)
                 } else {

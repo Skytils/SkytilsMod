@@ -19,8 +19,7 @@
 package skytils.skytilsmod.features.impl.trackers.impl
 
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
+import gg.essential.universal.UResolution
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -162,7 +161,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
     class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", FloatPair(150, 120)) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
-                val sr = ScaledResolution(Minecraft.getMinecraft())
+                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
@@ -195,7 +194,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         }
 
         override fun demoRender() {
-            val sr = ScaledResolution(Minecraft.getMinecraft())
+            val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT

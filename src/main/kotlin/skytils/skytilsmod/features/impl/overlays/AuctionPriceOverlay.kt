@@ -18,10 +18,10 @@
 package skytils.skytilsmod.features.impl.overlays
 
 import com.google.common.collect.Lists
+import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
@@ -38,7 +38,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.gui.elements.CleanButton
-import skytils.skytilsmod.mixins.accessors.AccessorGuiEditSign
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SBInfo
@@ -248,7 +248,7 @@ class AuctionPriceOverlay {
         }
 
         private fun onMouseMove() {
-            val sr = ScaledResolution(mc)
+            val sr = UResolution
             val minecraftScale = sr.scaleFactor.toFloat()
             val floatMouseX = Mouse.getX() / minecraftScale
             val floatMouseY = (Display.getHeight() - Mouse.getY()) / minecraftScale
@@ -262,9 +262,10 @@ class AuctionPriceOverlay {
         override fun actionPerformed(button: GuiButton) {
             if (button.id == 0) {
                 undercut = !undercut
+                sign.signText[0] = ChatComponentText(input ?: "Invalid Value")
             } else if (button.id == 999) {
                 dragging = true
-                val sr = ScaledResolution(mc)
+                val sr = UResolution
                 val minecraftScale = sr.scaleFactor.toFloat()
                 val floatMouseX = Mouse.getX() / minecraftScale
                 val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale

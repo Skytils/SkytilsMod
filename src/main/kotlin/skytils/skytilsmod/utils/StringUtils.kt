@@ -17,13 +17,27 @@
  */
 package skytils.skytilsmod.utils
 
-import net.minecraft.util.StringUtils as MinecraftStringUtils
+import gg.essential.universal.wrappers.message.UTextComponent
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
-fun String?.stripControlCodes(): String = MinecraftStringUtils.stripControlCodes(this)
+fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils.countMatches(this, subString)
 
-fun String?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
-fun String?.containsAny(vararg sequences: CharSequence?): Boolean {
+fun String?.stripControlCodes(): String = UTextComponent.stripFormatting(this ?: "")
+
+fun CharSequence?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
+fun CharSequence?.containsAny(vararg sequences: CharSequence?): Boolean {
     if (this == null) return false
     return sequences.any { it != null && this.contains(it) }
 }
+
+fun String.toDashedUUID(): String {
+    return buildString {
+        append(this@toDashedUUID)
+        insert(20, "-")
+        insert(16, "-")
+        insert(12, "-")
+        insert(8, "-")
+    }
+}
+
+fun String.toTitleCase(): String = this.lowercase().replaceFirstChar { c -> c.titlecase() }

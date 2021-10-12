@@ -19,10 +19,9 @@ package skytils.skytilsmod.events
 
 import net.minecraft.network.Packet
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-open class PacketEvent(val packet: Packet<*>) : Event() {
+open class PacketEvent(val packet: Packet<*>) : SkytilsEvent() {
     var direction: Direction? = null
 
     class ReceiveEvent(packet: Packet<*>) : PacketEvent(packet) {

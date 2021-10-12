@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
@@ -25,7 +26,6 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
-import gg.essential.vigilance.VigilanceConfig
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -33,18 +33,18 @@ import skytils.skytilsmod.utils.openGUI
 import java.awt.Desktop
 import java.net.URI
 
-class OptionsGui : WindowScreen(newGuiScale = 2) {
+class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
         x = CenterConstraint()
-        y = RelativeConstraint(0.1f)
+        y = RelativeConstraint(0.075f)
         textScale = basicTextScaleConstraint { window.getHeight() / 40 }
     }
 
     init {
         SimpleButton("Config").childOf(window).constrain {
             x = CenterConstraint()
-            y = SiblingConstraint() + RelativeConstraint(0.1f)
+            y = SiblingConstraint() + RelativeConstraint(0.075f)
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
@@ -82,13 +82,29 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         }.onMouseClick {
             mc.displayGuiScreen(SpamHiderGui())
         }
-        SimpleButton("Edit Vigilance").childOf(window).constrain {
+        SimpleButton("Edit Waypoints").childOf(window).constrain {
             x = CenterConstraint()
             y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            VigilanceConfig.openGUI()
+            mc.displayGuiScreen(WaypointsGui())
+        }
+        SimpleButton("Edit Enchantment Names").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(EnchantNamesGui())
+        }
+        SimpleButton("Open Config Folder").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            Desktop.getDesktop().open(Skytils.modDir)
         }
         SimpleButton("Discord").childOf(window).constrain {
             x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
@@ -113,7 +129,7 @@ class OptionsGui : WindowScreen(newGuiScale = 2) {
         animate()
     }
 
-    fun animate() {
+    private fun animate() {
         skytilsText.animate {
             setColorAnimation(Animations.IN_OUT_SIN, 1f, RainbowColorConstraint())
                 .onComplete {

@@ -25,7 +25,7 @@ import net.minecraft.util.ResourceLocation
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.RenderUtil
 
-class ComboEndToast : IToast<ComboToast> {
+class ComboEndToast(val input: String) : IToast<ComboToast> {
     private val buffer = GLAllocation.createDirectFloatBuffer(16)
     private val maxDrawTime: Long = Skytils.config.toastTime.toLong()
     override fun draw(toastGui: GuiToast, delta: Long): IToast.Visibility {
@@ -33,7 +33,7 @@ class ComboEndToast : IToast<ComboToast> {
         GlStateManager.color(1.0f, 1.0f, 1.0f)
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0f, 0f, 160, 32, 160f, 32f)
         toastGui.mc.fontRendererObj.drawStringWithShadow("§r§c§lCombo Failed!", 30f, 7f, 16777215)
-        GuiToast.drawSubline(toastGui, delta, 0L, maxDrawTime, buffer, "", false)
+        GuiToast.drawSubline(toastGui, delta, 0L, maxDrawTime, buffer, "§r§cYou reached ${input.filter { it.isDigit() }}", false)
         RenderHelper.enableGUIStandardItemLighting()
         RenderUtil.renderTexture(ICON, 8, 8)
         GlStateManager.disableLighting()

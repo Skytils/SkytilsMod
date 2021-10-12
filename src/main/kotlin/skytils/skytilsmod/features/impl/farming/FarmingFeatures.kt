@@ -17,11 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
-import net.minecraft.block.Block
 import net.minecraft.client.gui.GuiChat
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemAxe
-import net.minecraft.item.ItemHoe
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
@@ -36,34 +32,11 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.TickTask
-import skytils.skytilsmod.events.DamageBlockEvent
 import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 
 class FarmingFeatures {
-    private var lastNotifyBreakTime: Long = 0
-
-    @SubscribeEvent
-    fun onAttemptBreak(event: DamageBlockEvent) {
-        if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return
-        val p = mc.thePlayer
-        val heldItem = p.heldItem
-        val block = mc.theWorld.getBlockState(event.pos).block
-        if (Skytils.config.preventBreakingFarms && heldItem != null) {
-            if ((heldItem.item is ItemHoe || heldItem.item is ItemAxe) && farmBlocks.contains(block)) {
-                event.isCanceled = true
-                if (System.currentTimeMillis() - lastNotifyBreakTime > 10000) {
-                    lastNotifyBreakTime = System.currentTimeMillis()
-                    p.playSound("note.bass", 1f, 0.5f)
-                    val notif =
-                        ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has prevented you from breaking that block!")
-                    p.addChatMessage(notif)
-                }
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
@@ -171,34 +144,5 @@ class FarmingFeatures {
         var trapperStart = -1.0
         var animalFound = false
         var acceptTrapperCommand = ""
-        val farmBlocks = setOf<Block>(
-            Blocks.dirt,
-            Blocks.farmland,
-            Blocks.carpet,
-            Blocks.glowstone,
-            Blocks.sea_lantern,
-            Blocks.soul_sand,
-            Blocks.waterlily,
-            Blocks.standing_sign,
-            Blocks.wall_sign,
-            Blocks.wooden_slab,
-            Blocks.double_wooden_slab,
-            Blocks.oak_fence,
-            Blocks.dark_oak_fence,
-            Blocks.birch_fence,
-            Blocks.spruce_fence,
-            Blocks.acacia_fence,
-            Blocks.jungle_fence,
-            Blocks.oak_fence_gate,
-            Blocks.acacia_fence_gate,
-            Blocks.birch_fence_gate,
-            Blocks.jungle_fence_gate,
-            Blocks.spruce_fence_gate,
-            Blocks.dark_oak_fence_gate,
-            Blocks.glass,
-            Blocks.glass_pane,
-            Blocks.stained_glass,
-            Blocks.stained_glass_pane
-        )
     }
 }

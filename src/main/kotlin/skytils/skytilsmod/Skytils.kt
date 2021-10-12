@@ -26,13 +26,13 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
@@ -41,8 +41,10 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import org.lwjgl.input.Mouse
-import skytils.skytilsmod.commands.*
+import skytils.hylin.HylinAPI.Companion.createHylinAPI
+import skytils.skytilsmod.commands.impl.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import skytils.skytilsmod.core.*
@@ -59,6 +61,7 @@ import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.handlers.*
 import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
+import skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
 import skytils.skytilsmod.features.impl.misc.*
 import skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
 import skytils.skytilsmod.features.impl.protectitems.ProtectItems
@@ -71,17 +74,14 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.ReopenableGUI
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.mixins.accessors.AccessorCommandHandler
-import skytils.skytilsmod.mixins.accessors.AccessorGuiNewChat
-import skytils.skytilsmod.mixins.accessors.AccessorSettingsGui
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.Utils.printDebugMessage
-import skytils.skytilsmod.utils.getChatLine
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import java.awt.Desktop
 import java.io.File
-import java.net.URL
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.MethodType
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 
@@ -98,16 +98,19 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0-pre15.1"
+        const val VERSION = "1.0.7"
 
         @JvmField
-        val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+        val gson: Gson = GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(Enchant::class.java, Enchant.Serializer())
+            .create()
 
         @JvmStatic
         val mc: Minecraft
             get() = Minecraft.getMinecraft()
 
-        lateinit var config: Config
+        val config = Config
 
         @JvmField
         val modDir = File(File(mc.mcDataDir, "config"), "skytils")
@@ -137,21 +140,12 @@ class Skytils {
 
         @JvmField
         val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
-    }
 
+        val hylinAPI = createHylinAPI("", false)
+    }
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
-        // Must use reflection otherwise the "constant" value will be inlined by compiler
-        val forgeVersion = runCatching {
-            ForgeVersion::class.java.getDeclaredField("buildVersion").get(null) as Int
-        }.onFailure { it.printStackTrace() }.getOrDefault(2318)
-        // Asbyth's forge fork uses version 0
-        if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
-            Desktop.getDesktop()
-                .browse(URL("https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html").toURI())
-            throw RuntimeException("Skytils can't run on this Minecraft Forge version! Please use the latest Forge build 2318 for 1.8.9.")
-        }
         if (!modDir.exists()) modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
@@ -160,8 +154,8 @@ class Skytils {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        config = Config()
-        config.preload()
+        config.init()
+        hylinAPI.key = config.apiKey
 
         UpdateChecker.downloadDeleteTask()
 
@@ -172,6 +166,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MayorInfo)
         MinecraftForge.EVENT_BUS.register(SBInfo)
         MinecraftForge.EVENT_BUS.register(SoundQueue)
+        MinecraftForge.EVENT_BUS.register(TickTaskManager)
         MinecraftForge.EVENT_BUS.register(UpdateChecker)
 
         MinecraftForge.EVENT_BUS.register(AlignmentTaskSolver())
@@ -179,9 +174,9 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(AuctionData())
         MinecraftForge.EVENT_BUS.register(AuctionPriceOverlay())
         MinecraftForge.EVENT_BUS.register(BlazeSolver())
-        MinecraftForge.EVENT_BUS.register(BlockAbility())
         MinecraftForge.EVENT_BUS.register(BossHPDisplays())
         MinecraftForge.EVENT_BUS.register(BoulderSolver())
+        MinecraftForge.EVENT_BUS.register(ChatTabs)
         MinecraftForge.EVENT_BUS.register(ChestProfit())
         MinecraftForge.EVENT_BUS.register(ClickInOrderSolver())
         MinecraftForge.EVENT_BUS.register(CreeperSolver())
@@ -192,6 +187,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(DungeonFeatures())
         MinecraftForge.EVENT_BUS.register(DungeonMap())
         MinecraftForge.EVENT_BUS.register(DungeonTimer())
+        MinecraftForge.EVENT_BUS.register(EnchantNames())
         MinecraftForge.EVENT_BUS.register(FarmingFeatures())
         MinecraftForge.EVENT_BUS.register(FavoritePets())
         MinecraftForge.EVENT_BUS.register(GlintCustomizer())
@@ -209,6 +205,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(MiscFeatures())
         MinecraftForge.EVENT_BUS.register(MythologicalTracker())
         MinecraftForge.EVENT_BUS.register(PetFeatures())
+        MinecraftForge.EVENT_BUS.register(Ping)
         MinecraftForge.EVENT_BUS.register(ProtectItems())
         MinecraftForge.EVENT_BUS.register(RainTimer())
         MinecraftForge.EVENT_BUS.register(RelicWaypoints())
@@ -220,6 +217,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SpidersDenFeatures())
         MinecraftForge.EVENT_BUS.register(SpiritLeap())
         MinecraftForge.EVENT_BUS.register(StartsWithSequenceSolver())
+        MinecraftForge.EVENT_BUS.register(StupidTreasureChestOpeningThing)
         MinecraftForge.EVENT_BUS.register(TankDisplayStuff())
         MinecraftForge.EVENT_BUS.register(TechnoMayor())
         MinecraftForge.EVENT_BUS.register(TeleportMazeSolver())
@@ -229,6 +227,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(TreasureHunter())
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
         MinecraftForge.EVENT_BUS.register(WaterBoardSolver())
+        MinecraftForge.EVENT_BUS.register(Waypoints())
     }
 
     @Mod.EventHandler
@@ -237,47 +236,53 @@ class Skytils {
         usingLabymod = Loader.isModLoaded("labymod")
         usingNEU = Loader.isModLoaded("notenoughupdates")
 
-        if (usingDungeonRooms && Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2")) {
-            runCatching {
-                ScoreCalculation.drmRoomScanMethod =
-                    Class.forName("io.github.quantizr.utils.Utils").getDeclaredMethod("roomList")
+        if (usingDungeonRooms) {
+            if (Loader.instance().indexedModList["dungeonrooms"]!!.version.startsWith("2.0")) {
+                runCatching {
+                    Class.forName("io.github.quantizr.utils.Utils").also {
+                        ScoreCalculation.drmRoomScanMethod = MethodHandles.publicLookup().findStatic(
+                            it, "roomList", MethodType.methodType(
+                                List::class.java
+                            )
+                        )
+                    }
+                }
+            } else {
+                config.scoreCalculationMethod = 0
             }
         }
 
         val cch = ClientCommandHandler.instance
 
-        if (cch is AccessorCommandHandler) {
-            cch.registerCommand(SkytilsCommand)
+        if (cch !is AccessorCommandHandler) throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
+        cch.registerCommand(SkytilsCommand)
 
-            cch.registerCommand(CataCommand)
-            cch.registerCommand(SlayerCommand)
+        cch.registerCommand(CataCommand)
+        cch.registerCommand(CalcXPCommand)
+        cch.registerCommand(HollowWaypointCommand)
+        cch.registerCommand(SlayerCommand)
 
-            if (!cch.commands.containsKey("armorcolor")) {
-                cch.registerCommand(ArmorColorCommand)
-            }
+        if (!cch.commands.containsKey("armorcolor")) {
+            cch.registerCommand(ArmorColorCommand)
+        }
 
-            if (!cch.commands.containsKey("blockability")) {
-                //cch.registerCommand(BlockAbilityCommand);
-            }
+        if (!cch.commands.containsKey("glintcustomize")) {
+            cch.registerCommand(GlintCustomizeCommand)
+        }
 
-            if (!cch.commands.containsKey("glintcustomize")) {
-                cch.registerCommand(GlintCustomizeCommand)
-            }
+        if (!cch.commands.containsKey("trackcooldown")) {
+            cch.registerCommand(TrackCooldownCommand)
+        }
 
-            if (!cch.commands.containsKey("trackcooldown")) {
-                cch.registerCommand(TrackCooldownCommand)
-            }
+        if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
+            cch.commandSet.add(RepartyCommand)
+            cch.commandMap["reparty"] = RepartyCommand
+        }
 
-            if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
-                cch.commandSet.add(RepartyCommand)
-                cch.commandMap["reparty"] = RepartyCommand
-            }
-
-            if (config.overrideReparty || !cch.commands.containsKey("rp")) {
-                cch.commandSet.add(RepartyCommand)
-                cch.commandMap["rp"] = RepartyCommand
-            }
-        } else throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
+        if (config.overrideReparty || !cch.commands.containsKey("rp")) {
+            cch.commandSet.add(RepartyCommand)
+            cch.commandMap["rp"] = RepartyCommand
+        }
 
         DataFetcher.preload()
         MayorInfo.fetchMayorData()
@@ -296,20 +301,38 @@ class Skytils {
             displayScreen = null
         }
 
-        if (mc.thePlayer != null && sendMessageQueue.size > 0 && System.currentTimeMillis() - lastChatMessage > 200) {
-            mc.thePlayer.sendChatMessage(sendMessageQueue.removeFirst())
+        if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 200) {
+            val msg = sendMessageQueue.removeFirstOrNull()
+            if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(msg)
         }
 
         if (ticks % 20 == 0) {
             if (mc.thePlayer != null) {
-                Utils.checkForHypixel()
-                Utils.checkForSkyblock()
-                Utils.checkForDungeons()
+                Utils.isOnHypixel = mc.runCatching {
+                    theWorld != null && !isSingleplayer && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
+                        ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
+                }.onFailure { it.printStackTrace() }.getOrDefault(false)
+                Utils.inSkyblock = Utils.isOnHypixel && mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
+                    ?.let { ScoreboardUtil.cleanSB(it.displayName).contains("SKYBLOCK") } ?: false
+                Utils.inDungeons = Utils.inSkyblock && ScoreboardUtil.sidebarLines.any {
+                    ScoreboardUtil.cleanSB(it).run {
+                        (contains("The Catacombs") && !contains("Queue")) || contains("Dungeon Cleared:")
+                    }
+                }
+                if (DevTools.getToggle("sprint"))
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
             }
             ticks = 0
         }
 
         ticks++
+    }
+
+    @SubscribeEvent
+    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        Utils.isOnHypixel = false
+        Utils.inSkyblock = false
+        Utils.inDungeons = false
     }
 
     @SubscribeEvent
@@ -369,23 +392,34 @@ class Skytils {
 
     @SubscribeEvent
     fun onMouseClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (event.gui is GuiChat && config.debugMode && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
+        if (event.gui is GuiChat && DevTools.getToggle("chat") && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
             val button = Mouse.getEventButton()
             if (button != 0 && button != 1) return
             val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
             if (button == 0) {
-                val realText =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent?.formattedText
-                GuiScreen.setClipboardString(realText ?: chatLine.chatComponent.formattedText)
-                printDebugMessage("Copied formatted message to clipboard!")
+                val component =
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatLineID == chatLine.chatLineID }?.chatComponent
+                        ?: chatLine.chatComponent
+                val realText = buildString {
+                    append(component.unformattedTextForChat)
+                    append("§r")
+                    component.siblings.forEach {
+                        append(it.unformattedTextForChat)
+                        append("§r")
+                    }
+                }
+
+                GuiScreen.setClipboardString(realText)
+                printDevMessage("Copied formatted message to clipboard!", "chat")
             } else {
                 val component =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatComponent.unformattedText == chatLine.chatComponent.unformattedText }?.chatComponent
+                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatLineID == chatLine.chatLineID }?.chatComponent
+                        ?: chatLine.chatComponent
 
-                printDebugMessage("Copied serialized message to clipboard!")
+                printDevMessage("Copied serialized message to clipboard!", "chat")
                 GuiScreen.setClipboardString(
                     IChatComponent.Serializer.componentToJson(
-                        component ?: chatLine.chatComponent
+                        component
                     )
                 )
             }

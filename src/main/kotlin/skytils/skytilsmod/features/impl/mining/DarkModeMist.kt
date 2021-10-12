@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.RenderBlockInWorldEvent
 import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.Utils
 
 class DarkModeMist {
@@ -35,7 +36,7 @@ class DarkModeMist {
     fun onGetBlockModel(event: RenderBlockInWorldEvent) {
         if (!Utils.inSkyblock || !Skytils.config.darkModeMist) return
         val state = event.state
-        if (SBInfo.mode == SBInfo.SkyblockIsland.DwarvenMines.mode && event.state != null && event.pos != null) {
+        if (SBInfo.mode == SkyblockIsland.DwarvenMines.mode && event.state != null && event.pos != null) {
             if ((event.pos as BlockPos).y <= 76) {
                 if ((state as IBlockState).block === Blocks.stained_glass &&
                     (state as IBlockState).getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE

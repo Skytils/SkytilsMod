@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -32,7 +31,9 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.CheckRenderEntityEvent
@@ -44,16 +45,18 @@ import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderTexture
 import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.Utils.isInTablist
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
 class PetFeatures {
+    val petItems = HashMap<String, Boolean>()
+
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
@@ -94,7 +97,7 @@ class PetFeatures {
         if (Skytils.config.highlightActivePet && (SBInfo.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
             val item = event.slot.stack
             for (line in getItemLore(item)) {
-                if (line == "§7§cClick to despawn ") {
+                if (line == "§7§cClick to despawn.") {
                     GlStateManager.translate(0f, 0f, 3f)
                     event.slot highlight Skytils.config.activePetColor
                     GlStateManager.translate(0f, 0f, -3f)
@@ -108,50 +111,39 @@ class PetFeatures {
     fun onSendPacket(event: SendEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.petItemConfirmation && (event.packet is C02PacketUseEntity || event.packet is C08PacketPlayerBlockPlacement)) {
-            val item = mc.thePlayer.heldItem
-            if (item != null) {
-                val itemId = getSkyBlockItemID(item)
-                if (itemId != null) {
-                    var isPetItem =
-                        (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY") || itemId.startsWith(
-                            "PET_SKIN_"
-                        )
-                    if (!isPetItem) {
-                        val lore = getItemLore(item)
-                        for (i in lore.size - 1 downTo 1) {
-                            val line = lore[i]
-                            if (line.contains("PET ITEM")) {
-                                isPetItem = true
-                                break
-                            }
-                        }
+            val item = mc.thePlayer.heldItem ?: return
+            val itemId = getSkyBlockItemID(item) ?: return
+            if (itemId !in petItems) {
+                val isPetItem =
+                    (itemId.contains("PET_ITEM") && !itemId.endsWith("_DROP")) || itemId.endsWith("CARROT_CANDY") || itemId.startsWith(
+                        "PET_SKIN_"
+                    ) || getItemLore(item).asReversed().any {
+                        it.contains("PET ITEM")
                     }
-                    if (isPetItem) {
-                        if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
-                            event.isCanceled = true
-                            if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
-                                lastPetLockNotif = System.currentTimeMillis()
-                                val cc =
-                                    ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.")
-                                cc.chatStyle = cc.chatStyle
-                                    .setChatClickEvent(
-                                        ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
-                                            "/disableskytilspetitemlock"
-                                        )
-                                    )
-                                    .setChatHoverEvent(
-                                        HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
-                                            ChatComponentText("Click to disable the pet item lock for 5 seconds.")
-                                        )
-                                    )
-                                mc.thePlayer.addChatMessage(cc)
-                            }
-                        } else {
-                            lastPetConfirmation = 0
+                petItems[itemId] = isPetItem
+            }
+            if (petItems[itemId] == true) {
+                if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
+                    event.isCanceled = true
+                    if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
+                        lastPetLockNotif = System.currentTimeMillis()
+                        val cc =
+                            ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.")
+                        cc.chatStyle.also {
+                            it.chatClickEvent =
+                                ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/disableskytilspetitemlock"
+                                )
+                            it.chatHoverEvent = HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("Click to disable the pet item lock for 5 seconds.")
+                            )
                         }
+                        mc.thePlayer.addChatMessage(cc)
                     }
+                } else {
+                    lastPetConfirmation = 0
                 }
             }
         }
@@ -166,14 +158,29 @@ class PetFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
+
+        if (Skytils.config.dolphinPetDisplay && lastPet == "Dolphin") {
+            dolphinPlayers = mc.theWorld.getPlayers<EntityPlayer>(
+                EntityOtherPlayerMP::class.java
+            ) { p: EntityPlayer? ->
+                p != null && p !== mc.thePlayer && p.getDistanceSqToEntity(mc.thePlayer) <= 10 * 10 && p.uniqueID.version() != 2 && isInTablist(
+                    p
+                )
+            }.size
+        }
+    }
+
     companion object {
-        private val mc = Minecraft.getMinecraft()
         private var lastPetConfirmation: Long = 0
         private var lastPetLockNotif: Long = 0
         var lastPet: String? = null
         private val SUMMON_PATTERN = Pattern.compile("§r§aYou summoned your §r(?<pet>.+)§r§a!§r")
         private val AUTOPET_PATTERN =
             Pattern.compile("§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?<pet>.+)§e! §a§lVIEW RULE§r")
+        var dolphinPlayers = 0
 
         init {
             DolphinPetDisplay()
@@ -186,15 +193,8 @@ class PetFeatures {
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
                 if (lastPet != "Dolphin") return
                 renderTexture(ICON, 0, 0)
-                val players = mc.theWorld.getPlayers<EntityPlayer>(
-                    EntityOtherPlayerMP::class.java
-                ) { p: EntityPlayer? ->
-                    p!!.getDistanceSqToEntity(player) <= 10 * 10 && p.uniqueID.version() != 2 && p !== player && isInTablist(
-                        p
-                    )
-                }
                 ScreenRenderer.fontRenderer.drawString(
-                    if (Skytils.config.dolphinCap && players.size > 5) "5" else players.size.toString(),
+                    if (Skytils.config.dolphinCap && dolphinPlayers > 5) "5" else dolphinPlayers.toString(),
                     20f,
                     5f,
                     CommonColors.ORANGE,

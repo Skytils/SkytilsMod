@@ -20,7 +20,6 @@ package skytils.skytilsmod.events
 
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class ItemTossEvent(val item: ItemStack, val dropStack: Boolean) : Event()
+class ItemTossEvent(val item: ItemStack, val dropStack: Boolean) : SkytilsEvent()

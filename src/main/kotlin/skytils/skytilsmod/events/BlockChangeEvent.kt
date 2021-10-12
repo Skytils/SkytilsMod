@@ -19,6 +19,5 @@ package skytils.skytilsmod.events
 
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.Event
 
-class BlockChangeEvent(val pos: BlockPos, val old: IBlockState, val update: IBlockState) : Event()
+class BlockChangeEvent(val pos: BlockPos, val old: IBlockState, val update: IBlockState) : SkytilsEvent()

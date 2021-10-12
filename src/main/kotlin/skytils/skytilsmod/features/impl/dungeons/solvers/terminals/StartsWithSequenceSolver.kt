@@ -27,9 +27,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
 class StartsWithSequenceSolver {
@@ -40,7 +39,7 @@ class StartsWithSequenceSolver {
         if (mc.currentScreen is GuiChest) {
             val chest = mc.thePlayer.openContainer as ContainerChest
             val invSlots = (mc.currentScreen as GuiChest).inventorySlots.inventorySlots
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             val nameMatcher = titlePattern.matcher(chestName)
             if (nameMatcher.find()) {
                 val sequence = nameMatcher.group(1)
@@ -71,34 +70,13 @@ class StartsWithSequenceSolver {
     }
 
     @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.startsWithSequenceTerminalSolver) return
-        if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
-            if (chestName.startsWith("What starts with:")) {
-                event.isCanceled = true
-                if (Skytils.config.blockIncorrectTerminalClicks && event.slot != null) {
-                    if (shouldClick.size > 0) {
-                        if (shouldClick.none { slotNum: Int -> slotNum == event.slot.slotNumber }) {
-                            return
-                        }
-                    }
-                }
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.startsWithSequenceTerminalSolver) return
         if (event.container is ContainerChest) {
             val slot = event.slot
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim { it <= ' ' }
+            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
             if (chestName.startsWith("What starts with:")) {
                 if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
                     event.isCanceled = true

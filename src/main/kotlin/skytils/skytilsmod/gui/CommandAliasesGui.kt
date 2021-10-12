@@ -62,7 +62,7 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = 0.pixels()
             y = 0.pixels()
         }.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
         }
 
         SimpleButton("Add Alias").childOf(bottomButtons).constrain {
@@ -136,7 +136,7 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             y = CenterConstraint()
             height = 75.percent()
         }.onLeftClick {
-            container.parent.removeChild(container)
+            scrollComponent.removeChild(container)
         }
     }
 

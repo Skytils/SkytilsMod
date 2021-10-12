@@ -19,7 +19,6 @@ package skytils.skytilsmod.events
 
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.Cancelable
-import net.minecraftforge.fml.common.eventhandler.Event
 
 @Cancelable
-class AddChatMessageEvent(val message: IChatComponent) : Event()
+class AddChatMessageEvent(val message: IChatComponent) : SkytilsEvent()

@@ -24,14 +24,16 @@ import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
-import org.apache.http.HttpVersion
-import org.apache.http.client.methods.HttpGet
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.core5.http.io.entity.EntityUtils
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
+import skytils.skytilsmod.gui.UpdateGui
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.APIUtil.cm
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
-import java.io.*
+import java.io.File
 import java.net.URL
 import kotlin.concurrent.thread
 
@@ -58,18 +60,28 @@ object UpdateChecker {
                 println("Copying to mod folder")
                 val newLocation = File(oldJar.parent, "${if (oldJar.name.startsWith("!")) "!" else ""}${jarName}")
                 newLocation.createNewFile()
-                copyFile(newJar, newLocation)
+                newJar.copyTo(newLocation, true)
                 newJar.delete()
+                if (oldJar.delete()) {
+                    println("successfully deleted the files. skipping install tasks")
+                    return@Thread
+                }
                 println("Running delete task")
-                val taskFile = File(File(Skytils.modDir, "updates"), "tasks").listFiles()?.first()
+                val taskFile = File(File(Skytils.modDir, "updates"), "tasks").listFiles()?.last()
                 if (taskFile == null) {
                     println("Task doesn't exist")
                     return@Thread
                 }
                 val runtime = Utils.getJavaRuntime()
                 if (Util.getOSType() == Util.EnumOS.OSX) {
-                    println("On Mac, trying to open mods folder")
-                    Desktop.getDesktop().open(oldJar.parentFile)
+                    val sipStatus = Runtime.getRuntime().exec("csrutil status")
+                    sipStatus.waitFor()
+                    if (!sipStatus.inputStream.use { it.bufferedReader().readText() }
+                            .contains("System Integrity Protection status: disabled.")) {
+                        println("SIP is NOT disabled, opening Finder.")
+                        Desktop.getDesktop().open(oldJar.parentFile)
+                        return@Thread
+                    }
                 }
                 println("Using runtime $runtime")
                 Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" \"${oldJar.absolutePath}\"")
@@ -85,60 +97,27 @@ object UpdateChecker {
         Thread {
             println("Checking for Skytils install task...")
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
-            if (taskDir.mkdirs() || taskDir.list()?.isEmpty() == true) {
+            // TODO Make this dynamic and fetch latest one or something
+            val url =
+                "https://cdn.discordapp.com/attachments/881403326938353684/888153558321594438/SkytilsInstaller-1.1.1.jar"
+            val taskFile = File(taskDir, getJarNameFromUrl(url))
+            if (taskDir.mkdirs() || taskFile.createNewFile()) {
                 println("Downloading Skytils delete task.")
                 val client = APIUtil.builder.build()
-                val url =
-                    "https://cdn.discordapp.com/attachments/807303259902705685/841080571731640401/SkytilsInstaller-1.0-SNAPSHOT.jar"
+
                 val req = HttpGet(URL(url).toURI())
-                req.protocolVersion = HttpVersion.HTTP_1_1
-                val taskFile = File(taskDir, getJarNameFromUrl(url))
-                taskFile.createNewFile()
                 val res = client.execute(req)
-                if (res.statusLine.statusCode != 200) {
+                if (res.code != 200) {
                     println("Downloading delete task failed!")
                 } else {
                     println("Writing Skytils delete task.")
                     res.entity.writeTo(taskFile.outputStream())
+                    EntityUtils.consume(res.entity)
                     client.close()
                     println("Delete task successfully downloaded!")
                 }
             }
         }.start()
-    }
-
-    /**
-     * Taken from Wynntils under GNU Affero General Public License v3.0
-     * Modified to perform faster
-     * https://github.com/Wynntils/Wynntils/blob/development/LICENSE
-     * @author Wynntils
-     * Copy a file from a location to another
-     *
-     * @param sourceFile The source file
-     * @param destFile Where it will be
-     */
-
-    private fun copyFile(sourceFile: File, destFile: File?) {
-        var destFileModifiable = destFile
-        if (destFileModifiable == null || !destFileModifiable.exists()) {
-            destFileModifiable = File(File(sourceFile.parentFile, "mods"), "Skytils.jar")
-            sourceFile.renameTo(destFileModifiable)
-            return
-        }
-        var source: InputStream? = null
-        var dest: OutputStream? = null
-        try {
-            source = FileInputStream(sourceFile)
-            dest = FileOutputStream(destFileModifiable)
-            val buffer = ByteArray(1024)
-            var length: Int
-            while (source.read(buffer).also { length = it } > 0) {
-                dest.write(buffer, 0, length)
-            }
-        } finally {
-            source!!.close()
-            dest!!.close()
-        }
     }
 
     init {
@@ -153,6 +132,7 @@ object UpdateChecker {
     fun onGuiOpen(e: GuiOpenEvent) {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
+        if (UpdateGui.complete || UpdateGui.complete) return
         Skytils.displayScreen = RequestUpdateGui()
     }
 
@@ -162,30 +142,63 @@ object UpdateChecker {
 
         override fun run() {
             println("Checking for updates...")
-            val latestRelease =
-                if (Skytils.config.updateChannel == 1) APIUtil.getArrayResponse("https://api.github.com/repos/Skytils/SkytilsMod/releases")[0].asJsonObject else APIUtil.getJSONResponse(
+            val latestRelease = when (Skytils.config.updateChannel) {
+                2 -> APIUtil.getJSONResponse(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases/latest"
                 )
+                1 -> APIUtil.getArrayResponse(
+                    "https://api.github.com/repos/Skytils/SkytilsMod/releases"
+                )[0].asJsonObject
+                else -> return println("Channel set as none")
+            }
             val latestTag = latestRelease["tag_name"].asString
             val currentTag = Skytils.VERSION
 
-            val currentVersion = DefaultArtifactVersion(currentTag.substringBefore("-"))
-            val latestVersion = DefaultArtifactVersion(latestTag.substringAfter("v").substringBefore("-"))
-            if (latestTag.contains("pre") || (currentTag.contains("pre") && currentVersion >= latestVersion)) {
-                var currentPre = 0.0
-                var latestPre = 0.0
-                if (currentTag.contains("pre")) {
-                    currentPre = currentTag.substringAfter("pre").toDouble()
-                }
-                if (latestTag.contains("pre")) {
-                    latestPre = latestTag.substringAfter("pre").toDouble()
-                }
-                if ((latestPre > currentPre) || (latestPre == 0.0 && currentVersion.compareTo(latestVersion) == 0)) {
-                    updateObj = latestRelease
-                }
-            } else if (currentVersion < latestVersion) {
+            val currentVersion = SkytilsVersion(currentTag)
+            val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))
+            if (currentVersion < latestVersion) {
                 updateObj = latestRelease
             }
         }
+    }
+
+    class SkytilsVersion(val versionString: String) : Comparable<SkytilsVersion> {
+
+        companion object {
+            val regex = Regex("^(?<version>[\\d.]+)-?(?<type>\\D+)?(?<typever>\\d+\\.?\\d*)?\$")
+        }
+
+        private val matched by lazy {
+            regex.find(versionString)
+        }
+        val isSafe = matched != null
+
+        val version = matched!!.groups["version"]!!.value
+        val versionArtifact = DefaultArtifactVersion(matched!!.groups["version"]!!.value)
+        val specialVersionType by lazy {
+            val typeString = matched!!.groups["type"]?.value ?: return@lazy UpdateType.RELEASE
+
+            return@lazy UpdateType.values().find { typeString == it.prefix } ?: UpdateType.UNKNOWN
+        }
+        val specialVersion by lazy {
+            if (specialVersionType == UpdateType.RELEASE) return@lazy null
+            return@lazy matched!!.groups["typever"]?.value?.toDoubleOrNull()
+        }
+
+        override fun compareTo(other: SkytilsVersion): Int {
+            if (!isSafe || !other.isSafe) return -1
+            return if (versionArtifact.compareTo(other.versionArtifact) == 0) {
+                if (specialVersionType.ordinal == other.specialVersionType.ordinal) {
+                    (specialVersion ?: 0.0).compareTo(other.specialVersion ?: 0.0)
+                } else other.specialVersionType.ordinal - specialVersionType.ordinal
+            } else versionArtifact.compareTo(other.versionArtifact)
+        }
+    }
+
+    enum class UpdateType(val prefix: String) {
+        UNKNOWN("unknown"),
+        RELEASE(""),
+        RELEASECANDIDATE("RC"),
+        PRERELEASE("pre"),
     }
 }

@@ -55,7 +55,7 @@ class SpamHiderGui : WindowScreen() {
 
     init {
         saveButton.onLeftClick {
-            if (mc.thePlayer != null) mc.thePlayer.closeScreen() else mc.displayGuiScreen(null)
+            mc.displayGuiScreen(null)
         }
     }
 
@@ -354,7 +354,7 @@ class SpamHiderGui : WindowScreen() {
             } childOf customHiders
 
         addCustomHider.onMouseClick {
-            val filter = SpamHider.Filter("New Filter", 0, true, "Pattern", SpamHider.FilterType.STARTSWITH)
+            val filter = SpamHider.Filter("New Filter", 0, true, "Pattern", SpamHider.FilterType.STARTSWITH, true)
             SpamHider.filters.add(filter)
             val container = UIContainer()
                 .constrain {

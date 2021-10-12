@@ -31,6 +31,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import java.awt.Color
@@ -45,8 +46,7 @@ class DungeonMap {
     class TrashDungeonMap : GuiElement(name = "Dungeon Map", fp = FloatPair(0, 0)) {
 
         override fun render() {
-            if (!toggled || SBInfo.mode != SBInfo.SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
-            if (DungeonFeatures.hasBossSpawned) return
+            if (!toggled || SBInfo.mode != SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
             readMapData()
             if (mapData == null) return
             GlStateManager.color(1f, 1f, 1f, 1f)

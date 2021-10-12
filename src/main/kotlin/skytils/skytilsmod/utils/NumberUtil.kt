@@ -40,7 +40,9 @@ object NumberUtil {
      * @author assylias
      */
     @JvmStatic
-    fun format(value: Long): String {
+    fun format(value: Number): String {
+        @Suppress("NAME_SHADOWING")
+        val value = value.toLong()
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1)
         if (value < 0) return "-" + format(-value)
@@ -49,6 +51,13 @@ object NumberUtil {
         val truncated = value / (divideBy / 10) //the number part of the output times 10
         val hasDecimal = truncated < 100 && truncated / 10.0 != (truncated / 10).toDouble()
         return if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
+    }
+
+    @JvmStatic
+    fun unformat(value: String): Long {
+        val suffix = value.filter { !it.isDigit() }.lowercase()
+        val num = value.filter { it.isDigit() }.toLong()
+        return num * (suffixes.entries.find { it.value.lowercase() == suffix }?.key ?: 1)
     }
 
     /**
