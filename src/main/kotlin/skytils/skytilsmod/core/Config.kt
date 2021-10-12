@@ -1126,6 +1126,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showPetCandies = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Stacking Enchant Progress Display",
+        description = "Displays the progress for the held item's stacking enchant.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var stackingEnchantProgressDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Radioactive Bonus",
         description = "Shows the current Critical Damage bonus from Tarantula helmet",
         category = "Miscellaneous", subcategory = "Items"

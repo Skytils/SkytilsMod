@@ -101,7 +101,10 @@ class Skytils {
         const val VERSION = "1.0.7"
 
         @JvmField
-        val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+        val gson: Gson = GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(Enchant::class.java, Enchant.Serializer())
+            .create()
 
         @JvmStatic
         val mc: Minecraft

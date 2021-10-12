@@ -78,10 +78,12 @@ class ItemFeatures {
         val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
         var selectedArrow = ""
         var soulflowAmount = ""
+        var stackingEnchantDisplayText = ""
         var lowSoulFlowPinged = false
 
         init {
             SelectedArrowDisplay()
+            StackingEnchantDisplay()
             SoulflowGuiElement()
         }
 
@@ -128,8 +130,37 @@ class ItemFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (ticks % 4 == 0) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
-                for (i in 0..8) {
-                    hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
+                val held = mc.thePlayer.inventory.getCurrentItem()
+                if (Skytils.config.showItemRarity) {
+                    for (i in 0..8) {
+                        hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
+                    }
+                }
+                if (Skytils.config.stackingEnchantProgressDisplay) {
+                    apply {
+                        also {
+                            val extraAttr = getExtraAttributes(held) ?: return@also
+                            val enchantments = extraAttr.getCompoundTag("enchantments")
+                            val stacking =
+                                (EnchantUtil.enchants.find { it is StackingEnchant && extraAttr.hasKey(it.nbtNum) }
+                                    ?: return@also) as StackingEnchant
+
+                            val stackingLevel = enchantments.getInteger(stacking.nbtName)
+                            val stackingAmount = extraAttr.getInteger(stacking.nbtNum)
+
+                            stackingEnchantDisplayText = buildString {
+                                append("${stacking.loreName} $stackingLevel ")
+                                val nextLevel = stacking.stackLevel.getOrNull(stackingLevel)
+                                if (stackingLevel == stacking.maxLevel || nextLevel == null) {
+                                    append("(MAXED)")
+                                } else {
+                                    append("(${stackingAmount} / ${NumberUtil.format(nextLevel)})")
+                                }
+                            }
+                            return@apply
+                        }
+                        stackingEnchantDisplayText = ""
+                    }
                 }
             }
             ticks = 0
@@ -612,6 +643,47 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§aSelected: §rSkytils Arrow")
         override val toggled: Boolean
             get() = Skytils.config.showSelectedArrowDisplay
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class StackingEnchantDisplay : GuiElement("Stacking Enchant Display", FloatPair(0.65f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock && stackingEnchantDisplayText.isNotBlank()) {
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    stackingEnchantDisplayText,
+                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Expertise 10: Maxed",
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.RAINBOW,
+                alignment,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Expertise 10 (Maxed)")
+        override val toggled: Boolean
+            get() = Skytils.config.stackingEnchantProgressDisplay
 
         init {
             Skytils.guiManager.registerElement(this)

@@ -40,7 +40,9 @@ object NumberUtil {
      * @author assylias
      */
     @JvmStatic
-    fun format(value: Long): String {
+    fun format(value: Number): String {
+        @Suppress("NAME_SHADOWING")
+        val value = value.toLong()
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1)
         if (value < 0) return "-" + format(-value)

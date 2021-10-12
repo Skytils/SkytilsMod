@@ -20,6 +20,7 @@ package skytils.skytilsmod.core
 import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import skytils.skytilsmod.features.impl.farming.FarmingFeatures
@@ -34,6 +35,8 @@ import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.misc.SummonSkins
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.Enchant
+import skytils.skytilsmod.utils.EnchantUtil
 import skytils.skytilsmod.utils.SkillUtils
 import java.util.concurrent.Future
 import kotlin.concurrent.fixedRateTimer
@@ -42,6 +45,23 @@ object DataFetcher {
     private fun loadData(): Future<*> {
         val dataUrl = Skytils.config.dataURL
         return Skytils.threadPool.submit {
+
+            APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
+                val normal = this.getAsJsonObject("NORMAL")
+                val ultimate = this.getAsJsonObject("ULTIMATE")
+                val stacking = this.getAsJsonObject("STACKING")
+
+                normal.entrySet().mapTo(EnchantUtil.enchants) {
+                    gson.fromJson(it.value, Enchant::class.java)
+                }
+                ultimate.entrySet().mapTo(EnchantUtil.enchants) {
+                    gson.fromJson(it.value, Enchant::class.java)
+                }
+                stacking.entrySet().mapTo(EnchantUtil.enchants) {
+                    gson.fromJson(it.value, Enchant::class.java)
+                }
+            }
+
             val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
             for ((key, value) in fetchurData.entrySet()) {
                 MiningFeatures.fetchurItems[key] = value.asString
@@ -110,7 +130,7 @@ object DataFetcher {
             for ((key, value) in slayerHealthData.entrySet()) {
                 SlayerFeatures.BossHealths[key] = value.asJsonObject
             }
-            APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").mapNotNullTo(SpamHider.repoFilters) {
+            APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").mapTo(SpamHider.repoFilters) {
                 it as JsonObject
                 SpamHider.Filter(
                     it["name"].asString, 0, true, it["pattern"].asString, when (it["type"].asString) {
@@ -129,6 +149,7 @@ object DataFetcher {
     }
 
     private fun clearData() {
+        EnchantUtil.enchants.clear()
         ItemFeatures.sellPrices.clear()
         MayorInfo.mayorData.clear()
         MiningFeatures.fetchurItems.clear()

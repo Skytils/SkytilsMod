@@ -17,15 +17,13 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.core.Config
-import skytils.skytilsmod.features.impl.handlers.AuctionData.Companion.lowestBINs
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
-import java.util.function.Consumer
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.javaField
 
@@ -34,7 +32,6 @@ class AuctionData {
     companion object {
         const val dataURL = "https://sbe-stole-skytils.design/api/auctions/lowestbins"
         val lowestBINs = HashMap<String, Double>()
-        private val gson = GsonBuilder().setPrettyPrinting().create()
         fun getIdentifier(item: ItemStack?): String? {
             val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
             var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
