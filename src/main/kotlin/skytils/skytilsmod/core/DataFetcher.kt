@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UChat
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.gson
@@ -45,106 +46,111 @@ object DataFetcher {
     private fun loadData(): Future<*> {
         val dataUrl = Skytils.config.dataURL
         return Skytils.threadPool.submit {
+            try {
 
-            APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
-                val normal = this.getAsJsonObject("NORMAL")
-                val ultimate = this.getAsJsonObject("ULTIMATE")
-                val stacking = this.getAsJsonObject("STACKING")
+                APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
+                    val normal = this.getAsJsonObject("NORMAL")
+                    val ultimate = this.getAsJsonObject("ULTIMATE")
+                    val stacking = this.getAsJsonObject("STACKING")
 
-                normal.entrySet().mapTo(EnchantUtil.enchants) {
-                    gson.fromJson(it.value, Enchant::class.java)
+                    normal.entrySet().mapTo(EnchantUtil.enchants) {
+                        gson.fromJson(it.value, Enchant::class.java)
+                    }
+                    ultimate.entrySet().mapTo(EnchantUtil.enchants) {
+                        gson.fromJson(it.value, Enchant::class.java)
+                    }
+                    stacking.entrySet().mapTo(EnchantUtil.enchants) {
+                        gson.fromJson(it.value, Enchant::class.java)
+                    }
                 }
-                ultimate.entrySet().mapTo(EnchantUtil.enchants) {
-                    gson.fromJson(it.value, Enchant::class.java)
-                }
-                stacking.entrySet().mapTo(EnchantUtil.enchants) {
-                    gson.fromJson(it.value, Enchant::class.java)
-                }
-            }
 
-            val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
-            for ((key, value) in fetchurData.entrySet()) {
-                MiningFeatures.fetchurItems[key] = value.asString
-            }
-            val hikerData = APIUtil.getJSONResponse("${dataUrl}solvers/hungryhiker.json")
-            for ((key, value) in hikerData.entrySet()) {
-                FarmingFeatures.hungerHikerItems[key] = value.asString
-            }
-            val levelingData = APIUtil.getJSONResponse("${dataUrl}constants/levelingxp.json")
-            for ((key, value) in levelingData.get("default_skill_caps").asJsonObject.entrySet()) {
-                SkillUtils.maxSkillLevels[key] = value.asInt
-            }
-            for ((key, value) in levelingData.get("leveling_xp").asJsonObject.entrySet()) {
-                SkillUtils.skillXp[key.toInt()] = value.asLong
-            }
-            for ((key, value) in levelingData.get("dungeoneering_xp").asJsonObject.entrySet()) {
-                SkillUtils.dungeoneeringXp[key.toInt()] = value.asLong
-            }
-            for ((key, value) in levelingData.get("slayer_xp").asJsonObject.entrySet()) {
-                SkillUtils.slayerXp[key] =
-                    value.asJsonObject.entrySet().associateTo(LinkedHashMap()) { it.key.toInt() to it.value.asLong }
-            }
-            val mayorData = APIUtil.getArrayResponse("${dataUrl}constants/mayors.json")
-            for (m in mayorData) {
-                val mayorObj = m.asJsonObject
-                MayorInfo.mayorData.add(
-                    Mayor(
-                        mayorObj["name"].asString,
-                        mayorObj["role"].asString,
-                        mayorObj["perks"].asJsonArray.map {
-                            val obj = it.asJsonObject
-                            MayorPerk(obj["name"].asString, obj["description"].asString)
-                        },
-                        mayorObj["special"].asBoolean
+                val fetchurData = APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json")
+                for ((key, value) in fetchurData.entrySet()) {
+                    MiningFeatures.fetchurItems[key] = value.asString
+                }
+                val hikerData = APIUtil.getJSONResponse("${dataUrl}solvers/hungryhiker.json")
+                for ((key, value) in hikerData.entrySet()) {
+                    FarmingFeatures.hungerHikerItems[key] = value.asString
+                }
+                val levelingData = APIUtil.getJSONResponse("${dataUrl}constants/levelingxp.json")
+                for ((key, value) in levelingData.get("default_skill_caps").asJsonObject.entrySet()) {
+                    SkillUtils.maxSkillLevels[key] = value.asInt
+                }
+                for ((key, value) in levelingData.get("leveling_xp").asJsonObject.entrySet()) {
+                    SkillUtils.skillXp[key.toInt()] = value.asLong
+                }
+                for ((key, value) in levelingData.get("dungeoneering_xp").asJsonObject.entrySet()) {
+                    SkillUtils.dungeoneeringXp[key.toInt()] = value.asLong
+                }
+                for ((key, value) in levelingData.get("slayer_xp").asJsonObject.entrySet()) {
+                    SkillUtils.slayerXp[key] =
+                        value.asJsonObject.entrySet().associateTo(LinkedHashMap()) { it.key.toInt() to it.value.asLong }
+                }
+                val mayorData = APIUtil.getArrayResponse("${dataUrl}constants/mayors.json")
+                for (m in mayorData) {
+                    val mayorObj = m.asJsonObject
+                    MayorInfo.mayorData.add(
+                        Mayor(
+                            mayorObj["name"].asString,
+                            mayorObj["role"].asString,
+                            mayorObj["perks"].asJsonArray.map {
+                                val obj = it.asJsonObject
+                                MayorPerk(obj["name"].asString, obj["description"].asString)
+                            },
+                            mayorObj["special"].asBoolean
+                        )
                     )
-                )
-            }
-            val threeWeirdosSolutions = APIUtil.getArrayResponse("${dataUrl}solvers/threeweirdos.json")
-            for (solution in threeWeirdosSolutions) {
-                ThreeWeirdosSolver.solutions.add(solution.asString)
-            }
-            val treasureData = APIUtil.getJSONResponse("${dataUrl}solvers/treasurehunter.json")
-            for ((key, value) in treasureData.entrySet()) {
-                val parts = value.asString.split(",").map { it.toDouble() }
-                TreasureHunter.treasureHunterLocations[key] = BlockPos(parts[0], parts[1], parts[2])
-            }
-            val triviaData = APIUtil.getJSONResponse("${dataUrl}solvers/oruotrivia.json")
-            for ((key, value) in triviaData.entrySet()) {
-                TriviaSolver.triviaSolutions[key] = value.asJsonArray.map { it.asString }.toTypedArray()
-            }
-            val relicData = APIUtil.getArrayResponse("${dataUrl}constants/relics.json")
-            for (i in 0 until relicData.size()) {
-                val coordsArr = relicData[i].asJsonArray
-                RelicWaypoints.relicLocations.add(
-                    BlockPos(
-                        coordsArr[0].asInt,
-                        coordsArr[1].asInt,
-                        coordsArr[2].asInt
+                }
+                val threeWeirdosSolutions = APIUtil.getArrayResponse("${dataUrl}solvers/threeweirdos.json")
+                for (solution in threeWeirdosSolutions) {
+                    ThreeWeirdosSolver.solutions.add(solution.asString)
+                }
+                val treasureData = APIUtil.getJSONResponse("${dataUrl}solvers/treasurehunter.json")
+                for ((key, value) in treasureData.entrySet()) {
+                    val parts = value.asString.split(",").map { it.toDouble() }
+                    TreasureHunter.treasureHunterLocations[key] = BlockPos(parts[0], parts[1], parts[2])
+                }
+                val triviaData = APIUtil.getJSONResponse("${dataUrl}solvers/oruotrivia.json")
+                for ((key, value) in triviaData.entrySet()) {
+                    TriviaSolver.triviaSolutions[key] = value.asJsonArray.map { it.asString }.toTypedArray()
+                }
+                val relicData = APIUtil.getArrayResponse("${dataUrl}constants/relics.json")
+                for (i in 0 until relicData.size()) {
+                    val coordsArr = relicData[i].asJsonArray
+                    RelicWaypoints.relicLocations.add(
+                        BlockPos(
+                            coordsArr[0].asInt,
+                            coordsArr[1].asInt,
+                            coordsArr[2].asInt
+                        )
                     )
-                )
+                }
+                for ((key, value) in APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").entrySet()) {
+                    ItemFeatures.sellPrices[key] = value.asDouble
+                }
+                val slayerHealthData = APIUtil.getJSONResponse("${dataUrl}constants/slayerhealth.json")
+                for ((key, value) in slayerHealthData.entrySet()) {
+                    SlayerFeatures.BossHealths[key] = value.asJsonObject
+                }
+                APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").mapTo(SpamHider.repoFilters) {
+                    it as JsonObject
+                    SpamHider.Filter(
+                        it["name"].asString, 0, true, it["pattern"].asString, when (it["type"].asString) {
+                            "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
+                            "CONTAINS" -> SpamHider.FilterType.CONTAINS
+                            "REGEX" -> SpamHider.FilterType.REGEX
+                            else -> SpamHider.FilterType.CONTAINS
+                        }, it["formatted"].asBoolean
+                    )
+                }
+                APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {
+                    SummonSkins.skinMap[it.key] = it.value.asString
+                }
+                SummonSkins.loadSkins()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                UChat.chat("§cSkytils ran into an error while fetching data. Please report this to our Discord server!")
             }
-            for ((key, value) in APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").entrySet()) {
-                ItemFeatures.sellPrices[key] = value.asDouble
-            }
-            val slayerHealthData = APIUtil.getJSONResponse("${dataUrl}constants/slayerhealth.json")
-            for ((key, value) in slayerHealthData.entrySet()) {
-                SlayerFeatures.BossHealths[key] = value.asJsonObject
-            }
-            APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").mapTo(SpamHider.repoFilters) {
-                it as JsonObject
-                SpamHider.Filter(
-                    it["name"].asString, 0, true, it["pattern"].asString, when (it["type"].asString) {
-                        "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
-                        "CONTAINS" -> SpamHider.FilterType.CONTAINS
-                        "REGEX" -> SpamHider.FilterType.REGEX
-                        else -> SpamHider.FilterType.CONTAINS
-                    }, it["formatted"].asBoolean
-                )
-            }
-            APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {
-                SummonSkins.skinMap[it.key] = it.value.asString
-            }
-            SummonSkins.loadSkins()
         }
     }
 
