@@ -498,23 +498,16 @@ object RenderUtil {
             if (depthEnabled) GlStateManager.disableDepth()
             GlStateManager.enableBlend()
             if (!alphaEnabled) GlStateManager.enableAlpha()
-            when {
-                (Skytils.config.itemRarityShape == 0) -> {
-                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY)
+            mc.textureManager.bindTexture(
+                when (Skytils.config.itemRarityShape) {
+                    0 -> RARITY
+                    1 -> RARITY2
+                    2 -> RARITY3
+                    3 -> RARITY4
+                    4 -> CUSTOMRARITY
+                    else -> RARITY
                 }
-                (Skytils.config.itemRarityShape == 1) -> {
-                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY2)
-                }
-                (Skytils.config.itemRarityShape == 2) -> {
-                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY3)
-                }
-                (Skytils.config.itemRarityShape == 3) -> {
-                    Minecraft.getMinecraft().textureManager.bindTexture(RARITY4)
-                }
-                (Skytils.config.itemRarityShape == 4) -> {
-                    Minecraft.getMinecraft().textureManager.bindTexture(CUSTOMRARITY)
-                }
-            }
+            )
             GlStateManager.color(
                 rarity.color.red / 255.0f,
                 rarity.color.green / 255.0f,
