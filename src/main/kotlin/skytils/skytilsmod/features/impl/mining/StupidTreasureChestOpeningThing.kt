@@ -18,9 +18,9 @@
 
 package skytils.skytilsmod.features.impl.mining
 
-import gg.essential.universal.UChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
@@ -41,6 +41,8 @@ import java.awt.Color
 object StupidTreasureChestOpeningThing {
 
     var lastFoundChest = -1L
+
+    var iLovePain: BlockPos? = null
 
     val sendHelpPlease = hashMapOf<BlockPos, StupidChest>()
 
@@ -70,6 +72,19 @@ object StupidTreasureChestOpeningThing {
     }
 
     @SubscribeEvent
+    fun onSendPacket(event: PacketEvent.SendEvent) {
+        if (sendHelpPlease.isEmpty() || !Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+
+        when (val packet = event.packet) {
+            is C08PacketPlayerBlockPlacement -> {
+                if (sendHelpPlease.containsKey(packet.position)) {
+                    iLovePain = packet.position
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
 
@@ -77,6 +92,9 @@ object StupidTreasureChestOpeningThing {
             is S02PacketChat -> {
                 if (packet.chatComponent.formattedText == "§r§aYou uncovered a treasure chest!§r") {
                     lastFoundChest = System.currentTimeMillis()
+                } else if (packet.chatComponent.formattedText == "§r§6You have successfully picked the lock on this chest!") {
+                    sendHelpPlease.remove(iLovePain)
+                    iLovePain = null
                 }
             }
             is S2APacketParticles -> {
