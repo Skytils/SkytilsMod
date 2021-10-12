@@ -25,6 +25,8 @@ import gg.essential.vigilance.data.Property
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.data.SortingBehavior
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.LoaderState
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
@@ -784,7 +786,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var trackGaiaHits = false
 
-/*    @Property(
+    /*    @Property(
         type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
         description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
         category = "Events", subcategory = "Mythological"
@@ -2252,7 +2254,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
 
         registerListener("itemRarityShape") { i: Int ->
-            if (i == 4) {
+            if (i == 4 && Loader.instance().hasReachedState(LoaderState.POSTINITIALIZATION)) {
                 val old = itemRarityShape
                 runCatching {
                     val loc = ResourceLocation("skytils:gui/customrarity.png")
@@ -2261,7 +2263,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                     TickTask(1) {
                         if (itemRarityShape == 4) {
                             itemRarityShape = old
-                            EssentialAPI.getNotifications().push("Invalid Value", "You cannot use the Custom rarity while the texture is missing!")
+                            EssentialAPI.getNotifications()
+                                .push("Invalid Value", "You cannot use the Custom rarity while the texture is missing!")
                         }
                     }
                 }
