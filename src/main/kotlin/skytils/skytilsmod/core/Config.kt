@@ -17,12 +17,14 @@
  */
 package skytils.skytilsmod.core
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.data.SortingBehavior
+import net.minecraft.util.ResourceLocation
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
@@ -2248,6 +2250,23 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
+
+        registerListener("itemRarityShape") { i: Int ->
+            if (i == 4) {
+                val old = itemRarityShape
+                runCatching {
+                    val loc = ResourceLocation("skytils:gui/customrarity.png")
+                    mc.resourceManager.getResource(loc)
+                }.onFailure {
+                    TickTask(1) {
+                        if (itemRarityShape == 4) {
+                            itemRarityShape = old
+                            EssentialAPI.getNotifications().push("Invalid Value", "You cannot use the Custom rarity while the texture is missing!")
+                        }
+                    }
+                }
+            }
+        }
 
         registerListener("apiKey") { key: String ->
             Skytils.hylinAPI.key = key
