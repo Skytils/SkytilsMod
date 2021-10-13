@@ -435,35 +435,44 @@ class DungeonFeatures {
                     ) mc.theWorld.removeEntity(event.entity)
                 }
             }
-            if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
-                if (MayorInfo.currentMayor == "Derpy") Utils.equalsOneOf(
-                    event.entity.maxHealth,
-                    200f,
-                    800f
-                ) else Utils.equalsOneOf(
-                    event.entity.maxHealth,
-                    100f,
-                    400f
-                )
-                        && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible
-            ) {
-                RenderUtil.drawOutlinedBoundingBox(
-                    event.entity.entityBoundingBox,
-                    Color(0, 255, 255, 255),
-                    3f,
-                    RenderUtil.getPartialTicks()
-                )
-            }
-            if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && !mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible && ItemUtil.getSkyBlockItemID(
-                    event.entity.getCurrentArmor(0)
-                ) == "SKELETON_MASTER_BOOTS"
-            ) {
-                RenderUtil.drawOutlinedBoundingBox(
-                    event.entity.entityBoundingBox,
-                    Color(255, 107, 11, 255),
-                    3f,
-                    RenderUtil.getPartialTicks()
-                )
+            if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
+                if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
+                    if (MayorInfo.currentMayor == "Derpy") Utils.equalsOneOf(
+                        event.entity.maxHealth,
+                        200f,
+                        800f
+                    ) else Utils.equalsOneOf(
+                        event.entity.maxHealth,
+                        100f,
+                        400f
+                    )
+                ) {
+                    RenderUtil.drawOutlinedBoundingBox(
+                        event.entity.entityBoundingBox,
+                        Color(0, 255, 255, 255),
+                        3f,
+                        RenderUtil.getPartialTicks()
+                    )
+                }
+                if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
+                        event.entity.getCurrentArmor(0)
+                    ) == "SKELETON_MASTER_BOOTS"
+                ) {
+                    RenderUtil.drawOutlinedBoundingBox(
+                        event.entity.entityBoundingBox,
+                        Color(255, 107, 11, 255),
+                        3f,
+                        RenderUtil.getPartialTicks()
+                    )
+                }
+                if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
+                    RenderUtil.drawOutlinedBoundingBox(
+                        event.entity.entityBoundingBox,
+                        Color(121, 11, 255, 255),
+                        3f,
+                        RenderUtil.getPartialTicks()
+                    )
+                }
             }
             if (event.entity == lividTag) {
                 val aabb = AxisAlignedBB(

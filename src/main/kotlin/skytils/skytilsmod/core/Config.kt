@@ -259,6 +259,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var boxSkeletonMasters = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Box Spirit Bear",
+        description = "Draws the bounding box for Spirit Bears.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxSpiritBears = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Spirit Bow",
         description = "Draws a box around the Spirit Bow.",
         category = "Dungeons", subcategory = "Quality of Life"
