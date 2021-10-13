@@ -475,7 +475,7 @@ object RenderUtil {
             if (!Skytils.config.showPetRarity && ItemUtil.isPet(itemStack)) {
                 return
             } else {
-                renderRarity(xPos, yPos, ItemUtil.getRarity(itemStack))
+                renderRarity(xPos, yPos, itemStack)
             }
         }
     }
@@ -485,42 +485,116 @@ object RenderUtil {
      * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
      * @author SteveKunG
      */
-    fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity?) {
+    @JvmStatic
+    fun renderRarity(xPos: Int, yPos: Int, rarity: ItemRarity) {
+        val alpha = Skytils.config.itemRarityOpacity
+
+        // save the states
+        val lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING)
+        val depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
+        val alphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
+
+        if (lightingEnabled) GlStateManager.disableLighting()
+        if (depthEnabled) GlStateManager.disableDepth()
+        GlStateManager.pushMatrix()
+        GlStateManager.enableBlend()
+        if (!alphaEnabled) GlStateManager.enableAlpha()
+        mc.textureManager.bindTexture(
+            when (Skytils.config.itemRarityShape) {
+                0 -> RARITY
+                1 -> RARITY2
+                2 -> RARITY3
+                3 -> RARITY4
+                4 -> CUSTOMRARITY
+                else -> RARITY
+            }
+        )
+        GlStateManager.color(
+            rarity.color.red / 255.0f,
+            rarity.color.green / 255.0f,
+            rarity.color.blue / 255.0f,
+            alpha
+        )
+        GlStateManager.popMatrix()
+        GlStateManager.blendFunc(770, 771)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND)
+        Gui.drawModalRectWithCustomSizedTexture(xPos, yPos, 0f, 0f, 16, 16, 16f, 16f)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE)
+        if (lightingEnabled) GlStateManager.enableLighting()
+        if (depthEnabled) GlStateManager.enableDepth()
+        if (!alphaEnabled) GlStateManager.disableAlpha()
+    }
+
+    private fun renderRarity(xPos: Int, yPos: Int, itemStack: ItemStack?) {
+        if (itemStack == null) return
+        val rarity = ItemUtil.getRarity(itemStack)
         if (rarity != null) {
             val alpha = Skytils.config.itemRarityOpacity
+            GlStateManager.pushMatrix()
 
-            // save the states
-            val lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING)
-            val depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
-            val alphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
+            if (Skytils.config.itemRarityShape < 5) {
+                renderRarity(xPos, yPos, rarity)
+            } else {
+                // save the states
+                val lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING)
+                val depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
+                val alphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
 
-            if (lightingEnabled) GlStateManager.disableLighting()
-            if (depthEnabled) GlStateManager.disableDepth()
-            GlStateManager.enableBlend()
-            if (!alphaEnabled) GlStateManager.enableAlpha()
-            mc.textureManager.bindTexture(
-                when (Skytils.config.itemRarityShape) {
-                    0 -> RARITY
-                    1 -> RARITY2
-                    2 -> RARITY3
-                    3 -> RARITY4
-                    4 -> CUSTOMRARITY
-                    else -> RARITY
-                }
-            )
-            GlStateManager.color(
-                rarity.color.red / 255.0f,
-                rarity.color.green / 255.0f,
-                rarity.color.blue / 255.0f,
-                alpha
-            )
-            GlStateManager.blendFunc(770, 771)
-            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND)
-            Gui.drawModalRectWithCustomSizedTexture(xPos, yPos, 0f, 0f, 16, 16, 16f, 16f)
-            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE)
-            if (lightingEnabled) GlStateManager.enableLighting()
-            if (depthEnabled) GlStateManager.enableDepth()
-            if (!alphaEnabled) GlStateManager.disableAlpha()
+                if (lightingEnabled) GlStateManager.disableLighting()
+                if (depthEnabled) GlStateManager.disableDepth()
+                GlStateManager.enableBlend()
+                if (!alphaEnabled) GlStateManager.enableAlpha()
+
+                GL11.glEnable(GL11.GL_STENCIL_TEST) // Turn on da test
+                val scissorState = GL11.glGetInteger(GL11.GL_SCISSOR_TEST) // check if scissor test was on
+                GL11.glStencilMask(0xFF)
+                GL11.glDisable(GL11.GL_SCISSOR_TEST)
+                GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT) // Flush old data
+                if (scissorState == GL11.GL_TRUE) GL11.glEnable(GL11.GL_SCISSOR_TEST)
+
+                GL11.glStencilMask(0xFF) // Writing = ON
+                GL11.glStencilFunc(GL11.GL_ALWAYS, 1, 0xFF) // Always "add" to frame
+                GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE) // Replace on success
+                GL11.glColorMask(false, false, false, false)
+                //Anything rendered here becomes "cut" frame.
+
+                val scale: Double = 1.2
+                GlStateManager.translate(
+                    xPos.toFloat() - scale * scale,
+                    yPos.toFloat() - scale * scale,
+                    0.0
+                )
+                GlStateManager.scale(scale, scale, 0.0)
+                renderItem(ItemUtil.removeEnchants(itemStack.copy()), 0, 0)
+
+                GlStateManager.scale(1 / scale, 1 / scale, 0.0)
+                GL11.glColorMask(true, true, true, false)
+
+                GL11.glStencilMask(0x00) // Writing = OFF
+                GL11.glStencilFunc(GL11.GL_NOTEQUAL, 0, 0xFF) // Anything that wasn't defined above will not be rendered.
+                //Anything rendered here will be cut if goes beyond frame defined before.
+                GlStateManager.translate(
+                    scale - 1,
+                    scale - 1,
+                    0.0
+                )
+                Gui.drawRect(
+                    1, 1, 17, 17,
+                    Color(
+                        (rarity.color.red).coerceAtLeast(0) / 255f,
+                        (rarity.color.green).coerceAtLeast(0) / 255f,
+                        (rarity.color.blue).coerceAtLeast(0) / 255f,
+                        alpha
+                    ).rgb
+                )
+                GL11.glDisable(GL11.GL_STENCIL_TEST); // Turn this shit off!
+
+                if (lightingEnabled) GlStateManager.enableLighting()
+                if (depthEnabled) GlStateManager.enableDepth()
+                if (!alphaEnabled) GlStateManager.disableAlpha()
+            }
+
+            GlStateManager.popMatrix()
         }
     }
 

@@ -150,6 +150,7 @@ class Skytils {
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
         jarFile = event.sourceFile
+        Minecraft.getMinecraft().framebuffer.enableStencil();
     }
 
     @Mod.EventHandler

@@ -55,6 +55,6 @@ fun renderRarityOnHotbar(
     ci: CallbackInfo
 ) {
     if (Utils.inSkyblock && Skytils.config.showItemRarity) {
-        renderRarity(xPos, yPos, ItemFeatures.hotbarRarityCache[index])
+        ItemFeatures.hotbarRarityCache[index]?.let { renderRarity(xPos, yPos, it) }
     }
 }

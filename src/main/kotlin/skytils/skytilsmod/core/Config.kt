@@ -1163,7 +1163,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                 "§cCustom is made for Texture Pack makers, the png must be named customrarity.png.\n" +
                 "§cDon't use it if you don't know what you are doing",
         category = "Miscellaneous", subcategory = "Item Rarity",
-        options = ["Circle", "Square", "Square Outline", "Outline", "Custom"]
+        options = ["Circle", "Square", "Square Outline", "Outline", "Custom", "Item Outline"]
     )
     var itemRarityShape = 0
 
