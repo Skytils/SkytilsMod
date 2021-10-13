@@ -530,11 +530,11 @@ object RenderUtil {
         val rarity = ItemUtil.getRarity(itemStack)
         if (rarity != null) {
             val alpha = Skytils.config.itemRarityOpacity
-            GlStateManager.pushMatrix()
 
             if (Skytils.config.itemRarityShape < 5) {
                 renderRarity(xPos, yPos, rarity)
             } else {
+                GlStateManager.pushMatrix()
                 // save the states
                 val lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING)
                 val depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
@@ -592,9 +592,9 @@ object RenderUtil {
                 if (lightingEnabled) GlStateManager.enableLighting()
                 if (depthEnabled) GlStateManager.enableDepth()
                 if (!alphaEnabled) GlStateManager.disableAlpha()
+                GlStateManager.popMatrix()
             }
 
-            GlStateManager.popMatrix()
         }
     }
 

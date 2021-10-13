@@ -219,7 +219,7 @@ object ItemUtil {
     fun removeEnchants(item: ItemStack): ItemStack {
         val nbt = item.tagCompound ?: return item
         if (!nbt.hasKey("ench", 9)) return item
-        nbt.setTag("ench", null)
+        nbt.removeTag("ench")
         item.tagCompound = nbt
         return item
     }
