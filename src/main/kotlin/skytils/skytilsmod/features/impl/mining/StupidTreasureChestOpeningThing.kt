@@ -49,6 +49,8 @@ object StupidTreasureChestOpeningThing {
             pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(),
             (pos.x + 1).toDouble(), (pos.y + 1).toDouble(), (pos.z + 1).toDouble()
         )
+
+        var particleBox: AxisAlignedBB? = null
     }
 
     @SubscribeEvent
@@ -56,7 +58,7 @@ object StupidTreasureChestOpeningThing {
         if (!Skytils.config.chTreasureHelper || mc.thePlayer == null || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         if ((event.old.block == Blocks.air || event.old.block == Blocks.stone) && event.update.block == Blocks.chest) {
             printDevMessage("Distance ${event.pos} ${mc.thePlayer.getDistanceSq(event.pos)}", "chtreasure")
-            if (mc.thePlayer.entityBoundingBox.expand(8.0, 8.0, 8.0).isVecInside(Vec3(event.pos))) {
+            if (mc.thePlayer.entityBoundingBox.expand(8.0, 8.0, 8.0).isPosInside(event.pos)) {
                 val diff = System.currentTimeMillis() - lastFoundChest
                 if (diff < 1000) {
                     lastFoundChest = -1L
@@ -113,12 +115,20 @@ object StupidTreasureChestOpeningThing {
                 val y = packet.yCoordinate
                 val z = packet.zCoordinate
                 if (type == EnumParticleTypes.CRIT && longDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                    val probable = sendHelpPlease.entries.minByOrNull {
-                        it.key.distanceSq(x, y, z)
+                    val probable = sendHelpPlease.values.minByOrNull {
+                        it.pos.distanceSq(x, y, z)
                     } ?: return
 
-                    if (probable.key.distanceSqToCenter(x, y, z) < 2.5) {
-                        probable.value.particle = Vec3(x, y, z)
+                    if (probable.pos.distanceSqToCenter(x, y, z) < 2.5) {
+                        probable.particle = Vec3(x, y, z)
+                        probable.particleBox = AxisAlignedBB(
+                            probable.particle!!.xCoord,
+                            probable.particle!!.yCoord,
+                            probable.particle!!.zCoord,
+                            probable.particle!!.xCoord + 0.1,
+                            probable.particle!!.yCoord + 0.1,
+                            probable.particle!!.zCoord + 0.1
+                        )
                         printDevMessage(
                             "$count ${if (longDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
                             "chtreasure"
@@ -133,15 +143,18 @@ object StupidTreasureChestOpeningThing {
                 val x = packet.x
                 val y = packet.y
                 val z = packet.z
-                if (volume == 1f && pitch == 1f && Utils.equalsOneOf(sound, "random.orb", "mob.villager.no")) {
-                    if (sendHelpPlease.isNotEmpty()) {
-                        val rt = mc.thePlayer.rayTrace(25.0, (mc as AccessorMinecraft).timer.renderPartialTicks)
-                        if (rt.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                            val probable = sendHelpPlease[rt.blockPos] ?: return
-                            if (sound == "random.orb") probable.progress++
-                            else probable.progress = 0
-                            printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
-                        }
+                if (volume == 1f && pitch == 1f && Utils.equalsOneOf(
+                        sound,
+                        "random.orb",
+                        "mob.villager.no"
+                    ) && sendHelpPlease.isNotEmpty()
+                ) {
+                    val rt = mc.thePlayer.rayTrace(25.0, (mc as AccessorMinecraft).timer.renderPartialTicks)
+                    if (rt.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                        val probable = sendHelpPlease[rt.blockPos] ?: return
+                        if (sound == "random.orb") probable.progress++
+                        else probable.progress = 0
+                        printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
                     }
                 }
             }
@@ -167,16 +180,9 @@ object StupidTreasureChestOpeningThing {
                 Color.ORANGE,
                 event.partialTicks
             )
-            if (chest.particle != null) {
+            if (chest.particleBox != null) {
                 RenderUtil.drawFilledBoundingBox(
-                    AxisAlignedBB(
-                        chest.particle!!.xCoord,
-                        chest.particle!!.yCoord,
-                        chest.particle!!.zCoord,
-                        chest.particle!!.xCoord + 0.1,
-                        chest.particle!!.yCoord + 0.1,
-                        chest.particle!!.zCoord + 0.1
-                    ).offset(-viewerX, -viewerY, -viewerZ),
+                    chest.particleBox!!.offset(-viewerX, -viewerY, -viewerZ),
                     Color(255, 0, 255, 69),
                     1f
                 )

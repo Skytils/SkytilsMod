@@ -216,6 +216,10 @@ val AxisAlignedBB.minVec: Vec3
 val AxisAlignedBB.maxVec: Vec3
     get() = Vec3(maxX, maxY, maxZ)
 
+fun AxisAlignedBB.isPosInside(pos: BlockPos): Boolean {
+    return pos.x > this.minX && pos.x < this.maxX && pos.y > this.minY && pos.y < this.maxY && pos.z > this.minZ && pos.z < this.maxZ
+}
+
 fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
     Skytils.displayScreen = this.gui()
 }

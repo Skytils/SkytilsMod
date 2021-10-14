@@ -81,7 +81,7 @@ class TeleportMazeSolver {
                         steppedPads.add(oldTpPad)
                         if (tpPad !in steppedPads) {
                             steppedPads.add(tpPad)
-                            val magicYaw = -yaw * 0.017453292f - Math.PI.toFloat()
+                            val magicYaw = -yaw * 0.017453292f - 3.1415927f
                             val yawX = MathHelper.sin(magicYaw)
                             val yawZ = MathHelper.cos(magicYaw)
                             val pitchVal = -MathHelper.cos(-pitch * 0.017453292f)
