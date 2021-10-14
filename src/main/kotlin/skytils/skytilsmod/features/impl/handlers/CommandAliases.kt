@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
+import gg.essential.universal.UChat
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,10 +41,11 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
                 event.isCanceled = true
                 try {
                     val msg =
-                        if (Skytils.config.commandAliasMode == 0) "/" + aliases[command] + " " + java.lang.String.join(
-                            " ",
-                            args
-                        ) else "/${aliases[command]!!.format(*args.toTypedArray())}"
+                        if (Skytils.config.commandAliasMode == 0) "/" + aliases[command] + " " + args.joinToString(" ") else "/${
+                            aliases[command]!!.format(
+                                *args.toTypedArray()
+                            )
+                        }"
                     if (event.addToChat) {
                         mc.ingameGUI.chatGUI.addToSentMessages(msg)
                     }
@@ -51,7 +53,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
                     Skytils.sendMessageQueue.add(msg)
                 } catch (ignored: IllegalFormatException) {
                     if (event.addToChat) mc.ingameGUI.chatGUI.addToSentMessages(event.message)
-                    mc.thePlayer.addChatMessage(ChatComponentText("§cYou did not specify the correct amount of arguments for this alias!"))
+                    UChat.chat("§cYou did not specify the correct amount of arguments for this alias!")
                 }
             }
         }

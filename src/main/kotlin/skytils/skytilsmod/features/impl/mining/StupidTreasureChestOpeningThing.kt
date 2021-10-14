@@ -24,10 +24,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumParticleTypes
-import net.minecraft.util.Vec3
+import net.minecraft.util.*
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,6 +32,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.BlockChangeEvent
 import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import skytils.skytilsmod.utils.*
 import java.awt.Color
 
@@ -58,7 +56,7 @@ object StupidTreasureChestOpeningThing {
         if (!Skytils.config.chTreasureHelper || mc.thePlayer == null || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         if ((event.old.block == Blocks.air || event.old.block == Blocks.stone) && event.update.block == Blocks.chest) {
             printDevMessage("Distance ${event.pos} ${mc.thePlayer.getDistanceSq(event.pos)}", "chtreasure")
-            if (mc.thePlayer.entityBoundingBox.expand(5.0, 5.0, 5.0).isVecInside(Vec3(event.pos))) {
+            if (mc.thePlayer.entityBoundingBox.expand(8.0, 8.0, 8.0).isVecInside(Vec3(event.pos))) {
                 val diff = System.currentTimeMillis() - lastFoundChest
                 if (diff < 1000) {
                     lastFoundChest = -1L
@@ -90,9 +88,15 @@ object StupidTreasureChestOpeningThing {
 
         when (val packet = event.packet) {
             is S02PacketChat -> {
-                if (packet.chatComponent.formattedText == "§r§aYou uncovered a treasure chest!§r") {
+                val formatted = packet.chatComponent.formattedText
+                if (formatted == "§r§aYou uncovered a treasure chest!§r") {
                     lastFoundChest = System.currentTimeMillis()
-                } else if (packet.chatComponent.formattedText == "§r§6You have successfully picked the lock on this chest!") {
+                } else if (iLovePain != null && Utils.equalsOneOf(
+                        formatted,
+                        "§r§6You have successfully picked the lock on this chest!",
+                        "§r§aThe remaining contents of this treasure chest were placed in your inventory"
+                    )
+                ) {
                     sendHelpPlease.remove(iLovePain)
                     iLovePain = null
                 }
@@ -130,15 +134,14 @@ object StupidTreasureChestOpeningThing {
                 val y = packet.y
                 val z = packet.z
                 if (volume == 1f && pitch == 1f && Utils.equalsOneOf(sound, "random.orb", "mob.villager.no")) {
-                    val probable = sendHelpPlease.entries.minByOrNull {
-                        it.key.distanceSq(x, y, z)
-                    } ?: return
-
-                    printDevMessage("$sound distance from chest ${probable.key.distanceSq(x, y, z)}", "chtreasure")
-                    if (probable.key.distanceSq(x, y, z) < 6.9 * 6.9) {
-                        if (sound == "random.orb") probable.value.progress++
-                        else probable.value.progress = 0
-                        printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
+                    if (sendHelpPlease.isNotEmpty()) {
+                        val rt = mc.thePlayer.rayTrace(25.0, (mc as AccessorMinecraft).timer.renderPartialTicks)
+                        if (rt.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                            val probable = sendHelpPlease[rt.blockPos] ?: return
+                            if (sound == "random.orb") probable.progress++
+                            else probable.progress = 0
+                            printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
+                        }
                     }
                 }
             }
