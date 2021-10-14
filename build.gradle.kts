@@ -83,7 +83,7 @@ dependencies {
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
-    shadowMe("com.github.Skytils:AsmHelper:740f9bfb40") {
+    shadowMe("com.github.Skytils:AsmHelper:668d11deb2") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
