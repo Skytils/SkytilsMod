@@ -39,8 +39,6 @@ public abstract class MixinGuiNewChat extends Gui {
 
     @Shadow @Final private Minecraft mc;
 
-    @Shadow private int scrollPos;
-
     @Shadow
     public abstract int getLineCount();
 
