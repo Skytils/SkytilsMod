@@ -18,7 +18,7 @@
 package skytils.skytilsmod.mixins.hooks.gui
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
 
 fun onSendChatMessage(message: String, addToChat: Boolean, ci: CallbackInfo) {
     if (SendChatMessageEvent(message, addToChat).postAndCatch()) ci.cancel()

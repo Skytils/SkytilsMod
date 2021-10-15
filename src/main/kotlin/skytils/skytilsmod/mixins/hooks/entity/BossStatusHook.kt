@@ -19,7 +19,7 @@ package skytils.skytilsmod.mixins.hooks.entity
 
 import net.minecraft.entity.boss.IBossDisplayData
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import skytils.skytilsmod.events.BossBarEvent
+import skytils.skytilsmod.events.impl.BossBarEvent
 
 
 fun onSetBossStatus(displayData: IBossDisplayData, hasColorModifierIn: Boolean, ci: CallbackInfo) {

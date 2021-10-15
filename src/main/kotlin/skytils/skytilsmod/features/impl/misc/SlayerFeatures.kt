@@ -61,10 +61,10 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.BlockChangeEvent
-import skytils.skytilsmod.events.CheckRenderEntityEvent
-import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.RenderHUDEvent
+import skytils.skytilsmod.events.impl.BlockChangeEvent
+import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
+import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.RenderHUDEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision

@@ -18,15 +18,12 @@
 package skytils.skytilsmod.mixins.hooks.renderer
 
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.resources.model.IBakedModel
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.world.IBlockAccess
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.RenderBlockInWorldEvent
+import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
 
 fun modifyGetModelFromBlockState(
     blockRendererDispatcher: Any,

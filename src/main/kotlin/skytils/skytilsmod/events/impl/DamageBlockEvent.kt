@@ -15,16 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
-import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
-import net.minecraft.world.IBlockAccess
+import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
-/**
- * This event is posted when the chunk renderer tries to get the block model for a certain block.
- * Cancelling this event has no effect and is used to skip the rest of the event bus
- */
 @Cancelable
-class RenderBlockInWorldEvent(@JvmField var state: IBlockState?, var world: IBlockAccess, var pos: BlockPos?) : SkytilsEvent()
+data class DamageBlockEvent(val pos: BlockPos, val facing: EnumFacing) : SkytilsEvent()

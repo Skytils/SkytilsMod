@@ -28,7 +28,7 @@ import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils

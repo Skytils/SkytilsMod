@@ -17,15 +17,12 @@
  */
 package skytils.skytilsmod.mixins.hooks.gui
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.common.MinecraftForge
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.GuiContainerEvent.CloseWindowEvent
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent.CloseWindowEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 
 class GuiContainerHook(guiAny: Any) {
 

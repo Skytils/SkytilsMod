@@ -20,7 +20,7 @@ package skytils.skytilsmod.mixins.hooks.network
 import io.netty.channel.ChannelHandlerContext
 import net.minecraft.network.Packet
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 
 fun onReceivePacket(context: ChannelHandlerContext, packet: Packet<*>, ci: CallbackInfo) {
     if (ReceiveEvent(packet).postAndCatch()) ci.cancel()

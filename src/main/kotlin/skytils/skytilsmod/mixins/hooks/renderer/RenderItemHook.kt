@@ -28,7 +28,7 @@ import net.minecraft.util.ResourceLocation
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.GuiRenderItemEvent
+import skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorRenderItem
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID

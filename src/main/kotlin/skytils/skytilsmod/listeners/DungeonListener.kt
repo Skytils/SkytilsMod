@@ -27,7 +27,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.core.TickTask
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import skytils.skytilsmod.utils.*

@@ -31,7 +31,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.trackers.Tracker

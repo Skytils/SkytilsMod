@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.RenderHUDEvent
+import skytils.skytilsmod.events.impl.RenderHUDEvent
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast

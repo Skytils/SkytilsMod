@@ -20,7 +20,7 @@ package skytils.skytilsmod.mixins.hooks.gui
 import net.minecraft.entity.player.EntityPlayer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.SetActionBarEvent
+import skytils.skytilsmod.events.impl.SetActionBarEvent
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.Utils

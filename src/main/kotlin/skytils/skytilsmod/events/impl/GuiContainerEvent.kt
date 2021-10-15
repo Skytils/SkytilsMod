@@ -15,34 +15,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
-abstract class GuiContainerEvent(val gui: GuiContainer, val container: Container) : SkytilsEvent() {
-    class BackgroundDrawnEvent(
-        gui: GuiContainer,
-        container: Container,
+abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkytilsEvent() {
+    data class BackgroundDrawnEvent(
+        override val gui: GuiContainer,
+        override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float
     ) : GuiContainerEvent(gui, container)
 
-    class CloseWindowEvent(gui: GuiContainer, container: Container) : GuiContainerEvent(gui, container)
-    open class DrawSlotEvent(gui: GuiContainer, container: Container, val slot: Slot) :
+    data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
+        GuiContainerEvent(gui, container)
+
+    abstract class DrawSlotEvent(gui: GuiContainer, container: Container, open val slot: Slot) :
         GuiContainerEvent(gui, container) {
         @Cancelable
-        class Pre(gui: GuiContainer, container: Container, slot: Slot) : DrawSlotEvent(gui, container, slot)
-        class Post(gui: GuiContainer, container: Container, slot: Slot) : DrawSlotEvent(gui, container, slot)
+        data class Pre(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
+            DrawSlotEvent(gui, container, slot)
+
+        data class Post(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
+            DrawSlotEvent(gui, container, slot)
     }
 
     @Cancelable
-    class SlotClickEvent(
-        gui: GuiContainer,
-        container: Container,
+    data class SlotClickEvent(
+        override val gui: GuiContainer,
+        override val container: Container,
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,

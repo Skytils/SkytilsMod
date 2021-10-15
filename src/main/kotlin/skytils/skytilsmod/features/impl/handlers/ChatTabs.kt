@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.gui.elements.CleanButton
 import skytils.skytilsmod.mixins.extensions.ExtensionChatStyle
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiChat

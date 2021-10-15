@@ -27,7 +27,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.SetActionBarEvent
+import skytils.skytilsmod.events.impl.SetActionBarEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.Utils

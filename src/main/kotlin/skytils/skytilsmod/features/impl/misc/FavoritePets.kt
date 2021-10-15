@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.ItemRarity
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight

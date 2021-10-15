@@ -28,7 +28,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorServerListEntryNormal
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision

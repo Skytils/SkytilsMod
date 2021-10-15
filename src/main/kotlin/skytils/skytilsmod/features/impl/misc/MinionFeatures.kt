@@ -26,9 +26,9 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
-import skytils.skytilsmod.events.GuiRenderItemEvent
-import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
+import skytils.skytilsmod.events.impl.GuiRenderItemEvent
+import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils

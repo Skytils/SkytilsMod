@@ -30,8 +30,8 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.BlockChangeEvent
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.impl.BlockChangeEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import skytils.skytilsmod.utils.*
 import java.awt.Color

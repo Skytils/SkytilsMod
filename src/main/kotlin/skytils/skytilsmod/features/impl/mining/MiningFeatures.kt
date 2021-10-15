@@ -49,10 +49,10 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.BossBarEvent
-import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.PacketEvent
-import skytils.skytilsmod.events.RenderBlockInWorldEvent
+import skytils.skytilsmod.events.impl.BossBarEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
+import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight

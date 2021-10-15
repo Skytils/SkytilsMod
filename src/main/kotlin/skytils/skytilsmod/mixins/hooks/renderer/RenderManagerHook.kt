@@ -20,7 +20,7 @@ package skytils.skytilsmod.mixins.hooks.renderer
 import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.CheckRenderEntityEvent
+import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 
 fun shouldRender(
     entityIn: Entity,

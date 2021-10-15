@@ -27,7 +27,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.BlockChangeEvent
+import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils

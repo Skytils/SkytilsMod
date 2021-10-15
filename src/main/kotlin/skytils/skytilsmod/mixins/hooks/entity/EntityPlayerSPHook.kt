@@ -22,8 +22,8 @@ import net.minecraft.util.IChatComponent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.AddChatMessageEvent
-import skytils.skytilsmod.events.ItemTossEvent
+import skytils.skytilsmod.events.impl.AddChatMessageEvent
+import skytils.skytilsmod.events.impl.ItemTossEvent
 
 fun onAddChatMessage(message: IChatComponent, ci: CallbackInfo) {
     if (AddChatMessageEvent(message).postAndCatch()) ci.cancel()

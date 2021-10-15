@@ -33,8 +33,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.PacketEvent
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*

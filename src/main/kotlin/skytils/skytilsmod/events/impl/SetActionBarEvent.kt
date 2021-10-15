@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.mixins.hooks.network
+package skytils.skytilsmod.events.impl
 
-import net.minecraft.network.Packet
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import skytils.skytilsmod.events.impl.PacketEvent.SendEvent
+import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
-fun onSendPacket(packet: Packet<*>, ci: CallbackInfo) {
-    if (SendEvent(packet).postAndCatch()) ci.cancel()
-}
+@Cancelable
+data class SetActionBarEvent(var message: String, var isPlaying: Boolean) : SkytilsEvent()

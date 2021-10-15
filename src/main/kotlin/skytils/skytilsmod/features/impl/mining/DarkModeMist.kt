@@ -26,7 +26,7 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.RenderBlockInWorldEvent
+import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.Utils

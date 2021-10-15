@@ -21,7 +21,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
 import net.minecraft.world.chunk.Chunk
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.BlockChangeEvent
+import skytils.skytilsmod.events.impl.BlockChangeEvent
 
 fun onBlockChange(chunk: Any, pos: BlockPos, state: IBlockState, cir: CallbackInfoReturnable<IBlockState>) {
     (chunk as Chunk).apply {

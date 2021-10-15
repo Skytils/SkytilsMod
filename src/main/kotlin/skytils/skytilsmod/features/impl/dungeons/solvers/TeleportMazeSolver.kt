@@ -31,8 +31,8 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.PacketEvent
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.ConcurrentHashSet
 import skytils.skytilsmod.utils.DevTools

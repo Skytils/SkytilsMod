@@ -29,8 +29,8 @@ import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.SetActionBarEvent
+import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.SetActionBarEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer

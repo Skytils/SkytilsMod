@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
 import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
 @Cancelable
-class CheckRenderEntityEvent<T : Entity>(
+data class CheckRenderEntityEvent<T : Entity>(
     val entity: T,
     val camera: ICamera,
     val camX: Double,

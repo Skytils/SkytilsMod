@@ -23,13 +23,8 @@ import skytils.skytilsmod.asm.transformers.addColoredNamesCheck
 import skytils.skytilsmod.asm.transformers.injectSplashProgressTransformer
 
 class SkytilsTransformer : BaseClassTransformer() {
-    var transformed = false
-
     override fun makeTransformers() {
-        if (!transformed) {
-            transformed = true
-            addColoredNamesCheck()
-            injectSplashProgressTransformer()
-        }
+        addColoredNamesCheck()
+        injectSplashProgressTransformer()
     }
 }

@@ -20,7 +20,7 @@ package skytils.skytilsmod.mixins.hooks.multiplayer
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.DamageBlockEvent
+import skytils.skytilsmod.events.impl.DamageBlockEvent
 
 fun onPlayerDamageBlock(pos: BlockPos, directionFacing: EnumFacing, cir: CallbackInfoReturnable<Boolean>) {
     if (DamageBlockEvent(pos, directionFacing).postAndCatch()) cir.cancel()

@@ -58,10 +58,10 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.BossBarEvent
-import skytils.skytilsmod.events.GuiContainerEvent.SlotClickEvent
-import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.events.impl.BossBarEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
+import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor

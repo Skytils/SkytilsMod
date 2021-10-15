@@ -18,22 +18,15 @@
 
 package skytils.skytilsmod.mixins.transformers.gui;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import skytils.skytilsmod.Skytils;
-import skytils.skytilsmod.events.SetActionBarEvent;
 import skytils.skytilsmod.mixins.hooks.gui.GuiIngameHookKt;
-import skytils.skytilsmod.utils.RenderUtil;
-import skytils.skytilsmod.utils.Utils;
 
 @Mixin(GuiIngame.class)
 public abstract class MixinGuiIngame extends Gui {

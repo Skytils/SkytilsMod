@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
 
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
+package skytils.skytilsmod.events.impl
+
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
 @Cancelable
-class DamageBlockEvent(val pos: BlockPos, val facing: EnumFacing) : SkytilsEvent()
+data class ItemTossEvent(val item: ItemStack, val dropStack: Boolean) : SkytilsEvent()

@@ -30,7 +30,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.TickTask
-import skytils.skytilsmod.events.GuiContainerEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.*
 import java.io.IOException
 import java.net.URLEncoder

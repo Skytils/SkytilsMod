@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
-import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Cancelable
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import skytils.skytilsmod.events.SkytilsEvent
 
-@Cancelable
-class ItemTossEvent(val item: ItemStack, val dropStack: Boolean) : SkytilsEvent()
+data class RenderHUDEvent(val event: RenderGameOverlayEvent) : SkytilsEvent()

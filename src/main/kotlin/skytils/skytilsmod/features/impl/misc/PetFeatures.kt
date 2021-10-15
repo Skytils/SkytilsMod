@@ -36,10 +36,10 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.CheckRenderEntityEvent
-import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.PacketEvent.SendEvent
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
+import skytils.skytilsmod.events.impl.PacketEvent.SendEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight

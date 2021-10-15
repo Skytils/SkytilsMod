@@ -28,8 +28,8 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.PacketEvent.SendEvent
+import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.PacketEvent.SendEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.*
 import java.awt.Color

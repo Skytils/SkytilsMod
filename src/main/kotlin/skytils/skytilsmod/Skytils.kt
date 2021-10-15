@@ -48,7 +48,7 @@ import skytils.skytilsmod.commands.impl.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import skytils.skytilsmod.core.*
-import skytils.skytilsmod.events.PacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*

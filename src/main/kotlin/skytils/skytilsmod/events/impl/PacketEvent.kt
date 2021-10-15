@@ -15,9 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
+import net.minecraft.network.Packet
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
 @Cancelable
-class SendChatMessageEvent(val message: String, val addToChat: Boolean) : SkytilsEvent()
+open class PacketEvent(val packet: Packet<*>) : SkytilsEvent() {
+    var direction: Direction? = null
+
+    class ReceiveEvent(packet: Packet<*>) : PacketEvent(packet) {
+        init {
+            direction = Direction.INBOUND
+        }
+    }
+
+    class SendEvent(packet: Packet<*>) : PacketEvent(packet) {
+        init {
+            direction = Direction.OUTBOUND
+        }
+    }
+
+    enum class Direction {
+        INBOUND, OUTBOUND
+    }
+}

@@ -15,9 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package skytils.skytilsmod.events.impl
 
-package skytils.skytilsmod.events
+import net.minecraft.entity.boss.IBossDisplayData
+import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-
-class RenderHUDEvent(val event: RenderGameOverlayEvent) : SkytilsEvent()
+abstract class BossBarEvent : SkytilsEvent() {
+    @Cancelable
+    data class Set(val displayData: IBossDisplayData, val hasColorModifier: Boolean) : BossBarEvent()
+}

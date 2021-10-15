@@ -15,10 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
 
-import net.minecraft.util.IChatComponent
+package skytils.skytilsmod.events.impl
+
+import net.minecraft.network.INetHandler
+import net.minecraft.network.Packet
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
 @Cancelable
-class AddChatMessageEvent(val message: IChatComponent) : SkytilsEvent()
+data class MainReceivePacketEvent<T : Packet<U>, U : INetHandler>(val handler: U, val packet: T) : SkytilsEvent()

@@ -19,12 +19,11 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
 import gg.essential.universal.UChat
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.events.SendChatMessageEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter

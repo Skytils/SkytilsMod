@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
-import net.minecraft.block.state.IBlockState
-import net.minecraft.util.BlockPos
+import net.minecraft.util.IChatComponent
+import net.minecraftforge.fml.common.eventhandler.Cancelable
+import skytils.skytilsmod.events.SkytilsEvent
 
-class BlockChangeEvent(val pos: BlockPos, val old: IBlockState, val update: IBlockState) : SkytilsEvent()
+@Cancelable
+data class AddChatMessageEvent(val message: IChatComponent) : SkytilsEvent()

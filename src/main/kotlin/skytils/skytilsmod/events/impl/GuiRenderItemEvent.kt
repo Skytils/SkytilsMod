@@ -15,9 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package skytils.skytilsmod.events
+package skytils.skytilsmod.events.impl
 
-import net.minecraftforge.fml.common.eventhandler.Cancelable
+import net.minecraft.client.gui.FontRenderer
+import net.minecraft.item.ItemStack
+import skytils.skytilsmod.events.SkytilsEvent
 
-@Cancelable
-class SetActionBarEvent(var message: String, var isPlaying: Boolean) : SkytilsEvent()
+abstract class GuiRenderItemEvent : SkytilsEvent() {
+    abstract class RenderOverlayEvent(
+        open val fr: FontRenderer,
+        open val stack: ItemStack?,
+        open val x: Int,
+        open val y: Int,
+        open val text: String?
+    ) : GuiRenderItemEvent() {
+        data class Post(
+            override val fr: FontRenderer,
+            override val stack: ItemStack?,
+            override val x: Int,
+            override val y: Int,
+            override val text: String?
+        ) :
+            RenderOverlayEvent(fr, stack, x, y, text)
+    }
+}

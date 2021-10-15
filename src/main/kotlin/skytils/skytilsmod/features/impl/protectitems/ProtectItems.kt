@@ -25,8 +25,8 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.GuiContainerEvent
-import skytils.skytilsmod.events.ItemTossEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
+import skytils.skytilsmod.events.impl.ItemTossEvent
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
