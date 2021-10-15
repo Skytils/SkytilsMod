@@ -593,7 +593,7 @@ class DungeonFeatures {
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
-                    "Spirit Bear ${lastLitUpTime + 3400 - System.currentTimeMillis()}",
+                    "Spirit Bear ${(lastLitUpTime + 3400 - System.currentTimeMillis()) / 1000f}",
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     CommonColors.PURPLE,
