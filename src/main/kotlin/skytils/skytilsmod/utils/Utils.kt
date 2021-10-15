@@ -22,7 +22,6 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
-import io.netty.util.internal.ConcurrentSet
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.settings.GameSettings
@@ -208,8 +207,6 @@ object Utils {
     fun getKeyDisplayStringSafe(keyCode: Int): String =
         runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrNull() ?: "Key $keyCode"
 }
-
-typealias ConcurrentHashSet<T> = ConcurrentSet<T>
 
 val AxisAlignedBB.minVec: Vec3
     get() = Vec3(minX, minY, minZ)

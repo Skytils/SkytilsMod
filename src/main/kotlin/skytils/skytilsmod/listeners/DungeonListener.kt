@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.listeners
 
+import gg.essential.universal.UChat
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ChatComponentText
@@ -27,6 +28,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.core.TickTask
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -36,9 +38,9 @@ import skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 
 object DungeonListener {
 
-    val team = ConcurrentHashSet<DungeonTeammate>()
-    val deads = ConcurrentHashSet<DungeonTeammate>()
-    val missingPuzzles = ConcurrentHashSet<String>()
+    val team = HashSet<DungeonTeammate>()
+    val deads = HashSet<DungeonTeammate>()
+    val missingPuzzles = HashSet<String>()
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
@@ -48,37 +50,35 @@ object DungeonListener {
     private var ticks = 0
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons) return
-        Utils.checkThreadAndQueue {
-            if (event.packet is S02PacketChat) {
-                if (event.packet.chatComponent.unformattedText.startsWith("Dungeon starts in 1 second.")) {
-                    team.clear()
-                    deads.clear()
-                    missingPuzzles.clear()
-                    TickTask(40) {
-                        getMembers()
-                    }
-                } else if (event.packet.chatComponent.unformattedText.stripControlCodes()
-                        .trim() == "> EXTRA STATS <"
-                ) {
-                    if (Skytils.config.dungeonDeathCounter) {
-                        TickTask(6) {
-                            mc.ingameGUI.chatGUI.printChatMessage(
-                                ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
-                                    team.sortedByDescending { it.deaths }.filter { it.deaths > 0 }.joinToString(
-                                        separator = "\n"
-                                    ) {
-                                        "  §c☠ ${it.playerName}:§r ${it.deaths}"
-                                    }
-                                }"
-                                )
+        if (event.packet is S02PacketChat) {
+            if (event.packet.chatComponent.unformattedText.startsWith("Dungeon starts in 1 second.")) {
+                team.clear()
+                deads.clear()
+                missingPuzzles.clear()
+                TickTask(40) {
+                    getMembers()
+                }
+            } else if (event.packet.chatComponent.unformattedText.stripControlCodes()
+                    .trim() == "> EXTRA STATS <"
+            ) {
+                if (Skytils.config.dungeonDeathCounter) {
+                    TickTask(6) {
+                        mc.ingameGUI.chatGUI.printChatMessage(
+                            ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
+                                team.sortedByDescending { it.deaths }.filter { it.deaths > 0 }.joinToString(
+                                    separator = "\n"
+                                ) {
+                                    "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                                }
+                            }"
                             )
-                        }
+                        )
                     }
-                    if (Skytils.config.autoRepartyOnDungeonEnd) {
-                        RepartyCommand.processCommand(mc.thePlayer, emptyArray())
-                    }
+                }
+                if (Skytils.config.autoRepartyOnDungeonEnd) {
+                    RepartyCommand.processCommand(mc.thePlayer, emptyArray())
                 }
             }
         }
@@ -122,7 +122,7 @@ object DungeonListener {
                             teammate.deaths++
                             if (Skytils.config.dungeonDeathCounter) {
                                 TickTask(1) {
-                                    mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${team.sumOf { it.deaths }}§b total deaths."))
+                                    UChat.chat("§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${team.sumOf { it.deaths }}§b total deaths.")
                                 }
                             }
                         }

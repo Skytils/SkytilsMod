@@ -28,35 +28,27 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent.SendEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.SkyblockIsland
+import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.io.FileReader
 import java.io.FileWriter
 
 class RelicWaypoints : Tracker("found_spiders_den_relics") {
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
+    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock) return
         if (event.packet is S2APacketParticles) {
-            val packet = event.packet
-            val type = packet.particleType
-            val longDistance = packet.isLongDistance
-            val count = packet.particleCount
-            val speed = packet.particleSpeed
-            val xOffset = packet.xOffset
-            val yOffset = packet.yOffset
-            val zOffset = packet.zOffset
-            val x = packet.xCoordinate
-            val y = packet.yCoordinate
-            val z = packet.zCoordinate
             if (Skytils.config.rareRelicFinder) {
-                val filter =
-                    type == EnumParticleTypes.SPELL_WITCH && count == 2 && longDistance && speed == 0f && xOffset == 0.3f && yOffset == 0.3f && zOffset == 0.3f
-                if (filter && relicLocations.contains(BlockPos(x, y, z))) {
-                    rareRelicLocations.add(BlockPos(x, y, z))
+                event.packet.apply {
+                    if (particleType == EnumParticleTypes.SPELL_WITCH && particleCount == 2 && isLongDistance && particleSpeed == 0f && xOffset == 0.3f && yOffset == 0.3f && zOffset == 0.3f) {
+                        rareRelicLocations.add(BlockPos(xCoordinate, yCoordinate, zCoordinate))
+                    }
                 }
             }
         }
@@ -160,8 +152,8 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
     }
 
     companion object {
-        val relicLocations = ConcurrentHashSet<BlockPos>()
-        val foundRelics = ConcurrentHashSet<BlockPos>()
-        private val rareRelicLocations = ConcurrentHashSet<BlockPos>()
+        val relicLocations = HashSet<BlockPos>()
+        val foundRelics = HashSet<BlockPos>()
+        private val rareRelicLocations = HashSet<BlockPos>()
     }
 }

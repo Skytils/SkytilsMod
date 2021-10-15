@@ -31,10 +31,9 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.utils.ConcurrentHashSet
 import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -43,9 +42,9 @@ import java.awt.Color
 class TeleportMazeSolver {
 
     companion object {
-        private val steppedPads = ConcurrentHashSet<BlockPos>()
-        val poss = ConcurrentHashSet<BlockPos>()
-        val valid = ConcurrentHashSet<BlockPos>()
+        private val steppedPads = HashSet<BlockPos>()
+        val poss = HashSet<BlockPos>()
+        val valid = HashSet<BlockPos>()
     }
 
     @SubscribeEvent
@@ -58,7 +57,7 @@ class TeleportMazeSolver {
     }
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
         if (mc.thePlayer == null || mc.theWorld == null) return
         event.packet.apply {
