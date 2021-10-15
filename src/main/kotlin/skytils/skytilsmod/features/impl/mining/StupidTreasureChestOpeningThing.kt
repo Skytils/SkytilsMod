@@ -19,6 +19,7 @@
 package skytils.skytilsmod.features.impl.mining
 
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S02PacketChat
@@ -35,6 +36,7 @@ import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import skytils.skytilsmod.utils.*
 import java.awt.Color
+import kotlin.math.abs
 
 object StupidTreasureChestOpeningThing {
 
@@ -149,13 +151,13 @@ object StupidTreasureChestOpeningThing {
                         "mob.villager.no"
                     ) && sendHelpPlease.isNotEmpty()
                 ) {
-                    val rt = mc.thePlayer.rayTrace(25.0, (mc as AccessorMinecraft).timer.renderPartialTicks)
-                    if (rt.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                        val probable = sendHelpPlease[rt.blockPos] ?: return
-                        if (sound == "random.orb") probable.progress++
-                        else probable.progress = 0
-                        printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
-                    }
+                    val probable = sendHelpPlease.values.minByOrNull {
+                        val rot = mc.thePlayer.getRotationFor(it.pos)
+                        abs(rot.first - mc.thePlayer.rotationYaw) + abs(rot.second - mc.thePlayer.rotationPitch)
+                    } ?: return
+                    if (sound == "random.orb") probable.progress++
+                    else probable.progress = 0
+                    printDevMessage("sound $sound, $pitch pitch, $volume volume, at $x, $y, $z", "chtreasure")
                 }
             }
         }

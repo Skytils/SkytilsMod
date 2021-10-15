@@ -40,11 +40,11 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 object RenderUtil {
-    private val RARITY = ResourceLocation("skytils:gui/rarity.png")
-    private val RARITY2 = ResourceLocation("skytils:gui/rarity2.png")
-    private val RARITY3 = ResourceLocation("skytils:gui/rarity3.png")
-    private val RARITY4 = ResourceLocation("skytils:gui/rarity4.png")
-    private val CUSTOMRARITY = ResourceLocation("skytils:gui/customrarity.png")
+    private val RARITY = ResourceLocation("skytils", "gui/rarity.png")
+    private val RARITY2 = ResourceLocation("skytils", "gui/rarity2.png")
+    private val RARITY3 = ResourceLocation("skytils", "gui/rarity3.png")
+    private val RARITY4 = ResourceLocation("skytils", "gui/rarity4.png")
+    private val CUSTOMRARITY = ResourceLocation("skytils", "gui/customrarity.png")
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     /**

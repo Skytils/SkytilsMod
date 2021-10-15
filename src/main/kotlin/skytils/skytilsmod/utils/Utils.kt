@@ -261,6 +261,17 @@ fun Entity.getXZDistSq(other: Entity): Double {
 val Entity.hasMoved
     get() = this.posX != this.prevPosX || this.posY != this.prevPosY || this.posZ != this.prevPosZ
 
+fun Entity.getRotationFor(pos: BlockPos): Pair<Float, Float> {
+    val deltaX = pos.x - posX
+    val deltaZ = pos.z - posZ
+    val deltaY = pos.y - (posY + eyeHeight)
+
+    val dist = MathHelper.sqrt_double(deltaX * deltaX + deltaZ * deltaZ).toDouble()
+    val yaw = (MathHelper.atan2(deltaZ, deltaX) * 180.0 / Math.PI).toFloat() - 90.0f
+    val pitch = (-(MathHelper.atan2(deltaY, dist) * 180.0 / Math.PI)).toFloat()
+    return yaw to pitch
+}
+
 fun CheckboxComponent.toggle() {
     this.mouseClick(this.getLeft().toDouble(), this.getTop().toDouble(), 0)
 }
