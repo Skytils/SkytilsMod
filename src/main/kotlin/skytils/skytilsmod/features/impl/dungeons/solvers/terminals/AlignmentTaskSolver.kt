@@ -145,7 +145,7 @@ class AlignmentTaskSolver {
         directionSet.clear()
     }
 
-    class MazeSpace(val framePos: BlockPos? = null, val type: SpaceType, val coords: Point)
+    data class MazeSpace(val framePos: BlockPos? = null, val type: SpaceType, val coords: Point)
 
     enum class SpaceType {
         EMPTY,
@@ -154,7 +154,7 @@ class AlignmentTaskSolver {
         END,
     }
 
-    class GridMove(val point: Point, val directionNum: Int)
+    data class GridMove(val point: Point, val directionNum: Int)
 
     private fun convertPointMapToMoves(solution: ArrayList<Point>): ArrayList<GridMove> {
         solution.reverse()
