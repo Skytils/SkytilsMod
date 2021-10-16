@@ -22,6 +22,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.potion.Potion
 import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.IChatComponent
 import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
@@ -35,6 +36,12 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
         val smolPeople by lazy {
             File(Skytils.modDir, "smolpeople").exists()
         }
+    }
+
+    var overrideDisplayName: String? = null
+
+    fun onNewDisplayName(s: String) {
+        if (!Utils.inSkyblock) return
     }
 
     val isBreefing by lazy {

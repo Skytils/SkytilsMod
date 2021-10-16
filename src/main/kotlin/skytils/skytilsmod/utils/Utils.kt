@@ -17,6 +17,8 @@
  */
 package skytils.skytilsmod.utils
 
+import dev.falsehonesty.asmhelper.AsmHelper
+import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
@@ -38,8 +40,10 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
+import org.objectweb.asm.tree.MethodInsnNode
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.asm.SkytilsTransformer
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
@@ -286,3 +290,12 @@ fun <T : Any> T?.ifNull(run: () -> Unit): T? {
     if (this == null) run()
     return this
 }
+
+val MethodInsnNode.descriptor: Descriptor
+    get() = Descriptor(
+        AsmHelper.remapper.remapClassName(this.owner),
+        SkytilsTransformer.methodMaps.getOrSelf(AsmHelper.remapper.remapMethodName(this.owner, this.name, this.desc)),
+        AsmHelper.remapper.remapDesc(this.desc)
+    )
+
+fun <T : Any> Map<T, T>.getOrSelf(key: T): T = this.getOrDefault(key, key)

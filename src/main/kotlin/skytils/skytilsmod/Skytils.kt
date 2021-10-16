@@ -28,6 +28,7 @@ import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C01PacketChatMessage
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -74,6 +75,7 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.ReopenableGUI
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
+import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
@@ -423,6 +425,20 @@ class Skytils {
                         component
                     )
                 )
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
+        if (event.packet is S1CPacketEntityMetadata) {
+            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 }
+            if (nameObj != null) {
+                val entity = mc.theWorld.getEntityByID(event.packet.entityId)
+
+                if (entity is ExtensionEntityLivingBase) {
+                    entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
+                }
             }
         }
     }

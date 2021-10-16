@@ -23,16 +23,18 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase;
 import skytils.skytilsmod.mixins.hooks.entity.EntityLivingBaseHook;
 
 @Mixin(EntityLivingBase.class)
-public abstract class MixinEntityLivingBase extends Entity {
+public abstract class MixinEntityLivingBase extends Entity implements ExtensionEntityLivingBase {
 
     @Unique
     private final EntityLivingBaseHook hook = new EntityLivingBaseHook((EntityLivingBase) (Object) this);
@@ -59,5 +61,11 @@ public abstract class MixinEntityLivingBase extends Entity {
     @Inject(method = "isChild", at = @At("HEAD"), cancellable = true)
     private void setChildState(CallbackInfoReturnable<Boolean> cir) {
         hook.isChild(cir);
+    }
+
+    @NotNull
+    @Override
+    public EntityLivingBaseHook getSkytilsHook() {
+        return hook;
     }
 }

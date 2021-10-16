@@ -25,6 +25,8 @@ import skytils.skytilsmod.Skytils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
+import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.utils.*
 
 fun setColorMultiplier(
@@ -44,4 +46,10 @@ fun setColorMultiplier(
             cir.setReturnValue(Skytils.config.seraphHitsPhaseColor.withAlpha(169))
         } else cir.setReturnValue(Skytils.config.seraphNormalPhaseColor.withAlpha(169))
     }
+}
+
+fun replaceEntityName(entity: EntityLivingBase, currName: String): String {
+    entity as ExtensionEntityLivingBase
+
+    return entity.skytilsHook.overrideDisplayName ?: currName
 }

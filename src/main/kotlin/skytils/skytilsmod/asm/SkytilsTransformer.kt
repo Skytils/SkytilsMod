@@ -18,18 +18,41 @@
 
 package skytils.skytilsmod.asm
 
+import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.BaseClassTransformer
-import skytils.skytilsmod.asm.transformers.addColoredNamesCheck
-import skytils.skytilsmod.asm.transformers.injectSplashProgressTransformer
+import net.minecraft.launchwrapper.LaunchClassLoader
+import skytils.skytilsmod.asm.transformers.*
+import java.util.*
 
 class SkytilsTransformer : BaseClassTransformer() {
+
+    companion object {
+        /*
+         * Key is srg name, value is deobf name
+        */
+        val methodMaps: WeakHashMap<String, String> = WeakHashMap()
+    }
+
     var madeTransformers = false
+
+    override fun setup(classLoader: LaunchClassLoader) {
+        methodMaps + mapOf(
+            "func_150254_d" to "getFormattedText",
+            "func_145748_c_" to "getDisplayName",
+            "func_177067_a" to "renderName"
+        )
+    }
 
     override fun makeTransformers() {
         if (!madeTransformers) {
             madeTransformers = true
-            addColoredNamesCheck()
-            injectSplashProgressTransformer()
+            try {
+                addColoredNamesCheck()
+                injectSplashProgressTransformer()
+                changeRenderedName()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
         }
     }
 }
