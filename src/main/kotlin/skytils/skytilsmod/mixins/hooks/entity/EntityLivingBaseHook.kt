@@ -19,14 +19,15 @@ package skytils.skytilsmod.mixins.hooks.entity
 
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.potion.Potion
 import net.minecraft.util.EnumParticleTypes
-import net.minecraft.util.IChatComponent
 import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.io.File
 import kotlin.random.Random
 
@@ -36,12 +37,46 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
         val smolPeople by lazy {
             File(Skytils.modDir, "smolpeople").exists()
         }
+
+        private val dmgPattern = Regex("✧?(?<num>\\d+)[⚔+✧❤♞☄✷]*")
     }
 
     var overrideDisplayName: String? = null
 
     fun onNewDisplayName(s: String) {
         if (!Utils.inSkyblock) return
+        if (Skytils.config.commaDamage && entity is EntityArmorStand && entity.ticksExisted < 300 && s.isNotEmpty()) {
+            val matched = dmgPattern.matchEntire(s.stripControlCodes())
+            if (matched != null) {
+                val dmg = matched.groups["num"]?.value?.toIntOrNull()
+                if ((dmg ?: 0) >= 1000) {
+                    overrideDisplayName = buildString {
+                        var idx = 0
+                        val reverse = s.reversed()
+                        for ((i, c) in reverse.withIndex()) {
+                            append(c)
+                            if (c.isDigit()) {
+                                val next = reverse.getOrNull(i + 1)
+                                if (next != '§') {
+                                    idx++
+                                }
+                                if (idx != 0 && idx % 3 == 0) {
+                                    val remaining = reverse.substring(i + 1)
+                                    if (remaining.withIndex().any { (i1, c1) ->
+                                            c1.isDigit() && remaining.getOrNull(i1 + 1) != '§'
+                                        }) {
+                                        append(',')
+                                        idx = 0
+                                    }
+                                }
+                            }
+                        }
+                    }.reversed()
+                    return
+                }
+            }
+        }
+        if (overrideDisplayName != null) overrideDisplayName = s
     }
 
     val isBreefing by lazy {

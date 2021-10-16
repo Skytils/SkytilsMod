@@ -1323,6 +1323,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var bossBarFix = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Comma Damage",
+        description = "§b[WIP] §rAdds commas to Skyblock Damage Splashes.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var commaDamage = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Custom Damage Splash",
         description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
         category = "Miscellaneous", subcategory = "Quality of Life"
