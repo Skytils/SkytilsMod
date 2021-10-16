@@ -18,43 +18,36 @@
 
 package skytils.skytilsmod.asm.transformers
 
-import dev.falsehonesty.asmhelper.AsmHelper
-import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import dev.falsehonesty.asmhelper.dsl.modify
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
-import skytils.skytilsmod.asm.SkytilsTransformer
-import skytils.skytilsmod.utils.descriptor
-import skytils.skytilsmod.utils.getOrSelf
+import skytils.skytilsmod.utils.Utils
 
 fun changeRenderedName() = modify("net.minecraft.client.renderer.entity.RendererLivingEntity") {
     classNode.apply {
         this.methods.find {
-            SkytilsTransformer.methodMaps.getOrSelf(
-                AsmHelper.remapper.remapMethodName(
-                    "net/minecraft/client/renderer/entity/RendererLivingEntity",
-                    it.name,
-                    it.desc
-                )
-            ) == "renderName" && AsmHelper.remapper.remapDesc(it.desc) == "(Lnet/minecraft/entity/EntityLivingBase;DDD)V"
+            Utils.equalsOneOf(
+                it.name,
+                "renderName",
+                "b"
+            ) && Utils.equalsOneOf(it.desc, "(Lnet/minecraft/entity/EntityLivingBase;DDD)V", "(Lpr;DDD)V")
         }?.apply {
             for (insn in instructions) {
                 if (insn is VarInsnNode && insn.opcode == Opcodes.ASTORE) {
                     var prev = insn.previous
-                    if (prev is MethodInsnNode && prev.opcode == Opcodes.INVOKEINTERFACE && prev.descriptor == Descriptor(
-                            "net/minecraft/util/IChatComponent",
-                            "getFormattedText",
-                            "()Ljava/lang/String;"
-                        )
+                    if (prev is MethodInsnNode && prev.opcode == Opcodes.INVOKEINTERFACE &&
+                        Utils.equalsOneOf(prev.owner, "net/minecraft/util/IChatComponent", "eu") && Utils.equalsOneOf(
+                            prev.name,
+                            "getFormattedText", "d"
+                        ) && prev.desc == "()Ljava/lang/String;"
                     ) {
                         prev = prev.previous
-                        if (prev is MethodInsnNode && prev.opcode == Opcodes.INVOKEVIRTUAL && prev.descriptor == Descriptor(
-                                "net/minecraft/entity/EntityLivingBase",
-                                "getDisplayName",
-                                "()Lnet/minecraft/util/IChatComponent;"
-                            )
+                        if (prev is MethodInsnNode && prev.opcode == Opcodes.INVOKEVIRTUAL
+                            && Utils.equalsOneOf(prev.owner, "net/minecraft/entity/EntityLivingBase", "pr")
+                            && Utils.equalsOneOf(prev.name, "getDisplayName", "f_")
+                            && Utils.equalsOneOf(prev.desc, "()Lnet/minecraft/util/IChatComponent;", "()Leu;")
                         ) {
                             prev = prev.previous
                             if (prev is VarInsnNode && prev.opcode == Opcodes.ALOAD && prev.`var` == 1) {
