@@ -44,6 +44,8 @@ fun renderRarity(stack: ItemStack, x: Int, y: Int, ci: CallbackInfo) {
     if (Utils.inSkyblock && Skytils.config.showItemRarity) {
         if (mc.currentScreen != null) {
             if (isStorageMenuActive || isTradeWindowActive || isCustomAHActive) {
+                // TODO Fix items not rendering in neu storage overlay
+                if (stack.hasTagCompound() && stack.tagCompound.getBoolean("ignoreForRarity")) return
                 renderRarity(stack, x, y)
             }
         }

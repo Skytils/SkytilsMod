@@ -565,7 +565,7 @@ object RenderUtil {
                     0.0
                 )
                 GlStateManager.scale(scale, scale, 0.0)
-                renderItem(ItemUtil.removeEnchants(itemStack.copy()), 0, 0)
+                renderItem(ItemUtil.removeEnchants(itemStack.copy().also { it.tagCompound.setBoolean("ignoreForRarity", true) }), 0, 0)
 
                 GlStateManager.scale(1 / scale, 1 / scale, 0.0)
                 GL11.glColorMask(true, true, true, false)
