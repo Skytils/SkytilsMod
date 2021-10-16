@@ -152,9 +152,9 @@ class ItemFeatures {
                                 append("§b${stacking.loreName} §e$stackingLevel §f")
                                 val nextLevel = stacking.stackLevel.getOrNull(stackingLevel)
                                 if (stackingLevel == stacking.maxLevel || nextLevel == null) {
-                                    append("(§r${stackingAmount}§f)")
+                                    append("(§e${stackingAmount}§f)")
                                 } else {
-                                    append("(${stackingAmount} / ${NumberUtil.format(nextLevel)})")
+                                    append("(§c${stackingAmount} §f/ §a${NumberUtil.format(nextLevel)}§f)")
                                 }
                             }
                             return@apply
@@ -658,7 +658,7 @@ class ItemFeatures {
                     stackingEnchantDisplayText,
                     if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                     0f,
-                    CommonColors.RAINBOW,
+                    CommonColors.WHITE,
                     alignment,
                     TextShadow.NORMAL
                 )
