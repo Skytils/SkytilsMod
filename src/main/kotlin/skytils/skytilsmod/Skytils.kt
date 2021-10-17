@@ -304,7 +304,7 @@ class Skytils {
             displayScreen = null
         }
 
-        if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 200) {
+        if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 250) {
             val msg = sendMessageQueue.removeFirstOrNull()
             if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(msg)
         }
