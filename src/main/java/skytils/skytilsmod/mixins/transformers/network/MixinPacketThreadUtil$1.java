@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent;
 
-@Mixin(targets = "net.minecraft.network.PacketThreadUtil$1")
+@Mixin(targets = "net.minecraft.network.PacketThreadUtil$1", remap = false)
 public abstract class MixinPacketThreadUtil$1 {
     @Shadow @Final
     INetHandler val$p_180031_1_;
