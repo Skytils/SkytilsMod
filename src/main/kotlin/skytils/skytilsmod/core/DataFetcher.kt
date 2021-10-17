@@ -35,10 +35,7 @@ import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.misc.SummonSkins
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
-import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.Enchant
-import skytils.skytilsmod.utils.EnchantUtil
-import skytils.skytilsmod.utils.SkillUtils
+import skytils.skytilsmod.utils.*
 import java.util.concurrent.Future
 import kotlin.concurrent.fixedRateTimer
 
@@ -146,7 +143,11 @@ object DataFetcher {
                 APIUtil.getJSONResponse("${dataUrl}constants/summons.json").entrySet().forEach {
                     SummonSkins.skinMap[it.key] = it.value.asString
                 }
-                SummonSkins.loadSkins()
+                Utils.checkThreadAndQueue {
+                    SummonSkins.loadSkins()
+
+
+                }
             } catch (e: Throwable) {
                 e.printStackTrace()
                 UChat.chat("§cSkytils ran into an error while fetching data. Please report this to our Discord server!")
