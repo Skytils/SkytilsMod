@@ -17,10 +17,9 @@
  */
 package skytils.skytilsmod.commands.impl
 
+import gg.essential.universal.UChat
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.BaseCommand
@@ -56,24 +55,21 @@ object RepartyCommand : BaseCommand("reparty", listOf("rp")) {
         if (!Utils.isOnHypixel) throw WrongUsageException("You must be on Hypixel to use this command.")
         if (args.isNotEmpty() && (args[0].startsWith("fail") || args[0] == "f")) {
             partyThread = Thread {
-                val player = mc.thePlayer
                 try {
-                    Skytils.sendMessageQueue.add("/p " + java.lang.String.join(" ", repartyFailList))
+                    Skytils.sendMessageQueue.add("/p ${repartyFailList.joinToString(" ")}")
                     val members = repartyFailList.joinToString(
                         separator = """
-    ${EnumChatFormatting.WHITE}
-    - ${EnumChatFormatting.YELLOW}
-    """.trimIndent(),
-                    )
-                    player.addChatMessage(
-                        ChatComponentText(
-                            """
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
-${EnumChatFormatting.GREEN}Partying:${EnumChatFormatting.WHITE}
-- ${EnumChatFormatting.YELLOW}$members
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
+    §f
+    - §e
     """.trimIndent()
-                        )
+                    )
+                    UChat.chat(
+                        """
+§9§m-----------------------------
+§aPartying:§f
+- §e$members
+§9§m-----------------------------
+    """.trimIndent()
                     )
                     failInviting = true
                     while (failInviting) {
@@ -84,18 +80,16 @@ ${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-------------------
                             separator =
                             """
     
-    - ${EnumChatFormatting.RED}
-    """.trimIndent(),
-                        )
-                        player.addChatMessage(
-                            ChatComponentText(
-                                """
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
-${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
-- ${EnumChatFormatting.RED}$repartyFails
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
+    - §c
     """.trimIndent()
-                            )
+                        )
+                        UChat.chat(
+                            """
+§9§m-----------------------------
+§aFailed to invite:§f
+- §c$repartyFails
+§9§m-----------------------------
+    """.trimIndent()
                         )
                     }
                 } catch (e: InterruptedException) {
@@ -108,7 +102,6 @@ ${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-------------------
         party.clear()
         repartyFailList.clear()
         partyThread = Thread {
-            val player = mc.thePlayer
             try {
                 Skytils.sendMessageQueue.add("/pl")
                 gettingParty = true
@@ -124,19 +117,17 @@ ${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-------------------
                 val members = party.joinToString(
                     separator =
                     """
-    ${EnumChatFormatting.WHITE}
-    - ${EnumChatFormatting.YELLOW}
+    §f
+    - §e
     """.trimIndent()
                 )
-                player.addChatMessage(
-                    ChatComponentText(
-                        """
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
-${EnumChatFormatting.GREEN}Repartying:${EnumChatFormatting.WHITE}
-- ${EnumChatFormatting.YELLOW}$members
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
+                UChat.chat(
+                    """
+§9§m-----------------------------
+§aRepartying:§f
+- §e$members
+§9§m-----------------------------
     """.trimIndent()
-                    )
                 )
                 repartyFailList = ArrayList(party)
                 for (invitee in party) {
@@ -155,18 +146,16 @@ ${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-------------------
                         separator =
                         """
     
-    - ${EnumChatFormatting.RED}
+    - §c
     """.trimIndent(),
                     )
-                    player.addChatMessage(
-                        ChatComponentText(
-                            """
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
-${EnumChatFormatting.GREEN}Failed to invite:${EnumChatFormatting.WHITE}
-- ${EnumChatFormatting.RED}$repartyFails
-${EnumChatFormatting.BLUE}${EnumChatFormatting.STRIKETHROUGH}-----------------------------
+                    UChat.chat(
+                        """
+§9§m-----------------------------
+§aFailed to invite:§f
+- §c$repartyFails
+§9§m-----------------------------
     """.trimIndent()
-                        )
                     )
                 }
             } catch (e: InterruptedException) {
