@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.asm
 
-import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.BaseClassTransformer
 import net.minecraft.launchwrapper.LaunchClassLoader
 import skytils.skytilsmod.asm.transformers.*
@@ -50,6 +49,7 @@ class SkytilsTransformer : BaseClassTransformer() {
                 addColoredNamesCheck()
                 injectSplashProgressTransformer()
                 changeRenderedName()
+                insertReceivePacketEvent()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
