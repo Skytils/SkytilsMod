@@ -20,6 +20,7 @@ package skytils.skytilsmod
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import gg.essential.api.EssentialAPI
 import gg.essential.vigilance.gui.SettingsGui
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -84,8 +85,6 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.io.File
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadPoolExecutor
 
 
 @Mod(
@@ -137,12 +136,6 @@ class Skytils {
         var jarFile: File? = null
         private var lastChatMessage = 0L
 
-        @JvmField
-        var displayScreen: GuiScreen? = null
-
-        @JvmField
-        val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
-
         val hylinAPI = createHylinAPI("", false)
     }
 
@@ -152,7 +145,7 @@ class Skytils {
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
         jarFile = event.sourceFile
-        Minecraft.getMinecraft().framebuffer.enableStencil();
+        Minecraft.getMinecraft().framebuffer.enableStencil()
     }
 
     @Mod.EventHandler
@@ -258,23 +251,23 @@ class Skytils {
         val cch = ClientCommandHandler.instance
 
         if (cch !is AccessorCommandHandler) throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
-        cch.registerCommand(SkytilsCommand)
+        SkytilsCommand.register()
 
-        cch.registerCommand(CataCommand)
-        cch.registerCommand(CalcXPCommand)
+        CataCommand.register()
+        CalcXPCommand.register()
+        SlayerCommand.register()
         cch.registerCommand(HollowWaypointCommand)
-        cch.registerCommand(SlayerCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
-            cch.registerCommand(ArmorColorCommand)
+            ArmorColorCommand.register()
         }
 
         if (!cch.commands.containsKey("glintcustomize")) {
-            cch.registerCommand(GlintCustomizeCommand)
+            GlintCustomizeCommand.register()
         }
 
         if (!cch.commands.containsKey("trackcooldown")) {
-            cch.registerCommand(TrackCooldownCommand)
+            TrackCooldownCommand.register()
         }
 
         if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
@@ -298,11 +291,6 @@ class Skytils {
         if (event.phase != TickEvent.Phase.START) return
 
         ScreenRenderer.refresh()
-
-        if (displayScreen != null) {
-            mc.displayGuiScreen(displayScreen)
-            displayScreen = null
-        }
 
         if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 200) {
             val msg = sendMessageQueue.removeFirstOrNull()
@@ -377,7 +365,7 @@ class Skytils {
     @SubscribeEvent
     fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
         if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == 6969420) {
-            displayScreen = OptionsGui()
+            EssentialAPI.getGuiUtil().openScreen(OptionsGui())
         }
     }
 
@@ -387,7 +375,7 @@ class Skytils {
         if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) {
                 TickTask(1) {
-                    displayScreen = OptionsGui()
+                    EssentialAPI.getGuiUtil().openScreen(OptionsGui())
                 }
             }
         }

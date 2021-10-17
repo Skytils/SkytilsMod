@@ -21,17 +21,19 @@ package skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
-import net.minecraft.util.IChatComponent
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 
-object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw")) {
+object HollowWaypointCommand : CommandBase() {
+    override fun getCommandName(): String = "skytilshollowwaypoint"
+    override fun getCommandAliases(): List<String> = listOf("sthw")
+    override fun getRequiredPermissionLevel() = 0
     override fun getCommandUsage(sender: ICommandSender): String = "/skytilshollowwaypoint location x y z"
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
@@ -166,7 +168,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
         }
     }
 
-    private fun copyMessage(text: String): IChatComponent {
+    private fun copyMessage(text: String): UTextComponent {
         return UTextComponent("§9[Copy] ").apply {
             setHoverText("§9Copy the coordinates in chat box.")
             clickAction = ClickEvent.Action.SUGGEST_COMMAND
@@ -174,7 +176,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
         }
     }
 
-    private fun removeMessage(command: String): IChatComponent {
+    private fun removeMessage(command: String): UTextComponent {
         return UTextComponent("§c[Remove]\n").apply {
             setHoverText("§cRemove the waypoint.")
             clickAction = ClickEvent.Action.RUN_COMMAND

@@ -17,32 +17,34 @@
  */
 package skytils.skytilsmod.commands.impl
 
+import gg.essential.api.EssentialAPI
+import gg.essential.api.commands.Command
+import gg.essential.api.commands.DefaultHandler
+import gg.essential.api.commands.DisplayName
+import gg.essential.api.commands.Greedy
 import gg.essential.universal.UChat
-import net.minecraft.command.ICommandSender
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
 
-object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntracker")) {
-    override fun getCommandUsage(sender: ICommandSender): String = "/trackcooldown <cooldown> <ability>"
+object TrackCooldownCommand : Command("trackcooldown", true) {
+    override val commandAliases: Set<Alias> = setOf(Alias("cooldowntracker"))
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    @DefaultHandler
+    fun handle(@DisplayName("cooldown") cooldown: String, @Greedy @DisplayName("ability") ability: String) {
         if (!Skytils.config.itemCooldownDisplay) return UChat.chat("You must turn on Item Cooldown Display to use this command!")
-        if (args.size < 2) throw WrongUsageException(getCommandUsage(sender))
-        val seconds = args[0].toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
-        val ability = args.drop(1).joinToString(" ")
+        val seconds = cooldown.toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
         if (ability.isBlank()) throw WrongUsageException("You must specify valid arguments.")
         if (CooldownTracker.itemCooldowns[ability] == seconds) {
             CooldownTracker.itemCooldowns.remove(ability)
             PersistentSave.markDirty<CooldownTracker>()
-            sender.addChatMessage(ChatComponentText("Removed the cooldown for $ability."))
+            EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("Removed the cooldown for $ability."))
         } else {
             CooldownTracker.itemCooldowns[ability] = seconds
             PersistentSave.markDirty<CooldownTracker>()
-            sender.addChatMessage(ChatComponentText("Set the cooldown for $ability to $seconds seconds."))
+            EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("Set the cooldown for $ability to $seconds seconds."))
         }
     }
 }

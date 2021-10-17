@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import com.google.common.collect.ImmutableList
+import gg.essential.api.utils.Multithreading
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -47,7 +48,7 @@ class IceFillSolver {
         if (ticks % 20 == 0) {
             if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isDone == true)) {
                 if (chestPos == null || roomFacing == null) {
-                    job = Skytils.threadPool.submit {
+                    job = Multithreading.submit {
                         findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                             val playerX = mc.thePlayer.posX.toInt()
                             val playerZ = mc.thePlayer.posZ.toInt()
@@ -88,7 +89,7 @@ class IceFillSolver {
                     }
                 }
                 if (chestPos != null) {
-                    job = Skytils.threadPool.submit {
+                    job = Multithreading.submit {
                         if (three == null) {
                             three = IceFillPuzzle(world, 70)
                         }

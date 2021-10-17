@@ -17,93 +17,94 @@
  */
 package skytils.skytilsmod.commands.impl
 
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
+import gg.essential.api.EssentialAPI
+import gg.essential.api.commands.Command
+import gg.essential.api.commands.DisplayName
+import gg.essential.api.commands.SubCommand
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.ChatComponentText
-import skytils.skytilsmod.commands.BaseCommand
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
-object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizeglint")) {
-    override fun getCommandUsage(sender: ICommandSender) = "glintcustomize <override/color>"
+object GlintCustomizeCommand : Command("glintcustomize") {
+    override val commandAliases: Set<Alias> = setOf(Alias("customizeglint"))
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    @SubCommand("override")
+    fun override(@DisplayName("on/off/clear/clearall") type: String) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-        val player = sender as EntityPlayerSP
-        val item = player.heldItem ?: throw WrongUsageException("You need to hold an item that you wish to customize!")
+        val item =
+            mc.thePlayer.heldItem ?: throw WrongUsageException("You need to hold an item that you wish to customize!")
         val itemId = ItemUtil.getSkyBlockItemID(item) ?: throw WrongUsageException("That isn't a valid item!")
-        if (args.isEmpty()) {
-            throw WrongUsageException(getCommandUsage(sender))
-        }
-        val originalMessage = args.joinToString(" ")
-        when (args[0].lowercase()) {
-            "override" -> {
-                when {
-                    originalMessage.contains("on") -> {
-                        GlintCustomizer.overrides[itemId] = true
-                        PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aForced an enchant glint for your item."))
-                        return
-                    }
-                    originalMessage.contains("off") -> {
-                        GlintCustomizer.overrides[itemId] = false
-                        PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aForce disabled an enchant glint for your item."))
-                        return
-                    }
-                    originalMessage.contains("clearall") -> {
-                        GlintCustomizer.overrides.clear()
-                        PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aRemoved all your glint overrides."))
-                        return
-                    }
-                    originalMessage.contains("clear") -> {
-                        GlintCustomizer.overrides.remove(itemId)
-                        PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aCleared glint overrides for your item."))
-                        return
-                    }
-                    else -> {
-                        throw WrongUsageException("glintcustomize override <on/off/clear/clearall>")
-                    }
-                }
+        when (type) {
+            "on" -> {
+                GlintCustomizer.overrides[itemId] = true
+                PersistentSave.markDirty<GlintCustomizer>()
+                EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("§aForced an enchant glint for your item."))
+                return
             }
-            "color" -> {
-                when {
-                    originalMessage.contains("set") -> {
-                        if (args.size != 3) throw WrongUsageException("You must specify a valid hex color!")
-                        try {
-                            GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(args[2])
-                            PersistentSave.markDirty<GlintCustomizer>()
-                            sender.addChatMessage(ChatComponentText("§aForced an enchant glint color for your item."))
-                        } catch (e: NumberFormatException) {
-                            throw SyntaxErrorException("Unable to get a color from inputted string.")
-                        }
-                        return
-                    }
-                    originalMessage.contains("clearall") -> {
-                        GlintCustomizer.glintColors.clear()
-                        PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aRemoved all your custom glint colors."))
-                        return
-                    }
-                    originalMessage.contains("clear") -> {
-                        GlintCustomizer.glintColors.remove(itemId)
-                        PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aCleared the custom glint color for your item."))
-                        return
-                    }
-                    else -> {
-                        throw WrongUsageException("glintcustomize color <set/clearall/clear>")
-                    }
-                }
+            "off" -> {
+                GlintCustomizer.overrides[itemId] = false
+                PersistentSave.markDirty<GlintCustomizer>()
+                EssentialAPI.getMinecraftUtil()
+                    .sendMessage(UTextComponent("§aForce disabled an enchant glint for your item."))
+                return
+            }
+            "clearall" -> {
+                GlintCustomizer.overrides.clear()
+                PersistentSave.markDirty<GlintCustomizer>()
+                EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("§aRemoved all your glint overrides."))
+                return
+            }
+            "clear" -> {
+                GlintCustomizer.overrides.remove(itemId)
+                PersistentSave.markDirty<GlintCustomizer>()
+                EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("§aCleared glint overrides for your item."))
+                return
             }
             else -> {
-                throw WrongUsageException(getCommandUsage(sender))
+                throw WrongUsageException("glintcustomize override <on/off/clear/clearall>")
+            }
+        }
+    }
+
+    @SubCommand("color")
+    fun color(@DisplayName("set/clearall/clear") type: String, @DisplayName("hex color") hex: String?) {
+        if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
+        val item =
+            mc.thePlayer.heldItem ?: throw WrongUsageException("You need to hold an item that you wish to customize!")
+        val itemId = ItemUtil.getSkyBlockItemID(item) ?: throw WrongUsageException("That isn't a valid item!")
+        when (type) {
+            "set" -> {
+                if (hex == null) throw WrongUsageException("You must specify a valid hex color!")
+                try {
+                    GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(hex)
+                    PersistentSave.markDirty<GlintCustomizer>()
+                    EssentialAPI.getMinecraftUtil()
+                        .sendMessage(UTextComponent("§aForced an enchant glint color for your item."))
+                } catch (e: NumberFormatException) {
+                    throw SyntaxErrorException("Unable to get a color from inputted string.")
+                }
+                return
+            }
+            "clearall" -> {
+                GlintCustomizer.glintColors.clear()
+                PersistentSave.markDirty<GlintCustomizer>()
+                EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("§aRemoved all your custom glint colors."))
+                return
+            }
+            "clear" -> {
+                GlintCustomizer.glintColors.remove(itemId)
+                PersistentSave.markDirty<GlintCustomizer>()
+                EssentialAPI.getMinecraftUtil()
+                    .sendMessage(UTextComponent("§aCleared the custom glint color for your item."))
+                return
+            }
+            else -> {
+                throw WrongUsageException("glintcustomize color <set/clearall/clear>")
             }
         }
     }

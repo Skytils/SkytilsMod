@@ -19,7 +19,6 @@ package skytils.skytilsmod.utils
 
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.world.WorldSettings
 import skytils.skytilsmod.Skytils.Companion.mc

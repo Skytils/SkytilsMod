@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.api.utils.Multithreading
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
@@ -204,7 +205,7 @@ class DungeonFeatures {
                         }
                         0 -> {
                             if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && (lividJob == null || lividJob?.isCancelled == true || lividJob?.isDone == true)) {
-                                lividJob = Skytils.threadPool.submit {
+                                lividJob = Multithreading.submit {
                                     while (mc.thePlayer.isPotionActive(Potion.blindness)) {
                                         Thread.sleep(10)
                                     }

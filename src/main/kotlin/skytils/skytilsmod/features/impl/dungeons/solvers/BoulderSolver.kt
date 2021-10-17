@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import com.google.common.collect.Lists
+import gg.essential.api.utils.Multithreading
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -113,7 +114,7 @@ class BoulderSolver {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if ((job == null || job?.isCancelled == true || job?.isDone == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
-                job = Skytils.threadPool.submit {
+                job = Multithreading.submit {
                     var foundBirch = false
                     var foundBarrier = false
                     for (potentialBarrier in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 68)) {

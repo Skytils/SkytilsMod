@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.mojang.authlib.exceptions.AuthenticationException
+import gg.essential.api.utils.Multithreading
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -201,7 +202,7 @@ object MayorInfo {
     }
 
     fun fetchMayorData() {
-        Skytils.threadPool.submit {
+        Multithreading.runAsync {
             val res = APIUtil.getJSONResponse(baseURL)
             if (res.has("name") && res.has("perks")) {
                 if (res["name"].asString == currentMayor || currentMayor == null || mayorPerks.size == 0) isLocal =
@@ -224,7 +225,7 @@ object MayorInfo {
     fun sendMayorData(mayor: String?, perks: HashSet<String>) {
         if (mayor == null || perks.size == 0) return
         if (lastSentData - System.currentTimeMillis() < 300000) lastSentData = System.currentTimeMillis()
-        Skytils.threadPool.submit {
+        Multithreading.runAsync {
             try {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
                 val url =
@@ -251,7 +252,7 @@ object MayorInfo {
     }
 
     fun fetchJerryData() {
-        Skytils.threadPool.submit {
+        Multithreading.runAsync {
             val res = APIUtil.getJSONResponse("$baseURL/jerry")
             if (res.has("nextSwitch") && res.has("mayor") && res.has("perks")) {
                 TickTask(1) {
@@ -264,7 +265,7 @@ object MayorInfo {
 
     fun sendJerryData(mayor: Mayor?, nextSwitch: Long) {
         if (mayor == null || nextSwitch <= System.currentTimeMillis()) return
-        Skytils.threadPool.submit {
+        Multithreading.runAsync {
             try {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
                 val url =

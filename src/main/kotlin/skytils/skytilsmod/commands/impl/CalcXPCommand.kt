@@ -18,20 +18,24 @@
 
 package skytils.skytilsmod.commands.impl
 
+import gg.essential.api.commands.Command
+import gg.essential.api.commands.DefaultHandler
+import gg.essential.api.commands.DisplayName
 import gg.essential.universal.UChat
-import net.minecraft.command.ICommandSender
-import net.minecraft.command.SyntaxErrorException
-import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
 
-object CalcXPCommand : BaseCommand("skytilscalcxp") {
+object CalcXPCommand : Command("skytilscalcxp") {
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        if (args.size != 3) throw SyntaxErrorException("invalid arguments")
-        val type = args[0].lowercase()
-        var starting = args[1].toIntOrNull() ?: 0
-        var ending = args[2].toIntOrNull() ?: 0
+    @DefaultHandler
+    fun handle(
+        @DisplayName("type") type: String,
+        @DisplayName("starting") start: String,
+        @DisplayName("ending") end: String
+    ) {
+        val type = type.lowercase()
+        var starting = start.toIntOrNull() ?: 0
+        var ending = end.toIntOrNull() ?: 0
         val xpMap = when {
             type.endsWith("_slayer") -> SkillUtils.slayerXp[type.substringBefore("_slayer")]
             type == "dungeons" -> SkillUtils.dungeoneeringXp

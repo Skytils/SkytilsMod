@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
@@ -31,7 +32,6 @@ import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
-import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.features.impl.handlers.Waypoint
@@ -104,7 +104,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         }.onLeftClick {
             mc.displayGuiScreen(null)
             TickTask(2) {
-                Skytils.displayScreen = WaypointShareGui()
+                EssentialAPI.getGuiUtil().openScreen(WaypointShareGui())
             }
         }
 

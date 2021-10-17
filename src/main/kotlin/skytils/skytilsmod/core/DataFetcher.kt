@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import com.google.gson.JsonObject
+import gg.essential.api.utils.Multithreading
 import gg.essential.universal.UChat
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
@@ -45,7 +46,7 @@ import kotlin.concurrent.fixedRateTimer
 object DataFetcher {
     private fun loadData(): Future<*> {
         val dataUrl = Skytils.config.dataURL
-        return Skytils.threadPool.submit {
+        return Multithreading.submit {
             try {
 
                 APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {

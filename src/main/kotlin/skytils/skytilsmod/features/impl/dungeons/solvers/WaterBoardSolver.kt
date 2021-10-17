@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import com.google.common.collect.ImmutableSet
+import gg.essential.api.utils.Multithreading
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLever
 import net.minecraft.client.Minecraft
@@ -56,7 +57,7 @@ class WaterBoardSolver {
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
             if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isDone == true)) {
-                job = Skytils.threadPool.submit {
+                job = Multithreading.submit {
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
                     if (Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54).any {

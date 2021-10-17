@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIText
@@ -65,7 +66,7 @@ class RequestUpdateGui : WindowScreen(newGuiScale = 2) {
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
-                Skytils.displayScreen = UpdateGui(true)
+                EssentialAPI.getGuiUtil().openScreen(UpdateGui(true))
             } childOf window
         SimpleButton("Update Later")
             .constrain {
@@ -74,7 +75,7 @@ class RequestUpdateGui : WindowScreen(newGuiScale = 2) {
                 width = 100.pixels()
                 height = 20.pixels()
             }.onMouseClick {
-                Skytils.displayScreen = UpdateGui(false)
+                EssentialAPI.getGuiUtil().openScreen(UpdateGui(false))
             } childOf window
         SimpleButton("Main Menu")
             .constrain {
@@ -84,7 +85,7 @@ class RequestUpdateGui : WindowScreen(newGuiScale = 2) {
                 height = 20.pixels()
             }.onMouseClick {
                 UpdateChecker.updateGetter.updateObj = null
-                Skytils.displayScreen = GuiMainMenu()
+                EssentialAPI.getGuiUtil().openScreen(GuiMainMenu())
             } childOf window
     }
 }

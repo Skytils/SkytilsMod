@@ -17,16 +17,20 @@
  */
 package skytils.skytilsmod.commands.impl
 
+import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.Utils
 
-object RepartyCommand : BaseCommand("reparty", listOf("rp")) {
+object RepartyCommand : CommandBase() {
+    override fun getCommandName(): String = "reparty"
+    override fun getCommandAliases(): List<String> = listOf("rp")
+    override fun getRequiredPermissionLevel() = 0
+    override fun getCommandUsage(sender: ICommandSender): String = "/reparty"
 
     @JvmField
     var gettingParty = false

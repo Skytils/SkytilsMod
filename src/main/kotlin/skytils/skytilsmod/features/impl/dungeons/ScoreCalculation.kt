@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.dungeons
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import gg.essential.api.utils.Multithreading
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.monster.EntityZombie
@@ -188,7 +189,7 @@ object ScoreCalculation {
                                     )
                         ) {
                             lastRoomScanPos = mc.thePlayer.position
-                            Skytils.threadPool.submit {
+                            Multithreading.runAsync {
                                 @Suppress("UNCHECKED_CAST")
                                 roomScanCallback(
                                     drmRoomScanMethod!!.invokeExact() as List<String>

@@ -19,6 +19,7 @@ package skytils.skytilsmod.utils
 
 import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
+import gg.essential.api.utils.Multithreading
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
@@ -221,8 +222,8 @@ fun AxisAlignedBB.isPosInside(pos: BlockPos): Boolean {
     return pos.x > this.minX && pos.x < this.maxX && pos.y > this.minY && pos.y < this.maxY && pos.z > this.minZ && pos.z < this.maxZ
 }
 
-fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
-    Skytils.displayScreen = this.gui()
+fun Vigilant.openGUI(): Future<*> = Multithreading.submit {
+    this.gui()
 }
 
 val EntityLivingBase.baseMaxHealth: Double

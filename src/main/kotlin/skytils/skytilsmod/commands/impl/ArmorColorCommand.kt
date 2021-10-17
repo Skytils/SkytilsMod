@@ -17,65 +17,80 @@
  */
 package skytils.skytilsmod.commands.impl
 
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
+import gg.essential.api.EssentialAPI
+import gg.essential.api.commands.Command
+import gg.essential.api.commands.DisplayName
+import gg.essential.api.commands.SubCommand
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
-import net.minecraft.util.ChatComponentText
-import skytils.skytilsmod.commands.BaseCommand
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.ArmorColor
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 
-object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "armorcolour", "armourcolor")) {
-    override fun getCommandUsage(sender: ICommandSender): String = "/armorcolor <clearall/clear/set>"
+object ArmorColorCommand : Command("armorcolor") {
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        val player = sender as EntityPlayerSP
-        if (args.isEmpty()) {
-            player.addChatMessage(ChatComponentText(getCommandUsage(sender)))
-            return
+    override val commandAliases: Set<Alias> = setOf(Alias("armourcolour"), Alias("armorcolour"), Alias("armourcolor"))
+
+    @SubCommand("clearall")
+    fun clearAll() {
+        handleClearAll()
+    }
+
+    fun handleClearAll() {
+        ArmorColor.armorColors.clear()
+        PersistentSave.markDirty<ArmorColor>()
+        EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("§aCleared all your custom armor colors!"))
+    }
+
+    @SubCommand("clear")
+    fun clear() {
+        handleClear()
+    }
+
+    fun handleClear() {
+        if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
+        val item = mc.thePlayer.heldItem
+            ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
+        if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
+        if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
+        val extraAttributes = ItemUtil.getExtraAttributes(item)
+        if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
+        val uuid = extraAttributes.getString("uuid")
+        if (ArmorColor.armorColors.containsKey(uuid)) {
+            ArmorColor.armorColors.remove(uuid)
+            PersistentSave.markDirty<ArmorColor>()
+            EssentialAPI.getMinecraftUtil()
+                .sendMessage(UTextComponent("§aCleared the custom color for your " + item.displayName + "§a!"))
+        } else EssentialAPI.getMinecraftUtil().sendMessage(UTextComponent("§cThat item doesn't have a custom color!"))
+    }
+
+    @SubCommand("set")
+    fun set(@DisplayName("hex color") hex: String) {
+        handleSet(hex)
+    }
+
+    fun handleSet(hex: String) {
+        if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
+        val item = mc.thePlayer.heldItem
+            ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
+        if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
+        if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
+        val extraAttributes = ItemUtil.getExtraAttributes(item)
+        if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
+        val uuid = extraAttributes.getString("uuid")
+        val color: CustomColor = try {
+            Utils.customColorFromString(hex)
+        } catch (e: IllegalArgumentException) {
+            throw SyntaxErrorException("Unable to get a color from inputted string.")
         }
-        val subcommand = args[0].lowercase()
-        if (subcommand == "clearall") {
-            ArmorColor.armorColors.clear()
-            PersistentSave.markDirty<ArmorColor>()
-            sender.addChatMessage(ChatComponentText("§aCleared all your custom armor colors!"))
-        } else if (subcommand == "clear") {
-            if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = sender.heldItem
-                ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            val extraAttributes = ItemUtil.getExtraAttributes(item)
-            if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
-            val uuid = extraAttributes.getString("uuid")
-            if (ArmorColor.armorColors.containsKey(uuid)) {
-                ArmorColor.armorColors.remove(uuid)
-                PersistentSave.markDirty<ArmorColor>()
-                sender.addChatMessage(ChatComponentText("§aCleared the custom color for your " + item.displayName + "§a!"))
-            } else sender.addChatMessage(ChatComponentText("§cThat item doesn't have a custom color!"))
-        } else if (subcommand == "set") {
-            if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = sender.heldItem
-                ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            val extraAttributes = ItemUtil.getExtraAttributes(item)
-            if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
-            if (args.size != 2) throw WrongUsageException("You must specify a valid hex color!")
-            val uuid = extraAttributes.getString("uuid")
-            val color: CustomColor = try {
-                Utils.customColorFromString(args[1])
-            } catch (e: IllegalArgumentException) {
-                throw SyntaxErrorException("Unable to get a color from inputted string.")
-            }
-            ArmorColor.armorColors[uuid] = color
-            PersistentSave.markDirty<ArmorColor>()
-            sender.addChatMessage(ChatComponentText("§aSet the color of your " + item.displayName + "§a to " + args[1] + "!"))
-        } else player.addChatMessage(ChatComponentText(getCommandUsage(sender)))
+        ArmorColor.armorColors[uuid] = color
+        PersistentSave.markDirty<ArmorColor>()
+        EssentialAPI.getMinecraftUtil()
+            .sendMessage(UTextComponent("§aSet the color of your " + item.displayName + "§a to " + hex + "!"))
     }
 }

@@ -17,8 +17,11 @@
  */
 package skytils.skytilsmod.commands.stats
 
+import gg.essential.api.commands.Command
+import gg.essential.api.commands.DefaultHandler
+import gg.essential.api.commands.DisplayName
+import gg.essential.api.utils.Multithreading
 import gg.essential.universal.wrappers.message.UMessage
-import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import skytils.hylin.mojang.AshconException
@@ -26,43 +29,41 @@ import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.commands.BaseCommand
 import java.util.*
 
 abstract class StatCommand(
-    name: String,
+    private val commandName: String,
     private val needApiKey: Boolean = true,
     private val needProfile: Boolean = true,
-    aliases: List<String> = emptyList()
+    aliases: Set<Alias> = emptySet()
 ) :
-    BaseCommand(name, aliases) {
-
+    Command(commandName, true) {
+    override val commandAliases: Set<Alias>? = aliases.ifEmpty { super.commandAliases }
     val key: String
         get() = Skytils.config.apiKey
 
-    override fun getCommandUsage(sender: ICommandSender): String = "/${this.commandName} [player]"
-
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    @DefaultHandler
+    fun handle(@DisplayName("username") name: String?) {
         if (needApiKey && key.isEmpty()) {
             printMessage("§cYou must have an API key set to use this command!")
             return
         }
-        Skytils.threadPool.submit {
-            val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
+        Multithreading.runAsync {
+            val username = if (name.isNullOrBlank()) mc.thePlayer.name else name
             printMessage("§aGetting data for ${username}...")
             val uuid = try {
-                (if (args.isEmpty()) mc.thePlayer.uniqueID else Skytils.hylinAPI.getUUIDSync(username))
+                (if (name.isNullOrBlank()) mc.thePlayer.uniqueID else Skytils.hylinAPI.getUUIDSync(username))
             } catch (e: AshconException) {
                 printMessage("§cFailed to get UUID, reason: ${e.message}")
-                return@submit
-            } ?: return@submit
+                return@runAsync
+            } ?: return@runAsync
             if (needProfile) {
                 val profile = try {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                 } catch (e: HypixelAPIException) {
                     printMessage("§cUnable to retrieve profile information: ${e.message}")
-                    return@submit
-                } ?: return@submit
+                    return@runAsync
+                } ?: return@runAsync
                 displayStats(username, uuid, profile)
             } else displayStats(username, uuid)
         }

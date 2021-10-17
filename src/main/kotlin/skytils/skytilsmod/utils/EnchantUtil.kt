@@ -19,7 +19,6 @@
 package skytils.skytilsmod.utils
 
 import com.google.gson.*
-import net.minecraft.nbt.NBTTagCompound
 import java.lang.reflect.Type
 
 object EnchantUtil {

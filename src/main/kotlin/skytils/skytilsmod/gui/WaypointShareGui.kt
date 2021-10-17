@@ -38,7 +38,6 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
 import org.apache.commons.codec.binary.Base64
-import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -253,7 +252,7 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
 
     override fun onScreenClose() {
         super.onScreenClose()
-        Skytils.displayScreen = WaypointsGui()
+        EssentialAPI.getGuiUtil().openScreen(WaypointsGui())
     }
 
     private data class Entry(

@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.events
 
+import gg.essential.api.utils.Multithreading
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
@@ -64,7 +65,7 @@ class GriffinBurrows {
 
         private val mc = Minecraft.getMinecraft()
         fun refreshBurrows(): Future<*> {
-            return Skytils.threadPool.submit {
+            return Multithreading.submit {
                 try {
                     println("Finding burrows")
                     val uuid = mc.thePlayer.gameProfile.id

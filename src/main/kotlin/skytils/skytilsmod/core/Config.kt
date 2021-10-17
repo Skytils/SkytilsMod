@@ -415,7 +415,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     @Suppress("unused")
     fun spiritLeapNameButton() {
-        Skytils.displayScreen = SpiritLeapNamesGui()
+        EssentialAPI.getGuiUtil().openScreen(SpiritLeapNamesGui())
     }
 
     @Property(

@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import com.google.gson.JsonObject
+import gg.essential.api.EssentialAPI
 import net.minecraft.client.gui.GuiMainMenu
 import net.minecraft.util.Util
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -30,7 +31,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.gui.UpdateGui
 import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.APIUtil.cm
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
 import java.io.File
@@ -133,7 +133,7 @@ object UpdateChecker {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
         if (UpdateGui.complete || UpdateGui.complete) return
-        Skytils.displayScreen = RequestUpdateGui()
+        EssentialAPI.getGuiUtil().openScreen(RequestUpdateGui())
     }
 
     class UpdateGetter : Runnable {
