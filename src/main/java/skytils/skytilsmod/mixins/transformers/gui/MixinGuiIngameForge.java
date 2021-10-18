@@ -24,6 +24,7 @@ import net.minecraftforge.client.GuiIngameForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import skytils.skytilsmod.mixins.hooks.gui.GuiIngameForgeHookKt;
 
@@ -41,5 +42,10 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
     @ModifyArgs(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"))
     private void modifyActionBarPosition(Args args) {
         GuiIngameForgeHookKt.modifyActionBarPosition(args);
+    }
+
+    @ModifyVariable(method = "renderHealth", at = @At(value = "STORE"), ordinal = 1, remap = false)
+    private float removeAbsorption(float absorption) {
+        return GuiIngameForgeHookKt.setAbsorptionAmount(absorption);
     }
 }

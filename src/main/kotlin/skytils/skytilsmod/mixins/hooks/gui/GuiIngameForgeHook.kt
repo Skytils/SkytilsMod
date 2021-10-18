@@ -43,3 +43,7 @@ fun modifyActionBarPosition(args: Args) {
         args.set(1, element.actualY + 4f)
     }
 }
+
+fun setAbsorptionAmount(amount: Float): Float {
+    return if (Utils.inSkyblock && Skytils.config.hideAbsorption) 0f else amount
+}

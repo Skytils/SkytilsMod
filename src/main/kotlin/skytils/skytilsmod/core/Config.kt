@@ -1359,6 +1359,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var enchantGlintFix = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Absorption Hearts",
+        description = "Prevents the game from rendering absorption hearts.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideAbsorption = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Air Display",
         description = "Prevents the game from rendering the air bubbles while underwater.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1434,6 +1441,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var highlightDungeonSellableItems = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Lower Enderman Nametags",
+        description = "Lowers the health and nametag of endermen so it's easier to see.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var lowerEndermanNametags = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Middle Click GUI Items",
@@ -1555,13 +1569,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var rareRelicFinder = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Lower Enderman Nametags",
-        description = "Lowers the health and nametag of endermen so it's easier to see.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var lowerEndermanNametags = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
