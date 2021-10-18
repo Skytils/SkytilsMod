@@ -214,7 +214,7 @@ class DungeonFeatures {
                                     UChat.chat("§bLivid block is ${color.name}")
                                     val a = when (color) {
                                         EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
-                                        EnumDyeColor.PINK -> EnumChatFormatting.LIGHT_PURPLE
+                                        EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
                                         EnumDyeColor.RED -> EnumChatFormatting.RED
                                         EnumDyeColor.SILVER -> EnumChatFormatting.GRAY
                                         EnumDyeColor.GRAY -> EnumChatFormatting.GRAY
