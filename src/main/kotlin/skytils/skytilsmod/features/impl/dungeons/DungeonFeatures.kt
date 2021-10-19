@@ -211,7 +211,6 @@ class DungeonFeatures {
                                     val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
                                     val color = state.getValue(BlockStainedGlass.COLOR)
                                     color as AccessorEnumDyeColor
-                                    UChat.chat("§bLivid block is ${color.name}")
                                     val a = when (color) {
                                         EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
                                         EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
@@ -230,8 +229,8 @@ class DungeonFeatures {
                                         if (entity !is EntityArmorStand) continue
                                         val fallBackColor = entity.name.startsWith("$otherColor﴾ $otherColor§lLivid")
                                         if ((a != null && entity.name.startsWith("$a﴾ $a§lLivid")) || fallBackColor) {
-                                            if (fallBackColor) {
-                                                UChat.chat("§bBlock color ${color.name} should be mapped to ${otherColor}. Please report this to discord.gg/skytils")
+                                            if (fallBackColor && !(a != null && entity.name.startsWith("$a﴾ $a§lLivid"))) {
+                                                UChat.chat("§bBlock color ${color.name} should be mapped to ${otherColor}${otherColor.name}§b. Please report this to discord.gg/skytils")
                                             }
                                             lividTag = entity
                                             val aabb = AxisAlignedBB(
