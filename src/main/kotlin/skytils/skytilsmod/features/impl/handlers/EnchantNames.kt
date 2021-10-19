@@ -25,9 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.DevTools
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 
 class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
@@ -78,7 +76,7 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
         return this
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         replacements.clear()
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for ((key, value) in obj.entrySet()) {
@@ -86,7 +84,7 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         for ((key, value) in replacements) {
             obj.addProperty(key, value)
@@ -94,7 +92,7 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 }

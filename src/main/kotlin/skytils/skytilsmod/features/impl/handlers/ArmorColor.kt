@@ -22,13 +22,11 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         armorColors.clear()
         val dataObject = gson.fromJson(reader, JsonObject::class.java)
         for ((key, value) in dataObject.entrySet()) {
@@ -37,7 +35,7 @@ class ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         for ((key, value) in armorColors) {
             obj.addProperty(key, value.toString())
@@ -45,7 +43,7 @@ class ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 

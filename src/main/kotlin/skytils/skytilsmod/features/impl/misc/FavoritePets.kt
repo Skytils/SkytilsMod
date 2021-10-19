@@ -36,9 +36,7 @@ import skytils.skytilsmod.utils.ItemRarity
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -156,7 +154,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         }"
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         favorited.clear()
         val data = gson.fromJson(reader, JsonArray::class.java)
         for (value in data) {
@@ -164,7 +162,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val arr = JsonArray()
         for (value in favorited) {
             arr.add(JsonPrimitive(value))
@@ -172,7 +170,7 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         gson.toJson(arr, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonArray(), writer)
     }
 

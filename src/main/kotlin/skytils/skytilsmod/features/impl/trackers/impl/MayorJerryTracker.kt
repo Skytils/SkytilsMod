@@ -32,8 +32,8 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.stripControlCodes
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 object MayorJerryTracker : Tracker("mayorjerry") {
 
@@ -125,7 +125,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         JerryBoxDrops.values().onEach { it.droppedAmount = 0L }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for (entry in obj.get("jerry").asJsonObject.entrySet()) {
             (HiddenJerry.getFromType(entry.key) ?: continue).discoveredTimes = entry.value.asLong
@@ -135,7 +135,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
 
         val jerryObj = JsonObject()
@@ -151,7 +151,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
     }
 
     init {

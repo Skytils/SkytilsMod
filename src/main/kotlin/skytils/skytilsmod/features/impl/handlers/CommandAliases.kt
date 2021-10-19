@@ -24,9 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 import java.util.*
 
 class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
@@ -58,7 +56,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
         }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         aliases.clear()
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for ((key, value) in obj.entrySet()) {
@@ -66,7 +64,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         for ((key, value) in aliases) {
             obj.addProperty(key, value)
@@ -74,7 +72,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 

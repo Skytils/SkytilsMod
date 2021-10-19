@@ -22,8 +22,8 @@ import com.google.gson.Gson
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KClass
 
@@ -34,11 +34,11 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
     val gson: Gson = Skytils.gson
     val mc: Minecraft = Skytils.mc
 
-    abstract fun read(reader: FileReader)
+    abstract fun read(reader: InputStreamReader)
 
-    abstract fun write(writer: FileWriter)
+    abstract fun write(writer: OutputStreamWriter)
 
-    abstract fun setDefault(writer: FileWriter)
+    abstract fun setDefault(writer: OutputStreamWriter)
 
     private fun readSave() {
         try {
@@ -46,13 +46,13 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
                 this.saveFile.parentFile.mkdirs()
                 this.saveFile.createNewFile()
             }
-            FileReader(this.saveFile).use {
+            this.saveFile.reader().use {
                 read(it)
             }
         } catch (e: Exception) {
             e.printStackTrace()
             try {
-                FileWriter(this.saveFile).use {
+                this.saveFile.writer().use {
                     setDefault(it)
                 }
             } catch (ex: Exception) {
@@ -67,7 +67,7 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
                 this.saveFile.parentFile.mkdirs()
                 this.saveFile.createNewFile()
             }
-            FileWriter(this.saveFile).use { writer ->
+            this.saveFile.writer().use { writer ->
                 write(writer)
             }
             dirty = false

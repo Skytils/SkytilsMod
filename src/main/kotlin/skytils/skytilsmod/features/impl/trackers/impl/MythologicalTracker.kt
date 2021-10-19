@@ -40,8 +40,8 @@ import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.util.regex.Pattern
 import kotlin.math.pow
 
@@ -242,7 +242,7 @@ class MythologicalTracker : Tracker("mythological") {
         BurrowMob.values().forEach { it.dugTimes = 0L }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         burrowsDug = obj.get("dug").asLong
         for (entry in obj.get("items").asJsonObject.entrySet()) {
@@ -253,7 +253,7 @@ class MythologicalTracker : Tracker("mythological") {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
 
         obj.addProperty("dug", burrowsDug)
@@ -272,7 +272,7 @@ class MythologicalTracker : Tracker("mythological") {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
     }
 
     companion object {

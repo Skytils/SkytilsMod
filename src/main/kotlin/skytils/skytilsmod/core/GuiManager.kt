@@ -35,9 +35,7 @@ import skytils.skytilsmod.events.impl.RenderHUDEvent
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     private var counter = 0
@@ -199,7 +197,7 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
             GUIPOSITIONS[key] = FloatPair(
                 value.asJsonObject["x"].asFloat,
@@ -209,7 +207,7 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val data = JsonObject()
         for ((key, value) in names) {
             GUIPOSITIONS[key] = value.pos
@@ -223,7 +221,7 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         gson.toJson(data, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 

@@ -34,9 +34,7 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 import kotlin.math.floor
 import kotlin.time.ExperimentalTime
 
@@ -112,7 +110,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         itemCooldowns.clear()
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for ((key, value) in obj.entrySet()) {
@@ -120,7 +118,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         for ((key, value) in itemCooldowns) {
             obj.addProperty(key, value)
@@ -128,7 +126,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 

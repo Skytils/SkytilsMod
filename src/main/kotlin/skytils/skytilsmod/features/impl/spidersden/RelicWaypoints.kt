@@ -36,8 +36,8 @@ import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class RelicWaypoints : Tracker("found_spiders_den_relics") {
     @SubscribeEvent
@@ -131,7 +131,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
         foundRelics.clear()
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         foundRelics.clear()
         for (serializedPosition in gson.fromJson(reader, JsonArray::class.java).asJsonArray.map { it.asString }) {
             val parts = serializedPosition.split(",".toRegex()).toTypedArray()
@@ -139,7 +139,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val arr = JsonArray()
         for (found in foundRelics) {
             arr.add(JsonPrimitive(found.x.toString() + "," + found.y + "," + found.z))
@@ -147,7 +147,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
         gson.toJson(arr, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonArray(), writer)
     }
 

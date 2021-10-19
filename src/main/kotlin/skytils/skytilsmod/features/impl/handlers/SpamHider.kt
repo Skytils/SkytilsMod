@@ -41,16 +41,14 @@ import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         filters.clear()
         val obj = gson.fromJson(reader, JsonObject::class.java)
         if (!obj["default"].isJsonNull) {
@@ -66,7 +64,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         val defaultObj = JsonObject()
         repoFilters.forEach {
@@ -85,7 +83,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         val obj = JsonObject()
         obj.add("default", JsonObject())
         obj.add("filter", JsonObject())

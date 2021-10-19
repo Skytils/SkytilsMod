@@ -27,9 +27,7 @@ import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     @SubscribeEvent
@@ -50,7 +48,7 @@ class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
         }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         shortcuts.clear()
         val data = gson.fromJson(reader, JsonObject::class.java)
         for ((key, value) in data.entrySet()) {
@@ -58,7 +56,7 @@ class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         for ((key, value) in shortcuts) {
             obj.addProperty(key, value)
@@ -66,7 +64,7 @@ class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 

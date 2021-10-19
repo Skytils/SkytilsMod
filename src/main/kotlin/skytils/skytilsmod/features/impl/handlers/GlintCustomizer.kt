@@ -23,13 +23,11 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")) {
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         overrides.clear()
         glintColors.clear()
         for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
@@ -44,7 +42,7 @@ class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.js
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         for ((key, value) in overrides) {
             val child = JsonObject()
@@ -64,7 +62,7 @@ class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.js
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonObject(), writer)
     }
 

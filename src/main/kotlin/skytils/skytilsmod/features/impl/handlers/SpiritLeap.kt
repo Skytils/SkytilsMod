@@ -36,9 +36,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 import java.util.*
 import java.util.regex.Pattern
 
@@ -155,7 +153,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for (entry in obj["classes"].asJsonObject.entrySet()) {
             classes[DungeonListener.DungeonClass.getClassFromName(entry.key)] =
@@ -167,7 +165,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val obj = JsonObject()
         val classes = JsonObject()
         for (dClass in Companion.classes) {
@@ -188,6 +186,6 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         gson.toJson(obj, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
     }
 }

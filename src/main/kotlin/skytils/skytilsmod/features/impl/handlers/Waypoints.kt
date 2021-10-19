@@ -32,9 +32,7 @@ import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
 
@@ -47,7 +45,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         }
     }
 
-    override fun read(reader: FileReader) {
+    override fun read(reader: InputStreamReader) {
         waypoints.clear()
         val arr = gson.fromJson(reader, JsonArray::class.java)
         arr.mapNotNullTo(waypoints) { e ->
@@ -68,7 +66,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         }
     }
 
-    override fun write(writer: FileWriter) {
+    override fun write(writer: OutputStreamWriter) {
         val arr = JsonArray()
         waypoints.forEach {
             arr.add(JsonObject().apply {
@@ -84,7 +82,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         gson.toJson(arr, writer)
     }
 
-    override fun setDefault(writer: FileWriter) {
+    override fun setDefault(writer: OutputStreamWriter) {
         gson.toJson(JsonArray(), writer)
     }
 
