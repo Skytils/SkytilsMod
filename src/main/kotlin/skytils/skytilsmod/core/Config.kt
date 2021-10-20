@@ -25,11 +25,14 @@ import gg.essential.vigilance.data.Property
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.data.SortingBehavior
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.LoaderState
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import java.awt.Color
 import java.io.File
 import java.net.URI
@@ -110,7 +113,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Override other reparty commands",
-        description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to work",
+        description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to disable",
         category = "General", subcategory = "Reparty"
     )
     var overrideReparty = true
@@ -2266,7 +2269,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
         registerListener("protectItemBINThreshold") { threshold: String ->
             TickTask(1) {
-                val numeric = threshold.replace(Regex("[^0-9]"), "")
+                val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
             }
         }
@@ -2289,6 +2292,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                         }
                     }
                 }
+            }
+        }
+
+        registerListener("overrideReparty") { state: Boolean ->
+            if (state) {
+                (ClientCommandHandler.instance as AccessorCommandHandler).commandMap["reparty"] = RepartyCommand
+                (ClientCommandHandler.instance as AccessorCommandHandler).commandMap["rp"] = RepartyCommand
             }
         }
 

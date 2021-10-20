@@ -21,11 +21,10 @@ import gg.essential.universal.UChat
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.Utils
 
-object RepartyCommand : BaseCommand("reparty", listOf("rp")) {
+object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
 
     @JvmField
     var gettingParty = false
