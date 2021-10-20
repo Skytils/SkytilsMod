@@ -17,9 +17,9 @@
  */
 package skytils.skytilsmod.listeners
 
+import gg.essential.universal.UChat
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
-import net.minecraft.util.StringUtils.stripControlCodes
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -29,41 +29,43 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
+import kotlin.concurrent.thread
 
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
-        val unformatted = stripControlCodes(event.message.unformattedText)
-        if (unformatted.startsWith("Your new API key is ")) {
+        val formatted = event.message.formattedText
+        val unformatted = formatted.stripControlCodes()
+        if (unformatted.startsWith("Your new API key is ") && event.message.siblings.size >= 1) {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
             Skytils.config.apiKey = apiKey
             Skytils.hylinAPI.key = Skytils.config.apiKey
             Skytils.config.markDirty()
-            mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils updated your set Hypixel API key to " + EnumChatFormatting.DARK_GREEN + apiKey))
+            UChat.chat("§aSkytils updated your set Hypixel API key to §2${apiKey}")
         }
         if (Skytils.config.autoReparty) {
-            if (unformatted.contains("has disbanded the party!")) {
+            if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
                 val matcher = playerPattern.matcher(unformatted)
                 if (matcher.find()) {
                     lastPartyDisbander = matcher.group(1)
                     println("Party disbanded by $lastPartyDisbander")
-                    rejoinThread = Thread {
-                        if (Skytils.config.autoRepartyTimeout == 0) return@Thread
+                    rejoinThread = thread {
+                        if (Skytils.config.autoRepartyTimeout == 0) return@thread
                         try {
                             println("waiting for timeout")
-                            Thread.sleep((Skytils.config.autoRepartyTimeout * 1000).toLong())
+                            Thread.sleep(Skytils.config.autoRepartyTimeout * 1000L)
                             lastPartyDisbander = ""
                             println("cleared last party disbander")
                         } catch (e: Exception) {
                         }
                     }
-                    rejoinThread!!.start()
                     return
                 }
             }
-            if (unformatted.contains("You have 60 seconds to accept") && lastPartyDisbander.isNotEmpty() && event.message.siblings.size > 0) {
+            if (unformatted.contains("You have 60 seconds to accept") && lastPartyDisbander.isNotEmpty() && event.message.siblings.size >= 7) {
                 val acceptMessage = event.message.siblings[6].chatStyle
                 if (acceptMessage.chatHoverEvent.value.unformattedText.contains(lastPartyDisbander)) {
                     Skytils.sendMessageQueue.add("/p accept $lastPartyDisbander")
