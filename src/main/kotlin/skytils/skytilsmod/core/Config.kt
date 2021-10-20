@@ -1682,7 +1682,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Finds your slayer based on the one you hit the most.",
         category = "Slayer", subcategory = "General"
     )
-    var useSlayerHitMethod = false
+    var useSlayerHitMethod = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Ping when in Atoned Horror Danger Zone",
@@ -1776,12 +1776,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showSeraphDisplay = false
 
 
-    @Property(
+/*    @Property(
         PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
         description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
         category = "Slayer", subcategory = "Voidgloom Seraph"
-    )
-    var experimentalYangGlyphDetection = false
+    )*/
+    var experimentalYangGlyphDetection = true
 
     @Property(
         PropertyType.SWITCH, name = "Yang Glyph Ping",
