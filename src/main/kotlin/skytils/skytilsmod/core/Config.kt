@@ -2225,7 +2225,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "dungeonChestProfit",
             "showCoinsPerBit",
             "protectItemBINThreshold"
-        ).forEach { propertyName -> addDependency(propertyName, "fetchLowestBINPrices") }
+        ).forEach { propertyName ->
+            addDependency(propertyName, "fetchLowestBINPrices")
+            registerListener(propertyName) { prop: Any ->
+                if (prop is Boolean && prop) fetchLowestBINPrices = true
+            }
+        }
 
         addDependency("showNextBlaze", "blazeSolver")
         addDependency("lowestBlazeColor", "blazeSolver")
@@ -2271,6 +2276,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             TickTask(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
+                if (protectItemBINThreshold != "0") fetchLowestBINPrices = true
+                markDirty()
             }
         }
 
