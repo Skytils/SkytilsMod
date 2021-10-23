@@ -20,6 +20,7 @@ package skytils.skytilsmod.mixins.transformers.neu;
 
 import net.minecraft.client.shader.Framebuffer;
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,14 +35,16 @@ public class MixinStorageOverlay {
     @Shadow(remap = false)
     private Framebuffer framebuffer;
 
-    @SuppressWarnings({"UnresolvedMixinReference", "UnqualifiedMemberReference"})
+    @SuppressWarnings({"UnqualifiedMemberReference"})
+    @Dynamic
     @Inject(
         method = "render",
         at = @At(
             value = "FIELD",
             target = "Lio/github/moulberry/notenoughupdates/miscgui/StorageOverlay;framebuffer",
             shift = At.Shift.AFTER,
-            opcode = Opcodes.PUTFIELD
+            opcode = Opcodes.PUTFIELD,
+            remap = false
         ),
         remap = false
     )

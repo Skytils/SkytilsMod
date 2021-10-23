@@ -36,7 +36,7 @@ fun insertReceivePacketEvent() = modify("net/minecraft/network/PacketThreadUtil$
             invokeStatic(
                 "skytils/skytilsmod/asm/transformers/PacketThreadUtilTransformer",
                 "postEvent",
-                "(Lnet/minecraft/network/INetHandler;Lnet/minecraft/network/Packet;)Z)"
+                "(Lnet/minecraft/network/INetHandler;Lnet/minecraft/network/Packet;)Z"
             ) {
                 aload(0)
                 getField("net/minecraft/network/PacketThreadUtil$1", netHandler.name, netHandler.desc)
