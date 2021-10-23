@@ -50,6 +50,7 @@ class SkytilsTransformer : BaseClassTransformer() {
                 injectSplashProgressTransformer()
                 changeRenderedName()
                 insertReceivePacketEvent()
+                injectNullCheck()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
