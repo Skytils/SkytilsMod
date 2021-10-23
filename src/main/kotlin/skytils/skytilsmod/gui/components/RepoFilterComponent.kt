@@ -69,7 +69,7 @@ class RepoFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UIComp
     } childOf textBoundingBox
 
     init {
-        UIWrappedText("${filter.type.name.toTitleCase()} ${filter.pattern}")
+        UIWrappedText("${filter.type.name.toTitleCase()} ${filter.regex.pattern}")
             .constrain {
                 y = SiblingConstraint() + 3.pixels()
                 width = basicWidthConstraint {

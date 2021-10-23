@@ -109,12 +109,12 @@ class CustomFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UICo
                 height = basicHeightConstraint { this.getTextScale() * 10 }
             } childOf textBoundingBox
 
-        filterPattern.setText(filter.pattern.replace("§", "¶"))
+        filterPattern.setText(filter.regex.pattern.replace("§", "¶"))
         filterPattern.onMouseClick {
             grabWindowFocus()
         }.onFocusLost {
             if ((this as UITextInput).getText() == "") return@onFocusLost
-            filter.pattern = this.getText().replace("¶", "§")
+            filter.regex = this.getText().replace("¶", "§").toRegex()
         }
 
         val skyblockOnly by CheckboxComponent(filter.skyblockOnly)

@@ -44,6 +44,7 @@ import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
 import java.io.*
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.HashSet
 import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
@@ -68,6 +69,8 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         val obj = JsonObject()
         val defaultObj = JsonObject()
         repoFilters.forEach {
+            @Suppress("SENSELESS_COMPARISON")
+            if (it == null) return@forEach
             val json = JsonObject()
             json.addProperty("name", it.name)
             json.addProperty("state", it.state)
@@ -94,17 +97,10 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         var name: String,
         var state: Int,
         var skyblockOnly: Boolean,
-        private val initialPattern: String,
+        var regex: Regex,
         var type: FilterType,
         var formatted: Boolean
     ) {
-        var pattern: String = initialPattern
-            set(value) {
-                field = value
-                regex = Regex(value)
-            }
-        var regex = Regex(pattern)
-
         fun check(input: String): Boolean {
             return this.type.method(input, regex)
         }
@@ -124,8 +120,8 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
         }
 
-        val filters = ArrayList<Filter>()
-        val repoFilters = ArrayList<Filter>()
+        val filters = HashSet<Filter>()
+        val repoFilters = HashSet<Filter>()
 
         private fun newMessage(message: String) {
             spamMessages.add(SpamMessage(message, 0, 0.0))
@@ -643,6 +639,8 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     private fun checkFilter(filter: Filter, formatted: String, unformatted: String, event: ReceiveEvent): Boolean {
+        @Suppress("SENSELESS_COMPARISON")
+        if (filter == null) return false
         runCatching {
             if (filter.skyblockOnly && !Utils.inSkyblock) return false
             if (filter.check(if (filter.formatted) formatted else unformatted) && filter.state > 0) {
@@ -652,9 +650,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }.onFailure {
             UChat.chat("§cSkytils ran into an error whilst checking your Spam Hider filters. Please send your logs to discord.gg/skytils.")
             println("A ${it::class.simpleName} was thrown while checking Spam Hider Filter:")
-            println("Spam Filter: ${filter}")
-            println("Formatted Text: ${formatted}")
-            println("Unformatted Text: ${unformatted}")
+            println("Spam Filter: $filter")
+            println("Formatted Text: $formatted")
+            println("Unformatted Text: $unformatted")
             it.printStackTrace()
         }
         return false

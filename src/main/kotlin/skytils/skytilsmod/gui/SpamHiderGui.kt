@@ -42,7 +42,7 @@ class SpamHiderGui : WindowScreen() {
     val configHiders = Skytils.config.getCategories()
         .flatMap { category ->
             category.items.filter { item ->
-                item is PropertyItem && item.data.getDataType() == PropertyType.SELECTOR && item.data.attributes.category == "Spam"
+                item is PropertyItem && item.data.getDataType() == PropertyType.SELECTOR && item.data.attributesExt.category == "Spam"
             }
         } as List<PropertyItem>
 
@@ -219,7 +219,7 @@ class SpamHiderGui : WindowScreen() {
         Skytils.config.getCategories()
             .flatMap { category ->
                 category.items.filter { item ->
-                    item is PropertyItem && item.data.attributes.name == "Toast Time"
+                    item is PropertyItem && item.data.attributesExt.name == "Toast Time"
                 }
             }.first().toSettingsObject()!!
             .constrain {
@@ -229,7 +229,7 @@ class SpamHiderGui : WindowScreen() {
             } childOf toastTimeContainer
 
         // Show toast config options
-        configHiders.filter { it.data.attributes.options.contains("Toasts") }
+        configHiders.filter { it.data.attributesExt.options.contains("Toasts") }
             .forEach { property ->
                 val container = UIContainer()
                     .constrain {
@@ -257,7 +257,7 @@ class SpamHiderGui : WindowScreen() {
         Skytils.config.getCategories()
             .flatMap { category ->
                 category.items.filter { item ->
-                    item is PropertyItem && item.data.attributes.name == "Compact Building Tools"
+                    item is PropertyItem && item.data.attributesExt.name == "Compact Building Tools"
                 }
             }.first().toSettingsObject()!!
             .constrain {
@@ -267,7 +267,7 @@ class SpamHiderGui : WindowScreen() {
             } childOf compactBuildingToolsContainer
 
         // Show legacy hiders
-        configHiders.filter { !it.data.attributes.options.contains("Toasts") }
+        configHiders.filter { !it.data.attributesExt.options.contains("Toasts") }
             .forEach { propertyItem ->
                 val container = UIContainer()
                     .constrain {
@@ -286,6 +286,8 @@ class SpamHiderGui : WindowScreen() {
 
         // Show Repo Hiders
         SpamHider.repoFilters.forEach { filter ->
+            @Suppress("SENSELESS_COMPARISON")
+            if (filter == null) return@forEach
             val container = UIContainer()
                 .constrain {
                     x = CenterConstraint()
@@ -354,7 +356,8 @@ class SpamHiderGui : WindowScreen() {
             } childOf customHiders
 
         addCustomHider.onMouseClick {
-            val filter = SpamHider.Filter("New Filter", 0, true, "Pattern", SpamHider.FilterType.STARTSWITH, true)
+            val filter =
+                SpamHider.Filter("New Filter", 0, true, "Pattern".toRegex(), SpamHider.FilterType.STARTSWITH, true)
             SpamHider.filters.add(filter)
             val container = UIContainer()
                 .constrain {

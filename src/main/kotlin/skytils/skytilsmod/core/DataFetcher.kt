@@ -132,7 +132,7 @@ object DataFetcher {
                 APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").mapTo(SpamHider.repoFilters) {
                     it as JsonObject
                     SpamHider.Filter(
-                        it["name"].asString, 0, true, it["pattern"].asString, when (it["type"].asString) {
+                        it["name"].asString, 0, true, it["pattern"].asString.toRegex(), when (it["type"].asString) {
                             "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
                             "CONTAINS" -> SpamHider.FilterType.CONTAINS
                             "REGEX" -> SpamHider.FilterType.REGEX
