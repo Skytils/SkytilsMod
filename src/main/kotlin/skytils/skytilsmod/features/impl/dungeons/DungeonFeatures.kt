@@ -125,8 +125,9 @@ class DungeonFeatures {
                         }
                     }
                     is S0CPacketSpawnPlayer -> {
-                        if (lastLitUpTime != -1L) {
+                        if (lastLitUpTime != -1L && packet.player.version() == 2) {
                             printDevMessage("spawn ${System.currentTimeMillis() - lastLitUpTime}", "spiritbear")
+                            lastLitUpTime = -1L
                         }
                     }
                 }
@@ -592,7 +593,7 @@ class DungeonFeatures {
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
-                    "Spirit Bear ${(lastLitUpTime + 3400 - System.currentTimeMillis()) / 1000f}",
+                    "Spirit Bear ${(lastLitUpTime + 3400 - System.currentTimeMillis()) / 1000f}s",
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     CommonColors.PURPLE,
@@ -607,7 +608,7 @@ class DungeonFeatures {
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "Spirit Bear: 3400ms",
+                "Spirit Bear: 3.4s",
                 if (leftAlign) 0f else 0f + width,
                 0f,
                 CommonColors.PURPLE,
@@ -619,7 +620,7 @@ class DungeonFeatures {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Spirit Bear: 3400ms")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Spirit Bear: 3.4s")
 
         override val toggled: Boolean
             get() = Skytils.config.spiritBearTimer
