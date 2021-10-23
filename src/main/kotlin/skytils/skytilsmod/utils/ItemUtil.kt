@@ -215,12 +215,4 @@ object ItemUtil {
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
-
-    fun removeEnchants(item: ItemStack): ItemStack {
-        val nbt = item.tagCompound ?: return item
-        if (!nbt.hasKey("ench", 9)) return item
-        nbt.removeTag("ench")
-        item.tagCompound = nbt
-        return item
-    }
 }

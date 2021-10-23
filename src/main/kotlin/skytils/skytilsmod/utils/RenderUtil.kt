@@ -32,8 +32,10 @@ import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.mixins.hooks.renderer.skipGlint
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import java.awt.Color
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -46,6 +48,7 @@ object RenderUtil {
     private val RARITY4 = ResourceLocation("skytils", "gui/rarity4.png")
     private val CUSTOMRARITY = ResourceLocation("skytils", "gui/customrarity.png")
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+    private val mutex = ReentrantLock()
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -475,7 +478,11 @@ object RenderUtil {
             if (!Skytils.config.showPetRarity && ItemUtil.isPet(itemStack)) {
                 return
             } else {
-                renderRarity(xPos, yPos, itemStack)
+                if (!mutex.isLocked) {
+                    mutex.lock()
+                    renderRarity(xPos, yPos, itemStack)
+                    mutex.unlock()
+                }
             }
         }
     }
@@ -560,24 +567,25 @@ object RenderUtil {
 
                 val scale: Double = 1.2
                 GlStateManager.translate(
-                    xPos.toFloat() - scale * scale,
-                    yPos.toFloat() - scale * scale,
+                    xPos.toDouble(),
+                    yPos.toDouble(),
                     0.0
                 )
-                GlStateManager.scale(scale, scale, 0.0)
-                renderItem(ItemUtil.removeEnchants(itemStack.copy().also { it.tagCompound.setBoolean("ignoreForRarity", true) }), 0, 0)
 
-                GlStateManager.scale(1 / scale, 1 / scale, 0.0)
-                GL11.glColorMask(true, true, true, false)
+                GlStateManager.pushMatrix()
+                GlStateManager.translate(8.0, 8.0, 0.0)
+                GlStateManager.scale(scale, scale, 0.0)
+                GlStateManager.translate(-8.0, -8.0, 0.0)
+                skipGlint = true
+                renderItem(itemStack, 0, 0)
+                skipGlint = false
+                GlStateManager.popMatrix()
+
+                GL11.glColorMask(true, true, true, true)
 
                 GL11.glStencilMask(0x00) // Writing = OFF
                 GL11.glStencilFunc(GL11.GL_NOTEQUAL, 0, 0xFF) // Anything that wasn't defined above will not be rendered.
                 //Anything rendered here will be cut if goes beyond frame defined before.
-                GlStateManager.translate(
-                    scale - 1,
-                    scale - 1,
-                    0.0
-                )
                 Gui.drawRect(
                     1, 1, 17, 17,
                     Color(

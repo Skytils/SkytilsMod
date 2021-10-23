@@ -50,4 +50,11 @@ public abstract class MixinRenderItem {
         RenderItemHookKt.modifyGlintRendering(stack, model, ci);
     }
 
+    @Inject(method = "renderEffect", at = @At("HEAD"), cancellable = true)
+    public void onRenderEffect(CallbackInfo ci) {
+        if (RenderItemHookKt.getSkipGlint()) {
+            ci.cancel();
+        }
+    }
+
 }
