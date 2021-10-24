@@ -148,9 +148,9 @@ object MayorInfo {
             ) {
                 val slot = event.slot
                 val item = slot.stack
-                if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || currentMayor == null && item.displayName.contains(
+                if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || (currentMayor == null && item.displayName.contains(
                         "Mayor "
-                    ) && !item.displayName.contains("Election"))
+                    ) && !item.displayName.contains("Election")))
                 ) {
                     if (currentMayor == null) {
                         isLocal = true
@@ -160,7 +160,7 @@ object MayorInfo {
                     }
                     val color = item.displayName.substring(0, 2)
                     val lore = ItemUtil.getItemLore(item)
-                    if (lore.contains("§8Perks List") && lore.contains("§7The listed perks are")) {
+                    if (lore.contains("§8Perks List") && (lore.contains("§7The listed perks are") || lore.contains("§7This perk is available to all"))) {
                         val perks = HashSet<String>()
                         for (line in lore) {
                             if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {

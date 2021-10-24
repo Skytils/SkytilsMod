@@ -601,6 +601,8 @@ class SlayerFeatures {
                         nukekebiHeads.clear()
                         lastYangGlyphSwitch = -1L
                         lastYangGlyphSwitchTicks = -1
+                        yangGlyph = null
+                        yangGlyphEntity = null
                     }
                 }
             }
