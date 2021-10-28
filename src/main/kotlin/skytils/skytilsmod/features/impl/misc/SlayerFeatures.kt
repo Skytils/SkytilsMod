@@ -385,7 +385,7 @@ class SlayerFeatures {
                 val y = head.posY - viewerY
                 val z = head.posZ - viewerZ
                 drawFilledBoundingBox(
-                    AxisAlignedBB(x, y, z, x + 0.5, y + 1.975, z + 0.5),
+                    AxisAlignedBB(x - 0.25, y + 0.5, z - 0.25, x + 0.25, y + 1.5, z + 0.25),
                     Skytils.config.nukekebiHeadColor,
                     1f
                 )
