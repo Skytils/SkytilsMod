@@ -36,7 +36,6 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -53,7 +52,8 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.GuiRenderItemEvent
-import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
@@ -68,6 +68,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 import java.util.regex.Pattern
+import kotlin.math.pow
 
 class ItemFeatures {
 
@@ -361,53 +362,40 @@ class ItemFeatures {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
+    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock || mc.theWorld == null) return
-        try {
-            if (event.packet is S2APacketParticles) {
-                val packet = event.packet
-                val type = packet.particleType
-                val longDistance = packet.isLongDistance
-                val count = packet.particleCount
-                val speed = packet.particleSpeed
-                val xOffset = packet.xOffset
-                val yOffset = packet.yOffset
-                val zOffset = packet.zOffset
-                val x = packet.xCoordinate
-                val y = packet.yCoordinate
-                val z = packet.zCoordinate
-                val pos = Vec3(x, y, z)
+        event.packet.apply {
+            if (this is S2APacketParticles) {
                 if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
-                    if (longDistance && count == 8 && speed == 8f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                        for (player in mc.theWorld.playerEntities) {
-                            if (pos.squareDistanceTo(Vec3(player.posX, player.posY, player.posZ)) <= 11 * 11) {
-                                val item = player.heldItem
-                                if (item != null) {
-                                    val itemName = getDisplayName(item).stripControlCodes()
-                                    if (itemName.contains("Necron's Blade") || itemName.contains("Scylla") || itemName.contains(
-                                            "Astraea"
-                                        ) || itemName.contains("Hyperion") || itemName.contains("Valkyrie")
-                                    ) {
-                                        event.isCanceled = true
-                                        break
-                                    }
-                                }
-                            }
+                    if (isLongDistance && count == 8 && speed == 8f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
+                        val dist = (if (DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
+                                DungeonFeatures.dungeonFloor,
+                                "F7",
+                                "M7"
+                            )
+                        ) 4f else 11f).pow(2f)
+
+                        if (mc.theWorld.playerEntities.any {
+                                it.uniqueID.version() == 4 && it.getDistanceSq(
+                                    x,
+                                    y,
+                                    z
+                                ) <= dist && getDisplayName(it.heldItem).stripControlCodes().containsAny(
+                                    "Necron's Blade", "Scylla", "Astraea", "Hyperion", "Valkyrie"
+                                )
+                            }) {
+                            event.isCanceled = true
                         }
                     }
                 }
             }
-        } catch (e: ConcurrentModificationException) {
-            e.printStackTrace()
-        }
-        if (event.packet is S2FPacketSetSlot && event.packet.func_149175_c() == 0) {
-            Utils.checkThreadAndQueue {
-                if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return@checkThreadAndQueue
-                val slot = event.packet.func_149173_d()
+            if (this is S2FPacketSetSlot && func_149175_c() == 0) {
+                if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return
+                val slot = func_149173_d()
 
-                val item = event.packet.func_149174_e() ?: return@checkThreadAndQueue
-                val extraAttr = getExtraAttributes(item) ?: return@checkThreadAndQueue
-                val itemId = getSkyBlockItemID(extraAttr) ?: return@checkThreadAndQueue
+                val item = func_149174_e() ?: return
+                val extraAttr = getExtraAttributes(item) ?: return
+                val itemId = getSkyBlockItemID(extraAttr) ?: return
 
                 if (itemId == "ARROW_SWAPPER") {
                     selectedArrow = getItemLore(item).find {

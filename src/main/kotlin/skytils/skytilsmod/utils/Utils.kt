@@ -34,10 +34,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.MathHelper
-import net.minecraft.util.Vec3
+import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import org.objectweb.asm.tree.MethodInsnNode
@@ -299,3 +297,21 @@ val MethodInsnNode.descriptor: Descriptor
     )
 
 fun <T : Any> Map<T, T>.getOrSelf(key: T): T = this.getOrDefault(key, key)
+
+val S2APacketParticles.x
+    get() = this.xCoordinate
+
+val S2APacketParticles.y
+    get() = this.yCoordinate
+
+val S2APacketParticles.z
+    get() = this.zCoordinate
+
+val S2APacketParticles.type: EnumParticleTypes
+    get() = this.particleType
+
+val S2APacketParticles.count
+    get() = this.particleCount
+
+val S2APacketParticles.speed
+    get() = this.particleSpeed
