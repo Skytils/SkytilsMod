@@ -1791,10 +1791,10 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showSeraphDisplay = false
 
 /*    @Property(
-            PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
-            description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
-            category = "Slayer", subcategory = "Voidgloom Seraph"
-        )*/
+        PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
+        description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
+         category = "Slayer", subcategory = "Voidgloom Seraph"
+    )*/
     var experimentalYangGlyphDetection = true
 
     @Property(
