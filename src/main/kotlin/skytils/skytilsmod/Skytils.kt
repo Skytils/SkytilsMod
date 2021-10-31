@@ -213,7 +213,6 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(ProtectItems())
         MinecraftForge.EVENT_BUS.register(RainTimer())
         MinecraftForge.EVENT_BUS.register(BonzoMaskTimer())
-
         MinecraftForge.EVENT_BUS.register(RelicWaypoints())
         MinecraftForge.EVENT_BUS.register(ScoreCalculation)
         MinecraftForge.EVENT_BUS.register(SelectAllColorSolver())
