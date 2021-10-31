@@ -27,13 +27,12 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import kotlin.math.floor
 
 class BonzoMaskTimer {
 
     class BonzoMaskGuiElement : GuiElement(name = "Bonzo Timer", fp = FloatPair(10, 10)) {
         override fun render() {
-            if (Utils.inSkyblock && toggled) {
+            if (Utils.inDungeons && toggled) {
                 var text = "§6Bonzo Mask: "
                 var mc = Minecraft.getMinecraft()
                 var item = mc.thePlayer.getCurrentArmor(3)
@@ -43,7 +42,7 @@ class BonzoMaskTimer {
                         text += "§aREADY"
                     else {
                         if (Skytils.config.bonzoMaskMode == 0)
-                            text += "§c " + timeBetween(time.toDouble(), bonzoUse.toDouble())
+                            text += "§c " + timeBetween(time, bonzoUse.toLong())
                         else if (Skytils.config.bonzoMaskMode == 1)
                             text += "§c " + (bonzoUse - time) + "s"
                     }
@@ -81,30 +80,11 @@ class BonzoMaskTimer {
             Skytils.guiManager.registerElement(this)
         }
 
-        private fun timeBetween(timeOne: Double, timeTwo: Double): String {
-            val secondsBetween = floor(timeTwo - timeOne)
-
-            val timeFormatted: String
-            val days: Int
-            val hours: Int
-            val minutes: Int
-            val seconds: Int
-
-            if (secondsBetween > 86400) {
-                days = (secondsBetween / 86400).toInt()
-                hours = (secondsBetween % 86400 / 3600).toInt()
-                timeFormatted = days.toString() + "d" + hours + "h"
-            } else if (secondsBetween > 3600) {
-                hours = (secondsBetween / 3600).toInt()
-                minutes = (secondsBetween % 3600 / 60).toInt()
-                timeFormatted = hours.toString() + "h" + minutes + "m"
-            } else {
-                minutes = (secondsBetween / 60).toInt()
-                seconds = (secondsBetween % 60).toInt()
-                timeFormatted = minutes.toString() + "m" + seconds + "s"
-            }
-
-            return timeFormatted
+        private fun timeBetween(timeOne: Long, timeTwo: Long): String {
+            val totalSecs = timeTwo - timeOne
+            val minutes = totalSecs / 60
+            val seconds = totalSecs % 60
+            return ("" + minutes + "m" + seconds + "s")
         }
 
     }
@@ -114,6 +94,7 @@ class BonzoMaskTimer {
     fun onWorld(event: WorldEvent.Load) {
         bonzoUse = 0
     }
+
     companion object {
         var bonzoUse = 0
 
