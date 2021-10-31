@@ -981,6 +981,21 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var preFillChatTabCommands = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Bonzo Mask Timer",
+        description = "Displays whether your bonzo mask is read.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var bonzoMaskTimer = false
+
+    @Property(
+        PropertyType.SELECTOR, name = "Bonzo Mask Timer Display",
+        category = "Miscellaneous", subcategory = "Items",
+        options = ["Minutes", "Seconds"],
+        allowAlpha = false
+    )
+    var bonzoMaskMode = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Auto Switch Chat Channel",
         description = "Automatically types the command to switch to a certain channel.",
         category = "Miscellaneous", subcategory = "Chat Tabs"
@@ -1775,12 +1790,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var showSeraphDisplay = false
 
-
 /*    @Property(
-        PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
-        description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
-        category = "Slayer", subcategory = "Voidgloom Seraph"
-    )*/
+            PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
+            description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
+            category = "Slayer", subcategory = "Voidgloom Seraph"
+        )*/
     var experimentalYangGlyphDetection = true
 
     @Property(
