@@ -53,17 +53,17 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         "If you do have ChatTriggers, you can update to 1.3.2<br>" +
         "or later to fix the issue. https://www.chattriggers.com/<br>" +
         "In order to resolve this conflict you must<br>" +
-        "deleted the outdated mods.<br>" +
+        "delete the outdated mods.<br>" +
         "If you have already done this and are still getting this error,<br>" +
         "or need assistance, ask for support in the Discord.";
 
     public static final String badMixinVersionMessage =
         "<html><p>" +
         "Skytils has detected an older version of Mixin.<br>" +
-        "Many of my features require Mixin 0.7 or later!<br>" +
+        "Many of the features require Mixin 0.7 or later!<br>" +
         "In order to resolve this conflict you must remove<br>" +
         "any mods with a Mixin version below 0.7.<br>" +
-        "You can also try to rename Skytils be above other mods alphabetically<br>" +
+        "You can also try to rename Skytils to be above other mods alphabetically<br>" +
         "by changing Skytils.jar to !Skytils.jar<br>" +
         "If you have already done this and are still getting this error,<br>" +
         "ask for support in the Discord.";
@@ -81,7 +81,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     private static final String voidChatMessage =
         "<html><p>" +
         "Skytils has detected that you are using VoidChat.<br>" +
-        "VoidChat breaks many of my features!<br>" +
+        "VoidChat breaks many of the features!<br>" +
         "In order to resolve this conflict you must remove<br>" +
         "VoidChat from your Minecraft mods folder.<br>" +
         "A good alternative is Patcher at https://sk1er.club/mods/Patcher.<br>" +
@@ -92,7 +92,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     private static final String betterFPSMessage =
         "<html><p>" +
         "Skytils has detected that you are using BetterFPS.<br>" +
-        "BetterFPS breaks my core plugins, and also breaks the game!<br>" +
+        "BetterFPS breaks the core plugins, and also breaks the game!<br>" +
         "In order to resolve this conflict you must remove<br>" +
         "BetterFPS from your Minecraft mods folder.<br>" +
         "You probably will not notice a change in your FPS.<br>" +
