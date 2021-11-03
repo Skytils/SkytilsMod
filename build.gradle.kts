@@ -29,7 +29,7 @@ plugins {
     java
 }
 
-version = "1.0.8-pre1"
+version = "1.0.8-RC1"
 group = "skytils.skytilsmod"
 
 minecraft {

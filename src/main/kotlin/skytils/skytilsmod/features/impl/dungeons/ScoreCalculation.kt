@@ -63,9 +63,9 @@ object ScoreCalculation {
     private var lastRoomScanPos: BlockPos? = null
 
     private val deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
-    private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
+    private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val failedPuzzlePattern =
-        Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f\\((?:§r(?<player>.+))?§r§f\\)§r")
+        Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f(?:\\((?:§r(?<player>.+))?§r§f\\)|\\(§r§f})§r")
     private val secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r")
 

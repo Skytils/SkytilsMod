@@ -376,7 +376,7 @@ class ItemFeatures {
                         ) 4f else 11f).pow(2f)
 
                         if (mc.theWorld.playerEntities.any {
-                                it.uniqueID.version() == 4 && it.getDistanceSq(
+                                it.heldItem != null && it.uniqueID.version() == 4 && it.getDistanceSq(
                                     x,
                                     y,
                                     z

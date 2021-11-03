@@ -23,6 +23,8 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.entity.RenderManager
 import net.minecraft.entity.item.EntityArmorStand
+import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.NumberUtil.format
 import skytils.skytilsmod.utils.Utils.random
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -121,12 +123,18 @@ class DamageSplashEntity(
             }
             color = Damage.fromSymbol(symbol)?.color
         }
-        displayText = "${format(damage.toLong())}${exportStringIfTrue(love, "❤")}${
-            exportStringIfTrue(
-                extremeFocus,
-                "⚔"
-            )
-        }${exportStringIfTrue(octodexterity, "+")}"
+        displayText =
+            "${if (Skytils.config.commaDamage) NumberUtil.nf.format(damage.toLong()) else format(damage.toLong())}${
+                exportStringIfTrue(
+                    love,
+                    "❤"
+                )
+            }${
+                exportStringIfTrue(
+                    extremeFocus,
+                    "⚔"
+                )
+            }${exportStringIfTrue(octodexterity, "+")}"
         val uuid = UUID(random.nextLong(), random.nextLong())
         if (added.containsValue(uuid)) remove() else added[displayText] = uuid
     }
