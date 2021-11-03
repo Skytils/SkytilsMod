@@ -45,7 +45,7 @@ object DungeonListener {
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
         Regex("§r(?:§.)+(?<name>\\w+?) §r§f\\(§r§d(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)§r§f\\)§r")
-    private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7]§r")
+    private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
 
     private var ticks = 0
 
@@ -67,9 +67,7 @@ object DungeonListener {
                     TickTask(6) {
                         mc.ingameGUI.chatGUI.printChatMessage(
                             ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
-                                team.sortedByDescending { it.deaths }.filter { it.deaths > 0 }.joinToString(
-                                    separator = "\n"
-                                ) {
+                                team.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
                                     "  §c☠ ${it.playerName}:§r ${it.deaths}"
                                 }
                             }"
