@@ -127,7 +127,7 @@ class DungeonFeatures {
                     is S0CPacketSpawnPlayer -> {
                         if (lastLitUpTime != -1L && packet.player.version() == 2) {
                             printDevMessage("spawn ${System.currentTimeMillis() - lastLitUpTime}", "spiritbear")
-                            lastLitUpTime = -1L
+                            //lastLitUpTime = -1L
                         }
                     }
                 }
