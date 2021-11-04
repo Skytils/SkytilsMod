@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -204,8 +205,8 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     fun onChatPacket(event: ReceiveEvent) {
-        if (event.packet !is S02PacketChat) return
         val packet = event.packet
+        if (packet !is S02PacketChat) return
         if (packet.type.toInt() == 2) return
         val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         val formatted = packet.chatComponent.formattedText
