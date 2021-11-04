@@ -76,7 +76,6 @@ import skytils.skytilsmod.gui.OptionsGui
 import skytils.skytilsmod.gui.ReopenableGUI
 import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.listeners.SpookMessageHider
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
@@ -221,7 +220,6 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(SlayerFeatures())
         MinecraftForge.EVENT_BUS.register(SpidersDenFeatures())
         MinecraftForge.EVENT_BUS.register(SpiritLeap())
-        MinecraftForge.EVENT_BUS.register(SpookMessageHider)
         MinecraftForge.EVENT_BUS.register(StartsWithSequenceSolver())
         MinecraftForge.EVENT_BUS.register(StupidTreasureChestOpeningThing)
         MinecraftForge.EVENT_BUS.register(TankDisplayStuff())

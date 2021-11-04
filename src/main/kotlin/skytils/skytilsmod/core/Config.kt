@@ -2158,6 +2158,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var profileHider = 0
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Spook Message Hider",
+        description = "§b[WIP] §rRemoves the messages from the Great Spooky Staff from your chat.",
+        category = "Spam", subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var spookyMessageHider = 0
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Blessing Enchant Hider",
         description = "Removes blessing enchant message from fishing.",
         category = "Spam", subcategory = "Fishing",
