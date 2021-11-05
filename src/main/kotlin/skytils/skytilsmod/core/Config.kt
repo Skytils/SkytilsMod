@@ -609,7 +609,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Replaces left clicks while on terminals with middle clicks.",
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
-    var middleClickTerminals = false
+    var middleClickTerminals = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
