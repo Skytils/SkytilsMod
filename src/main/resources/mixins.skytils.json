@@ -69,6 +69,7 @@
   "client": [
     "accessors.AccessorGuiChat",
     "accessors.AccessorGuiMainMenu",
+    "gui.MixinChatLine",
     "neu.MixinCustomAH",
     "renderer.MixinItemRenderer",
     "renderer.MixinRendererLivingEntity"
