@@ -22,6 +22,7 @@ import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.ChatComponentText
@@ -193,8 +194,9 @@ class MythologicalTracker : Tracker("mythological") {
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
                 if (!extraAttr.hasKey("timestamp")) {
                     if (Skytils.config.broadcastMythCreatureDrop) {
-                        mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"))
-
+                        val text = "§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"
+                        if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text)
+                        UChat.chat(text)
                         SoundQueue.addToQueue(
                             SoundQueue.QueuedSound(
                                 "note.pling",
