@@ -101,7 +101,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0.8-RC1"
+        const val VERSION = "1.0.8"
 
         @JvmField
         val gson: Gson = GsonBuilder()
@@ -392,42 +392,6 @@ class Skytils {
                 TickTask(1) {
                     displayScreen = OptionsGui()
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onMouseClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (event.gui is GuiChat && DevTools.getToggle("chat") && GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
-            val button = Mouse.getEventButton()
-            if (button != 0 && button != 1) return
-            val chatLine = mc.ingameGUI.chatGUI.getChatLine(Mouse.getX(), Mouse.getY()) ?: return
-            if (button == 0) {
-                val component =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatLineID == chatLine.chatLineID }?.chatComponent
-                        ?: chatLine.chatComponent
-                val realText = buildString {
-                    append(component.unformattedTextForChat)
-                    append("§r")
-                    component.siblings.forEach {
-                        append(it.unformattedTextForChat)
-                        append("§r")
-                    }
-                }
-
-                GuiScreen.setClipboardString(realText)
-                printDevMessage("Copied formatted message to clipboard!", "chat")
-            } else {
-                val component =
-                    (mc.ingameGUI.chatGUI as AccessorGuiNewChat).chatLines.find { it.chatLineID == chatLine.chatLineID }?.chatComponent
-                        ?: chatLine.chatComponent
-
-                printDevMessage("Copied serialized message to clipboard!", "chat")
-                GuiScreen.setClipboardString(
-                    IChatComponent.Serializer.componentToJson(
-                        component
-                    )
-                )
             }
         }
     }

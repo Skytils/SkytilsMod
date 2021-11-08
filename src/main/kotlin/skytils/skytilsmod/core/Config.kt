@@ -609,7 +609,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Replaces left clicks while on terminals with middle clicks.",
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
-    var middleClickTerminals = false
+    var middleClickTerminals = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
@@ -930,6 +930,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Solvers"
     )
     var puzzlerSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows Death Waypoints",
+        description = "Drops a waypoint to where you last died in the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowDeathWaypoint = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows map",
@@ -2171,6 +2178,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var profileHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Spook Message Hider",
+        description = "§b[WIP] §rRemoves the messages from the Great Spooky Staff from your chat.",
+        category = "Spam", subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var spookyMessageHider = 0
 
     @Property(
         type = PropertyType.SELECTOR, name = "Blessing Enchant Hider",

@@ -763,6 +763,24 @@ object RenderUtil {
         renderer.pos(x.toDouble() + width.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
         tesselator.draw()
     }
+
+    /*
+    * @link https://stackoverflow.com/a/54913292
+    */
+    fun mixColors(vararg colors: Color): Color {
+        val ratio = 1f / colors.size.toFloat()
+        var r = 0
+        var g = 0
+        var b = 0
+        var a = 0
+        for (color in colors) {
+            r += (color.red * ratio).toInt()
+            g += (color.green * ratio).toInt()
+            b += (color.blue * ratio).toInt()
+            a += (color.alpha * ratio).toInt()
+        }
+        return Color(r, g, b, a)
+    }
 }
 
 fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)

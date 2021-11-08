@@ -27,6 +27,61 @@ import skytils.skytilsmod.utils.Utils
 
 fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
     classNode.methods.find {
+        Utils.equalsOneOf(it.name, "drawChat") && it.desc == "(I)V"
+    }?.apply {
+        var chatLineVar: VarInsnNode? = null
+        for (insn in instructions) {
+            if (chatLineVar == null && insn is VarInsnNode && insn.opcode == Opcodes.ASTORE) {
+                var prev = insn.previous
+                if (prev is TypeInsnNode && prev.opcode == Opcodes.CHECKCAST && Utils.equalsOneOf(
+                        prev.desc,
+                        "net/minecraft/client/gui/ChatLine"
+                    )
+                )
+                    chatLineVar = insn
+            }
+            if (chatLineVar != null && insn is MethodInsnNode && insn.owner == classNode.name && Utils.equalsOneOf(
+                    insn.name,
+                    "drawRect"
+                ) && insn.desc == "(IIIII)V"
+            ) {
+                instructions.insertBefore(insn, InsnListBuilder(this).apply {
+                    aload(chatLineVar.`var`)
+                    invokeStatic(
+                        "skytils/skytilsmod/features/impl/handlers/ChatTabs",
+                        "setBGColor",
+                        "(ILnet/minecraft/client/gui/ChatLine;)I"
+                    )
+                }.build())
+                break
+            }
+        }
+    }
+    classNode.methods.find {
+        Utils.equalsOneOf(it.name, "setChatLine") && Utils.equalsOneOf(
+            it.desc,
+            "(Lnet/minecraft/util/IChatComponent;IIZ)V"
+        )
+    }?.apply {
+        for (insn in instructions) {
+            if (insn.opcode == Opcodes.INVOKESPECIAL && insn is MethodInsnNode && insn.name == "<init>" && Utils.equalsOneOf(
+                    insn.owner,
+                    "net/minecraft/client/gui/ChatLine"
+                )
+            ) {
+                instructions.insert(insn, InsnListBuilder(this).apply {
+                    aload(1)
+                    invokeVirtual(
+                        "net/minecraft/client/gui/ChatLine",
+                        "withFullComponent",
+                        "(Lnet/minecraft/util/IChatComponent;)Lnet/minecraft/client/gui/ChatLine;"
+                    )
+                }.build())
+                break
+            }
+        }
+    }
+    classNode.methods.find {
         Utils.equalsOneOf(it.name, "refreshChat", "b") && it.desc == "()V"
     }?.apply {
         var labelNode: LabelNode? = null
