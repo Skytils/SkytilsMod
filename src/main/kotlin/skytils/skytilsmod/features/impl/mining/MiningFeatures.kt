@@ -17,7 +17,9 @@
  */
 package skytils.skytilsmod.features.impl.mining
 
+import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -30,6 +32,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -49,10 +52,7 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.BossBarEvent
-import skytils.skytilsmod.events.impl.GuiContainerEvent
-import skytils.skytilsmod.events.impl.PacketEvent
-import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
+import skytils.skytilsmod.events.impl.*
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
@@ -80,6 +80,14 @@ class MiningFeatures {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
+        if (!Utils.inSkyblock) return
+        if (Skytils.config.crystalHollowDeathWaypoint && event.packet is S08PacketPlayerPosLook && mc.thePlayer != null) {
+            lastTPLoc = mc.thePlayer.position
         }
     }
 
@@ -175,9 +183,17 @@ class MiningFeatures {
             else if (xzMatcher.matches())
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
         }
-        if (unformatted.startsWith(" ☠ You were killed by ")) {
+        if (formatted.startsWith("§r§cYou died")) {
             deadCount =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
+            if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
+                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§3Skytils > §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").apply {
+                    chatStyle.chatClickEvent = ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/skytilshollowwaypoint set last_death ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}"
+                    )
+                })
+            }
         }
     }
 
@@ -386,8 +402,8 @@ class MiningFeatures {
                 prefix = event.packet.prefix,
                 postfix = event.packet.suffix
             ).contains("12:00am") &&
-                    Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode
-        ){
+            Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode
+        ) {
             val message = ChatComponentText("§cSkymall reset ")
             val hotm = ChatComponentText("§b[HOTM]")
             hotm.chatStyle.chatClickEvent = ClickEvent(
@@ -584,6 +600,7 @@ class MiningFeatures {
         var minesLoc = LocationObject()
         var balLoc = LocationObject()
         var fairyLoc = LocationObject()
+        var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
     }

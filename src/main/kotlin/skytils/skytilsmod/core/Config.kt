@@ -932,6 +932,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var puzzlerSolver = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows Death Waypoints",
+        description = "Drops a waypoint to where you last died in the Crystal Hollows.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var crystalHollowDeathWaypoint = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows map",
         description = "Shows a map to see in which part of the crystal hollows you are and saves locations of special places.",
         category = "Mining", subcategory = "Crystal Hollows"
