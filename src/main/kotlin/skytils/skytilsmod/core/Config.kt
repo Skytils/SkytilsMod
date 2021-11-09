@@ -757,6 +757,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var burrowHubFastTravel = false
 
     @Property(
+        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Museum",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Museum warp.",
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
+    )
+    var burrowMuseumFastTravel = false
+
+    @Property(
         type = PropertyType.COLOR, name = "Empty/Start Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
         category = "Events", subcategory = "Mythological",
@@ -2267,7 +2275,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "burrowCastleFastTravel",
             "burrowCryptsFastTravel",
             "burrowDarkAuctionFastTravel",
-            "burrowHubFastTravel"
+            "burrowHubFastTravel",
+            "burrowMuseumFastTravel"
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
 
         addDependency("activePetColor", "highlightActivePet")

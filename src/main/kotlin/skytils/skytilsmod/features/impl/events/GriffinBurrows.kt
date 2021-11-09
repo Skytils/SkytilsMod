@@ -482,28 +482,28 @@ class GriffinBurrows {
     }
 
     enum class FastTravelLocations(val pos: BlockPos) {
-        CASTLE(BlockPos(-250, 130, 45)), CRYPTS(
-            BlockPos(-162, 60, -100)
-        ),
-        DA(BlockPos(91, 74, 173)), HUB(
-            BlockPos(-3, 70, -70)
-        );
+        CASTLE(BlockPos(-250, 130, 45)),
+        CRYPTS(BlockPos(-162, 60, -100)),
+        DA(BlockPos(91, 74, 173)),
+        HUB(BlockPos(-3, 70, -70)),
+        MUSEUM(BlockPos(-76, 76, 80));
 
         val toggled: Boolean
-            get() {
-                if (this == CASTLE) return Skytils.config.burrowCastleFastTravel
-                if (this == CRYPTS) return Skytils.config.burrowCryptsFastTravel
-                if (this == DA) return Skytils.config.burrowDarkAuctionFastTravel
-                if (this == HUB) return Skytils.config.burrowHubFastTravel
-                return false
+            get() = when(this) {
+                CASTLE -> Skytils.config.burrowCastleFastTravel
+                CRYPTS -> Skytils.config.burrowCryptsFastTravel
+                DA -> Skytils.config.burrowDarkAuctionFastTravel
+                HUB -> Skytils.config.burrowHubFastTravel
+                MUSEUM -> Skytils.config.burrowMuseumFastTravel
             }
 
         val nameWithColor: String
             get() = when (this) {
-                CASTLE -> EnumChatFormatting.GRAY.toString() + "CASTLE"
-                CRYPTS -> EnumChatFormatting.DARK_GREEN.toString() + "CRYPTS"
-                DA -> EnumChatFormatting.DARK_PURPLE.toString() + "DA"
-                HUB -> EnumChatFormatting.WHITE.toString() + "HUB"
+                CASTLE -> "§7CASTLE"
+                CRYPTS -> "§2CRYPTS"
+                DA -> "§5DA"
+                HUB -> "§fHUB"
+                MUSEUM -> "§bMUSEUM"
             }
     }
 }
