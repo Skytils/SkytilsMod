@@ -2249,6 +2249,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("itemRarityOpacity", "showItemRarity")
         addDependency("itemRarityShape", "showItemRarity")
 
+        addDependency("bonzoMaskMode", "bonzoMaskTime")
+
         listOf(
             "showLowestBINPrice",
             "betterAuctionPriceInput",
