@@ -23,14 +23,12 @@ import com.google.gson.GsonBuilder
 import gg.essential.vigilance.gui.SettingsGui
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
-import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
-import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -38,13 +36,13 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.common.ProgressManager
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import org.lwjgl.input.Mouse
 import skytils.hylin.HylinAPI.Companion.createHylinAPI
 import skytils.skytilsmod.commands.impl.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
@@ -78,7 +76,6 @@ import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
-import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -153,16 +150,20 @@ class Skytils {
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
         jarFile = event.sourceFile
-        Minecraft.getMinecraft().framebuffer.enableStencil();
+        mc.framebuffer.enableStencil()
     }
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+        val bored = ProgressManager.push("Sychicing", 3)
+        bored.step("Reading instructions (impossible)")
         config.init()
         hylinAPI.key = config.apiKey
 
+        bored.step("Downloading cat <3")
         UpdateChecker.downloadDeleteTask()
 
+        bored.step("Finding the main cat I need")
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
         MinecraftForge.EVENT_BUS.register(DungeonListener)
@@ -232,6 +233,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
         MinecraftForge.EVENT_BUS.register(WaterBoardSolver())
         MinecraftForge.EVENT_BUS.register(Waypoints())
+        ProgressManager.pop(bored)
     }
 
     @Mod.EventHandler

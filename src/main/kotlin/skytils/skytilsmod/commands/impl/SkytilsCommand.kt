@@ -18,8 +18,6 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
-import gg.essential.vigilance.data.PropertyItem
-import gg.essential.vigilance.data.PropertyType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
