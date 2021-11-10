@@ -155,15 +155,11 @@ class Skytils {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        val bored = ProgressManager.push("Sychicing", 3)
-        bored.step("Reading instructions (impossible)")
         config.init()
         hylinAPI.key = config.apiKey
 
-        bored.step("Downloading cat <3")
         UpdateChecker.downloadDeleteTask()
 
-        bored.step("Finding the main cat I need")
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.EVENT_BUS.register(ChatListener())
         MinecraftForge.EVENT_BUS.register(DungeonListener)
@@ -233,7 +229,6 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(TriviaSolver())
         MinecraftForge.EVENT_BUS.register(WaterBoardSolver())
         MinecraftForge.EVENT_BUS.register(Waypoints())
-        ProgressManager.pop(bored)
     }
 
     @Mod.EventHandler
