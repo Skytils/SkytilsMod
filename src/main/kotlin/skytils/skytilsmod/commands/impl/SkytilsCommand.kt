@@ -90,10 +90,11 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             } else {
                 when (args[1].lowercase()) {
                     "refresh" -> {
-                        GriffinBurrows.particleBurrows.removeIf { pb -> !pb.dug }
+                        GriffinBurrows.particleBurrows.values.removeAll { !it.dug }
                         GriffinBurrows.burrows.clear()
                         if (System.currentTimeMillis() - GriffinBurrows.lastManualRefresh <= 2500) {
                             UChat.chat("§cSlow down! Did not refresh your burrows to prevent a rate limit!")
+                        } else {
                             GriffinBurrows.burrowRefreshTimer.reset()
                             GriffinBurrows.shouldRefreshBurrows = true
                             GriffinBurrows.lastManualRefresh = System.currentTimeMillis()
