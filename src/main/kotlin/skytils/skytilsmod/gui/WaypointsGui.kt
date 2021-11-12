@@ -132,7 +132,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
                             ),
                             current,
                             entry.enabled.checked,
-                            entry.color
+                            entry.color.getColor()
                         )
                     )
                 }.onFailure {
@@ -163,7 +163,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 80.percent()
-            height = 30.percent()
+            height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
         val enabled = CheckboxComponent(enabled).childOf(container).constrain {
@@ -238,11 +238,15 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         }
 
         entries[container] =
-            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent.getColor()).also { entry ->
-                colorComponent.onValueChange { newColor ->
-                    entry.color = newColor as Color
-                }
-            }
+            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent)
+    }
+
+    override fun onTick() {
+        for ((container, entry) in entries) {
+            if (entry.color.getHeight() == 20f) container.setHeight(9.5f.percent())
+            else container.setHeight(30f.percent())
+        }
+        super.onTick()
     }
 
     override fun onScreenClose() {
@@ -256,6 +260,6 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         val x: UITextInput,
         val y: UITextInput,
         val z: UITextInput,
-        var color: Color
+        var color: ColorComponent
     )
 }
