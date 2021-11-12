@@ -82,12 +82,13 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             addNewShortcut()
         }
 
-        KeyShortcuts.shortcuts.onEach {
-            addNewShortcut(it.key, it.value)
+        KeyShortcuts.shortcuts.forEach {
+            addNewShortcut(it.message, it.keyCode, it.modifiers)
         }
     }
 
-    private fun addNewShortcut(command: String = "", keyCode: Int = 0) {
+    private fun addNewShortcut(command: String = "", keyCode: Int = 0, modifiers: Int = 0) {
+        val modifiersList = KeyShortcuts.Modifiers.fromBitfield(modifiers)
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -104,11 +105,18 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         } as UITextInput).also {
             it.setText(command)
             it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(256))
             }
         }
 
-        val keybindButton = SimpleButton(Utils.getKeyDisplayStringSafe(keyCode)).childOf(container).constrain {
+        val keybindButton = SimpleButton(
+            "${
+                if (modifiers != 0) modifiersList.joinToString(
+                    "+",
+                    postfix = " + "
+                ) else ""
+            }${Utils.getKeyDisplayStringSafe(keyCode)}"
+        ).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             height = 75.percent()
@@ -122,7 +130,8 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             container.parent.removeChild(container)
             components.remove(container)
         }
-        val entry = Entry(container, commandToRun, keybindButton, keyCode)
+        val entry =
+            Entry(container, commandToRun, keybindButton, keyCode, modifiersList)
 
         keybindButton.onLeftClick {
             clickedButton = entry
@@ -140,7 +149,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val keyCode = entry.keyCode
             if (command.isBlank() || keyCode == 0) continue
 
-            KeyShortcuts.shortcuts[command] = keyCode
+            KeyShortcuts.shortcuts.add(KeyShortcuts.KeybindShortcut(command, keyCode, entry.modifiers))
         }
 
         PersistentSave.markDirty<KeyShortcuts>()
@@ -148,10 +157,22 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
     override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {
         if (clickedButton != null) {
+            val extra =
+                if (modifiers != null) KeyShortcuts.Modifiers.fromUCraft(modifiers)
+                else KeyShortcuts.Modifiers.getPressed()
             when {
-                keyCode == 1 -> clickedButton!!.keyCode = 0
-                keyCode != 0 -> clickedButton!!.keyCode = keyCode
-                typedChar.code > 0 -> clickedButton!!.keyCode = typedChar.code + 256
+                keyCode == 1 -> {
+                    clickedButton!!.keyCode = 0
+                    clickedButton!!.modifiers = emptyList()
+                }
+                keyCode != 0 -> {
+                    clickedButton!!.keyCode = keyCode
+                    clickedButton!!.modifiers = extra
+                }
+                typedChar.code > 0 -> {
+                    clickedButton!!.keyCode = typedChar.code + 256
+                    clickedButton!!.modifiers = extra
+                }
             }
             clickedButton = null
         } else super.onKeyPressed(keyCode, typedChar, modifiers)
@@ -160,19 +181,20 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
     override fun onMouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int) {
         if (clickedButton != null) {
             clickedButton!!.keyCode = -100 + mouseButton
+            clickedButton!!.modifiers = KeyShortcuts.Modifiers.getPressed()
             clickedButton = null
         } else super.onMouseClicked(mouseX, mouseY, mouseButton)
     }
 
     override fun onTick() {
         super.onTick()
-        for (item in components) {
-            val button = item.value.button
-            val keyCode = item.value.keyCode
-            button.text.setText(Utils.getKeyDisplayStringSafe(keyCode))
-            val pressed = clickedButton === item.value
+        for ((_, entry) in components) {
+            val button = entry.button
+            val keyCode = entry.keyCode
+            button.text.setText(entry.getDisplayString())
+            val pressed = clickedButton === entry
             val reused =
-                keyCode != 0 && (mc.gameSettings.keyBindings.any { it.keyCode == keyCode } || components.any { it.value.keyCode != 0 && it !== item && it.value.keyCode == keyCode })
+                keyCode != 0 && (mc.gameSettings.keyBindings.any { it.keyCode == keyCode } || components.any { it.value.keyCode != 0 && it.value !== entry && it.value.keyCode == keyCode })
             if (pressed) {
                 button.text.setText("§f> §e${button.text.getText()}§f <")
             } else if (reused) {
@@ -181,5 +203,19 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         }
     }
 
-    data class Entry(val container: UIContainer, val input: UITextInput, val button: SimpleButton, var keyCode: Int)
+    data class Entry(
+        val container: UIContainer,
+        val input: UITextInput,
+        val button: SimpleButton,
+        var keyCode: Int,
+        var modifiers: List<KeyShortcuts.Modifiers>
+    ) {
+        fun getDisplayString() =
+            "${
+                if (modifiers.isNotEmpty()) modifiers.joinToString(
+                    "+",
+                    postfix = " + "
+                ) else ""
+            }${Utils.getKeyDisplayStringSafe(keyCode)}"
+    }
 }
