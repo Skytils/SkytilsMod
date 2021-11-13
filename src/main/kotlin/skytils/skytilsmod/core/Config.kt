@@ -1003,6 +1003,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var autoSwitchChatChannel = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Copy Chat Messages",
+        description = "Copy chat messages with control + click.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var copyChat = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
         description = "Adds a check to rendering in order to prevent crashes.",
         category = "Miscellaneous", subcategory = "Fixes"
