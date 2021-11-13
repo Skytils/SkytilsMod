@@ -143,8 +143,8 @@ class ItemFeatures {
                             val extraAttr = getExtraAttributes(held) ?: return@also
                             val enchantments = extraAttr.getCompoundTag("enchantments")
                             val stacking =
-                                (EnchantUtil.enchants.find { it is StackingEnchant && extraAttr.hasKey(it.nbtNum) }
-                                    ?: return@also) as StackingEnchant
+                                EnchantUtil.enchants.find { it is StackingEnchant && extraAttr.hasKey(it.nbtNum) } as? StackingEnchant
+                                    ?: return@also
 
                             val stackingLevel = enchantments.getInteger(stacking.nbtName)
                             val stackingAmount = extraAttr.getInteger(stacking.nbtNum)

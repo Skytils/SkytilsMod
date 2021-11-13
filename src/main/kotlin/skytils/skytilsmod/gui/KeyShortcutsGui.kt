@@ -109,14 +109,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
 
-        val keybindButton = SimpleButton(
-            "${
-                if (modifiers != 0) modifiersList.joinToString(
-                    "+",
-                    postfix = " + "
-                ) else ""
-            }${Utils.getKeyDisplayStringSafe(keyCode)}"
-        ).childOf(container).constrain {
+        val keybindButton = SimpleButton("placeholder").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             height = 75.percent()
@@ -215,7 +208,7 @@ class KeyShortcutsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
                 if (modifiers.isNotEmpty()) modifiers.joinToString(
                     "+",
                     postfix = " + "
-                ) else ""
+                ) { it.shortName } else ""
             }${Utils.getKeyDisplayStringSafe(keyCode)}"
     }
 }
