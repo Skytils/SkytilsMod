@@ -27,7 +27,7 @@ import skytils.skytilsmod.utils.Utils
 
 fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
     classNode.methods.find {
-        Utils.equalsOneOf(it.name, "drawChat") && it.desc == "(I)V"
+        Utils.equalsOneOf(it.name, "drawChat", "avt") && it.desc == "(I)V"
     }?.apply {
         var chatLineVar: VarInsnNode? = null
         for (insn in instructions) {
@@ -35,14 +35,14 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
                 var prev = insn.previous
                 if (prev is TypeInsnNode && prev.opcode == Opcodes.CHECKCAST && Utils.equalsOneOf(
                         prev.desc,
-                        "net/minecraft/client/gui/ChatLine"
+                        "net/minecraft/client/gui/ChatLine", "ava"
                     )
                 )
                     chatLineVar = insn
             }
             if (chatLineVar != null && insn is MethodInsnNode && insn.owner == classNode.name && Utils.equalsOneOf(
                     insn.name,
-                    "drawRect"
+                    "drawRect", "a"
                 ) && insn.desc == "(IIIII)V"
             ) {
                 instructions.insertBefore(insn, InsnListBuilder(this).apply {
@@ -58,15 +58,15 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
         }
     }
     classNode.methods.find {
-        Utils.equalsOneOf(it.name, "setChatLine") && Utils.equalsOneOf(
+        Utils.equalsOneOf(it.name, "setChatLine", "a") && Utils.equalsOneOf(
             it.desc,
-            "(Lnet/minecraft/util/IChatComponent;IIZ)V"
+            "(Lnet/minecraft/util/IChatComponent;IIZ)V", "(Leu;IIZ)V"
         )
     }?.apply {
         for (insn in instructions) {
             if (insn.opcode == Opcodes.INVOKESPECIAL && insn is MethodInsnNode && insn.name == "<init>" && Utils.equalsOneOf(
                     insn.owner,
-                    "net/minecraft/client/gui/ChatLine"
+                    "net/minecraft/client/gui/ChatLine", "ava"
                 )
             ) {
                 instructions.insert(insn, InsnListBuilder(this).apply {
