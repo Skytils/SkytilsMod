@@ -32,6 +32,7 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.features.impl.handlers.Waypoint
@@ -46,6 +47,8 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
     private val scrollComponent: ScrollComponent
 
     private val islandDropdown: DropDown
+    private val sortingOrder: DropDown
+    private val searchBar: UITextInput
 
     private val entries = HashMap<UIContainer, Entry>()
 
@@ -59,17 +62,59 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 70.percent() + 2.pixels()
         }
 
+        val topButtons = UIContainer().childOf(window).constrain {
+            x = 0.pixels()
+            y = 5.percent()
+            width = 100.percent()
+            height = ChildBasedSizeConstraint()
+        }
+
         islandDropdown = DropDown(SkyblockIsland.values().indexOfFirst {
             SBInfo.mode == it.mode
-        }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(window)
+        }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(topButtons)
             .constrain {
-                x = basicXConstraint { it.parent.getRight() - it.getWidth() - 5f }
-                y = 5.percent()
+                x = 5.pixels(true)
             }.also {
                 it.onValueChange { s ->
                     loadWaypointsForSelection(s)
                 }
             }
+
+        sortingOrder =
+            DropDown(SortingOptions.lastSelected, SortingOptions.values().map { it.displayName }).childOf(topButtons)
+                .constrain {
+                    x = SiblingConstraint(10f, true)
+                }.apply {
+                    onValueChange {
+                        SortingOptions.lastSelected = it
+                        val sorter = SortingOptions.values()[it]
+                        scrollComponent.sortChildren { c ->
+                            c as UIContainer
+                            val entry = entries[c] ?: error("no entry found for child")
+                            return@sortChildren sorter.sortingBy(entry.toWaypoint(SkyblockIsland.PrivateIsland))
+                        }
+                    }
+                }
+
+        searchBar = UITextInput("Search").childOf(topButtons).constrain {
+            x = 2.pixels()
+            y = 2.pixels()
+            width = 20.percent()
+            height = 12.pixels()
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            onKeyType { _, _ ->
+                scrollComponent.allChildren.forEach { c ->
+                    c as UIContainer
+                    val entry = entries[c] ?: error("no entry found for child")
+                    if (entry.name.getText().contains(this@apply.getText())) c.unhide()
+                    else c.hide()
+                }
+            }
+        }
+
 
         UIText("Waypoints").childOf(window).constrain {
             x = CenterConstraint()
@@ -123,17 +168,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             for (entry in entries.values) {
                 runCatching {
                     Waypoints.waypoints.add(
-                        Waypoint(
-                            entry.name.getText(),
-                            BlockPos(
-                                entry.x.getText().toInt(),
-                                entry.y.getText().toInt(),
-                                entry.z.getText().toInt()
-                            ),
-                            current,
-                            entry.enabled.checked,
-                            entry.color.getColor()
-                        )
+                        entry.toWaypoint(current)
                     )
                 }.onFailure {
                     it.printStackTrace()
@@ -147,8 +182,8 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val island = SkyblockIsland.values()[selection]
             Waypoints.waypoints.filter {
                 it.island == island
-            }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-                addNewWaypoint(it.name, it.pos, it.enabled, it.color)
+            }.sortedBy { SortingOptions.values()[SortingOptions.lastSelected].sortingBy(it) }.forEach {
+                addNewWaypoint(it.name, it.pos, it.enabled, it.color, it.addedAt)
             }
         }
     }
@@ -157,7 +192,8 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         name: String = "",
         pos: BlockPos = mc.thePlayer.position,
         enabled: Boolean = true,
-        color: Color = Color.RED
+        color: Color = Color.RED,
+        addedAt: Long = System.currentTimeMillis()
     ) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
@@ -238,7 +274,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         }
 
         entries[container] =
-            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent)
+            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent, addedAt)
     }
 
     override fun onTick() {
@@ -260,6 +296,30 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         val x: UITextInput,
         val y: UITextInput,
         val z: UITextInput,
-        var color: ColorComponent
-    )
+        val color: ColorComponent,
+        val addedAt: Long
+    ) {
+        fun toWaypoint(island: SkyblockIsland) = Waypoint(
+            name.getText(),
+            BlockPos(
+                x.getText().toInt(),
+                y.getText().toInt(),
+                z.getText().toInt()
+            ),
+            island,
+            enabled.checked,
+            color.getColor(),
+            addedAt
+        )
+    }
+
+    enum class SortingOptions(val displayName: String, val sortingBy: (Waypoint) -> String) {
+        AZ("A-Z", { "${it.name} ${it.pos} ${it.enabled}" }),
+        CLOSEST("Closest", { "${mc.thePlayer?.getDistanceSq(it.pos)} ${AZ.sortingBy(it)}" }),
+        RECENT("Recent", { "${Long.MAX_VALUE - it.addedAt} ${AZ.sortingBy(it)}" });
+
+        companion object {
+            var lastSelected = 0
+        }
+    }
 }
