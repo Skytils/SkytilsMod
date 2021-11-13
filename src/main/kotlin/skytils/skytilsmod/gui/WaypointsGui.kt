@@ -26,6 +26,7 @@ import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
@@ -207,53 +208,48 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             y = CenterConstraint()
         }
 
-        val nameComponent = (UITextInput("Waypoint Name").childOf(container).constrain {
+        val nameComponent = UITextInput("Waypoint Name").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 30.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(name)
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(name)
         }
 
-        val xComponent = (UITextInput("X").childOf(container).constrain {
+        val xComponent = UITextInput("X").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.x.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(pos.x.toString())
         }
 
-        val yComponent = (UITextInput("Y").childOf(container).constrain {
+        val yComponent = UITextInput("Y").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.y.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(pos.x.toString())
         }
 
-        val zComponent = (UITextInput("Z").childOf(container).constrain {
+        val zComponent = UITextInput("Z").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.z.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(pos.x.toString())
         }
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
@@ -271,6 +267,33 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         }.onLeftClick {
             scrollComponent.removeChild(container)
             entries.remove(container)
+        }
+
+        nameComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) xComponent.grabWindowFocus()
+            }
+        }
+
+        xComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) yComponent.grabWindowFocus()
+                setText(getText().filter { c -> c.isDigit() || c == '-' })
+            }
+        }
+
+        yComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) zComponent.grabWindowFocus()
+                setText(getText().filter { c -> c.isDigit() || c == '-' })
+            }
+        }
+
+        zComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) nameComponent.grabWindowFocus()
+                setText(getText().filter { c -> c.isDigit() || c == '-' })
+            }
         }
 
         entries[container] =
