@@ -177,7 +177,6 @@ object StupidTreasureChestOpeningThing {
         val time = System.currentTimeMillis()
         sendHelpPlease.entries.removeAll { (pos, chest) ->
             GlStateManager.disableCull()
-            GlStateManager.disableDepth()
             RenderUtil.drawFilledBoundingBox(
                 chest.box.offset(-viewerX, -viewerY, -viewerZ).expand(0.01, 0.01, 0.01),
                 Color(255, 0, 0, 69),
@@ -196,7 +195,6 @@ object StupidTreasureChestOpeningThing {
                     1f
                 )
             }
-            GlStateManager.enableDepth()
             GlStateManager.enableCull()
             return@removeAll (time - chest.time) > (5 * 1000 * 60)
         }
