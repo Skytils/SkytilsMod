@@ -86,10 +86,10 @@ object DataFetcher {
                             .associateTo(SkillUtils.skillXp) { it.key.toInt() to it.value.asLong }
                         SkillUtils.dungeoneeringXp.clear()
                         get("dungeoneering_xp").asJsonObject.entrySet()
-                            .associateTo(SkillUtils.skillXp) { it.key.toInt() to it.value.asLong }
+                            .associateTo(SkillUtils.dungeoneeringXp) { it.key.toInt() to it.value.asLong }
                         SkillUtils.slayerXp.clear()
-                        get("slayer_xp").asJsonObject.entrySet().associateTo(SkillUtils.slayerXp) {
-                            it.key to it.value.asJsonObject.entrySet()
+                        get("slayer_xp").asJsonObject.entrySet().associateTo(SkillUtils.slayerXp) { (key, element) ->
+                            key to element.asJsonObject.entrySet()
                                 .associateTo(LinkedHashMap()) { it.key.toInt() to it.value.asLong }
                         }
                     }

@@ -112,35 +112,27 @@ object StupidTreasureChestOpeningThing {
                 }
             }
             is S2APacketParticles -> {
-                val type = packet.particleType
-                val longDistance = packet.isLongDistance
-                val count = packet.particleCount
-                val speed = packet.particleSpeed
-                val xOffset = packet.xOffset
-                val yOffset = packet.yOffset
-                val zOffset = packet.zOffset
-                val x = packet.xCoordinate
-                val y = packet.yCoordinate
-                val z = packet.zCoordinate
-                if (type == EnumParticleTypes.CRIT && longDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                    val probable = sendHelpPlease.values.minByOrNull {
-                        it.pos.distanceSq(x, y, z)
-                    } ?: return
+                packet.apply {
+                    if (type == EnumParticleTypes.CRIT && isLongDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
+                        val probable = sendHelpPlease.values.minByOrNull {
+                            it.pos.distanceSq(x, y, z)
+                        } ?: return
 
-                    if (probable.pos.distanceSqToCenter(x, y, z) < 2.5) {
-                        probable.particle = Vec3(x, y, z)
-                        probable.particleBox = AxisAlignedBB(
-                            probable.particle!!.xCoord,
-                            probable.particle!!.yCoord,
-                            probable.particle!!.zCoord,
-                            probable.particle!!.xCoord + 0.1,
-                            probable.particle!!.yCoord + 0.1,
-                            probable.particle!!.zCoord + 0.1
-                        )
-                        printDevMessage(
-                            "$count ${if (longDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
-                            "chtreasure"
-                        )
+                        if (probable.pos.distanceSqToCenter(x, y, z) < 2.5) {
+                            probable.particle = Vec3(x, y, z)
+                            probable.particleBox = AxisAlignedBB(
+                                probable.particle!!.xCoord,
+                                probable.particle!!.yCoord,
+                                probable.particle!!.zCoord,
+                                probable.particle!!.xCoord + 0.1,
+                                probable.particle!!.yCoord + 0.1,
+                                probable.particle!!.zCoord + 0.1
+                            )
+                            printDevMessage(
+                                "$count ${if (isLongDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
+                                "chtreasure"
+                            )
+                        }
                     }
                 }
             }
