@@ -2155,6 +2155,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var compactBuildingTools = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Compact Mining Powder Gain",
+        description = "Compacts messages from the chests when gaining powder",
+        category = "Spam", subcategory = "Miscellaneous"
+    )
+    var compactPowderMessages = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Cooldown Hider",
         description = "Removes ability still on cooldown messages from your chat.",
         category = "Spam", subcategory = "Miscellaneous",
