@@ -17,9 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.mining
 
-import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
-import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -52,7 +50,10 @@ import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.*
+import skytils.skytilsmod.events.impl.BossBarEvent
+import skytils.skytilsmod.events.impl.GuiContainerEvent
+import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
@@ -317,13 +318,20 @@ class MiningFeatures {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (event.slot.hasStack && SBInfo.lastOpenContainerName.equals("Commissions") && Skytils.config.highlightCompletedCommissions) {
+        if (event.slot.hasStack) {
             val item = event.slot.stack
-            if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
-                if (ItemUtil.getItemLore(item).any {
-                        it == "§7§eClick to claim rewards!"
-                    }) {
+            if (Skytils.config.highlightDisabledHOTMPerks && SBInfo.lastOpenContainerName == "Heart of the Mountain") {
+                if (ItemUtil.getItemLore(item).any { it == "§cDISABLED" }) {
                     event.slot highlight Color(255, 0, 0)
+                }
+            }
+            if (Skytils.config.highlightCompletedCommissions && SBInfo.lastOpenContainerName.equals("Commissions")) {
+                if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
+                    if (ItemUtil.getItemLore(item).any {
+                            it == "§7§eClick to claim rewards!"
+                        }) {
+                        event.slot highlight Color(255, 0, 0)
+                    }
                 }
             }
         }

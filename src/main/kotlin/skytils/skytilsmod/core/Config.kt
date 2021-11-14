@@ -884,6 +884,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var highlightCompletedCommissions = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Highlight Disabled HOTM Perks",
+        description = "Marks disabled perks in the menu with a red background.",
+        category = "Mining", subcategory = "Quality of Life"
+    )
+    var highlightDisabledHOTMPerks = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "More Visible Ghosts",
         description = "Makes ghosts more visible in the Dwarven Mines.\nThis is allowed on the Hypixel network and can be done in Vanilla.",
         category = "Mining", subcategory = "Quality of Life"
