@@ -348,7 +348,7 @@ class ItemFeatures {
         if (Skytils.config.showGemstones && extraAttr?.hasKey("gems") == true) {
             val gems = extraAttr.getCompoundTag("gems")
             event.toolTip.add("§bGemstones: ")
-            event.toolTip.addAll(gems.keySet.filter { !it.endsWith("_gem") }.map {
+            event.toolTip.addAll(gems.keySet.filter { !it.endsWith("_gem") && it != "unlocked_slots" }.map {
                 "  §6- ${
                     gems.getString(it).toTitleCase()
                 } ${
