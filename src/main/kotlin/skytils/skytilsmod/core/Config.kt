@@ -361,6 +361,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showBatHitboxes = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Dungeon Floor as Stack Size",
+        description = "Shows the dungeon floor as the stack size.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showDungeonFloorAsStackSize = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Giant HP",
         description = "Shows the HP of Giants in your HUD.",
         category = "Dungeons", subcategory = "Quality of Life"
