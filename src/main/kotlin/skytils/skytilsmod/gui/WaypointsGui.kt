@@ -238,7 +238,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(pos.x.toString())
+            setText(pos.y.toString())
         }
 
         val zComponent = UITextInput("Z").childOf(container).constrain {
@@ -249,7 +249,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(pos.x.toString())
+            setText(pos.z.toString())
         }
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
