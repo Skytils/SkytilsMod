@@ -230,8 +230,12 @@ fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
     if (this is AccessorGuiNewChat) {
         if (this.chatOpen) {
             val scaleFactor = ScaledResolution(mc).scaleFactor
+            val extraOffset =
+                if (ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
+                        ?.getBoolean(null) == true
+                ) 12 else 0
             val x = MathHelper.floor_float((mouseX / scaleFactor - 3).toFloat() / chatScale)
-            val y = MathHelper.floor_float((mouseY / scaleFactor - 27).toFloat() / chatScale)
+            val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - extraOffset).toFloat() / chatScale)
 
             if (x >= 0 && y >= 0) {
                 val l = this.lineCount.coerceAtMost(this.drawnChatLines.size)

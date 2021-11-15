@@ -361,6 +361,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showBatHitboxes = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Dungeon Floor as Stack Size",
+        description = "Shows the dungeon floor as the stack size.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showDungeonFloorAsStackSize = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Giant HP",
         description = "Shows the HP of Giants in your HUD.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -757,6 +764,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var burrowHubFastTravel = false
 
     @Property(
+        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Museum",
+        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Museum warp.",
+        category = "Events", subcategory = "Mythological",
+        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
+    )
+    var burrowMuseumFastTravel = false
+
+    @Property(
         type = PropertyType.COLOR, name = "Empty/Start Burrow Color",
         description = "Color used to highlight the Griffin Burrows in.",
         category = "Events", subcategory = "Mythological",
@@ -874,6 +889,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Quality of Life"
     )
     var highlightCompletedCommissions = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Highlight Disabled HOTM Perks",
+        description = "Marks disabled perks in the menu with a red background.",
+        category = "Mining", subcategory = "Quality of Life"
+    )
+    var highlightDisabledHOTMPerks = false
 
     @Property(
         type = PropertyType.SWITCH, name = "More Visible Ghosts",
@@ -1008,6 +1030,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Chat Tabs"
     )
     var autoSwitchChatChannel = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Copy Chat Messages",
+        description = "Copy chat messages with control + click.",
+        category = "Miscellaneous", subcategory = "Chat Tabs"
+    )
+    var copyChat = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
@@ -2148,6 +2177,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var compactBuildingTools = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Compact Mining Powder Gain",
+        description = "Compacts messages from the chests when gaining powder",
+        category = "Spam", subcategory = "Miscellaneous"
+    )
+    var compactPowderMessages = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Cooldown Hider",
         description = "Removes ability still on cooldown messages from your chat.",
         category = "Spam", subcategory = "Miscellaneous",
@@ -2284,7 +2320,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "burrowCastleFastTravel",
             "burrowCryptsFastTravel",
             "burrowDarkAuctionFastTravel",
-            "burrowHubFastTravel"
+            "burrowHubFastTravel",
+            "burrowMuseumFastTravel"
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
 
         addDependency("activePetColor", "highlightActivePet")

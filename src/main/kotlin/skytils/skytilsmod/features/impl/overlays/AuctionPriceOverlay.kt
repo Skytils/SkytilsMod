@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.overlays
 
 import com.google.common.collect.Lists
+import gg.essential.universal.UKeyboard
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
@@ -30,11 +31,13 @@ import net.minecraft.network.play.client.C12PacketUpdateSign
 import net.minecraft.tileentity.TileEntitySign
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.gui.elements.CleanButton
@@ -61,6 +64,30 @@ class AuctionPriceOverlay {
             val sign = (event.gui as AccessorGuiEditSign).tileSign
             if (sign != null && sign.pos.y == 0 && sign.signText[1].unformattedText == "^^^^^^^^^^^^^^^" && sign.signText[2].unformattedText == "Your auction" && sign.signText[3].unformattedText == "starting bid") {
                 event.gui = AuctionPriceScreen(event.gui as GuiEditSign)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onGuiKey(event: GuiScreenEvent.KeyboardInputEvent) {
+        if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
+        if (event.gui is GuiChest && Keyboard.getEventKeyState() && Keyboard.getEventKey() == UKeyboard.KEY_ENTER) {
+            if (Utils.equalsOneOf(
+                    SBInfo.lastOpenContainerName,
+                    "Create Auction",
+                    "Create BIN Auction"
+                )
+            ) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 29, 2, 0, mc.thePlayer)
+                event.isCanceled = true
+            } else if (Utils.equalsOneOf(
+                    SBInfo.lastOpenContainerName,
+                    "Confirm Auction",
+                    "Confirm BIN Auction"
+                )
+            ) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 11, 2, 0, mc.thePlayer)
+                event.isCanceled = true
             }
         }
     }

@@ -76,7 +76,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
             val fr = ScreenRenderer.fontRenderer
             val invSlots = containerChest.inventorySlots
             val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim()
-            if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap" || Skytils.config.reviveStoneNames && displayName == "Revive A Teammate") {
+            if ((Skytils.config.spiritLeapNames && displayName == "Spirit Leap") || (Skytils.config.reviveStoneNames && displayName == "Revive A Teammate")) {
                 var people = 0
                 for (slot in invSlots) {
                     if (slot.inventory == mc.thePlayer.inventory) continue
@@ -84,7 +84,6 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     val item = slot.stack
                     people++
 
-                    //slot is 16x16
                     val x = slot.xDisplayPosition
                     val y = slot.yDisplayPosition + if (people % 2 != 0) -15 else 20
                     val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
@@ -95,22 +94,6 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                         ?: continue)
                     val dungeonClass = teammate.dungeonClass
                     val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
-                    var shouldDrawBkg = true
-                    if (Skytils.usingNEU && displayName != "Revive A Teammate") {
-                        try {
-                            val neuClass =
-                                Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
-                            val neuConfig = neuClass.getDeclaredField("config")
-                            val config = neuConfig[neuClass.getDeclaredField("INSTANCE")[null]]
-                            val improvedSBMenuS = config.javaClass.getDeclaredField("improvedSBMenu")[config]
-                            val enableSbMenus = improvedSBMenuS.javaClass.getDeclaredField("enableSbMenus")
-                            val customGuiEnabled = enableSbMenus.getBoolean(improvedSBMenuS)
-                            if (customGuiEnabled) shouldDrawBkg = false
-                        } catch (ignored: ClassNotFoundException) {
-                        } catch (ignored: NoSuchFieldException) {
-                        } catch (ignored: IllegalAccessException) {
-                        }
-                    }
                     val scale = 0.9
                     val scaleReset = 1 / scale
                     GlStateManager.pushMatrix()
@@ -124,7 +107,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     } else if (classes.getOrDefault(dungeonClass, false)) {
                         slot highlight Color(0, 255, 0)
                     }
-                    if (shouldDrawBkg) Gui.drawRect(
+                    Gui.drawRect(
                         x - 2 - fr.getStringWidth(text) / 2,
                         y - 2,
                         x + fr.getStringWidth(text) / 2 + 2,

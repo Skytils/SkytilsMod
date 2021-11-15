@@ -21,10 +21,12 @@ package skytils.skytilsmod.mixins.transformers.gui;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNoCallback;
+import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.mixins.hooks.gui.GuiScreenHookKt;
 
 @Mixin(GuiScreen.class)
@@ -33,6 +35,11 @@ public abstract class MixinGuiScreen extends Gui implements GuiYesNoCallback {
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(String message, boolean addToChat, CallbackInfo ci) {
         GuiScreenHookKt.onSendChatMessage(message, addToChat, ci);
+    }
+
+    @Inject(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/event/ClickEvent;getAction()Lnet/minecraft/event/ClickEvent$Action;"), cancellable = true)
+    private void blockComponentClick(IChatComponent s, CallbackInfoReturnable<Boolean> cir) {
+        GuiScreenHookKt.onComponentClick(s, cir);
     }
 
 }

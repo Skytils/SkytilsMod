@@ -17,7 +17,10 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import gg.essential.universal.UKeyboard
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -27,48 +30,112 @@ import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     @SubscribeEvent
     fun onInput(event: InputEvent) {
-        if (!Utils.inSkyblock) return
-        for ((message, code) in shortcuts) {
-            if (code == 0) continue
-            val isDown =
-                if (code > 0) event is KeyInputEvent && Keyboard.getEventKeyState() && Keyboard.getEventKey() == code else event is InputEvent.MouseInputEvent && Mouse.getEventButtonState() && Mouse.getEventButton() == code + 100
-            if (isDown) {
-                if (message.startsWith("/") && ClientCommandHandler.instance.executeCommand(
+        if (!Utils.inSkyblock || shortcuts.isEmpty()) return
+        val key =
+            when {
+                event is KeyInputEvent && Keyboard.getEventKeyState() -> Keyboard.getEventKey()
+                event is InputEvent.MouseInputEvent && Mouse.getEventButtonState() -> Mouse.getEventButton() - 100
+                else -> return
+            }
+        val modifiers = Modifiers.getBitfield(Modifiers.getPressed())
+        for (s in shortcuts) {
+            if (s.keyCode == 0) continue
+            if (s.keyCode == key && s.modifiers == modifiers) {
+                if (s.message.startsWith("/") && ClientCommandHandler.instance.executeCommand(
                         mc.thePlayer,
-                        message
+                        s.message
                     ) != 0
-                ) break
-                Skytils.sendMessageQueue.add(message)
+                ) continue
+                Skytils.sendMessageQueue.add(s.message)
             }
         }
     }
 
     override fun read(reader: InputStreamReader) {
         shortcuts.clear()
-        val data = gson.fromJson(reader, JsonObject::class.java)
-        for ((key, value) in data.entrySet()) {
-            shortcuts[key] = value.asInt
+        when (val data = gson.fromJson(reader, JsonElement::class.java)) {
+            is JsonObject -> {
+                data.entrySet().mapTo(shortcuts) { (cmd, keyCode) ->
+                    KeybindShortcut(cmd, keyCode.asInt, 0)
+                }
+            }
+            is JsonArray -> {
+                data.mapTo(shortcuts) {
+                    it as JsonObject
+                    KeybindShortcut(it["message"].asString, it["keyCode"].asInt, it["modifiers"].asInt)
+                }
+            }
         }
     }
 
     override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        for ((key, value) in shortcuts) {
-            obj.addProperty(key, value)
+        val arr = JsonArray()
+        for (s in shortcuts) {
+            val obj = JsonObject()
+            obj.addProperty("message", s.message)
+            obj.addProperty("keyCode", s.keyCode)
+            obj.addProperty("modifiers", s.modifiers)
+            arr.add(obj)
         }
-        gson.toJson(obj, writer)
+        gson.toJson(arr, writer)
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+        gson.toJson(JsonArray(), writer)
     }
 
     companion object {
-        val shortcuts = HashMap<String, Int>()
+        val shortcuts = HashSet<KeybindShortcut>()
+    }
+
+
+    data class KeybindShortcut(val message: String, val keyCode: Int, val modifiers: Int) {
+        constructor(message: String, keyCode: Int, modifiers: List<Modifiers>) : this(
+            message,
+            keyCode,
+            Modifiers.getBitfield(modifiers)
+        )
+    }
+
+    enum class Modifiers(val shortName: String, val pressed: () -> Boolean) {
+        CONTROL("Ctrl", { UKeyboard.isCtrlKeyDown() }),
+        ALT("Alt", { UKeyboard.isAltKeyDown() }),
+        SHIFT("Sft", { UKeyboard.isShiftKeyDown() });
+
+        val bitValue by lazy {
+            1 shl ordinal
+        }
+
+        fun inBitfield(field: Int) = (field and bitValue) == bitValue
+
+        companion object {
+            fun getPressed() = values().filter { it.pressed() }
+            fun getBitfield(modifiers: List<Modifiers>): Int {
+                var bits = 0
+                for (modifier in modifiers) {
+                    bits = bits or modifier.bitValue
+                }
+                return bits
+            }
+
+            fun fromBitfield(field: Int) = values().filter { it.inBitfield(field) }
+
+            fun fromUCraftBitfield(modifiers: UKeyboard.Modifiers) = getBitfield(fromUCraft(modifiers))
+
+            fun fromUCraft(modifiers: UKeyboard.Modifiers) = modifiers.run {
+                mutableListOf<Modifiers>().apply {
+                    if (isCtrl) add(CONTROL)
+                    if (isAlt) add(ALT)
+                    if (isShift) add(SHIFT)
+                }
+            }
+        }
     }
 }

@@ -155,7 +155,8 @@ class WaypointShareGui : WindowScreen(newGuiScale = 2) {
                             it.mode == e["island"].asString
                         } ?: return@mapNotNull null,
                         e["enabled"].asBoolean,
-                        e["color"]?.let{Color(it.asInt)} ?: Color.RED
+                        e["color"]?.let { Color(it.asInt) } ?: Color.RED,
+                        System.currentTimeMillis()
                     )
                 }.onFailure {
                     it.printStackTrace()

@@ -26,12 +26,14 @@ import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.features.impl.handlers.Waypoint
@@ -46,6 +48,8 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
     private val scrollComponent: ScrollComponent
 
     private val islandDropdown: DropDown
+    private val sortingOrder: DropDown
+    private val searchBar: UITextInput
 
     private val entries = HashMap<UIContainer, Entry>()
 
@@ -59,17 +63,59 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 70.percent() + 2.pixels()
         }
 
+        val topButtons = UIContainer().childOf(window).constrain {
+            x = 0.pixels()
+            y = 5.percent()
+            width = 100.percent()
+            height = ChildBasedSizeConstraint()
+        }
+
         islandDropdown = DropDown(SkyblockIsland.values().indexOfFirst {
             SBInfo.mode == it.mode
-        }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(window)
+        }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(topButtons)
             .constrain {
-                x = basicXConstraint { it.parent.getRight() - it.getWidth() - 5f }
-                y = 5.percent()
+                x = 5.pixels(true)
             }.also {
                 it.onValueChange { s ->
                     loadWaypointsForSelection(s)
                 }
             }
+
+        sortingOrder =
+            DropDown(SortingOptions.lastSelected, SortingOptions.values().map { it.displayName }).childOf(topButtons)
+                .constrain {
+                    x = SiblingConstraint(10f, true)
+                }.apply {
+                    onValueChange {
+                        SortingOptions.lastSelected = it
+                        val sorter = SortingOptions.values()[it]
+                        scrollComponent.sortChildren { c ->
+                            c as UIContainer
+                            val entry = entries[c] ?: error("no entry found for child")
+                            return@sortChildren sorter.sortingBy(entry.toWaypoint(SkyblockIsland.PrivateIsland))
+                        }
+                    }
+                }
+
+        searchBar = UITextInput("Search").childOf(topButtons).constrain {
+            x = 2.pixels()
+            y = 2.pixels()
+            width = 20.percent()
+            height = 12.pixels()
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            onKeyType { _, _ ->
+                scrollComponent.allChildren.forEach { c ->
+                    c as UIContainer
+                    val entry = entries[c] ?: error("no entry found for child")
+                    if (entry.name.getText().contains(this@apply.getText())) c.unhide()
+                    else c.hide()
+                }
+            }
+        }
+
 
         UIText("Waypoints").childOf(window).constrain {
             x = CenterConstraint()
@@ -123,17 +169,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             for (entry in entries.values) {
                 runCatching {
                     Waypoints.waypoints.add(
-                        Waypoint(
-                            entry.name.getText(),
-                            BlockPos(
-                                entry.x.getText().toInt(),
-                                entry.y.getText().toInt(),
-                                entry.z.getText().toInt()
-                            ),
-                            current,
-                            entry.enabled.checked,
-                            entry.color
-                        )
+                        entry.toWaypoint(current)
                     )
                 }.onFailure {
                     it.printStackTrace()
@@ -147,8 +183,8 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val island = SkyblockIsland.values()[selection]
             Waypoints.waypoints.filter {
                 it.island == island
-            }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-                addNewWaypoint(it.name, it.pos, it.enabled, it.color)
+            }.sortedBy { SortingOptions.values()[SortingOptions.lastSelected].sortingBy(it) }.forEach {
+                addNewWaypoint(it.name, it.pos, it.enabled, it.color, it.addedAt)
             }
         }
     }
@@ -157,13 +193,14 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         name: String = "",
         pos: BlockPos = mc.thePlayer.position,
         enabled: Boolean = true,
-        color: Color = Color.RED
+        color: Color = Color.RED,
+        addedAt: Long = System.currentTimeMillis()
     ) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 80.percent()
-            height = 30.percent()
+            height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
         val enabled = CheckboxComponent(enabled).childOf(container).constrain {
@@ -171,53 +208,48 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             y = CenterConstraint()
         }
 
-        val nameComponent = (UITextInput("Waypoint Name").childOf(container).constrain {
+        val nameComponent = UITextInput("Waypoint Name").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 30.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(name)
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(name)
         }
 
-        val xComponent = (UITextInput("X").childOf(container).constrain {
+        val xComponent = UITextInput("X").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.x.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(pos.x.toString())
         }
 
-        val yComponent = (UITextInput("Y").childOf(container).constrain {
+        val yComponent = UITextInput("Y").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.y.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(pos.y.toString())
         }
 
-        val zComponent = (UITextInput("Z").childOf(container).constrain {
+        val zComponent = UITextInput("Z").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 5.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(pos.z.toString())
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter { c -> c.isDigit() || c == '-' })
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(pos.z.toString())
         }
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
@@ -237,12 +269,43 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             entries.remove(container)
         }
 
-        entries[container] =
-            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent.getColor()).also { entry ->
-                colorComponent.onValueChange { newColor ->
-                    entry.color = newColor as Color
-                }
+        nameComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) xComponent.grabWindowFocus()
             }
+        }
+
+        xComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) yComponent.grabWindowFocus()
+                setText(getText().filter { c -> c.isDigit() || c == '-' })
+            }
+        }
+
+        yComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) zComponent.grabWindowFocus()
+                setText(getText().filter { c -> c.isDigit() || c == '-' })
+            }
+        }
+
+        zComponent.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) nameComponent.grabWindowFocus()
+                setText(getText().filter { c -> c.isDigit() || c == '-' })
+            }
+        }
+
+        entries[container] =
+            Entry(enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent, addedAt)
+    }
+
+    override fun onTick() {
+        for ((container, entry) in entries) {
+            if (entry.color.getHeight() == 20f) container.setHeight(9.5f.percent())
+            else container.setHeight(30f.percent())
+        }
+        super.onTick()
     }
 
     override fun onScreenClose() {
@@ -256,6 +319,30 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         val x: UITextInput,
         val y: UITextInput,
         val z: UITextInput,
-        var color: Color
-    )
+        val color: ColorComponent,
+        val addedAt: Long
+    ) {
+        fun toWaypoint(island: SkyblockIsland) = Waypoint(
+            name.getText(),
+            BlockPos(
+                x.getText().toInt(),
+                y.getText().toInt(),
+                z.getText().toInt()
+            ),
+            island,
+            enabled.checked,
+            color.getColor(),
+            addedAt
+        )
+    }
+
+    enum class SortingOptions(val displayName: String, val sortingBy: (Waypoint) -> String) {
+        AZ("A-Z", { "${it.name} ${it.pos} ${it.enabled}" }),
+        CLOSEST("Closest", { "${mc.thePlayer?.getDistanceSq(it.pos)} ${AZ.sortingBy(it)}" }),
+        RECENT("Recent", { "${Long.MAX_VALUE - it.addedAt} ${AZ.sortingBy(it)}" });
+
+        companion object {
+            var lastSelected = 0
+        }
+    }
 }

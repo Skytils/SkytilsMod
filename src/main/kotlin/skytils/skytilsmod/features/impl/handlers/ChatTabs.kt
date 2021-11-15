@@ -136,7 +136,7 @@ object ChatTabs {
                     b.yPosition =
                         UResolution.scaledHeight - chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * 9 - 50 - 9
                 }
-                hoveredChatLine = if (chat.chatOpen) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
+                hoveredChatLine = if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
             }
             is GuiScreenEvent.MouseInputEvent.Pre -> {
                 if (GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
@@ -173,7 +173,7 @@ object ChatTabs {
                                 )
                             )
                         }
-                    } else {
+                    } else if (Skytils.config.copyChat) {
                         val button = Mouse.getEventButton()
                         if (button != 0) return
                         val chatLine = hoveredChatLine ?: return

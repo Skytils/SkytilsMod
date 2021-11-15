@@ -29,7 +29,7 @@ plugins {
     java
 }
 
-version = "1.0.8"
+version = "1.0.9-pre1.1"
 group = "skytils.skytilsmod"
 
 minecraft {
@@ -68,7 +68,7 @@ dependencies {
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.2")
-    implementation("gg.essential:essential-1.8.9-forge:1541") {
+    implementation("gg.essential:essential-1.8.9-forge:1560") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")

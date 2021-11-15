@@ -417,14 +417,17 @@ class MiscFeatures {
             ) {
                 val arrowSlot = c.inventorySlots.getOrNull(48)?.stack
                 if (arrowSlot != null && arrowSlot.item == Items.arrow && ItemUtil.getItemLore(item)
-                        .lastOrNull() == "§eClick to view!" /* && ItemUtil.getDisplayName(arrowSlot) == "§aGo Back" && ItemUtil.getItemLore(
-                        arrowSlot
-                    ).firstOrNull() == "§7To Bestiary"*/
+                        .lastOrNull() == "§eClick to view!"
                 ) {
                     var ending = ItemUtil.getDisplayName(item).substringAfterLast(" ", "")
                     if (ending.any { !it.isUpperCase() }) ending = ""
                     stackTip = ending.romanToDecimal().toString()
                 }
+            }
+            if (Skytils.config.showDungeonFloorAsStackSize && name == "Catacombs Gate" && item.item === Items.skull) {
+                stackTip =
+                    getSkyBlockItemID(item)?.substringAfterLast("CATACOMBS_PASS_")?.toIntOrNull()?.minus(3)?.toString()
+                        ?: ""
             }
         }
 

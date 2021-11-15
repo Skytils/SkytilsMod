@@ -20,6 +20,8 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
+import gg.essential.vigilance.data.PropertyItem
+import gg.essential.vigilance.data.PropertyType
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.init.Blocks
@@ -28,6 +30,7 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
@@ -183,6 +186,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         Item.getItemFromBlock(Blocks.deadbush)
     }
 
+    private val powderQueue = hashMapOf<String, Int>()
+    private var powderQueueTicks = -1
+
     @SubscribeEvent
     fun onActionBarDisplay(event: SetActionBarEvent) {
         if (!Utils.inSkyblock) return
@@ -214,7 +220,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             Pattern.compile(
                 "(§r§cYou died and lost [\\d,.]+ coins!§r)|(§r§dJust kidding! .+ §r§7spooked you!§r)|(§r§aAll your coins are fine, this was just a big mean spook :\\)§r)|(§r§c§lDO YOU REALLY WANT TO DELETE YOUR CURRENT PROFILE\\?§r)|(§r§cIt will delete in 10 seconds\\.\\.\\.§r)|(§r§c(?:[1-5]|\\.\\.\\.)§r)|(§r§7You just got spooked! .+ §r§7is the culprit!§r)|(§r§7False! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§cYou had a blacklisted .+ §r§cin your inventory, we had to delete it! Sorry!§r)|(§r§aJK! Your items are fine\\. This was just a big spook :\\)§r)|(§r§[9-b]§l▬+§r)|(§r§eFriend request from §r§d\\[PIG§r§b\\+\\+\\+§r§d\\] Technoblade§r)|(§r§a§l\\[ACCEPT\\] §r§8- §r§c§l\\[DENY\\] §r§8- §r§7§l\\[IGNORE\\]§r)|(§r§7Nope! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§aOnly kidding! We won't give you op ;\\)§r)|(§r§eYou are now op!§r)|(§r§aYour profile is fine! This was just an evil spook :\\)§r)|(§r§aYou're fine! Nothing changed with your guild status! :\\)§r)|(§r§cYou were kicked from your guild with reason '.+'§r)|(§r§aSorry, its just a spook bro\\. :\\)§r)"
             )
-        );
+        ),
+        POWDERCHEST(Pattern.compile("§r§aYou received §r§b\\+(?<amount>\\d+) §r§a(?<type>Gemstone|Mithril) Powder§r"))
+        ;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -653,14 +661,38 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
                 // Spooky Staff
                 Skytils.config.spookyMessageHider != 0 && System.currentTimeMillis() - lastSpooked <= 10000 && Regexs.SPOOKED.pattern.matcher(
-                    packet.chatComponent.formattedText
+                    formatted
                 ).matches() -> {
                     cancelChatPacket(event, Skytils.config.spookyMessageHider == 2)
+                }
+                Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(" Powder§r") -> {
+                    val matcher = Regexs.POWDERCHEST.pattern.matcher(formatted)
+                    if (matcher.find()) {
+                        val amount = matcher.group("amount").toInt()
+                        val type = matcher.group("type")
+                        powderQueueTicks = 10
+                        powderQueue.compute(type) { _, v ->
+                            (v ?: 0) + amount
+                        }
+                        cancelChatPacket(event, false)
+                    }
                 }
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        if (powderQueueTicks != -1) {
+            if (--powderQueueTicks <= 0) {
+                powderQueueTicks = -1
+                UChat.chat("§r§aYou received ${powderQueue.entries.joinToString(separator = " and ") { "§r§b+${it.value} §r§a${it.key}" }} Powder§r")
+                powderQueue.clear()
+            }
         }
     }
 
@@ -774,38 +806,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         override val width: Int
             get() = ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r")
         override val toggled: Boolean
-            get() = Skytils.config.profileHider == 2 ||
-                    Skytils.config.implosionHider == 2 ||
-                    Skytils.config.midasStaffHider == 2 ||
-                    Skytils.config.spiritSceptreHider == 2 ||
-                    Skytils.config.giantSwordHider == 2 ||
-                    Skytils.config.lividHider == 2 ||
-                    Skytils.config.hopeHider == 2 ||
-                    Skytils.config.manaUseHider == 2 ||
-                    Skytils.config.bloodKeyHider == 2 ||
-                    Skytils.config.hideBossMessages == 2 ||
-                    Skytils.config.hideDungeonCountdownAndReady == 2 ||
-                    Skytils.config.hideDungeonAbilities == 2 ||
-                    Skytils.config.hideMortMessages == 2 ||
-                    Skytils.config.superboomHider == 2 ||
-                    Skytils.config.reviveStoneHider == 2 ||
-                    Skytils.config.witherKeyHider == 2 ||
-                    Skytils.config.inTheWayHider == 2 ||
-                    Skytils.config.hideCantUseAbility == 2 ||
-                    Skytils.config.comboHider == 2 ||
-                    Skytils.config.cooldownHider == 2 ||
-                    Skytils.config.hideNoEnemiesNearby == 2 ||
-                    Skytils.config.manaMessages == 2 ||
-                    Skytils.config.blessingEnchantHider == 2 ||
-                    Skytils.config.blessedBaitHider == 2 ||
-                    Skytils.config.tetherHider == 2 ||
-                    Skytils.config.selfOrbHider == 2 ||
-                    Skytils.config.otherOrbHider == 2 ||
-                    Skytils.config.trapDamageHider == 2 ||
-                    Skytils.config.autoRecombHider == 2 ||
-                    Skytils.config.witherEssenceHider == 2 ||
-                    Skytils.config.undeadEssenceHider == 2 ||
-                    Skytils.config.healingHider == 2
+            get() = Skytils.config.getCategoryFromSearch("Hider").items.filterIsInstance<PropertyItem>()
+                .filter { it.data.attributesExt.type == PropertyType.SELECTOR && it.data.attributesExt.options.size >= 3 && it.data.attributesExt.name != "Text Shadow" }
+                .any { it.data.getValue() as Int == 2 }
 
         companion object {
             var lastTimeRender = Date().time
