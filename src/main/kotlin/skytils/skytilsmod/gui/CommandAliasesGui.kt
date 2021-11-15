@@ -24,6 +24,7 @@ import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
@@ -105,29 +106,37 @@ class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        (UITextInput("Alias Name").childOf(container).constrain {
+        val aliasName = UITextInput("Alias Name").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
             width = 30.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(alias)
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(alias)
         }
 
-        (UITextInput("Executed Command").childOf(container).constrain {
+        val commandInput = UITextInput("Executed Command").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 50.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(replacement)
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(replacement)
+        }
+        aliasName.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) commandInput.grabWindowFocus()
+                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+            }
+        }
+        commandInput.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) aliasName.grabWindowFocus()
+                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
 

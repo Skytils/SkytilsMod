@@ -24,6 +24,7 @@ import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
@@ -105,29 +106,39 @@ class EnchantNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        (UITextInput("Enchant Name").childOf(container).constrain {
+
+        val enchantName = UITextInput("Enchant Name").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
             width = 40.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(name)
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
             }
+            setText(name)
         }
 
-        (UITextInput("Replacement").childOf(container).constrain {
+        val replacement = UITextInput("Replacement").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 40.percent()
-        }.onLeftClick {
-            grabWindowFocus()
-        } as UITextInput).also {
-            it.setText(replacement)
-            it.onKeyType { _, _ ->
-                it.setText(it.getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(replacement)
+        }
+
+        enchantName.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) replacement.grabWindowFocus()
+                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+            }
+        }
+        replacement.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) enchantName.grabWindowFocus()
+                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
 

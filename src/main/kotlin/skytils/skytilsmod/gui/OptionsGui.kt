@@ -66,7 +66,7 @@ class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiSc
         }.onMouseClick {
             mc.displayGuiScreen(LocationEditGui())
         }
-        SimpleButton("Edit Shortcuts").childOf(window).constrain {
+        SimpleButton("Edit Key Shortcuts").childOf(window).constrain {
             x = CenterConstraint()
             y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()

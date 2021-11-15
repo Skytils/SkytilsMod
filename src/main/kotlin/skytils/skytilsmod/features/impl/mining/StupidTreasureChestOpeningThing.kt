@@ -19,13 +19,15 @@
 package skytils.skytilsmod.features.impl.mining
 
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,7 +35,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.events.impl.PacketEvent
-import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import skytils.skytilsmod.utils.*
 import java.awt.Color
 import kotlin.math.abs
@@ -46,7 +47,12 @@ object StupidTreasureChestOpeningThing {
 
     val sendHelpPlease = hashMapOf<BlockPos, StupidChest>()
 
-    data class StupidChest(val pos: BlockPos, var progress: Int = 0, var particle: Vec3? = null) {
+    data class StupidChest(
+        val pos: BlockPos,
+        var progress: Int = 0,
+        val time: Long = System.currentTimeMillis(),
+        var particle: Vec3? = null
+    ) {
         val box = AxisAlignedBB(
             pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(),
             (pos.x + 1).toDouble(), (pos.y + 1).toDouble(), (pos.z + 1).toDouble()
@@ -106,35 +112,27 @@ object StupidTreasureChestOpeningThing {
                 }
             }
             is S2APacketParticles -> {
-                val type = packet.particleType
-                val longDistance = packet.isLongDistance
-                val count = packet.particleCount
-                val speed = packet.particleSpeed
-                val xOffset = packet.xOffset
-                val yOffset = packet.yOffset
-                val zOffset = packet.zOffset
-                val x = packet.xCoordinate
-                val y = packet.yCoordinate
-                val z = packet.zCoordinate
-                if (type == EnumParticleTypes.CRIT && longDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                    val probable = sendHelpPlease.values.minByOrNull {
-                        it.pos.distanceSq(x, y, z)
-                    } ?: return
+                packet.apply {
+                    if (type == EnumParticleTypes.CRIT && isLongDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
+                        val probable = sendHelpPlease.values.minByOrNull {
+                            it.pos.distanceSq(x, y, z)
+                        } ?: return
 
-                    if (probable.pos.distanceSqToCenter(x, y, z) < 2.5) {
-                        probable.particle = Vec3(x, y, z)
-                        probable.particleBox = AxisAlignedBB(
-                            probable.particle!!.xCoord,
-                            probable.particle!!.yCoord,
-                            probable.particle!!.zCoord,
-                            probable.particle!!.xCoord + 0.1,
-                            probable.particle!!.yCoord + 0.1,
-                            probable.particle!!.zCoord + 0.1
-                        )
-                        printDevMessage(
-                            "$count ${if (longDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
-                            "chtreasure"
-                        )
+                        if (probable.pos.distanceSqToCenter(x, y, z) < 2.5) {
+                            probable.particle = Vec3(x, y, z)
+                            probable.particleBox = AxisAlignedBB(
+                                probable.particle!!.xCoord,
+                                probable.particle!!.yCoord,
+                                probable.particle!!.zCoord,
+                                probable.particle!!.xCoord + 0.1,
+                                probable.particle!!.yCoord + 0.1,
+                                probable.particle!!.zCoord + 0.1
+                            )
+                            printDevMessage(
+                                "$count ${if (isLongDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
+                                "chtreasure"
+                            )
+                        }
                     }
                 }
             }
@@ -165,12 +163,12 @@ object StupidTreasureChestOpeningThing {
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
-        if (!Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+        if (!Skytils.config.chTreasureHelper || sendHelpPlease.isEmpty() || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
-        for ((pos, chest) in sendHelpPlease) {
+        val time = System.currentTimeMillis()
+        sendHelpPlease.entries.removeAll { (pos, chest) ->
             GlStateManager.disableCull()
-            GlStateManager.disableDepth()
             RenderUtil.drawFilledBoundingBox(
                 chest.box.offset(-viewerX, -viewerY, -viewerZ).expand(0.01, 0.01, 0.01),
                 Color(255, 0, 0, 69),
@@ -189,8 +187,8 @@ object StupidTreasureChestOpeningThing {
                     1f
                 )
             }
-            GlStateManager.enableDepth()
             GlStateManager.enableCull()
+            return@removeAll (time - chest.time) > (5 * 1000 * 60)
         }
     }
 

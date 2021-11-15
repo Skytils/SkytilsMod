@@ -61,7 +61,8 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     it.mode == e["island"].asString
                 } ?: return@mapNotNullTo null,
                 e["enabled"].asBoolean,
-                e["color"]?.let { Color(it.asInt) } ?: Color.RED
+                e["color"]?.let { Color(it.asInt) } ?: Color.RED,
+                e["addedAt"]?.asLong ?: System.currentTimeMillis()
             )
         }
     }
@@ -77,6 +78,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 addProperty("island", it.island.mode)
                 addProperty("enabled", it.enabled)
                 addProperty("color", it.color.rgb)
+                addProperty("addedAt", it.addedAt)
             })
         }
         gson.toJson(arr, writer)
@@ -97,7 +99,8 @@ data class Waypoint(
     var pos: BlockPos,
     var island: SkyblockIsland,
     var enabled: Boolean,
-    val color: Color
+    val color: Color,
+    val addedAt: Long
 ) {
     fun draw(partialTicks: Float) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)

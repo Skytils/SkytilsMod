@@ -61,7 +61,7 @@ object RenderUtil {
         val topOffset = bottomOffset + height
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
-        Minecraft.getMinecraft().textureManager.bindTexture(beaconBeam)
+        mc.textureManager.bindTexture(beaconBeam)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0f)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0f)
         GlStateManager.disableLighting()
@@ -70,7 +70,7 @@ object RenderUtil {
         GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        val time = Minecraft.getMinecraft().theWorld.totalWorldTime + partialTicks.toDouble()
+        val time = mc.theWorld.totalWorldTime + partialTicks.toDouble()
         val d1 = MathHelper.func_181162_h(
             -time * 0.2 - MathHelper.floor_double(-time * 0.1)
                 .toDouble()
@@ -223,7 +223,7 @@ object RenderUtil {
      */
     @JvmStatic
     fun drawOutlinedBoundingBox(aabb: AxisAlignedBB?, color: Color, width: Float, partialTicks: Float) {
-        val render = Minecraft.getMinecraft().renderViewEntity
+        val render = mc.renderViewEntity
         val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
         val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
         val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
@@ -258,7 +258,7 @@ object RenderUtil {
         GlStateManager.enableBlend()
         GlStateManager.enableDepth()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        Minecraft.getMinecraft().renderItem.renderItemAndEffectIntoGUI(itemStack, x, y)
+        mc.renderItem.renderItemAndEffectIntoGUI(itemStack, x, y)
     }
 
     /**
@@ -283,7 +283,7 @@ object RenderUtil {
         GlStateManager.enableDepth()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.pushMatrix()
-        Minecraft.getMinecraft().textureManager.bindTexture(texture)
+        mc.textureManager.bindTexture(texture)
         GlStateManager.enableRescaleNormal()
         GlStateManager.enableAlpha()
         GlStateManager.alphaFunc(516, 0.1f)
@@ -303,7 +303,7 @@ object RenderUtil {
      * @author bowser0000
      */
     fun draw3DLine(pos1: Vec3, pos2: Vec3, width: Int, color: Color, partialTicks: Float) {
-        val render = Minecraft.getMinecraft().renderViewEntity
+        val render = mc.renderViewEntity
         val worldRenderer = Tessellator.getInstance().worldRenderer
         val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
         val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
@@ -335,7 +335,7 @@ object RenderUtil {
      * @author bowser0000
      */
     fun draw3DString(pos: Vec3, text: String, color: Color, partialTicks: Float) {
-        val mc = Minecraft.getMinecraft()
+        val mc = mc
         val player: EntityPlayer = mc.thePlayer
         val x =
             pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
@@ -369,7 +369,7 @@ object RenderUtil {
     fun renderWaypointText(str: String?, loc: BlockPos, partialTicks: Float) {
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()
-        val viewer = Minecraft.getMinecraft().renderViewEntity
+        val viewer = mc.renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
         val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
@@ -386,11 +386,11 @@ object RenderUtil {
         GlStateManager.translate(x, y, z)
         GlStateManager.translate(0f, viewer.eyeHeight, 0f)
         drawNametag(str)
-        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(Minecraft.getMinecraft().renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.translate(0f, -0.25f, 0f)
-        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.rotate(Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(-mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
@@ -405,13 +405,10 @@ object RenderUtil {
     fun renderWaypointText(str: String?, X: Double, Y: Double, Z: Double, partialTicks: Float) {
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        var x = X - viewerX
-        var y = Y - viewerY - viewer.eyeHeight
-        var z = Z - viewerZ
+        val viewer = mc.renderViewEntity
+        var x = X - mc.renderManager.viewerPosX
+        var y = Y - mc.renderManager.viewerPosY - viewer.eyeHeight
+        var z = Z - mc.renderManager.viewerPosZ
         val distSq = x * x + y * y + z * z
         val dist = sqrt(distSq)
         if (distSq > 144) {
@@ -422,29 +419,31 @@ object RenderUtil {
         GlStateManager.translate(x, y, z)
         GlStateManager.translate(0f, viewer.eyeHeight, 0f)
         drawNametag(str)
-        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(Minecraft.getMinecraft().renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.translate(0f, -0.25f, 0f)
-        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.rotate(Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(-mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
     }
 
     /**
-     * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
-     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
-     * @author Moulberry
+     * @author Mojang
      */
     private fun drawNametag(str: String?) {
-        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-        val f = 1.6f
-        val f1 = 0.016666668f * f
+        val fontRenderer = mc.fontRendererObj
+        val f1 = 0.02666667f
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(Minecraft.getMinecraft().renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(
+            mc.renderManager.playerViewX,
+            1.0f,
+            0.0f,
+            0.0f
+        )
         GlStateManager.scale(-f1, -f1, f1)
         GlStateManager.disableLighting()
         GlStateManager.depthMask(false)
@@ -463,9 +462,9 @@ object RenderUtil {
         worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
         tessellator.draw()
         GlStateManager.enableTexture2D()
-        fontRenderer.drawString(str, -fontRenderer.getStringWidth(str) / 2, i, 553648127)
+        fontRenderer.drawString(str, -j, i, 553648127)
         GlStateManager.depthMask(true)
-        fontRenderer.drawString(str, -fontRenderer.getStringWidth(str) / 2, i, -1)
+        fontRenderer.drawString(str, -j, i, -1)
         GlStateManager.enableDepth()
         GlStateManager.enableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
@@ -584,7 +583,11 @@ object RenderUtil {
                 GL11.glColorMask(true, true, true, true)
 
                 GL11.glStencilMask(0x00) // Writing = OFF
-                GL11.glStencilFunc(GL11.GL_NOTEQUAL, 0, 0xFF) // Anything that wasn't defined above will not be rendered.
+                GL11.glStencilFunc(
+                    GL11.GL_NOTEQUAL,
+                    0,
+                    0xFF
+                ) // Anything that wasn't defined above will not be rendered.
                 //Anything rendered here will be cut if goes beyond frame defined before.
                 Gui.drawRect(
                     1, 1, 17, 17,
@@ -659,7 +662,7 @@ object RenderUtil {
         var x1 = x
         var y1 = y
         var z1 = z
-        val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
+        val renderViewEntity = mc.renderViewEntity
         val viewX =
             renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * partialTicks.toDouble()
         val viewY =
@@ -715,7 +718,7 @@ object RenderUtil {
     }
 
     fun getViewerPos(partialTicks: Float): Triple<Double, Double, Double> {
-        val viewer = Minecraft.getMinecraft().renderViewEntity
+        val viewer = mc.renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
         val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
@@ -762,6 +765,24 @@ object RenderUtil {
             .color(red, green, blue, alpha).endVertex()
         renderer.pos(x.toDouble() + width.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
         tesselator.draw()
+    }
+
+    /*
+    * @link https://stackoverflow.com/a/54913292
+    */
+    fun mixColors(vararg colors: Color): Color {
+        val ratio = 1f / colors.size.toFloat()
+        var r = 0
+        var g = 0
+        var b = 0
+        var a = 0
+        for (color in colors) {
+            r += (color.red * ratio).toInt()
+            g += (color.green * ratio).toInt()
+            b += (color.blue * ratio).toInt()
+            a += (color.alpha * ratio).toInt()
+        }
+        return Color(r, g, b, a)
     }
 }
 
