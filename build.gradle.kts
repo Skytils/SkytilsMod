@@ -22,7 +22,7 @@ import net.minecraftforge.gradle.user.TaskSingleReobf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
     id("net.minecraftforge.gradle.forge") version "6f5327"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.spongepowered.mixin") version "d5f9873d60"
