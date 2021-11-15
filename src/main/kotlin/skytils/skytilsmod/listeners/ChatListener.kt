@@ -18,8 +18,11 @@
 package skytils.skytilsmod.listeners
 
 import gg.essential.universal.UChat
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
+import net.minecraft.util.StringUtils
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -27,11 +30,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
+import skytils.skytilsmod.features.impl.misc.BonzoMaskTimer
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 import kotlin.concurrent.thread
+
 
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -65,13 +71,19 @@ class ChatListener {
                     return
                 }
             }
-            if (unformatted.contains("You have 60 seconds to accept") && lastPartyDisbander.isNotEmpty() && event.message.siblings.size >= 7) {
-                val acceptMessage = event.message.siblings[6].chatStyle
-                if (acceptMessage.chatHoverEvent.value.unformattedText.contains(lastPartyDisbander)) {
-                    Skytils.sendMessageQueue.add("/p accept $lastPartyDisbander")
-                    rejoinThread!!.interrupt()
-                    lastPartyDisbander = ""
-                    return
+            if (unformatted.contains("Your Bonzo's Mask saved your life!")) {
+                val bonzoMask: ItemStack = mc.thePlayer.getCurrentArmor(3)
+                if (bonzoMask.item === Items.skull) {
+                    val usedTime = (System.currentTimeMillis() / 1000).toDouble()
+
+                    var cooldownSeconds = 0
+                    for (line in ItemUtil.getItemLore(bonzoMask)) {
+                        val stripped: String = StringUtils.stripControlCodes(line)
+                        if (stripped.startsWith("Cooldown: "))
+                            cooldownSeconds = stripped.replace("[^\\d]".toRegex(), "").toInt()
+                    }
+                    println("Parsed Bonzo Mask Cooldown: $cooldownSeconds")
+                    if (cooldownSeconds > 0) BonzoMaskTimer.bonzoUse = (usedTime + cooldownSeconds).toInt()
                 }
             }
         }

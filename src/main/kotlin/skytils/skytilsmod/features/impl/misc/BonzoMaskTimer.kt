@@ -60,7 +60,7 @@ class BonzoMaskTimer {
 
         override fun demoRender() {
             fr.drawString(
-                "§6Bonzo Mask: §c9:99",
+                "§6Bonzo Mask: §aREADY",
                 0f,
                 0f,
                 CommonColors.GREEN,
