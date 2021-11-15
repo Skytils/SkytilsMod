@@ -68,7 +68,7 @@ dependencies {
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.2")
-    implementation("gg.essential:essential-1.8.9-forge:1560") {
+    implementation("gg.essential:essential-1.8.9-forge:1566") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
