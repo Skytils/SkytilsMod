@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.entity.Entity
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
@@ -396,7 +397,7 @@ class Skytils {
         if (event.packet is S1CPacketEntityMetadata) {
             val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 }
             if (nameObj != null) {
-                val entity = mc.theWorld.getEntityByID(event.packet.entityId)
+                val entity = mc.theWorld?.getEntityByID(event.packet.entityId)
 
                 if (entity is ExtensionEntityLivingBase) {
                     entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
