@@ -132,7 +132,7 @@ object UpdateChecker {
     fun onGuiOpen(e: GuiOpenEvent) {
         if (e.gui !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
-        if (UpdateGui.complete || UpdateGui.complete) return
+        if (UpdateGui.complete) return
         Skytils.displayScreen = RequestUpdateGui()
     }
 
@@ -165,16 +165,14 @@ object UpdateChecker {
     class SkytilsVersion(val versionString: String) : Comparable<SkytilsVersion> {
 
         companion object {
-            val regex = Regex("^(?<version>[\\d.]+)-?(?<type>\\D+)?(?<typever>\\d+\\.?\\d*)?\$")
+            val regex by lazy { Regex("^(?<version>[\\d.]+)-?(?<type>\\D+)?(?<typever>\\d+\\.?\\d*)?\$") }
         }
 
-        private val matched by lazy {
-            regex.find(versionString)
-        }
-        val isSafe = matched != null
+        private val matched by lazy { regex.find(versionString) }
+        val isSafe by lazy { matched != null }
 
-        val version = matched!!.groups["version"]!!.value
-        val versionArtifact = DefaultArtifactVersion(matched!!.groups["version"]!!.value)
+        val version by lazy { matched!!.groups["version"]!!.value }
+        val versionArtifact by lazy { DefaultArtifactVersion(matched!!.groups["version"]!!.value) }
         val specialVersionType by lazy {
             val typeString = matched!!.groups["type"]?.value ?: return@lazy UpdateType.RELEASE
 
