@@ -1042,7 +1042,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Fixes SBA chroma with Patcher 1.6",
         category = "Miscellaneous", subcategory = "Fixes"
     )
-    var fixSbaChroma = false
+    var fixSbaChroma = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix World Time",
@@ -1366,7 +1366,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Hides the Witherborn boss bars.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var bossBarFix = false
+    var bossBarFix = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
