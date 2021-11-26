@@ -149,11 +149,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var updateChannel = 2
 
     @Property(
-        type = PropertyType.SWITCH, name = "Auto Copy Fails to Clipboard",
-        description = "Copies deaths and fails in dungeons to your clipboard.",
+        type = PropertyType.SWITCH, name = "Red Screen Fix",
+        description = "Fixes an issue in The Catacombs Floors 2 and 3 where the screen turns red on fancy graphics.",
         category = "Dungeons", subcategory = "Miscellaneous"
     )
-    var autoCopyFailToClipboard = false
+    var worldborderFix = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
@@ -161,6 +161,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "HUD"
     )
     var bigCryptsCounter = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Copy Fails to Clipboard",
+        description = "Copies deaths and fails in dungeons to your clipboard.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var autoCopyFailToClipboard = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Auto-Reparty on Dungeon Ending",
