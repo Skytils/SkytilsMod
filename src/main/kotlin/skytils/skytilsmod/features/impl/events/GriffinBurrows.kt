@@ -98,9 +98,11 @@ class GriffinBurrows {
                     val dupes = receivedBurrows.filterTo(hashMapOf()) { (bpos, _) ->
                         dugBurrows.contains(bpos) || particleBurrows[bpos]?.dug == true
                     }.also { receivedBurrows.entries.removeAll(it.entries) }
-                    burrows.clear()
-                    burrows.putAll(receivedBurrows)
-                    particleBurrows.clear()
+                    Utils.checkThreadAndQueue {
+                        burrows.clear()
+                        burrows.putAll(receivedBurrows)
+                        particleBurrows.clear()
+                    }
                     if (receivedBurrows.size == 0) {
                         if (dupes.isEmpty()) UChat.chat("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.") else UChat.chat(
                             "§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."
