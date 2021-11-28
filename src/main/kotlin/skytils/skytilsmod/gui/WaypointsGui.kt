@@ -200,7 +200,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 80.percent()
-            height = 9.5.percent()
+            height = ChildBasedRangeConstraint()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
         val enabled = CheckboxComponent(enabled).childOf(container).constrain {
@@ -255,7 +255,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
             x = SiblingConstraint(25f)
             y = CenterConstraint()
-            width = CoerceAtLeastConstraint(AspectConstraint(), 20.percent)
+            width = CoerceAtLeastConstraint(AspectConstraint(), 10.percentOfWindow)
         }.also {
             it.setColor(color)
         }
@@ -263,7 +263,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         SimpleButton("Remove").childOf(container).constrain {
             x = 85.percent()
             y = CenterConstraint()
-            height = 75.percent()
+            height = 40.pixels
         }.onLeftClick {
             scrollComponent.removeChild(container)
             entries.remove(container)
