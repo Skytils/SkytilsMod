@@ -98,7 +98,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0.9-pre1.1"
+        const val VERSION = "1.0.9-RC1"
 
         @JvmField
         val gson: Gson = GsonBuilder()
