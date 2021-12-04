@@ -19,6 +19,7 @@
     "audio.MixinSoundManager",
     "block.MixinBlockSlab",
     "block.MixinBlockStairs",
+    "command.MixinCommandHandler",
     "crash.MixinCrashReport",
     "entity.MixinAbstractClientPlayer",
     "entity.MixinBossStatus",
