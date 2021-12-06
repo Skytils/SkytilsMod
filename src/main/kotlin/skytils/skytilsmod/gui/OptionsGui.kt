@@ -90,6 +90,14 @@ class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiSc
         }.onMouseClick {
             mc.displayGuiScreen(WaypointsGui())
         }
+        SimpleButton("Edit Notifications").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            mc.displayGuiScreen(CustomNotificationsGui())
+        }
         SimpleButton("Edit Enchantment Names").childOf(window).constrain {
             x = CenterConstraint()
             y = SiblingConstraint() + 2.pixels()
