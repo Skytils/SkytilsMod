@@ -130,13 +130,11 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         triggerMessage.apply {
             onKeyType { _, keyCode ->
                 if (keyCode == UKeyboard.KEY_TAB) displayText.grabWindowFocus()
-                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
         displayText.apply {
             onKeyType { _, keyCode ->
                 if (keyCode == UKeyboard.KEY_TAB) triggerMessage.grabWindowFocus()
-                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
 

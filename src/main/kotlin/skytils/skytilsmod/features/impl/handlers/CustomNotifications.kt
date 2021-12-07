@@ -25,14 +25,15 @@ import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.utils.Utils
-import java.io.*
-import java.util.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifications.json")) {
 
     @SubscribeEvent
     fun onMessage(event: MainReceivePacketEvent<*, *>) {
-        if (!Utils.inSkyblock || event.packet !is S02PacketChat || notifications.isEmpty()) return
+        if (!Utils.inSkyblock || (event.packet !is S02PacketChat) || event.packet.type != 0.toByte() || notifications.isEmpty()) return
         Skytils.threadPool.submit {
             val formatted = event.packet.chatComponent.formattedText
             for ((regex, text) in notifications) {
