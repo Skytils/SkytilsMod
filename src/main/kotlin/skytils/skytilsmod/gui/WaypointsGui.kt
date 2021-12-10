@@ -256,8 +256,11 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = SiblingConstraint(25f)
             y = CenterConstraint()
             width = CoerceAtLeastConstraint(AspectConstraint(), 10.percentOfWindow)
-        }.also {
-            it.setColor(color)
+        }.apply {
+            setColor(color)
+            onValueChange { c ->
+                setColor(c as Color)
+            }
         }
 
         SimpleButton("Remove").childOf(container).constrain {
