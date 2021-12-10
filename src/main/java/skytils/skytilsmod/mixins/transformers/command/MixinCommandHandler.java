@@ -20,18 +20,23 @@ package skytils.skytilsmod.mixins.transformers.command;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommandManager;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.features.impl.handlers.CommandAliases;
 
 import java.util.List;
 
 @Mixin(CommandHandler.class)
 public abstract class MixinCommandHandler implements ICommandManager {
-    @ModifyVariable(method = "getTabCompletionOptions", at = @At(value = "STORE"), ordinal = 0)
-    private List<String> addTabCompletableCommands(List<String> list) {
-        list.addAll(CommandAliases.Companion.getAliases().keySet());
-        return list;
+    @Inject(method = "getTabCompletionOptions", at = @At(value = "RETURN", ordinal = 0))
+    private void addTabCompletableCommands(ICommandSender sender, String input, BlockPos pos, CallbackInfoReturnable<List<String>> cir) {
+        List<String> list = cir.getReturnValue();
+        for (String cmd : CommandAliases.Companion.getAliases().keySet()) {
+            if (cmd.startsWith(input)) list.add(cmd);
+        }
     }
 }
