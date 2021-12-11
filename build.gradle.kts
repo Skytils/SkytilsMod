@@ -105,6 +105,14 @@ sourceSets {
     }
 }
 
+configure<NamedDomainObjectContainer<IReobfuscator>> {
+    clear()
+    create("shadowJar") {
+        mappingType = SEARGE
+        classpath = sourceSets.main.get().compileClasspath
+    }
+}
+
 tasks {
     processResources {
         inputs.property("version", project.version)
@@ -166,16 +174,13 @@ tasks {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
         }
+        kotlinDaemonJvmArguments.set(listOf("-Xmx4G", "-Dkotlin.enableCacheBuilding=true", "-Dkotlin.useParallelTasks=true", "-Dkotlin.enableFastIncremental=true"))
     }
     named<TaskSingleReobf>("reobfJar") {
-        dependsOn(shadowJar)
+        enabled = false
     }
-}
-
-configure<NamedDomainObjectContainer<IReobfuscator>> {
-    create("shadowJar") {
-        mappingType = SEARGE
-        classpath = sourceSets.main.get().compileClasspath
+    named<TaskSingleReobf>("reobfShadowJar") {
+        mustRunAfter(shadowJar)
     }
 }
 
