@@ -44,6 +44,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.asm.SkytilsTransformer
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
@@ -168,9 +169,9 @@ object Utils {
 
     fun timeFormat(seconds: Double): String {
         return if (seconds >= 60) {
-            floor(seconds / 60).toInt().toString() + "m " + (seconds % 60).roundToInt() + "s"
+            "${floor(seconds / 60).toInt()}m ${(seconds % 60).roundToPrecision(3)}s"
         } else {
-            seconds.roundToInt().toString() + "s"
+            "${seconds.roundToPrecision(3)}s"
         }
     }
 
