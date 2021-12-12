@@ -146,6 +146,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
+        DataFetcher.preload()
         if (!modDir.exists()) modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
@@ -286,7 +287,6 @@ class Skytils {
             cch.commandMap["rp"] = RepartyCommand
         }
 
-        DataFetcher.preload()
         MayorInfo.fetchMayorData()
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
