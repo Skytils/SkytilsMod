@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent
 import java.io.File
 import java.net.URI
 import java.net.URL
+import java.util.*
 import javax.swing.*
 
 /**
@@ -47,10 +48,11 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     init {
         if (System.getProperty("skytils.skipStartChecks") == null) {
             // Must use reflection otherwise the "constant" value will be inlined by compiler
-            if (!runCatching {
-                    MixinBootstrap::class.java.getDeclaredField("VERSION").also { it.isAccessible = true }
-                        .get(null) as String
-                }.getOrDefault("unknown").startsWithAny("0.7", "0.8")) {
+            val mixinVersion = runCatching {
+                MixinBootstrap::class.java.getDeclaredField("VERSION").also { it.isAccessible = true }
+                    .get(null) as String
+            }.getOrDefault("unknown")
+            if (!mixinVersion.startsWithAny("0.7", "0.8")) {
                 try {
                     Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
                     showMessage(SkytilsLoadingPlugin.liteloaderUserMessage)
@@ -63,6 +65,14 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                     )
                     SkytilsLoadingPlugin.exit()
                 }
+            }
+            val testString = "I love using the Skytils mod <3"
+            if (mixinVersion.startsWith("0.7") && (testString.lowercase(Locale.getDefault()) != testString.lowercase() || testString.uppercase(
+                    Locale.getDefault()
+                ) != testString.uppercase())
+            ) {
+                println("Problematic locale detected, setting to en-US")
+                Locale.setDefault(Locale.US)
             }
 
             // Must use reflection otherwise the "constant" value will be inlined by compiler

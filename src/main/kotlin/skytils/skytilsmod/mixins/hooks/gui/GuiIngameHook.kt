@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.impl.SetActionBarEvent
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.Utils
@@ -58,3 +59,13 @@ fun renderRarityOnHotbar(
         ItemFeatures.hotbarRarityCache[index]?.let { renderRarity(xPos, yPos, it) }
     }
 }
+
+fun onWorldBorder(f: Float): Float =
+    if (Skytils.config.worldborderFix && DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
+            DungeonFeatures.dungeonFloor,
+            "F2",
+            "M2",
+            "F3",
+            "M3"
+        )
+    ) 0f else f

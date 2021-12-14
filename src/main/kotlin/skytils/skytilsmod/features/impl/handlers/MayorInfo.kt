@@ -98,12 +98,12 @@ object MayorInfo {
         if (mc.currentServerData?.serverIP?.lowercase()
                 ?.contains("alpha") == true
         ) return
-        if (event.message.unformattedText == "§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]" && event.message.siblings.size == 1) {
-            val hoverEvent = event.message.siblings[0].chatStyle.chatHoverEvent
+        if (event.message.unformattedText == "§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]") {
+            val hoverEvent = event.message.chatStyle.chatHoverEvent
             if (hoverEvent != null && hoverEvent.action == HoverEvent.Action.SHOW_TEXT) {
                 val value = hoverEvent.value
                 println(value.formattedText)
-                val lines = value.formattedText.split("\n".toRegex()).toTypedArray()
+                val lines = value.formattedText.split("\n")
                 if (lines.size < 2) return
                 var color = ""
                 if (lines[0].stripControlCodes().startsWith("Mayor ")) {
@@ -116,7 +116,7 @@ object MayorInfo {
                 val perks = HashSet<String>()
                 for (i in 1 until lines.size) {
                     val line = lines[i]
-                    if (!line.contains("§") || line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
+                    if (line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
                     if (color.isNotEmpty()) {
                         if (line.startsWith("§r$color")) {
                             perks.add(line.stripControlCodes())

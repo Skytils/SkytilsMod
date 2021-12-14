@@ -61,7 +61,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     it.mode == e["island"].asString
                 } ?: return@mapNotNullTo null,
                 e["enabled"].asBoolean,
-                e["color"]?.let { Color(it.asInt) } ?: Color.RED,
+                e["color"]?.let { Color(it.asInt, true) } ?: Color.RED,
                 e["addedAt"]?.asLong ?: System.currentTimeMillis()
             )
         }

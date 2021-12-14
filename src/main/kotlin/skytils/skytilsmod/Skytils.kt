@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.entity.Entity
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
@@ -97,7 +98,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0.9-pre1"
+        const val VERSION = "1.0.9-RC1"
 
         @JvmField
         val gson: Gson = GsonBuilder()
@@ -145,6 +146,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
+        DataFetcher.preload()
         if (!modDir.exists()) modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
@@ -182,6 +184,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(CreeperSolver())
         MinecraftForge.EVENT_BUS.register(CommandAliases())
         MinecraftForge.EVENT_BUS.register(CooldownTracker())
+        MinecraftForge.EVENT_BUS.register(CustomNotifications())
         MinecraftForge.EVENT_BUS.register(DamageSplash())
         MinecraftForge.EVENT_BUS.register(DarkModeMist())
         MinecraftForge.EVENT_BUS.register(DungeonFeatures())
@@ -284,7 +287,6 @@ class Skytils {
             cch.commandMap["rp"] = RepartyCommand
         }
 
-        DataFetcher.preload()
         MayorInfo.fetchMayorData()
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
@@ -396,7 +398,7 @@ class Skytils {
         if (event.packet is S1CPacketEntityMetadata) {
             val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 }
             if (nameObj != null) {
-                val entity = mc.theWorld.getEntityByID(event.packet.entityId)
+                val entity = mc.theWorld?.getEntityByID(event.packet.entityId)
 
                 if (entity is ExtensionEntityLivingBase) {
                     entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)

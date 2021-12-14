@@ -146,16 +146,7 @@ object ChatTabs {
                         val chatLine = hoveredChatLine ?: return
                         if (button == 0) {
                             val component = (chatLine as ExtensionChatLine).fullComponent ?: chatLine.chatComponent
-                            val realText = buildString {
-                                append(component.unformattedTextForChat)
-                                append("§r")
-                                component.siblings.forEach {
-                                    append(it.unformattedTextForChat)
-                                    append("§r")
-                                }
-                            }
-
-                            GuiScreen.setClipboardString(realText)
+                            GuiScreen.setClipboardString(component.formattedText)
                             printDevMessage("Copied formatted message to clipboard!", "chat")
                         } else {
                             val component =

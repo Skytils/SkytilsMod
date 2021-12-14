@@ -181,8 +181,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 )
                 return
             }
-            "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen =
-                CommandAliasesGui()
+            "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen = CommandAliasesGui()
             "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
                 LocationEditGui()
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
@@ -200,9 +199,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     }
                 }
             }
-            "spiritleapnames" -> {
-                Skytils.displayScreen = SpiritLeapNamesGui()
-            }
+            "spiritleapnames" -> Skytils.displayScreen = SpiritLeapNamesGui()
             "dev" -> {
                 if (args.size == 1) {
                     player.addChatMessage(ChatComponentText("/skytils dev <toggle>"))
@@ -263,21 +260,14 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     ex.printStackTrace()
                 }
             }
-            "updatenow" -> {
-                Skytils.displayScreen = UpdateGui(true)
-                return
-            }
-            "updatelater" -> {
-                Skytils.displayScreen = UpdateGui(false)
-                return
-            }
+            "updatenow" -> Skytils.displayScreen = UpdateGui(true)
+            "updatelater" -> Skytils.displayScreen = UpdateGui(false)
             "ping" -> {
                 Ping.invokedCommand = true
                 Ping.sendPing()
             }
-            "waypoint", "waypoints" -> {
-                Skytils.displayScreen = WaypointsGui()
-            }
+            "waypoint", "waypoints" -> Skytils.displayScreen = WaypointsGui()
+            "notifications" -> Skytils.displayScreen = CustomNotificationsGui()
             else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
         }
     }

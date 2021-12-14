@@ -159,12 +159,13 @@ object DataFetcher {
                 }
                 APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").apply {
                     Utils.checkThreadAndQueue {
+                        val filters = SpamHider.repoFilters.toHashSet()
                         SpamHider.repoFilters.clear()
                         mapTo(SpamHider.repoFilters) {
                             it as JsonObject
                             SpamHider.Filter(
                                 it["name"].asString,
-                                0,
+                                filters.find { f -> f.name == it["name"].asString }?.state ?: 0,
                                 true,
                                 it["pattern"].asString.toRegex(),
                                 when (it["type"].asString) {

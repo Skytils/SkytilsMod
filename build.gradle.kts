@@ -22,14 +22,14 @@ import net.minecraftforge.gradle.user.TaskSingleReobf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
     id("net.minecraftforge.gradle.forge") version "6f5327"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.spongepowered.mixin") version "d5f9873d60"
     java
 }
 
-version = "1.0.9-pre1"
+version = "1.0.9-RC1"
 group = "skytils.skytilsmod"
 
 minecraft {
@@ -68,14 +68,14 @@ dependencies {
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.2")
-    implementation("gg.essential:essential-1.8.9-forge:1560") {
+    implementation("gg.essential:essential-1.8.9-forge:1579") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
     }
 
-    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.1")
+    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.2")
     shadowMe("com.github.Skytils:Hylin:a9899c8c03") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
@@ -102,6 +102,14 @@ sourceSets {
     main {
         ext["refmap"] = "mixins.skytils.refmap.json"
         output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
+    }
+}
+
+configure<NamedDomainObjectContainer<IReobfuscator>> {
+    clear()
+    create("shadowJar") {
+        mappingType = SEARGE
+        classpath = sourceSets.main.get().compileClasspath
     }
 }
 
@@ -166,16 +174,13 @@ tasks {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
         }
+        kotlinDaemonJvmArguments.set(listOf("-Xmx4G", "-Dkotlin.enableCacheBuilding=true", "-Dkotlin.useParallelTasks=true", "-Dkotlin.enableFastIncremental=true"))
     }
     named<TaskSingleReobf>("reobfJar") {
-        dependsOn(shadowJar)
+        enabled = false
     }
-}
-
-configure<NamedDomainObjectContainer<IReobfuscator>> {
-    create("shadowJar") {
-        mappingType = SEARGE
-        classpath = sourceSets.main.get().compileClasspath
+    named<TaskSingleReobf>("reobfShadowJar") {
+        mustRunAfter(shadowJar)
     }
 }
 

@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.mixins.hooks.gui.GuiIngameHookKt;
 
@@ -49,6 +50,11 @@ public abstract class MixinGuiIngame extends Gui {
     @Inject(method = "renderHotbarItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItemAndEffectIntoGUI(Lnet/minecraft/item/ItemStack;II)V"))
     private void renderRarityOnHotbar(int index, int xPos, int yPos, float partialTicks, EntityPlayer player, CallbackInfo ci) {
         GuiIngameHookKt.renderRarityOnHotbar(index, xPos, yPos, partialTicks, player, ci);
+    }
+
+    @ModifyVariable(method = "renderVignette", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
+    private float disableWorldBorder(float f) {
+        return GuiIngameHookKt.onWorldBorder(f);
     }
 
 }
