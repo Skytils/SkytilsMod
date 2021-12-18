@@ -76,7 +76,12 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
                 }
             }
         }
-        if (overrideDisplayName != null) overrideDisplayName = s
+        if (s.contains("SlashSlayer")) {
+            overrideDisplayName = s.replace("SlashSlayer", "§dSlashSlayer")
+            return
+        }
+        if (overrideDisplayName != null)
+            overrideDisplayName = s
     }
 
     val isBreefing by lazy {
