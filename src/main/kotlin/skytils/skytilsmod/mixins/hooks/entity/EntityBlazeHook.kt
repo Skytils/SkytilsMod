@@ -32,7 +32,7 @@ fun removeBlazeSmokeParticle(
     zOffset: Double,
     p_175688_14_: IntArray
 ) {
-    if (particleType != EnumParticleTypes.SMOKE_LARGE || !Utils.inDungeons) {
+    if (!Utils.inDungeons || particleType != EnumParticleTypes.SMOKE_LARGE) {
         world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
     }
 }
