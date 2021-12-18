@@ -144,6 +144,7 @@ class DungeonFeatures {
                     val line = ScoreboardUtil.cleanSB(s)
                     if (line.contains("The Catacombs (")) {
                         dungeonFloor = line.substringAfter("(").substringBefore(")")
+                        ScoreCalculation.floorReq = ScoreCalculation.floorRequirements[dungeonFloor] ?: ScoreCalculation.floorRequirements["default"]!!
                         break
                     }
                 }

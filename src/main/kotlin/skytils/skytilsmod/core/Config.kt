@@ -233,14 +233,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showScoreCalculation = false
 
     @Property(
-        type = PropertyType.SELECTOR, name = "Score Calculation Method",
-        description = "\"Special\" method only works with Dungeon Rooms Mod v2.0.0, for ANY other version use \"Standard\"\n§c\"Special\" method is use at your own risk.",
-        category = "Dungeons", subcategory = "Score Calculation",
-        options = ["Standard", "Special"]
-    )
-    var scoreCalculationMethod = 0
-
-    @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
         description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\n§cThis feature is use at your own risk.",
         category = "Dungeons", subcategory = "Score Calculation"

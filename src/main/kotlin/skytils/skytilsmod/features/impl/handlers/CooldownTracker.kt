@@ -144,4 +144,5 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         }
     }
 
+    data class CooldownThing(var name: String, var seconds: Double, var mageBypass: Boolean)
 }

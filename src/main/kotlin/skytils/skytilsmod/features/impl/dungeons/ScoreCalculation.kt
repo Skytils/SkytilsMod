@@ -17,16 +17,11 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -37,93 +32,64 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.AddChatMessageEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.lang.invoke.MethodHandle
-import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 import kotlin.math.floor
-import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object ScoreCalculation {
 
     private val partyAssistSecretsPattern: Pattern =
         Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
-    private var rooms = ConcurrentHashMap<String, Int>()
     private val mc = Minecraft.getMinecraft()
     private var ticks = 0
-    private val JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}")
-    private var lastRoomScanPos: BlockPos? = null
 
-    private val deathsTabPattern = Pattern.compile("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
-    private val missingPuzzlePattern = Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
+    private val deathsTabPattern = Regex("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
+    private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val failedPuzzlePattern =
-        Pattern.compile("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f(?:\\((?:§r(?<player>.+))?§r§f\\)|\\(§r§f})§r")
-    private val secretsFoundPattern = Pattern.compile("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
-    private val cryptsPattern = Pattern.compile("§r Crypts: §r§6(?<crypts>\\d+)§r")
+        Regex("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f(?:\\((?:§r(?<player>.+))?§r§f\\)|\\(§r§f})§r")
+    private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
+    private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
+    private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
+
+    val floorRequirements = hashMapOf(
+        // idk what entrance is so i put it as the same as f1
+        "E" to FloorRequirement(.3),
+        "F1" to FloorRequirement(.3),
+        "F2" to FloorRequirement(.4),
+        "F3" to FloorRequirement(.5),
+        "F4" to FloorRequirement(.6, 12.minutes),
+        "F5" to FloorRequirement(.7),
+        "F6" to FloorRequirement(.85, 12.minutes),
+        "F7" to FloorRequirement(speed = 12.minutes),
+        "M1" to FloorRequirement(speed = 8.minutes),
+        "M2" to FloorRequirement(speed = 8.minutes),
+        "M3" to FloorRequirement(speed = 8.minutes),
+        "M4" to FloorRequirement(speed = 8.minutes),
+        "M5" to FloorRequirement(speed = 8.minutes),
+        "M6" to FloorRequirement(speed = 8.minutes),
+        //still waiting on m7 release lol
+        "M7" to FloorRequirement(speed = 8.minutes),
+        "default" to FloorRequirement()
+    )
 
     var deaths = 0
     var missingPuzzles = 0
     var failedPuzzles = 0
     var foundSecrets = 0
-    val totalSecrets: Int
-        get() = rooms.values.sum()
+    var totalSecrets = 0
     var crypts = 0
     var mimicKilled = false
 
-    var drmRoomScanMethod: MethodHandle? = null
-
-    private fun roomScanCallback(list: List<String>) {
-        if (Skytils.config.scoreCalculationMethod != 1) return
-        Utils.checkThreadAndQueue {
-            for (room in list) {
-                if (!rooms.containsKey(room)) {
-                    val secrets = room.substringAfterLast("-").toIntOrNull() ?: 0
-                    rooms[room] = secrets
-                    if (Skytils.config.scoreCalculationAssist && false) {
-                        Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-ROOM$: [$room] ($secrets)")
-                    }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onAddChatMessage(event: AddChatMessageEvent) {
-        if (!Utils.inDungeons || Skytils.config.scoreCalculationMethod != 0) return
-        try {
-            val unformatted = event.message.unformattedText.stripControlCodes()
-            if (unformatted == "null" || unformatted.startsWith("Dungeon Rooms: Use this command in dungeons")) {
-                event.isCanceled = true
-            }
-            if (event.message.unformattedText.contains("{") && event.message.unformattedText.contains("}")) {
-                val matcher = JSON_BRACKET_PATTERN.matcher(event.message.unformattedText)
-                if (matcher.find()) {
-                    val obj = Gson().fromJson(unformatted, JsonObject::class.java)
-                    if (obj.has("name") && obj.has("category") && obj.has("secrets")) {
-                        val name = obj["name"].asString
-                        val secrets = obj["secrets"].asInt
-                        if (!rooms.containsKey(name)) {
-                            rooms[name] = secrets
-                            if (Skytils.config.scoreCalculationAssist && Skytils.config.scoreCalculationMethod == 0) {
-                                Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-ROOM$: [$name] ($secrets)")
-                            }
-                        }
-                        event.isCanceled = true
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+    var floorReq = floorRequirements["default"]!!
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -137,65 +103,37 @@ object ScoreCalculation {
                         val name = pi.text
                         when {
                             name.contains("Deaths:") -> {
-                                val matcher = deathsTabPattern.matcher(name)
-                                if (matcher.find()) {
-                                    deaths = matcher.group("deaths").toInt()
-                                }
+                                val matcher = deathsTabPattern.find(name) ?: continue
+                                deaths = matcher.groups["deaths"]?.value?.toIntOrNull() ?: 0
                             }
                             name.contains("✦") -> {
-                                val matcher = missingPuzzlePattern.matcher(name)
-                                if (matcher.find()) {
+                                if (missingPuzzlePattern.containsMatchIn(name)) {
                                     missingPuzzles++
                                 }
                             }
                             name.contains("✖") -> {
-                                val matcher = failedPuzzlePattern.matcher(name)
-                                if (matcher.find()) {
+                                if (failedPuzzlePattern.containsMatchIn(name)) {
                                     failedPuzzles++
                                 }
                             }
                             name.contains("Secrets Found:") -> {
-                                val matcher = secretsFoundPattern.matcher(name)
-                                if (matcher.find()) {
-                                    foundSecrets = matcher.group("secrets").toInt()
+                                if (name.contains("%")) {
+                                    val matcher = secretsFoundPercentagePattern.find(name) ?: continue
+                                    val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
+                                        ?: 0.0) / foundSecrets
+                                    totalSecrets =
+                                        if (percentagePer > 0.0) (100 / percentagePer).roundToInt() else 0
+                                } else {
+                                    val matcher = secretsFoundPattern.find(name) ?: continue
+                                    foundSecrets = matcher.groups["secrets"]?.value?.toIntOrNull() ?: 0
                                 }
                             }
                             name.contains("Crypts:") -> {
-                                val matcher = cryptsPattern.matcher(name)
-                                if (matcher.find()) {
-                                    crypts = matcher.group("crypts").toInt()
-                                }
+                                val matcher = cryptsPattern.find(name) ?: continue
+                                crypts = matcher.groups["crypts"]?.value?.toIntOrNull() ?: 0
                             }
                         }
                     } catch (ignored: NumberFormatException) {
-                    }
-                }
-            }
-            if (Skytils.usingDungeonRooms && (Skytils.config.showScoreCalculation || Skytils.config.scoreCalculationAssist)) {
-                when (Skytils.config.scoreCalculationMethod) {
-                    0 -> {
-                        if (ticks % 30 == 0) {
-                            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/room json")
-                            ticks = 0
-                        }
-                    }
-                    1 -> {
-                        if (drmRoomScanMethod != null && (lastRoomScanPos == null || ticks % 900 == 0 || mc.thePlayer.getDistanceSqToCenter(
-                                lastRoomScanPos
-                            ) >= (mc.gameSettings.renderDistanceChunks.coerceAtMost(
-                                10
-                            ) * 16.0).pow(2)
-                                    )
-                        ) {
-                            lastRoomScanPos = mc.thePlayer.position
-                            Skytils.threadPool.submit {
-                                @Suppress("UNCHECKED_CAST")
-                                roomScanCallback(
-                                    drmRoomScanMethod!!.invokeExact() as List<String>
-                                )
-                            }
-                            ticks = 0
-                        }
                     }
                 }
             }
@@ -218,11 +156,6 @@ object ScoreCalculation {
                     if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-ROOM$")) {
                         val matcher = partyAssistSecretsPattern.matcher(unformatted)
                         if (matcher.find()) {
-                            val name = matcher.group("name")
-                            val secrets = matcher.group("secrets").toIntOrNull() ?: return
-                            if (!rooms.containsKey(name)) {
-                                rooms[name] = secrets
-                            }
                             event.isCanceled = true
                             return
                         }
@@ -274,18 +207,9 @@ object ScoreCalculation {
     }
 
     @SubscribeEvent
-    fun onSendChat(event: SendChatMessageEvent) {
-        if (DevTools.getToggle("scorecalc") && event.message == "/debugscorecalcrooms") {
-            mc.thePlayer.addChatMessage(ChatComponentText(rooms.toString()))
-            event.isCanceled = true
-        }
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         mimicKilled = false
-        lastRoomScanPos = null
-        rooms.clear()
+        floorReq = floorRequirements["default"]!!
     }
 
     init {
@@ -349,69 +273,60 @@ object ScoreCalculation {
                 for (l in ScoreboardUtil.sidebarLines) {
                     val line = ScoreboardUtil.cleanSB(l)
                     if (line.startsWith("Dungeon Cleared:")) {
-                        val matcher = dungeonClearedPattern.matcher(line)
-                        if (matcher.find()) {
-                            clearedPercentage = matcher.group("percentage").toInt()
+                        val matcher = dungeonClearedPattern.find(line)
+                        if (matcher != null) {
+                            clearedPercentage = matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0
                             continue
                         }
                     }
                     if (line.startsWith("Time Elapsed:")) {
-                        val matcher = timeElapsedPattern.matcher(line)
-                        if (matcher.find()) {
-                            val hours: Int = runCatching { matcher.group("hrs").toInt() }.getOrDefault(0)
-                            val minutes: Int = runCatching { matcher.group("min").toInt() }.getOrDefault(0)
-                            val seconds: Int = runCatching { matcher.group("sec").toInt() }.getOrDefault(0)
+                        val matcher = timeElapsedPattern.find(line)
+                        if (matcher != null) {
+                            val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
+                            val minutes = matcher.groups["min"]?.value?.toIntOrNull() ?: 0
+                            val seconds = matcher.groups["sec"]?.value?.toIntOrNull() ?: 0
                             secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
                             continue
                         }
                     }
                 }
                 val skillScore = 100 - 2 * deaths - 14 * (missingPuzzles + failedPuzzles)
+                val percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
                 val discoveryScore: Double = floor(
                     (60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
                 ) + if (totalSecrets <= 0) 0.0 else floor(
-                    (40f * foundSecrets / totalSecrets).toDouble().coerceIn(0.0, 40.0)
+                    (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
                 )
                 val speedScore: Double
                 val bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
-                val countedSeconds =
-                    if (DungeonFeatures.dungeonFloor == "F2") 0.0.coerceAtLeast(secondsElapsed - 120) else secondsElapsed
-                speedScore = if (countedSeconds <= 1320) {
+                val countedSeconds = secondsElapsed
+                // no idea how speed score works soooo
+                speedScore = (if (countedSeconds <= floorReq.speed.inWholeSeconds) {
                     100.0
-                } else if (1320 < countedSeconds && countedSeconds <= 1420) {
+                } else if (countedSeconds < floorReq.speed.inWholeSeconds + 100) {
                     232 - 0.1 * countedSeconds
-                } else if (1420 < countedSeconds && countedSeconds <= 1820) {
+                } else if (countedSeconds < floorReq.speed.inWholeSeconds + 400) {
                     161 - 0.05 * countedSeconds
-                } else if (1820 < countedSeconds && countedSeconds <= 3920) {
+                } else if (countedSeconds < floorReq.speed.inWholeSeconds + 2600) {
                     392 / 3f - 1 / 30f * countedSeconds
-                } else 0.0
-                text.add("§6Deaths:§a $deaths")
-                text.add("§6Missing Puzzles:§a $missingPuzzles")
-                text.add("§6Failed Puzzles:§a $failedPuzzles")
-                text.add("§6Secrets Found:§a $foundSecrets")
-                if (totalSecrets != 0) {
-                    if (Skytils.config.scoreCalculationMethod == 0) text.add("§6Estimated Secret Count:§a $totalSecrets")
-                    else {
-                        if (clearedPercentage >= 80) {
-                            text.add("§6Estimated Secret Count:§a $totalSecrets")
-                        } else {
-                            text.add("§6Estimated Secret Count:§c HIDDEN")
-                        }
-                    }
-                }
+                } else 0.0).coerceIn(0.0, 100.0)
+                if (deaths != 0) text.add("§6Deaths:§a $deaths")
+                if (missingPuzzles != 0) text.add("§6Missing Puzzles:§a $missingPuzzles")
+                if (failedPuzzles != 0) text.add("§6Failed Puzzles:§a $failedPuzzles")
+                if (foundSecrets != 0) text.add("§6Secrets:§a${if (percentageSecretsFound >= 0.999999999) "§l" else ""} $foundSecrets")
+                if (totalSecrets != 0) text.add("§6Total Secrets:§a $totalSecrets")
                 text.add("§6Crypts:§a $crypts")
                 if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                    text.add("§6Mimic Killed:" + if (mimicKilled) "§a ✓" else " §c X")
+                    text.add("§6Mimic:" + if (mimicKilled) "§a ✓" else " §c X")
                 }
                 if (isPaul) {
                     text.add("§6EZPZ: §a+10")
                 }
-                text.add("§6Skill Score:§a $skillScore")
-                if (totalSecrets != 0) text.add("§6Estimated Discovery Score:§a " + discoveryScore.toInt())
-                if (speedScore != 100.0) text.add("§6Speed Score:§a " + speedScore.toInt())
-                text.add("§6Estimated Bonus Score:§a $bonusScore")
-                if (totalSecrets != 0) text.add("§6Estimated Total Score:§a " + (skillScore + discoveryScore + speedScore + bonusScore).toInt())
-                if (!Skytils.usingDungeonRooms) text.add("§cDownload the Dungeon Rooms Mod for discovery estimate.")
+                if (skillScore != 100) text.add("§6Skill:§a $skillScore")
+                if (totalSecrets != 0) text.add("§6Discovery:§a " + discoveryScore.toInt())
+                if (speedScore != 100.0) text.add("§6Speed:§a " + speedScore.toInt())
+                if (bonusScore != 0) text.add("§6Bonus:§a $bonusScore")
+                if (totalSecrets != 0) text.add("§6Total:§a " + (skillScore + discoveryScore + speedScore + bonusScore).toInt())
                 for (i in text.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                     ScreenRenderer.fontRenderer.drawString(
@@ -456,13 +371,15 @@ object ScoreCalculation {
             get() = Skytils.config.showScoreCalculation
 
         companion object {
-            private val dungeonClearedPattern = Pattern.compile("Dungeon Cleared: (?<percentage>\\d+)%")
+            private val dungeonClearedPattern = Regex("Dungeon Cleared: (?<percentage>\\d+)%")
             private val timeElapsedPattern =
-                Pattern.compile("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
+                Regex("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
         }
 
         init {
             Skytils.guiManager.registerElement(this)
         }
     }
+
+    data class FloorRequirement(val secretPercentage: Double = 1.0, val speed: Duration = 10.minutes)
 }
