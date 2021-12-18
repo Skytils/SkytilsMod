@@ -156,18 +156,19 @@ object ItemUtil {
         for (i in (lore.tagCount() - 1) downTo 0) {
             val currentLine = lore.getStringTagAt(i)
             val rarityMatcher = RARITY_PATTERN.find(currentLine)
-            val petRarityMatcher = PET_PATTERN.find(name)
             if (rarityMatcher != null) {
-                val rarity = rarityMatcher.groupValues.getOrNull(3) ?: continue
+                val rarity = rarityMatcher.groups["rarity"]?.value ?: continue
                 ItemRarity.values().find {
-                    it.rarityName == rarity
+                    it.rarityName == rarity.stripControlCodes()
                 }?.let {
                     return it
                 }
-            } else if (petRarityMatcher != null) {
-                val color = petRarityMatcher.groupValues.getOrNull(1) ?: continue
-                return ItemRarity.byBaseColor(color)
             }
+        }
+        val petRarityMatcher = PET_PATTERN.find(name)
+        if (petRarityMatcher != null) {
+            val color = petRarityMatcher.groupValues.getOrNull(1) ?: return null
+            return ItemRarity.byBaseColor(color)
         }
 
         // If the item doesn't have a valid rarity, return null
