@@ -42,8 +42,6 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.roundToInt
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 object ScoreCalculation {
 
@@ -66,18 +64,18 @@ object ScoreCalculation {
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
         "F3" to FloorRequirement(.5),
-        "F4" to FloorRequirement(.6, 12.minutes),
+        "F4" to FloorRequirement(.6, 12 * 60),
         "F5" to FloorRequirement(.7),
-        "F6" to FloorRequirement(.85, 12.minutes),
-        "F7" to FloorRequirement(speed = 12.minutes),
-        "M1" to FloorRequirement(speed = 8.minutes),
-        "M2" to FloorRequirement(speed = 8.minutes),
-        "M3" to FloorRequirement(speed = 8.minutes),
-        "M4" to FloorRequirement(speed = 8.minutes),
-        "M5" to FloorRequirement(speed = 8.minutes),
-        "M6" to FloorRequirement(speed = 8.minutes),
+        "F6" to FloorRequirement(.85, 12 * 60),
+        "F7" to FloorRequirement(speed = 12 * 60),
+        "M1" to FloorRequirement(speed = 8 * 60),
+        "M2" to FloorRequirement(speed = 8 * 60),
+        "M3" to FloorRequirement(speed = 8 * 60),
+        "M4" to FloorRequirement(speed = 8 * 60),
+        "M5" to FloorRequirement(speed = 8 * 60),
+        "M6" to FloorRequirement(speed = 8 * 60),
         //still waiting on m7 release lol
-        "M7" to FloorRequirement(speed = 8.minutes),
+        "M7" to FloorRequirement(speed = 8 * 60),
         "default" to FloorRequirement()
     )
 
@@ -301,13 +299,13 @@ object ScoreCalculation {
                 val bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
                 val countedSeconds = secondsElapsed
                 // no idea how speed score works soooo
-                speedScore = (if (countedSeconds <= floorReq.speed.inWholeSeconds) {
+                speedScore = (if (countedSeconds <= floorReq.speed) {
                     100.0
-                } else if (countedSeconds < floorReq.speed.inWholeSeconds + 100) {
+                } else if (countedSeconds < floorReq.speed + 100) {
                     232 - 0.1 * countedSeconds
-                } else if (countedSeconds < floorReq.speed.inWholeSeconds + 400) {
+                } else if (countedSeconds < floorReq.speed + 400) {
                     161 - 0.05 * countedSeconds
-                } else if (countedSeconds < floorReq.speed.inWholeSeconds + 2600) {
+                } else if (countedSeconds < floorReq.speed + 2600) {
                     392 / 3f - 1 / 30f * countedSeconds
                 } else 0.0).coerceIn(0.0, 100.0)
                 if (deaths != 0) text.add("§6Deaths:§a $deaths")
@@ -381,5 +379,5 @@ object ScoreCalculation {
         }
     }
 
-    data class FloorRequirement(val secretPercentage: Double = 1.0, val speed: Duration = 10.minutes)
+    data class FloorRequirement(val secretPercentage: Double = 1.0, val speed: Int = 10 * 60)
 }

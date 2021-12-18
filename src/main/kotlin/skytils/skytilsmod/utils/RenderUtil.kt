@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.utils
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
@@ -783,6 +782,10 @@ object RenderUtil {
             a += (color.alpha * ratio).toInt()
         }
         return Color(r, g, b, a)
+    }
+
+    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
+        return lastValue + (currentValue - lastValue) * multiplier
     }
 }
 
