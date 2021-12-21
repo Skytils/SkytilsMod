@@ -227,27 +227,27 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Dungeon Score Estimate",
-        description = "Shows an estimate of the current dungeon score.\nRequires the Dungeon Rooms mod in order to use.",
+        description = "Shows an estimate of the current dungeon score.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
     var showScoreCalculation = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
-        description = "Helps your party determine the amount of secrets in the dungeon by sending room info in party chat.\n§cThis feature is use at your own risk.",
+        description = "Helps your party determine the state of the mimic in your dungeon by sending in party chat.\n§cThis feature is use at your own risk.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
     var scoreCalculationAssist = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Receive Help for Secret Counts",
-        description = "Receive help from your party in order to determine the amount of secrets in the dungeon.",
+        type = PropertyType.SWITCH, name = "Receive Score Calculation Party Assist",
+        description = "Receive help from your party in order to determine the state of the mimic in the dungeon.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
     var scoreCalculationReceiveAssist = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Remove Party Chat Notification Sounds",
+        type = PropertyType.SWITCH, name = "Remove Party Assist Chat Notification Sounds",
         description = "Removes party chat notification sounds caused by score calculation.\n§cDo not turn this on if you do not use the Hypixel feature.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
