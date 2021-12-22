@@ -67,7 +67,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
-    shadowMe("gg.essential:loader-launchwrapper:1.1.2")
+    shadowMe("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:1664") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
