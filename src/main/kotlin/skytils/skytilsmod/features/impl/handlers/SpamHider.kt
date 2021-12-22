@@ -340,7 +340,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Mining Abilities
-                formatted.startsWith("§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
+                formatted.startsWith("§r§a§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
                     when (Skytils.config.miningAbilityHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.miningAbilityHider == 2)
                     }
