@@ -41,6 +41,7 @@ import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
+import skytils.skytilsmod.utils.toggle
 import java.awt.Color
 
 class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
@@ -67,7 +68,7 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             x = 0.pixels()
             y = 5.percent()
             width = 100.percent()
-            height = ChildBasedSizeConstraint()
+            height = 50.pixels()
         }
 
         islandDropdown = DropDown(SkyblockIsland.values().indexOfFirst {
@@ -116,6 +117,48 @@ class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
 
+        SimpleButton("Toggle Visible").childOf(topButtons).constrain {
+            x = 2.pixels()
+            y = 20.pixels()
+            width = 100.pixels()
+            height = 20.pixels()
+        }.apply {
+            onLeftClick {
+                val valid = scrollComponent.allChildren.mapNotNull { c ->
+                    c as UIContainer
+                    val entry = entries[c] ?: error("no entry found for child")
+                    if (entry.name.getText().contains(searchBar.getText())) return@mapNotNull entry
+                    else return@mapNotNull null
+                }
+                if (valid.any { it.enabled.checked }) {
+                    valid.forEach {
+                        if (it.enabled.checked) it.enabled.toggle()
+                    }
+                } else {
+                    valid.forEach {
+                        if (!it.enabled.checked) it.enabled.toggle()
+                    }
+                }
+            }
+        }
+
+        SimpleButton("Remove Visible").childOf(topButtons).constrain {
+            x = 107.pixels()
+            y = 20.pixels()
+            width = 100.pixels()
+            height = 20.pixels()
+        }.apply {
+            onLeftClick {
+                scrollComponent.allChildren.forEach { c ->
+                    c as UIContainer
+                    val entry = entries[c] ?: error("no entry found for child")
+                    if (entry.name.getText().contains(searchBar.getText())) {
+                        scrollComponent.removeChild(c)
+                        entries.remove(c)
+                    }
+                }
+            }
+        }
 
         UIText("Waypoints").childOf(window).constrain {
             x = CenterConstraint()
