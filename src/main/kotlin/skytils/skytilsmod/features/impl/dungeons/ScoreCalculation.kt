@@ -86,6 +86,7 @@ object ScoreCalculation {
     var totalSecrets = 0
     var crypts = 0
     var mimicKilled = false
+    var firstDeathHadSpirit = false
 
     var floorReq = floorRequirements["default"]!!
 
@@ -207,6 +208,7 @@ object ScoreCalculation {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         mimicKilled = false
+        firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
     }
 
@@ -288,7 +290,8 @@ object ScoreCalculation {
                         }
                     }
                 }
-                val skillScore = 100 - 2 * deaths - 14 * (missingPuzzles + failedPuzzles)
+                val skillScore =
+                    100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles)
                 val percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
                 val discoveryScore: Double = floor(
                     (60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)

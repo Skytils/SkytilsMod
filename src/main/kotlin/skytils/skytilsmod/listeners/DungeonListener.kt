@@ -18,19 +18,22 @@
 
 package skytils.skytilsmod.listeners
 
+import gg.essential.lib.caffeine.cache.Cache
+import gg.essential.lib.caffeine.cache.Caffeine
+import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import skytils.hylin.skyblock.item.Tier
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.addSuffix
@@ -41,6 +44,35 @@ object DungeonListener {
     val team = HashSet<DungeonTeammate>()
     val deads = HashSet<DungeonTeammate>()
     val missingPuzzles = HashSet<String>()
+    val hutaoFans: Cache<String, Boolean> = Caffeine.newBuilder()
+        .weakKeys()
+        .weakValues()
+        .maximumSize(100L)
+        .expireAfter(object : Expiry<String, Boolean> {
+            val hour = 3600000000000L
+            val tenMinutes = 600000000000L
+
+
+            override fun expireAfterCreate(
+                key: String, value: Boolean, currentTime: Long
+            ): Long {
+                return if (value) hour else tenMinutes
+            }
+
+            override fun expireAfterUpdate(
+                key: String, value: Boolean, currentTime: Long, currentDuration: Long
+            ): Long {
+                return currentDuration
+            }
+
+            override fun expireAfterRead(
+                key: String, value: Boolean, currentTime: Long, currentDuration: Long
+            ): Long {
+                return currentDuration
+            }
+
+        })
+        .build()
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
@@ -65,13 +97,11 @@ object DungeonListener {
             ) {
                 if (Skytils.config.dungeonDeathCounter) {
                     TickTask(6) {
-                        mc.ingameGUI.chatGUI.printChatMessage(
-                            ChatComponentText("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
-                                team.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
-                                    "  §c☠ ${it.playerName}:§r ${it.deaths}"
-                                }
-                            }"
-                            )
+                        UChat.chat("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
+                            team.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
+                                "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                            }
+                        }"
                         )
                     }
                 }
@@ -105,7 +135,7 @@ object DungeonListener {
             ticks = 0
         }
         if (ticks % 2 == 0) {
-            if (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1000) {
+            if (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500) {
                 val tabEntries = TabListUtils.tabEntries
                 for (teammate in team) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
@@ -118,9 +148,25 @@ object DungeonListener {
                     if (teammate.dead) {
                         if (deads.add(teammate)) {
                             teammate.deaths++
+                            val isFirstDeath = team.sumOf { it.deaths } == 1
+
+                            @Suppress("LocalVariableName")
+                            val `silly~churl, billy~churl, silly~billy hilichurl` = if (isFirstDeath) {
+                                val hutaoIsCool = hutaoFans.getIfPresent(teammate.playerName) ?: false
+                                ScoreCalculation.firstDeathHadSpirit = hutaoIsCool
+                                hutaoIsCool
+                            } else false
+                            printDevMessage(isFirstDeath.toString(), "spiritpet")
+                            printDevMessage(ScoreCalculation.firstDeathHadSpirit.toString(), "spiritpet")
                             if (Skytils.config.dungeonDeathCounter) {
                                 TickTask(1) {
-                                    UChat.chat("§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${team.sumOf { it.deaths }}§b total deaths.")
+                                    UChat.chat(
+                                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${team.sumOf { it.deaths }}§b total deaths.${
+                                            " §6(SPIRIT)".toStringIfTrue(
+                                                `silly~churl, billy~churl, silly~billy hilichurl`
+                                            )
+                                        }"
+                                    )
                                 }
                             }
                         }
@@ -169,6 +215,32 @@ object DungeonListener {
             )
         }
         CooldownTracker.updateCooldownReduction()
+        checkSpiritPet()
+    }
+
+    fun checkSpiritPet() {
+        if (Skytils.hylinAPI.key.isNotEmpty()) {
+            Skytils.threadPool.submit {
+                runCatching {
+                    for (teammate in team) {
+                        val name = teammate.playerName
+                        if (hutaoFans.getIfPresent(name) != null) continue
+                        val uuid = teammate.player?.uniqueID ?: Skytils.hylinAPI.getUUIDSync(
+                            name
+                        )
+                        val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
+                            uuid
+                        ) ?: continue
+                        hutaoFans[name] = profile.pets.any {
+                            it.type == "SPIRIT" && (it.tier == Tier.LEGENDARY || it.tier == Tier.EPIC && it.heldItem == "PET_ITEM_TIER_BOOST")
+                        }
+                    }
+                    printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
+                }.onFailure {
+                    it.printStackTrace()
+                }
+            }
+        }
     }
 
     class DungeonTeammate(

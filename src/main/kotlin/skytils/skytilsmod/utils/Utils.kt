@@ -19,6 +19,7 @@ package skytils.skytilsmod.utils
 
 import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
+import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
@@ -320,3 +321,7 @@ val S2APacketParticles.count
 
 val S2APacketParticles.speed
     get() = this.particleSpeed
+
+operator fun <K, V> Cache<K, V>.set(name: K, value: V) = put(name, value)
+
+fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
