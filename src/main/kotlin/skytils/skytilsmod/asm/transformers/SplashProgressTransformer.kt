@@ -25,6 +25,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
 import skytils.skytilsmod.utils.Utils
+import java.util.*
 import kotlin.random.Random
 
 fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.SplashProgress") {
@@ -69,18 +70,24 @@ object SplashProgressTransformer {
         94.5 to ResourceLocation("skytils", "breefingdog.png"),
         96.0 to ResourceLocation("skytils", "azoopet.gif"),
         99.0 to ResourceLocation("skytils", "abdpfp.gif"),
-        // this is the chance of winning the jackpot on the lottery, but even less due to a loss of precision
+        // this is around the chance of winning the jackpot on the lottery
         100 - 100 * 1 / 302_575_350.0 to ResourceLocation("skytils", "jamcat.gif")
     )
 
     @JvmStatic
     fun setForgeGif(resourceLocation: ResourceLocation): ResourceLocation {
         if (Utils.noSychic) return resourceLocation
-
-        if (Utils.breefingdog) return ResourceLocation("skytils", "breefingdog.png")
+        val cal = GregorianCalendar.getInstance()
+        val month = cal.get(GregorianCalendar.MONTH) + 1
+        val date = cal.get(GregorianCalendar.DATE)
+        if (month == 12 && date in 24..25) return ResourceLocation(
+            "skytils",
+            "christmassychicpet.gif"
+        )
+        return if (Utils.breefingdog) ResourceLocation("skytils", "breefingdog.png")
         else {
             val weight = Random.nextDouble() * 100
-            return (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
+            (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
                 "skytils",
                 "sychicpet.gif"
             )).also {
