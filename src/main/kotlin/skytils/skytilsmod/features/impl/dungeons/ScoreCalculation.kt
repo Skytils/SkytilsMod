@@ -57,6 +57,9 @@ object ScoreCalculation {
     private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
     private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
+    private val dungeonClearedPattern = Regex("Dungeon Cleared: (?<percentage>\\d+)%")
+    private val timeElapsedPattern =
+        Regex("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
 
     val floorRequirements = hashMapOf(
         // idk what entrance is so i put it as the same as f1
@@ -87,6 +90,14 @@ object ScoreCalculation {
     var crypts = 0
     var mimicKilled = false
     var firstDeathHadSpirit = false
+    var clearedPercentage = 0
+    var secondsElapsed = 0.0
+    var isPaul = false
+    var skillScore = 0
+    var percentageSecretsFound = 0.0
+    var discoveryScore = 0
+    var speedScore = 0
+    var bonusScore = 0
 
     var floorReq = floorRequirements["default"]!!
 
@@ -94,7 +105,7 @@ object ScoreCalculation {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (mc.thePlayer != null && mc.theWorld != null && Utils.inDungeons) {
-            if (ticks % 2 == 0) {
+            if (ticks % 5 == 0) {
                 missingPuzzles = 0
                 failedPuzzles = 0
                 for (pi in TabListUtils.tabEntries) {
@@ -135,6 +146,60 @@ object ScoreCalculation {
                     } catch (ignored: NumberFormatException) {
                     }
                 }
+                isPaul =
+                    (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
+                        ?: "") == "Paul"
+                for (l in ScoreboardUtil.sidebarLines) {
+                    val line = ScoreboardUtil.cleanSB(l)
+                    if (line.startsWith("Dungeon Cleared:")) {
+                        val matcher = dungeonClearedPattern.find(line)
+                        if (matcher != null) {
+                            clearedPercentage = matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0
+                            continue
+                        }
+                    }
+                    if (line.startsWith("Time Elapsed:")) {
+                        val matcher = timeElapsedPattern.find(line)
+                        if (matcher != null) {
+                            val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
+                            val minutes = matcher.groups["min"]?.value?.toIntOrNull() ?: 0
+                            val seconds = matcher.groups["sec"]?.value?.toIntOrNull() ?: 0
+                            secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
+                            continue
+                        }
+                    }
+                }
+                skillScore =
+                    100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles)
+                percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
+                discoveryScore = (floor(
+                    (60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
+                ) + if (totalSecrets <= 0) 0.0 else floor(
+                    (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
+                )).toInt()
+                bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
+                // no idea how speed score works soooo
+                speedScore = (100 - ((secondsElapsed - floorReq.speed) / 3f).coerceIn(0.0, 100.0)).toInt()
+
+                ScoreCalculationElement.text.clear()
+                if (deaths != 0) ScoreCalculationElement.text.add("§6Deaths:§a $deaths")
+                if (missingPuzzles != 0) ScoreCalculationElement.text.add("§6Missing Puzzles:§a $missingPuzzles")
+                if (failedPuzzles != 0) ScoreCalculationElement.text.add("§6Failed Puzzles:§a $failedPuzzles")
+                if (foundSecrets != 0) ScoreCalculationElement.text.add("§6Secrets:§a${if (percentageSecretsFound >= 0.999999999) "§l" else ""} $foundSecrets")
+                if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Total Secrets:§a $totalSecrets")
+                ScoreCalculationElement.text.add("§6Crypts:§a $crypts")
+                if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
+                    ScoreCalculationElement.text.add("§6Mimic:" + if (mimicKilled) "§a ✓" else " §c X")
+                }
+                if (isPaul) {
+                    ScoreCalculationElement.text.add("§6EZPZ: §a+10")
+                }
+                if (skillScore != 100) ScoreCalculationElement.text.add("§6Skill:§a $skillScore")
+                if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Discovery:§a $discoveryScore")
+                if (speedScore != 100) ScoreCalculationElement.text.add("§6Speed:§a $speedScore")
+                if (bonusScore != 0) ScoreCalculationElement.text.add("§6Bonus:§a $bonusScore")
+                if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Total:§a ${(skillScore + discoveryScore + speedScore + bonusScore)}")
+                ticks = 0
             }
         }
         ticks++
@@ -264,61 +329,6 @@ object ScoreCalculation {
                 val sr = UResolution
 
                 val leftAlign = actualX < sr.scaledWidth / 2f
-                val text = ArrayList<String>()
-                var clearedPercentage = 0
-                var secondsElapsed = 0.0
-                val isPaul =
-                    (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
-                        ?: "") == "Paul"
-                for (l in ScoreboardUtil.sidebarLines) {
-                    val line = ScoreboardUtil.cleanSB(l)
-                    if (line.startsWith("Dungeon Cleared:")) {
-                        val matcher = dungeonClearedPattern.find(line)
-                        if (matcher != null) {
-                            clearedPercentage = matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0
-                            continue
-                        }
-                    }
-                    if (line.startsWith("Time Elapsed:")) {
-                        val matcher = timeElapsedPattern.find(line)
-                        if (matcher != null) {
-                            val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
-                            val minutes = matcher.groups["min"]?.value?.toIntOrNull() ?: 0
-                            val seconds = matcher.groups["sec"]?.value?.toIntOrNull() ?: 0
-                            secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
-                            continue
-                        }
-                    }
-                }
-                val skillScore =
-                    100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles)
-                val percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
-                val discoveryScore: Double = floor(
-                    (60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
-                ) + if (totalSecrets <= 0) 0.0 else floor(
-                    (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
-                )
-                val speedScore: Double
-                val bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
-                // no idea how speed score works soooo
-                speedScore = 100 - ((secondsElapsed - floorReq.speed) / 3f).coerceIn(0.0, 100.0)
-                if (deaths != 0) text.add("§6Deaths:§a $deaths")
-                if (missingPuzzles != 0) text.add("§6Missing Puzzles:§a $missingPuzzles")
-                if (failedPuzzles != 0) text.add("§6Failed Puzzles:§a $failedPuzzles")
-                if (foundSecrets != 0) text.add("§6Secrets:§a${if (percentageSecretsFound >= 0.999999999) "§l" else ""} $foundSecrets")
-                if (totalSecrets != 0) text.add("§6Total Secrets:§a $totalSecrets")
-                text.add("§6Crypts:§a $crypts")
-                if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                    text.add("§6Mimic:" + if (mimicKilled) "§a ✓" else " §c X")
-                }
-                if (isPaul) {
-                    text.add("§6EZPZ: §a+10")
-                }
-                if (skillScore != 100) text.add("§6Skill:§a $skillScore")
-                if (totalSecrets != 0) text.add("§6Discovery:§a " + discoveryScore.toInt())
-                if (speedScore != 100.0) text.add("§6Speed:§a " + speedScore.toInt())
-                if (bonusScore != 0) text.add("§6Bonus:§a $bonusScore")
-                if (totalSecrets != 0) text.add("§6Total:§a " + (skillScore + discoveryScore + speedScore + bonusScore).toInt())
                 for (i in text.indices) {
                     val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                     ScreenRenderer.fontRenderer.drawString(
@@ -354,6 +364,10 @@ object ScoreCalculation {
             }
         }
 
+        companion object {
+            val text = ArrayList<String>()
+        }
+
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
         override val width: Int
@@ -361,12 +375,6 @@ object ScoreCalculation {
 
         override val toggled: Boolean
             get() = Skytils.config.showScoreCalculation
-
-        companion object {
-            private val dungeonClearedPattern = Regex("Dungeon Cleared: (?<percentage>\\d+)%")
-            private val timeElapsedPattern =
-                Regex("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
-        }
 
         init {
             Skytils.guiManager.registerElement(this)

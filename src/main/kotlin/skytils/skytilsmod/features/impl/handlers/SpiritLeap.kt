@@ -42,7 +42,7 @@ import java.util.regex.Pattern
 
 class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
-    private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
+    private val playerPattern = Regex("(?:\\[.+?] )?(?<name>\\w+)")
 
     companion object {
         val names = HashMap<String, Boolean>()
@@ -78,29 +78,27 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
             val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim()
             if ((Skytils.config.spiritLeapNames && displayName == "Spirit Leap") || (Skytils.config.reviveStoneNames && displayName == "Revive A Teammate")) {
                 var people = 0
+                GlStateManager.disableLighting()
+                GlStateManager.disableDepth()
+                GlStateManager.disableBlend()
                 for (slot in invSlots) {
                     if (slot.inventory == mc.thePlayer.inventory) continue
                     if (!slot.hasStack || slot.stack.item != Items.skull) continue
                     val item = slot.stack
                     people++
 
-                    val x = slot.xDisplayPosition
-                    val y = slot.yDisplayPosition + if (people % 2 != 0) -15 else 20
-                    val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
-                    if (!matcher.find()) continue
-                    val name = matcher.group(1)
+                    val x = slot.xDisplayPosition.toFloat()
+                    val y = slot.yDisplayPosition + if (people % 2 != 0) -15f else 20f
+                    val name =
+                        playerPattern.find(item.displayName.stripControlCodes())?.groups?.get("name")?.value ?: continue
                     if (name == "Unknown") continue
                     val teammate = (DungeonListener.team.find { it.playerName == name }
                         ?: continue)
                     val dungeonClass = teammate.dungeonClass
                     val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
-                    val scale = 0.9
+                    val scale = 0.9f
                     val scaleReset = 1 / scale
                     GlStateManager.pushMatrix()
-                    GlStateManager.pushAttrib()
-                    GlStateManager.disableLighting()
-                    GlStateManager.disableDepth()
-                    GlStateManager.disableBlend()
                     GlStateManager.translate(0f, 0f, 1f)
                     if (names.getOrDefault(name, false)) {
                         slot highlight Color(255, 0, 0)
@@ -108,30 +106,30 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                         slot highlight Color(0, 255, 0)
                     }
                     Gui.drawRect(
-                        x - 2 - fr.getStringWidth(text) / 2,
-                        y - 2,
-                        x + fr.getStringWidth(text) / 2 + 2,
-                        y + fr.FONT_HEIGHT + 2,
+                        (x - 2 - fr.getStringWidth(text) / 2).toInt(),
+                        (y - 2).toInt(),
+                        (x + fr.getStringWidth(text) / 2 + 2).toInt(),
+                        (y + fr.FONT_HEIGHT + 2).toInt(),
                         Color(47, 40, 40).rgb
                     )
                     fr.drawString(
                         text,
-                        x.toFloat(),
-                        y.toFloat(),
+                        x,
+                        y,
                         alignment = SmartFontRenderer.TextAlignment.MIDDLE,
                         shadow = SmartFontRenderer.TextShadow.OUTLINE
                     )
-                    GlStateManager.scale(scale, scale, 1.0)
+                    GlStateManager.scale(scale, scale, 1f)
                     fr.drawString(
                         dungeonClass.className.first().uppercase(),
-                        (scaleReset * x).toFloat(),
-                        (scaleReset * slot.yDisplayPosition).toFloat(),
+                        scaleReset * x,
+                        scaleReset * slot.yDisplayPosition,
                         Color(255, 255, 0).rgb,
                         true
                     )
-                    GlStateManager.popAttrib()
                     GlStateManager.popMatrix()
                 }
+                GlStateManager.enableDepth()
             }
         }
     }

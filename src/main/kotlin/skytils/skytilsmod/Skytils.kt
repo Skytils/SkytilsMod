@@ -21,12 +21,12 @@ package skytils.skytilsmod
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import gg.essential.vigilance.gui.SettingsGui
+import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
-import net.minecraft.entity.Entity
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
@@ -80,8 +80,6 @@ import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.io.File
-import java.lang.invoke.MethodHandles
-import java.lang.invoke.MethodType
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 
@@ -137,6 +135,9 @@ class Skytils {
 
         @JvmField
         val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
+
+        @JvmField
+        val dispatcher = threadPool.asCoroutineDispatcher()
 
         val hylinAPI = createHylinAPI("", false)
     }

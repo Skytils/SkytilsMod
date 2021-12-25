@@ -18,6 +18,7 @@
 package skytils.skytilsmod.listeners
 
 import gg.essential.universal.UChat
+import kotlinx.coroutines.CoroutineScope
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
@@ -45,6 +46,7 @@ class ChatListener {
             Skytils.hylinAPI.key = Skytils.config.apiKey
             Skytils.config.markDirty()
             UChat.chat("§aSkytils updated your set Hypixel API key to §2${apiKey}")
+            return
         }
         if (Skytils.config.autoReparty) {
             if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
@@ -52,14 +54,14 @@ class ChatListener {
                 if (matcher.find()) {
                     lastPartyDisbander = matcher.group(1)
                     println("Party disbanded by $lastPartyDisbander")
-                    rejoinThread = thread {
-                        if (Skytils.config.autoRepartyTimeout == 0) return@thread
+                    Skytils.threadPool.submit {
+                        if (Skytils.config.autoRepartyTimeout == 0) return@submit
                         try {
                             println("waiting for timeout")
                             Thread.sleep(Skytils.config.autoRepartyTimeout * 1000L)
                             lastPartyDisbander = ""
                             println("cleared last party disbander")
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                         }
                     }
                     return
@@ -69,7 +71,6 @@ class ChatListener {
                 val acceptMessage = event.message.siblings[6].chatStyle
                 if (acceptMessage.chatHoverEvent.value.unformattedText.contains(lastPartyDisbander)) {
                     Skytils.sendMessageQueue.add("/p accept $lastPartyDisbander")
-                    rejoinThread!!.interrupt()
                     lastPartyDisbander = ""
                     return
                 }
@@ -206,7 +207,6 @@ class ChatListener {
     }
 
     companion object {
-        private var rejoinThread: Thread? = null
         private var lastPartyDisbander = ""
         private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
         private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
