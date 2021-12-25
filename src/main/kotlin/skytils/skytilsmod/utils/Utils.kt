@@ -34,6 +34,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagList
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
@@ -325,3 +326,5 @@ val S2APacketParticles.speed
 operator fun <K, V> Cache<K, V>.set(name: K, value: V) = put(name, value)
 
 fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
+
+fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTagAt(it) }

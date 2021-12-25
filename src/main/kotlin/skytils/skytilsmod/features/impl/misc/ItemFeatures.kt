@@ -31,12 +31,15 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.common.util.Constants
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -53,6 +56,7 @@ import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.utils.*
@@ -60,6 +64,7 @@ import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -81,11 +86,14 @@ class ItemFeatures {
         var soulflowAmount = ""
         var stackingEnchantDisplayText = ""
         var lowSoulFlowPinged = false
+        var lastShieldUse = -1L
+        var lastShieldClick = 0L
 
         init {
             SelectedArrowDisplay()
             StackingEnchantDisplay()
             SoulflowGuiElement()
+            WitherShieldDisplay()
         }
 
         val interactables = setOf(
@@ -420,6 +428,22 @@ class ItemFeatures {
                     }
                 }
             }
+            if (this is S1CPacketEntityMetadata && lastShieldClick != -1L && entityId == mc.thePlayer?.entityId && System.currentTimeMillis() - lastShieldClick <= 500 && func_149376_c()?.any { it.dataValueId == 17 } == true) {
+                lastShieldUse = System.currentTimeMillis()
+                lastShieldClick = -1
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onSendPacket(event: PacketEvent.SendEvent) {
+        if (!Utils.inSkyblock || lastShieldUse != -1L || mc.thePlayer?.heldItem == null) return
+        if (event.packet is C08PacketPlayerBlockPlacement && mc.thePlayer.heldItem.item == Items.iron_sword && getExtraAttributes(
+                mc.thePlayer.heldItem
+            )?.getTagList("ability_scroll", Constants.NBT.TAG_STRING)?.asStringSet()
+                ?.contains("WITHER_SHIELD_SCROLL") == true
+        ) {
+            lastShieldClick = System.currentTimeMillis()
         }
     }
 
@@ -713,6 +737,61 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§3100⸎ Soulflow")
         override val toggled: Boolean
             get() = Skytils.config.showSoulflowDisplay
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+
+    class WitherShieldDisplay : GuiElement("Wither Shield Display", FloatPair(0.65f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock) {
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (lastShieldUse != -1L) {
+                    val diff = ((lastShieldUse + 5000 - System.currentTimeMillis()) / 1000f).roundToPrecision(2)
+                    ScreenRenderer.fontRenderer.drawString(
+                        "Shield: §c${diff}s",
+                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        0f,
+                        CommonColors.ORANGE,
+                        alignment,
+                        TextShadow.NORMAL
+                    )
+                    if (diff < 0) lastShieldUse = -1
+                } else {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "Shield: §aREADY",
+                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        0f,
+                        CommonColors.ORANGE,
+                        alignment,
+                        TextShadow.NORMAL
+                    )
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§6Shield: idk why i added this",
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§6Shield: idk why i added this")
+        override val toggled: Boolean
+            get() = Skytils.config.witherShieldCooldown
 
         init {
             Skytils.guiManager.registerElement(this)

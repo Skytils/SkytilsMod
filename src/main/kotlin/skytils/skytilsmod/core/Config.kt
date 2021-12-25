@@ -1119,6 +1119,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var preventPlacingWeapons = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Wither Shield Cooldown Tracker",
+        description = "Displays the cooldowns for your wither shield (because apparently people can't follow directions)",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["Wither Impact", "Hyperion", "Wither Shield", "Scylla", "Astraea", "Valkyrie"]
+    )
+    var witherShieldCooldown = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Dungeon Item Level",
         description = "Shows the amount of stars on dungeon items as the stack size.",
         category = "Miscellaneous", subcategory = "Items"
