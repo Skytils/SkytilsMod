@@ -220,26 +220,21 @@ object ScoreCalculation {
     fun onChatReceived(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || mc.thePlayer == null) return
         val unformatted = event.message.unformattedText.stripControlCodes()
-        try {
-            if (Skytils.config.scoreCalculationReceiveAssist) {
-                if (unformatted.startsWith("Party > ")) {
-                    if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$")) {
-                        mimicKilled = true
+        if (Skytils.config.scoreCalculationReceiveAssist) {
+            if (unformatted.startsWith("Party > ")) {
+                if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") || (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.contains("Mimic dead!"))) {
+                    mimicKilled = true
+                    event.isCanceled = true
+                    return
+                }
+                if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-ROOM$")) {
+                    val matcher = partyAssistSecretsPattern.matcher(unformatted)
+                    if (matcher.find()) {
                         event.isCanceled = true
                         return
                     }
-                    if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-ROOM$")) {
-                        val matcher = partyAssistSecretsPattern.matcher(unformatted)
-                        if (matcher.find()) {
-                            event.isCanceled = true
-                            return
-                        }
-                    }
                 }
             }
-        } catch (ignored: NumberFormatException) {
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
         if (Skytils.config.removePartyChatNotifFromScoreCalc) {
             if (unformatted.startsWith("Party > ") && mc.thePlayer != null && !unformatted.contains(mc.thePlayer.name)) {

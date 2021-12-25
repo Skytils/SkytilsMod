@@ -261,6 +261,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var removePartyChatNotifFromScoreCalc = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Allow Mimic Dead! from other Mods",
+        description = "Uses the Mimic dead! in order to determine the state of the mimic in the dungeon.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var receiveHelpFromOtherModMimicDead
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"
