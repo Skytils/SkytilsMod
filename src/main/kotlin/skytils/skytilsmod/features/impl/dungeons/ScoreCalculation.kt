@@ -176,7 +176,7 @@ object ScoreCalculation {
                     }
                 }
                 val calcingClearedPercentage =
-                    perRoomPercentage * (completedRooms + if (!DungeonFeatures.hasBossSpawned && DungeonTimer.bloodClearTime != -1L) 1 else 0)
+                    (perRoomPercentage * (completedRooms + if (!DungeonFeatures.hasBossSpawned) 1 else 0)).coerceAtMost(100.0)
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
                         ?: "") == "Paul"
