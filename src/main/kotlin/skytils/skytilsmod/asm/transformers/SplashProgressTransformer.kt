@@ -84,7 +84,7 @@ object SplashProgressTransformer {
             "partysychic.gif"
         )
         if (Utils.noSychic) return resourceLocation
-        if (month == 12 && date in 24..25) return ResourceLocation(
+        if ((month == 12 && date in arrayOf(24, 25, 31)) || (month == 1 && date == 1)) return ResourceLocation(
             "skytils",
             "christmassychicpet.gif"
         )
