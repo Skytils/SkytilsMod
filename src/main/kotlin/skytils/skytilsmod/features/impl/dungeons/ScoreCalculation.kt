@@ -170,7 +170,7 @@ object ScoreCalculation {
                     }
                 }
                 skillScore =
-                    100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles)
+                    100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles) - (100 - clearedPercentage)
                 percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
                 discoveryScore = (floor(
                     (60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
