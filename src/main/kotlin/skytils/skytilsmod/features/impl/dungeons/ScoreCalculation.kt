@@ -60,6 +60,7 @@ object ScoreCalculation {
     private val dungeonClearedPattern = Regex("Dungeon Cleared: (?<percentage>\\d+)%")
     private val timeElapsedPattern =
         Regex("Time Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
+    private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
 
     val floorRequirements = hashMapOf(
         // idk what entrance is so i put it as the same as f1
@@ -98,6 +99,8 @@ object ScoreCalculation {
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
+    var perRoomPercentage = 0.0
+    var completedRooms = 0
 
     var floorReq = floorRequirements["default"]!!
 
@@ -108,6 +111,26 @@ object ScoreCalculation {
             if (ticks % 5 == 0) {
                 missingPuzzles = 0
                 failedPuzzles = 0
+                for (l in ScoreboardUtil.sidebarLines) {
+                    val line = ScoreboardUtil.cleanSB(l)
+                    if (line.startsWith("Dungeon Cleared:")) {
+                        val matcher = dungeonClearedPattern.find(line)
+                        if (matcher != null) {
+                            clearedPercentage = matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0
+                            continue
+                        }
+                    }
+                    if (line.startsWith("Time Elapsed:")) {
+                        val matcher = timeElapsedPattern.find(line)
+                        if (matcher != null) {
+                            val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
+                            val minutes = matcher.groups["min"]?.value?.toIntOrNull() ?: 0
+                            val seconds = matcher.groups["sec"]?.value?.toIntOrNull() ?: 0
+                            secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
+                            continue
+                        }
+                    }
+                }
                 for (pi in TabListUtils.tabEntries) {
                     try {
                         val name = pi.text
@@ -142,38 +165,27 @@ object ScoreCalculation {
                                 val matcher = cryptsPattern.find(name) ?: continue
                                 crypts = matcher.groups["crypts"]?.value?.toIntOrNull() ?: 0
                             }
+                            name.contains("Completed Rooms") -> {
+                                val matcher = roomCompletedPattern.find(name) ?: continue
+                                completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
+                                if (completedRooms > 0)
+                                    perRoomPercentage = clearedPercentage / completedRooms.toDouble()
+                            }
                         }
                     } catch (ignored: NumberFormatException) {
                     }
                 }
+                val calcingClearedPercentage =
+                    perRoomPercentage * (completedRooms + if (!DungeonFeatures.hasBossSpawned && DungeonTimer.bloodClearTime != -1L) 1 else 0)
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
                         ?: "") == "Paul"
-                for (l in ScoreboardUtil.sidebarLines) {
-                    val line = ScoreboardUtil.cleanSB(l)
-                    if (line.startsWith("Dungeon Cleared:")) {
-                        val matcher = dungeonClearedPattern.find(line)
-                        if (matcher != null) {
-                            clearedPercentage = matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0
-                            continue
-                        }
-                    }
-                    if (line.startsWith("Time Elapsed:")) {
-                        val matcher = timeElapsedPattern.find(line)
-                        if (matcher != null) {
-                            val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
-                            val minutes = matcher.groups["min"]?.value?.toIntOrNull() ?: 0
-                            val seconds = matcher.groups["sec"]?.value?.toIntOrNull() ?: 0
-                            secondsElapsed = (hours * 3600 + minutes * 60 + seconds).toDouble()
-                            continue
-                        }
-                    }
-                }
                 skillScore =
-                    100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles) - (100 - clearedPercentage)
+                    (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles) - (100 - calcingClearedPercentage)).roundToInt()
+                        .coerceIn(0, 100)
                 percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
                 discoveryScore = (floor(
-                    (60 * (clearedPercentage / 100f)).toDouble().coerceIn(0.0, 60.0)
+                    (60 * (calcingClearedPercentage / 100f)).coerceIn(0.0, 60.0)
                 ) + if (totalSecrets <= 0) 0.0 else floor(
                     (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
                 )).toInt()
@@ -222,7 +234,10 @@ object ScoreCalculation {
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ")) {
-                if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") || (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.contains("Mimic dead!"))) {
+                if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") || (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.contains(
+                        "Mimic dead!"
+                    ))
+                ) {
                     mimicKilled = true
                     event.isCanceled = true
                     return
@@ -281,6 +296,7 @@ object ScoreCalculation {
         mimicKilled = false
         firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
+        perRoomPercentage = 0.0
     }
 
     init {

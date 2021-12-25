@@ -265,7 +265,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Uses the Mimic dead! in order to determine the state of the mimic in the dungeon.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
-    var receiveHelpFromOtherModMimicDead
+    var receiveHelpFromOtherModMimicDead = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
