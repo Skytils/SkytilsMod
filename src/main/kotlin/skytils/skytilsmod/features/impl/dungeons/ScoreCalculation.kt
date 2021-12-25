@@ -99,6 +99,7 @@ object ScoreCalculation {
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
+    val perRoomPercentages = hashSetOf<Double>()
     var perRoomPercentage = 0.0
     var completedRooms = 0
 
@@ -168,8 +169,10 @@ object ScoreCalculation {
                             name.contains("Completed Rooms") -> {
                                 val matcher = roomCompletedPattern.find(name) ?: continue
                                 completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
-                                if (completedRooms > 0)
-                                    perRoomPercentage = clearedPercentage / completedRooms.toDouble()
+                                if (completedRooms > 0) {
+                                    perRoomPercentages.add(clearedPercentage / completedRooms.toDouble())
+                                    perRoomPercentage = perRoomPercentages.sum() / perRoomPercentages.size
+                                }
                             }
                         }
                     } catch (ignored: NumberFormatException) {
@@ -297,6 +300,7 @@ object ScoreCalculation {
         firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
         perRoomPercentage = 0.0
+        perRoomPercentages.clear()
     }
 
     init {
