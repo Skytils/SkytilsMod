@@ -174,6 +174,7 @@ class Skytils {
         MinecraftForge.EVENT_BUS.register(AuctionData())
         MinecraftForge.EVENT_BUS.register(AuctionPriceOverlay())
         MinecraftForge.EVENT_BUS.register(BlazeSolver())
+        MinecraftForge.EVENT_BUS.register(BookHelper)
         MinecraftForge.EVENT_BUS.register(BossHPDisplays())
         MinecraftForge.EVENT_BUS.register(BoulderSolver())
         MinecraftForge.EVENT_BUS.register(ChatTabs)

@@ -1140,6 +1140,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showEnchantedBookTier = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Book Helper",
+        description = "Shows if you're combining incompatible books",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var bookHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Etherwarp Teleport Position",
         description = "Shows the block you will teleport to with the Etherwarp Transmission ability.",
         category = "Miscellaneous", subcategory = "Items"
