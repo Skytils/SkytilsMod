@@ -99,7 +99,6 @@ object ScoreCalculation {
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
-    val perRoomPercentages = hashSetOf<Double>()
     var perRoomPercentage = 0.0
     var completedRooms = 0
 
@@ -170,8 +169,7 @@ object ScoreCalculation {
                                 val matcher = roomCompletedPattern.find(name) ?: continue
                                 completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
                                 if (completedRooms > 0) {
-                                    perRoomPercentages.add(clearedPercentage / completedRooms.toDouble())
-                                    perRoomPercentage = perRoomPercentages.sum() / perRoomPercentages.size
+                                    perRoomPercentage = (clearedPercentage / completedRooms.toDouble())
                                 }
                             }
                         }
@@ -179,7 +177,10 @@ object ScoreCalculation {
                     }
                 }
                 val calcingClearedPercentage =
-                    (perRoomPercentage * (completedRooms + if (!DungeonFeatures.hasBossSpawned) 1 else 0)).coerceAtMost(100.0)
+                    (perRoomPercentage * (completedRooms + if (!DungeonFeatures.hasBossSpawned) 1 else 0)).coerceAtMost(
+                        100.0
+                    )
+                printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
                         ?: "") == "Paul"
@@ -300,7 +301,6 @@ object ScoreCalculation {
         firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
         perRoomPercentage = 0.0
-        perRoomPercentages.clear()
     }
 
     init {
