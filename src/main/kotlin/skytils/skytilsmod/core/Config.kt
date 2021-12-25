@@ -233,6 +233,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showScoreCalculation = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Minimized Dungeon Score Estimate",
+        description = "Only shows the dungeon score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var minimizedScoreCalculation = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
         description = "Helps your party determine the state of the mimic in your dungeon by sending in party chat.\n§cThis feature is use at your own risk.",
         category = "Dungeons", subcategory = "Score Calculation"
