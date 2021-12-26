@@ -44,6 +44,7 @@ import org.objectweb.asm.tree.MethodInsnNode
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.asm.SkytilsTransformer
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -165,6 +166,7 @@ object Utils {
         ReceivePacketEvent.isCanceled = true
         val packet = ReceivePacketEvent.packet
         checkThreadAndQueue {
+            MinecraftForge.EVENT_BUS.post(MainReceivePacketEvent(mc.netHandler, ReceivePacketEvent.packet))
             MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
         }
     }
