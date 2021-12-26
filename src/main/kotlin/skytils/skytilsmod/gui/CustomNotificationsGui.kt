@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
@@ -26,7 +27,6 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
-import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CustomNotifications
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -159,7 +159,12 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             val displayText = (text.find { it.placeholder == "Display Text" }
                 ?: throw IllegalStateException("${container.componentName} does not have the display text UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
             if (triggerRegex.isBlank() || displayText.isBlank()) continue
-            CustomNotifications.notifications[triggerRegex.toRegex()] = displayText
+            runCatching {
+                CustomNotifications.notifications[triggerRegex.toRegex()] = displayText
+            }.onFailure {
+                it.printStackTrace()
+                EssentialAPI.getNotifications().push("Invalid regex for notification", triggerRegex, 3f)
+            }
         }
 
         PersistentSave.markDirty<CustomNotifications>()
