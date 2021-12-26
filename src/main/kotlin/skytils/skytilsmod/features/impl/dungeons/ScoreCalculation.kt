@@ -45,8 +45,7 @@ import kotlin.math.roundToInt
 
 object ScoreCalculation {
 
-    private val partyAssistSecretsPattern: Pattern =
-        Pattern.compile("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
+    private val partyAssistSecretsPattern = Regex("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
     private val mc = Minecraft.getMinecraft()
     private var ticks = 0
 
@@ -243,12 +242,10 @@ object ScoreCalculation {
                     ))
                 ) {
                     mimicKilled = true
-                    event.isCanceled = true
                     return
                 }
                 if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-ROOM$")) {
-                    val matcher = partyAssistSecretsPattern.matcher(unformatted)
-                    if (matcher.find()) {
+                    if (partyAssistSecretsPattern.containsMatchIn(unformatted)) {
                         event.isCanceled = true
                         return
                     }
