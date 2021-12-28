@@ -21,6 +21,7 @@ package skytils.skytilsmod.utils
 object SkillUtils {
     val maxSkillLevels = LinkedHashMap<String, Int>()
     val skillXp = LinkedHashMap<Int, Long>()
+    val runeXp = LinkedHashMap<Int, Long>()
     val dungeoneeringXp = LinkedHashMap<Int, Long>()
     val slayerXp = LinkedHashMap<String, LinkedHashMap<Int, Long>>()
 
