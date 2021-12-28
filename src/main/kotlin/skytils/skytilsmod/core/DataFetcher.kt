@@ -92,6 +92,8 @@ object DataFetcher {
                             key to element.asJsonObject.entrySet()
                                 .associateTo(LinkedHashMap()) { it.key.toInt() to it.value.asLong }
                         }
+                        SkillUtils.runeXp.clear()
+                        get("runecrafting_xp").asJsonObject.entrySet().associateTo(SkillUtils.runeXp) { it.key.toInt() to it.value.asLong }
                     }
                 }
                 APIUtil.getArrayResponse("${dataUrl}constants/mayors.json").apply {
