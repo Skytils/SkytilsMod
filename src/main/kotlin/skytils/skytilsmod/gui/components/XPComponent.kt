@@ -50,8 +50,11 @@ class XPComponent(
         }
     }.getOrDefault(50)!!
     private val skillXP: Float = skillField.getter.call(userData.skills) ?: 0f
-    private val skillLevel =
+    private val skillLevel = if (skillField == Skills::runecraftingXP) {
+        SkillUtils.calcXpWithOverflowAndProgress(skillXP.toDouble(), skillCap, SkillUtils.runeXp.values)
+    } else {
         SkillUtils.calcXpWithOverflowAndProgress(skillXP.toDouble(), skillCap, SkillUtils.skillXp.values)
+    }
     private val percent = (skillLevel.third % 1).toFloat()
 
     private val background = UIRoundedRectangle(5f)
@@ -83,7 +86,6 @@ class XPComponent(
         .constrain {
             x = CenterConstraint()
             y = CenterConstraint()
-            textScale = RelativeConstraint(0.1f)
         } childOf background
 
 
@@ -125,7 +127,6 @@ class XPComponent(
             .constrain {
                 x = 2.pixels()
                 y = CenterConstraint()
-                textScale = RelativeConstraint(0.1f)
             } childOf skillLevelContainer
 
     init {
