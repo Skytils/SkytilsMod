@@ -195,9 +195,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         val manaUsageMatcher = Regexs.MANAUSED.pattern.matcher(event.message)
         if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
             val manaUsage = manaUsageMatcher.group(1) ?: return
-            var spaced = ""
-
-            for (i in manaUsage) spaced += " "
+            val spaced = " ".repeat(manaUsage.length)
 
             event.message = event.message.replace(manaUsage, spaced)
             if (Skytils.config.manaUseHider == 2) {

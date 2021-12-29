@@ -76,7 +76,7 @@ object DungeonListener {
 
     private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
     private val classPattern =
-        Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* §r§f\\(§r§d(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)§r§f\\)§r")
+        Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* §r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
 
     private var ticks = 0
@@ -190,9 +190,16 @@ object DungeonListener {
             return
         }
 
-        val partyCount = partyCountPattern.find(tabEntries[0].text)?.groupValues?.get(1)?.toInt()
+        val partyCount = partyCountPattern.find(tabEntries[0].text)?.groupValues?.get(1)?.toIntOrNull()
+        if (partyCount == null) {
+            println("Couldn't get party count")
+            TickTask(5) {
+                getMembers()
+            }
+            return
+        }
         println("There are $partyCount members in this party")
-        for (i in 0 until partyCount!!) {
+        for (i in 0 until partyCount) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].text
             val matcher = classPattern.find(text)
@@ -201,18 +208,35 @@ object DungeonListener {
                 continue
             }
             val name = matcher.groups["name"]!!.value
-            val dungeonClass = matcher.groups["class"]!!.value
-            val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
-            println("Parsed teammate $name, they are a $dungeonClass $classLevel")
-            team.add(
-                DungeonTeammate(
-                    name,
-                    DungeonClass.getClassFromName(
-                        dungeonClass
-                    ), classLevel,
-                    pos
+            if (matcher.groups["class"] == null) {
+                val dungeonClass = matcher.groups["class"]!!.value
+                val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
+                println("Parsed teammate $name, they are a $dungeonClass $classLevel")
+                team.add(
+                    DungeonTeammate(
+                        name,
+                        DungeonClass.getClassFromName(
+                            dungeonClass
+                        ), classLevel,
+                        pos
+                    )
                 )
-            )
+            } else {
+                println("Parsed teammate $name with value EMPTY, $text")
+                team.add(
+                    DungeonTeammate(
+                        name,
+                        DungeonClass.EMPTY, 0,
+                        pos
+                    )
+                )
+            }
+        }
+        if (partyCount != team.size) {
+            UChat.chat("§9§lSkytils §8» §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+        }
+        if (team.any { it.dungeonClass == DungeonClass.EMPTY }) {
+            UChat.chat("§9§lSkytils §8» §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
         }
         CooldownTracker.updateCooldownReduction()
         checkSpiritPet()
@@ -263,7 +287,8 @@ object DungeonListener {
         BERSERK("Berserk"),
         MAGE("Mage"),
         HEALER("Healer"),
-        TANK("Tank");
+        TANK("Tank"),
+        EMPTY("Empty");
 
         companion object {
             fun getClassFromName(name: String): DungeonClass {
