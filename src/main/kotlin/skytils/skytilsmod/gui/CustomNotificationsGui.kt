@@ -93,7 +93,7 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             tooltipBlock.hide()
         }
 
-        for (name in CustomNotifications.notifications) {
+        for (name in CustomNotifications.notifications.entries.sortedBy { it.value }) {
             addNewNotification(name.key.pattern, name.value)
         }
     }
@@ -160,7 +160,8 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
                 ?: throw IllegalStateException("${container.componentName} does not have the display text UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
             if (triggerRegex.isBlank() || displayText.isBlank()) continue
             runCatching {
-                CustomNotifications.notifications[triggerRegex.toRegex()] = displayText
+                CustomNotifications.notifications[triggerRegex.replace("%%MC_IGN%%", mc.session.username).toRegex()] =
+                    displayText
             }.onFailure {
                 it.printStackTrace()
                 EssentialAPI.getNotifications().push("Invalid regex for notification", triggerRegex, 3f)
