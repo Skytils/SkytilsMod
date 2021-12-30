@@ -268,6 +268,20 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var receiveHelpFromOtherModMimicDead = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Send message on 270 score",
+        description = "Send message on 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var sendMessageOn270Score = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Send message on 300 score",
+        description = "Send message on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var sendMessageOn300Score = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"

@@ -100,6 +100,8 @@ object ScoreCalculation {
     var bonusScore = 0
     var perRoomPercentage = 0.0
     var completedRooms = 0
+    var sent270Message = false
+    var sent300Message = false
 
     var floorReq = floorRequirements["default"]!!
 
@@ -107,7 +109,7 @@ object ScoreCalculation {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (mc.thePlayer != null && mc.theWorld != null && Utils.inDungeons) {
-            if (ticks % 5 == 0) {
+            if (Skytils.config.showScoreCalculation && ticks % 5 == 0) {
                 missingPuzzles = 0
                 failedPuzzles = 0
                 for (l in ScoreboardUtil.sidebarLines) {
@@ -197,6 +199,14 @@ object ScoreCalculation {
                 speedScore = (100 - ((secondsElapsed - floorReq.speed) / 3f).coerceIn(0.0, 100.0)).toInt()
 
                 val totalScore = (skillScore + discoveryScore + speedScore + bonusScore)
+                if (totalScore >= 270 && !sent270Message) {
+                    sent270Message = true
+                    Skytils.sendMessageQueue.add("Skytils > 270 score")
+                }
+                if (totalScore >= 300 && !sent300Message) {
+                    sent300Message = true
+                    Skytils.sendMessageQueue.add("Skytils > 300 score")
+                }
 
                 ScoreCalculationElement.text.clear()
                 if (Skytils.config.minimizedScoreCalculation) {
@@ -298,6 +308,8 @@ object ScoreCalculation {
         firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
         perRoomPercentage = 0.0
+        sent270Message = false
+        sent300Message = false
     }
 
     init {
