@@ -31,6 +31,7 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil.highlight
+import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -48,28 +49,27 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         val names = HashMap<String, Boolean>()
         val classes = DungeonListener.DungeonClass.values()
             .associateWithTo(EnumMap(DungeonListener.DungeonClass::class.java)) { false }
+        private val glassPane by lazy {
+            Item.getItemFromBlock(Blocks.stained_glass_pane)
+        }
     }
 
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock) return
         val slot = event.slot
-        if (event.container is ContainerChest) {
-            val cc = event.container
-            val displayName = cc.lowerChestInventory.displayName.unformattedText.trim()
-            if (slot.hasStack) {
-                val item = slot.stack
-                if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap") {
-                    if (item.item === Item.getItemFromBlock(Blocks.stained_glass_pane)) {
-                        event.isCanceled = true
-                    }
+        if (slot.hasStack && event.container is ContainerChest) {
+            val item = slot.stack
+            if (Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") {
+                if (item.item === glassPane) {
+                    event.isCanceled = true
                 }
             }
         }
     }
 
     @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             val containerChest = event.container
@@ -79,8 +79,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
             if ((Skytils.config.spiritLeapNames && displayName == "Spirit Leap") || (Skytils.config.reviveStoneNames && displayName == "Revive A Teammate")) {
                 var people = 0
                 GlStateManager.disableLighting()
-                GlStateManager.disableDepth()
-                GlStateManager.disableBlend()
+                GlStateManager.enableBlend()
                 for (slot in invSlots) {
                     if (slot.inventory == mc.thePlayer.inventory) continue
                     if (!slot.hasStack || slot.stack.item != Items.skull) continue
@@ -101,9 +100,9 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     GlStateManager.pushMatrix()
                     GlStateManager.translate(0f, 0f, 1f)
                     if (names.getOrDefault(name, false)) {
-                        slot highlight Color(255, 0, 0)
+                        slot highlight Color(255, 0, 0, 69)
                     } else if (classes.getOrDefault(dungeonClass, false)) {
-                        slot highlight Color(0, 255, 0)
+                        slot highlight Color(0, 255, 0, 69)
                     }
                     Gui.drawRect(
                         (x - 2 - fr.getStringWidth(text) / 2).toInt(),
@@ -129,7 +128,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     )
                     GlStateManager.popMatrix()
                 }
-                GlStateManager.enableDepth()
+                GlStateManager.disableBlend()
             }
         }
     }

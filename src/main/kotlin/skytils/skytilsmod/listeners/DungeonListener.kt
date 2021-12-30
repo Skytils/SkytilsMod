@@ -208,7 +208,7 @@ object DungeonListener {
                 continue
             }
             val name = matcher.groups["name"]!!.value
-            if (matcher.groups["class"] == null) {
+            if (matcher.groups["class"] != null) {
                 val dungeonClass = matcher.groups["class"]!!.value
                 val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
                 println("Parsed teammate $name, they are a $dungeonClass $classLevel")

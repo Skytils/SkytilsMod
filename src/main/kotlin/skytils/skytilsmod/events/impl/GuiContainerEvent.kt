@@ -45,6 +45,14 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
             DrawSlotEvent(gui, container, slot)
     }
 
+    data class ForegroundDrawnEvent(
+        override val gui: GuiContainer,
+        override val container: Container,
+        val mouseX: Int,
+        val mouseY: Int,
+        val partialTicks: Float
+    ) : GuiContainerEvent(gui, container)
+
     @Cancelable
     data class SlotClickEvent(
         override val gui: GuiContainer,

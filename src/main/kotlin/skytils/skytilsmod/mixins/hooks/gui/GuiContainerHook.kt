@@ -46,6 +46,10 @@ class GuiContainerHook(guiAny: Any) {
         ).postAndCatch()
     }
 
+    fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
+        GuiContainerEvent.ForegroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
+    }
+
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
         if (GuiContainerEvent.DrawSlotEvent.Pre(
                 gui,
