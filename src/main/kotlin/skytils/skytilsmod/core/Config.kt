@@ -1573,6 +1573,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var powerOrbLock = false
 
     @Property(
+        type = PropertyType.NUMBER, name = "Power Orb Lock Duration",
+        description = "Needs Power Orb Lock to be active. Allows overwriting a power orb, if it has less time left than this option.",
+        min = 1, max = 60,
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var powerOrbDuration = 10
+
+    @Property(
         type = PropertyType.SWITCH, name = "Prevent Log Spam",
         description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
         category = "Miscellaneous", subcategory = "Quality of Life"
