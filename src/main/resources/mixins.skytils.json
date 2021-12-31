@@ -59,6 +59,7 @@
     "renderer.MixinTileEntityChestRenderer",
     "renderer.MixinTileEntityItemStackRenderer",
     "renderer.MixinTileEntitySkullRenderer",
+    "sba.MixinContainerPreviewManager",
     "sk1eroam.MixinAnimationHandler",
     "util.MixinChatStyle",
     "util.MixinIChatComponent$Serializer",
