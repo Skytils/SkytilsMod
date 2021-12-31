@@ -2365,6 +2365,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("boxedTankColor", "boxedTanks")
         addDependency("boxedProtectedTeammatesColor", "boxedProtectedTeammates")
 
+        addDependency("powerOrbDuration", "powerOrbLock")
+
         addDependency("yangGlyphColor", "highlightYangGlyph")
         addDependency("nukekebiHeadColor", "highlightNukekebiHeads")
 
