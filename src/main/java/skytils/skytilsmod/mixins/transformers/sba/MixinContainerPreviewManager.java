@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins.transformers.sba;
 
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,15 +28,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import skytils.skytilsmod.core.Config;
 import skytils.skytilsmod.utils.RenderUtil;
 
-//this doesn't actually work and idk why
 @Pseudo
-@Mixin(targets = "codes.biscuit.skyblockaddons.features.backpacks.ContainerPreviewManager")
+@Mixin(targets = "codes.biscuit.skyblockaddons.features.backpacks.ContainerPreviewManager", remap = false)
 public class MixinContainerPreviewManager {
     @Dynamic
-    @Redirect(method = "drawContainerPreviews", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItemAndEffectIntoGUI(Lnet/minecraft/item/ItemStack;II)V"), remap = false)
-    private static void drawRarityBackground(ItemStack item, int x, int y) {
+    @Redirect(method = "drawContainerPreviews", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;func_180450_b(Lnet/minecraft/item/ItemStack;II)V"))
+    private static void drawRarityBackground(RenderItem instance, ItemStack itemStack, int x, int y) {
         if (Config.INSTANCE.getShowItemRarity()) {
-            RenderUtil.renderRarity(item, x, y);
+            RenderUtil.renderRarity(itemStack, x, y);
         }
+        instance.renderItemAndEffectIntoGUI(itemStack, x, y);
     }
 }
