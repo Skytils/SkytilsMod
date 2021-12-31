@@ -736,6 +736,16 @@ object RenderUtil {
         )
     }
 
+    infix fun Slot.highlight(color: Int) {
+        Gui.drawRect(
+            this.xDisplayPosition,
+            this.yDisplayPosition,
+            this.xDisplayPosition + 16,
+            this.yDisplayPosition + 16,
+            color
+        )
+    }
+
     fun drawDurabilityBar(xPos: Int, yPos: Int, durability: Double) {
         val j = (13.0 - durability * 13.0).roundToInt()
         val i = (255.0 - durability * 255.0).roundToInt()
