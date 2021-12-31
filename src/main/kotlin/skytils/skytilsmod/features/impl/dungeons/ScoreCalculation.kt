@@ -199,11 +199,11 @@ object ScoreCalculation {
                 speedScore = (100 - ((secondsElapsed - floorReq.speed) / 3f).coerceIn(0.0, 100.0)).toInt()
 
                 val totalScore = (skillScore + discoveryScore + speedScore + bonusScore)
-                if (totalScore >= 270 && !sent270Message) {
+                if (Skytils.config.sendMessageOn270Score && !sent270Message && totalScore >= 270) {
                     sent270Message = true
                     Skytils.sendMessageQueue.add("Skytils > 270 score")
                 }
-                if (totalScore >= 300 && !sent300Message) {
+                if (Skytils.config.sendMessageOn300Score && !sent300Message && totalScore >= 300) {
                     sent300Message = true
                     Skytils.sendMessageQueue.add("Skytils > 300 score")
                 }
