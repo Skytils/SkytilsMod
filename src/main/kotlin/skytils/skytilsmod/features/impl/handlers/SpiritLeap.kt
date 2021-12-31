@@ -36,10 +36,10 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.stripControlCodes
-import java.awt.Color
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.util.*
-import java.util.regex.Pattern
 
 class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
@@ -72,15 +72,12 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
-            val containerChest = event.container
-            val fr = ScreenRenderer.fontRenderer
-            val invSlots = containerChest.inventorySlots
-            val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim()
-            if ((Skytils.config.spiritLeapNames && displayName == "Spirit Leap") || (Skytils.config.reviveStoneNames && displayName == "Revive A Teammate")) {
+            if ((Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") || (Skytils.config.reviveStoneNames && SBInfo.lastOpenContainerName == "Revive A Teammate")) {
+                val fr = ScreenRenderer.fontRenderer
                 var people = 0
                 GlStateManager.disableLighting()
                 GlStateManager.enableBlend()
-                for (slot in invSlots) {
+                for (slot in event.container.inventorySlots) {
                     if (slot.inventory == mc.thePlayer.inventory) continue
                     if (!slot.hasStack || slot.stack.item != Items.skull) continue
                     val item = slot.stack
@@ -100,16 +97,16 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     GlStateManager.pushMatrix()
                     GlStateManager.translate(0f, 0f, 1f)
                     if (names.getOrDefault(name, false)) {
-                        slot highlight Color(255, 0, 0, 69)
+                        slot highlight 1174339584
                     } else if (classes.getOrDefault(dungeonClass, false)) {
-                        slot highlight Color(0, 255, 0, 69)
+                        slot highlight 1157693184
                     }
                     Gui.drawRect(
                         (x - 2 - fr.getStringWidth(text) / 2).toInt(),
                         (y - 2).toInt(),
                         (x + fr.getStringWidth(text) / 2 + 2).toInt(),
                         (y + fr.FONT_HEIGHT + 2).toInt(),
-                        Color(47, 40, 40).rgb
+                        -13686744
                     )
                     fr.drawString(
                         text,
@@ -123,7 +120,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                         dungeonClass.className.first().uppercase(),
                         scaleReset * x,
                         scaleReset * slot.yDisplayPosition,
-                        Color(255, 255, 0).rgb,
+                        -256,
                         true
                     )
                     GlStateManager.popMatrix()
