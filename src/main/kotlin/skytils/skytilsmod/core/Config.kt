@@ -1575,7 +1575,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     @Property(
         type = PropertyType.NUMBER, name = "Power Orb Lock Duration",
         description = "Needs Power Orb Lock to be active. Allows overwriting a power orb, if it has less time left than this option.",
-        min = 1, max = 60,
+        min = 1, max = 120,
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var powerOrbDuration = 10
