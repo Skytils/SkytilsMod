@@ -25,7 +25,6 @@ plugins {
     kotlin("jvm") version "1.6.10"
     id("net.minecraftforge.gradle.forge") version "6f5327"
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.spongepowered.mixin") version "d5f9873d60"
     java
 }
 
@@ -64,8 +63,8 @@ val shadowMe: Configuration by configurations.creating {
 }
 
 dependencies {
-    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
-    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    compileOnly("org.spongepowered:mixin:0.8.5")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:1733") {
@@ -92,15 +91,11 @@ dependencies {
     }
 }
 
-mixin {
-    disableRefMapWarning = true
-    defaultObfuscationEnv = searge
-    add(sourceSets.main.get(), "mixins.skytils.refmap.json")
-}
+val mixinSrg = File(project.buildDir, "tmp/mixins/mixins.srg")
+val mixinRefMap = File(project.buildDir, "tmp/mixins/mixins.skytils.refmap.json")
 
 sourceSets {
     main {
-        ext["refmap"] = "mixins.skytils.refmap.json"
         output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
     }
 }
@@ -121,6 +116,10 @@ tasks {
         filesMatching("mcmod.info") {
             expand(mapOf("version" to project.version, "mcversion" to project.minecraft.version))
         }
+    }
+    val copySrg = register<Copy>("copySrg") {
+        from(genSrgs.get().mcpToSrg)
+        into("build")
     }
     named<Jar>("jar") {
         archiveBaseName.set("Skytils")
@@ -168,6 +167,12 @@ tasks {
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
+        options.compilerArgs.addAll(arrayOf(
+            "-AoutSrgFile=${mixinSrg.canonicalPath}",
+            "-AoutRefMapFile=${mixinRefMap.canonicalPath}",
+            "-AreobfSrgFile=${project.file("build/mcp-srg.srg").canonicalPath}"
+        ))
+        dependsOn(copySrg.get())
     }
     withType<KotlinCompile> {
         kotlinOptions {
@@ -181,6 +186,7 @@ tasks {
     }
     named<TaskSingleReobf>("reobfShadowJar") {
         mustRunAfter(shadowJar)
+        addSecondarySrgFile(mixinSrg)
     }
 }
 

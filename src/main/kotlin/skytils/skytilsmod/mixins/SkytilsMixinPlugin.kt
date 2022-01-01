@@ -19,7 +19,7 @@
 package skytils.skytilsmod.mixins
 
 import net.minecraft.launchwrapper.Launch
-import org.spongepowered.asm.lib.tree.ClassNode
+import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 
