@@ -143,6 +143,7 @@ tasks {
         archiveFileName.set(jar.get().archiveFileName)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe)
+        from(mixinRefMap)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
         relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
