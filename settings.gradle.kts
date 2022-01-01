@@ -32,7 +32,6 @@ pluginManagement {
         eachPlugin {
             when (requested.id.id) {
                 "net.minecraftforge.gradle.forge" -> useModule("com.github.Skytils:ForgeGradle:${requested.version}")
-                "org.spongepowered.mixin" -> useModule("com.github.Skytils:mixingradle:${requested.version}")
             }
         }
     }
