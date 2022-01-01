@@ -25,11 +25,16 @@ plugins {
     kotlin("jvm") version "1.6.10"
     id("net.minecraftforge.gradle.forge") version "6f5327"
     id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.skytils.knockoffmixingradle") version "7d2bb154b0"
     java
 }
 
 version = "1.0.9-RC2"
 group = "skytils.skytilsmod"
+
+mixin {
+    refmapName = "mixins.skytils.refmap.json"
+}
 
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
@@ -52,7 +57,6 @@ minecraft {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://repo.spongepowered.org/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-releases/")
     maven("https://jitpack.io")
@@ -63,9 +67,6 @@ val shadowMe: Configuration by configurations.creating {
 }
 
 dependencies {
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
-    compileOnly("org.spongepowered:mixin:0.8.5")
-
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:1733") {
         exclude(module = "asm")
@@ -91,9 +92,6 @@ dependencies {
     }
 }
 
-val mixinSrg = File(project.buildDir, "tmp/mixins/mixins.srg")
-val mixinRefMap = File(project.buildDir, "tmp/mixins/mixins.skytils.refmap.json")
-
 sourceSets {
     main {
         output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
@@ -117,10 +115,6 @@ tasks {
             expand(mapOf("version" to project.version, "mcversion" to project.minecraft.version))
         }
     }
-    val copySrg = register<Copy>("copySrg") {
-        from(genSrgs.get().mcpToSrg)
-        into("build")
-    }
     named<Jar>("jar") {
         archiveBaseName.set("Skytils")
         manifest {
@@ -143,7 +137,6 @@ tasks {
         archiveFileName.set(jar.get().archiveFileName)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe)
-        from(mixinRefMap)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
         relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
@@ -168,12 +161,6 @@ tasks {
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.compilerArgs.addAll(arrayOf(
-            "-AoutSrgFile=${mixinSrg.canonicalPath}",
-            "-AoutRefMapFile=${mixinRefMap.canonicalPath}",
-            "-AreobfSrgFile=${project.file("build/mcp-srg.srg").canonicalPath}"
-        ))
-        dependsOn(copySrg.get())
     }
     withType<KotlinCompile> {
         kotlinOptions {
@@ -187,7 +174,6 @@ tasks {
     }
     named<TaskSingleReobf>("reobfShadowJar") {
         mustRunAfter(shadowJar)
-        addSecondarySrgFile(mixinSrg)
     }
 }
 
