@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -663,7 +663,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 ).matches() -> {
                     cancelChatPacket(event, Skytils.config.spookyMessageHider == 2)
                 }
-                Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(" Powder§r") -> {
+                Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(
+                    " Powder§r"
+                ) -> {
                     val matcher = Regexs.POWDERCHEST.pattern.matcher(formatted)
                     if (matcher.find()) {
                         val amount = matcher.group("amount").toInt()

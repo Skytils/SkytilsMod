@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -136,7 +136,8 @@ object ChatTabs {
                     b.yPosition =
                         UResolution.scaledHeight - chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * 9 - 50 - 9
                 }
-                hoveredChatLine = if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
+                hoveredChatLine =
+                    if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
             }
             is GuiScreenEvent.MouseInputEvent.Pre -> {
                 if (GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
