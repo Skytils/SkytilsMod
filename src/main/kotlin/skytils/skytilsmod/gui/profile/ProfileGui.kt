@@ -25,11 +25,16 @@ import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
+import gg.essential.elementa.state.BasicState
+import gg.essential.elementa.state.State
+import gg.essential.universal.UMinecraft
+import kotlinx.coroutines.runBlocking
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import skytils.hylin.extension.getLatestSkyblockProfile
 import skytils.hylin.extension.nonDashedString
+import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
 import skytils.skytilsmod.gui.profile.components.ItemComponent
@@ -37,8 +42,20 @@ import skytils.skytilsmod.gui.profile.components.XPComponent
 import java.awt.Color
 import java.util.*
 
-class ProfileGui(val uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
-    private val profileData = hylinAPI.getSkyblockProfilesSync(uuid).getLatestSkyblockProfile(uuid)!!.members.get(uuid.nonDashedString())!!
+class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
+    private val uuidState: State<UUID> = BasicState(uuid)
+    private val profileState: State<Member> = uuidState.map {
+        runBlocking {
+            hylinAPI.getSkyblockProfiles(it).await().getLatestSkyblockProfile(it)!!.members[uuid.nonDashedString()]!!
+        }
+    }
+    private val gameProfileState: State<GameProfile?> = uuidState.map {
+        val profile = GameProfile(it, "")
+        UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
+        return@map profile
+    }
+    private val profileData =
+        hylinAPI.getSkyblockProfilesSync(uuid).getLatestSkyblockProfile(uuid)!!.members[uuid.nonDashedString()]!!
 
     private val navBar by UIBlock(Color(0, 0, 0, 160))
         .constrain {
@@ -59,7 +76,7 @@ class ProfileGui(val uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         } childOf window
 
     private val playerComponent = EssentialAPI.getEssentialComponentFactory().buildEmulatedPlayer {
-        profile = GameProfile(uuid, "")
+        profileState = gameProfileState
 
     }
         .constrain {
