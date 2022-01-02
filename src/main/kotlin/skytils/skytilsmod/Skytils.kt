@@ -191,6 +191,7 @@ class Skytils {
             DungeonMap(),
             DungeonTimer(),
             EnchantNames(),
+            EnterToConfirmSignPopup(),
             FarmingFeatures(),
             FavoritePets(),
             GlintCustomizer(),
