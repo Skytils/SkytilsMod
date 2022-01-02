@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,22 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.gui.components
+package skytils.skytilsmod.gui.profile.components
 
-import com.google.gson.JsonObject
 import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.*
+import gg.essential.elementa.components.GradientComponent
+import gg.essential.elementa.components.UIContainer
+import gg.essential.elementa.components.UIRoundedRectangle
+import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
-import gg.essential.elementa.effects.OutlineEffect
-import gg.essential.elementa.state.BasicState
-import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
-import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.SkillUtils
 import java.awt.Color
 import kotlin.reflect.KProperty
@@ -139,4 +136,3 @@ class XPComponent(
             } childOf imageContainer
     }
 }
-
