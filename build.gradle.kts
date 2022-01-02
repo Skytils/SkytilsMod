@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,16 +42,20 @@ minecraft {
     mappings = "stable_22"
     makeObfSourceJar = false
     isGitVersion = false
-    clientJvmArgs.addAll(arrayOf(
-        "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-        "-Delementa.dev=true",
-        "-Delementa.debug=true",
-        "-Dasmhelper.verbose=true"
-    ))
-    clientRunArgs.addAll(arrayOf(
-        "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
-        "--mixin mixins.skytils.json"
-    ))
+    clientJvmArgs.addAll(
+        arrayOf(
+            "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+            "-Delementa.dev=true",
+            "-Delementa.debug=true",
+            "-Dasmhelper.verbose=true"
+        )
+    )
+    clientRunArgs.addAll(
+        arrayOf(
+            "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
+            "--mixin mixins.skytils.json"
+        )
+    )
 }
 
 repositories {
@@ -167,7 +171,14 @@ tasks {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
         }
-        kotlinDaemonJvmArguments.set(listOf("-Xmx2G", "-Dkotlin.enableCacheBuilding=true", "-Dkotlin.useParallelTasks=true", "-Dkotlin.enableFastIncremental=true"))
+        kotlinDaemonJvmArguments.set(
+            listOf(
+                "-Xmx2G",
+                "-Dkotlin.enableCacheBuilding=true",
+                "-Dkotlin.useParallelTasks=true",
+                "-Dkotlin.enableFastIncremental=true"
+            )
+        )
     }
     named<TaskSingleReobf>("reobfJar") {
         enabled = false
