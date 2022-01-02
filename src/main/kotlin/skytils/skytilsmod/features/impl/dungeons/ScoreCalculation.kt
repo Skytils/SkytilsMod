@@ -21,7 +21,6 @@ import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -37,7 +36,6 @@ import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlin.math.floor
@@ -357,48 +355,22 @@ object ScoreCalculation {
 
     class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", FloatPair(200, 100)) {
         override fun render() {
-            val player = mc.thePlayer
-            val world: World? = mc.theWorld
-            if (toggled && Utils.inDungeons && player != null && world != null) {
-                val sr = UResolution
-
-                val leftAlign = actualX < sr.scaledWidth / 2f
-                for (i in text.indices) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        text[i],
-                        if (leftAlign) 0f else width.toFloat(),
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
+            if (toggled && Utils.inDungeons) {
+                RenderUtil.drawAllInList(this, text)
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
-            val text = ArrayList<String>()
-            text.add("§6Secrets Found: 99")
-            text.add("§6Estimated Secret Count: 99")
-            text.add("§6Crypts: 99")
-            text.add("§6Mimic Killed:§a ✓")
-            for (i in text.indices) {
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    text[i],
-                    if (leftAlign) 0f else width.toFloat(),
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            RenderUtil.drawAllInList(this, demoText)
         }
 
         companion object {
+            private val demoText = listOf(
+                "§6Secrets Found: 99",
+                "§6Estimated Secret Count: 99",
+                "§6Crypts: 99",
+                "§6Mimic Killed:§a ✓"
+            )
             val text = ArrayList<String>()
         }
 

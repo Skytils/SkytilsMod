@@ -29,15 +29,12 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import skytils.skytilsmod.utils.stripControlCodes
 
 
 /**
@@ -159,47 +156,21 @@ class ChestProfit {
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
-                var drawnLines = 0
-                for (chest in DungeonChest.values()) {
-                    if (chest.items.size == 0) continue
-                    val profit = chest.value - chest.price
-                    val line = chest.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.format(
-                        profit.toLong()
-                    )
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        line,
-                        if (leftAlign) 0f else width.toFloat(),
-                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        chest.displayColor,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                    drawnLines++
-                }
+                RenderUtil.drawAllInList(this, DungeonChest.values().filter { it.items.isNotEmpty() }.map {
+                    val profit = it.value - it.price
+                    "${it.displayText}§f: §${(if (profit > 0) "a" else "c")}${
+                        NumberUtil.format(
+                            profit.toLong()
+                        )
+                    }"
+                })
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
-            for (i in DungeonChest.values().indices) {
-                val chest = DungeonChest.values()[i]
-                val line = chest.displayText + ": §a+300M"
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    line,
-                    if (leftAlign) 0f else width.toFloat(),
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    chest.displayColor,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            RenderUtil.drawAllInList(this, DungeonChest.values().map { "${it.displayText}: §a+300M" })
         }
 
         override val height: Int

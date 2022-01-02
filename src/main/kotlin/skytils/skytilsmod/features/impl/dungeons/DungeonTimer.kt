@@ -18,9 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UChat
-import gg.essential.universal.UResolution
-import net.minecraft.client.Minecraft
-import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -31,11 +28,9 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
+import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.stripControlCodes
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -167,7 +162,6 @@ class DungeonTimer {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
         var dungeonStartTime = -1L
         var bloodOpenTime = -1L
         var bloodClearTime = -1L
@@ -191,8 +185,6 @@ class DungeonTimer {
     class DungeonTimerElement : GuiElement("Dungeon Timer", FloatPair(200, 80)) {
         override fun render() {
             if (toggled && Utils.inDungeons && dungeonStartTime != -1L) {
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
                 val time =
                     (((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime) / 1000.0)
                 val lines = arrayListOf(
@@ -218,23 +210,11 @@ class DungeonTimer {
                     if (bossEntryTime != -1L)
                         add("§bBoss Clear: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - bossEntryTime) / 1000.0)}")
                 }
-                for (i in lines.indices) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        lines[i],
-                        if (leftAlign) 0f else width.toFloat(),
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
+                RenderUtil.drawAllInList(this, lines)
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
             val displayText = """
                 §aReal Time: 0s
                 §aTime Elapsed: 0s
@@ -244,18 +224,8 @@ class DungeonTimer {
                 §9Boss Entry: 0s
                 §bBoss Clear: 0s
                 """.trimIndent()
-            val lines = displayText.split("\n".toRegex()).toTypedArray()
-            for (i in lines.indices) {
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    lines[i],
-                    if (leftAlign) 0f else actualWidth,
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            val lines = displayText.split('\n')
+            RenderUtil.drawAllInList(this, lines)
         }
 
         override val height: Int
@@ -274,8 +244,6 @@ class DungeonTimer {
     class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && DungeonFeatures.dungeonFloor == "F7") {
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = arrayListOf(
                     "§bPhase 1: ${dungeonTimeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime) / 1000.0)}"
                 ).apply {
@@ -286,41 +254,19 @@ class DungeonTimer {
                     if (phase3ClearTime != -1L)
                         add("§4Phase 4: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase3ClearTime) / 1000.0)}")
                 }
-                for (i in lines.indices) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        lines[i],
-                        if (leftAlign) 0f else width.toFloat(),
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
+                RenderUtil.drawAllInList(this, lines)
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
             val displayText = """
                 §bPhase 1: 0s
                 §cPhase 2: 0s
                 §6Phase 3: 0s
                 §4Phase 4: 0s
                 """.trimIndent()
-            val lines = displayText.split("\n".toRegex()).toTypedArray()
-            for (i in lines.indices) {
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    lines[i],
-                    if (leftAlign) 0f else width.toFloat(),
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            val lines = displayText.split('\n')
+            RenderUtil.drawAllInList(this, lines)
         }
 
         override val height: Int
@@ -338,16 +284,12 @@ class DungeonTimer {
 
     class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", FloatPair(200, 120)) {
         override fun render() {
-            val player = mc.thePlayer
-            val world: World? = mc.theWorld
-            if (toggled && Utils.inDungeons && player != null && world != null && bossEntryTime != -1L && Utils.equalsOneOf(
+            if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
                     "F6",
                     "M6"
                 )
             ) {
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
                 val lines = arrayListOf(
                     "§dTerracotta: ${dungeonTimeFormat(((if (terraClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else terraClearTime) - bossEntryTime) / 1000.0)}"
                 ).apply {
@@ -356,40 +298,18 @@ class DungeonTimer {
                     if (giantsClearTime != -1L)
                         add("§cSadan: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - giantsClearTime) / 1000.0)}")
                 }
-                for (i in lines.indices) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        lines[i],
-                        if (leftAlign) 0f else width.toFloat(),
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
+                RenderUtil.drawAllInList(this, lines)
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
             val displayText = """
                 §dTerracotta: 0s
                 §aGiants: 0s
                 §cSadan: 0s
                 """.trimIndent()
-            val lines = displayText.split("\n".toRegex()).toTypedArray()
-            for (i in lines.indices) {
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    lines[i],
-                    if (leftAlign) 0f else width.toFloat(),
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            val lines = displayText.split('\n')
+            RenderUtil.drawAllInList(this, lines)
         }
 
         override val height: Int
