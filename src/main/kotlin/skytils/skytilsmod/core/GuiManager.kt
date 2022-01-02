@@ -35,7 +35,9 @@ import skytils.skytilsmod.events.impl.RenderHUDEvent
 import skytils.skytilsmod.gui.LocationEditGui
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     private var counter = 0
@@ -88,7 +90,9 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHUD(event: RenderHUDEvent) {
         if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
+        mc.mcProfiler.startSection("SkytilsHUD")
         for ((_, element) in Companion.elements) {
+            mc.mcProfiler.startSection(element.name)
             try {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(element.actualX, element.actualY, 0f)
@@ -98,8 +102,10 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
+            mc.mcProfiler.endSection()
         }
         renderTitles(event.event.resolution)
+        mc.mcProfiler.endSection()
     }
 
     @SubscribeEvent
