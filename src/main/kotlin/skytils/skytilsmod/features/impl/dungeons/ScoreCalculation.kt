@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -40,13 +40,13 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
 object ScoreCalculation {
 
-    private val partyAssistSecretsPattern = Regex("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
+    private val partyAssistSecretsPattern =
+        Regex("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
     private val mc = Minecraft.getMinecraft()
     private var ticks = 0
 
@@ -113,8 +113,7 @@ object ScoreCalculation {
             if (Skytils.config.showScoreCalculation && ticks % 5 == 0) {
                 missingPuzzles = 0
                 failedPuzzles = 0
-                for (l in ScoreboardUtil.sidebarLines) {
-                    val line = ScoreboardUtil.cleanSB(l)
+                for (line in ScoreboardUtil.sidebarLines) {
                     if (line.startsWith("Dungeon Cleared:")) {
                         val matcher = dungeonClearedPattern.find(line)
                         if (matcher != null) {
