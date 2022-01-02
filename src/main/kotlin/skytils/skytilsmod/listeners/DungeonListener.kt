@@ -118,7 +118,7 @@ object DungeonListener {
         if (event.phase != TickEvent.Phase.START) return
         if (ticks % 4 == 0) {
             val localMissingPuzzles = TabListUtils.tabEntries.mapNotNull {
-                val name = it.text
+                val name = it.second
                 if (name.contains("✦")) {
                     val matcher = missingPuzzlePattern.find(name)
                     if (matcher != null) {
@@ -139,7 +139,7 @@ object DungeonListener {
                 val tabEntries = TabListUtils.tabEntries
                 for (teammate in team) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
-                    val entry = tabEntries[teammate.tabEntryIndex].text
+                    val entry = tabEntries[teammate.tabEntryIndex].second
                     if (!entry.contains(teammate.playerName)) continue
                     teammate.player = mc.theWorld.playerEntities.find {
                         it.name == teammate.playerName && it.uniqueID.version() == 4
@@ -183,14 +183,14 @@ object DungeonListener {
         if (team.isNotEmpty() || !Utils.inDungeons) return
         val tabEntries = TabListUtils.tabEntries
 
-        if (tabEntries.isEmpty() || !tabEntries[0].text.contains("§r§b§lParty §r§f(")) {
+        if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
             TickTask(5) {
                 getMembers()
             }
             return
         }
 
-        val partyCount = partyCountPattern.find(tabEntries[0].text)?.groupValues?.get(1)?.toIntOrNull()
+        val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
         if (partyCount == null) {
             println("Couldn't get party count")
             TickTask(5) {
@@ -201,7 +201,7 @@ object DungeonListener {
         println("There are $partyCount members in this party")
         for (i in 0 until partyCount) {
             val pos = 1 + i * 4
-            val text = tabEntries[pos].text
+            val text = tabEntries[pos].second
             val matcher = classPattern.find(text)
             if (matcher == null) {
                 println("Skipping over entry $text due to it not matching")
@@ -256,7 +256,7 @@ object DungeonListener {
                             uuid
                         ) ?: continue
                         hutaoFans[name] = profile.pets.any {
-                            it.type == "SPIRIT" && (it.tier == Tier.LEGENDARY || it.tier == Tier.EPIC && it.heldItem == "PET_ITEM_TIER_BOOST")
+                            it.type == "SPIRIT" && (it.tier == Tier.LEGENDARY || (it.heldItem == "PET_ITEM_TIER_BOOST" && it.tier == Tier.EPIC))
                         }
                     }
                     printDevMessage(hutaoFans.asMap().toString(), "spiritpet")

@@ -283,7 +283,7 @@ class Skytils {
         ScreenRenderer.refresh()
 
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
-
+        TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it.text }
         if (displayScreen != null) {
             mc.displayGuiScreen(displayScreen)
             displayScreen = null
@@ -368,7 +368,7 @@ class Skytils {
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
         if (event.gui == null && config.reopenOptionsMenu) {
-            if (old is ReopenableGUI || (old is SettingsGui && (old as AccessorSettingsGui).config is Config)) {
+            if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 TickTask(1) {
                     displayScreen = OptionsGui()
                 }
