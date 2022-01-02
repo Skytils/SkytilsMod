@@ -19,7 +19,6 @@ package skytils.skytilsmod.utils
 
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.world.WorldSettings
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -47,8 +46,9 @@ object TabListUtils {
             return -1
         }
     }
-    val tabEntries: List<NetworkPlayerInfo>
-        get() = if (mc.thePlayer == null) emptyList() else playerInfoOrdering.sortedCopy(
+    var tabEntries: List<Pair<NetworkPlayerInfo, String>> = emptyList()
+    fun fetchTabEntires(): List<NetworkPlayerInfo> =
+        if (mc.thePlayer == null) emptyList() else playerInfoOrdering.sortedCopy(
             mc.thePlayer.sendQueue.playerInfoMap
         )
 }

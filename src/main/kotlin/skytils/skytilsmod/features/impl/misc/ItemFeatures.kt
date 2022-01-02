@@ -336,7 +336,7 @@ class ItemFeatures {
         }
         if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
             val bonus = try {
-                (TabListUtils.tabEntries[68].text.substringAfter("❁").removeSuffix("§r").toInt()
+                (TabListUtils.tabEntries[68].second.substringAfter("❁").removeSuffix("§r").toInt()
                     .coerceAtMost(1000) / 10).toString()
             } catch (e: Exception) {
                 "Error"

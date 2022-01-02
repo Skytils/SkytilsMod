@@ -132,9 +132,8 @@ object ScoreCalculation {
                         }
                     }
                 }
-                for (pi in TabListUtils.tabEntries) {
+                for ((_, name) in TabListUtils.tabEntries) {
                     try {
-                        val name = pi.text
                         when {
                             name.contains("Deaths:") -> {
                                 val matcher = deathsTabPattern.find(name) ?: continue
