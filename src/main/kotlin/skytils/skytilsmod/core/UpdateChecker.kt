@@ -30,7 +30,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.gui.UpdateGui
 import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.APIUtil.cm
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
 import java.io.File
@@ -99,7 +98,7 @@ object UpdateChecker {
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             // TODO Make this dynamic and fetch latest one or something
             val url =
-                "https://cdn.discordapp.com/attachments/881403326938353684/888153558321594438/SkytilsInstaller-1.1.1.jar"
+                "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.1.1.jar"
             val taskFile = File(taskDir, getJarNameFromUrl(url))
             if (taskDir.mkdirs() || taskFile.createNewFile()) {
                 println("Downloading Skytils delete task.")
