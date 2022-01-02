@@ -42,6 +42,7 @@ import skytils.skytilsmod.features.impl.misc.Ping
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.*
+import skytils.skytilsmod.gui.profile.ProfileGui
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.Utils
