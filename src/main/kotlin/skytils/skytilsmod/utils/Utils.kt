@@ -20,13 +20,13 @@ package skytils.skytilsmod.utils
 import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import gg.essential.lib.caffeine.cache.Cache
+import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -231,23 +231,21 @@ val EntityLivingBase.baseMaxHealth: Double
     get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
 
 fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
-    if (this is AccessorGuiNewChat) {
-        if (this.chatOpen) {
-            val scaleFactor = ScaledResolution(mc).scaleFactor
-            val extraOffset =
-                if (ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
-                        ?.getBoolean(null) == true
-                ) 12 else 0
-            val x = MathHelper.floor_float((mouseX / scaleFactor - 3).toFloat() / chatScale)
-            val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - extraOffset).toFloat() / chatScale)
+    if (chatOpen && this is AccessorGuiNewChat) {
+        val scaleFactor = UResolution.scaleFactor
+        val extraOffset =
+            if (ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
+                    ?.getBoolean(null) == true
+            ) 12 else 0
+        val x = MathHelper.floor_float((mouseX / scaleFactor - 3).toFloat() / chatScale)
+        val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - extraOffset).toFloat() / chatScale)
 
-            if (x >= 0 && y >= 0) {
-                val l = this.lineCount.coerceAtMost(this.drawnChatLines.size)
-                if (x <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && y < mc.fontRendererObj.FONT_HEIGHT * l + l) {
-                    val lineNum = y / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
-                    if (lineNum >= 0 && lineNum < this.drawnChatLines.size) {
-                        return drawnChatLines[lineNum]
-                    }
+        if (x >= 0 && y >= 0) {
+            val l = this.lineCount.coerceAtMost(this.drawnChatLines.size)
+            if (x <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && y < mc.fontRendererObj.FONT_HEIGHT * l + l) {
+                val lineNum = y / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
+                if (lineNum >= 0 && lineNum < this.drawnChatLines.size) {
+                    return drawnChatLines[lineNum]
                 }
             }
         }

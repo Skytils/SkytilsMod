@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
-import com.google.common.base.Predicate
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -138,21 +137,7 @@ class BossHPDisplays {
                         }
                     }
                 }
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
-                var i = 0
-                for ((name, timer) in respawnTimers.entries) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        "$name: $timer",
-                        if (leftAlign) 0f else actualWidth,
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                    i++
-                }
+                RenderUtil.drawAllInList(this, respawnTimers.entries.map { "${it.key}: ${it.value}" })
             }
         }
 
@@ -163,7 +148,7 @@ class BossHPDisplays {
             ScreenRenderer.fontRenderer.drawString(
                 "Guardian Respawn Timer Here",
                 if (leftAlign) 0f else actualWidth,
-                (0 * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                0f,
                 CommonColors.WHITE,
                 alignment,
                 SmartFontRenderer.TextShadow.NORMAL
@@ -189,59 +174,32 @@ class BossHPDisplays {
             val world: World? = mc.theWorld
             if (canGiantsSpawn && toggled && Utils.inSkyblock && player != null && world != null) {
                 val giantNames =
-                    world.getEntities(EntityArmorStand::class.java, Predicate { entity: EntityArmorStand? ->
+                    world.getEntities(EntityArmorStand::class.java) { entity: EntityArmorStand? ->
                         val name = entity!!.displayName.formattedText
                         if (name.contains("❤")) {
                             if (name.contains("§e﴾ §c§lSadan§r")) {
-                                return@Predicate true
+                                return@getEntities true
                             } else if (name.contains("Giant") && Utils.equalsOneOf(
                                     DungeonFeatures.dungeonFloor,
                                     "F7",
                                     "M6"
                                 )
-                            ) return@Predicate true
-                            for (giant in GIANT_NAMES) {
-                                if (name.contains(giant)) return@Predicate true
-                            }
+                            ) return@getEntities true
+                            if (GIANT_NAMES.any { name.contains(it) }) return@getEntities true
                         }
                         false
-                    })
-                giantNames.removeIf { entity: EntityArmorStand ->
+                    }
+                giantNames.removeAll { entity: EntityArmorStand ->
                     DungeonFeatures.dungeonFloor == "F6" && entity.displayName.formattedText.contains(
                         "Sadan"
                     ) && giantNames.size > 1
                 }
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
-                for (i in giantNames.indices) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        giantNames[i].displayName.formattedText,
-                        if (leftAlign) 0f else actualWidth,
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
+                RenderUtil.drawAllInList(this, giantNames.map { it.displayName.formattedText })
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
-            for (i in GIANT_NAMES.indices) {
-                val text = GIANT_NAMES[i] + " §a20M§c❤"
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    text,
-                    if (leftAlign) 0f else actualWidth,
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            RenderUtil.drawAllInList(this, GIANT_NAMES.map { "$it §a20M§c❤" })
         }
 
         override val height: Int
@@ -254,7 +212,7 @@ class BossHPDisplays {
 
         companion object {
             val GIANT_NAMES =
-                arrayOf(
+                setOf(
                     "§3§lThe Diamond Giant",
                     "§c§lBigfoot",
                     "§4§lL.A.S.R.",

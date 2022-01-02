@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.init.Blocks
@@ -31,6 +30,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -185,7 +185,7 @@ class BlazeSolver {
         impossible = false
     }
 
-    class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
+    data class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
     companion object {
         @JvmField
         var orderedBlazes = ArrayList<ShootableBlaze>()
@@ -194,6 +194,5 @@ class BlazeSolver {
         var blazeMode = 0
         var blazeChest: BlockPos? = null
         var impossible = false
-        private val mc = Minecraft.getMinecraft()
     }
 }

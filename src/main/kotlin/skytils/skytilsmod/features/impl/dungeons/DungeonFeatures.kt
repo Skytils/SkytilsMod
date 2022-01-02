@@ -568,6 +568,7 @@ class DungeonFeatures {
                     if (event.toolTip[i].contains("Click to reroll")) {
                         val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
                         event.toolTip[i] = "§eClick §a$neededClicks§e times to reroll this chest!"
+                        break
                     }
                 }
             }

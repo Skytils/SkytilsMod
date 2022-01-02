@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.universal.UResolution
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
@@ -31,8 +32,12 @@ import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.mixins.hooks.renderer.skipGlint
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
+import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.cos
@@ -796,6 +801,23 @@ object RenderUtil {
 
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
         return lastValue + (currentValue - lastValue) * multiplier
+    }
+
+    fun drawAllInList(element: GuiElement, lines: Collection<String>) {
+        val leftAlign = element.actualX < UResolution.scaledWidth / 2f
+        val alignment =
+            if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+        val xPos = if (leftAlign) 0f else element.actualWidth.toFloat()
+        for ((i, str) in lines.withIndex()) {
+            ScreenRenderer.fontRenderer.drawString(
+                str,
+                xPos,
+                (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                CommonColors.WHITE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
     }
 }
 

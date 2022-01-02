@@ -96,19 +96,7 @@ class SpidersDenFeatures {
                         }
                         false
                     })
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
-                for (i in arachneNames.indices) {
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    ScreenRenderer.fontRenderer.drawString(
-                        arachneNames[i].displayName.formattedText,
-                        if (leftAlign) 0f else width.toFloat(),
-                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
+                RenderUtil.drawAllInList(this, arachneNames.map { it.displayName.formattedText })
             }
         }
 
