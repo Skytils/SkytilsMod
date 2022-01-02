@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -140,11 +140,11 @@ class DungeonFeatures {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (Utils.inDungeons) {
             if (dungeonFloor == null) {
-                for (s in ScoreboardUtil.sidebarLines) {
-                    val line = ScoreboardUtil.cleanSB(s)
+                for (line in ScoreboardUtil.sidebarLines) {
                     if (line.contains("The Catacombs (")) {
                         dungeonFloor = line.substringAfter("(").substringBefore(")")
-                        ScoreCalculation.floorReq = ScoreCalculation.floorRequirements[dungeonFloor] ?: ScoreCalculation.floorRequirements["default"]!!
+                        ScoreCalculation.floorReq = ScoreCalculation.floorRequirements[dungeonFloor]
+                            ?: ScoreCalculation.floorRequirements["default"]!!
                         break
                     }
                 }
