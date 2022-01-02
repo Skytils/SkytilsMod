@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package skytils.skytilsmod.gui.components
+package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
 import net.minecraft.client.renderer.GlStateManager
