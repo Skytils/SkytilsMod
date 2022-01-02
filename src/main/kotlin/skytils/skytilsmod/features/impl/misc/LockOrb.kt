@@ -21,7 +21,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.SoundQueue

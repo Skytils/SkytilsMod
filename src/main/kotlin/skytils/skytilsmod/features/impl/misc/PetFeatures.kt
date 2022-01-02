@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -140,7 +141,7 @@ class PetFeatures {
                                 ChatComponentText("Click to disable the pet item lock for 5 seconds.")
                             )
                         }
-                        mc.thePlayer.addChatMessage(cc)
+                        UChat.chat(cc)
                     }
                 } else {
                     lastPetConfirmation = 0
@@ -153,7 +154,7 @@ class PetFeatures {
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message == "/disableskytilspetitemlock" && !event.addToChat) {
             lastPetConfirmation = System.currentTimeMillis()
-            mc.thePlayer.addChatMessage(ChatComponentText("§aYou may now apply pet items for 5 seconds."))
+            UChat.chat("§aYou may now apply pet items for 5 seconds.")
             event.isCanceled = true
         }
     }
