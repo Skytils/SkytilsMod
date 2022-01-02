@@ -19,18 +19,21 @@ package skytils.skytilsmod.features.impl.misc
 
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.Utils
 import kotlin.math.pow
 
 class LockOrb {
     @SubscribeEvent
-    fun onInteract(event: PlayerInteractEvent) {
+    fun onPacket(event: PacketEvent.SendEvent) {
         if (!Utils.inSkyblock || !Skytils.config.powerOrbLock) return
-        if (event.entity !== mc.thePlayer || event.action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) return
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
         val item = mc.thePlayer.heldItem
         val itemId = getSkyBlockItemID(item)
         if (itemId == null || !itemId.endsWith("_POWER_ORB")) return

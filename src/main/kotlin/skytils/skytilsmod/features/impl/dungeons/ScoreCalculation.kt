@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
@@ -264,7 +265,7 @@ object ScoreCalculation {
         }
         if (Skytils.config.removePartyChatNotifFromScoreCalc) {
             if (unformatted.startsWith("Party > ") && mc.thePlayer != null && !unformatted.contains(mc.thePlayer.name)) {
-                mc.thePlayer.playSound("random.orb", 1f, 1f)
+                SoundQueue.addToQueue("random.orb", 1f)
             }
         }
     }

@@ -58,6 +58,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -149,7 +150,7 @@ class SlayerFeatures {
                             else -> false
                         }
                         if (isDanger) {
-                            mc.thePlayer.playSound("random.orb", 1f, 1f)
+                            SoundQueue.addToQueue("random.orb", 1f)
                         }
                     }
                 }
