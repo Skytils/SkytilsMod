@@ -254,13 +254,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var scoreCalculationReceiveAssist = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Remove Party Assist Chat Notification Sounds",
-        description = "Removes party chat notification sounds caused by score calculation.\n§cDo not turn this on if you do not use the Hypixel feature.",
-        category = "Dungeons", subcategory = "Score Calculation"
-    )
-    var removePartyChatNotifFromScoreCalc = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Allow Mimic Dead! from other Mods",
         description = "Uses the Mimic dead! in order to determine the state of the mimic in the dungeon.",
         category = "Dungeons", subcategory = "Score Calculation"
@@ -1854,11 +1847,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showSeraphDisplay = false
 
 
-/*    @Property(
-        PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
-        description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
-        category = "Slayer", subcategory = "Voidgloom Seraph"
-    )*/
+    /*    @Property(
+            PropertyType.SWITCH, name = "Experimental Yang Glyph Detection",
+            description = "Testing new detection for Yang Glyphs. Give us feedback on Discord!",
+            category = "Slayer", subcategory = "Voidgloom Seraph"
+        )*/
     var experimentalYangGlyphDetection = true
 
     @Property(
