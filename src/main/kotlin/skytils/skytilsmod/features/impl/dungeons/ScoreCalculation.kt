@@ -93,6 +93,8 @@ object ScoreCalculation {
     var bonusScore = 0
     var perRoomPercentage = 0.0
     var completedRooms = 0
+    var totalRooms = 0
+
     var sent270Message = false
     var sent300Message = false
 
@@ -161,22 +163,25 @@ object ScoreCalculation {
                             completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
                             if (completedRooms > 0) {
                                 perRoomPercentage = (clearedPercentage / completedRooms.toDouble())
+                                totalRooms = (100 / perRoomPercentage).toInt()
                             }
                         }
                     }
                 }
-                val calcingClearedPercentage =
-                    (perRoomPercentage * (completedRooms + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(
+                val calcingCompletedRooms =
+                    completedRooms + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(
                         1
-                    )).coerceAtMost(
-                        100
-                    ))
+                    )
+                val calcingClearedPercentage =
+                    (perRoomPercentage * calcingCompletedRooms).coerceAtMost(
+                        100.0
+                    )
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
                         ?: "") == "Paul"
                 skillScore =
-                    (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 14 * (missingPuzzles + failedPuzzles) - (100 - calcingClearedPercentage)).roundToInt()
+                    (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 10 * (missingPuzzles + failedPuzzles) - 4 * (totalRooms - calcingCompletedRooms))
                         .coerceIn(0, 100)
                 percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
                 discoveryScore = (floor(
