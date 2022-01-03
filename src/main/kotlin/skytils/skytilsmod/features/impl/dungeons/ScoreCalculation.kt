@@ -166,9 +166,11 @@ object ScoreCalculation {
                     }
                 }
                 val calcingClearedPercentage =
-                    (perRoomPercentage * (completedRooms + if (!DungeonFeatures.hasBossSpawned) 1 else 0)).coerceAtMost(
-                        100.0
-                    )
+                    (perRoomPercentage * (completedRooms + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(
+                        1
+                    )).coerceAtMost(
+                        100
+                    ))
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
@@ -358,4 +360,6 @@ object ScoreCalculation {
     }
 
     data class FloorRequirement(val secretPercentage: Double = 1.0, val speed: Int = 10 * 60)
+
+    private fun Boolean.ifTrue(num: Int) = if (this) num else 0
 }
