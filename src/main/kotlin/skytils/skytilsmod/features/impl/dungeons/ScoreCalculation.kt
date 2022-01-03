@@ -18,9 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UResolution
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -29,10 +27,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -43,9 +40,6 @@ import kotlin.math.roundToInt
 
 object ScoreCalculation {
 
-    private val partyAssistSecretsPattern =
-        Regex("^Party > .+: \\\$SKYTILS-DUNGEON-SCORE-ROOM\\$: \\[(?<name>.+)] \\((?<secrets>\\d+)\\)$")!!
-    private val mc = Minecraft.getMinecraft()
     private var ticks = 0
 
     private val deathsTabPattern = Regex("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
@@ -131,47 +125,44 @@ object ScoreCalculation {
                     }
                 }
                 for ((_, name) in TabListUtils.tabEntries) {
-                    try {
-                        when {
-                            name.contains("Deaths:") -> {
-                                val matcher = deathsTabPattern.find(name) ?: continue
-                                deaths = matcher.groups["deaths"]?.value?.toIntOrNull() ?: 0
-                            }
-                            name.contains("✦") -> {
-                                if (missingPuzzlePattern.containsMatchIn(name)) {
-                                    missingPuzzles++
-                                }
-                            }
-                            name.contains("✖") -> {
-                                if (failedPuzzlePattern.containsMatchIn(name)) {
-                                    failedPuzzles++
-                                }
-                            }
-                            name.contains("Secrets Found:") -> {
-                                if (name.contains("%")) {
-                                    val matcher = secretsFoundPercentagePattern.find(name) ?: continue
-                                    val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
-                                        ?: 0.0) / foundSecrets
-                                    totalSecrets =
-                                        if (percentagePer > 0.0) (100 / percentagePer).roundToInt() else 0
-                                } else {
-                                    val matcher = secretsFoundPattern.find(name) ?: continue
-                                    foundSecrets = matcher.groups["secrets"]?.value?.toIntOrNull() ?: 0
-                                }
-                            }
-                            name.contains("Crypts:") -> {
-                                val matcher = cryptsPattern.find(name) ?: continue
-                                crypts = matcher.groups["crypts"]?.value?.toIntOrNull() ?: 0
-                            }
-                            name.contains("Completed Rooms") -> {
-                                val matcher = roomCompletedPattern.find(name) ?: continue
-                                completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
-                                if (completedRooms > 0) {
-                                    perRoomPercentage = (clearedPercentage / completedRooms.toDouble())
-                                }
+                    when {
+                        name.contains("Deaths:") -> {
+                            val matcher = deathsTabPattern.find(name) ?: continue
+                            deaths = matcher.groups["deaths"]?.value?.toIntOrNull() ?: 0
+                        }
+                        name.contains("✦") -> {
+                            if (missingPuzzlePattern.containsMatchIn(name)) {
+                                missingPuzzles++
                             }
                         }
-                    } catch (ignored: NumberFormatException) {
+                        name.contains("✖") -> {
+                            if (failedPuzzlePattern.containsMatchIn(name)) {
+                                failedPuzzles++
+                            }
+                        }
+                        name.contains("Secrets Found:") -> {
+                            if (name.contains("%")) {
+                                val matcher = secretsFoundPercentagePattern.find(name) ?: continue
+                                val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
+                                    ?: 0.0) / foundSecrets
+                                totalSecrets =
+                                    if (percentagePer > 0.0) (100 / percentagePer).roundToInt() else 0
+                            } else {
+                                val matcher = secretsFoundPattern.find(name) ?: continue
+                                foundSecrets = matcher.groups["secrets"]?.value?.toIntOrNull() ?: 0
+                            }
+                        }
+                        name.contains("Crypts:") -> {
+                            val matcher = cryptsPattern.find(name) ?: continue
+                            crypts = matcher.groups["crypts"]?.value?.toIntOrNull() ?: 0
+                        }
+                        name.contains("Completed Rooms") -> {
+                            val matcher = roomCompletedPattern.find(name) ?: continue
+                            completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
+                            if (completedRooms > 0) {
+                                perRoomPercentage = (clearedPercentage / completedRooms.toDouble())
+                            }
+                        }
                     }
                 }
                 val calcingClearedPercentage =
@@ -252,16 +243,9 @@ object ScoreCalculation {
                     return
                 }
                 if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-ROOM$")) {
-                    if (partyAssistSecretsPattern.containsMatchIn(unformatted)) {
-                        event.isCanceled = true
-                        return
-                    }
+                    event.isCanceled = true
+                    return
                 }
-            }
-        }
-        if (Skytils.config.removePartyChatNotifFromScoreCalc) {
-            if (unformatted.startsWith("Party > ") && mc.thePlayer != null && !unformatted.contains(mc.thePlayer.name)) {
-                SoundQueue.addToQueue("random.orb", 1f)
             }
         }
     }
@@ -281,20 +265,6 @@ object ScoreCalculation {
                         Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")
                     }
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
-        if (!Utils.inDungeons) return
-        if (event.packet is S29PacketSoundEffect) {
-            val packet = event.packet
-            val sound = packet.soundName
-            val pitch = packet.pitch
-            val volume = packet.volume
-            if (Skytils.config.removePartyChatNotifFromScoreCalc && sound == "random.orb" && pitch == 1f && volume == 1f) {
-                event.isCanceled = true
             }
         }
     }
