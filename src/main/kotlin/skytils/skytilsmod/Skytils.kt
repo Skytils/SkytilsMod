@@ -210,6 +210,7 @@ class Skytils {
             MythologicalTracker(),
             PetFeatures(),
             Ping,
+            PricePaid,
             ProtectItems(),
             RainTimer(),
             RelicWaypoints(),
