@@ -39,7 +39,7 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
 
     @SubscribeEvent
     fun toolTip(event: ItemTooltipEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || !Skytils.config.pricePaid) return
         val extraAttr = ItemUtil.getExtraAttributes(event.itemStack) ?: return
         prices[UUID.fromString(extraAttr.getString("uuid").ifEmpty { return })]?.let { price ->
             event.toolTip.add("§r§7Price Paid: §9\$${NumberUtil.nf.format(price)}")
