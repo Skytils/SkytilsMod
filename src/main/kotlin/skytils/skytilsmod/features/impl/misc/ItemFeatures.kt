@@ -579,9 +579,10 @@ class ItemFeatures {
         val enchantNBT = listOf(nbt1, nbt2).map { nbt ->
             nbt.getCompoundTag("enchantments")
         }
-        val enchantList = enchantNBT.map { nbt ->
+        val enchantList = enchantNBT.mapNotNull { nbt ->
             nbt.keySet.takeIf { it.size == 1 }?.first()
-        }.takeIf { it.all { it != null } }?.map { it!! } ?: return
+        }
+        if (enchantList.size != 2) return
         val errorString = if (enchantList[0] != enchantList[1]) {
             "Enchant Types don't match!"
         } else if (enchantNBT[0].getInteger(enchantList[0]) != enchantNBT[1].getInteger(enchantList[1])) {
