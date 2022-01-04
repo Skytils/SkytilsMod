@@ -1065,6 +1065,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var fixWorldTime = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Price Paid",
+        description = "Records and shows the price you paid for certain items.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var pricePaid = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Block Zapper Fatigue Timer",
         description = "Displays how long your block zapper is fatigued for.",
         category = "Miscellaneous", subcategory = "Items"
