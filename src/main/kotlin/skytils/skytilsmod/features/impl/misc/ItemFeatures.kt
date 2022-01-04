@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockDoor
 import net.minecraft.block.BlockLadder
@@ -59,6 +60,7 @@ import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.handlers.AuctionData
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -68,6 +70,7 @@ import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -562,6 +565,42 @@ class ItemFeatures {
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
         }
+    }
+
+    @SubscribeEvent
+    fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
+        if (!Skytils.config.bookHelper || !Utils.inSkyblock) return
+        if (event.container !is ContainerChest || SBInfo.lastOpenContainerName != "Anvil") return
+        val book1 = event.container.getSlot(29).stack ?: return
+        val book2 = event.container.getSlot(33).stack ?: return
+        if (book1.item != Items.enchanted_book || book2.item != Items.enchanted_book) return
+        val nbt1 = getExtraAttributes(book1) ?: return
+        val nbt2 = getExtraAttributes(book2) ?: return
+        val enchantNBT = listOf(nbt1, nbt2).map { nbt ->
+            nbt.getCompoundTag("enchantments")
+        }
+        val enchantList = enchantNBT.map { nbt ->
+            nbt.keySet.takeIf { it.size == 1 }?.first()
+        }.takeIf { it.all { it != null } }?.map { it!! } ?: return
+        val errorString = if (enchantList[0] != enchantList[1]) {
+            "Enchant Types don't match!"
+        } else if (enchantNBT[0].getInteger(enchantList[0]) != enchantNBT[1].getInteger(enchantList[1])) {
+            "Tiers don't match!"
+        } else return
+        val gui = event.gui as AccessorGuiContainer
+        UGraphics.disableLighting()
+        UGraphics.disableBlend()
+        UGraphics.disableDepth()
+        ScreenRenderer.fontRenderer.drawString(
+            errorString,
+            gui.guiLeft + gui.xSize / 2f,
+            gui.guiTop + 22.5f,
+            CommonColors.RED,
+            SmartFontRenderer.TextAlignment.MIDDLE
+        )
+        UGraphics.enableDepth()
+        UGraphics.enableBlend()
+        UGraphics.enableLighting()
     }
 
     @SubscribeEvent

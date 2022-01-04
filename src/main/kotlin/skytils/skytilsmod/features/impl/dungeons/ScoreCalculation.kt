@@ -178,8 +178,7 @@ object ScoreCalculation {
                     )
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
-                    (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || (MayorInfo.jerryMayor?.name
-                        ?: "") == "Paul"
+                    (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
                 skillScore =
                     (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 10 * (missingPuzzles + failedPuzzles) - 4 * (totalRooms - calcingCompletedRooms))
                         .coerceIn(0, 100)

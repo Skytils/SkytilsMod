@@ -20,7 +20,6 @@ package skytils.skytilsmod
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import gg.essential.vigilance.gui.SettingsGui
 import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -175,7 +174,6 @@ class Skytils {
             AuctionData(),
             AuctionPriceOverlay(),
             BlazeSolver(),
-            BookHelper,
             BossHPDisplays(),
             BoulderSolver(),
             ChatTabs,

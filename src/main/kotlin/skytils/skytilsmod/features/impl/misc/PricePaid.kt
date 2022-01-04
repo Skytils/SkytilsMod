@@ -19,9 +19,6 @@
 package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -43,10 +40,8 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
     @SubscribeEvent
     fun toolTip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock) return
-        val item = event.itemStack
-        val extraAttr = ItemUtil.getExtraAttributes(item)
-        if (extraAttr == null || !extraAttr.hasKey("uuid")) return;
-        prices[UUID.fromString(extraAttr.getString("uuid"))]?.let { price ->
+        val extraAttr = ItemUtil.getExtraAttributes(event.itemStack) ?: return
+        prices[UUID.fromString(extraAttr.getString("uuid").ifEmpty { return })]?.let { price ->
             event.toolTip.add("§r§7Price Paid: §9\$${NumberUtil.nf.format(price)}")
         } ?: return
     }
@@ -55,18 +50,18 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
     fun slotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (SBInfo.lastOpenContainerName?.equals("BIN Auction View") == false) return
         if (event.slotId != 31) return
-        ItemUtil.getItemLore(event.slot!!.stack).map {
+        ItemUtil.getItemLore(event.slot!!.stack).firstNotNullOfOrNull {
             coinRegex.find(it)?.groupValues?.get(1)
-        }.find { it != null }?.let { price ->
+        }?.let { price ->
             val uuid = ItemUtil.getExtraAttributes(event.gui.inventorySlots.getSlot(13).stack)!!.getString("uuid")
-            if (uuid.isEmpty()) return
+                .ifEmpty { return }
             prices[UUID.fromString(uuid)] = price.replace(",", "").substringBefore(' ').toDouble()
             dirty = true
         }
     }
 
     override fun read(reader: InputStreamReader) {
-        Skytils.gson.fromJson(reader, JsonObject::class.java).entrySet().forEach { price ->
+        gson.fromJson(reader, JsonObject::class.java).entrySet().forEach { price ->
             prices[UUID.fromString(price.key)] = price.value.asDouble
         }
     }
@@ -76,11 +71,11 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
         prices.forEach { (uuid, price) ->
             res.addProperty(uuid.toString(), price)
         }
-        Skytils.gson.toJson(res, writer)
+        gson.toJson(res, writer)
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
-        Skytils.gson.toJson(JsonObject(), writer)
+        gson.toJson(JsonObject(), writer)
     }
 
 }
