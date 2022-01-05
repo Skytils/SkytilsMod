@@ -35,6 +35,7 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -88,6 +89,7 @@ object ScoreCalculation {
     var isPaul = false
     var skillScore = 0
     var percentageSecretsFound = 0.0
+    var totalSecretsNeeded = 0.0
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
@@ -182,7 +184,8 @@ object ScoreCalculation {
                 skillScore =
                     (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 10 * (missingPuzzles + failedPuzzles) - 4 * (totalRooms - calcingCompletedRooms))
                         .coerceIn(0, 100)
-                percentageSecretsFound = foundSecrets / (totalSecrets * floorReq.secretPercentage)
+                totalSecretsNeeded = (totalSecrets * floorReq.secretPercentage)
+                percentageSecretsFound = foundSecrets / totalSecretsNeeded
                 discoveryScore = (floor(
                     (60 * (calcingClearedPercentage / 100f)).coerceIn(0.0, 60.0)
                 ) + if (totalSecrets <= 0) 0.0 else floor(
@@ -215,7 +218,7 @@ object ScoreCalculation {
                     if (missingPuzzles != 0) ScoreCalculationElement.text.add("§6Missing Puzzles:§a $missingPuzzles")
                     if (failedPuzzles != 0) ScoreCalculationElement.text.add("§6Failed Puzzles:§a $failedPuzzles")
                     if (foundSecrets != 0) ScoreCalculationElement.text.add("§6Secrets:§a${if (percentageSecretsFound >= 0.999999999) "§l" else ""} $foundSecrets")
-                    if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Total Secrets:§a $totalSecrets")
+                    if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Needed Secrets:§a ${ceil(totalSecretsNeeded)}")
                     ScoreCalculationElement.text.add("§6Crypts:§a $crypts")
                     if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
                         ScoreCalculationElement.text.add("§6Mimic:" + if (mimicKilled) "§a ✓" else " §c X")
