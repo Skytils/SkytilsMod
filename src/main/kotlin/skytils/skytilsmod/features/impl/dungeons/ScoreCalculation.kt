@@ -36,7 +36,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.math.BigDecimal
-import java.math.RoundingMode
+import java.math.MathContext
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -168,9 +168,12 @@ object ScoreCalculation {
                         name.contains("Completed Rooms") -> {
                             val matcher = roomCompletedPattern.find(name) ?: continue
                             completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
-                            if (completedRooms > 0) {
-                                perRoomPercentage = BigDecimal(clearedPercentage / completedRooms.toDouble())
-                                totalRooms = (oneHundred / perRoomPercentage).setScale(0, RoundingMode.HALF_UP).toInt()
+                            if (completedRooms > 0 && clearedPercentage > 0) {
+                                perRoomPercentage = BigDecimal(clearedPercentage).divide(
+                                    BigDecimal(completedRooms),
+                                    MathContext.DECIMAL128
+                                )
+                                totalRooms = (oneHundred / perRoomPercentage).toInt()
                             }
                         }
                     }
@@ -187,7 +190,7 @@ object ScoreCalculation {
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
                 skillScore =
-                    (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 10 * (missingPuzzles + failedPuzzles) - 4 * (totalRooms - calcingCompletedRooms))
+                    (100 - ((2 * deaths) - firstDeathHadSpirit.ifTrue(1)) - (10 * (missingPuzzles + failedPuzzles)) - (4 * (totalRooms - calcingCompletedRooms)))
                         .coerceIn(0, 100)
                 totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
