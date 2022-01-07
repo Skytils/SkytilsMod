@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.client.ClientCommandHandler
@@ -139,6 +140,10 @@ class Skytils {
         val dispatcher = threadPool.asCoroutineDispatcher()
 
         val hylinAPI = createHylinAPI("", false)
+
+        val deobfEnvironment by lazy {
+            Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
+        }
     }
 
     @Mod.EventHandler

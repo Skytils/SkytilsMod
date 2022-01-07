@@ -215,6 +215,8 @@ class MiscFeatures {
             if (Skytils.config.hideLightning) {
                 event.isCanceled = true
             }
+        } else if (Skytils.deobfEnvironment && DevTools.getToggle("invis")) {
+            event.entity.isInvisible = false
         }
     }
 
