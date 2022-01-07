@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.LoaderState
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
+import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import java.awt.Color
@@ -1650,6 +1651,16 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var rareRelicFinder = false
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Reset Found Relic Waypoints",
+        description = "Resets the state of all the relics at the Spider's Den.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    @Suppress("unused")
+    fun resetRelicWaypoints() {
+        Tracker.getTrackerById("found_spiders_den_relics")!!.doReset()
+    }
 
     @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
