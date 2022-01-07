@@ -46,7 +46,7 @@ object ScoreCalculation {
     private val deathsTabPattern = Regex("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val failedPuzzlePattern =
-        Regex("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §r§f(?:\\((?:§r(?<player>.+))?§r§f\\)|\\(§r§f})§r")
+        Regex("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §.+")
     private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
     private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
@@ -184,7 +184,7 @@ object ScoreCalculation {
                 skillScore =
                     (100 - (2 * deaths - if (firstDeathHadSpirit) 1 else 0) - 10 * (missingPuzzles + failedPuzzles) - 4 * (totalRooms - calcingCompletedRooms))
                         .coerceIn(0, 100)
-                totalSecretsNeeded = (totalSecrets * floorReq.secretPercentage)
+                totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
                 discoveryScore = (floor(
                     (60 * (calcingClearedPercentage / 100f)).coerceIn(0.0, 60.0)
@@ -218,7 +218,9 @@ object ScoreCalculation {
                     if (missingPuzzles != 0) ScoreCalculationElement.text.add("§6Missing Puzzles:§a $missingPuzzles")
                     if (failedPuzzles != 0) ScoreCalculationElement.text.add("§6Failed Puzzles:§a $failedPuzzles")
                     if (foundSecrets != 0) ScoreCalculationElement.text.add("§6Secrets:§a${if (percentageSecretsFound >= 0.999999999) "§l" else ""} $foundSecrets")
-                    if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Needed Secrets:§a ${ceil(totalSecretsNeeded)}")
+                    if (totalSecrets != 0) ScoreCalculationElement.text.add(
+                        "§6Needed Secrets:§a ${totalSecretsNeeded.toInt()}"
+                    )
                     ScoreCalculationElement.text.add("§6Crypts:§a $crypts")
                     if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
                         ScoreCalculationElement.text.add("§6Mimic:" + if (mimicKilled) "§a ✓" else " §c X")
