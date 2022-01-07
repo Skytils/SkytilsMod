@@ -35,6 +35,8 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -93,7 +95,7 @@ object ScoreCalculation {
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
-    var perRoomPercentage = 0.0
+    var perRoomPercentage = BigDecimal(0.0)
     var completedRooms = 0
     var totalRooms = 0
 
@@ -101,6 +103,9 @@ object ScoreCalculation {
     var sent300Message = false
 
     var floorReq = floorRequirements["default"]!!
+
+    private val oneHundred = BigDecimal(100)
+    private val sixty = BigDecimal(60)
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -164,8 +169,8 @@ object ScoreCalculation {
                             val matcher = roomCompletedPattern.find(name) ?: continue
                             completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
                             if (completedRooms > 0) {
-                                perRoomPercentage = (clearedPercentage / completedRooms.toDouble())
-                                totalRooms = (100 / perRoomPercentage).toInt()
+                                perRoomPercentage = BigDecimal(clearedPercentage / completedRooms.toDouble())
+                                totalRooms = (oneHundred / perRoomPercentage).setScale(0, RoundingMode.HALF_UP).toInt()
                             }
                         }
                     }
@@ -175,8 +180,8 @@ object ScoreCalculation {
                         1
                     )
                 val calcingClearedPercentage =
-                    (perRoomPercentage * calcingCompletedRooms).coerceAtMost(
-                        100.0
+                    (perRoomPercentage * BigDecimal(calcingCompletedRooms)).coerceAtMost(
+                        oneHundred
                     )
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
@@ -186,11 +191,11 @@ object ScoreCalculation {
                         .coerceIn(0, 100)
                 totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
-                discoveryScore = (floor(
-                    (60 * (calcingClearedPercentage / 100f)).coerceIn(0.0, 60.0)
-                ) + if (totalSecrets <= 0) 0.0 else floor(
-                    (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
-                )).toInt()
+                discoveryScore = (
+                        (sixty * (calcingClearedPercentage / oneHundred)).coerceIn(BigDecimal.ZERO, sixty)
+                            .toInt() + if (totalSecrets <= 0) 0.0 else floor(
+                            (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
+                        )).toInt()
                 bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
                 // no idea how speed score works soooo
                 speedScore = (100 - ((secondsElapsed - floorReq.speed) / 3f).coerceIn(0.0, 100.0)).toInt()
@@ -198,11 +203,11 @@ object ScoreCalculation {
                 val totalScore = (skillScore + discoveryScore + speedScore + bonusScore)
                 if (Skytils.config.sendMessageOn270Score && !sent270Message && totalScore >= 270) {
                     sent270Message = true
-                    Skytils.sendMessageQueue.add("Skytils > 270 score")
+                    Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
                 }
                 if (Skytils.config.sendMessageOn300Score && !sent300Message && totalScore >= 300) {
                     sent300Message = true
-                    Skytils.sendMessageQueue.add("Skytils > 300 score")
+                    Skytils.sendMessageQueue.add("/pc Skytils > 300 score")
                 }
 
                 ScoreCalculationElement.text.clear()
@@ -285,7 +290,7 @@ object ScoreCalculation {
         mimicKilled = false
         firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
-        perRoomPercentage = 0.0
+        perRoomPercentage = BigDecimal.ZERO
         sent270Message = false
         sent300Message = false
     }
