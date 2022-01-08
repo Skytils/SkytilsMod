@@ -106,6 +106,7 @@ object ScoreCalculation {
 
     private val oneHundred = BigDecimal(100)
     private val sixty = BigDecimal(60)
+    private val eighty = BigDecimal(80)
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -189,9 +190,11 @@ object ScoreCalculation {
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
+                val deathPenalty = (2 * deaths) - firstDeathHadSpirit.ifTrue(1)
+                val puzzlePenalty = 10 * (missingPuzzles + failedPuzzles)
                 skillScore =
-                    (100 - ((2 * deaths) - firstDeathHadSpirit.ifTrue(1)) - (10 * (missingPuzzles + failedPuzzles)) - (4 * (totalRooms - calcingCompletedRooms)))
-                        .coerceIn(0, 100)
+                    (20 + (calcingClearedPercentage * eighty).toInt() - deathPenalty - puzzlePenalty)
+                        .coerceIn(20, 100)
                 totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
                 discoveryScore = (
