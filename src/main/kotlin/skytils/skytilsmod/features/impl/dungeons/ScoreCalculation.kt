@@ -35,8 +35,6 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.math.BigDecimal
-import java.math.MathContext
 import kotlin.math.*
 
 object ScoreCalculation {
@@ -93,7 +91,6 @@ object ScoreCalculation {
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
-    var perRoomPercentage = BigDecimal(0.0)
     var completedRooms = 0
     var totalRooms = 0
 
@@ -101,11 +98,6 @@ object ScoreCalculation {
     var sent300Message = false
 
     var floorReq = floorRequirements["default"]!!
-
-    private val oneHundred = BigDecimal(100)
-    private val sixty = BigDecimal(60)
-    private val eighty = BigDecimal(80)
-    private val eightyPercent = eighty / oneHundred
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -168,13 +160,10 @@ object ScoreCalculation {
                         name.contains("Completed Rooms") -> {
                             val matcher = roomCompletedPattern.find(name) ?: continue
                             completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
-                            if (completedRooms > 0 && clearedPercentage > 0) {
-                                perRoomPercentage = BigDecimal(clearedPercentage).divide(
-                                    BigDecimal(completedRooms),
-                                    MathContext.DECIMAL128
-                                )
-                                totalRooms = (oneHundred / perRoomPercentage).toInt()
-                            }
+                            totalRooms = if (completedRooms > 0 && clearedPercentage > 0) {
+                                (100 * (completedRooms / clearedPercentage.toDouble())).roundToInt()
+                            } else 1
+                            printDevMessage(totalRooms.toString(), "scorecalc")
                         }
                     }
                 }
@@ -182,22 +171,19 @@ object ScoreCalculation {
                     completedRooms + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(
                         1
                     )
-                val calcingClearedPercentage =
-                    (perRoomPercentage * BigDecimal(calcingCompletedRooms)).coerceAtMost(
-                        oneHundred
-                    )
+                val calcingClearedPercentage = (calcingCompletedRooms / totalRooms.toDouble()).coerceAtMost(1.0)
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
                 val deathPenalty = (2 * deaths) - firstDeathHadSpirit.ifTrue(1)
                 val puzzlePenalty = 10 * (missingPuzzles + failedPuzzles)
                 skillScore =
-                    (20 + (calcingClearedPercentage * eightyPercent).toInt() - deathPenalty - puzzlePenalty)
+                    (20 + (calcingClearedPercentage * 80).toInt() - deathPenalty - puzzlePenalty)
                         .coerceIn(20, 100)
                 totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
                 discoveryScore = (
-                        (sixty * (calcingClearedPercentage / oneHundred)).coerceIn(BigDecimal.ZERO, sixty)
+                        (60 * calcingClearedPercentage).coerceIn(0.0, 60.0)
                             .toInt() + if (totalSecrets <= 0) 0.0 else floor(
                             (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
                         )).toInt()
@@ -299,7 +285,6 @@ object ScoreCalculation {
         mimicKilled = false
         firstDeathHadSpirit = false
         floorReq = floorRequirements["default"]!!
-        perRoomPercentage = BigDecimal.ZERO
         sent270Message = false
         sent300Message = false
     }
