@@ -64,7 +64,7 @@ object ScoreCalculation {
         "F4" to FloorRequirement(.6, 12 * 60),
         "F5" to FloorRequirement(.7),
         "F6" to FloorRequirement(.85, 12 * 60),
-        "F7" to FloorRequirement(speed = 12 * 60),
+        "F7" to FloorRequirement(speed = 14 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
         "M2" to FloorRequirement(speed = 8 * 60),
         "M3" to FloorRequirement(speed = 8 * 60),
@@ -203,10 +203,11 @@ object ScoreCalculation {
                         )).toInt()
                 bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
 
-                val overtime = (secondsElapsed - floorReq.speed).toDouble()
+                val overtime = secondsElapsed - floorReq.speed
                 val t = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")) 7 else 6
-                val x = floor((-5.0 * t + sqrt((5.0 * t).pow(2) + 20.0 * t * overtime)) / (10.0 * t)).toInt()
-                speedScore = max(0.0, min(100.0, 100 - 10 * x - (overtime - (5 * t * x + 5 * t * x * x)) / ((x + 1) * t))).toInt()
+                val x = ((-5.0 * t + sqrt((5.0 * t).pow(2) + 20.0 * t * overtime)) / (10.0 * t)).toInt()
+                speedScore =
+                    (100 - 10 * x - (overtime - (5 * t * x + 5 * t * x * x)) / ((x + 1) * t)).toInt().coerceIn(0, 100)
 
                 val totalScore = (skillScore + discoveryScore + speedScore + bonusScore)
                 if (Skytils.config.sendMessageOn270Score && !sent270Message && totalScore >= 270) {
