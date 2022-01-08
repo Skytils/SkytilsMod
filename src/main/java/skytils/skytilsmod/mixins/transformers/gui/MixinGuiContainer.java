@@ -34,7 +34,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
     @Unique
     private final GuiContainerHook hook = new GuiContainerHook(this);
 
-    @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE))
+    @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(CallbackInfo ci) {
         hook.closeWindowPressed(ci);
     }
