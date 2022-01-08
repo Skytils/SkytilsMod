@@ -37,9 +37,7 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.math.BigDecimal
 import java.math.MathContext
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 object ScoreCalculation {
 
@@ -66,7 +64,7 @@ object ScoreCalculation {
         "F4" to FloorRequirement(.6, 12 * 60),
         "F5" to FloorRequirement(.7),
         "F6" to FloorRequirement(.85, 12 * 60),
-        "F7" to FloorRequirement(speed = 14 * 60),
+        "F7" to FloorRequirement(speed = 12 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
         "M2" to FloorRequirement(speed = 8 * 60),
         "M3" to FloorRequirement(speed = 8 * 60),
@@ -203,8 +201,11 @@ object ScoreCalculation {
                             (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
                         )).toInt()
                 bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
-                // no idea how speed score works soooo
-                speedScore = (100 - ((secondsElapsed - floorReq.speed) / 3f).coerceIn(0.0, 100.0)).toInt()
+
+                val overtime = (secondsElapsed - floorReq.speed).toDouble()
+                val t = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")) 7 else 6
+                val x = floor((-5.0 * t + sqrt((5.0 * t).pow(2) + 20.0 * t * overtime)) / (10.0 * t)).toInt()
+                speedScore = max(0.0, min(100.0, 100 - 10 * x - (overtime - (5 * t * x + 5 * t * x * x)) / ((x + 1) * t))).toInt()
 
                 val totalScore = (skillScore + discoveryScore + speedScore + bonusScore)
                 if (Skytils.config.sendMessageOn270Score && !sent270Message && totalScore >= 270) {
