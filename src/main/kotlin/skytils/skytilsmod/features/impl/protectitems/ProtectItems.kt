@@ -40,12 +40,14 @@ class ProtectItems {
             val item = mc.thePlayer.inventory.itemStack
             val extraAttr = ItemUtil.getExtraAttributes(item)
             if (ItemProtectStrategy.isAnyWorth(item, extraAttr, ItemProtectStrategy.ProtectType.USERCLOSEWINDOW)) {
-                notifyStopped(null, "dropping")
                 for (slot in event.container.inventorySlots) {
-                    if (slot.inventory !== mc.thePlayer.inventory || slot.hasStack) continue
+                    if (slot.inventory !== mc.thePlayer.inventory || slot.hasStack || !slot.isItemValid(item)) continue
                     mc.playerController.windowClick(event.container.windowId, slot.slotNumber, 0, 0, mc.thePlayer)
-                    break
+                    notifyStopped(null, "dropping")
+                    return
                 }
+                notifyStopped(null, "closing the window on")
+                event.isCanceled = true
             }
         }
     }

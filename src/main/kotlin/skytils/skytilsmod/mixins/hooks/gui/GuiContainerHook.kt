@@ -33,7 +33,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun closeWindowPressed(ci: CallbackInfo) {
-        CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()
+        if (CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()) ci.cancel()
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {

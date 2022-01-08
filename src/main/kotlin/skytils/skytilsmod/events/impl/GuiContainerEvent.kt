@@ -32,6 +32,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val partialTicks: Float
     ) : GuiContainerEvent(gui, container)
 
+    @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
         GuiContainerEvent(gui, container)
 

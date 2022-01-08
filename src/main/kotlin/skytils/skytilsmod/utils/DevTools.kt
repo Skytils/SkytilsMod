@@ -21,7 +21,7 @@ package skytils.skytilsmod.utils
 import gg.essential.universal.UChat
 
 object DevTools {
-    private val toggles = HashMap<String, Boolean>()
+    val toggles = HashMap<String, Boolean>()
     var allToggle = false
         private set
 
