@@ -107,6 +107,7 @@ object ScoreCalculation {
     private val oneHundred = BigDecimal(100)
     private val sixty = BigDecimal(60)
     private val eighty = BigDecimal(80)
+    private val eightyPercent = eighty / oneHundred
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -193,7 +194,7 @@ object ScoreCalculation {
                 val deathPenalty = (2 * deaths) - firstDeathHadSpirit.ifTrue(1)
                 val puzzlePenalty = 10 * (missingPuzzles + failedPuzzles)
                 skillScore =
-                    (20 + (calcingClearedPercentage * eighty).toInt() - deathPenalty - puzzlePenalty)
+                    (20 + (calcingClearedPercentage * eightyPercent).toInt() - deathPenalty - puzzlePenalty)
                         .coerceIn(20, 100)
                 totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
