@@ -87,7 +87,7 @@ object ScoreCalculation {
     var isPaul = false
     var skillScore = 0
     var percentageSecretsFound = 0.0
-    var totalSecretsNeeded = 0.0
+    var totalSecretsNeeded = 0
     var discoveryScore = 0
     var speedScore = 0
     var bonusScore = 0
@@ -171,24 +171,25 @@ object ScoreCalculation {
                     completedRooms + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(
                         1
                     )
-                val calcingClearedPercentage = if(totalRooms > 0) (calcingCompletedRooms / totalRooms.toDouble()).coerceAtMost(1.0) else 0.0
+                val calcingClearedPercentage =
+                    if (totalRooms > 0) (calcingCompletedRooms / totalRooms.toDouble()).coerceAtMost(1.0) else 0.0
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
                 val deathPenalty = (2 * deaths) - firstDeathHadSpirit.ifTrue(1)
                 val puzzlePenalty = 10 * (missingPuzzles + failedPuzzles)
                 skillScore =
-                    (20 + (calcingClearedPercentage * 80).toInt() - deathPenalty - puzzlePenalty)
-                        .coerceIn(20, 100)
-                totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
-                percentageSecretsFound = foundSecrets / totalSecretsNeeded
-                val roomClearScore = (60 * calcingClearedPercentage).coerceIn(0.0, 60.0).toInt()
-                val secretScore = if (totalSecrets <= 0) 0 else floor(
+                    (20 + calcingClearedPercentage * 80 - deathPenalty - puzzlePenalty)
+                        .coerceIn(20.0, 100.0).roundToInt()
+                totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage).toInt()
+                percentageSecretsFound = foundSecrets / totalSecretsNeeded.toDouble()
+                val roomClearScore = (60 * calcingClearedPercentage).coerceIn(0.0, 60.0)
+                val secretScore = if (totalSecrets <= 0) 0.0 else
                     (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
-                ).toInt()
-                discoveryScore = roomClearScore + secretScore
+                discoveryScore = (roomClearScore + secretScore).roundToInt()
                 bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
 
+                // this still seems to be wrong, and I have no idea how this works
                 val overtime = secondsElapsed - floorReq.speed
                 val t = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")) 7 else 6
                 val x = ((-5.0 * t + sqrt((5.0 * t).pow(2) + 20.0 * t * overtime)) / (10.0 * t)).toInt()
@@ -222,24 +223,24 @@ object ScoreCalculation {
                         totalScore < 300 -> 'e'
                         else -> 'a'
                     }
-                    ScoreCalculationElement.text.add("§6Score: §$color$totalScore")
+                    ScoreCalculationElement.text.add("§6Score: §$color$totalScore §7(${rank}§7)")
                 } else {
                     ScoreCalculationElement.text.add("§9Dungeon Status")
-                    ScoreCalculationElement.text.add("§f• §eDeaths:§c $deaths")
+                    ScoreCalculationElement.text.add("§f• §eDeaths:§c $deaths ${if (firstDeathHadSpirit) "§7(§6Spirit§7)" else ""}")
                     ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c $missingPuzzles")
                     ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c $failedPuzzles")
-                    if (discoveryScore > 0) ScoreCalculationElement.text.add("§f• §eSecrets:${if (foundSecrets >= totalSecretsNeeded) "§a" else "§c"} $foundSecrets§7/§a${totalSecretsNeeded.toInt()} §7(§6Total: ${totalSecrets.toInt()}§7)")
+                    if (discoveryScore > 0) ScoreCalculationElement.text.add("§f• §eSecrets: ${if (foundSecrets >= totalSecretsNeeded) "§a" else "§c"}$foundSecrets§7/§a${totalSecretsNeeded} §7(§6Total: ${totalSecrets}§7)")
                     ScoreCalculationElement.text.add("§f• §eCrypts:§a $crypts")
                     if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                        ScoreCalculationElement.text.add("§f• §eMimic:" + if (mimicKilled) "§a ✓" else " §c X")
+                        ScoreCalculationElement.text.add("§f• §eMimic:${if (mimicKilled) "§a ✓" else " §c X"}")
                     }
                     ScoreCalculationElement.text.add("")
                     ScoreCalculationElement.text.add("§6Score:")
                     ScoreCalculationElement.text.add("§f• §eSkill Score:§a $skillScore")
-                    ScoreCalculationElement.text.add("§f• §eExplore Score:§a " + discoveryScore.toInt() + " §7(§e${roomClearScore} §7+ §6${secretScore}§7)")
-                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a " + speedScore.toInt())
+                    ScoreCalculationElement.text.add("§f• §eExplore Score:§a $discoveryScore §7(§e${roomClearScore.roundToInt()} §7+ §6${secretScore.roundToInt()}§7)")
+                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a $speedScore")
                     ScoreCalculationElement.text.add("§f• §eBonus Score:§a $bonusScore")
-                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $totalScore" + if(isPaul) " §7(§6+10§7)" else "")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $totalScore" + if (isPaul) " §7(§6+10§7)" else "")
                     ScoreCalculationElement.text.add("§f• §eRank: $rank")
                 }
                 ticks = 0
@@ -376,7 +377,7 @@ object ScoreCalculation {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§6Estimated Secret Count: 99")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§f• §eExplore Score:§a 100 §7(§e60 §7+ §640§7)")
 
         override val toggled: Boolean
             get() = Skytils.config.showScoreCalculation
