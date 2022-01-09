@@ -49,8 +49,8 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
     @SubscribeEvent
     fun slotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (SBInfo.lastOpenContainerName?.equals("BIN Auction View") == false) return
-        if (event.slotId != 31) return
-        ItemUtil.getItemLore(event.slot!!.stack).firstNotNullOfOrNull {
+        if (event.slotId != 31 || !event.slot!!.hasStack) return
+        ItemUtil.getItemLore(event.slot.stack).firstNotNullOfOrNull {
             coinRegex.find(it)?.groupValues?.get(1)
         }?.let { price ->
             val uuid = ItemUtil.getExtraAttributes(event.gui.inventorySlots.getSlot(13).stack)!!.getString("uuid")
