@@ -145,9 +145,9 @@ object ScoreCalculation {
                             if (name.contains("%")) {
                                 val matcher = secretsFoundPercentagePattern.find(name) ?: continue
                                 val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
-                                    ?: 0.0) / foundSecrets
+                                    ?: 0.0)
                                 totalSecrets =
-                                    if (percentagePer > 0.0) (100 / percentagePer).roundToInt() else 0
+                                    if (foundSecrets > 0 && percentagePer > 0) floor(100f / percentagePer * foundSecrets + 0.5).toInt() else 0
                             } else {
                                 val matcher = secretsFoundPattern.find(name) ?: continue
                                 foundSecrets = matcher.groups["secrets"]?.value?.toIntOrNull() ?: 0
@@ -162,7 +162,7 @@ object ScoreCalculation {
                             completedRooms = matcher.groups["count"]?.value?.toIntOrNull() ?: continue
                             totalRooms = if (completedRooms > 0 && clearedPercentage > 0) {
                                 (100 * (completedRooms / clearedPercentage.toDouble())).roundToInt()
-                            } else 1
+                            } else 0
                             printDevMessage(totalRooms.toString(), "scorecalc")
                         }
                     }
@@ -171,7 +171,7 @@ object ScoreCalculation {
                     completedRooms + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(
                         1
                     )
-                val calcingClearedPercentage = (calcingCompletedRooms / totalRooms.toDouble()).coerceAtMost(1.0)
+                val calcingClearedPercentage = if(totalRooms > 0) (calcingCompletedRooms / totalRooms.toDouble()).coerceAtMost(1.0) else 0.0
                 printDevMessage(calcingClearedPercentage.toString(), "scorecalc")
                 isPaul =
                     (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
@@ -182,11 +182,11 @@ object ScoreCalculation {
                         .coerceIn(20, 100)
                 totalSecretsNeeded = ceil(totalSecrets * floorReq.secretPercentage)
                 percentageSecretsFound = foundSecrets / totalSecretsNeeded
-                discoveryScore = (
-                        (60 * calcingClearedPercentage).coerceIn(0.0, 60.0)
-                            .toInt() + if (totalSecrets <= 0) 0.0 else floor(
-                            (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
-                        )).toInt()
+                val roomClearScore = (60 * calcingClearedPercentage).coerceIn(0.0, 60.0).toInt()
+                val secretScore = if (totalSecrets <= 0) 0 else floor(
+                    (40f * percentageSecretsFound).coerceIn(0.0, 40.0)
+                ).toInt()
+                discoveryScore = roomClearScore + secretScore
                 bonusScore = (if (mimicKilled) 2 else 0) + crypts.coerceAtMost(5) + if (isPaul) 10 else 0
 
                 val overtime = secondsElapsed - floorReq.speed
@@ -196,6 +196,16 @@ object ScoreCalculation {
                     (100 - 10 * x - (overtime - (5 * t * x + 5 * t * x * x)) / ((x + 1) * t)).toInt().coerceIn(0, 100)
 
                 val totalScore = (skillScore + discoveryScore + speedScore + bonusScore)
+
+                val rank = when {
+                    totalScore < 100 -> "§cD"
+                    totalScore < 160 -> "§9C"
+                    totalScore < 230 -> "§aB"
+                    totalScore < 270 -> "§5A"
+                    totalScore < 300 -> "§eS"
+                    else -> "§6S+"
+                }
+
                 if (Skytils.config.sendMessageOn270Score && !sent270Message && totalScore >= 270) {
                     sent270Message = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
@@ -214,25 +224,23 @@ object ScoreCalculation {
                     }
                     ScoreCalculationElement.text.add("§6Score: §$color$totalScore")
                 } else {
-                    if (deaths != 0) ScoreCalculationElement.text.add("§6Deaths:§a $deaths")
-                    if (missingPuzzles != 0) ScoreCalculationElement.text.add("§6Missing Puzzles:§a $missingPuzzles")
-                    if (failedPuzzles != 0) ScoreCalculationElement.text.add("§6Failed Puzzles:§a $failedPuzzles")
-                    if (foundSecrets != 0) ScoreCalculationElement.text.add("§6Secrets:§a${if (percentageSecretsFound >= 0.999999999) "§l" else ""} $foundSecrets")
-                    if (totalSecrets != 0) ScoreCalculationElement.text.add(
-                        "§6Needed Secrets:§a ${totalSecretsNeeded.toInt()}"
-                    )
-                    ScoreCalculationElement.text.add("§6Crypts:§a $crypts")
+                    ScoreCalculationElement.text.add("§9Dungeon Status")
+                    ScoreCalculationElement.text.add("§f• §eDeaths:§c $deaths")
+                    ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c $missingPuzzles")
+                    ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c $failedPuzzles")
+                    if (discoveryScore > 0) ScoreCalculationElement.text.add("§f• §eSecrets:${if (foundSecrets >= totalSecretsNeeded) "§a" else "§c"} $foundSecrets§7/§a${totalSecretsNeeded.toInt()} §7(§6Total: ${totalSecrets.toInt()}§7)")
+                    ScoreCalculationElement.text.add("§f• §eCrypts:§a $crypts")
                     if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                        ScoreCalculationElement.text.add("§6Mimic:" + if (mimicKilled) "§a ✓" else " §c X")
+                        ScoreCalculationElement.text.add("§f• §eMimic:" + if (mimicKilled) "§a ✓" else " §c X")
                     }
-                    if (isPaul) {
-                        ScoreCalculationElement.text.add("§6EZPZ: §a+10")
-                    }
-                    if (skillScore != 100) ScoreCalculationElement.text.add("§6Skill:§a $skillScore")
-                    if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Discovery:§a $discoveryScore")
-                    if (speedScore != 100) ScoreCalculationElement.text.add("§6Speed:§a $speedScore")
-                    if (bonusScore != 0) ScoreCalculationElement.text.add("§6Bonus:§a $bonusScore")
-                    if (totalSecrets != 0) ScoreCalculationElement.text.add("§6Total:§a $totalScore")
+                    ScoreCalculationElement.text.add("")
+                    ScoreCalculationElement.text.add("§6Score:")
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a $skillScore")
+                    ScoreCalculationElement.text.add("§f• §eExplore Score:§a " + discoveryScore.toInt() + " §7(§e${roomClearScore} §7+ §6${secretScore}§7)")
+                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a " + speedScore.toInt())
+                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a $bonusScore")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $totalScore" + if(isPaul) " §7(§6+10§7)" else "")
+                    ScoreCalculationElement.text.add("§f• §eRank: $rank")
                 }
                 ticks = 0
             }
@@ -346,10 +354,21 @@ object ScoreCalculation {
 
         companion object {
             private val demoText = listOf(
-                "§6Secrets Found: 99",
-                "§6Estimated Secret Count: 99",
-                "§6Crypts: 99",
-                "§6Mimic Killed:§a ✓"
+                "§9Dungeon Status",
+                "§f• §eDeaths:§c 0",
+                "§f• §eMissing Puzzles:§c 0",
+                "§f• §eFailed Puzzles:§c 0",
+                "§f• §eSecrets: §a50§7/§a50 §7(§6Total: 50§7)",
+                "§f• §eCrypts:§a 5",
+                "§f• §eMimic: §a ✓",
+                "",
+                "§6Score:",
+                "§f• §eSkill Score:§a 100",
+                "§f• §eExplore Score:§a 100 §7(§e60 §7+ §640§7)",
+                "§f• §eSpeed Score:§a 100",
+                "§f• §eBonus Score:§a 17",
+                "§f• §eTotal Score:§a 317 §7(§6+10§7)",
+                "§f• §eRank: §6S+"
             )
             val text = ArrayList<String>()
         }
