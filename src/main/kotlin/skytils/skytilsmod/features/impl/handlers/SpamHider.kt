@@ -263,6 +263,11 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                             1, 2 -> cancelChatPacket(event, Skytils.config.hideBossMessages == 2)
                         }
                     }
+                    unformatted.startsWith("[BOSS] The Watcher") -> {
+                        when (Skytils.config.hideTheWatcherMessages) {
+                            1, 2 -> cancelChatPacket(event, Skytils.config.hideTheWatcherMessages == 2)
+                        }
+                    }
                     Skytils.config.hideOruoMessages && unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && !unformatted.contains(
                         "You should have listened"
                     ) && !unformatted.contains("Yikes") && !unformatted.contains("chose the wrong answer") && !unformatted.contains(
@@ -638,6 +643,20 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         }
                     }
                 }
+
+                // Wither Essence Found
+                formatted.contains("found a §r§dWither Essence§r§f!") -> {
+                    when (Skytils.config.witherEssenceFoundHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceFoundHider == 2)
+                        3 -> {
+                            cancelChatPacket(event, false)
+                            val player = formatted.split(" ")[0]
+                            GuiManager.toastGui.add(WitherEssenceToast(if (player.contains ("You")) mc.thePlayer.displayName.formattedText else player))
+                        }
+                    }
+                }
+
+                // Wither Essence
                 formatted.contains("§r§eunlocked §r§dWither Essence §r§8x") -> {
                     when (Skytils.config.witherEssenceHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceHider == 2)

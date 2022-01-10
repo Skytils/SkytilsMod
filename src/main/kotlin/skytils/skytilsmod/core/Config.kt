@@ -2087,6 +2087,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hideBossMessages = 0
 
     @Property(
+        type = PropertyType.SELECTOR, name = "The Watcher Messages Hider",
+        description = "Hides The Watcher Messages.",
+        category = "Spam", subcategory = "Dungeons",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var hideTheWatcherMessages = 0
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Wither Essence Hider",
         description = "Removes Wither Essence unlock messages from your chat.",
         category = "Spam", subcategory = "Dungeons",
@@ -2101,6 +2109,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var undeadEssenceHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Wither Essence Found Hider",
+        description = "Removes Wither Essence found messages from your chat.",
+        category = "Spam", subcategory = "Dungeons",
+        options = ["Normal", "Hidden", "Separate GUI", "Toasts"]
+    )
+    var witherEssenceFoundHider = 0
 
     @Property(
         type = PropertyType.SELECTOR, name = "Countdown and Ready Messages Hider",
