@@ -153,7 +153,7 @@ object DungeonListener {
                             @Suppress("LocalVariableName")
                             val `silly~churl, billy~churl, silly~billy hilichurl` = if (isFirstDeath) {
                                 val hutaoIsCool = hutaoFans.getIfPresent(teammate.playerName) ?: false
-                                ScoreCalculation.firstDeathHadSpirit = hutaoIsCool
+                                ScoreCalculation.firstDeathHadSpirit.set(hutaoIsCool)
                                 hutaoIsCool
                             } else false
                             printDevMessage(isFirstDeath.toString(), "spiritpet")
