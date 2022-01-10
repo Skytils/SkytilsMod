@@ -136,7 +136,11 @@ object ScoreCalculation {
     }
 
     // puzzle stuff
-    var missingPuzzles = BasicState(0)
+    var missingPuzzles = BasicState(0).also {
+        it.onSetValue {
+            printDevMessage("missing puzzles $it", "scorecalcpuzzle")
+        }
+    }
     var failedPuzzles = BasicState(0)
     val puzzlePenalty = (missingPuzzles.zip(failedPuzzles)).map { (missing, failed) ->
         printDevMessage("puzzle penalty changed", "scorecalcpuzzle")
@@ -144,8 +148,9 @@ object ScoreCalculation {
     }
 
     val skillScore = (calcingClearPercentage.zip(deathPenalty.zip(puzzlePenalty))).map { (clear, penalties) ->
+        printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
         (20.0 + clear * 80.0 - penalties.first - penalties.second)
-            .coerceIn(20.0, 100.0).roundToInt()
+            .roundToInt()
     }
 
     // speed stuff
@@ -179,7 +184,8 @@ object ScoreCalculation {
 
     val totalScore =
         ((skillScore.zip(discoveryScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
-            first.first + first.second + second.first + second.second
+            printDevMessage("skill score ${first.first}", "scorecalcpuzzle")
+            first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also {
             it.onSetValue {
                 if (Skytils.config.sendMessageOn270Score && it >= 270) {
@@ -208,7 +214,7 @@ object ScoreCalculation {
                     }
                     ScoreCalculationElement.text.add("")
                     ScoreCalculationElement.text.add("§6Score:")
-                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get()}")
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
                     ScoreCalculationElement.text.add(
                         "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
                             roomClearScore.get().roundToInt()
