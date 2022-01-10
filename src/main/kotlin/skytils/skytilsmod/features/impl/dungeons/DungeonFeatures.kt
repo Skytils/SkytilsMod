@@ -143,8 +143,10 @@ class DungeonFeatures {
                 for (line in ScoreboardUtil.sidebarLines) {
                     if (line.contains("The Catacombs (")) {
                         dungeonFloor = line.substringAfter("(").substringBefore(")")
-                        ScoreCalculation.floorReq = ScoreCalculation.floorRequirements[dungeonFloor]
-                            ?: ScoreCalculation.floorRequirements["default"]!!
+                        ScoreCalculation.floorReq.set(
+                            ScoreCalculation.floorRequirements[dungeonFloor]
+                                ?: ScoreCalculation.floorRequirements["default"]!!
+                        )
                         break
                     }
                 }
