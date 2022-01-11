@@ -195,6 +195,7 @@ object ScoreCalculation {
             first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also { state ->
             state.onSetValue { score ->
+                if (!Utils.inDungeons) return@onSetValue
                 if (Skytils.config.sendMessageOn270Score && !hasSaid270 && score >= 270) {
                     hasSaid270 = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
