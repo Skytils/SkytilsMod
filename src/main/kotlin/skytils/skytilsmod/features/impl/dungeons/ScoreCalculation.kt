@@ -84,18 +84,16 @@ object ScoreCalculation {
     // clear stuff
     var completedRooms = BasicState(0)
     var clearedPercentage = BasicState(0)
-    var totalRooms = (completedRooms.zip(clearedPercentage)).map { (complete, clear) ->
-        if (complete > 0 && clear > 0) {
-            (100 * (complete / clear.toDouble())).roundToInt()
+    val totalRooms: Int
+        get() = if (clearedPercentage.get() > 0 && completedRooms.get() > 0) {
+            (100 * (completedRooms.get() / clearedPercentage.get().toDouble())).roundToInt()
         } else 0
-    }
     val calcingCompletedRooms = completedRooms.map {
         it + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(1)
     }
     val calcingClearPercentage = calcingCompletedRooms.map { complete ->
-        val total = totalRooms.get()
-        printDevMessage("total $total complete $complete", "scorecalcroom")
-        val a = if (total > 0) (complete / total.toDouble()).coerceAtMost(1.0) else 0.0
+        printDevMessage("total $totalRooms complete $complete", "scorecalcroom")
+        val a = if (totalRooms > 0) (complete / totalRooms.toDouble()).coerceAtMost(1.0) else 0.0
         printDevMessage("calced room clear $a", "scorecalcroom")
         a
     }
@@ -344,7 +342,7 @@ object ScoreCalculation {
                     val matcher = roomCompletedPattern.find(name) ?: return@forEach
                     completedRooms.set(matcher.groups["count"]?.value?.toIntOrNull() ?: return@forEach)
                     printDevMessage("count ${completedRooms.get()} percent ${clearedPercentage.get()}", "scorecalc")
-                    printDevMessage("Total rooms: ${totalRooms.get()}", "scorecalc")
+                    printDevMessage("Total rooms: ${totalRooms}", "scorecalc")
                 }
             }
         }
