@@ -169,7 +169,7 @@ object ScoreCalculation {
         seconds - req.speed
     }
     val totalElapsed = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
-        (seconds + 480 - req.speed).coerceAtLeast(0.0)
+        seconds + 480 - req.speed
     }
     val speedScore = totalElapsed.map { time ->
         when {
