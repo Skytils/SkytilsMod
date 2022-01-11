@@ -84,16 +84,22 @@ object ScoreCalculation {
     // clear stuff
     var completedRooms = BasicState(0)
     var clearedPercentage = BasicState(0)
-    val totalRooms: Int
-        get() = if (clearedPercentage.get() > 0 && completedRooms.get() > 0) {
-            (100 * (completedRooms.get() / clearedPercentage.get().toDouble())).roundToInt()
+    val totalRoomMap = mutableMapOf<Int, Int>()
+    val totalRooms = (clearedPercentage.zip(completedRooms)).map { (clear, complete) ->
+        val a = if (clear > 0 && complete > 0) {
+            (100 * (complete / clear.toDouble())).roundToInt()
         } else 0
+        printDevMessage("total? $a", "scorecalcroom")
+        totalRoomMap[a] = (totalRoomMap[a] ?: 0) + 1
+        totalRoomMap.toList().maxByOrNull { it.second }!!.first
+    }
     val calcingCompletedRooms = completedRooms.map {
         it + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(1)
     }
     val calcingClearPercentage = calcingCompletedRooms.map { complete ->
-        printDevMessage("total $totalRooms complete $complete", "scorecalcroom")
-        val a = if (totalRooms > 0) (complete / totalRooms.toDouble()).coerceAtMost(1.0) else 0.0
+        val total = totalRooms.get()
+        printDevMessage("total $total complete $complete", "scorecalcroom")
+        val a = if (total > 0) (complete / total.toDouble()).coerceAtMost(1.0) else 0.0
         printDevMessage("calced room clear $a", "scorecalcroom")
         a
     }
@@ -342,7 +348,7 @@ object ScoreCalculation {
                     val matcher = roomCompletedPattern.find(name) ?: return@forEach
                     completedRooms.set(matcher.groups["count"]?.value?.toIntOrNull() ?: return@forEach)
                     printDevMessage("count ${completedRooms.get()} percent ${clearedPercentage.get()}", "scorecalc")
-                    printDevMessage("Total rooms: ${totalRooms}", "scorecalc")
+                    printDevMessage("Total rooms: ${totalRooms.get()}", "scorecalc")
                 }
             }
         }
@@ -414,6 +420,7 @@ object ScoreCalculation {
         }
         hasSaid270 = false
         hasSaid300 = false
+        totalRoomMap.clear()
     }
 
     init {
