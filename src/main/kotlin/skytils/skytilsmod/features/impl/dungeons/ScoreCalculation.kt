@@ -231,7 +231,7 @@ object ScoreCalculation {
                     score < 300 -> 'e'
                     else -> 'a'
                 }
-                ScoreCalculationElement.text.add("§fScore: §$color$score §7(${rank.get()}§7)")
+                ScoreCalculationElement.text.add("§eScore: §$color$score §7(${rank.get()}§7)")
             } else {
                 ScoreCalculationElement.text.add("§9Dungeon Status")
                 ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
