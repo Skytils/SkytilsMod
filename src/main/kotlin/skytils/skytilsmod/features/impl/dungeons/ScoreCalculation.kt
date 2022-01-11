@@ -420,8 +420,6 @@ object ScoreCalculation {
             failedPuzzles.set(0)
             secondsElapsed.set(0.0)
         }
-        hasSaid270 = false
-        hasSaid300 = false
         clearedPercentage.set(0)
         totalRoomMap.clear()
     }

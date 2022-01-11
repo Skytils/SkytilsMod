@@ -310,7 +310,11 @@ class Skytils {
                     (it.contains("The Catacombs") && !it.contains("Queue")) || it.contains("Dungeon Cleared:")
                 }
                 if (Utils.inDungeons)
-                    ScoreCalculation.updateText(ScoreCalculation.totalScore.get().toInt())
+                    ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
+                else {
+                    ScoreCalculation.hasSaid270 = false
+                    ScoreCalculation.hasSaid300 = false
+                }
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
                     if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.inSkyblock = true
