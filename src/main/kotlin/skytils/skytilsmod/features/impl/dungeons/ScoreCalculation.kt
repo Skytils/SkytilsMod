@@ -188,19 +188,24 @@ object ScoreCalculation {
         (if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0
     }
 
+    var hasSaid270 = false
+    var hasSaid300 = false
+
     val totalScore =
         ((skillScore.zip(discoveryScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
             printDevMessage("skill score ${first.first}", "scorecalcpuzzle")
             first.first.coerceIn(20, 100) + first.second + second.first + second.second
-        }.also {
-            it.onSetValue {
-                if (Skytils.config.sendMessageOn270Score && it >= 270) {
+        }.also { state ->
+            state.onSetValue { score ->
+                if (Skytils.config.sendMessageOn270Score && !hasSaid270 && score >= 270) {
+                    hasSaid270 = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
                 }
-                if (Skytils.config.sendMessageOn300Score && it >= 300) {
+                if (Skytils.config.sendMessageOn300Score && !hasSaid300 && score >= 300) {
+                    hasSaid300 = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 300 score")
                 }
-                updateText(it.toInt())
+                updateText(score.toInt())
             }
         }
 
@@ -409,6 +414,8 @@ object ScoreCalculation {
             missingPuzzles.set(0)
             failedPuzzles.set(0)
         }
+        hasSaid270 = false
+        hasSaid300 = false
     }
 
     init {
