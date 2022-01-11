@@ -114,12 +114,13 @@ object ScoreCalculation {
         }
     }
     var totalSecrets = BasicState(0)
-    var percentageSecretsFound = BasicState(0.0)
     var totalSecretsNeeded = (floorReq.zip(totalSecrets)).map { (req, total) ->
         ceil(total * req.secretPercentage).toInt()
     }
-    val secretScore = (totalSecrets.zip(percentageSecretsFound)).map { (total, percent) ->
-        printDevMessage("percent score $percent score ${(40f * percent / 100.0)}", "scorecalcsecrets")
+    val percentageOfNeededSecretsFound = (foundSecrets.zip(totalSecretsNeeded)).map { (found, totalNeeded) ->
+        found / totalNeeded
+    }
+    val secretScore = (totalSecrets.zip(percentageOfNeededSecretsFound)).map { (total, percent) ->
         if (total <= 0)
             0.0
         else
@@ -322,7 +323,6 @@ object ScoreCalculation {
                         val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
                             ?: 0.0)
                         printDevMessage("percent $percentagePer", "scorecalcsecrets")
-                        percentageSecretsFound.set(percentagePer)
                         totalSecrets.set(
                             if (foundSecrets.get() > 0 && percentagePer > 0) floor(100f / percentagePer * foundSecrets.get() + 0.5).toInt() else 0
                         )
