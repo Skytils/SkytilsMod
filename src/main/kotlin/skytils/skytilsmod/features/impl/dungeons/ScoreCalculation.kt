@@ -243,7 +243,7 @@ object ScoreCalculation {
                 )
                 ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
                 if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                    ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else " §c ✘"}")
+                    ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else "§c ✘"}")
                 }
                 ScoreCalculationElement.text.add("")
                 ScoreCalculationElement.text.add("§6Score")
