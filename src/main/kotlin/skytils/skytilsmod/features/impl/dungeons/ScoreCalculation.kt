@@ -126,7 +126,7 @@ object ScoreCalculation {
 
     val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
         printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        (clear + secret).roundToInt()
+        (clear + secret).toInt()
     }
 
 
@@ -242,8 +242,8 @@ object ScoreCalculation {
                 ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
                 ScoreCalculationElement.text.add(
                     "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
-                        roomClearScore.get().roundToInt()
-                    } §7+ §6${secretScore.get().roundToInt()}§7)"
+                        roomClearScore.get().toInt()
+                    } §7+ §6${secretScore.get().toInt()}§7)"
                 )
                 ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
                 ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
