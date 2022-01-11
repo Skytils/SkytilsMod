@@ -243,7 +243,7 @@ object ScoreCalculation {
                 )
                 ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
                 if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                    ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✓" else " §c X"}")
+                    ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else " §c ✘"}")
                 }
                 ScoreCalculationElement.text.add("")
                 ScoreCalculationElement.text.add("§6Score:")
@@ -489,7 +489,7 @@ object ScoreCalculation {
                 "§f• §eFailed Puzzles:§c 0",
                 "§f• §eSecrets: §a50§7/§a50 §7(§6Total: 50§7)",
                 "§f• §eCrypts:§a 5",
-                "§f• §eMimic: §a ✓",
+                "§f• §eMimic: §a ✔",
                 "",
                 "§6Score:",
                 "§f• §eSkill Score:§a 100",
@@ -503,9 +503,9 @@ object ScoreCalculation {
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§f• §eExplore Score:§a 100 §7(§e60 §7+ §640§7)")
+            get() = demoText.maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
 
         override val toggled: Boolean
             get() = Skytils.config.showScoreCalculation
