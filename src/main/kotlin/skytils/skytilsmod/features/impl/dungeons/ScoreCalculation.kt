@@ -124,7 +124,7 @@ object ScoreCalculation {
         if (total <= 0)
             0.0
         else
-            (40f * percent / 100.0).coerceIn(0.0, 40.0)
+            (40f * percent).coerceIn(0.0, 40.0)
     }
 
 
