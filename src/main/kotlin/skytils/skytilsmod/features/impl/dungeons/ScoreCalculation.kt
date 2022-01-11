@@ -160,7 +160,7 @@ object ScoreCalculation {
     val skillScore = (calcingClearPercentage.zip(deathPenalty.zip(puzzlePenalty))).map { (clear, penalties) ->
         printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
         (20.0 + clear * 80.0 - penalties.first - penalties.second)
-            .roundToInt()
+            .toInt()
     }
 
     // speed stuff
