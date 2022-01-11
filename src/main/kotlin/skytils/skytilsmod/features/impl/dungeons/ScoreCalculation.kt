@@ -115,6 +115,7 @@ object ScoreCalculation {
     }
     var totalSecrets = BasicState(0)
     var totalSecretsNeeded = (floorReq.zip(totalSecrets)).map { (req, total) ->
+        if (total == 0) return@map 1
         ceil(total * req.secretPercentage).toInt()
     }
     val percentageOfNeededSecretsFound = (foundSecrets.zip(totalSecretsNeeded)).map { (found, totalNeeded) ->
