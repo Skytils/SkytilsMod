@@ -218,7 +218,7 @@ object ScoreCalculation {
             it < 230 -> "§aB"
             it < 270 -> "§5A"
             it < 300 -> "§eS"
-            else -> "§6S+"
+            else -> "§6§lS+"
         }
     }
 
@@ -231,7 +231,7 @@ object ScoreCalculation {
                     score < 300 -> 'e'
                     else -> 'a'
                 }
-                ScoreCalculationElement.text.add("§6Score: §$color$score §7(${rank.get()}§7)")
+                ScoreCalculationElement.text.add("§fScore: §$color$score §7(${rank.get()}§7)")
             } else {
                 ScoreCalculationElement.text.add("§9Dungeon Status")
                 ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
@@ -246,7 +246,7 @@ object ScoreCalculation {
                     ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else " §c ✘"}")
                 }
                 ScoreCalculationElement.text.add("")
-                ScoreCalculationElement.text.add("§6Score:")
+                ScoreCalculationElement.text.add("§6Score")
                 ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
                 ScoreCalculationElement.text.add(
                     "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
@@ -489,9 +489,9 @@ object ScoreCalculation {
                 "§f• §eFailed Puzzles:§c 0",
                 "§f• §eSecrets: §a50§7/§a50 §7(§6Total: 50§7)",
                 "§f• §eCrypts:§a 5",
-                "§f• §eMimic: §a ✔",
+                "§f• §eMimic:§a ✔",
                 "",
-                "§6Score:",
+                "§6Score",
                 "§f• §eSkill Score:§a 100",
                 "§f• §eExplore Score:§a 100 §7(§e60 §7+ §640§7)",
                 "§f• §eSpeed Score:§a 100",
