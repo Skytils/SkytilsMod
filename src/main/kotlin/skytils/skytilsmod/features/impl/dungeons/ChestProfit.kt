@@ -156,16 +156,20 @@ class ChestProfit {
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
+                val leftAlign = actualX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
-                RenderUtil.drawAllInList(this, DungeonChest.values().filter { it.items.isNotEmpty() }.map {
-                    val profit = it.value - it.price
-                    "${it.displayText}§f: §${(if (profit > 0) "a" else "c")}${
-                        NumberUtil.format(
-                            profit.toLong()
-                        )
-                    }"
-                })
+                DungeonChest.values().filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
+                    val profit = chest.value - chest.price
+                    ScreenRenderer.fontRenderer.drawString(
+                        "${chest.displayText}§f: §${(if (profit > 0) "a" else "c")}${NumberUtil.format(profit.toLong())}",
+                        if (leftAlign) 0f else width.toFloat(),
+                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        chest.displayColor,
+                        if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                }
             }
         }
 
