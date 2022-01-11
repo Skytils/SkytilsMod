@@ -119,10 +119,11 @@ object ScoreCalculation {
         ceil(total * req.secretPercentage).toInt()
     }
     val secretScore = (totalSecrets.zip(percentageSecretsFound)).map { (total, percent) ->
+        printDevMessage("percent score $percent score ${(40f * percent / 100.0)}", "scorecalcsecrets")
         if (total <= 0)
             0.0
         else
-            (40f * percent).coerceIn(0.0, 40.0)
+            (40f * percent / 100.0).coerceIn(0.0, 40.0)
     }
 
 
@@ -315,16 +316,17 @@ object ScoreCalculation {
                     }
                 }
                 name.contains("Secrets Found:") -> {
+                    printDevMessage(name, "scorecalcsecrets")
                     if (name.contains("%")) {
                         val matcher = secretsFoundPercentagePattern.find(name) ?: return@forEach
                         val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
                             ?: 0.0)
+                        printDevMessage("percent $percentagePer", "scorecalcsecrets")
                         percentageSecretsFound.set(percentagePer)
                         totalSecrets.set(
                             if (foundSecrets.get() > 0 && percentagePer > 0) floor(100f / percentagePer * foundSecrets.get() + 0.5).toInt() else 0
                         )
                     } else {
-                        printDevMessage(name, "scorecalcsecrets")
                         val matcher = secretsFoundPattern.find(name) ?: return@forEach
                         foundSecrets.set(matcher.groups["secrets"]?.value?.toIntOrNull() ?: 0)
                     }
