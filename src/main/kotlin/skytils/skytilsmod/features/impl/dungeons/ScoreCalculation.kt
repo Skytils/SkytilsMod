@@ -168,20 +168,17 @@ object ScoreCalculation {
     val overtime = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
         seconds - req.speed
     }
-
-    // formula works in F6, but calc lower in F7
-    // TODO: 1/10/22 Fix this to not use a magic number
-    val weirdOffset: Int
-        get() = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")) 7 else 6
-    val arbitraryCalculation = overtime.map {
-        ((-5.0 * weirdOffset + sqrt((5.0 * weirdOffset).pow(2) + 20.0 * weirdOffset * it)) / (10.0 * weirdOffset)).toInt()
+    val totalElapsed = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
+        (seconds + 480 - req.speed).coerceAtLeast(0.0)
     }
-
-    val speedScore = (overtime.zip(arbitraryCalculation)).map { (over, calculation) ->
-        (100 - 10 * calculation - (over - (5 * weirdOffset * calculation + 5 * weirdOffset * calculation * calculation)) / ((calculation + 1) * weirdOffset)).coerceIn(
-            0.0,
-            100.0
-        )
+    val speedScore = totalElapsed.map { time ->
+        when {
+            time <= 480.0 -> 100.0
+            time <= 580.0 -> 148 - 0.1 * time
+            time <= 980 -> 119 - 0.05 * time
+            time < 3060 -> 102 - 1.0 / 30.0 * time
+            else -> 0.0
+        }.roundToInt()
     }
 
     // bonus stuff
