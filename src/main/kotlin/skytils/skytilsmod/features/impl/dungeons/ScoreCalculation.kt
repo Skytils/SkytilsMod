@@ -118,7 +118,7 @@ object ScoreCalculation {
         ceil(total * req.secretPercentage).toInt()
     }
     val percentageOfNeededSecretsFound = (foundSecrets.zip(totalSecretsNeeded)).map { (found, totalNeeded) ->
-        found / totalNeeded
+        found / totalNeeded.toDouble()
     }
     val secretScore = (totalSecrets.zip(percentageOfNeededSecretsFound)).map { (total, percent) ->
         if (total <= 0)
