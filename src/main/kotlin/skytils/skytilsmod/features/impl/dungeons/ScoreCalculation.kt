@@ -91,15 +91,12 @@ object ScoreCalculation {
     }
     val calcingCompletedRooms = completedRooms.map {
         it + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(1)
-    }.also {
-        it.onSetValue {
-            println("room score $it")
-        }
     }
-    val calcingClearPercentage = (totalRooms.zip(calcingCompletedRooms)).map { (total, complete) ->
-        printDevMessage("$total $complete", "scorecalc")
+    val calcingClearPercentage = calcingCompletedRooms.map { complete ->
+        val total = totalRooms.get()
+        printDevMessage("total $total complete $complete", "scorecalcroom")
         val a = if (total > 0) (complete / total.toDouble()).coerceAtMost(1.0) else 0.0
-        printDevMessage(a.toString(), "scorecalc")
+        printDevMessage("calced room clear $a", "scorecalcroom")
         a
     }
     val roomClearScore = calcingClearPercentage.map {
