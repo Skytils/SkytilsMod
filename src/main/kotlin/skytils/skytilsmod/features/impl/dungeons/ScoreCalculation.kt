@@ -410,6 +410,7 @@ object ScoreCalculation {
         if (Utils.inDungeons) {
             missingPuzzles.set(0)
             failedPuzzles.set(0)
+            secondsElapsed.set(0.0)
         }
         hasSaid270 = false
         hasSaid300 = false
