@@ -191,7 +191,7 @@ object ScoreCalculation {
 
                 // formula works in F6, but calc lower in F7
                 val overtime = secondsElapsed - floorReq.speed
-                val t = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")) 7 else 6 // value not correct in f7
+                val t = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")) 15 else 6 // value is between 13 and 16 in F7, may not correct, need more datas
                 val x = ((-5.0 * t + sqrt((5.0 * t).pow(2) + 20.0 * t * overtime)) / (10.0 * t)).toInt()
                 speedScore =
                     (100 - 10 * x - (overtime - (5 * t * x + 5 * t * x * x)) / ((x + 1) * t)).toInt().coerceIn(0, 100)
@@ -232,7 +232,7 @@ object ScoreCalculation {
                     if (discoveryScore > 0) ScoreCalculationElement.text.add("§f• §eSecrets: ${if (foundSecrets >= totalSecretsNeeded) "§a" else "§c"}$foundSecrets§7/§a${totalSecretsNeeded} §7(§6Total: ${totalSecrets}§7)")
                     ScoreCalculationElement.text.add("§f• §eCrypts:§a $crypts")
                     if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                        ScoreCalculationElement.text.add("§f• §eMimic:${if (mimicKilled) "§a ✓" else " §c X"}")
+                        ScoreCalculationElement.text.add("§f• §eMimic:${if (mimicKilled) "§a ✔" else "§c ✘"}")
                     }
                     ScoreCalculationElement.text.add("")
                     ScoreCalculationElement.text.add("§6Score:")
@@ -361,7 +361,7 @@ object ScoreCalculation {
                 "§f• §eFailed Puzzles:§c 0",
                 "§f• §eSecrets: §a50§7/§a50 §7(§6Total: 50§7)",
                 "§f• §eCrypts:§a 5",
-                "§f• §eMimic: §a ✓",
+                "§f• §eMimic:§a ✔",
                 "",
                 "§6Score:",
                 "§f• §eSkill Score:§a 100",
