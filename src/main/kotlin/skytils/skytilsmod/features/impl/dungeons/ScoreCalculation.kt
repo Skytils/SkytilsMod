@@ -86,10 +86,12 @@ object ScoreCalculation {
     var clearedPercentage = BasicState(0)
     val totalRoomMap = mutableMapOf<Int, Int>()
     val totalRooms = (clearedPercentage.zip(completedRooms)).map { (clear, complete) ->
+        printDevMessage("total clear $clear complete $complete", "scorecalcroom")
         val a = if (clear > 0 && complete > 0) {
             (100 * (complete / clear.toDouble())).roundToInt()
         } else 0
         printDevMessage("total? $a", "scorecalcroom")
+        if (a == 0) return@map 0
         totalRoomMap[a] = (totalRoomMap[a] ?: 0) + 1
         totalRoomMap.toList().maxByOrNull { it.second }!!.first
     }
@@ -423,6 +425,7 @@ object ScoreCalculation {
         }
         hasSaid270 = false
         hasSaid300 = false
+        clearedPercentage.set(0)
         totalRoomMap.clear()
     }
 
