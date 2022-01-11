@@ -216,38 +216,39 @@ object ScoreCalculation {
     }
 
     fun updateText(score: Int) {
+        Utils.checkThreadAndQueue {
+            ScoreCalculationElement.text.clear()
+            if (Skytils.config.minimizedScoreCalculation) {
+                val color = when {
+                    score < 270 -> 'c'
+                    score < 300 -> 'e'
+                    else -> 'a'
+                }
+                ScoreCalculationElement.text.add("§6Score: §$color$score §7(${rank.get()}§7)")
+            } else {
+                ScoreCalculationElement.text.add("§9Dungeon Status")
+                ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
+                ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c ${missingPuzzles.get()}")
+                ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c ${failedPuzzles.get()}")
+                if (discoveryScore.get() > 0) ScoreCalculationElement.text.add("§f• §eSecrets: ${if (foundSecrets.get() >= totalSecretsNeeded.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${totalSecretsNeeded.get()} §7(§6Total: ${totalSecrets.get()}§7)")
+                ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
+                if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
+                    ScoreCalculationElement.text.add("§f• §eMimic:${if (mimicKilled.get()) "§a ✓" else " §c X"}")
+                }
+                ScoreCalculationElement.text.add("")
+                ScoreCalculationElement.text.add("§6Score:")
+                ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
+                ScoreCalculationElement.text.add(
+                    "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
+                        roomClearScore.get().roundToInt()
+                    } §7+ §6${secretScore.get().roundToInt()}§7)"
+                )
+                ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
+                ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
+                ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+                ScoreCalculationElement.text.add("§f• §eRank: ${rank.get()}")
 
-        ScoreCalculationElement.text.clear()
-        if (Skytils.config.minimizedScoreCalculation) {
-            val color = when {
-                score < 270 -> 'c'
-                score < 300 -> 'e'
-                else -> 'a'
             }
-            ScoreCalculationElement.text.add("§6Score: §$color$score §7(${rank.get()}§7)")
-        } else {
-            ScoreCalculationElement.text.add("§9Dungeon Status")
-            ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
-            ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c ${missingPuzzles.get()}")
-            ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c ${failedPuzzles.get()}")
-            if (discoveryScore.get() > 0) ScoreCalculationElement.text.add("§f• §eSecrets: ${if (foundSecrets.get() >= totalSecretsNeeded.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${totalSecretsNeeded.get()} §7(§6Total: ${totalSecrets.get()}§7)")
-            ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
-            if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "F7", "M6", "M7")) {
-                ScoreCalculationElement.text.add("§f• §eMimic:${if (mimicKilled.get()) "§a ✓" else " §c X"}")
-            }
-            ScoreCalculationElement.text.add("")
-            ScoreCalculationElement.text.add("§6Score:")
-            ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
-            ScoreCalculationElement.text.add(
-                "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
-                    roomClearScore.get().roundToInt()
-                } §7+ §6${secretScore.get().roundToInt()}§7)"
-            )
-            ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
-            ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
-            ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
-            ScoreCalculationElement.text.add("§f• §eRank: ${rank.get()}")
-
         }
     }
 
