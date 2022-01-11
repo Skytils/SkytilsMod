@@ -497,7 +497,7 @@ object ScoreCalculation {
                 "§f• §eSpeed Score:§a 100",
                 "§f• §eBonus Score:§a 17",
                 "§f• §eTotal Score:§a 317 §7(§6+10§7)",
-                "§f• §eRank: §6S+"
+                "§f• §eRank: §6§lS+"
             )
             val text = ArrayList<String>()
         }
