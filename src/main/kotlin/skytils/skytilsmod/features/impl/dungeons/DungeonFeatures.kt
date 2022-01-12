@@ -168,6 +168,16 @@ class DungeonFeatures {
                                     else -> 85 - 1 / 35.0 * it
                                 }
                             }
+                            else -> ScoreCalculation.speedFunc = {
+                                when {
+                                    it < 12 -> 100.0
+                                    it <= 120 -> 100 - 1 / 12.0 * it
+                                    it <= 360 -> 95 - 1 / 24.0 * it
+                                    it <= 660 -> 92 - 1 / 30.0 * it
+                                    it <= 1020 -> 88.333 - 1 / 36.0 * it
+                                    else -> 84.286 - 1 / 42.0 * it
+                                }
+                            }
                         }
                         break
                     }
