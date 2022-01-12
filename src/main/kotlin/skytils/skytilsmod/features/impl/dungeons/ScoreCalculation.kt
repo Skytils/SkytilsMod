@@ -327,12 +327,12 @@ object ScoreCalculation {
                 }
                 name.contains("✔") -> {
                     if (solvedPuzzlePattern.containsMatchIn(name)) {
-                        missingPuzzles.set(missingPuzzles.get() - 1)
+                        missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                     }
                 }
                 name.contains("✖") -> {
                     if (failedPuzzlePattern.containsMatchIn(name)) {
-                        missingPuzzles.set(missingPuzzles.get() - 1)
+                        missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                         failedPuzzles.set(failedPuzzles.get() + 1)
                     }
                 }
