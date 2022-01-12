@@ -147,6 +147,28 @@ class DungeonFeatures {
                             ScoreCalculation.floorRequirements[dungeonFloor]
                                 ?: ScoreCalculation.floorRequirements["default"]!!
                         )
+                        when (ScoreCalculation.floorReq.get().speed) {
+                            12 -> ScoreCalculation.speedFunc = {
+                                when {
+                                    it < 14 -> 100.0
+                                    it <= 140 -> 100 - 1 / 14.0 * it
+                                    it <= 420 -> 95 - 1 / 28.0 * it
+                                    it <= 780 -> 92 - 1 / 36.0 * it
+                                    it <= 1200 -> 87 - 1 / 45.0 * it
+                                    else -> 85 - 1 / 50.0 * it
+                                }
+                            }
+                            8 -> ScoreCalculation.speedFunc = {
+                                when {
+                                    it < 10 -> 100.0
+                                    it <= 100 -> 100 - 0.1 * it
+                                    it <= 300 -> 95 - 0.05 * it
+                                    it <= 550 -> 92 - 0.04 * it
+                                    it <= 850 -> 87 - 1 / 30.0 * it
+                                    else -> 85 - 1 / 35.0 * it
+                                }
+                            }
+                        }
                         break
                     }
                 }

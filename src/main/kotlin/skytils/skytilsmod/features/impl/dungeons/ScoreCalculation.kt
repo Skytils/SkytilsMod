@@ -167,6 +167,17 @@ object ScoreCalculation {
     }
 
     // speed stuff
+    var speedFunc: (Int) -> Double = {
+        when {
+            it < 12 -> 100.0
+            it <= 120 -> 100 - 1 / 12.0 * it
+            it <= 360 -> 95 - 1 / 24.0 * it
+            it <= 660 -> 92 - 1 / 30.0 * it
+            it <= 1020 -> 88.333 - 1 / 36.0 * it
+            else -> 84.286 - 1 / 42.0 * it
+        }
+    }
+
     var secondsElapsed = BasicState(0.0)
     val overtime = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
         seconds - req.speed
@@ -174,14 +185,8 @@ object ScoreCalculation {
     val totalElapsed = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
         seconds + 480 - req.speed
     }
-    val speedScore = totalElapsed.map { time ->
-        when {
-            time <= 480.0 -> 100.0
-            time <= 580.0 -> 148 - 0.1 * time
-            time <= 980 -> 119 - 0.05 * time
-            time < 3060 -> 102 - 1.0 / 30.0 * time
-            else -> 0.0
-        }.roundToInt()
+    val speedScore = overtime.map { time ->
+        speedFunc(time.toInt()).roundToInt().coerceAtLeast(0)
     }
 
     // bonus stuff
