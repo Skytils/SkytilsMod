@@ -25,6 +25,7 @@ import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
+import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Skills
@@ -37,22 +38,30 @@ class XPComponent(
     var image: ItemComponent,
     var colorConstraint: ColorConstraint,
     val skillField: KProperty<Float?>,
-    val userData: Member
+    val userState: State<Member>
 ) : UIComponent() {
-    val skillCap: Int = kotlin.runCatching {
-        if (skillField == Skills::farmingXP) {
-            return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (userData.jacob.perks.farmingLevelCap ?: 0)
-        } else {
-            return@runCatching SkillUtils.maxSkillLevels[skillField.name.substringBefore("XP")]
-        }
-    }.getOrDefault(50)!!
-    private val skillXP: Float = skillField.getter.call(userData.skills) ?: 0f
-    private val skillLevel = if (skillField == Skills::runecraftingXP) {
-        SkillUtils.calcXpWithOverflowAndProgress(skillXP.toDouble(), skillCap, SkillUtils.runeXp.values)
-    } else {
-        SkillUtils.calcXpWithOverflowAndProgress(skillXP.toDouble(), skillCap, SkillUtils.skillXp.values)
+    val skillCap = userState.map { user ->
+        kotlin.runCatching {
+            if (skillField == Skills::farmingXP) {
+                return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (user.jacob.perks.farmingLevelCap ?: 0)
+            } else {
+                return@runCatching SkillUtils.maxSkillLevels[skillField.name.substringBefore("XP")]
+            }
+        }.getOrNull() ?: 50
     }
-    private val percent = (skillLevel.third % 1).toFloat()
+    val skillXP = userState.map { user ->
+        skillField.getter.call(user.skills) ?: 0f
+    }
+    val skillLevel = (skillXP.zip(skillCap)).map { (xp, cap) ->
+        if (skillField == Skills::runecraftingXP) {
+            SkillUtils.calcXpWithOverflowAndProgress(xp.toDouble(), cap, SkillUtils.runeXp.values)
+        } else {
+            SkillUtils.calcXpWithOverflowAndProgress(xp.toDouble(), cap, SkillUtils.skillXp.values)
+        }
+    }
+    val percent = skillLevel.map { (_, _, percent) ->
+        (percent % 1).toFloat()
+    }
 
     private val background = UIRoundedRectangle(5f)
         .constrain {
@@ -67,23 +76,22 @@ class XPComponent(
         .constrain {
             x = 0.pixels()
             y = 0.pixels()
-            width = if (skillLevel.first == skillCap) {
-                RelativeConstraint()
-            } else {
-                basicWidthConstraint {
-                    val hidden = imageContainer.getWidth() / 2
-                    (background.getWidth() - hidden) * percent + hidden
-                }
-            }
+            width = (skillLevel.zip(skillCap)).map { (level, cap) ->
+                if (level.first == cap)
+                    RelativeConstraint()
+                else
+                    (background.constraints.width * (percent as State<Number>)) + (imageContainer.constraints.width / 2)
+            }.get()
             height = RelativeConstraint()
             color = colorConstraint
         } childOf background
 
-    private val overflow = UIText(text = NumberUtil.format(skillLevel.second.toLong()))
-        .constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-        } childOf background
+    private val overflow =
+        UIText().also { it.bindText(skillLevel.map { level -> NumberUtil.format(level.second.toLong()) }) }
+            .constrain {
+                x = CenterConstraint()
+                y = CenterConstraint()
+            } childOf background
 
 
     private val shadow by GradientComponent(
@@ -117,10 +125,7 @@ class XPComponent(
 
     private val skillText =
         UIText(
-            "${
-                skillField.name.lowercase().substringBefore("xp").replaceFirstChar { it.uppercase() }
-            } ${skillLevel.first}"
-        )
+        ).also { it.bindText(skillLevel.map { level -> "${skillField.name.lowercase().substringBefore("xp").replaceFirstChar { it.uppercase() }} ${level.first}" }) }
             .constrain {
                 x = 2.pixels()
                 y = CenterConstraint()
