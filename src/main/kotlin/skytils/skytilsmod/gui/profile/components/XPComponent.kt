@@ -38,19 +38,19 @@ class XPComponent(
     var image: ItemComponent,
     var colorConstraint: ColorConstraint,
     val skillField: KProperty<Float?>,
-    val userState: State<Member>
+    val userState: State<Member?>
 ) : UIComponent() {
     val skillCap = userState.map { user ->
         kotlin.runCatching {
             if (skillField == Skills::farmingXP) {
-                return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (user.jacob.perks.farmingLevelCap ?: 0)
+                return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (user?.jacob?.perks?.farmingLevelCap ?: 0)
             } else {
                 return@runCatching SkillUtils.maxSkillLevels[skillField.name.substringBefore("XP")]
             }
         }.getOrNull() ?: 50
     }
     val skillXP = userState.map { user ->
-        skillField.getter.call(user.skills) ?: 0f
+        user?.skills?.let { skills -> skillField.getter.call(skills) } ?: 0f
     }
     val skillLevel = (skillXP.zip(skillCap)).map { (xp, cap) ->
         if (skillField == Skills::runecraftingXP) {
@@ -77,10 +77,10 @@ class XPComponent(
             x = 0.pixels()
             y = 0.pixels()
             width = (skillLevel.zip(skillCap)).map { (level, cap) ->
-                if (level.first == cap)
+//                if (level.first == cap)
                     RelativeConstraint()
-                else
-                    (background.constraints.width * (percent as State<Number>)) + (imageContainer.constraints.width / 2)
+//                else
+//                    (background.constraints.width * (percent as State<Number>)) + (imageContainer.constraints.width / 2)
             }.get()
             height = RelativeConstraint()
             color = colorConstraint
