@@ -50,24 +50,39 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
         it.onSetValue {
             var a: Member? = null
+            val profile = GameProfile(it, "")
             Skytils.launch {
-                a = hylinAPI.getSkyblockProfiles(it).await().getLatestSkyblockProfile(it)!!.members[uuid.nonDashedString()]!!
-            }.invokeOnCompletion {
-                profileState.set(a)
+                launch {
+                    a = hylinAPI.getSkyblockProfiles(it).await().getLatestSkyblockProfile(it)!!.members[uuid.nonDashedString()]!!
+                }.invokeOnCompletion {
+                    profileState.set(a)
+                }
+                launch {
+                    UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
+                }.invokeOnCompletion {
+                    gameProfileState.set(profile)
+                }
             }
-        }
-        var a: Member? = null
-        Skytils.launch {
-            a = hylinAPI.getSkyblockProfiles(it.get()).await().getLatestSkyblockProfile(it.get())!!.members[uuid.nonDashedString()]!!
-        }.invokeOnCompletion {
-            profileState.set(a)
         }
     }
     private val profileState: State<Member?> = BasicState(null)
-    private val gameProfileState: State<GameProfile?> = uuidState.map {
-        val profile = GameProfile(it, "")
-        UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
-        return@map profile
+    private val gameProfileState: State<GameProfile?> = BasicState(null)
+
+    override fun afterInitialization() {
+        Skytils.launch {
+            var a: Member? = null
+            val profile = GameProfile(uuidState.get(), "")
+            launch {
+                a = hylinAPI.getSkyblockProfiles(uuidState.get()).await().getLatestSkyblockProfile(uuidState.get())!!.members[uuidState.get().nonDashedString()]!!
+            }.invokeOnCompletion {
+                profileState.set(a)
+            }
+            launch {
+                UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
+            }.invokeOnCompletion {
+                gameProfileState.set(profile)
+            }
+        }
     }
 
     private val navBar by UIBlock(Color(0, 0, 0, 160))
