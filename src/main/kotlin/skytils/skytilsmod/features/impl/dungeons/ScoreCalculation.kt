@@ -19,9 +19,11 @@ package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.elementa.state.*
 import gg.essential.universal.UResolution
+import gg.essential.universal.wrappers.UPlayer
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
+import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -35,6 +37,7 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -298,6 +301,7 @@ object ScoreCalculation {
     @SubscribeEvent
     fun onTabChange(event: PacketEvent.ReceiveEvent) {
         if (
+            !Utils.inDungeons ||
             event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
@@ -353,6 +357,21 @@ object ScoreCalculation {
                     printDevMessage("Total rooms: ${totalRooms.get()}", "scorecalc")
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onTitle(event: PacketEvent.ReceiveEvent) {
+        if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
+        if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
+            firstDeathHadSpirit.set(
+                DungeonListener.hutaoFans.getIfPresent(
+                    DungeonListener.team.find {
+                        it.player?.uniqueID == UPlayer.getUUID()
+                    }?.playerName ?: ""
+                ) ?: false
+            )
+            printDevMessage("you died. spirit: ${firstDeathHadSpirit.get()}", "scorecalcdeath")
         }
     }
 
