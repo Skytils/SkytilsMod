@@ -397,14 +397,12 @@ class Skytils {
 
     @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
-        if (event.packet is S1CPacketEntityMetadata) {
-            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 }
-            if (nameObj != null) {
-                val entity = mc.theWorld?.getEntityByID(event.packet.entityId)
+        if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
+            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
+            val entity = mc.theWorld.getEntityByID(event.packet.entityId)
 
-                if (entity is ExtensionEntityLivingBase) {
-                    entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
-                }
+            if (entity is ExtensionEntityLivingBase) {
+                entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
             }
         }
     }
