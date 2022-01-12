@@ -54,8 +54,6 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
         return@map profile
     }
-    private val profileData =
-        hylinAPI.getSkyblockProfilesSync(uuid).getLatestSkyblockProfile(uuid)!!.members[uuid.nonDashedString()]!!
 
     private val navBar by UIBlock(Color(0, 0, 0, 160))
         .constrain {
@@ -110,7 +108,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.spawn_egg),
         Color(65, 102, 245).toConstraint(),
         Skills::tamingXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 5.percent()
@@ -123,7 +121,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.golden_hoe),
         Color(65, 102, 245).toConstraint(),
         Skills::farmingXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 52.5.percent()
@@ -136,7 +134,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.stone_pickaxe),
         Color(65, 102, 245).toConstraint(),
         Skills::miningXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 5.percent()
@@ -149,7 +147,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.stone_sword),
         Color(65, 102, 245).toConstraint(),
         Skills::combatXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 52.5.percent()
@@ -162,7 +160,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Item.getItemFromBlock(Blocks.sapling), 3),
         Color(65, 102, 245).toConstraint(),
         Skills::foragingXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 5.percent()
@@ -175,7 +173,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.fishing_rod),
         Color(65, 102, 245).toConstraint(),
         Skills::fishingXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 52.5.percent()
@@ -188,7 +186,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Item.getItemFromBlock(Blocks.enchanting_table)),
         Color(65, 102, 245).toConstraint(),
         Skills::enchantingXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 5.percent()
@@ -201,7 +199,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.brewing_stand),
         Color(65, 102, 245).toConstraint(),
         Skills::alchemyXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 52.5.percent()
@@ -214,7 +212,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Item.getItemFromBlock(Blocks.crafting_table)),
         Color(65, 102, 245).toConstraint(),
         Skills::carpentryXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 5.percent()
@@ -227,7 +225,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
         ItemComponent(Items.magma_cream),
         Color(65, 102, 245).toConstraint(),
         Skills::runecraftingXP,
-        profileData
+        profileState
     )
         .constrain {
             x = 52.5.percent()
