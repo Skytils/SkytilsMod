@@ -20,6 +20,9 @@ package skytils.skytilsmod.features.impl.dungeons
 import gg.essential.elementa.state.*
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.UPlayer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -429,8 +432,7 @@ object ScoreCalculation {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun clearScore() {
         mimicKilled.set(false)
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)
@@ -441,6 +443,11 @@ object ScoreCalculation {
         }
         clearedPercentage.set(0)
         totalRoomMap.clear()
+        CoroutineScope(Skytils.dispatcher).launch {
+            delay(500L)
+            hasSaid270 = false
+            hasSaid300 = false
+        }
     }
 
     init {

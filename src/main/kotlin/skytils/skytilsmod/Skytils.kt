@@ -317,8 +317,7 @@ class Skytils {
                 if (Utils.inDungeons)
                     ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
                 else {
-                    ScoreCalculation.hasSaid270 = false
-                    ScoreCalculation.hasSaid300 = false
+                    ScoreCalculation.clearScore()
                 }
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
