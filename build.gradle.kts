@@ -29,7 +29,7 @@ plugins {
     java
 }
 
-version = "1.0.9-RC2"
+version = "1.1.0"
 group = "skytils.skytilsmod"
 
 mixin {

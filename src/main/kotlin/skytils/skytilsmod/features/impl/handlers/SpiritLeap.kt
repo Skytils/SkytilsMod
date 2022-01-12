@@ -164,5 +164,9 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
+        val e = JsonObject()
+        e.add("classes", JsonObject())
+        e.add("users", JsonObject())
+        gson.toJson(e, writer)
     }
 }

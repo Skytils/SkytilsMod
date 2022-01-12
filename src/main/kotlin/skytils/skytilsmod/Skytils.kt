@@ -96,7 +96,7 @@ class Skytils {
     companion object {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.0.9-RC2"
+        const val VERSION = "1.1.0"
 
         @JvmField
         val gson: Gson = GsonBuilder()
@@ -125,6 +125,9 @@ class Skytils {
 
         @JvmField
         var usingNEU = false
+
+        @JvmField
+        var usingSBA = false
 
         @JvmField
         var jarFile: File? = null
@@ -243,6 +246,7 @@ class Skytils {
     fun postInit(event: FMLPostInitializationEvent) {
         usingLabymod = Loader.isModLoaded("labymod")
         usingNEU = Loader.isModLoaded("notenoughupdates")
+        usingSBA = Loader.isModLoaded("skyblockaddons")
 
         val cch = ClientCommandHandler.instance
 
@@ -309,6 +313,12 @@ class Skytils {
                     ?.let { ScoreboardUtil.cleanSB(it.displayName).contains("SKYBLOCK") } ?: false
                 Utils.inDungeons = Utils.inSkyblock && ScoreboardUtil.sidebarLines.any {
                     (it.contains("The Catacombs") && !it.contains("Queue")) || it.contains("Dungeon Cleared:")
+                }
+                if (Utils.inDungeons)
+                    ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
+                else {
+                    ScoreCalculation.hasSaid270 = false
+                    ScoreCalculation.hasSaid300 = false
                 }
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
