@@ -1066,6 +1066,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var fixWorldTime = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Prevent Log Spam",
+        description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var preventLogSpam = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Price Paid",
         description = "Records and shows the price you paid for certain items.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1574,11 +1581,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var powerOrbLock = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Prevent Log Spam",
-        description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
+        type = PropertyType.NUMBER, name = "Power Orb Lock Duration",
+        description = "Needs Power Orb Lock to be active. Allows overwriting a power orb, if it has less time left than this option.",
+        min = 1, max = 120,
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var preventLogSpam = false
+    var powerOrbDuration = 10
 
     @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",

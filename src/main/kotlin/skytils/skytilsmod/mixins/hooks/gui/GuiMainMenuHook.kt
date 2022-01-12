@@ -25,7 +25,7 @@ import java.util.*
 
 fun setSplashText(gui: GuiMainMenu, cal: Calendar) {
     gui as AccessorGuiMainMenu
-    if (cal.get(Calendar.MONTH) + 1 == 2 && cal.get(Calendar.DATE) == 5) {
+    if (cal.get(Calendar.MONTH) + 1 == 2 && cal.get(Calendar.DATE) == 6) {
         val numBirthday = cal.get(Calendar.YEAR) - 2021
         gui.splashText = "§z§kstay§z Happy ${numBirthday.addSuffix()} Birthday Skytils! §kmadL"
     }

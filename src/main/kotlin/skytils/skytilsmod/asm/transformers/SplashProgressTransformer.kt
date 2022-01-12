@@ -79,7 +79,7 @@ object SplashProgressTransformer {
         val cal = GregorianCalendar.getInstance()
         val month = cal.get(GregorianCalendar.MONTH) + 1
         val date = cal.get(GregorianCalendar.DATE)
-        if (month == 2 && date == 5) return ResourceLocation(
+        if (month == 2 && date == 6) return ResourceLocation(
             "skytils",
             "partysychic.gif"
         )
