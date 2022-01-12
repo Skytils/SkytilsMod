@@ -100,7 +100,9 @@ import kotlin.coroutines.CoroutineContext
     acceptedMinecraftVersions = "[1.8.9]",
     clientSideOnly = true
 )
-class Skytils {
+class Skytils: CoroutineScope {
+
+    override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob()
 
     companion object : CoroutineScope {
         const val MODID = "skytils"
