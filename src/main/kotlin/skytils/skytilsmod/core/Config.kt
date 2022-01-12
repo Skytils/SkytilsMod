@@ -1376,11 +1376,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var transparentHeadLayer = 1f
 
-    /*@Property(
+    @Property(
         type = PropertyType.SWITCH, name = "Fix Summon Skin",
         description = "§c[WIP] §rChanges the summon's skin to the correct one.\n§cThis is very broken and may crash your game.",
         category = "Miscellaneous", subcategory = "Other"
-    )*/
+    )
     var fixSummonSkin = false
 
     @Property(
