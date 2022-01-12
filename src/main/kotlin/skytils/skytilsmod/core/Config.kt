@@ -1066,6 +1066,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var fixWorldTime = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Prevent Log Spam",
+        description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var preventLogSpam = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Price Paid",
         description = "Records and shows the price you paid for certain items.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1580,13 +1587,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var powerOrbDuration = 10
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Prevent Log Spam",
-        description = "Prevents your logs from being spammed with exceptions while on Hypixel.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var preventLogSpam = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Press Enter to confirm Sign Popups",
