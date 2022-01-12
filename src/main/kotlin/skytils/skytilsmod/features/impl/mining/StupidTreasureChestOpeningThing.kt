@@ -42,6 +42,7 @@ import kotlin.math.abs
 object StupidTreasureChestOpeningThing {
 
     var lastFoundChest = -1L
+    var found = 0
 
     var iLovePain: BlockPos? = null
 
@@ -64,15 +65,16 @@ object StupidTreasureChestOpeningThing {
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
         if (!Skytils.config.chTreasureHelper || mc.thePlayer == null || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
-        if ((event.old.block == Blocks.air || event.old.block == Blocks.stone) && event.update.block == Blocks.chest) {
+        if (((event.old.block == Blocks.air || event.old.block == Blocks.stone) && event.update.block == Blocks.chest)) {
             printDevMessage("Distance ${event.pos} ${mc.thePlayer.getDistanceSq(event.pos)}", "chtreasure")
             if (mc.thePlayer.entityBoundingBox.expand(8.0, 8.0, 8.0).isPosInside(event.pos)) {
                 val diff = System.currentTimeMillis() - lastFoundChest
-                if (diff < 1000) {
+                if (diff < 1000 && found > 0) {
                     lastFoundChest = -1L
+                    found--
                     sendHelpPlease[event.pos] = StupidChest(event.pos)
                     printDevMessage("chest found at $diff", "chtreasure")
-                }
+                } else found = 0
             }
         } else if (event.old.block == Blocks.chest && event.update.block == Blocks.air) {
             sendHelpPlease.remove(event.pos)
@@ -101,6 +103,7 @@ object StupidTreasureChestOpeningThing {
                 val formatted = packet.chatComponent.formattedText
                 if (formatted == "§r§aYou uncovered a treasure chest!§r") {
                     lastFoundChest = System.currentTimeMillis()
+                    found++
                 } else if (iLovePain != null && Utils.equalsOneOf(
                         formatted,
                         "§r§6You have successfully picked the lock on this chest!",
