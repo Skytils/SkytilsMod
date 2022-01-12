@@ -127,6 +127,9 @@ class Skytils {
         var usingNEU = false
 
         @JvmField
+        var usingSBA = false
+
+        @JvmField
         var jarFile: File? = null
         private var lastChatMessage = 0L
 
@@ -243,6 +246,7 @@ class Skytils {
     fun postInit(event: FMLPostInitializationEvent) {
         usingLabymod = Loader.isModLoaded("labymod")
         usingNEU = Loader.isModLoaded("notenoughupdates")
+        usingSBA = Loader.isModLoaded("skyblockaddons")
 
         val cch = ClientCommandHandler.instance
 
