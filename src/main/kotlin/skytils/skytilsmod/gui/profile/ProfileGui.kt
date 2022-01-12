@@ -28,6 +28,9 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.universal.UMinecraft
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -36,6 +39,7 @@ import skytils.hylin.extension.getLatestSkyblockProfile
 import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Skills
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
 import skytils.skytilsmod.gui.profile.components.ItemComponent
 import skytils.skytilsmod.gui.profile.components.XPComponent
@@ -43,12 +47,23 @@ import java.awt.Color
 import java.util.*
 
 class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
-    private val uuidState: State<UUID> = BasicState(uuid)
-    private val profileState: State<Member> = uuidState.map {
-        runBlocking {
-            hylinAPI.getSkyblockProfiles(it).await().getLatestSkyblockProfile(it)!!.members[uuid.nonDashedString()]!!
+    private val uuidState: State<UUID> = BasicState(uuid).also {
+        it.onSetValue {
+            var a: Member? = null
+            Skytils.launch {
+                a = hylinAPI.getSkyblockProfiles(it).await().getLatestSkyblockProfile(it)!!.members[uuid.nonDashedString()]!!
+            }.invokeOnCompletion {
+                profileState.set(a)
+            }
+        }
+        var a: Member? = null
+        Skytils.launch {
+            a = hylinAPI.getSkyblockProfiles(it.get()).await().getLatestSkyblockProfile(it.get())!!.members[uuid.nonDashedString()]!!
+        }.invokeOnCompletion {
+            profileState.set(a)
         }
     }
+    private val profileState: State<Member?> = BasicState(null)
     private val gameProfileState: State<GameProfile?> = uuidState.map {
         val profile = GameProfile(it, "")
         UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
