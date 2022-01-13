@@ -205,7 +205,7 @@ object ScoreCalculation {
         }.also { state ->
             state.onSetValue { score ->
                 if (!Utils.inDungeons) return@onSetValue
-                if (score == 120) {
+                if (score < 200) {
                     hasSaid270 = false
                     hasSaid300 = false
                     return@onSetValue
