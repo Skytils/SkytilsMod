@@ -205,6 +205,11 @@ object ScoreCalculation {
         }.also { state ->
             state.onSetValue { score ->
                 if (!Utils.inDungeons) return@onSetValue
+                if (score == 120) {
+                    hasSaid270 = false
+                    hasSaid300 = false
+                    return@onSetValue
+                }
                 if (Skytils.config.sendMessageOn270Score && !hasSaid270 && score >= 270) {
                     hasSaid270 = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
@@ -213,7 +218,7 @@ object ScoreCalculation {
                     hasSaid300 = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 300 score")
                 }
-                updateText(score.toInt())
+                updateText(score)
             }
         }
 
@@ -432,7 +437,8 @@ object ScoreCalculation {
         }
     }
 
-    fun clearScore() {
+    @SubscribeEvent
+    fun clearScore(event: WorldEvent.Load) {
         mimicKilled.set(false)
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)
@@ -443,11 +449,6 @@ object ScoreCalculation {
         }
         clearedPercentage.set(0)
         totalRoomMap.clear()
-        CoroutineScope(Skytils.dispatcher).launch {
-            delay(500L)
-            hasSaid270 = false
-            hasSaid300 = false
-        }
     }
 
     init {

@@ -20,6 +20,8 @@ package skytils.skytilsmod
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import gg.essential.universal.UMinecraft
+import gg.essential.universal.wrappers.UPlayer
 import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -28,7 +30,7 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.S1CPacketEntityMetadata
+import net.minecraft.network.play.server.*
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -147,6 +149,8 @@ class Skytils {
         val deobfEnvironment by lazy {
             Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
         }
+
+        val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
     }
 
     @Mod.EventHandler
@@ -305,20 +309,6 @@ class Skytils {
 
         if (ticks % 20 == 0) {
             if (mc.thePlayer != null) {
-                Utils.isOnHypixel = mc.runCatching {
-                    theWorld != null && !isSingleplayer && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
-                        ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
-                }.onFailure { it.printStackTrace() }.getOrDefault(false)
-                Utils.inSkyblock = Utils.isOnHypixel && mc.theWorld.scoreboard.getObjectiveInDisplaySlot(1)
-                    ?.let { ScoreboardUtil.cleanSB(it.displayName).contains("SKYBLOCK") } ?: false
-                Utils.inDungeons = Utils.inSkyblock && ScoreboardUtil.sidebarLines.any {
-                    (it.contains("The Catacombs") && !it.contains("Queue")) || it.contains("Dungeon Cleared:")
-                }
-                if (Utils.inDungeons)
-                    ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
-                else {
-                    ScoreCalculation.clearScore()
-                }
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
                     if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.inSkyblock = true
@@ -331,6 +321,40 @@ class Skytils {
         }
 
         ticks++
+    }
+
+    @SubscribeEvent
+    fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
+        Utils.isOnHypixel = mc.runCatching {
+            !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
+                ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
+        }.onFailure { it.printStackTrace() }.getOrDefault(false)
+    }
+
+    @SubscribeEvent
+    fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
+        if (!Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
+        if (event.packet.func_149371_c() != 1) return
+        Utils.inSkyblock = Utils.isOnHypixel && event.packet.func_149370_d() == "SBScoreboard"
+        printDevMessage("score ${event.packet.func_149370_d()}", "utils")
+        printDevMessage("sb ${Utils.inSkyblock}", "utils")
+    }
+
+    @SubscribeEvent
+    fun onTabUpdate(event: PacketEvent.ReceiveEvent) {
+        if (!Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
+            (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
+                    event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
+        ) return
+        event.packet.entries.forEach { playerData ->
+            val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
+            areaRegex.matchEntire(name)?.let { result ->
+                Utils.inDungeons = Utils.inSkyblock && result.groups["area"]?.value == "Dungeon"
+                printDevMessage("dungeons ${Utils.inDungeons}", "utils")
+                if (Utils.inDungeons)
+                    ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
+            }
+        }
     }
 
     @SubscribeEvent
