@@ -34,6 +34,6 @@ abstract class SkytilsEvent : Event() {
         }.onFailure {
             it.printStackTrace()
             UChat.chat("§cSkytils ${Skytils.VERSION} caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}. Please report this on the Discord server at discord.gg/skytils.")
-        }.getOrDefault(false)
+        }.getOrDefault(isCanceled)
     }
 }
