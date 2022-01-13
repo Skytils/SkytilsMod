@@ -18,12 +18,12 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -52,6 +52,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.setHoverText
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
@@ -128,20 +129,11 @@ class PetFeatures {
                     event.isCanceled = true
                     if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
                         lastPetLockNotif = System.currentTimeMillis()
-                        val cc =
-                            ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.")
-                        cc.chatStyle.also {
-                            it.chatClickEvent =
-                                ClickEvent(
-                                    ClickEvent.Action.RUN_COMMAND,
-                                    "/disableskytilspetitemlock"
-                                )
-                            it.chatHoverEvent = HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("Click to disable the pet item lock for 5 seconds.")
-                            )
-                        }
-                        UChat.chat(cc)
+                        UChat.chat(
+                            UTextComponent("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.").setHoverText(
+                                "Click to disable the pet item lock for 5 seconds."
+                            ).setClick(ClickEvent.Action.RUN_COMMAND, "/disableskytilspetitemlock")
+                        )
                     }
                 } else {
                     lastPetConfirmation = 0
