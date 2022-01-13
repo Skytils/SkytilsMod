@@ -1045,6 +1045,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var copyChat = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Boss Bar Fix",
+        description = "Hides the Witherborn boss bars.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var bossBarFix = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
         description = "Adds a check to rendering in order to prevent crashes.",
         category = "Miscellaneous", subcategory = "Fixes"
@@ -1403,13 +1410,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var betterAuctionPriceInput = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Boss Bar Fix",
-        description = "Hides the Witherborn boss bars.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var bossBarFix = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
