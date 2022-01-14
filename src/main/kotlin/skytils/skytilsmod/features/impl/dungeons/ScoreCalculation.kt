@@ -201,6 +201,7 @@ object ScoreCalculation {
     val totalScore =
         ((skillScore.zip(discoveryScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
             printDevMessage("skill score ${first.first}", "scorecalcpuzzle")
+            printDevMessage("skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}", "scorecalctotal")
             first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also { state ->
             state.onSetValue { score ->
@@ -442,14 +443,13 @@ object ScoreCalculation {
         mimicKilled.set(false)
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)
-        if (Utils.inDungeons) {
-            missingPuzzles.set(0)
-            failedPuzzles.set(0)
-            secondsElapsed.set(0.0)
-        }
+        missingPuzzles.set(0)
+        failedPuzzles.set(0)
+        secondsElapsed.set(0.0)
         foundSecrets.set(0)
         clearedPercentage.set(0)
         totalRoomMap.clear()
+        updateText(totalScore.get())
     }
 
     init {
