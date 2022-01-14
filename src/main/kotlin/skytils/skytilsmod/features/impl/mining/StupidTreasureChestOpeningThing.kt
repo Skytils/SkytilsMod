@@ -70,7 +70,6 @@ object StupidTreasureChestOpeningThing {
             if (mc.thePlayer.entityBoundingBox.expand(8.0, 8.0, 8.0).isPosInside(event.pos)) {
                 val diff = System.currentTimeMillis() - lastFoundChest
                 if (diff < 1000 && found > 0) {
-                    lastFoundChest = -1L
                     found--
                     sendHelpPlease[event.pos] = StupidChest(event.pos)
                     printDevMessage("chest found at $diff", "chtreasure")

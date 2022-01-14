@@ -17,12 +17,10 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
-import gg.essential.elementa.state.*
+import gg.essential.elementa.state.BasicState
+import gg.essential.elementa.state.State
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.UPlayer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -45,7 +43,9 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import kotlin.math.*
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.roundToInt
 
 object ScoreCalculation {
 
@@ -201,7 +201,10 @@ object ScoreCalculation {
     val totalScore =
         ((skillScore.zip(discoveryScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
             printDevMessage("skill score ${first.first}", "scorecalcpuzzle")
-            printDevMessage("skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}", "scorecalctotal")
+            printDevMessage(
+                "skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}",
+                "scorecalctotal"
+            )
             first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also { state ->
             state.onSetValue { score ->
@@ -415,7 +418,12 @@ object ScoreCalculation {
                     event.isCanceled = true
                     return
                 }
-            } else if (unformatted.contains(":") && !unformatted.contains(">") && unformatted.containsAny("Mimic dead!", "Mimic Killed!", "Mimic Dead!")) {
+            } else if (unformatted.contains(":") && !unformatted.contains(">") && unformatted.containsAny(
+                    "Mimic dead!",
+                    "Mimic Killed!",
+                    "Mimic Dead!"
+                )
+            ) {
                 mimicKilled.set(true)
                 return
             }
