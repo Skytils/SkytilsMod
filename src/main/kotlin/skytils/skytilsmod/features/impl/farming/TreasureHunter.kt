@@ -17,15 +17,14 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
+import gg.essential.universal.UChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.*
 import java.awt.Color
@@ -47,7 +46,7 @@ class TreasureHunter {
         }
         if (Skytils.config.treasureHunterSolver && formatted.startsWith("§e[NPC] Treasure Hunter§f: ")) {
             if (treasureHunterLocations.isEmpty()) {
-                mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
+                UChat.chat("§cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -57,7 +56,7 @@ class TreasureHunter {
                 }, null)
             if (solution != null) {
                 treasureLocation = solution
-                mc.thePlayer.addChatMessage(ChatComponentText("§aSkytils will track your treasure located at: §b(${solution.x},${solution.y},${solution.z})"))
+                UChat.chat("§aSkytils will track your treasure located at: §b(${solution.x},${solution.y},${solution.z})")
             }
         }
     }

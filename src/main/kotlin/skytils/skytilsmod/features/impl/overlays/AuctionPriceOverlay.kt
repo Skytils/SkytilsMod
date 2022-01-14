@@ -199,7 +199,9 @@ class AuctionPriceOverlay {
                 if (isUndercut()) {
                     val input = input
                     fr.drawString(
-                        "Listing For: " + (input ?: "§cInvalid Value"),
+                        "Listing For: ${
+                            input ?: "§cInvalid Value"
+                        }",
                         width / 2f,
                         height / 2f - 25,
                         CommonColors.ORANGE,
@@ -225,7 +227,7 @@ class AuctionPriceOverlay {
                         tooltipLocationButton.width = largestLen
                         tooltipLocationButton.height = lore.size * fr.FONT_HEIGHT + 20
                         fr.drawString(
-                            "You're selling: " + lastAuctionedStack!!.stackSize + "x",
+                            "You're selling: ${lastAuctionedStack!!.stackSize}x",
                             x.toFloat(),
                             y.toFloat(),
                             CommonColors.ORANGE,
@@ -404,7 +406,7 @@ class AuctionPriceOverlay {
             var total = 0.0
             for (enchantName in enchantments.keySet) {
                 val id =
-                    "ENCHANTED_BOOK-" + enchantName.uppercase() + "-" + enchantments.getInteger(enchantName)
+                    "ENCHANTED_BOOK-${enchantName.uppercase()}-${enchantments.getInteger(enchantName)}"
                 val price = AuctionData.lowestBINs[id] ?: continue
                 var npcPrice = Double.MAX_VALUE
                 when (id) {

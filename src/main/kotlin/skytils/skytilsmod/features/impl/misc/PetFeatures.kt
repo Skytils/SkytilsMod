@@ -27,7 +27,6 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -84,12 +83,12 @@ class PetFeatures {
             val petMatcher = SUMMON_PATTERN.matcher(message)
             if (petMatcher.find()) {
                 lastPet = petMatcher.group("pet").stripControlCodes()
-            } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
+            } else UChat.chat("§cSkytils failed to capture equipped pet.")
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
             val autopetMatcher = AUTOPET_PATTERN.matcher(message)
             if (autopetMatcher.find()) {
                 lastPet = autopetMatcher.group("pet").stripControlCodes()
-            } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
+            } else UChat.chat("§cSkytils failed to capture equipped pet.")
         }
     }
 

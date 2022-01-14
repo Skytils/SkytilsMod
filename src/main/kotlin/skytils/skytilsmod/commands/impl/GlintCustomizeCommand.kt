@@ -17,11 +17,11 @@
  */
 package skytils.skytilsmod.commands.impl
 
+import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
@@ -46,25 +46,25 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("on") -> {
                         GlintCustomizer.overrides[itemId] = true
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aForced an enchant glint for your item."))
+                        UChat.chat("§aForced an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("off") -> {
                         GlintCustomizer.overrides[itemId] = false
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aForce disabled an enchant glint for your item."))
+                        UChat.chat("§aForce disabled an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.overrides.clear()
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aRemoved all your glint overrides."))
+                        UChat.chat("§aRemoved all your glint overrides.")
                         return
                     }
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.overrides.remove(itemId)
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aCleared glint overrides for your item."))
+                        UChat.chat("§aCleared glint overrides for your item.")
                         return
                     }
                     else -> {
@@ -79,7 +79,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         try {
                             GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(args[2])
                             PersistentSave.markDirty<GlintCustomizer>()
-                            sender.addChatMessage(ChatComponentText("§aForced an enchant glint color for your item."))
+                            UChat.chat("§aForced an enchant glint color for your item.")
                         } catch (e: NumberFormatException) {
                             throw SyntaxErrorException("Unable to get a color from inputted string.")
                         }
@@ -88,13 +88,13 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.glintColors.clear()
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aRemoved all your custom glint colors."))
+                        UChat.chat("§aRemoved all your custom glint colors.")
                         return
                     }
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.glintColors.remove(itemId)
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aCleared the custom glint color for your item."))
+                        UChat.chat("§aCleared the custom glint color for your item.")
                         return
                     }
                     else -> {

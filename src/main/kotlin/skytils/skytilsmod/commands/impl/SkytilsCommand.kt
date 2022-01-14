@@ -60,7 +60,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
         when (args[0].lowercase()) {
             "setkey" -> {
                 if (args.size == 1) {
-                    player.addChatMessage(ChatComponentText("§c§l[ERROR] §8» §cPlease provide your Hypixel API key!"))
+                    UChat.chat("§c§l[ERROR] §8» §cPlease provide your Hypixel API key!")
                     return
                 }
                 Skytils.threadPool.submit {
@@ -71,9 +71,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         Skytils.config.apiKey = apiKey
                         Skytils.hylinAPI.key = Skytils.config.apiKey
                         Skytils.config.markDirty()
-                        player.addChatMessage(ChatComponentText("§a§l[SUCCESS] §8» §aYour Hypixel API key has been set to §f$apiKey§a."))
+                        UChat.chat("§a§l[SUCCESS] §8» §aYour Hypixel API key has been set to §f$apiKey§a.")
                     } else {
-                        player.addChatMessage(ChatComponentText("§c§l[ERROR] §8» §cThe Hypixel API key you provided was §finvalid§c."))
+                        UChat.chat("§c§l[ERROR] §8» §cThe Hypixel API key you provided was §finvalid§c.")
                     }
                 }
             }
@@ -86,7 +86,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 )
             )
             "griffin" -> if (args.size == 1) {
-                player.addChatMessage(ChatComponentText("/skytils griffin <refresh>"))
+                UChat.chat("/skytils griffin <refresh>")
             } else {
                 when (args[1].lowercase()) {
                     "refresh" -> {
@@ -100,7 +100,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             GriffinBurrows.lastManualRefresh = System.currentTimeMillis()
                         }
                     }
-                    else -> player.addChatMessage(ChatComponentText("/skytils griffin <refresh>"))
+                    else -> UChat.chat("/skytils griffin <refresh>")
                 }
             }
             "resettracker" -> if (args.size == 1) {
@@ -116,18 +116,18 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
             "reload" -> {
                 if (args.size == 1) {
-                    player.addChatMessage(ChatComponentText("/skytils reload <aliases/data/slayer>"))
+                    UChat.chat("/skytils reload <aliases/data/slayer>")
                     return
                 } else {
                     when (args[1].lowercase()) {
                         "data" -> {
                             DataFetcher.reloadData()
-                            player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils repository data has been §freloaded§b successfully."))
+                            UChat.chat("§b§l[RELOAD] §8» §bSkytils repository data has been §freloaded§b successfully.")
                         }
                         "mayor" -> {
                             MayorInfo.fetchMayorData()
                             MayorInfo.fetchJerryData()
-                            player.addChatMessage(ChatComponentText("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully."))
+                            UChat.chat("§b§l[RELOAD] §8» §bSkytils mayor data has been §freloaded§b successfully.")
                         }
                         "slayer" -> {
                             for (entity in mc.theWorld.getEntitiesWithinAABBExcludingEntity(
@@ -138,7 +138,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                                 SlayerFeatures.processSlayerEntity(entity)
                             }
                         }
-                        else -> player.addChatMessage(ChatComponentText("/skytils reload <aliases/data/slayer>"))
+                        else -> UChat.chat("/skytils reload <aliases/data/slayer>")
                     }
                 }
             }
@@ -202,7 +202,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "spiritleapnames" -> Skytils.displayScreen = SpiritLeapNamesGui()
             "dev" -> {
                 if (args.size == 1) {
-                    player.addChatMessage(ChatComponentText("/skytils dev <toggle>"))
+                    UChat.chat("/skytils dev <toggle>")
                     return
                 } else {
                     DevTools.toggle(args[1])
@@ -224,7 +224,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 try {
                     thread(block = UpdateChecker.updateGetter::run).join()
                     if (UpdateChecker.updateGetter.updateObj == null) {
-                        return player.addChatMessage(ChatComponentText("§b§lSkytils §r§8➡ §cNo new update found"))
+                        return UChat.chat("§b§lSkytils §r§8➡ §cNo new update found")
                     }
                     val message = ChatComponentText(
                         "§b§lSkytils §r§8➜ §7Update for version ${
@@ -268,7 +268,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
             "waypoint", "waypoints" -> Skytils.displayScreen = WaypointsGui()
             "notifications" -> Skytils.displayScreen = CustomNotificationsGui()
-            else -> player.addChatMessage(ChatComponentText("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands"))
+            else -> UChat.chat("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
         }
     }
 }

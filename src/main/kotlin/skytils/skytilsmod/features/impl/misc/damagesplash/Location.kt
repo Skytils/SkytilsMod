@@ -56,7 +56,7 @@ class Location(x: Double, y: Double, z: Double) : Point3d(x, y, z) {
     }
 
     override fun toString(): String {
-        return "[" + x.roundToInt() + ", " + y.roundToInt() + ", " + z.roundToInt() + "]"
+        return "[${x.roundToInt()}, ${y.roundToInt()}, ${z.roundToInt()}]"
     }
 
 }

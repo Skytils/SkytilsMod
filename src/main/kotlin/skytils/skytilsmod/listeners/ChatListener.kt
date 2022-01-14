@@ -18,7 +18,6 @@
 package skytils.skytilsmod.listeners
 
 import gg.essential.universal.UChat
-import kotlinx.coroutines.CoroutineScope
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
@@ -32,7 +31,6 @@ import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
-import kotlin.concurrent.thread
 
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -191,7 +189,7 @@ class ChatListener {
             }
         }
         if (Skytils.config.firstLaunch && unformatted == "Welcome to Hypixel SkyBlock!") {
-            mc.thePlayer.addChatMessage(ChatComponentText("§bThank you for downloading Skytils!"))
+            UChat.chat("§bThank you for downloading Skytils!")
             ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
             Skytils.config.firstLaunch = false
             Skytils.config.markDirty()
