@@ -447,6 +447,7 @@ object ScoreCalculation {
             failedPuzzles.set(0)
             secondsElapsed.set(0.0)
         }
+        foundSecrets.set(0)
         clearedPercentage.set(0)
         totalRoomMap.clear()
     }
