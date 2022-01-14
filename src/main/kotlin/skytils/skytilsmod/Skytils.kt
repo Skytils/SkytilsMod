@@ -352,7 +352,8 @@ class Skytils {
     @SubscribeEvent
     fun onTabUpdate(event: PacketEvent.ReceiveEvent) {
         if (!Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
-            (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME)
+            (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
+                    event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
         ) return
         event.packet.entries.forEach { playerData ->
             val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
