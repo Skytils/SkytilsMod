@@ -23,7 +23,6 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
-import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.ArmorColor
@@ -44,7 +43,7 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
         if (subcommand == "clearall") {
             ArmorColor.armorColors.clear()
             PersistentSave.markDirty<ArmorColor>()
-            sender.addChatMessage(ChatComponentText("§aCleared all your custom armor colors!"))
+            UChat.chat("§aCleared all your custom armor colors!")
         } else if (subcommand == "clear") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
             val item = sender.heldItem
@@ -57,8 +56,8 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             if (ArmorColor.armorColors.containsKey(uuid)) {
                 ArmorColor.armorColors.remove(uuid)
                 PersistentSave.markDirty<ArmorColor>()
-                sender.addChatMessage(ChatComponentText("§aCleared the custom color for your " + item.displayName + "§a!"))
-            } else sender.addChatMessage(ChatComponentText("§cThat item doesn't have a custom color!"))
+                UChat.chat("§aCleared the custom color for your ${item.displayName}§a!")
+            } else UChat.chat("§cThat item doesn't have a custom color!")
         } else if (subcommand == "set") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
             val item = sender.heldItem
@@ -76,7 +75,7 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             }
             ArmorColor.armorColors[uuid] = color
             PersistentSave.markDirty<ArmorColor>()
-            sender.addChatMessage(ChatComponentText("§aSet the color of your " + item.displayName + "§a to " + args[1] + "!"))
-        } else player.addChatMessage(ChatComponentText(getCommandUsage(sender)))
+            UChat.chat("§aSet the color of your ${item.displayName}§a to ${args[1]}!")
+        } else UChat.chat(getCommandUsage(sender))
     }
 }

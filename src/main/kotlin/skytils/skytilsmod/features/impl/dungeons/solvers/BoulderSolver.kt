@@ -18,11 +18,14 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import com.google.common.collect.Lists
+import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -195,13 +198,13 @@ class BoulderSolver {
                                 }
                                 if (isRight) {
                                     roomVariant = i
-                                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "Skytils detected boulder variant " + (roomVariant + 1) + "."))
+                                    UChat.chat("§aSkytils detected boulder variant ${roomVariant + 1}.")
                                     break
                                 }
                                 i++
                             }
                             if (roomVariant == -2) {
-                                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils couldn't detect the boulder variant."))
+                                UChat.chat("§cSkytils couldn't detect the boulder variant.")
                             }
                         }
                     }

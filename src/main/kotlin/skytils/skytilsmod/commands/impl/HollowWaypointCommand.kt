@@ -39,37 +39,37 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
             val message = UMessage("§3Skytils > §eWaypoints:\n")
             if (MiningFeatures.cityLoc.exists()) {
                 message.append(UTextComponent("§fLost Precursor City "))
-                message.append(copyMessage("Lost Precursor City: " + MiningFeatures.cityLoc.toString()))
+                message.append(copyMessage("Lost Precursor City: ${MiningFeatures.cityLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_city"))
             }
             if (MiningFeatures.templeLoc.exists()) {
                 message.append(UTextComponent("§aJungle Temple "))
-                message.append(copyMessage("Jungle Temple: " + MiningFeatures.templeLoc.toString()))
+                message.append(copyMessage("Jungle Temple: ${MiningFeatures.templeLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_temple"))
             }
             if (MiningFeatures.denLoc.exists()) {
                 message.append(UTextComponent("§eGoblin Queen's Den "))
-                message.append(copyMessage("Goblin Queen's Den: " + MiningFeatures.denLoc.toString()))
+                message.append(copyMessage("Goblin Queen's Den: ${MiningFeatures.denLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_den"))
             }
             if (MiningFeatures.minesLoc.exists()) {
                 message.append(UTextComponent("§9Mines of Divan "))
-                message.append(copyMessage("Mines of Divan: " + MiningFeatures.minesLoc.toString()))
+                message.append(copyMessage("Mines of Divan: MiningFeatures.minesLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_mines"))
             }
             if (MiningFeatures.balLoc.exists()) {
                 message.append(UTextComponent("§cKhazad-dûm "))
-                message.append(copyMessage("Khazad-dûm: " + MiningFeatures.balLoc.toString()))
+                message.append(copyMessage("Khazad-dûm: ${MiningFeatures.balLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_bal"))
             }
             if (MiningFeatures.fairyLoc.exists()) {
                 message.append(UTextComponent("§dFairy Grotto "))
-                message.append(copyMessage("Fairy Grotto: " + MiningFeatures.fairyLoc.toString()))
+                message.append(copyMessage("Fairy Grotto: ${MiningFeatures.fairyLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_fairy"))
             }
             for ((key, value) in MiningFeatures.waypoints) {
                 message.append(UTextComponent("§e$key "))
-                message.append(copyMessage("$key: " + value.x + " " + value.y + " " + value.z))
+                message.append(copyMessage("$key: ${value.x} ${value.y} ${value.z}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove $key"))
             }
             message.append(UTextComponent("§eFor more info do /skytilshollowwaypoint help"))

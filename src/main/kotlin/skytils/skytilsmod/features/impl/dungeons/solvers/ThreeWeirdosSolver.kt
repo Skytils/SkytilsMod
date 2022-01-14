@@ -18,10 +18,13 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import com.google.common.collect.Lists
+import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import net.minecraft.util.*
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -53,7 +56,7 @@ class ThreeWeirdosSolver {
         }
         if (unformatted.contains("[NPC]")) {
             if (solutions.size == 0) {
-                mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to load solutions for Three Weirdos."))
+                UChat.chat("§cSkytils failed to load solutions for Three Weirdos.")
                 DataFetcher.reloadData()
             }
             for (solution in Lists.newArrayList(solutions)) {

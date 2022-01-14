@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.mining
 
+import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
@@ -143,13 +144,13 @@ class MiningFeatures {
                         }
                     }
                     println("Puzzler Solution: $puzzlerSolution")
-                    mc.thePlayer.addChatMessage(ChatComponentText("§aMine the block highlighted in §c§lRED§a!"))
+                    UChat.chat("§aMine the block highlighted in §c§lRED§a!")
                 }
             }
         }
         if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size == 0) {
-                mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
+                UChat.chat("§cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -160,18 +161,11 @@ class MiningFeatures {
             }, null)
             TickTask(50) {
                 if (solution != null) {
-                    mc.thePlayer.addChatMessage(ChatComponentText("§aFetchur needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"))
+                    UChat.chat("§aFetchur needs: §2§l${solution}§a!")
                 } else {
                     if (unformatted.contains("its") || unformatted.contains("theyre")) {
                         println("Missing Fetchur item: $unformatted")
-                        mc.thePlayer.addChatMessage(
-                            ChatComponentText(
-                                String.format(
-                                    "§cSkytils couldn't determine the Fetchur item. There were %s solutions loaded.",
-                                    fetchurItems.size
-                                )
-                            )
-                        )
+                        UChat.chat("§cSkytils couldn't determine the Fetchur item. There were ${fetchurItems.size} solutions loaded.")
                     }
                 }
             }

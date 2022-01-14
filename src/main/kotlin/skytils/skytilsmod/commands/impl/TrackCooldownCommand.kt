@@ -20,7 +20,6 @@ package skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
@@ -38,11 +37,11 @@ object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntrack
         if (CooldownTracker.itemCooldowns[ability] == seconds) {
             CooldownTracker.itemCooldowns.remove(ability)
             PersistentSave.markDirty<CooldownTracker>()
-            sender.addChatMessage(ChatComponentText("Removed the cooldown for $ability."))
+            UChat.chat("Removed the cooldown for $ability.")
         } else {
             CooldownTracker.itemCooldowns[ability] = seconds
             PersistentSave.markDirty<CooldownTracker>()
-            sender.addChatMessage(ChatComponentText("Set the cooldown for $ability to $seconds seconds."))
+            UChat.chat("Set the cooldown for $ability to $seconds seconds.")
         }
     }
 }
