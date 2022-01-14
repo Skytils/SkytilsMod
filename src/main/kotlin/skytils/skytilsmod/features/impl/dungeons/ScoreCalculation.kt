@@ -415,6 +415,9 @@ object ScoreCalculation {
                     event.isCanceled = true
                     return
                 }
+            } else if (unformatted.contains(":") && !unformatted.contains(">") && unformatted.containsAny("Mimic dead!", "Mimic Killed!", "Mimic Dead!")) {
+                mimicKilled.set(true)
+                return
             }
         }
     }
