@@ -208,6 +208,7 @@ object ScoreCalculation {
             first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also { state ->
             state.onSetValue { score ->
+                updateText(score)
                 if (!Utils.inDungeons) return@onSetValue
                 if (score < 200) {
                     hasSaid270 = false
@@ -222,7 +223,6 @@ object ScoreCalculation {
                     hasSaid300 = true
                     Skytils.sendMessageQueue.add("/pc Skytils > 300 score")
                 }
-                updateText(score)
             }
         }
 
@@ -463,7 +463,6 @@ object ScoreCalculation {
         deaths.set(0)
         crypts.set(0)
         totalRoomMap.clear()
-        updateText(totalScore.get())
     }
 
     init {
