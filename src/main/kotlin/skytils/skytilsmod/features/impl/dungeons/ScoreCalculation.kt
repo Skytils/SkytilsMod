@@ -450,7 +450,10 @@ object ScoreCalculation {
         failedPuzzles.set(0)
         secondsElapsed.set(0.0)
         foundSecrets.set(0)
+        totalSecrets.set(0)
         clearedPercentage.set(0)
+        deaths.set(0)
+        crypts.set(0)
         totalRoomMap.clear()
         updateText(totalScore.get())
     }
