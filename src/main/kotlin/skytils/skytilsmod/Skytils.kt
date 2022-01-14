@@ -20,8 +20,8 @@ package skytils.skytilsmod
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import gg.essential.universal.UMinecraft
-import gg.essential.universal.wrappers.UPlayer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -36,6 +36,7 @@ import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -84,6 +85,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
+import kotlin.coroutines.CoroutineContext
 
 
 @Mod(
@@ -95,7 +97,7 @@ import java.util.concurrent.ThreadPoolExecutor
 )
 class Skytils {
 
-    companion object {
+    companion object : CoroutineScope {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
         const val VERSION = "1.1.0"
@@ -143,6 +145,8 @@ class Skytils {
 
         @JvmField
         val dispatcher = threadPool.asCoroutineDispatcher()
+
+        override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob()
 
         val hylinAPI = createHylinAPI("", false)
 
@@ -331,6 +335,12 @@ class Skytils {
     }
 
     @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        Utils.inSkyblock = false
+        Utils.inDungeons = false
+    }
+
+    @SubscribeEvent
     fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
         if (!Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
         if (event.packet.func_149371_c() != 1) return
@@ -342,14 +352,13 @@ class Skytils {
     @SubscribeEvent
     fun onTabUpdate(event: PacketEvent.ReceiveEvent) {
         if (!Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
-            (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
-                    event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
+            (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME)
         ) return
         event.packet.entries.forEach { playerData ->
             val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
             areaRegex.matchEntire(name)?.let { result ->
                 Utils.inDungeons = Utils.inSkyblock && result.groups["area"]?.value == "Dungeon"
-                printDevMessage("dungeons ${Utils.inDungeons}", "utils")
+                printDevMessage("dungeons ${Utils.inDungeons} action ${event.packet.action}", "utils")
                 if (Utils.inDungeons)
                     ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
             }
