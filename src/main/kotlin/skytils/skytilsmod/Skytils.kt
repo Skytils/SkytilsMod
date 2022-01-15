@@ -30,7 +30,9 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.*
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
+import net.minecraft.network.play.server.S38PacketPlayerListItem
+import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -342,16 +344,16 @@ class Skytils {
 
     @SubscribeEvent
     fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
-        if (!Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
+        if (Utils.inSkyblock || !Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
         if (event.packet.func_149371_c() != 1) return
-        Utils.inSkyblock = Utils.isOnHypixel && event.packet.func_149370_d() == "SBScoreboard"
+        Utils.inSkyblock = event.packet.func_149370_d() == "SBScoreboard"
         printDevMessage("score ${event.packet.func_149370_d()}", "utils")
         printDevMessage("sb ${Utils.inSkyblock}", "utils")
     }
 
     @SubscribeEvent
     fun onTabUpdate(event: PacketEvent.ReceiveEvent) {
-        if (!Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
+        if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
         ) return
