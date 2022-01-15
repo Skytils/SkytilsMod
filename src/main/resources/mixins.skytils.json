@@ -74,6 +74,7 @@
     "gui.MixinChatLine",
     "neu.MixinCustomAH",
     "renderer.MixinItemRenderer",
+    "renderer.MixinLayerCape",
     "renderer.MixinRendererLivingEntity"
   ]
 }
