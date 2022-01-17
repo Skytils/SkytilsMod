@@ -53,6 +53,7 @@ import skytils.skytilsmod.commands.impl.*
 import skytils.skytilsmod.commands.stats.impl.CataCommand
 import skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import skytils.skytilsmod.core.*
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.*
 import skytils.skytilsmod.features.impl.dungeons.solvers.*
@@ -343,7 +344,7 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
+    fun onScoreboardChange(event: MainReceivePacketEvent<*, *>) {
         if (Utils.inSkyblock || !Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
         if (event.packet.func_149371_c() != 1) return
         Utils.inSkyblock = event.packet.func_149370_d() == "SBScoreboard"
@@ -352,7 +353,7 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: PacketEvent.ReceiveEvent) {
+    fun onTabUpdate(event: MainReceivePacketEvent<*, *>) {
         if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
