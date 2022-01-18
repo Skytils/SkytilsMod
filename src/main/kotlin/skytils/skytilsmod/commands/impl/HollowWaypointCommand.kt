@@ -54,7 +54,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
             }
             if (MiningFeatures.minesLoc.exists()) {
                 message.append(UTextComponent("§9Mines of Divan "))
-                message.append(copyMessage("Mines of Divan: MiningFeatures.minesLoc}"))
+                message.append(copyMessage("Mines of Divan: ${MiningFeatures.minesLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_mines"))
             }
             if (MiningFeatures.balLoc.exists()) {
