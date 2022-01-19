@@ -596,7 +596,7 @@ class ItemFeatures {
             gui.xSize / 2f,
             22.5f,
             CommonColors.RED,
-            SmartFontRenderer.TextAlignment.MIDDLE
+            TextAlignment.MIDDLE
         )
         UGraphics.enableDepth()
         UGraphics.enableBlend()
