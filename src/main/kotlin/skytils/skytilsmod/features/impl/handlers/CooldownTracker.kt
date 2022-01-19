@@ -29,12 +29,13 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.SetActionBarEvent
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import kotlin.math.floor
 import kotlin.time.ExperimentalTime
 
@@ -75,7 +76,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
                 for ((i, entry) in (cooldowns.entries).withIndex()) {
                     val elapsed = (entry.value - System.currentTimeMillis()) / 1000.0
                     ScreenRenderer.fontRenderer.drawString(
-                        "${entry.key.replace("_", " ")}: ${elapsed.roundToPrecision(1)}s",
+                        "${entry.key.replace("_", " ")}: ${"%.1f".format(elapsed)}s",
                         0f,
                         (ScreenRenderer.fontRenderer.FONT_HEIGHT * i).toFloat(),
                         CommonColors.ORANGE,
