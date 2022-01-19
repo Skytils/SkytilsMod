@@ -53,42 +53,45 @@ import java.awt.Color
 import java.util.concurrent.Future
 import kotlin.math.roundToInt
 
-class GriffinBurrows {
-    companion object {
-        var lastManualRefresh = 0L
+object GriffinBurrows {
+    init {
+        GriffinGuiElement()
+    }
 
-        val burrows = hashMapOf<BlockPos, Burrow>()
-        val dugBurrows = hashSetOf<BlockPos>()
-        var lastDugBurrow: BlockPos? = null
-        val particleBurrows = hashMapOf<BlockPos, ParticleBurrow>()
-        var lastDugParticleBurrow: BlockPos? = null
-        val burrowRefreshTimer = StopWatch()
-        var shouldRefreshBurrows = false
+    var lastManualRefresh = 0L
 
-        var hasSpadeInHotbar = false
+    val burrows = hashMapOf<BlockPos, Burrow>()
+    val dugBurrows = hashSetOf<BlockPos>()
+    var lastDugBurrow: BlockPos? = null
+    val particleBurrows = hashMapOf<BlockPos, ParticleBurrow>()
+    var lastDugParticleBurrow: BlockPos? = null
+    val burrowRefreshTimer = StopWatch()
+    var shouldRefreshBurrows = false
 
-        fun refreshBurrows(): Future<*> {
-            return Skytils.threadPool.submit {
-                try {
-                    println("Finding burrows")
-                    val uuid = mc.thePlayer.gameProfile.id
-                    val apiKey = Skytils.config.apiKey
-                    if (apiKey.isBlank()) {
-                        UChat.chat("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>")
-                        Skytils.config.showGriffinBurrows = false
-                        return@submit
-                    }
-                    val profileData =
-                        Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
-                    if (profileData == null) {
-                        UChat.chat("§c§lUnable to find your Skyblock Profile!")
-                        return@submit
-                    }
-                    val receivedBurrows = profileData.griffin.burrows.associateTo(hashMapOf()) {
-                        val b = Burrow(it.x, it.y, it.z, it.type, it.tier, it.chain)
-                        b.blockPos to b
-                    }
+    var hasSpadeInHotbar = false
 
+    fun refreshBurrows(): Future<*> {
+        return Skytils.threadPool.submit {
+            try {
+                println("Finding burrows")
+                val uuid = mc.thePlayer.gameProfile.id
+                val apiKey = Skytils.config.apiKey
+                if (apiKey.isBlank()) {
+                    UChat.chat("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>")
+                    Skytils.config.showGriffinBurrows = false
+                    return@submit
+                }
+                val profileData =
+                    Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
+                if (profileData == null) {
+                    UChat.chat("§c§lUnable to find your Skyblock Profile!")
+                    return@submit
+                }
+                val receivedBurrows = profileData.griffin.burrows.associateTo(hashMapOf()) {
+                    val b = Burrow(it.x, it.y, it.z, it.type, it.tier, it.chain)
+                    b.blockPos to b
+                }
+                Utils.checkThreadAndQueue {
                     dugBurrows.removeAll {
                         !receivedBurrows.containsKey(it)
                     }
@@ -98,29 +101,24 @@ class GriffinBurrows {
                     val dupes = receivedBurrows.filterTo(hashMapOf()) { (bpos, _) ->
                         dugBurrows.contains(bpos) || particleBurrows[bpos]?.dug == true
                     }.also { receivedBurrows.entries.removeAll(it.entries) }
-                    Utils.checkThreadAndQueue {
-                        burrows.clear()
-                        burrows.putAll(receivedBurrows)
-                        particleBurrows.clear()
-                    }
+                    burrows.clear()
+                    burrows.putAll(receivedBurrows)
+                    particleBurrows.clear()
                     if (receivedBurrows.size == 0) {
                         if (dupes.isEmpty()) UChat.chat("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.") else UChat.chat(
                             "§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."
                         )
                     } else UChat.chat("§aSkytils loaded §2${receivedBurrows.size}§a burrows!")
-                } catch (apiException: HypixelAPIException) {
-                    UChat.chat("§cFailed to get burrows with reason: ${apiException.message}")
-                } catch (e: Exception) {
-                    UChat.chat("§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${e.message}")
-                    e.printStackTrace()
                 }
+            } catch (apiException: HypixelAPIException) {
+                UChat.chat("§cFailed to get burrows with reason: ${apiException.message}")
+            } catch (e: Exception) {
+                UChat.chat("§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${e.message}")
+                e.printStackTrace()
             }
         }
-
-        init {
-            GriffinGuiElement()
-        }
     }
+
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -158,8 +156,8 @@ class GriffinBurrows {
                 val particleBurrow =
                     particleBurrows[lastDugParticleBurrow] ?: return
                 particleBurrow.dug = true
-                dugBurrows.add(lastDugParticleBurrow!!)
-                particleBurrows.remove(lastDugParticleBurrow)
+                dugBurrows.add(particleBurrow.blockPos)
+                particleBurrows.remove(particleBurrow.blockPos)
                 lastDugParticleBurrow = null
             }
         }
@@ -267,10 +265,10 @@ class GriffinBurrows {
                 if (isLongDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
                     if (!burrows.containsKey(pos) && !dugBurrows.contains(pos)) {
                         if (burrows.keys.any { it.distanceSq(x, y, z) < 4 }) return
-                        val burrow = particleBurrows[pos] ?: particleBurrows.putIfAbsent(
-                            pos,
+                        val burrow = particleBurrows.getOrPut(pos) {
                             ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
-                        ) ?: particleBurrows[pos]!!
+                        }
+
                         if (!burrow.hasFootstep && footstepFilter) {
                             burrow.hasFootstep = true
                         } else if (!burrow.hasEnchant && enchantFilter) {

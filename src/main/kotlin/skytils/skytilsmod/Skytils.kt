@@ -212,7 +212,7 @@ class Skytils {
             FarmingFeatures(),
             FavoritePets(),
             GlintCustomizer(),
-            GriffinBurrows(),
+            GriffinBurrows,
             IceFillSolver(),
             IcePathSolver(),
             ItemFeatures(),
