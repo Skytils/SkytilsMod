@@ -186,6 +186,22 @@ tasks {
     named<TaskSingleReobf>("reobfShadowJar") {
         mustRunAfter(shadowJar)
     }
+
+    create<Delete>("deleteClassloader") {
+        delete(
+            "${project.projectDir}/run/CLASSLOADER_TEMP",
+            "${project.projectDir}/run/CLASSLOADER_TEMP1",
+            "${project.projectDir}/run/CLASSLOADER_TEMP2",
+            "${project.projectDir}/run/CLASSLOADER_TEMP3",
+            "${project.projectDir}/run/CLASSLOADER_TEMP4",
+            "${project.projectDir}/run/CLASSLOADER_TEMP5",
+            "${project.projectDir}/run/CLASSLOADER_TEMP6",
+            "${project.projectDir}/run/CLASSLOADER_TEMP7",
+            "${project.projectDir}/run/CLASSLOADER_TEMP8",
+            "${project.projectDir}/run/CLASSLOADER_TEMP9",
+            "${project.projectDir}/run/CLASSLOADER_TEMP10"
+        )
+    }
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
