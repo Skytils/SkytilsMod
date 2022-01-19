@@ -73,10 +73,16 @@ object Utils {
     var noSychic = false
 
     @JvmField
-    var inSkyblock = false
+    var skyblock = false
+
+    val inSkyblock: Boolean
+        get() = skyblock || SBInfo.mode != null
 
     @JvmField
-    var inDungeons = false
+    var dungeons = false
+
+    val inDungeons: Boolean
+        get() = dungeons || SBInfo.mode == "dungeon"
 
     @JvmField
     var isOnHypixel = false
