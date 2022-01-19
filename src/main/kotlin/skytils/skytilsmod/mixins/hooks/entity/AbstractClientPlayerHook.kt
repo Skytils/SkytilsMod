@@ -94,7 +94,7 @@ class AbstractClientPlayerHook(player: Any) {
             if (Skytils.config.fixSummonSkin) {
                 if (correctSkin == null) {
                     if (!summonType.isDone) return
-                    if (summonType.get() == "lostadventurer" || summonType.get() == null) {
+                    if (summonType.get() == "lost_adventurer" || summonType.get() == null) {
                         return
                     }
                     // TODO Add support for resource packs
