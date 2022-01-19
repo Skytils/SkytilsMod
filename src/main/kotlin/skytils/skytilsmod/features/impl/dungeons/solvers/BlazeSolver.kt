@@ -154,23 +154,23 @@ class BlazeSolver {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size > 0) {
-            if (blazeMode <= 0) {
+            if (blazeMode < 0) {
                 val shootableBlaze = orderedBlazes[0]
                 val lowestBlaze = shootableBlaze.blaze
                 RenderUtil.draw3DString(
                     Vec3(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ),
                     "§lSmallest",
-                    Color(255, 0, 0, 200),
+                    Skytils.config.lowestBlazeColor,
                     event.partialTicks
                 )
             }
-            if (blazeMode >= 0) {
+            if (blazeMode > 0) {
                 val shootableBlaze = orderedBlazes[orderedBlazes.size - 1]
                 val highestBlaze = shootableBlaze.blaze
                 RenderUtil.draw3DString(
                     Vec3(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ),
                     "§lBiggest",
-                    Color(0, 255, 0, 200),
+                    Skytils.config.highestBlazeColor,
                     event.partialTicks
                 )
             }
