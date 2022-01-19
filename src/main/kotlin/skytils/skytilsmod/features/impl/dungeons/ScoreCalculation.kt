@@ -36,7 +36,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.*
@@ -140,7 +140,7 @@ object ScoreCalculation {
 
     val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
         printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        (clear + secret).toInt()
+        clear.toInt() + secret.toInt()
     }
 
 
@@ -279,7 +279,7 @@ object ScoreCalculation {
 
 
     @SubscribeEvent
-    fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
+    fun onScoreboardChange(event: MainReceivePacketEvent<*, *>) {
         if (
             !Utils.inSkyblock ||
             event.packet !is S3EPacketTeams
@@ -311,7 +311,7 @@ object ScoreCalculation {
     }
 
     @SubscribeEvent
-    fun onTabChange(event: PacketEvent.ReceiveEvent) {
+    fun onTabChange(event: MainReceivePacketEvent<*, *>) {
         if (
             !Utils.inDungeons ||
             event.packet !is S38PacketPlayerListItem ||
@@ -373,7 +373,7 @@ object ScoreCalculation {
     }
 
     @SubscribeEvent
-    fun onTitle(event: PacketEvent.ReceiveEvent) {
+    fun onTitle(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
         if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
             firstDeathHadSpirit.set(
