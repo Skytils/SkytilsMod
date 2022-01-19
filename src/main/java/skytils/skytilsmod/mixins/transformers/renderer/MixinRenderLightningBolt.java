@@ -31,7 +31,7 @@ import skytils.skytilsmod.utils.Utils;
 public abstract class MixinRenderLightningBolt {
     @Inject(method = "doRender", at = @At("HEAD"), cancellable = true)
     private void onRenderLightning(EntityLightningBolt entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
-        if (Config.INSTANCE.getHideLightning() && Utils.inSkyblock) {
+        if (Config.INSTANCE.getHideLightning() && Utils.INSTANCE.getInSkyblock()) {
             ci.cancel();
         }
     }
