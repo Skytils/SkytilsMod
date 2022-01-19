@@ -593,8 +593,8 @@ class ItemFeatures {
         UGraphics.disableDepth()
         ScreenRenderer.fontRenderer.drawString(
             errorString,
-            gui.guiLeft + gui.xSize / 2f,
-            gui.guiTop + 22.5f,
+            gui.xSize / 2f,
+            22.5f,
             CommonColors.RED,
             SmartFontRenderer.TextAlignment.MIDDLE
         )
