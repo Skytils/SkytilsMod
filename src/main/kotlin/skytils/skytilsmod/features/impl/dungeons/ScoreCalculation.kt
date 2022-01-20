@@ -242,6 +242,7 @@ object ScoreCalculation {
     fun updateText(score: Int) {
         Utils.checkThreadAndQueue {
             ScoreCalculationElement.text.clear()
+            if (!Utils.inDungeons) return@checkThreadAndQueue
             if (Skytils.config.minimizedScoreCalculation) {
                 val color = when {
                     score < 270 -> 'c'
