@@ -234,6 +234,8 @@ object ScoreCalculation {
             it < 270 -> "§5A"
             it < 300 -> "§eS"
             else -> "§6§lS+"
+        }.also { str ->
+            updateText(it)
         }
     }
 
