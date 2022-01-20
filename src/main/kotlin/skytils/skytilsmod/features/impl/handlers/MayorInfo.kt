@@ -192,7 +192,7 @@ object MayorInfo {
                 val nextPerksNoRound = System.currentTimeMillis() + timeLeft.inWholeMilliseconds
                 val offset = (nextPerksNoRound % 300000)
                 val rounded = nextPerksNoRound - 300000
-                val nextPerks = if (offset > 150000) rounded + 300000 else rounded
+                val nextPerks = (if (offset > 150000) rounded + 300000 else rounded) - 1
                 if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 60000) {
                     println("Jerry has ${mayor.name}'s perks ($perks) and is ending in $newJerryPerks ($${endingIn.stripControlCodes()})")
                     sendJerryData(mayor, nextPerks)
