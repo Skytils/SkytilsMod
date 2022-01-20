@@ -18,6 +18,8 @@
 
 package skytils.skytilsmod.tweaker;
 
+import com.google.common.collect.Sets;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
 import javax.swing.*;
@@ -25,9 +27,35 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.SocketPermission;
 import java.security.Permission;
+import java.util.Set;
 
 public class SkytilsSecurityManager extends FMLSecurityManager {
+    Set<String> badPaths = Sets.newHashSet(".ldb", ".leveldb", "launcher_accounts.json");
+    
+    @Override
+    public void checkExec(String cmd) {
+        if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
+            quitGame();
+        }
+        super.checkExec(cmd);
+    }
+
+    @Override
+    public void checkRead(String file) {
+        for (String p : badPaths) {
+            if (file.contains(p)) quitGame();
+        }
+        super.checkRead(file);
+    }
+
+    @Override
+    public void checkRead(String file, Object context) {
+        checkRead(file);
+        super.checkRead(file, context);
+    }
+
     @Override
     public void checkPermission(Permission perm) {
         String permName = perm.getName() != null ? perm.getName() : "missing";
@@ -46,13 +74,25 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
             if (!(callingClass.startsWith("net.minecraftforge.fml.")
                     || "net.minecraft.server.dedicated.ServerHangWatchdog$1".equals(callingClass)
                     || "net.minecraft.server.dedicated.ServerHangWatchdog".equals(callingClass)
-                    || ( "net.minecraft.client.Minecraft".equals(callingClass) && "net.minecraft.client.Minecraft".equals(callingParent))
+                    || ("net.minecraft.client.Minecraft".equals(callingClass) && "net.minecraft.client.Minecraft".equals(callingParent))
                     || ("net.minecraft.server.dedicated.DedicatedServer".equals(callingClass) && "net.minecraft.server.MinecraftServer".equals(callingParent)))
             ) {
                 throw new ExitTrappedException();
             }
         } else if ("setSecurityManager".equals(permName)) {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
+        } else if (perm instanceof SocketPermission) {
+            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org")) {
+                quitGame();
+            }
+        }
+    }
+
+    private void quitGame() {
+        try {
+            Minecraft.getMinecraft().shutdownMinecraftApplet();
+        } catch (Throwable t) {
+            System.exit(0);
         }
     }
 
