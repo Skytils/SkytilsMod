@@ -226,18 +226,18 @@ object ScoreCalculation {
             }
         }
 
-    val rank: State<String> = totalScore.map {
-        when {
-            it < 100 -> "§cD"
-            it < 160 -> "§9C"
-            it < 230 -> "§aB"
-            it < 270 -> "§5A"
-            it < 300 -> "§eS"
-            else -> "§6§lS+"
-        }.also { str ->
-            updateText(it)
+    val rank: String
+        get() {
+            val score = totalScore.get()
+            return when {
+                score < 100 -> "§cD"
+                score < 160 -> "§9C"
+                score < 230 -> "§aB"
+                score < 270 -> "§5A"
+                score < 300 -> "§eS"
+                else -> "§6§lS+"
+            }
         }
-    }
 
     fun updateText(score: Int) {
         Utils.checkThreadAndQueue {
@@ -249,7 +249,7 @@ object ScoreCalculation {
                     score < 300 -> 'e'
                     else -> 'a'
                 }
-                ScoreCalculationElement.text.add("§eScore: §$color$score §7(${rank.get()}§7)")
+                ScoreCalculationElement.text.add("§eScore: §$color$score §7($rank§7)")
             } else {
                 ScoreCalculationElement.text.add("§9Dungeon Status")
                 ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
@@ -274,7 +274,7 @@ object ScoreCalculation {
                 ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
                 ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
                 ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
-                ScoreCalculationElement.text.add("§f• §eRank: ${rank.get()}")
+                ScoreCalculationElement.text.add("§f• §eRank: $rank")
 
             }
         }
