@@ -27,6 +27,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("com.github.skytils.knockoffmixingradle") version "7d2bb154b0"
     java
+    idea
 }
 
 version = "1.1.1"
@@ -201,6 +202,27 @@ tasks {
             "${project.projectDir}/run/CLASSLOADER_TEMP9",
             "${project.projectDir}/run/CLASSLOADER_TEMP10"
         )
+    }
+
+
+    register<Jar>("loveYouJohni") {
+        archiveFileName.set("!SkytilsFake.jar")
+        destinationDirectory.set(file("${minecraft.runDir}/mods/"))
+
+        manifest {
+            attributes(
+                mapOf(
+                    "FMLCorePlugin" to "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+                    "ModSide" to "CLIENT",
+                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
+                    "TweakOrder" to "0"
+                )
+            )
+        }
+
+        exclude(mixin.refmapName)
+
+        named("genIntellijRuns").get().dependsOn(this)
     }
 }
 
