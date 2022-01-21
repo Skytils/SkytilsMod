@@ -453,7 +453,14 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         }
                     }
                 }
-
+                
+                // Chests Searched
+                formatted.contains("¶r¶cThis chest has already been searched!") && Utils.inDungeons -> {
+                    when (Skytils.config.chestMsgHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.chestMsgHider == 2)
+                    }
+                }
+                
                 // Combo
                 unformatted.contains(" Combo") -> {
                     when (Skytils.config.comboHider) {
