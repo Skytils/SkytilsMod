@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
@@ -99,6 +100,7 @@ class DungeonFeatures {
             "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
         private var lastLitUpTime = -1L
         private val lastBlockPos = BlockPos(207, 77, 234)
+        private var startWithoutFullParty = false
 
         init {
             LividGuiElement()
@@ -547,16 +549,38 @@ class DungeonFeatures {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName.endsWith(" Chest")) {
-                if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
-                    rerollClicks++
-                    val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
-                    if (neededClicks > 0) {
-                        event.isCanceled = true
+            val chestName = chest.lowerChestInventory.displayName.unformattedText ?: return
+            when {
+                chestName.endsWith(" Chest") -> {
+                    if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
+                        rerollClicks++
+                        val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
+                        if (neededClicks > 0) {
+                            event.isCanceled = true
+                        }
+                    }
+                }
+                chestName == "Start Dungeon?" -> {
+                    if (!startWithoutFullParty && Skytils.config.noChildLeftBehind && event.slot?.stack?.displayName == "§aStart Dungeon?") {
+                        val teamCount =
+                            (DungeonListener.partyCountPattern.find(TabListUtils.tabEntries[0].second)?.groupValues?.get(
+                                1
+                            )?.toIntOrNull() ?: 0)
+                        if (teamCount < 5) {
+                            event.isCanceled = true
+                            EssentialAPI.getNotifications()
+                                .push(
+                                    "Party only has $teamCount members!",
+                                    "Click me to disable this warning.",
+                                    4f,
+                                    action = {
+                                        startWithoutFullParty = true
+                                    })
+                        }
                     }
                 }
             }
+
         }
     }
 
@@ -588,6 +612,7 @@ class DungeonFeatures {
         foundLivid = false
         alertedSpiritPet = false
         lastLitUpTime = -1L
+        startWithoutFullParty = false
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {

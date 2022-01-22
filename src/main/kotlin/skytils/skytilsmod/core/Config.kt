@@ -199,6 +199,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var dungeonTrashMap = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Dungeon Start Confirmation",
+        description = "Requires a confirmation to start the dungeon when not in a full party.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var noChildLeftBehind = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Timer",
         description = "Shows the time taken for certain actions in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous"
