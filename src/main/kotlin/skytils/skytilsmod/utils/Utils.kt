@@ -76,7 +76,7 @@ object Utils {
     var skyblock = false
 
     val inSkyblock: Boolean
-        get() = skyblock || SBInfo.mode != null
+        get() = skyblock || SBInfo.mode == "SKYBLOCK"
 
     @JvmField
     var dungeons = false
