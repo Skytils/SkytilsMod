@@ -30,7 +30,7 @@ plugins {
     idea
 }
 
-version = "1.1.1"
+version = "1.1.2"
 group = "skytils.skytilsmod"
 
 mixin {
