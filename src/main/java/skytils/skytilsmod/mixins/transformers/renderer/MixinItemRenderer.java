@@ -29,7 +29,8 @@ import skytils.skytilsmod.mixins.hooks.renderer.ItemRendererHookKt;
 
 @Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
-    @Shadow private ItemStack itemToRender;
+    @Shadow
+    private ItemStack itemToRender;
 
     @Redirect(method = "renderItemInFirstPerson", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
     private int getItemInUseCountForFirstPerson(AbstractClientPlayer abstractClientPlayer) {
