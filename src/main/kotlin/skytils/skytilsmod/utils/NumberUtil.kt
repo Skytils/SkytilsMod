@@ -33,6 +33,23 @@ object NumberUtil {
         this[1000000000000000L] = "P"
         this[1000000000000000000L] = "E"
     }
+    private val romanSymbols = TreeMap(
+        mapOf(
+            1000 to "M",
+            900 to "CM",
+            500 to "D",
+            400 to "CD",
+            100 to "C",
+            90 to "XC",
+            50 to "L",
+            40 to "XL",
+            10 to "X",
+            9 to "IX",
+            5 to "V",
+            4 to "IV",
+            1 to "I",
+        )
+    )
 
     /**
      * This code was unmodified and taken under CC BY-SA 3.0 license
@@ -132,6 +149,13 @@ object NumberUtil {
             }
         }
         return decimal
+    }
+
+    fun Int.toRoman(): String {
+        val l: Int = romanSymbols.floorKey(this)
+        return if (this == l) {
+            romanSymbols[this]!!
+        } else romanSymbols[l] + (this - l).toRoman()
     }
 
     private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int): Int {

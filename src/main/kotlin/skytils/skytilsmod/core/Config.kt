@@ -1789,6 +1789,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var voidRNG = 0f
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Carry Mode",
+        description = "Allow middle clicking to set your local LappySheep's slayer boss.\nDisable this if you are doing your own boss.",
+        category = "Slayer", subcategory = "General",
+        options = ["Off", "T1", "T2", "T3", "T4", "T5"]
+    )
+    var slayerCarryMode = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Use Hits to Detect Slayer",
         description = "Finds your slayer based on the one you hit the most.",
         category = "Slayer", subcategory = "General"
