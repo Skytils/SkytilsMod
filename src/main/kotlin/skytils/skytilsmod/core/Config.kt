@@ -1299,6 +1299,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showMinionTier = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Always Show Item Name Highlight",
+        description = "Always shows the item name highlight.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var alwaysShowItemHighlight = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Tooltips while on Storage",
         description = "Hides the tooltips of backpacks and ender chest while on the Storage GUI",
         category = "Miscellaneous", subcategory = "Other"

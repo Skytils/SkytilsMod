@@ -23,7 +23,12 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.features.impl.misc.MiscFeatures
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.Utils
+
+
+fun alwaysShowItemHighlight(orig: Int): Int {
+    return if (Skytils.config.alwaysShowItemHighlight && Utils.inSkyblock) 1 else orig
+}
 
 fun modifyItemHighlightPosition(args: Args, highlightingItemStack: ItemStack) {
     if (Skytils.config.moveableItemNameHighlight && Utils.inSkyblock) {
