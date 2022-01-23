@@ -95,6 +95,9 @@ dependencies {
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
+
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.3")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.3")
 }
 
 sourceSets {
@@ -144,8 +147,9 @@ tasks {
         configurations = listOf(shadowMe)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
-        relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
+        relocate("org.apache.commons.codec", "skytils.apacheorg.codec")
         relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
+        relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
 
         exclude(
             "**/LICENSE.md",
