@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins
 
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.minecraft.launchwrapper.Launch
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
@@ -33,6 +34,7 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         if (deobfEnvironment) {
             println("We are in a deobfuscated environment, loading compatibility mixins.")
         }
+        MixinExtrasBootstrap.init()
     }
 
     override fun getRefMapperConfig(): String? {
