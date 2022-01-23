@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.mixins.hooks.renderer
 
-import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
@@ -26,6 +25,6 @@ fun onHurtcam(partialTicks: Float, ci: CallbackInfo) {
     if (Utils.inSkyblock && Skytils.config.noHurtcam) ci.cancel()
 }
 
-fun getLastLightningBolt(world: World): Int {
-    return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else world.lastLightningBolt
+fun getLastLightningBolt(orig: Int): Int {
+    return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else orig
 }
