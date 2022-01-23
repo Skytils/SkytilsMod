@@ -18,13 +18,12 @@
 
 package skytils.skytilsmod.mixins.transformers.renderer;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.mixins.hooks.renderer.EntityRendererHookKt;
 
@@ -35,8 +34,8 @@ public abstract class MixinEntityRenderer implements IResourceManagerReloadListe
         EntityRendererHookKt.onHurtcam(partialTicks, ci);
     }
 
-    @Redirect(method = "updateLightmap", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getLastLightningBolt()I"))
-    private int getLastLightningBolt(World world) {
-        return EntityRendererHookKt.getLastLightningBolt(world);
+    @ModifyExpressionValue(method = "updateLightmap", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getLastLightningBolt()I"))
+    private int getLastLightningBolt(int orig) {
+        return EntityRendererHookKt.getLastLightningBolt(orig);
     }
 }

@@ -19,6 +19,7 @@ package skytils.skytilsmod.mixins.hooks.entity
 
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.world.World
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.Utils
 
 fun removeBlazeSmokeParticle(
@@ -31,8 +32,8 @@ fun removeBlazeSmokeParticle(
     yOffset: Double,
     zOffset: Double,
     p_175688_14_: IntArray
-) {
-    if (!Utils.inDungeons || particleType != EnumParticleTypes.SMOKE_LARGE) {
-        world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
-    }
+): Boolean {
+    return !Utils.inDungeons || particleType != EnumParticleTypes.SMOKE_LARGE || !DungeonListener.missingPuzzles.contains(
+        "Higher Or Lower"
+    )
 }
