@@ -107,10 +107,8 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
         yOffset: Double,
         zOffset: Double,
         p_175688_14_: IntArray
-    ) {
-        if (!(Skytils.config.hideDeathParticles && particleType == EnumParticleTypes.EXPLOSION_NORMAL)) {
-            world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
-        }
+    ): Boolean {
+        return !Skytils.config.hideDeathParticles || !Utils.inSkyblock || particleType != EnumParticleTypes.EXPLOSION_NORMAL
     }
 
     fun isChild(cir: CallbackInfoReturnable<Boolean>) {

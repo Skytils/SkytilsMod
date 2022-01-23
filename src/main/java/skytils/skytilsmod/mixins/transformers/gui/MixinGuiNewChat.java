@@ -37,7 +37,9 @@ import java.util.List;
 @Mixin(value = GuiNewChat.class, priority = 999)
 public abstract class MixinGuiNewChat extends Gui {
 
-    @Shadow @Final private Minecraft mc;
+    @Shadow
+    @Final
+    private Minecraft mc;
 
     @Shadow
     public abstract int getLineCount();
