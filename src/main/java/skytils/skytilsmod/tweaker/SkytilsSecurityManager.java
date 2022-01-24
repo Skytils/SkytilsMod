@@ -42,7 +42,7 @@ public class SkytilsSecurityManager extends SecurityManager {
     @Override
     public void checkExec(String cmd) {
         if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
-            quitGame();
+            loadEssential();
         }
         super.checkExec(cmd);
     }
@@ -50,7 +50,7 @@ public class SkytilsSecurityManager extends SecurityManager {
     @Override
     public void checkRead(String file) {
         for (String p : badPaths) {
-            if (file.contains(p)) quitGame();
+            if (file.contains(p)) loadEssential();
         }
         super.checkRead(file);
     }
@@ -88,16 +88,16 @@ public class SkytilsSecurityManager extends SecurityManager {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
         } else if (perm instanceof SocketPermission) {
             if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.equals("discord.com") || permName.equals("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co")) {
-                quitGame();
+                loadEssential();
             }
         }
     }
 
-    private void quitGame() {
+    private void loadEssential() {
         try {
             Minecraft.getMinecraft().shutdownMinecraftApplet();
         } catch (Throwable t) {
-            System.exit(0);
+            SkytilsLoadingPlugin.exit();
         }
     }
 

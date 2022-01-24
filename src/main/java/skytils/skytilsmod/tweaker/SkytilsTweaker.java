@@ -35,6 +35,7 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
             overrideSecurityManager(System.getSecurityManager().getClass() == FMLSecurityManager.class);
             System.out.println("Current security manager: " + System.getSecurityManager());
         }
+        EssentialPlatformSetup.setup();
     }
 
     // Bypass the FML security manager in order to set our own
