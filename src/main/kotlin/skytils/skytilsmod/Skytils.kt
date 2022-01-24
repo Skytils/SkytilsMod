@@ -193,6 +193,7 @@ class Skytils {
             AuctionData(),
             AuctionPriceOverlay(),
             BlazeSolver(),
+            BloodHelper,
             BossHPDisplays(),
             BoulderSolver(),
             ChatTabs,
