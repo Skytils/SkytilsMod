@@ -333,3 +333,6 @@ operator fun <K, V> Cache<K, V>.set(name: K, value: V) = put(name, value)
 fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
 
 fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTagAt(it) }
+
+
+fun Vec3i.toBoundingBox() = AxisAlignedBB(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
