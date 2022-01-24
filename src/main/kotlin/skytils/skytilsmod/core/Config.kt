@@ -283,6 +283,20 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var sendMessageOn300Score = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Blood Camp Helper",
+        description = "Draws an outline where blood mobs spawn in after spinning as armor stands.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var bloodHelper = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Blood Camp Helper Color",
+        description = "Changes the color of the outline.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var bloodHelperColor = Color.RED
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -2372,6 +2386,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                 if (prop is Boolean && prop) fetchLowestBINPrices = true
             }
         }
+
+        addDependency("bloodHelperColor", "bloodHelper")
 
         addDependency("showNextBlaze", "blazeSolver")
         addDependency("lowestBlazeColor", "blazeSolver")
