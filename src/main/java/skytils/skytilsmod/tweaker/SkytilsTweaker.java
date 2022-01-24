@@ -27,27 +27,26 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+@SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
-        if (System.getProperty("skytils.noSecurityManager") == null && System.getSecurityManager().getClass() == FMLSecurityManager.class) {
+        if (System.getProperty("skytils.noSecurityManager") == null && (System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager().getClass() == FMLSecurityManager.class)) {
             System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
-            overrideSecurityManager();
+            overrideSecurityManager(System.getSecurityManager().getClass() == FMLSecurityManager.class);
             System.out.println("Current security manager: " + System.getSecurityManager());
         }
     }
 
     // Bypass the FML security manager in order to set our own
-    private void overrideSecurityManager() {
+    private void overrideSecurityManager(boolean isForge) {
         try {
-            SecurityManager s = new SkytilsSecurityManager();
+            SecurityManager s = new SkytilsSecurityManager(isForge);
 
             if (s.getClass().getClassLoader() != null) {
-                AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                    public Object run() {
-                        s.getClass().getProtectionDomain().implies
-                                (SecurityConstants.ALL_PERMISSION);
-                        return null;
-                    }
+                AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+                    s.getClass().getProtectionDomain().implies
+                            (SecurityConstants.ALL_PERMISSION);
+                    return null;
                 });
             }
 
