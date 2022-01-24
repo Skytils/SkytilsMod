@@ -367,6 +367,7 @@ class MiningFeatures {
             GlStateManager.enableCull()
         }
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
+            GlStateManager.disableDepth()
             cityLoc.drawWaypoint("Lost Precursor City", event.partialTicks)
             templeLoc.drawWaypoint("Jungle Temple", event.partialTicks)
             denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
@@ -376,6 +377,7 @@ class MiningFeatures {
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
             for ((key, value) in waypoints)
                 RenderUtil.renderWaypointText(key, value, event.partialTicks)
+            GlStateManager.enableDepth()
         }
     }
 
