@@ -73,6 +73,7 @@
     "accessors.AccessorGuiMainMenu",
     "gui.MixinChatLine",
     "neu.MixinCustomAH",
+    "particle.MixinEffectRenderer",
     "renderer.MixinItemRenderer",
     "renderer.MixinLayerCape",
     "renderer.MixinRendererLivingEntity"
