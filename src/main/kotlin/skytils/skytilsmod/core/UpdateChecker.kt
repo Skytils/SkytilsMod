@@ -151,7 +151,7 @@ object UpdateChecker {
                 else -> return println("Channel set as none")
             }
             val latestTag = latestRelease["tag_name"].asString
-            val currentTag = Skytils.VERSION
+            val currentTag = Skytils.VERSION.substringBefore("-dev")
 
             val currentVersion = SkytilsVersion(currentTag)
             val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))
