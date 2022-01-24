@@ -1628,7 +1628,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Allows pressing enter to confirm a sign popup, such as the bazaar or auction house prices.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var pressEnterToConfirmSignQuestion = true
+    var pressEnterToConfirmSignQuestion = false
 
     @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
