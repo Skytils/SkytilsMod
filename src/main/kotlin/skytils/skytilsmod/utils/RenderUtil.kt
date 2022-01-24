@@ -451,7 +451,6 @@ object RenderUtil {
         GlStateManager.scale(-f1, -f1, f1)
         GlStateManager.disableLighting()
         GlStateManager.depthMask(false)
-        GlStateManager.disableDepth()
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         val tessellator = Tessellator.getInstance()
@@ -469,7 +468,6 @@ object RenderUtil {
         fontRenderer.drawString(str, -j, i, 553648127)
         GlStateManager.depthMask(true)
         fontRenderer.drawString(str, -j, i, -1)
-        GlStateManager.enableDepth()
         GlStateManager.enableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
@@ -823,3 +821,5 @@ object RenderUtil {
 
 fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
 fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)

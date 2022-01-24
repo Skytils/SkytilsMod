@@ -307,7 +307,7 @@ object GriffinBurrows {
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
-                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
                 this.color,
                 (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )

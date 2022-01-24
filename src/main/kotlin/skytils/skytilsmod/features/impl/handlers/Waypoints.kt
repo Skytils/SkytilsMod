@@ -21,18 +21,16 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
 
@@ -104,11 +102,8 @@ data class Waypoint(
 ) {
     fun draw(partialTicks: Float) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
-        val x = pos.x - viewerX
-        val y = pos.y - viewerY
-        val z = pos.z - viewerZ
         RenderUtil.drawFilledBoundingBox(
-            AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+            pos.toBoundingBox().expandBlock().offset(-viewerX, -viewerY, -viewerZ),
             color.withAlpha(color.alpha.coerceAtMost(128)),
             1f
         )
