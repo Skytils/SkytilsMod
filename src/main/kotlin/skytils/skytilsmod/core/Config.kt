@@ -326,6 +326,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var kismetRerollConfirm = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Archer Bone Passive",
+        description = "Hides the archer bone shield passive.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var hideArcherBonePassive = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Damage In Boss",
         description = "Removes damage numbers while in a boss fight. Requires the custom damage splash to be enabled.",
         category = "Dungeons", subcategory = "Quality of Life"
