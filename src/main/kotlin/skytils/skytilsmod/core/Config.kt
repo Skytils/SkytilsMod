@@ -1504,6 +1504,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hideAirDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Cheap Coins",
+        description = "Prevents the game from rendering cheap coins.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideCheapCoins = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Dying Mobs",
         description = "Removes dead/dying mobs from your screen.",
         category = "Dungeons", subcategory = "Quality of Life"
