@@ -230,6 +230,7 @@ class Skytils {
             PricePaid,
             ProtectItems(),
             RainTimer(),
+            RandomStuff,
             RelicWaypoints(),
             ScoreCalculation,
             SelectAllColorSolver(),
