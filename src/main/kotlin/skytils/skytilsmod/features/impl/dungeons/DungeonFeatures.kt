@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.event.ClickEvent
@@ -60,6 +61,7 @@ import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.BossBarEvent
+import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -387,7 +389,13 @@ class DungeonFeatures {
         }
     }
 
-    // Show hidden fels
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!Utils.inDungeons) return
+        if (Skytils.config.hideArcherBonePassive && event.entity is EntityItem && event.entity.entityItem.itemDamage == 15 && event.entity.entityItem.item === Items.dye)
+            event.isCanceled = true
+    }
+
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
