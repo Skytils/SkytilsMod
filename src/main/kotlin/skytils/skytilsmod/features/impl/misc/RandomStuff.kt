@@ -18,21 +18,19 @@
 
 package skytils.skytilsmod.features.impl.misc
 
-import net.minecraft.entity.item.EntityFallingBlock
+import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.Utils
 
 object RandomStuff {
     @SubscribeEvent
-    fun onCheckRenderEntity(event: CheckRenderEntityEvent<*>) {
+    fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (!Skytils.config.randomStuff || !Utils.inSkyblock) return
-        if (event.entity is EntityFallingBlock && DungeonTimer.phase2ClearTime == -1L && DungeonTimer.phase1ClearTime != -1L) {
+        if (event.packet is S0EPacketSpawnObject && event.packet.type == 70 && DungeonTimer.phase2ClearTime == -1L && DungeonTimer.phase1ClearTime != -1L) {
             event.isCanceled = true
-            mc.theWorld?.removeEntity(event.entity)
         }
     }
 }
