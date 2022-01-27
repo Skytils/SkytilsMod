@@ -23,6 +23,7 @@ import gg.essential.api.EssentialAPI
 import gg.essential.api.gui.buildEmulatedPlayer
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
+import gg.essential.elementa.components.inspector.Inspector
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.BasicState
@@ -263,5 +264,14 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             width = 42.5.percent()
             height = 20.pixels()
         } childOf skillContainer
+
+    init {
+        if (EssentialAPI.getMinecraftUtil().isDevelopment()) {
+            Inspector(window).constrain {
+                x = 10.pixels
+                y = 10.pixels
+            } childOf window
+        }
+    }
 
 }
