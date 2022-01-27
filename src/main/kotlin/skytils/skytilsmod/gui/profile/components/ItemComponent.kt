@@ -19,7 +19,8 @@
 package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
-import net.minecraft.client.renderer.GlStateManager
+import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import skytils.skytilsmod.utils.RenderUtil
@@ -28,14 +29,16 @@ class ItemComponent(val item: ItemStack) : UIComponent() {
 
     constructor(item: Item, metadata: Int = 0) : this(ItemStack(item, 1, metadata))
 
-    override fun draw() {
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(getLeft(), getTop(), 100f)
-        GlStateManager.scale(getWidth() / 16f, getHeight() / 16f, 0f)
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        RenderUtil.renderItem(item, 0, 0)
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-        super.draw()
+    override fun draw(matrixStack: UMatrixStack) {
+        super.draw(matrixStack)
+        matrixStack.push()
+        matrixStack.translate(getLeft(), getTop(), 100f)
+        matrixStack.scale(getWidth() / 16f, getHeight() / 16f, 0f)
+        UGraphics.color4f(1f, 1f, 1f, 1f)
+        matrixStack.runWithGlobalState {
+            RenderUtil.renderItem(item, 0, 0)
+        }
+        matrixStack.pop()
+        UGraphics.disableLighting()
     }
 }
