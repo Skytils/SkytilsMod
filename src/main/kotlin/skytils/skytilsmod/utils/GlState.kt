@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import org.lwjgl.opengl.GLContext
-import java.nio.FloatBuffer
+import java.nio.ByteBuffer
 
 object GlState {
     var lightingState = false
@@ -33,7 +33,7 @@ object GlState {
     var blendAlphaDst = 0
     var alphaState = false
     var depthState = false
-    var colorState = FloatBuffer.allocate(4)
+    var colorState = ByteBuffer.allocateDirect(64).asFloatBuffer()
 
     val newBlend: Boolean
 
