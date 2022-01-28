@@ -24,16 +24,15 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.toConstraint
-import gg.essential.elementa.state.MappedState
+import gg.essential.elementa.state.State
 import gg.essential.universal.UMatrixStack
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.client.config.GuiUtils
-import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.item.Inventory
 import skytils.skytilsmod.Skytils.Companion.mc
 import java.awt.Color
 
-class InventoryComponent(val inv: MappedState<Member?, Inventory?>) : UIComponent() {
+class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
 
     init {
         inv.onSetValue {
@@ -49,7 +48,7 @@ class InventoryComponent(val inv: MappedState<Member?, Inventory?>) : UIComponen
         }
     }
 
-    class SlotComponent(val item: ItemStack?) : UIRoundedRectangle(2f) {
+    class SlotComponent(val item: ItemStack?, radius: Float = 2f) : UIRoundedRectangle(radius) {
 
         init {
             if (item != null) addChild(ItemComponent(item).constrain {
