@@ -222,6 +222,7 @@ class DungeonFeatures {
                                     val a = when (color) {
                                         EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
                                         EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
+                                        EnumDyeColor.PINK -> EnumChatFormatting.LIGHT_PURPLE
                                         EnumDyeColor.RED -> EnumChatFormatting.RED
                                         EnumDyeColor.SILVER -> EnumChatFormatting.GRAY
                                         EnumDyeColor.GRAY -> EnumChatFormatting.GRAY
