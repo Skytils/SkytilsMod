@@ -62,7 +62,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "API",
         protectedText = true
     )
-    var apiKey = ""
+    var apiKey = System.getenv("HYPIXEL_KEY") ?: ""
 
     @Property(
         type = PropertyType.SELECTOR, name = "Command Alias Mode",
