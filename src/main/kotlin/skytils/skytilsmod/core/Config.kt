@@ -340,6 +340,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hideDamageInBoss = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Fairies",
+        description = "Hides the fairies in dungeons.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var hideFairies = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Floor 4 Crowd Messages",
         description = "Hides the messages from the Crowd on Floor 4.",
         category = "Dungeons", subcategory = "Quality of Life"
