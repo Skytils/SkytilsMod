@@ -22,26 +22,23 @@ import com.mojang.authlib.GameProfile
 import gg.essential.api.EssentialAPI
 import gg.essential.api.gui.buildEmulatedPlayer
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.*
+import gg.essential.elementa.components.UIBlock
+import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.inspector.Inspector
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.universal.UMinecraft
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
-import skytils.hylin.extension.getLatestSkyblockProfile
-import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
+import skytils.skytilsmod.gui.profile.components.InventoryComponent
 import skytils.skytilsmod.gui.profile.components.ItemComponent
 import skytils.skytilsmod.gui.profile.components.XPComponent
 import java.awt.Color
@@ -54,7 +51,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             val profile = GameProfile(it, "")
             Skytils.launch {
                 launch {
-                    a = hylinAPI.getSkyblockProfiles(it).await().getLatestSkyblockProfile(it)!!.members[uuid.nonDashedString()]!!
+                    a = hylinAPI.getLatestSkyblockProfileForMember(uuid).await()
                 }.invokeOnCompletion {
                     profileState.set(a)
                 }
@@ -74,7 +71,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             var a: Member? = null
             val profile = GameProfile(uuidState.get(), "")
             launch {
-                a = hylinAPI.getSkyblockProfiles(uuidState.get()).await().getLatestSkyblockProfile(uuidState.get())!!.members[uuidState.get().nonDashedString()]!!
+                a = hylinAPI.getLatestSkyblockProfileForMember(uuidState.get()).await()
             }.invokeOnCompletion {
                 profileState.set(a)
             }
@@ -264,6 +261,13 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             width = 42.5.percent()
             height = 20.pixels()
         } childOf skillContainer
+
+    private val inventory = InventoryComponent(profileState.map { it?.inventory }).constrain {
+        x = 5.percent()
+        y = basicYConstraint { runecrafting.getTop() + 40 }
+        width = (9 * 16 * 10).pixels
+        height = (4 * 16 * 10).pixels
+    } childOf contentContainer
 
     init {
         if (EssentialAPI.getMinecraftUtil().isDevelopment()) {
