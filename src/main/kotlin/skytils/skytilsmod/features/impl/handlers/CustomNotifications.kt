@@ -20,12 +20,12 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import net.minecraft.network.play.server.S02PacketChat
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.InputStreamReader
@@ -33,11 +33,11 @@ import java.io.OutputStreamWriter
 
 class CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifications.json")) {
 
-    @SubscribeEvent
-    fun onMessage(event: MainReceivePacketEvent<*, *>) {
-        if (!Utils.inSkyblock || (event.packet !is S02PacketChat) || event.packet.type != 0.toByte() || notifications.isEmpty()) return
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onMessage(event: ClientChatReceivedEvent) {
+        if (!Utils.inSkyblock || event.type != 0.toByte() || notifications.isEmpty()) return
         Skytils.threadPool.submit {
-            val formatted = event.packet.chatComponent.formattedText
+            val formatted = event.message.formattedText
             for ((regex, text, displayTicks) in notifications) {
                 val match = regex.find(formatted) ?: continue
                 var title = text
