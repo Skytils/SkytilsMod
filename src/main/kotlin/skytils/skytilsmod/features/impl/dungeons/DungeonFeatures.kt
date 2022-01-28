@@ -448,6 +448,9 @@ class DungeonFeatures {
                         )
                     ) mc.theWorld.removeEntity(event.entity)
                 }
+                if (Skytils.config.hideFairies && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
+                    event.isCanceled = true
+                }
             }
             if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
                 if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
