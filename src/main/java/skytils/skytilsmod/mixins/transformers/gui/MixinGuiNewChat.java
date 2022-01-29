@@ -20,22 +20,29 @@ package skytils.skytilsmod.mixins.transformers.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import skytils.skytilsmod.features.impl.handlers.ChatTabs;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
-@Mixin(value = GuiNewChat.class, priority = 999)
+@Mixin(value = GuiNewChat.class, priority = 1001)
 public abstract class MixinGuiNewChat extends Gui {
+
+
+    private static final ChatLine skytils$placeholderLine = new ChatLine(0, new ChatComponentText("skytils placeholder"), 0);
 
     @Shadow
     @Final
@@ -58,5 +65,17 @@ public abstract class MixinGuiNewChat extends Gui {
     private void stopOutsideWindow(int mouseX, int mouseY, CallbackInfoReturnable<IChatComponent> cir, ScaledResolution scaledresolution, int i, float f, int j, int k, int l) {
         int line = k / mc.fontRendererObj.FONT_HEIGHT;
         if (line >= getLineCount()) cir.setReturnValue(null);
+    }
+
+    @Inject(method = "deleteChatLine", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ChatLine;getChatLineID()I"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void stopDeleteCrash(int id, CallbackInfo ci, Iterator<ChatLine> iterator, ChatLine chatline) {
+        if (chatline == null || skytils$placeholderLine == chatline) {
+            iterator.remove();
+        }
+    }
+
+    @ModifyVariable(method = "deleteChatLine", at = @At("STORE"))
+    private ChatLine stopDeleteCrash(ChatLine chatLine) {
+        return chatLine == null ? skytils$placeholderLine : chatLine;
     }
 }
