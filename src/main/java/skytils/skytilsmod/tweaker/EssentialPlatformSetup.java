@@ -44,7 +44,8 @@ public class EssentialPlatformSetup {
     private static final String e = "Please don't tell anyone this exists if you see it, thanks <3";
 
     public static void setup() {
-        if (System.getProperty("skytils.skipEssentialSetup") != null) return;
+        if (!System.getProperty("skytils.skipEssentialSetup").equals("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo"))
+            return;
         try {
             File me = getMyLocation();
             //noinspection ConstantConditions
