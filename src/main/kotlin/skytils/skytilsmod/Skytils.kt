@@ -367,7 +367,7 @@ class Skytils {
             }
         }
         if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName == "MC|Brand") {
-            if (event.packet.bufferData.readStringFromBuffer(32767).lowercase().contains("hypixel"))
+            if (event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt()).lowercase().contains("hypixel"))
                 Utils.isOnHypixel = true
         }
         if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
