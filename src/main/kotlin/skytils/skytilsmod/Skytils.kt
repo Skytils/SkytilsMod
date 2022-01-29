@@ -33,6 +33,7 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
+import net.minecraft.network.play.server.S3FPacketCustomPayload
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -355,7 +356,19 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+        if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
+            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
+            val entity = mc.theWorld.getEntityByID(event.packet.entityId)
+
+            if (entity is ExtensionEntityLivingBase) {
+                entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
+            }
+        }
+        if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName == "MC|Brand") {
+            if (event.packet.bufferData.readStringFromBuffer(32767).lowercase().contains("hypixel"))
+                Utils.isOnHypixel = true
+        }
         if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
@@ -430,18 +443,6 @@ class Skytils {
                 TickTask(1) {
                     displayScreen = OptionsGui()
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
-        if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
-            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
-            val entity = mc.theWorld.getEntityByID(event.packet.entityId)
-
-            if (entity is ExtensionEntityLivingBase) {
-                entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
             }
         }
     }
