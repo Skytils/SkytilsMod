@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.RenderUtil
 
 class ItemComponent(val item: ItemStack) : UIComponent() {
@@ -37,6 +38,13 @@ class ItemComponent(val item: ItemStack) : UIComponent() {
         UGraphics.color4f(1f, 1f, 1f, 1f)
         matrixStack.runWithGlobalState {
             RenderUtil.renderItem(item, 0, 0)
+            mc.renderItem.renderItemOverlayIntoGUI(
+                item.item.getFontRenderer(item) ?: mc.fontRendererObj,
+                item,
+                0,
+                0,
+                null
+            )
         }
         matrixStack.pop()
         UGraphics.disableLighting()

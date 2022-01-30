@@ -34,18 +34,27 @@ import java.awt.Color
 
 class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
 
+    var needsSetup = false
+
     init {
         inv.onSetValue {
-            if (it != null) {
-                clearChildren()
-                for ((i, item) in it.items.withIndex()) {
-                    addChild(SlotComponent(item?.asMinecraft).constrain {
-                        x = ((i % 9) * (16 + 2)).pixels
-                        y = ((i / 9) * (16 + 2)).pixels
-                    })
-                }
-            }
+            if (it != null) needsSetup = true
         }
+    }
+
+    override fun draw(matrixStack: UMatrixStack) {
+        if (needsSetup) {
+            val inv = this.inv.get()!!
+            clearChildren()
+            for ((i, item) in inv.items.withIndex()) {
+                addChild(SlotComponent(item?.asMinecraft).constrain {
+                    x = ((i % 9) * (16 + 2)).pixels
+                    y = ((i / 9) * (16 + 2)).pixels
+                })
+            }
+            needsSetup = false
+        }
+        super.draw(matrixStack)
     }
 
     class SlotComponent(val item: ItemStack?, radius: Float = 2f) : UIRoundedRectangle(radius) {
