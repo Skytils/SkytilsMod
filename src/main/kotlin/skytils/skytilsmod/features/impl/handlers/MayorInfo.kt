@@ -213,6 +213,7 @@ object MayorInfo {
                     TickTask(1) {
                         currentMayor = res["name"].asString
                         lastFetchedMayorData = System.currentTimeMillis()
+                        if (currentMayor != "Jerry") jerryMayor = null
                         mayorPerks.clear()
                         val perks = res["perks"].asJsonArray
                         for (i in 0 until perks.size()) {
