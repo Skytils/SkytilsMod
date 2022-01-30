@@ -21,6 +21,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
 import java.util.*
@@ -215,5 +216,14 @@ object ItemUtil {
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+    }
+
+    fun ItemStack.setLore(lines: List<String>): ItemStack {
+        setTagInfo("display", getSubCompound("display", true).apply {
+            setTag("Lore", NBTTagList().apply {
+                for (line in lines) appendTag(NBTTagString(line))
+            })
+        })
+        return this
     }
 }
