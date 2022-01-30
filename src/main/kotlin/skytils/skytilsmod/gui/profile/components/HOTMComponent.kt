@@ -26,6 +26,7 @@ import gg.essential.elementa.state.State
 import gg.essential.universal.UMatrixStack
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.mining.HOTM
+import skytils.skytilsmod.utils.ItemUtil.setLore
 import skytils.skytilsmod.utils.SkillUtils
 import kotlin.math.ceil
 
@@ -47,13 +48,23 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
             val hotmLevel = SkillUtils.calcXpWithProgress(profile.hotm.experience.toDouble(), SkillUtils.hotmXp.values)
             for (slot in HOTM.HOTMSlot.slots) {
                 if (slot is HOTM.HOTMSlot.HOTMLevel) {
-                    InventoryComponent.SlotComponent(slot.getItem(if (slot.hotmLevel == ceil(hotmLevel).toInt()) -1 else hotmLevel.toInt()))
+                    InventoryComponent.SlotComponent(
+                        slot.getItem(if (slot.hotmLevel == ceil(hotmLevel).toInt()) -1 else hotmLevel.toInt())
+                            .setLore(slot.getLore(slot.hotmLevel))
+                    )
                         .constrain {
                             x = ((slot.slotNum % 9) * (16 + 2)).pixels
                             y = ((slot.slotNum / 9) * (16 + 2)).pixels
                         } childOf this
                 } else {
-                    InventoryComponent.SlotComponent(slot.getItem(profile.hotm.perks.getOrDefault(slot, 0))).constrain {
+                    var level = profile.hotm.perks.getOrDefault(slot, 0)
+                    if (slot is HOTM.HOTMSlot.PickaxeAbility && profile.hotm.perks.getOrDefault(
+                            HOTM.HOTMSlot.Perk.SpecialPerk.PeakOfTheMountain,
+                            0
+                        ) >= 1
+                    )
+                        level++
+                    InventoryComponent.SlotComponent(slot.getItem(level).setLore(slot.getLore(level))).constrain {
                         x = ((slot.slotNum % 9) * (16 + 2)).pixels
                         y = ((slot.slotNum / 9) * (16 + 2)).pixels
                     } childOf this
