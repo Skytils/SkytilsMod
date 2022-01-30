@@ -38,6 +38,7 @@ import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
+import skytils.skytilsmod.gui.profile.components.HOTMComponent
 import skytils.skytilsmod.gui.profile.components.InventoryComponent
 import skytils.skytilsmod.gui.profile.components.ItemComponent
 import skytils.skytilsmod.gui.profile.components.XPComponent
@@ -265,8 +266,15 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
     private val inventory = InventoryComponent(profileState.map { it?.inventory }).constrain {
         x = 5.percent()
         y = basicYConstraint { runecrafting.getTop() + 40 }
-        width = (9 * 16 * 10).pixels
-        height = (4 * 16 * 10).pixels
+        width = (9 * (16 + 2)).pixels
+        height = (4 * (16 + 2)).pixels
+    } childOf contentContainer
+
+    private val hotm = HOTMComponent(profileState).constrain {
+        x = 5.percent()
+        y = SiblingConstraint(5f)
+        width = (9 * (16 + 2)).pixels
+        height = (7 * (16 + 2)).pixels
     } childOf contentContainer
 
     init {
