@@ -23,7 +23,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
@@ -44,7 +43,7 @@ public class EssentialPlatformSetup {
     private static final String e = "Please don't tell anyone this exists if you see it, thanks <3";
 
     public static void setup() {
-        if (!"onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
+        if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
             return;
         try {
             File me = getMyLocation();
@@ -72,7 +71,7 @@ public class EssentialPlatformSetup {
 
     private static void loadEssential() {
         try {
-            LogManager.getLogger("launcher").log(Level.ALL, "\n" +
+            LogManager.getLogger("launcher").fatal("\n" +
                     "#\n" +
                     "# A fatal error has been detected by the Java Runtime Environment:\n" +
                     "#\n" +
