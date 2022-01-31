@@ -25,69 +25,75 @@ import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
+import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.SkillUtils
 import java.awt.Color
-import kotlin.reflect.KProperty
 
-class XPComponent(
-    var image: ItemComponent,
-    var colorConstraint: ColorConstraint,
-    val skillField: KProperty<Float?>,
-    val userState: State<Member?>
+open class XPComponent(
+    itemComponent: ItemComponent,
+    text: String = "",
+    percent: Float = 0f,
+    overflow: Long = 0,
+//    var text: State<String> = BasicState(""),
+//    var percent: State<Float> = BasicState(0f),
+//    var overflow: State<Long> = BasicState(0),
+    var colorConstraint: ColorConstraint = Color(0x4166f5).constraint
 ) : UIComponent() {
-    val skillCap = userState.map { user ->
-        kotlin.runCatching {
-            if (skillField == Skills::farmingXP) {
-                return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (user?.jacob?.perks?.farmingLevelCap ?: 0)
-            } else {
-                return@runCatching SkillUtils.maxSkillLevels[skillField.name.substringBefore("XP")]
-            }
-        }.getOrNull() ?: 50
+    // to get around leaking `this` into ctor
+    private fun that() = this
+
+    private var textState: State<String> = BasicState(text)
+    private var percentState: State<Float> = BasicState(percent)
+    private var overflowState: State<Long> = BasicState(overflow)
+
+    fun bindText(newState: State<String>) {
+        textState = newState
+        textLabel.bindText(textState)
     }
-    val skillXP = userState.map { user ->
-        user?.skills?.let { skills -> skillField.getter.call(skills) } ?: 0f
+
+    fun bindPercent(newState: State<Float>) {
+        percentState = newState
+        progress.constraints.width =
+            (background.constraints.width - imageContainer.constraints.width) * (percentState as State<Number>) + imageContainer.constraints.width
     }
-    val skillLevel = (skillXP.zip(skillCap)).map { (xp, cap) ->
-        if (skillField == Skills::runecraftingXP) {
-            SkillUtils.calcXpWithOverflowAndProgress(xp.toDouble(), cap, SkillUtils.runeXp.values)
-        } else {
-            SkillUtils.calcXpWithOverflowAndProgress(xp.toDouble(), cap, SkillUtils.skillXp.values)
-        }
-    }
-    val percent = skillLevel.map { (_, _, percent) ->
-        (percent % 1).toFloat()
+
+    fun bindOverflow(newState: State<Long>) {
+        overflowState = newState
+        overflowText.bindText(overflowState.map { NumberUtil.format(it) })
     }
 
     private val background = UIRoundedRectangle(5f)
         .constrain {
-            x = basicXConstraint { this@XPComponent.getHeight() / 2 + this@XPComponent.getLeft() }
+            x = basicXConstraint { getHeight() / 2 + getLeft() }
             y = RelativeConstraint(0.5f)
-            width = RelativeConstraint()
+            width = FillConstraint(useSiblings = false)
             height = RelativeConstraint(0.5f)
             color = Color.WHITE.withAlpha(40).toConstraint()
-        } childOf this
+        } childOf that()
+
+    private val imageContainer = UIRoundedRectangle(5f)
+        .constrain {
+            x = 0.pixels()
+            y = 0.pixels()
+            width = AspectConstraint()
+            height = RelativeConstraint()
+            color = colorConstraint
+        } childOf that()
 
     private val progress = UIRoundedRectangle(5f)
         .constrain {
             x = 0.pixels()
             y = 0.pixels()
-            width = (skillLevel.zip(skillCap)).map { (level, cap) ->
-//                if (level.first == cap)
-                    RelativeConstraint()
-//                else
-//                    (background.constraints.width * (percent as State<Number>)) + (imageContainer.constraints.width / 2)
-            }.get()
+            width =
+                (background.constraints.width - imageContainer.constraints.width) * (percentState as State<Number>) + imageContainer.constraints.width
             height = RelativeConstraint()
             color = colorConstraint
         } childOf background
 
-    private val overflow =
-        UIText().also { it.bindText(skillLevel.map { level -> NumberUtil.format(level.second.toLong()) }) }
+    private val overflowText =
+        UIText().also { it.bindText(overflowState.map { NumberUtil.format(it) }) }
             .constrain {
                 x = CenterConstraint()
                 y = CenterConstraint()
@@ -106,33 +112,27 @@ class XPComponent(
             height = RelativeConstraint()
         } childOf background
 
-    private val imageContainer = UIRoundedRectangle(5f)
-        .constrain {
-            x = 0.pixels()
-            y = 0.pixels()
-            width = AspectConstraint()
-            height = RelativeConstraint()
-            color = colorConstraint
-        } childOf this
-
-    private val skillLevelContainer = UIContainer()
+    private val textContainer = UIContainer()
         .constrain {
             x = basicXConstraint { imageContainer.getRight() }
             y = 0.pixels()
             width = FillConstraint()
             height = RelativeConstraint(0.5f)
-        } childOf this
+        } childOf that()
 
-    private val skillText =
+    private val textLabel =
         UIText(
-        ).also { it.bindText(skillLevel.map { level -> "${skillField.name.lowercase().substringBefore("xp").replaceFirstChar { it.uppercase() }} ${level.first}" }) }
+        ).also {
+            it.bindText(textState)
+        }
             .constrain {
                 x = 2.pixels()
                 y = CenterConstraint()
-            } childOf skillLevelContainer
+            } childOf textContainer
+
 
     init {
-        image
+        itemComponent
             .constrain {
                 x = CenterConstraint()
                 y = CenterConstraint()
