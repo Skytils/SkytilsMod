@@ -26,10 +26,14 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.state.State
 import gg.essential.universal.UMatrixStack
+import gg.essential.universal.UMinecraft
+import gg.essential.universal.wrappers.UPlayer
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.client.config.GuiUtils
 import skytils.hylin.skyblock.item.Inventory
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.utils.addTooltip
+import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 
 class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
@@ -71,23 +75,18 @@ class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
                 height = 16.pixels
                 color = Color(65, 102, 245).toConstraint()
             }
-        }
 
-        override fun draw(matrixStack: UMatrixStack) {
-            super.draw(matrixStack)
-            if (isHovered() && item != null) {
-                val mouse = getMousePosition()
-                val window = Window.of(this)
-                GuiUtils.drawHoveringText(
-                    item.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips),
-                    mouse.first.toInt(),
-                    mouse.second.toInt(),
-                    window.getWidth().toInt(),
-                    window.getHeight().toInt(),
-                    -1,
-                    item.item.getFontRenderer(item) ?: mc.fontRendererObj
-                )
+            item?.run {
+                val tooltip = TooltipComponent()
+                getTooltip(UPlayer.getPlayer(), UMinecraft.getMinecraft().gameSettings.advancedItemTooltips).forEach {
+                    if (it.stripControlCodes().isEmpty()) {
+                        return@forEach
+                    }
+                    tooltip.addLine(it)
+                }
+                this@SlotComponent.addTooltip(tooltip)
             }
+
         }
     }
 }
