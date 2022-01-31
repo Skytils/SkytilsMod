@@ -31,12 +31,11 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.TickTask
-import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.printDevMessage
-import java.util.concurrent.ConcurrentHashMap
 
 object BloodHelper {
     val watcherSkins = setOf(
@@ -45,7 +44,7 @@ object BloodHelper {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmY2ZTFlN2VkMzY1ODZjMmQ5ODA1NzAwMmJjMWFkYzk4MWUyODg5ZjdiZDdiNWIzODUyYmM1NWNjNzgwMjIwNCJ9fX0K"
     )
     val watchers = mutableSetOf<EntityZombie>()
-    val mobs = ConcurrentHashMap<EntityArmorStand, BloodMob>()
+    val mobs = hashMapOf<EntityArmorStand, BloodMob>()
 
     @SubscribeEvent
     fun render(event: RenderWorldLastEvent) {
@@ -101,7 +100,7 @@ object BloodHelper {
     }
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || watchers.isEmpty()) return
         if (event.packet !is S14PacketEntity.S17PacketEntityLookMove) return
         val entity = event.packet.getEntity(UMinecraft.getWorld()) ?: return
