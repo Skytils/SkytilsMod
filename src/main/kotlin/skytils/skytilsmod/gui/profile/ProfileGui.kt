@@ -21,6 +21,7 @@ package skytils.skytilsmod.gui.profile
 import com.mojang.authlib.GameProfile
 import gg.essential.api.EssentialAPI
 import gg.essential.api.gui.buildEmulatedPlayer
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
@@ -45,7 +46,7 @@ import skytils.skytilsmod.gui.profile.components.SkillComponent
 import java.awt.Color
 import java.util.*
 
-class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
+class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
         it.onSetValue {
             var a: Member? = null
