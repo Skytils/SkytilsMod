@@ -54,7 +54,7 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
                     )
                         .constrain {
                             x = ((slot.slotNum % 9) * (16 + 2)).pixels
-                            y = ((slot.slotNum / 9) * (16 + 2)).pixels
+                            y = ((slot.slotNum / 9) * (16 + 2) - 18).pixels
                         } childOf this
                 } else {
                     var level = profile.hotm.perks.getOrDefault(slot, 0)
