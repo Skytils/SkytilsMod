@@ -41,7 +41,7 @@ import skytils.skytilsmod.Skytils.Companion.hylinAPI
 import skytils.skytilsmod.gui.profile.components.HOTMComponent
 import skytils.skytilsmod.gui.profile.components.InventoryComponent
 import skytils.skytilsmod.gui.profile.components.ItemComponent
-import skytils.skytilsmod.gui.profile.components.XPComponent
+import skytils.skytilsmod.gui.profile.components.SkillComponent
 import java.awt.Color
 import java.util.*
 
@@ -133,7 +133,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = ChildBasedRangeConstraint() + 5.pixels
         } childOf contentContainer
 
-    private val taming = XPComponent(
+    private val taming = SkillComponent(
         ItemComponent(Items.spawn_egg),
         Color(65, 102, 245).toConstraint(),
         Skills::tamingXP,
@@ -146,7 +146,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val farming = XPComponent(
+    private val farming = SkillComponent(
         ItemComponent(Items.golden_hoe),
         Color(65, 102, 245).toConstraint(),
         Skills::farmingXP,
@@ -159,7 +159,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val mining = XPComponent(
+    private val mining = SkillComponent(
         ItemComponent(Items.stone_pickaxe),
         Color(65, 102, 245).toConstraint(),
         Skills::miningXP,
@@ -172,7 +172,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val combat = XPComponent(
+    private val combat = SkillComponent(
         ItemComponent(Items.stone_sword),
         Color(65, 102, 245).toConstraint(),
         Skills::combatXP,
@@ -185,7 +185,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val foraging = XPComponent(
+    private val foraging = SkillComponent(
         ItemComponent(Item.getItemFromBlock(Blocks.sapling), 3),
         Color(65, 102, 245).toConstraint(),
         Skills::foragingXP,
@@ -198,7 +198,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val fishing = XPComponent(
+    private val fishing = SkillComponent(
         ItemComponent(Items.fishing_rod),
         Color(65, 102, 245).toConstraint(),
         Skills::fishingXP,
@@ -211,7 +211,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val enchanting = XPComponent(
+    private val enchanting = SkillComponent(
         ItemComponent(Item.getItemFromBlock(Blocks.enchanting_table)),
         Color(65, 102, 245).toConstraint(),
         Skills::enchantingXP,
@@ -224,7 +224,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val alchemy = XPComponent(
+    private val alchemy = SkillComponent(
         ItemComponent(Items.brewing_stand),
         Color(65, 102, 245).toConstraint(),
         Skills::alchemyXP,
@@ -237,7 +237,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val carpentry = XPComponent(
+    private val carpentry = SkillComponent(
         ItemComponent(Item.getItemFromBlock(Blocks.crafting_table)),
         Color(65, 102, 245).toConstraint(),
         Skills::carpentryXP,
@@ -250,7 +250,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(drawDefaultBackground = false) {
             height = 20.pixels()
         } childOf skillContainer
 
-    private val runecrafting = XPComponent(
+    private val runecrafting = SkillComponent(
         ItemComponent(Items.magma_cream),
         Color(65, 102, 245).toConstraint(),
         Skills::runecraftingXP,
