@@ -36,6 +36,7 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.printDevMessage
+import java.util.concurrent.ConcurrentHashMap
 
 object BloodHelper {
     val watcherSkins = setOf(
@@ -44,7 +45,7 @@ object BloodHelper {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmY2ZTFlN2VkMzY1ODZjMmQ5ODA1NzAwMmJjMWFkYzk4MWUyODg5ZjdiZDdiNWIzODUyYmM1NWNjNzgwMjIwNCJ9fX0K"
     )
     val watchers = mutableSetOf<EntityZombie>()
-    val mobs = mutableMapOf<EntityArmorStand, BloodMob>()
+    val mobs = ConcurrentHashMap<EntityArmorStand, BloodMob>()
 
     @SubscribeEvent
     fun render(event: RenderWorldLastEvent) {
