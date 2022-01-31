@@ -36,9 +36,6 @@ open class XPComponent(
     text: String = "",
     percent: Float = 0f,
     overflow: Long = 0,
-//    var text: State<String> = BasicState(""),
-//    var percent: State<Float> = BasicState(0f),
-//    var overflow: State<Long> = BasicState(0),
     var colorConstraint: ColorConstraint = Color(0x4166f5).constraint
 ) : UIComponent() {
     // to get around leaking `this` into ctor
