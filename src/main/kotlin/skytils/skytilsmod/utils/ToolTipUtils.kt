@@ -40,6 +40,7 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.MousePositionConstraint
 import gg.essential.elementa.dsl.*
+import gg.essential.elementa.events.UIScrollEvent
 import gg.essential.elementa.utils.ObservableClearEvent
 import gg.essential.elementa.utils.ObservableRemoveEvent
 import java.util.Observer
@@ -71,30 +72,40 @@ fun UIComponent.onRemoved(listener: () -> Unit): () -> Unit {
 }
 
 fun <T : UIComponent> T.addTooltip(tooltip: UIComponent) = apply {
-    tooltip.constrain {
-        // Slightly right of the cursor but never off-screen
-        x = (MousePositionConstraint() + 8.pixels)
-            .coerceAtMost(100.percentOfWindow - basicXConstraint { tooltip.getWidth() })
-        // Slightly below the cursor except when there is insufficient space, then slightly above it
-        y = basicYConstraint {
-            val mouseY = MousePositionConstraint().getYPosition(it)
-            val idealY = mouseY + 8
-            val height = tooltip.getHeight()
-            val fallbackY = mouseY - 8 - height
-            if (idealY + height <= 100.percentOfWindow.getYPosition(it) || fallbackY < 0) {
-                idealY
-            } else {
-                fallbackY
+    fun <U : UIComponent> U.resetTooltip() = apply {
+        constrain {
+            // Slightly right of the cursor but never off-screen
+            x = (MousePositionConstraint() + 8.pixels)
+                .coerceAtMost(100.percentOfWindow - basicXConstraint { tooltip.getWidth() })
+            // Slightly below the cursor except when there is insufficient space, then slightly above it
+            y = basicYConstraint {
+                val mouseY = MousePositionConstraint().getYPosition(it)
+                val idealY = mouseY + 8
+                val height = tooltip.getHeight()
+                val fallbackY = mouseY - 8 - height
+                if (idealY + height <= 100.percentOfWindow.getYPosition(it) || fallbackY < 0) {
+                    idealY
+                } else {
+                    fallbackY
+                }
             }
         }
     }
+    tooltip.resetTooltip()
 
     var unregister: (() -> Unit)? = null
 
     onMouseEnter {
         Window.enqueueRenderOperation {
+            tooltip.resetTooltip()
             tooltip childOf Window.of(this)
             tooltip.setFloating(true)
+            val scroll: UIComponent.(UIScrollEvent) -> Unit = { event ->
+                Window.enqueueRenderOperation {
+                    tooltip.constraints.y += (if (event.delta > 0) 10 else -10).pixels
+                }
+            }
+            Window.of(this).onMouseScroll(scroll)
             val unregisterOnRemoved = this.onRemoved {
                 unregister?.invoke()
                 unregister = null
@@ -102,6 +113,7 @@ fun <T : UIComponent> T.addTooltip(tooltip: UIComponent) = apply {
             unregister = {
                 unregisterOnRemoved.invoke()
                 Window.enqueueRenderOperation {
+                    Window.of(this).mouseScrollListeners.remove(scroll)
                     tooltip.setFloating(false)
                     tooltip.hide(true)
                 }
