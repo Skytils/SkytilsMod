@@ -30,9 +30,10 @@ import java.security.PrivilegedAction;
 @SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
-        if (System.getProperty("skytils.noSecurityManager") == null && (System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager().getClass() == FMLSecurityManager.class)) {
+        boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
+        if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
             System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
-            overrideSecurityManager(System.getSecurityManager().getClass() == FMLSecurityManager.class);
+            overrideSecurityManager(isFML);
             System.out.println("Current security manager: " + System.getSecurityManager());
         }
         EssentialPlatformSetup.setup();
