@@ -18,10 +18,7 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
@@ -49,7 +46,9 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.openGUI
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.*
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
@@ -273,7 +272,18 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 if (args.size == 1) {
                     Skytils.displayScreen = ProfileGui(mc.thePlayer.uniqueID)
                 } else {
-                    Skytils.displayScreen = ProfileGui(Skytils.hylinAPI.getUUIDSync(args[1]))
+                    // TODO Add some kind of message indicating progress
+                    var uuid by Delegates.notNull<UUID>()
+                    Skytils.launch {
+                        uuid = Skytils.hylinAPI.getUUIDSync(args[1])
+                    }.invokeOnCompletion {
+                        it?.let { error ->
+                            UChat.chat("§9§lSkytils ➜ §cError finding player!")
+                            error.printStackTrace()
+                            return@invokeOnCompletion
+                        }
+                        Skytils.displayScreen = ProfileGui(uuid)
+                    }
                 }
             }
             else -> UChat.chat("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
