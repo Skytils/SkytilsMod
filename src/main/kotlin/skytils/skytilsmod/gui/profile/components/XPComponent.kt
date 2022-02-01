@@ -74,7 +74,7 @@ open class XPComponent(
         .constrain {
             x = 0.pixels()
             y = 0.pixels()
-            width = AspectConstraint()
+            width = basicWidthConstraint { getHeight() }
             height = RelativeConstraint()
             color = colorConstraint
         } childOf that()
