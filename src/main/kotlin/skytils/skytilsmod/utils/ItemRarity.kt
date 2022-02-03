@@ -27,6 +27,7 @@ import java.awt.Color
  * @author SteveKunG
  */
 enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting, val color: Color) {
+    NONE("NONE", EnumChatFormatting.GRAY, Color(0, 0, 0)),
     COMMON("COMMON", EnumChatFormatting.WHITE, Color(255, 255, 255)),
     UNCOMMON("UNCOMMON", EnumChatFormatting.GREEN, Color(77, 231, 77)),
     RARE("RARE", EnumChatFormatting.BLUE, Color(85, 85, 255)),
