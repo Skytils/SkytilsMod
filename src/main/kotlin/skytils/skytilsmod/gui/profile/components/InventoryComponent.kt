@@ -20,10 +20,11 @@ package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.toConstraint
+import gg.essential.elementa.components.UIText
+import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
+import gg.essential.universal.ChatColor
 import gg.essential.universal.UMatrixStack
 import net.minecraft.item.ItemStack
 import skytils.hylin.skyblock.item.Inventory
@@ -32,23 +33,34 @@ import java.awt.Color
 
 class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
 
-    var needsSetup = false
+    var needsSetup = true
 
     init {
         inv.onSetValue {
-            if (it != null) needsSetup = true
+            needsSetup = true
         }
     }
 
     override fun draw(matrixStack: UMatrixStack) {
         if (needsSetup) {
-            val inv = this.inv.get()!!
             clearChildren()
-            for ((i, item) in inv.items.withIndex()) {
-                addChild(SlotComponent(item?.asMinecraft).constrain {
-                    x = ((i % 9) * (16 + 2)).pixels
-                    y = ((i / 9) * (16 + 2)).pixels
-                })
+            inv.get()?.run {
+                for ((i, item) in items.withIndex()) {
+                    addChild(SlotComponent(item?.asMinecraft).constrain {
+                        x = ((i % 9) * (16 + 2)).pixels
+                        y = ((i / 9) * (16 + 2)).pixels
+                    })
+                }
+            } ?: kotlin.run {
+                UIRoundedRectangle(5f).constrain {
+                    width = 100.percent
+                    height = 100.percent
+                    color = ChatColor.GRAY.color!!.constraint
+                } childOf this
+                UIText("Inventory api not enabled!").constrain {
+                    x = CenterConstraint()
+                    y = CenterConstraint()
+                } childOf this
             }
             needsSetup = false
         }
