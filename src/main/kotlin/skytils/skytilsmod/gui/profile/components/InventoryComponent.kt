@@ -20,20 +20,14 @@ package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.state.State
 import gg.essential.universal.UMatrixStack
-import gg.essential.universal.UMinecraft
-import gg.essential.universal.wrappers.UPlayer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.client.config.GuiUtils
 import skytils.hylin.skyblock.item.Inventory
-import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.addTooltip
-import skytils.skytilsmod.utils.stripControlCodes
 import java.awt.Color
 
 class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
@@ -77,13 +71,7 @@ class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
             }
 
             item?.run {
-                val tooltip = TooltipComponent()
-                getTooltip(UPlayer.getPlayer(), UMinecraft.getMinecraft().gameSettings.advancedItemTooltips).forEach {
-                    if (it.stripControlCodes().isEmpty()) {
-                        return@forEach
-                    }
-                    tooltip.addLine(it)
-                }
+                val tooltip = TooltipComponent(this)
                 this@SlotComponent.addTooltip(tooltip)
             }
 

@@ -123,7 +123,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             x = 0.pixels()
             y = SiblingConstraint()
             width = 35.percent()
-            height = basicHeightConstraint { window.getHeight() - 25f }
+            height = 100.percentOfWindow - 25.pixels
         } childOf window
 
     private val playerComponent = EssentialAPI.getEssentialComponentFactory().buildEmulatedPlayer {
