@@ -142,13 +142,13 @@ object ItemUtil {
      * @param item the Skyblock item to check
      * @return the rarity of the item if a valid rarity is found, `null` if no rarity is found, `null` if item is `null`
      */
-    fun getRarity(item: ItemStack?): ItemRarity? {
+    fun getRarity(item: ItemStack?): ItemRarity {
         if (item == null || !item.hasTagCompound()) {
-            return null
+            return ItemRarity.NONE
         }
         val display = item.getSubCompound("display", false)
         if (display == null || !display.hasKey("Lore")) {
-            return null
+            return ItemRarity.NONE
         }
         val lore = display.getTagList("Lore", Constants.NBT.TAG_STRING)
         val name = display.getString("Name")
@@ -168,12 +168,12 @@ object ItemUtil {
         }
         val petRarityMatcher = PET_PATTERN.find(name)
         if (petRarityMatcher != null) {
-            val color = petRarityMatcher.groupValues.getOrNull(1) ?: return null
-            return ItemRarity.byBaseColor(color)
+            val color = petRarityMatcher.groupValues.getOrNull(1) ?: return ItemRarity.NONE
+            return ItemRarity.byBaseColor(color) ?: ItemRarity.NONE
         }
 
         // If the item doesn't have a valid rarity, return null
-        return null
+        return ItemRarity.NONE
     }
 
     fun isPet(item: ItemStack?): Boolean {
