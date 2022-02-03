@@ -26,10 +26,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UMatrixStack
-import net.minecraft.item.ItemStack
 import skytils.hylin.skyblock.item.Inventory
-import skytils.skytilsmod.utils.addTooltip
-import java.awt.Color
 
 class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
 
@@ -67,26 +64,4 @@ class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
         super.draw(matrixStack)
     }
 
-    class SlotComponent(val item: ItemStack?, radius: Float = 2f) : UIRoundedRectangle(radius) {
-
-        init {
-            if (item != null) addChild(ItemComponent(item).constrain {
-                x = 0.pixels
-                y = 0.pixels
-                width = 16.pixels
-                height = 16.pixels
-            })
-            constrain {
-                width = 16.pixels
-                height = 16.pixels
-                color = Color(65, 102, 245).toConstraint()
-            }
-
-            item?.run {
-                val tooltip = TooltipComponent(this)
-                this@SlotComponent.addTooltip(tooltip)
-            }
-
-        }
-    }
 }
