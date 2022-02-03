@@ -113,7 +113,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
         .bindSelection(selection)
         .constrain {
             x = 10.pixels(true)
-            y = 5.pixels
+            y = 2.5.pixels
         } childOf navBar
 
     // Player Section
