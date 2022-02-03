@@ -52,6 +52,12 @@ class DropdownComponent(
     private var selectionState: State<Int> = BasicState(initialSelection)
     private var optionsState: State<List<String>> = BasicState(options)
 
+    var collapsedHeight: HeightConstraint = 20.pixels
+
+    fun height(newHeight: HeightConstraint) = apply {
+        collapsedHeight = newHeight
+    }
+
     fun bindSelection(newState: State<Int>) = apply {
         selectionState = newState
         onValueChange(selectionState.get())
@@ -147,7 +153,7 @@ class DropdownComponent(
     init {
         constrain {
             width = collapsedWidth
-            height = 20.pixels()
+            height = collapsedHeight
             color = VigilancePalette.getDarkHighlight().toConstraint()
         }
 
@@ -214,7 +220,7 @@ class DropdownComponent(
             setHeightAnimation(
                 Animations.IN_SIN,
                 0.35f,
-                20.pixels() + RelativeConstraint(1f).boundTo(scrollContainer)
+                collapsedHeight + RelativeConstraint(1f).boundTo(scrollContainer)
             )
         }
 
@@ -240,11 +246,11 @@ class DropdownComponent(
         }
 
         if (instantly) {
-            setHeight(20.pixels())
+            setHeight(collapsedHeight)
             animationComplete()
         } else {
             animate {
-                setHeightAnimation(Animations.OUT_SIN, 0.35f, 20.pixels())
+                setHeightAnimation(Animations.OUT_SIN, 0.35f, collapsedHeight)
 
                 onComplete(::animationComplete)
             }

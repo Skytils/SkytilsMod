@@ -50,19 +50,19 @@ class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalett
         width = 16.pixels
     } childOf itemTitle
     val itemName: UIText = UIText(lore[0].replace("§c✪", "Ⓜ").stripControlCodes()).constrain {
-        x = CenterConstraint()
+        x = CenterConstraint() coerceAtLeast SiblingConstraint()
         y = CenterConstraint()
         width = UMinecraft.getFontRenderer().getStringWidth(lore[0]).pixels
     } childOf itemTitle
 
     val contentContainer by UIContainer().constrain {
         y = SiblingConstraint()
-        width = ChildBasedSizeConstraint() + 6.pixels
-        height = ChildBasedSizeConstraint() + 6.pixels
+        width = ChildBasedSizeConstraint() + 10.pixels
+        height = ChildBasedSizeConstraint() + 10.pixels
     } childOf this
     val content = UIContainer().constrain {
-        x = 3.pixels
-        y = 3.pixels
+        x = 5.pixels
+        y = 5.pixels
         width = ChildBasedMaxSizeConstraint()
         height = ChildBasedSizeConstraint()
     } childOf contentContainer
