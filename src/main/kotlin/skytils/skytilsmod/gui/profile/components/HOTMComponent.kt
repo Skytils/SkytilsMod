@@ -48,7 +48,7 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
             val hotmLevel = SkillUtils.calcXpWithProgress(profile.hotm.experience.toDouble(), SkillUtils.hotmXp.values)
             for (slot in HOTM.HOTMSlot.slots) {
                 if (slot is HOTM.HOTMSlot.HOTMLevel) {
-                    InventoryComponent.SlotComponent(
+                    SlotComponent(
                         slot.getItem(if (slot.hotmLevel == ceil(hotmLevel).toInt()) -1 else hotmLevel.toInt())
                             .setLore(slot.getLore(slot.hotmLevel))
                     )
@@ -64,7 +64,7 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
                         ) >= 1
                     )
                         level++
-                    InventoryComponent.SlotComponent(slot.getItem(level).setLore(slot.getLore(level))).constrain {
+                    SlotComponent(slot.getItem(level).setLore(slot.getLore(level))).constrain {
                         x = ((slot.slotNum % 9) * (16 + 2)).pixels
                         y = ((slot.slotNum / 9) * (16 + 2)).pixels
                     } childOf this
