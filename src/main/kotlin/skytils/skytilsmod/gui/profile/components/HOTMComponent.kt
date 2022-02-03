@@ -58,7 +58,7 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
                         } childOf this
                 } else {
                     var level = profile.hotm.perks.getOrDefault(slot, 0)
-                    if (slot is HOTM.HOTMSlot.PickaxeAbility && profile.hotm.perks.getOrDefault(
+                    if (slot is HOTM.HOTMSlot.PickaxeAbility && level == 1 && profile.hotm.perks.getOrDefault(
                             HOTM.HOTMSlot.Perk.SpecialPerk.PeakOfTheMountain,
                             0
                         ) >= 1
