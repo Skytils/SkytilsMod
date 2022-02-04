@@ -306,7 +306,7 @@ class Skytils {
         ScreenRenderer.refresh()
 
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
-        TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it.text }
+        TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
         if (displayScreen != null) {
             mc.displayGuiScreen(displayScreen)
             displayScreen = null
