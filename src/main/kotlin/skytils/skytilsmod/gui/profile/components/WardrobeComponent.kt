@@ -19,32 +19,57 @@
 package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.Window
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.CramSiblingConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
+import gg.essential.elementa.constraints.*
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.item.Inventory
+import skytils.skytilsmod.gui.profile.states.alwaysMap
 
 class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
 
-    init {
-        ArmorComponent(profileState.map { it?.armor.also { it?.items?.reverse() } }, false).constrain {
-            width = 400.pixels
-            height = 20.pixels
+    private val armor =
+        ArmorComponent(profileState.map { p ->
+            p?.armor.also { it?.items?.reverse() } ?: Inventory(
+                "armor",
+                ArrayList(4)
+            )
+        }, false).constrain {
+            width = ChildBasedRangeConstraint()
+            height = ChildBasedMaxSizeConstraint()
         } childOf this
-        profileState.map { profile ->
-            profile?.wardrobe?.items?.chunked(36) {
-                it.withIndex().groupBy { it.index % 9 }.values.map { it.map { it.value } }
-            }?.flatten()
-        }.also {
-            it.onSetValue {
-                it?.forEach {
-                    it.forEachIndexed { i, item ->
-                        println("$i ${item?.id}")
+    private val wardrobeContainer = UIContainer().constrain {
+        x = 0.pixels
+        y = SiblingConstraint(2f)
+        width = 40.percentOfWindow
+        height = ChildBasedRangeConstraint()
+    } childOf this
+
+
+    init {
+        profileState.onSetValue { profile ->
+            Window.enqueueRenderOperation {
+                wardrobeContainer.clearChildren()
+                profile?.wardrobe?.items?.run {
+                    (0 until size / 4).map { slot ->
+                        val page = slot / 9
+                        profileState.alwaysMap { prof ->
+                            Inventory(
+                                "Wardrobe slot $slot",
+                                prof?.wardrobe?.items?.slice((0..3).map { it * 9 + slot % 9 + page * 36 })
+                                    ?.toMutableList()
+                                    ?: ArrayList(4)
+                            )
+                        }
+                    }.forEach { state ->
+                        ArmorComponent(state, true).constrain {
+                            x = CramSiblingConstraint(2f)
+                            width = ChildBasedMaxSizeConstraint()
+                            height = ChildBasedRangeConstraint()
+                        }.also { it.parseSlots(state.get()) } childOf wardrobeContainer
                     }
                 }
             }
@@ -56,22 +81,22 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
 
     }
 
-    class ArmorComponent(invState: State<Inventory?>, val vertical: Boolean) : UIComponent() {
-        private var invState: State<Inventory?> = invState.also {
+    class ArmorComponent(invState: State<Inventory>, val vertical: Boolean) : UIComponent() {
+        private var invState: State<Inventory> = invState.also {
             it.onSetValue(::parseSlots)
         }
 
-        fun bindInv(newState: State<Inventory?>) = apply {
+        fun bindInv(newState: State<Inventory>) = apply {
             invState = newState
             invState.onSetValue(::parseSlots)
         }
 
-        fun parseSlots(inv: Inventory?) = Window.enqueueRenderOperation {
+        fun parseSlots(inv: Inventory) = Window.enqueueRenderOperation {
             clearChildren()
-            inv?.run {
+            inv.run {
                 items.forEach { item ->
                     insertChildAt(SlotComponent(item?.asMinecraft).constrain {
-                        x = if (vertical) 0.pixels else CramSiblingConstraint(2f)
+                        x = if (vertical) 0.pixels else SiblingConstraint(2f)
                         y = if (vertical) SiblingConstraint(2f) else 0.pixels
                     }, children.size)
                 }
