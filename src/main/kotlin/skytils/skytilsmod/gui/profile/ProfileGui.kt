@@ -205,7 +205,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
     )
         .constrain {
             x = 52.5.percent()
-            y = basicYConstraint { mining.getTop() }
+            y = CopyConstraintFloat() boundTo mining
             width = 42.5.percent()
             height = 20.pixels()
         } childOf skillContainer
@@ -231,7 +231,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
     )
         .constrain {
             x = 52.5.percent()
-            y = basicYConstraint { foraging.getTop() }
+            y = CopyConstraintFloat() boundTo foraging
             width = 42.5.percent()
             height = 20.pixels()
         } childOf skillContainer
@@ -257,7 +257,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
     )
         .constrain {
             x = 52.5.percent()
-            y = basicYConstraint { enchanting.getTop() }
+            y = CopyConstraintFloat() boundTo enchanting
             width = 42.5.percent()
             height = 20.pixels()
         } childOf skillContainer
@@ -287,6 +287,11 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             width = 42.5.percent()
             height = 20.pixels()
         } childOf skillContainer
+
+    private val wardrobe = WardrobeComponent(profileState).constrain {
+        x = 5.percent
+        y = SiblingConstraint(5f)
+    } childOf contentContainer
 
     private val inventory = InventoryComponent(profileState.alwaysMap { it?.inventory }).constrain {
         x = 5.percent()
