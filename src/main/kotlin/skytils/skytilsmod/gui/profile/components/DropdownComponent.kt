@@ -73,7 +73,7 @@ class DropdownComponent(
     }
 
     private val currentSelectionState: MappedState<Pair<List<String>, Int>, String> =
-        optionsState.zip(selectionState).map { (options, selection) -> println(options[selection]); options[selection] }
+        optionsState.zip(selectionState).map { (options, selection) -> options[selection] }
             .also {
                 it.onSetValue {
                     readOptionComponents()
