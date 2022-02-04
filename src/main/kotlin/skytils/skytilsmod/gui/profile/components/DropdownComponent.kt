@@ -60,8 +60,9 @@ class DropdownComponent(
 
     fun bindSelection(newState: State<Int>) = apply {
         selectionState = newState
-        onValueChange(selectionState.get())
         currentSelectionState.rebind(optionsState.zip(selectionState))
+        mappedOptions.rebind(optionsState)
+        onValueChange(selectionState.get())
     }
 
     fun bindOptions(newState: State<List<String>>) = apply {
@@ -71,8 +72,13 @@ class DropdownComponent(
         currentSelectionState.rebind(optionsState.zip(selectionState))
     }
 
-    private val currentSelectionState: MappedState<Pair<List<String>, Int>, String> = optionsState.zip(selectionState).map { (options, selection) -> options[selection] }
-
+    private val currentSelectionState: MappedState<Pair<List<String>, Int>, String> =
+        optionsState.zip(selectionState).map { (options, selection) -> println(options[selection]); options[selection] }
+            .also {
+                it.onSetValue {
+                    readOptionComponents()
+                }
+            }
     private val currentSelectionText by UIText().bindText(currentSelectionState).constrain {
         x = 5.pixels()
         y = 6.pixels()
