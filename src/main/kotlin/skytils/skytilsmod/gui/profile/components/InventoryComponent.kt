@@ -46,7 +46,6 @@ class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
     fun parseInv(inventory: Inventory?) = Window.enqueueRenderOperation {
         clearChildren()
         inventory?.run {
-            println("inv")
             for ((i, item) in items.withIndex()) {
                 addChild(SlotComponent(item?.asMinecraft).constrain {
                     x = ((i % 9) * (16 + 2)).pixels
@@ -54,7 +53,6 @@ class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
                 })
             }
         } ?: kotlin.run {
-            println("no inv")
             UIRoundedRectangle(5f).constrain {
                 width = 100.percent
                 height = 100.percent
