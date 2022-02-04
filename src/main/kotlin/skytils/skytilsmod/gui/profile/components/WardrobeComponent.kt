@@ -69,7 +69,9 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
                             x = CramSiblingConstraint(2f)
                             width = ChildBasedMaxSizeConstraint()
                             height = ChildBasedRangeConstraint()
-                        }.also { it.parseSlots(state.get()) } childOf wardrobeContainer
+                        }.apply {
+                            parseSlots(state.get())
+                        } childOf wardrobeContainer
                     }
                 }
             }
@@ -99,30 +101,6 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
                         x = if (vertical) 0.pixels else SiblingConstraint(2f)
                         y = if (vertical) SiblingConstraint(2f) else 0.pixels
                     }, children.size)
-                }
-            }
-        }
-
-        fun collapse(immediate: Boolean = false) {
-            children.forEach {
-                if (immediate) {
-                    it.setY(0.pixels)
-                } else {
-                    it.animate {
-                        setYAnimation(Animations.IN_OUT_CUBIC, 1f, 0.pixels)
-                    }
-                }
-            }
-        }
-
-        fun expand(immediate: Boolean = false) {
-            children.forEach {
-                if (immediate) {
-                    it.setY(SiblingConstraint())
-                } else {
-                    it.animate {
-                        setYAnimation(Animations.IN_OUT_CUBIC, 1f, SiblingConstraint())
-                    }
                 }
             }
         }
