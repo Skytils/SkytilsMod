@@ -53,6 +53,7 @@ class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalett
         x = CenterConstraint() coerceAtLeast SiblingConstraint()
         y = CenterConstraint()
         width = UMinecraft.getFontRenderer().getStringWidth(lore[0]).pixels
+        height = UMinecraft.getFontRenderer().FONT_HEIGHT.pixels
     } childOf itemTitle
 
     val contentContainer by UIContainer().constrain {
@@ -69,6 +70,7 @@ class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalett
 
     init {
         lore.drop(1).forEach { line ->
+            if (!line.startsWith("§5§o")) return@forEach
             if (line.stripControlCodes().isEmpty()) {
                 return@forEach
             }
