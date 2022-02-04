@@ -26,32 +26,44 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import gg.essential.universal.ChatColor
+import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.item.Inventory
 
 class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
     init {
-        inv.onSetValue {
-            Window.enqueueRenderOperation {
-                clearChildren()
-                inv.get()?.run {
-                    for ((i, item) in items.withIndex()) {
-                        addChild(SlotComponent(item?.asMinecraft).constrain {
-                            x = ((i % 9) * (16 + 2)).pixels
-                            y = ((i / 9) * (16 + 2)).pixels
-                        })
-                    }
-                } ?: kotlin.run {
-                    UIRoundedRectangle(5f).constrain {
-                        width = 100.percent
-                        height = 100.percent
-                        color = ChatColor.GRAY.color!!.constraint
-                    } childOf this
-                    UIText("Inventory api not enabled!").constrain {
-                        x = CenterConstraint()
-                        y = CenterConstraint()
-                    } childOf this
-                }
+        inv.onSetValue(::parseInv)
+        UIRoundedRectangle(5f).constrain {
+            width = 100.percent
+            height = 100.percent
+            color = VigilancePalette.getBackground().constraint
+        } childOf this
+        UIText("Loading...").constrain {
+            x = CenterConstraint()
+            y = CenterConstraint()
+        } childOf this
+    }
+
+    fun parseInv(inventory: Inventory?) = Window.enqueueRenderOperation {
+        clearChildren()
+        inventory?.run {
+            println("inv")
+            for ((i, item) in items.withIndex()) {
+                addChild(SlotComponent(item?.asMinecraft).constrain {
+                    x = ((i % 9) * (16 + 2)).pixels
+                    y = ((i / 9) * (16 + 2)).pixels
+                })
             }
+        } ?: kotlin.run {
+            println("no inv")
+            UIRoundedRectangle(5f).constrain {
+                width = 100.percent
+                height = 100.percent
+                color = VigilancePalette.getBackground().constraint
+            } childOf this
+            UIText("Inventory api not enabled!").constrain {
+                x = CenterConstraint()
+                y = CenterConstraint()
+            } childOf this
         }
     }
 }
