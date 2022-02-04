@@ -43,6 +43,7 @@ import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
 import skytils.skytilsmod.gui.profile.components.*
+import skytils.skytilsmod.gui.profile.states.alwaysMap
 import java.awt.Color
 import java.util.*
 
@@ -73,7 +74,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
     private val selection: State<Int> = BasicState(0)
     private val profileList: State<List<String>> =
         profiles.map { selection.set(0); it?.map { profile -> profile.cuteName } ?: listOf("None") }
-    private val profileState: State<Member?> = selection.zip(profiles).map { (selection, profiles) ->
+    private val profileState: State<Member?> = selection.zip(profiles).alwaysMap { (selection, profiles) ->
         profiles?.get(selection)?.members?.get(uuidState.get().nonDashedString())
     }
     private val gameProfileState: State<GameProfile?> = BasicState(null)
@@ -287,9 +288,9 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             height = 20.pixels()
         } childOf skillContainer
 
-    private val inventory = InventoryComponent(profileState.map { it?.inventory }).constrain {
+    private val inventory = InventoryComponent(profileState.alwaysMap { it?.inventory }).constrain {
         x = 5.percent()
-        y = basicYConstraint { runecrafting.getTop() + 40 }
+        y = SiblingConstraint(5f)
         width = (9 * (16 + 2)).pixels
         height = (4 * (16 + 2)).pixels
     } childOf contentContainer
