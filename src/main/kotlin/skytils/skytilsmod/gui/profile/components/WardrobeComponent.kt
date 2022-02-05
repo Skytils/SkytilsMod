@@ -20,11 +20,13 @@ package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
+import gg.essential.elementa.components.UIRoundedRectangle
+import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.*
-import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
+import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.item.Inventory
 import skytils.skytilsmod.gui.profile.states.alwaysMap
@@ -65,20 +67,32 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
                             )
                         }
                     }.forEach { state ->
+                        if (state.get().items.any { it == null }) return@forEach
                         ArmorComponent(state, true).constrain {
                             x = CramSiblingConstraint(2f)
+                            y = CramSiblingConstraint(2f)
                             width = ChildBasedMaxSizeConstraint()
                             height = ChildBasedRangeConstraint()
                         }.apply {
                             parseSlots(state.get())
                         } childOf wardrobeContainer
                     }
+                } ?: kotlin.run {
+                    val rectangle = UIRoundedRectangle(5f).constrain {
+                        width = 100.percent
+                        height = 70.pixels
+                        color = VigilancePalette.getBackground().constraint
+                    } childOf wardrobeContainer
+                    UIText("Wardrobe API disabled!").constrain {
+                        x = CenterConstraint()
+                        y = CenterConstraint()
+                    } childOf rectangle
                 }
             }
         }
         constrain {
             width = ChildBasedSizeConstraint()
-            height = ChildBasedSizeConstraint()
+            height = ChildBasedRangeConstraint()
         }
 
     }
