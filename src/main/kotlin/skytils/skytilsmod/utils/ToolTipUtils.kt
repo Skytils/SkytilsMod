@@ -100,23 +100,23 @@ fun <T : UIComponent> T.addTooltip(tooltip: UIComponent) = apply {
             tooltip.resetTooltip()
             tooltip childOf Window.of(this)
             tooltip.setFloating(true)
-            val scroll: UIComponent.(UIScrollEvent) -> Unit = { event ->
-                Window.enqueueRenderOperation {
-                    tooltip.constraints.y += (if (event.delta > 0) 10 else -10).pixels
-                }
+        }
+        val scroll: UIComponent.(UIScrollEvent) -> Unit = { event ->
+            Window.enqueueRenderOperation {
+                tooltip.constraints.y += (if (event.delta > 0) 10 else -10).pixels
             }
-            Window.of(this).onMouseScroll(scroll)
-            val unregisterOnRemoved = this.onRemoved {
-                unregister?.invoke()
-                unregister = null
-            }
-            unregister = {
-                unregisterOnRemoved.invoke()
-                Window.enqueueRenderOperation {
-                    Window.of(this).mouseScrollListeners.remove(scroll)
-                    tooltip.setFloating(false)
-                    tooltip.hide(true)
-                }
+        }
+        Window.of(this).onMouseScroll(scroll)
+        val unregisterOnRemoved = this.onRemoved {
+            unregister?.invoke()
+            unregister = null
+        }
+        unregister = {
+            unregisterOnRemoved.invoke()
+            Window.enqueueRenderOperation {
+                Window.of(this).mouseScrollListeners.remove(scroll)
+                tooltip.setFloating(false)
+                tooltip.hide(true)
             }
         }
     }
