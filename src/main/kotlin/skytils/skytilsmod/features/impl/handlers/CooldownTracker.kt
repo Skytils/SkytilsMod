@@ -22,6 +22,7 @@ import com.google.gson.JsonObject
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
@@ -137,7 +138,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         val cooldowns = mutableMapOf<String, Long>()
 
         fun updateCooldownReduction() {
-            val mages = DungeonListener.team.filter { it.dungeonClass == DungeonListener.DungeonClass.MAGE }
+            val mages = DungeonListener.team.filter { it.dungeonClass == DungeonClass.MAGE }
             val self = mages.find { it.playerName == mc.session.username } ?: return
             val soloMage = mages.size == 1
             cooldownReduction = ((if (soloMage) 50 else 25) + floor(self.classLevel / 2.0))

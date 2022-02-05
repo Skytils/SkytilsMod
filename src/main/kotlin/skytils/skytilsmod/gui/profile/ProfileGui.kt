@@ -37,6 +37,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import skytils.hylin.extension.getLatestSkyblockProfile
 import skytils.hylin.extension.nonDashedString
+import skytils.hylin.player.Player
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Profile
 import skytils.hylin.skyblock.Skills
@@ -49,18 +50,19 @@ import java.util.*
 
 class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
-        it.onSetValue {
-            var b: List<Profile>? = null
-            var c = 0
+        it.onSetValue { it ->
             val profile = GameProfile(it, "")
             Skytils.launch {
                 launch {
-                    b = hylinAPI.getSkyblockProfiles(uuid).await()
-                    val e = b?.getLatestSkyblockProfile(uuid)
-                    c = b?.indexOf(e) ?: 0
-                }.invokeOnCompletion {
-                    profiles.set(b)
-                    selection.set(c)
+                    hylinAPI.getPlayer(uuid).whenComplete {
+                        hypixelPlayer.set(it)
+                    }
+                }
+                launch {
+                    hylinAPI.getSkyblockProfiles(uuid).whenComplete { list ->
+                        profiles.set(list)
+                        selection.set(list.indexOf(list.getLatestSkyblockProfile(uuid)))
+                    }
                 }
                 launch {
                     UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
@@ -70,6 +72,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             }
         }
     }
+    private val hypixelPlayer: State<Player?> = BasicState(null)
     private val profiles: State<List<Profile>?> = BasicState(null)
     private val selection: State<Int> = BasicState(0)
     private val profileList: State<List<String>> =
@@ -110,7 +113,9 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             height = 25.pixels()
         } childOf window
 
-    private val profilesDropdown by DropdownComponent(0, profileList.get(), optionPadding = 2.5f).bindOptions(profileList)
+    private val profilesDropdown by DropdownComponent(0, profileList.get(), optionPadding = 2.5f).bindOptions(
+        profileList
+    )
         .bindSelection(selection)
         .constrain {
             x = 10.pixels(true)
@@ -305,6 +310,13 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
         y = SiblingConstraint(5f)
         width = (9 * (16 + 2)).pixels
         height = (7 * (16 + 2)).pixels
+    } childOf contentContainer
+
+    private val dungeons = DungeonsComponent(hypixelPlayer, profileState).constrain {
+        x = 5.percent()
+        y = SiblingConstraint(5f)
+        width = RelativeConstraint()
+        height = ChildBasedRangeConstraint() + 5.pixels
     } childOf contentContainer
 
     init {
