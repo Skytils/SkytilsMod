@@ -76,10 +76,14 @@ object SplashProgressTransformer {
 
     @JvmStatic
     fun setForgeGif(resourceLocation: ResourceLocation): ResourceLocation {
-        if (Utils.noSychic) return resourceLocation
         val cal = GregorianCalendar.getInstance()
         val month = cal.get(GregorianCalendar.MONTH) + 1
         val date = cal.get(GregorianCalendar.DATE)
+        if (month == 2 && date == 5) return ResourceLocation(
+            "skytils",
+            "partysychic.gif"
+        )
+        if (Utils.noSychic) return resourceLocation
         if (month == 12 && date in 24..25) return ResourceLocation(
             "skytils",
             "christmassychicpet.gif"
