@@ -327,6 +327,13 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
         height = ChildBasedRangeConstraint() + 5.pixels
     } childOf contentContainer
 
+    private val slayer = SlayerComponent(profileState).constrain {
+        x = 5.percent()
+        y = SiblingConstraint(5f)
+        width = RelativeConstraint()
+        height = ChildBasedRangeConstraint() + 5.pixels
+    } childOf contentContainer
+
     init {
         if (EssentialAPI.getMinecraftUtil().isDevelopment()) {
             Inspector(window).constrain {
