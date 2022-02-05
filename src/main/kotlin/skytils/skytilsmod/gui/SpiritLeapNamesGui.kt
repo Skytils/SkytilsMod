@@ -28,16 +28,16 @@ import gg.essential.elementa.effects.RecursiveFadeEffect
 import gg.essential.universal.UGraphics
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.utils.onLeftClick
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.SpiritLeap
 import skytils.skytilsmod.gui.components.SimpleButton
-import skytils.skytilsmod.listeners.DungeonListener
 import java.awt.Color
 
 class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
-    private val classCheckboxes = HashMap<DungeonListener.DungeonClass, UIContainer>()
+    private val classCheckboxes = HashMap<DungeonClass, UIContainer>()
 
     init {
         UIText("Spirit Leap Names").childOf(window).constrain {
@@ -85,8 +85,8 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = ChildBasedSizeConstraint()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
         val longestTextConstraint =
-            (DungeonListener.DungeonClass.values().maxOf { UGraphics.getStringWidth(it.className) } + 7).pixels()
-        for ((index, dClass) in DungeonListener.DungeonClass.values().withIndex()) {
+            (DungeonClass.values().maxOf { UGraphics.getStringWidth(it.className) } + 7).pixels()
+        for ((index, dClass) in DungeonClass.values().withIndex()) {
 
             val text = UIText(dClass.className).constrain {
                 x = 0.pixels()
@@ -99,7 +99,7 @@ class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
 
             val container = UIContainer().childOf(checkboxes).addChildren(text, checkbox).constrain {
                 x = 4.pixels()
-                y = RelativeConstraint(1f / DungeonListener.DungeonClass.values().size * index)
+                y = RelativeConstraint(1f / DungeonClass.values().size * index)
                 width = longestTextConstraint + checkbox.getWidth().pixels()
                 height = ChildBasedSizeConstraint()
             } as UIContainer

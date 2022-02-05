@@ -26,6 +26,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.hylin.skyblock.item.Tier
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -280,22 +281,4 @@ object DungeonListener {
 
         fun canRender() = player != null && player!!.health > 0 && !dead
     }
-
-    @Suppress("unused")
-    enum class DungeonClass(val className: String) {
-        ARCHER("Archer"),
-        BERSERK("Berserk"),
-        MAGE("Mage"),
-        HEALER("Healer"),
-        TANK("Tank"),
-        EMPTY("Empty");
-
-        companion object {
-            fun getClassFromName(name: String): DungeonClass {
-                return values().find { it.className.lowercase() == name.lowercase() }
-                    ?: throw IllegalArgumentException("No class could be found for the name $name")
-            }
-        }
-    }
-
 }
