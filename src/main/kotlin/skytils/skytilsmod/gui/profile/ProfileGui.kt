@@ -23,6 +23,7 @@ import gg.essential.api.EssentialAPI
 import gg.essential.api.gui.buildEmulatedPlayer
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
+import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.inspector.Inspector
@@ -144,14 +145,21 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
         } childOf playerContainer
 
     // Main Section
-
-    private val contentContainer by UIBlock(Color(0, 0, 0, 100))
+    private val contentBlock by UIBlock(Color(0, 0, 0, 100))
         .constrain {
             x = CramSiblingConstraint()
             y = CramSiblingConstraint()
             width = 65.percent()
             height = basicHeightConstraint { window.getHeight() - 25f }
+        } childOf window
 
+    private val contentContainer by ScrollComponent()
+        .constrain {
+            x = CopyConstraintFloat() boundTo contentBlock
+            y = CopyConstraintFloat() boundTo contentBlock
+            width = CopyConstraintFloat() boundTo contentBlock
+            height = CopyConstraintFloat() boundTo contentBlock
+            color = Color(0, 0, 0, 100).toConstraint()
         } childOf window
 
     // Skills
