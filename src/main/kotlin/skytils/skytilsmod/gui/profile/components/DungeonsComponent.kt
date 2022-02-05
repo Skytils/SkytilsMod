@@ -201,7 +201,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
                     y = SiblingConstraint(5f)
                 } childOf floors
             }
-            if (masterData != null && highestMasterFloor != null) for (i in 0..highestMasterFloor) {
+            if (masterData != null && highestMasterFloor != null) for (i in 1..highestMasterFloor) {
                 DungeonFloorComponent(masterData, i).constrain {
                     x = SiblingConstraint(5f)
                     y = SiblingConstraint(5f)
