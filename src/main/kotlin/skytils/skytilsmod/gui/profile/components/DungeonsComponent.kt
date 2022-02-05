@@ -173,7 +173,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
 
             val highestFloorBeaten by UIText("Highest Floor Beaten: ${highestFloor?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}").constrain {
                 x = 0.pixels
-                y = 5.pixels
+                y = SiblingConstraint(5f)
             } childOf catacombs
             val highestMasterFloorBeaten by UIText("Highest Master Floor Beaten: ${highestMasterFloor?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}").constrain {
                 x = 0.pixels
