@@ -92,7 +92,7 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
         }
         constrain {
             width = ChildBasedSizeConstraint()
-            height = ChildBasedRangeConstraint()
+            height = ChildBasedRangeConstraint() coerceAtLeast 88.pixels
         }
 
     }
