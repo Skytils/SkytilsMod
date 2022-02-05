@@ -45,7 +45,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
         dungeonBase.fastestTimeSPlus?.get(floor)
             ?.apply { pairs.add("Fastest Time S+" to timeFormat()) }
 
-        UIWrappedText(pairs.joinToString {
+        UIWrappedText(pairs.joinToString("\n") {
             "§7${it.first}: §f${it.second}"
         }).constrain {
             x = 5.pixels
