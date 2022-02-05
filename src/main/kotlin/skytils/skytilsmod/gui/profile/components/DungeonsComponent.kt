@@ -189,22 +189,26 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
             val floors by UIContainer().constrain {
                 x = 0.pixels
                 y = SiblingConstraint(10f)
+                width = RelativeConstraint()
+                height = ChildBasedSizeConstraint()
             } childOf catacombs
             val masterFloors by UIContainer().constrain {
                 x = 0.pixels
                 y = SiblingConstraint(5f)
+                width = RelativeConstraint()
+                height = ChildBasedSizeConstraint()
             } childOf catacombs
 
             if (normalData != null && highestFloor != null) for (i in 0..highestFloor) {
                 DungeonFloorComponent(normalData, i).constrain {
-                    x = SiblingConstraint(5f)
-                    y = SiblingConstraint(5f)
+                    x = CramSiblingConstraint(5f)
+                    y = CramSiblingConstraint(5f)
                 } childOf floors
             }
             if (masterData != null && highestMasterFloor != null) for (i in 1..highestMasterFloor) {
                 DungeonFloorComponent(masterData, i).constrain {
-                    x = SiblingConstraint(5f)
-                    y = SiblingConstraint(5f)
+                    x = CramSiblingConstraint(5f)
+                    y = CramSiblingConstraint(5f)
                 } childOf masterFloors
             }
             needsSetup = false
