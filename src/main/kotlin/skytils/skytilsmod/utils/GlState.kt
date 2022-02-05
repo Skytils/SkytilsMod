@@ -48,6 +48,7 @@ object GlState {
         blendSrc = GL11.glGetInteger(GL11.GL_BLEND_SRC)
         blendDst = GL11.glGetInteger(GL11.GL_BLEND_DST)
         alphaState = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
+        depthState = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
         if (newBlend) {
             blendSrc = GL11.glGetInteger(GL14.GL_BLEND_SRC_RGB)
             blendDst = GL11.glGetInteger(GL14.GL_BLEND_DST_RGB)
