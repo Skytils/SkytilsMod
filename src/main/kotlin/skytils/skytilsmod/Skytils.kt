@@ -297,6 +297,8 @@ class Skytils {
         MayorInfo.fetchMayorData()
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
+
+        ModChecker.checkModdedForge()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
