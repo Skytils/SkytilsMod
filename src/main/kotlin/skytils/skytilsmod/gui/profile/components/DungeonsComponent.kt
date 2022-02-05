@@ -64,14 +64,15 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
             val profile = profileState.get()!!
             clearChildren()
             classes childOf this
+            catacombs childOf this
 
             val classesTitle by UIText("Classes: ").constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = 5.pixels
             } childOf classes
 
             val selectedClass by UIText("Selected Class: ${profile.dungeons.selectedClass?.className ?: "None"}").constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
             } childOf classes
 
@@ -81,7 +82,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
                 DungeonClass.HEALER,
                 profileState
             ).constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
                 height = 20.pixels
                 width = 42.5.percent
@@ -105,7 +106,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
                 DungeonClass.BERSERK,
                 profileState
             ).constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
                 height = 20.pixels
                 width = 42.5.percent
@@ -129,7 +130,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
                 DungeonClass.TANK,
                 profileState
             ).constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
                 height = 20.pixels
                 width = 42.5.percent
@@ -151,17 +152,17 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
             }
 
             val cataTitle by UIText("Catacombs: ").constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = 5.pixels
             } childOf catacombs
 
             val cata by XPComponent(
-                ItemComponent(ItemStack(Items.skull, 1)),
+                ItemComponent(ItemStack(Items.skull, 1, 1)),
                 "Catacombs ${cataXp.first}",
                 progress,
                 cataXp.second.toLong()
             ).constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
                 height = 20.pixels
                 width = 42.5.percent
@@ -171,37 +172,39 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
             val highestMasterFloor = masterData?.highestCompletion
 
             val highestFloorBeaten by UIText("Highest Floor Beaten: ${highestFloor?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}").constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = 5.pixels
             } childOf catacombs
             val highestMasterFloorBeaten by UIText("Highest Master Floor Beaten: ${highestMasterFloor?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}").constrain {
-                x = 5.percent
-                y = 5.pixels
+                x = 0.pixels
+                y = SiblingConstraint(5f)
             } childOf catacombs
             val secretsFound by UIText("${
                 playerState.map { it?.achievements?.getOrDefault("skyblock_treasure_hunter", 0) }
                     .getOrDefault(0)
             }").constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
             } childOf catacombs
             val floors by UIContainer().constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(10f)
             } childOf catacombs
             val masterFloors by UIContainer().constrain {
-                x = 5.percent
+                x = 0.pixels
                 y = SiblingConstraint(5f)
             } childOf catacombs
 
             if (normalData != null && highestFloor != null) for (i in 0..highestFloor) {
                 DungeonFloorComponent(normalData, i).constrain {
                     x = SiblingConstraint(5f)
+                    y = SiblingConstraint(5f)
                 } childOf floors
             }
             if (masterData != null && highestMasterFloor != null) for (i in 0..highestMasterFloor) {
                 DungeonFloorComponent(masterData, i).constrain {
                     x = SiblingConstraint(5f)
+                    y = SiblingConstraint(5f)
                 } childOf masterFloors
             }
             needsSetup = false
