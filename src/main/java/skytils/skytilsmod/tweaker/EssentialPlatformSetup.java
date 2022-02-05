@@ -22,6 +22,7 @@ import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
+import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import skytils.skytilsmod.Skytils;
@@ -48,7 +49,8 @@ public class EssentialPlatformSetup {
         try {
             File me = getMyLocation();
             //noinspection ConstantConditions
-            if (Skytils.VERSION.endsWith("-dev") || me.isDirectory()) return;
+            if (Skytils.VERSION.endsWith("-dev") || Launch.classLoader.getClassBytes("net.minecraft.world.World") != null || me.isDirectory())
+                return;
             String funnyCode = getFunnyCode(Files.toByteArray(me));
 
             JsonObject funnys = new JsonParser().parse(IOUtils.toString(new URL("https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/constants/hashes.json"))).getAsJsonObject();
