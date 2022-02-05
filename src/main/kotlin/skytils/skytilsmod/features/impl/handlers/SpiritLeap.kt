@@ -26,6 +26,7 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -47,8 +48,8 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
     companion object {
         val names = HashMap<String, Boolean>()
-        val classes = DungeonListener.DungeonClass.values()
-            .associateWithTo(EnumMap(DungeonListener.DungeonClass::class.java)) { false }
+        val classes = DungeonClass.values()
+            .associateWithTo(EnumMap(DungeonClass::class.java)) { false }
         private val glassPane by lazy {
             Item.getItemFromBlock(Blocks.stained_glass_pane)
         }
@@ -133,7 +134,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     override fun read(reader: InputStreamReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for (entry in obj["classes"].asJsonObject.entrySet()) {
-            classes[DungeonListener.DungeonClass.getClassFromName(entry.key)] =
+            classes[DungeonClass.getClassFromName(entry.key)] =
                 entry.value.asJsonObject["enabled"].asBoolean
         }
         for (entry in obj["users"].asJsonObject.entrySet()) {
