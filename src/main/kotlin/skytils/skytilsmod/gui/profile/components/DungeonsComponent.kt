@@ -32,6 +32,7 @@ import net.minecraft.potion.Potion
 import skytils.hylin.player.Player
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.dungeons.DungeonClass
+import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
 import java.awt.Color
@@ -41,13 +42,13 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
 
     val classes by UIContainer().constrain {
         width = 100.percent
-        height = ChildBasedRangeConstraint() + 5.pixels
+        height = FixedChildBasedRangeConstraint() + 5.pixels
     } childOf this
 
     val catacombs by UIContainer().constrain {
         y = SiblingConstraint(2.5f)
         width = RelativeConstraint()
-        height = ChildBasedRangeConstraint()
+        height = FixedChildBasedRangeConstraint()
     } childOf this
 
     // Classes stuff

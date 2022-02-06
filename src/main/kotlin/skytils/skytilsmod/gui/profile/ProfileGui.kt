@@ -45,6 +45,7 @@ import skytils.hylin.skyblock.Profile
 import skytils.hylin.skyblock.Skills
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
+import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import skytils.skytilsmod.gui.profile.components.*
 import skytils.skytilsmod.gui.profile.states.alwaysMap
 import skytils.skytilsmod.gui.profile.states.alwaysUpdateState
@@ -201,7 +202,7 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
             x = 0.pixels()
             y = 0.pixels()
             width = RelativeConstraint()
-            height = ChildBasedRangeConstraint() + 5.pixels
+            height = FixedChildBasedRangeConstraint() + 5.pixels
         } childOf contentContainer
 
     private val taming = SkillComponent(
@@ -357,14 +358,14 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
         x = 0.pixels
         y = SiblingConstraint(5f)
         width = RelativeConstraint()
-        height = ChildBasedRangeConstraint()
+        height = FixedChildBasedRangeConstraint()
     } childOf contentContainer
 
     private val slayer = SlayerComponent(profileState).constrain {
         x = 5.percent()
         y = SiblingConstraint(5f)
         width = 90.percent
-        height = ChildBasedRangeConstraint() + 5.pixels
+        height = FixedChildBasedRangeConstraint() + 5.pixels
     } childOf contentContainer
 
     init {
