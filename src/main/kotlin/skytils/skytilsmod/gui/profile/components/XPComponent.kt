@@ -45,18 +45,18 @@ open class XPComponent(
     private var percentState: State<Float> = BasicState(percent)
     private var overflowState: State<Long> = BasicState(overflow)
 
-    fun bindText(newState: State<String>) {
+    fun bindText(newState: State<String>) = apply {
         textState = newState
         textLabel.bindText(textState)
     }
 
-    fun bindPercent(newState: State<Float>) {
+    fun bindPercent(newState: State<Float>) = apply {
         percentState = newState
         progress.constraints.width =
             (background.constraints.width - imageContainer.constraints.width) * (percentState as State<Number>) + imageContainer.constraints.width
     }
 
-    fun bindOverflow(newState: State<Long>) {
+    fun bindOverflow(newState: State<Long>) = apply {
         overflowState = newState
         overflowText.bindText(overflowState.map { NumberUtil.format(it) })
     }

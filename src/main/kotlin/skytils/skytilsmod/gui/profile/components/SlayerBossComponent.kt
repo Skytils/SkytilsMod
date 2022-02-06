@@ -20,10 +20,10 @@ package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.CramSiblingConstraint
+import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
+import gg.essential.universal.UMinecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import skytils.hylin.skyblock.slayer.RevenantSlayer
@@ -75,12 +75,14 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
         if (level == xpSet.size) 1f else (percent % 1).toFloat()
     }
 
+    val textWidth = UMinecraft.getFontRenderer().getStringWidth("Tier III").pixels
+
     val xpComponent by XPComponent(
         ItemComponent(stack)
     ).constrain {
         x = 5.pixels
         y = 5.pixels
-        width = 42.5.percent()
+        width = ((textWidth + 2.5.pixels) * 4 + textWidth)
         height = 20.pixels()
     }.apply {
         bindText(levelData.map { (level, _, _) ->
@@ -91,8 +93,9 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     } childOf this
 
     val t1Kills by UIWrappedText(centered = true).constrain {
-        x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
+        x = 5.pixels
+        y = SiblingConstraint(2.5f)
+        width = textWidth
     }.bindText(slayer.map {
         """
             #Tier I
@@ -101,18 +104,20 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }) childOf this
 
     val t2Kills by UIWrappedText(centered = true).constrain {
-        x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
+        x = SiblingConstraint(2.5f) boundTo t1Kills
+        y = CopyConstraintFloat() boundTo t1Kills
+        width = textWidth
     }.bindText(slayer.map {
         """
-            #Tier I
+            #Tier II
             #${it?.t1Kills ?: 0}
         """.trimMargin("#")
     }) childOf this
 
     val t3Kills by UIWrappedText(centered = true).constrain {
-        x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
+        x = SiblingConstraint(2.5f) boundTo t2Kills
+        y = CopyConstraintFloat() boundTo t1Kills
+        width = textWidth
     }.bindText(slayer.map {
         """
             #Tier III
@@ -121,8 +126,9 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }) childOf this
 
     val t4Kills by UIWrappedText(centered = true).constrain {
-        x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
+        x = SiblingConstraint(2.5f) boundTo t3Kills
+        y = CopyConstraintFloat() boundTo t1Kills
+        width = textWidth
     }.bindText(slayer.map {
         """
             #Tier IV
@@ -131,8 +137,9 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }) childOf this
 
     val t5Kills by UIWrappedText(centered = true).constrain {
-        x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
+        x = SiblingConstraint(2.5f) boundTo t4Kills
+        y = CopyConstraintFloat() boundTo t1Kills
+        width = textWidth
     }.bindText(slayer.map {
         if (it is RevenantSlayer) {
             """
@@ -144,8 +151,8 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
 
     init {
         constrain {
-            width = ChildBasedSizeConstraint(5f)
-            height = ChildBasedSizeConstraint(5f)
+            width = xpComponent.constraints.width + 10.pixels
+            height = ChildBasedRangeConstraint() + 10.pixels
         }
     }
 }
