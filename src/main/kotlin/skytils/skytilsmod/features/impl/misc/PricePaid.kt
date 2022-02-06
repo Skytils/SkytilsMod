@@ -34,9 +34,8 @@ import java.io.OutputStreamWriter
 import java.util.*
 
 object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
-    private val prices = mutableMapOf<UUID, Double>()
+    val prices = mutableMapOf<UUID, Double>()
     private val coinRegex = Regex("(?:§6)?([\\d,]+) coins", RegexOption.IGNORE_CASE)
-    private val boughtRegex = Regex("§r§eYou purchased (?<item>.+) §r§efor §r§6(?<coins>[\\d,.]+) coins§r§e!§r")
     private var lastBought: Triple<String, UUID, Double>? = null
     private val junkRegex = Regex("[,.]")
 
