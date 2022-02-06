@@ -44,6 +44,7 @@ import skytils.skytilsmod.gui.elements.CleanButton
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.NumberUtil
+import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -166,8 +167,8 @@ class AuctionPriceOverlay {
                     // this might actually have multiple items as the price
                     val valuePer = AuctionData.lowestBINs[auctionIdentifier]
                     if (valuePer != null) fr.drawString(
-                        "Clean Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * lastAuctionedStack!!.stackSize) + if (lastAuctionedStack!!.stackSize > 1) " §7(" + NumberUtil.nf.format(
-                            valuePer
+                        "Clean Lowest BIN Price: §b" + NumberUtil.nf.format((valuePer * lastAuctionedStack!!.stackSize).toInt()) + if (lastAuctionedStack!!.stackSize > 1) " §7(" + NumberUtil.nf.format(
+                            valuePer.roundToPrecision(2)
                         ) + " each§7)" else "",
                         width / 2f,
                         height / 2f - 50,
