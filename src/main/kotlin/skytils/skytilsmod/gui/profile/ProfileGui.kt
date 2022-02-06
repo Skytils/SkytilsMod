@@ -23,12 +23,11 @@ import gg.essential.api.EssentialAPI
 import gg.essential.api.gui.buildEmulatedPlayer
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.ScrollComponent
-import gg.essential.elementa.components.UIBlock
-import gg.essential.elementa.components.UIContainer
+import gg.essential.elementa.components.*
 import gg.essential.elementa.components.inspector.Inspector
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
+import gg.essential.elementa.font.DefaultFonts
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
@@ -119,6 +118,18 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
             width = RelativeConstraint()
             height = 25.pixels()
         } childOf window
+
+    private val logo by UIImage.ofResourceCached("/assets/skytils/logo.png").constrain {
+        x = 2.5.pixels
+        y = CenterConstraint()
+        width = 20.pixels
+        height = AspectConstraint()
+    } childOf navBar
+
+    private val navText by UIText("Skytils Profile Viewer").constrain {
+        x = SiblingConstraint(5f)
+        y = CenterConstraint()
+    } childOf navBar
 
     private val nameState: State<String> = BasicState(name).also { state ->
         state.onSetValue { name ->
