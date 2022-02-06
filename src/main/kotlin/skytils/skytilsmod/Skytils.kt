@@ -75,6 +75,7 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
+import skytils.skytilsmod.features.impl.trackers.impl.DupeTracker
 import skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
 import skytils.skytilsmod.features.impl.trackers.impl.MythologicalTracker
 import skytils.skytilsmod.gui.OptionsGui
@@ -209,6 +210,7 @@ class Skytils {
             DungeonFeatures(),
             DungeonMap(),
             DungeonTimer(),
+            DupeTracker,
             EnchantNames(),
             EnterToConfirmSignPopup(),
             FarmingFeatures(),
