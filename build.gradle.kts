@@ -82,7 +82,7 @@ dependencies {
     }
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
-    shadowMe("com.github.Skytils:Hylin:b7c6f75f9a") {
+    shadowMe("com.github.Skytils:Hylin:5c43ef95bf") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
