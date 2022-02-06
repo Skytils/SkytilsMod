@@ -29,6 +29,7 @@ import gg.essential.elementa.state.State
 import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.item.Inventory
+import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import skytils.skytilsmod.gui.profile.states.alwaysMap
 
 class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
@@ -40,14 +41,14 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
                 ArrayList(4)
             )
         }, false).constrain {
-            width = ChildBasedRangeConstraint()
+            width = FixedChildBasedRangeConstraint()
             height = ChildBasedMaxSizeConstraint()
         } childOf this
     private val wardrobeContainer = UIContainer().constrain {
         x = 0.pixels
         y = SiblingConstraint(2f)
         width = 40.percentOfWindow
-        height = ChildBasedRangeConstraint()
+        height = FixedChildBasedRangeConstraint()
     } childOf this
 
 
@@ -72,7 +73,7 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
                             x = CramSiblingConstraint(2f)
                             y = CramSiblingConstraint(2f)
                             width = ChildBasedMaxSizeConstraint()
-                            height = ChildBasedRangeConstraint()
+                            height = FixedChildBasedRangeConstraint()
                         }.apply {
                             parseSlots(state.get())
                         } childOf wardrobeContainer
@@ -92,7 +93,7 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
         }
         constrain {
             width = ChildBasedSizeConstraint()
-            height = ChildBasedRangeConstraint() coerceAtLeast 88.pixels
+            height = FixedChildBasedRangeConstraint() coerceAtLeast 88.pixels
         }
 
     }

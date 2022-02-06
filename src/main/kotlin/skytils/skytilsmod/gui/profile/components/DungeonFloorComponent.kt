@@ -27,13 +27,14 @@ import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import skytils.hylin.skyblock.dungeons.DungeonBase
+import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import kotlin.time.Duration
 
 class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRoundedRectangle(5f) {
     init {
         constrain {
             width = ChildBasedMaxSizeConstraint()
-            height = ChildBasedRangeConstraint() + 10.pixels
+            height = FixedChildBasedRangeConstraint() + 10.pixels
         }
         val pairs = arrayListOf<Pair<String, Any>>()
         dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
