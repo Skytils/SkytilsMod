@@ -25,9 +25,7 @@ fun commitArson() = overwrite {
     methodName = "douse"
     methodDesc = "(Ljava/io/File;)V"
 
-    codeBlock {
-        insnList {
-            methodReturn()
-        }
+    insnList {
+        methodReturn()
     }
 }
