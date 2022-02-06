@@ -536,7 +536,7 @@ object RenderUtil {
     private fun renderRarity(xPos: Int, yPos: Int, itemStack: ItemStack?) {
         if (itemStack == null) return
         val rarity = ItemUtil.getRarity(itemStack)
-        if (rarity != null) {
+        if (rarity != ItemRarity.NONE) {
             val alpha = Skytils.config.itemRarityOpacity
 
             if (Skytils.config.itemRarityShape < 5) {
