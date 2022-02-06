@@ -921,10 +921,7 @@ class SlayerFeatures {
                         false
                     }
                     var isSlayer = 0
-                    val currentTier =
-                        sidebarLines.find { it.startsWith("Revenant Horror ") }
-                            ?.substringAfter("Revenant Horror ")
-                            ?: Skytils.config.slayerCarryMode.toRoman()
+                    val currentTier = getTier("Revenant Horror")
                     for (nearby in nearbyArmorStands) {
                         if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
                         if (nearby.displayName.formattedText.startsWith("§c☠ §bRevenant Horror") ||
@@ -1005,9 +1002,7 @@ class SlayerFeatures {
                     if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
                     if (nearby.displayName.formattedText.startsWith(nameStart)
                     ) {
-                        val currentTier =
-                            sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
-                                ?: Skytils.config.slayerCarryMode.toRoman()
+                        val currentTier = getTier(name)
                         val expectedHealth =
                             (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
                                 " "
@@ -1039,6 +1034,11 @@ class SlayerFeatures {
                     slayerTimerEntity = potentialTimerEntities.first()
                 }
             }
+        }
+
+        private fun getTier(name: String): String {
+            return sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
+                ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
         }
 
 

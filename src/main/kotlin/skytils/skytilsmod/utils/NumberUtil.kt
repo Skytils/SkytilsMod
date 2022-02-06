@@ -152,7 +152,8 @@ object NumberUtil {
     }
 
     fun Int.toRoman(): String {
-        val l: Int = romanSymbols.floorKey(this)
+        if (this <= 0) error("$this must be positive!")
+        val l = romanSymbols.floorKey(this)
         return if (this == l) {
             romanSymbols[this]!!
         } else romanSymbols[l] + (this - l).toRoman()
