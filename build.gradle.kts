@@ -48,6 +48,7 @@ minecraft {
             "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
             "-Delementa.dev=true",
             "-Delementa.debug=true",
+            "-Delementa.invalid_usage=warn",
             "-Dasmhelper.verbose=true"
         )
     )
