@@ -1362,6 +1362,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var autoCopyVeryRareDrops = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Dupe Tracker",
+        description = "Tries to track duplicated items on the auction house.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var dupeTracker = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",
         description = "Counts down the time until the Endstone Protector spawns.",
         category = "Miscellaneous", subcategory = "Other"
