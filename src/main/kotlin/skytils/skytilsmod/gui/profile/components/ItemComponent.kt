@@ -19,6 +19,8 @@
 package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.state.BasicState
+import gg.essential.elementa.state.State
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import net.minecraft.item.Item
@@ -26,8 +28,9 @@ import net.minecraft.item.ItemStack
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.RenderUtil
 
-class ItemComponent(val item: ItemStack) : UIComponent() {
+class ItemComponent(val state: State<ItemStack>) : UIComponent() {
 
+    constructor(stack: ItemStack) : this(BasicState(stack))
     constructor(item: Item, metadata: Int = 0) : this(ItemStack(item, 1, metadata))
 
     override fun draw(matrixStack: UMatrixStack) {
@@ -37,6 +40,7 @@ class ItemComponent(val item: ItemStack) : UIComponent() {
         matrixStack.scale(getWidth() / 16f, getHeight() / 16f, 0f)
         UGraphics.color4f(1f, 1f, 1f, 1f)
         matrixStack.runWithGlobalState {
+            val item = state.get()
             RenderUtil.renderItem(item, 0, 0)
             mc.renderItem.renderItemOverlayIntoGUI(
                 item.item.getFontRenderer(item) ?: mc.fontRendererObj,
