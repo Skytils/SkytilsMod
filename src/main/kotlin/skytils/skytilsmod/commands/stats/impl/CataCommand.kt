@@ -231,7 +231,7 @@ object CataCommand : StatCommand("skytilscata") {
             append("%02d".format(seconds))
             if (nanoseconds != 0) {
                 append('.')
-                append("%03d".format(nanoseconds / 1e6))
+                append("%03f".format(nanoseconds / 1e6))
             }
         }
     }
