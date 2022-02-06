@@ -18,42 +18,45 @@
 
 package skytils.skytilsmod.tweaker;
 
-import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 public class EssentialPlatformSetup {
     @SuppressWarnings("unused")
     private static final String e = "Please don't tell anyone this exists if you see it, thanks <3";
+    private static boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
 
     public static void setup() {
         if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
             return;
         try {
             File me = getMyLocation();
+            if (isDev) System.out.println(me);
             //noinspection ConstantConditions
             if (Skytils.VERSION.endsWith("-dev") || Launch.classLoader.getClassBytes("net.minecraft.world.World") != null || me.isDirectory())
                 return;
-            String funnyCode = getFunnyCode(Files.toByteArray(me));
+            String funnyCode = DigestUtils.sha256Hex(new FileInputStream(me)).toUpperCase(Locale.ENGLISH);
+            if (isDev) System.out.println(funnyCode);
 
             JsonObject funnys = new JsonParser().parse(IOUtils.toString(new URL("https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/constants/hashes.json"))).getAsJsonObject();
+            if (isDev) System.out.println(funnys);
             if (!funnys.has(Skytils.VERSION)) loadEssential();
             if (!funnys.get(Skytils.VERSION).getAsString().equalsIgnoreCase(funnyCode)) loadEssential();
         } catch (IOException ignored) {
@@ -65,10 +68,6 @@ public class EssentialPlatformSetup {
 
     private static File getMyLocation() {
         return new File(EssentialPlatformSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-    }
-
-    private static String getFunnyCode(byte[] bytes) throws NoSuchAlgorithmException {
-        return new String(MessageDigest.getInstance("SHA-256").digest(bytes)).toUpperCase(Locale.ENGLISH);
     }
 
     private static void loadEssential() {
