@@ -22,7 +22,6 @@ import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
 import gg.essential.elementa.constraints.ChildBasedRangeConstraint
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
@@ -65,7 +64,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
             append("%02d".format(seconds))
             if (nanoseconds != 0) {
                 append('.')
-                append("%03d".format(nanoseconds))
+                append("%03d".format(nanoseconds / 1e6))
             }
         }
     }
