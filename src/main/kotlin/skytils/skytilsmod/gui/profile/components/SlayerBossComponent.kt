@@ -55,17 +55,17 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
             "spider" -> ItemUtil.setSkullTexture(
                 ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ3ZTNiMTlhYzRmM2RlZTljNTY3N2MxMzUzMzNiOWQzNWE3ZjU2OGI2M2QxZWY0YWRhNGIwNjhiNWEyNSJ9fX0=",
-                "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
+                "baf72192-7e1b-45a2-a80e-2e873bdbbacf"
             )
             "wolf" -> ItemUtil.setSkullTexture(
                 ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgzYTJhYTlkMzczNGI5MTlhYzI0Yzk2NTllNWUwZjg2ZWNhZmJmNjRkNDc4OGNmYTQzM2JiZWMxODllOCJ9fX0=",
-                "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
+                "daf2a9b9-2326-4cc2-b1a9-d49194886c70"
             )
             "enderman" -> ItemUtil.setSkullTexture(
                 ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWIwOWEzNzUyNTEwZTkxNGIwYmRjOTA5NmIzOTJiYjM1OWY3YThlOGE5NTY2YTAyZTdmNjZmYWZmOGQ2Zjg5ZSJ9fX0=",
-                "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
+                "c4880012-4860-43d2-aaaf-51dfc00a8399"
             )
             else -> ItemStack(Items.skull, -1, 1)
         }
