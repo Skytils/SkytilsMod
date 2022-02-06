@@ -55,7 +55,7 @@ public class EssentialPlatformSetup {
             String funnyCode = DigestUtils.sha256Hex(new FileInputStream(me)).toUpperCase(Locale.ENGLISH);
             if (isDev) System.out.println(funnyCode);
 
-            JsonObject funnys = new JsonParser().parse(IOUtils.toString(new URL("https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/constants/hashes.json"))).getAsJsonObject();
+            JsonObject funnys = new JsonParser().parse(IOUtils.toString(new URL("https://skytilsmod-data.pages.dev/constants/hashes.json"))).getAsJsonObject();
             if (isDev) System.out.println(funnys);
             if (!funnys.has(Skytils.VERSION)) loadEssential();
             if (!funnys.get(Skytils.VERSION).getAsString().equalsIgnoreCase(funnyCode)) loadEssential();
