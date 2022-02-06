@@ -53,11 +53,11 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         return true
     }
 
-    override fun acceptTargets(myTargets: MutableSet<String>, otherTargets: MutableSet<String>) {
+    override fun acceptTargets(myTargets: MutableSet<String>, otherTargets: Set<String>) {
 
     }
 
-    override fun getMixins(): MutableList<String>? {
+    override fun getMixins(): List<String>? {
         return null
     }
 
