@@ -64,7 +64,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
             append("%02d".format(seconds))
             if (nanoseconds != 0) {
                 append('.')
-                append("%03d".format(nanoseconds / 1e6))
+                append("%03f".format(nanoseconds / 1e6))
             }
         }
     }
