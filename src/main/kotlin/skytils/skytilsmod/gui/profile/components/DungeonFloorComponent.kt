@@ -20,18 +20,21 @@ package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
+import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
+import gg.essential.elementa.constraints.ChildBasedRangeConstraint
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.plus
 import skytils.hylin.skyblock.dungeons.DungeonBase
 import kotlin.time.Duration
 
-class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRoundedRectangle(2f) {
+class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRoundedRectangle(5f) {
     init {
         constrain {
-            width = ChildBasedSizeConstraint(5f)
-            height = ChildBasedSizeConstraint(5f)
+            width = ChildBasedMaxSizeConstraint()
+            height = ChildBasedRangeConstraint() + 10.pixels
         }
         val pairs = arrayListOf<Pair<String, Any>>()
         dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
