@@ -21,15 +21,11 @@ package skytils.skytilsmod.gui.profile.components
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.CramSiblingConstraint
-import gg.essential.elementa.constraints.RelativeConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.provideDelegate
+import gg.essential.elementa.constraints.*
+import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
+import gg.essential.elementa.utils.withAlpha
+import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.utils.NumberUtil
 
@@ -62,30 +58,26 @@ class SlayerComponent(profileState: State<Member?>) : UIComponent() {
     } childOf this
 
     val zom by SlayerBossComponent(rev, "zombie").constrain {
-        x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
-        width = RelativeConstraint()
-        height = ChildBasedSizeConstraint()
+        x = 0.pixels
+        y = 0.pixels
+        color = VigilancePalette.getBackground().withAlpha(120).constraint
     } childOf slayersContainer
 
     val spi by SlayerBossComponent(tara, "spider").constrain {
         x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
-        width = RelativeConstraint()
-        height = ChildBasedSizeConstraint()
+        y = CramSiblingConstraint(5f)
+        color = VigilancePalette.getBackground().withAlpha(120).constraint
     } childOf slayersContainer
 
     val wol by SlayerBossComponent(sven, "wolf").constrain {
         x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
-        width = RelativeConstraint()
-        height = ChildBasedSizeConstraint()
+        y = CramSiblingConstraint(5f)
+        color = VigilancePalette.getBackground().withAlpha(120).constraint
     } childOf slayersContainer
 
     val end by SlayerBossComponent(eman, "enderman").constrain {
         x = CramSiblingConstraint(10f)
-        y = CramSiblingConstraint(10f)
-        width = RelativeConstraint()
-        height = ChildBasedSizeConstraint()
+        y = CramSiblingConstraint(5f)
+        color = VigilancePalette.getBackground().withAlpha(120).constraint
     } childOf slayersContainer
 }

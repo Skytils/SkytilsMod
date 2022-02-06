@@ -89,6 +89,11 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             var c = 0
             val profile = GameProfile(uuidState.get(), "")
             launch {
+                hylinAPI.getPlayer(uuidState.get()).whenComplete {
+                    hypixelPlayer.set(it)
+                }
+            }
+            launch {
                 b = hylinAPI.getSkyblockProfiles(uuidState.get()).await()
                 val e = b?.getLatestSkyblockProfile(uuidState.get())
                 c = b?.indexOf(e) ?: 0
@@ -114,9 +119,8 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             height = 25.pixels()
         } childOf window
 
-    private val profilesDropdown by DropdownComponent(0, profileList.get(), optionPadding = 2.5f).bindOptions(
-        profileList
-    )
+    private val profilesDropdown by DropdownComponent(0, profileList.get(), optionPadding = 2.5f)
+        .bindOptions(profileList)
         .bindSelection(selection)
         .constrain {
             x = 10.pixels(true)
@@ -314,23 +318,23 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
     } childOf contentContainer
 
     private val hotm = HOTMComponent(profileState).constrain {
-        x = 5.percent()
-        y = SiblingConstraint(5f)
+        x = CramSiblingConstraint(5f) + 5.percent
+        y = CramSiblingConstraint(5f)
         width = (9 * (16 + 2)).pixels
         height = (7 * (16 + 2)).pixels
     } childOf contentContainer
 
     private val dungeons = DungeonsComponent(hypixelPlayer, profileState).constrain {
-        x = 5.percent()
+        x = 0.pixels
         y = SiblingConstraint(5f)
         width = RelativeConstraint()
-        height = ChildBasedRangeConstraint() + 5.pixels
+        height = ChildBasedRangeConstraint()
     } childOf contentContainer
 
     private val slayer = SlayerComponent(profileState).constrain {
         x = 5.percent()
         y = SiblingConstraint(5f)
-        width = RelativeConstraint()
+        width = 90.percent
         height = ChildBasedRangeConstraint() + 5.pixels
     } childOf contentContainer
 
