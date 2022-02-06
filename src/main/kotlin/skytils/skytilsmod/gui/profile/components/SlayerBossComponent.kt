@@ -22,81 +22,130 @@ import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.CramSiblingConstraint
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.percent
-import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.*
+import gg.essential.elementa.state.State
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import skytils.hylin.skyblock.slayer.Slayers
+import skytils.hylin.skyblock.slayer.RevenantSlayer
 import skytils.hylin.skyblock.slayer.StandardSlayer
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.SkillUtils
 import skytils.skytilsmod.utils.toTitleCase
-import kotlin.reflect.KProperty
 
-class SlayerBossComponent<T : StandardSlayer>(slayerField: KProperty<T>, type: String) : UIRoundedRectangle(2f) {
-    init {
-        constrain {
-            width = ChildBasedSizeConstraint(5f)
-            height = ChildBasedSizeConstraint(5f)
-        }
+class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) : UIRoundedRectangle(2f) {
+    val xpSet = SkillUtils.slayerXp[type] ?: SkillUtils.slayerXp.values.first()
 
-        val slayer: T = slayerField.call()
-        val xpSet = SkillUtils.slayerXp[type]!!
-        val (level, overflow, percent) = SkillUtils.calcXpWithOverflowAndProgress(
-            slayer.xp.toDouble(),
+    val slayerXp = slayer.map { it?.xp?.toDouble() ?: 0.0 }
+
+    val levelData = slayerXp.map {
+        SkillUtils.calcXpWithOverflowAndProgress(
+            it,
             xpSet.size,
             xpSet.values
         )
+    }
 
-        val stack = when (slayerField) {
-            Slayers::revenant -> ItemUtil.setSkullTexture(
-                ItemStack(Items.skull, level, 3),
+    val stack = levelData.map {
+        return@map when (type) {
+            "zombie" -> ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWZjMDE4NDQ3M2ZlODgyZDI4OTVjZTdjYmM4MTk3YmQ0MGZmNzBiZjEwZDM3NDVkZTk3YjZjMmE5YzVmYzc4ZiJ9fX0=",
                 "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
             )
-            Slayers::tarantula -> ItemUtil.setSkullTexture(
-                ItemStack(Items.skull, level, 3),
+            "spider" -> ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ3ZTNiMTlhYzRmM2RlZTljNTY3N2MxMzUzMzNiOWQzNWE3ZjU2OGI2M2QxZWY0YWRhNGIwNjhiNWEyNSJ9fX0=",
                 "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
             )
-            Slayers::sven -> ItemUtil.setSkullTexture(
-                ItemStack(Items.skull, level, 3),
+            "wolf" -> ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgzYTJhYTlkMzczNGI5MTlhYzI0Yzk2NTllNWUwZjg2ZWNhZmJmNjRkNDc4OGNmYTQzM2JiZWMxODllOCJ9fX0=",
                 "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
             )
-            Slayers::enderman -> ItemUtil.setSkullTexture(
-                ItemStack(Items.skull, level, 3),
+            "enderman" -> ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWIwOWEzNzUyNTEwZTkxNGIwYmRjOTA5NmIzOTJiYjM1OWY3YThlOGE5NTY2YTAyZTdmNjZmYWZmOGQ2Zjg5ZSJ9fX0=",
                 "063f9bdf-047b-47ef-85b6-533ff1dfd69b"
             )
             else -> ItemStack(Items.skull, -1, 1)
         }
+    }
 
-        XPComponent(
-            ItemComponent(stack),
-            "${slayerField.name.toTitleCase()} Slayer $level",
-            if (level == xpSet.size) 1f else (percent % 1).toFloat(),
-            overflow.toLong()
-        ).constrain {
-            x = 5.pixels
-            y = 5.pixels
-            width = 42.5.percent()
-            height = 20.pixels()
-        } childOf this
+    val progress = levelData.map { (level, _, percent) ->
+        if (level == xpSet.size) 1f else (percent % 1).toFloat()
+    }
 
-        for (field in slayer::class.java.declaredFields.filter { it.name.endsWith("Kills") }) {
-            field.isAccessible = true
-            UIWrappedText(
-                """
-                    #Tier ${(field.name.substringBeforeLast("Kills").substringAfter("t").toIntOrNull() ?: 0) + 1}
-                    #${field.get(slayer) ?: 0}
-                """.trimMargin("#"), centered = true
-            ).constrain {
-                x = CramSiblingConstraint(10f)
-                y = CramSiblingConstraint(10f)
-            } childOf this
+    val xpComponent by XPComponent(
+        ItemComponent(stack)
+    ).constrain {
+        x = 5.pixels
+        y = 5.pixels
+        width = 42.5.percent()
+        height = 20.pixels()
+    }.apply {
+        bindText(levelData.map { (level, _, _) ->
+            "${type.toTitleCase()} Slayer $level"
+        })
+        bindOverflow(levelData.map { it.second.toLong() })
+        bindPercent(progress)
+    } childOf this
+
+    val t1Kills by UIWrappedText(centered = true).constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+    }.bindText(slayer.map {
+        """
+            #Tier I
+            #${it?.t0Kills ?: 0}
+        """.trimMargin("#")
+    }) childOf this
+
+    val t2Kills by UIWrappedText(centered = true).constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+    }.bindText(slayer.map {
+        """
+            #Tier I
+            #${it?.t1Kills ?: 0}
+        """.trimMargin("#")
+    }) childOf this
+
+    val t3Kills by UIWrappedText(centered = true).constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+    }.bindText(slayer.map {
+        """
+            #Tier III
+            #${it?.t2Kills ?: 0}
+        """.trimMargin("#")
+    }) childOf this
+
+    val t4Kills by UIWrappedText(centered = true).constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+    }.bindText(slayer.map {
+        """
+            #Tier IV
+            #${it?.t3Kills ?: 0}
+        """.trimMargin("#")
+    }) childOf this
+
+    val t5Kills by UIWrappedText(centered = true).constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+    }.bindText(slayer.map {
+        if (it is RevenantSlayer) {
+            """
+                #Tier V
+                #${it.t4Kills}
+            """.trimMargin("#")
+        } else ""
+    }) childOf this
+
+    init {
+        constrain {
+            width = ChildBasedSizeConstraint(5f)
+            height = ChildBasedSizeConstraint(5f)
         }
     }
 }
