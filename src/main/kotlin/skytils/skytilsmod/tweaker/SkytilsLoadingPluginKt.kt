@@ -19,6 +19,7 @@
 package skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
+import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.hc.client5.http.classic.methods.HttpGet
@@ -151,6 +152,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 
     override fun injectData(data: MutableMap<String, Any>?) {
+        Launch.classLoader.addTransformerExclusion("skytils.skytilsmod.utils.ModChecker")
     }
 
     override fun getAccessTransformerClass(): String? {
