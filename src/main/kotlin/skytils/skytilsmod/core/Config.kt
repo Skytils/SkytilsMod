@@ -46,7 +46,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "API",
         hidden = true
     )
-    var dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
+    var dataURL = "https://skytilsmod-data.pages.dev/"
 
     @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
@@ -2522,7 +2522,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()
                     }
-                    dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
+                    dataURL = "https://skytilsmod-data.pages.dev/"
                 }
             }
         }
