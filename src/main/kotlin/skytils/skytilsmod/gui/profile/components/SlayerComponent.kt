@@ -21,7 +21,6 @@ package skytils.skytilsmod.gui.profile.components
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
-import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
@@ -34,55 +33,59 @@ import gg.essential.elementa.state.State
 import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.utils.NumberUtil
 
-class SlayerComponent(private val profileState: State<Member?>) : UIComponent() {
-    init {
-        profileState.onSetValue { m ->
-            clearChildren()
-            if (m == null) return@onSetValue
-            Window.enqueueRenderOperation {
-                val rev = m.slayers.revenant
-                val tara = m.slayers.tarantula
-                val sven = m.slayers.sven
-                val eman = m.slayers.enderman
-                UIText("§7Total Slayer XP: §f${NumberUtil.nf.format(rev.xp + tara.xp + sven.xp + eman.xp)}").constrain {
-                    x = 0.pixels
-                    y = 0.pixels
-                } childOf this
-                val slayers by UIContainer().constrain {
-                    x = 0.pixels
-                    y = SiblingConstraint(5f)
-                    width = RelativeConstraint()
-                    height = ChildBasedSizeConstraint()
-                } childOf this
+class SlayerComponent(profileState: State<Member?>) : UIComponent() {
 
-                SlayerBossComponent(m.slayers::revenant, "zombie").constrain {
-                    x = CramSiblingConstraint(10f)
-                    y = CramSiblingConstraint(10f)
-                    width = RelativeConstraint()
-                    height = ChildBasedSizeConstraint()
-                } childOf slayers
-
-                SlayerBossComponent(m.slayers::tarantula, "spider").constrain {
-                    x = CramSiblingConstraint(10f)
-                    y = CramSiblingConstraint(10f)
-                    width = RelativeConstraint()
-                    height = ChildBasedSizeConstraint()
-                } childOf slayers
-
-                SlayerBossComponent(m.slayers::sven, "wolf").constrain {
-                    x = CramSiblingConstraint(10f)
-                    y = CramSiblingConstraint(10f)
-                    width = RelativeConstraint()
-                    height = ChildBasedSizeConstraint()
-                } childOf slayers
-
-                SlayerBossComponent(m.slayers::enderman, "enderman").constrain {
-                    x = CramSiblingConstraint(10f)
-                    y = CramSiblingConstraint(10f)
-                    width = RelativeConstraint()
-                    height = ChildBasedSizeConstraint()
-                } childOf slayers
-            }
-        }
+    val slayers = profileState.map { it?.slayers }
+    val rev = slayers.map { it?.revenant }
+    val tara = slayers.map { it?.tarantula }
+    val sven = slayers.map { it?.sven }
+    val eman = slayers.map { it?.enderman }
+    val totalXp = rev.zip(tara).zip(sven.zip(eman)).map { stuff ->
+        val (rev, tara) = stuff.first
+        val (sven, eman) = stuff.second
+        0L + (rev?.xp ?: 0) + (tara?.xp ?: 0) + (sven?.xp ?: 0) + (eman?.xp ?: 0)
     }
+
+
+    val totalXpText by UIText().constrain {
+        x = 0.pixels
+        y = 0.pixels
+    }.bindText(totalXp.map { xp ->
+        "§7Total Slayer XP: §f${NumberUtil.nf.format(xp)}"
+    }) childOf this
+
+    val slayersContainer by UIContainer().constrain {
+        x = 0.pixels
+        y = SiblingConstraint(5f)
+        width = RelativeConstraint()
+        height = ChildBasedSizeConstraint()
+    } childOf this
+
+    val zom by SlayerBossComponent(rev, "zombie").constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+        width = RelativeConstraint()
+        height = ChildBasedSizeConstraint()
+    } childOf slayersContainer
+
+    val spi by SlayerBossComponent(tara, "spider").constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+        width = RelativeConstraint()
+        height = ChildBasedSizeConstraint()
+    } childOf slayersContainer
+
+    val wol by SlayerBossComponent(sven, "wolf").constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+        width = RelativeConstraint()
+        height = ChildBasedSizeConstraint()
+    } childOf slayersContainer
+
+    val end by SlayerBossComponent(eman, "enderman").constrain {
+        x = CramSiblingConstraint(10f)
+        y = CramSiblingConstraint(10f)
+        width = RelativeConstraint()
+        height = ChildBasedSizeConstraint()
+    } childOf slayersContainer
 }
