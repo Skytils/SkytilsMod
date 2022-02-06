@@ -2505,22 +2505,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         if (Skytils.config.lastLaunchedVersion != Skytils.VERSION) {
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
-                !ver.isSafe -> {
-                    if (largerHeadScale > 2) {
-                        largerHeadScale /= 100
-                    }
-                    if (itemDropScale > 5) {
-                        itemDropScale /= 100f
-                    }
-                    if (itemRarityOpacity > 1) {
-                        itemRarityOpacity /= 100f
-                    }
-                    if (transparentHeadLayer > 1) {
-                        transparentHeadLayer /= 100f
-                    }
-                    dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
-                }
-                ver < UpdateChecker.SkytilsVersion("1.0.8") -> {
+                !ver.isSafe || ver < UpdateChecker.SkytilsVersion("1.2-pre3") || Skytils.config.lastLaunchedVersion == "0" -> {
                     if (largerHeadScale > 2) {
                         largerHeadScale /= 100
                     }
