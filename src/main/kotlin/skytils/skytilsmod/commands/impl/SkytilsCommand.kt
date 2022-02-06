@@ -18,6 +18,7 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
+import gg.essential.universal.wrappers.UPlayer
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.ICommandSender
@@ -270,7 +271,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "notifications" -> Skytils.displayScreen = CustomNotificationsGui()
             "pv" -> {
                 if (args.size == 1) {
-                    Skytils.displayScreen = ProfileGui(mc.thePlayer.uniqueID)
+                    Skytils.displayScreen = ProfileGui(mc.thePlayer.uniqueID, UPlayer.getPlayer()?.displayNameString ?: "")
                 } else {
                     // TODO Add some kind of message indicating progress
                     var uuid by Delegates.notNull<UUID>()
@@ -282,7 +283,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             error.printStackTrace()
                             return@invokeOnCompletion
                         }
-                        Skytils.displayScreen = ProfileGui(uuid)
+                        Skytils.displayScreen = ProfileGui(uuid, args[1])
                     }
                 }
             }

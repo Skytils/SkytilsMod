@@ -31,7 +31,9 @@ import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UMinecraft
+import gg.essential.vigilance.gui.VigilancePalette
 import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -46,13 +48,14 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.hylinAPI
 import skytils.skytilsmod.gui.profile.components.*
 import skytils.skytilsmod.gui.profile.states.alwaysMap
+import skytils.skytilsmod.gui.profile.states.alwaysUpdateState
 import java.awt.Color
 import java.util.*
 
-class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackground = false) {
+class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
-        it.onSetValue { it ->
-            val profile = GameProfile(it, "")
+        it.onSetValue { uuid ->
+            val profile = GameProfile(uuid, "")
             Skytils.launch {
                 launch {
                     hylinAPI.getPlayer(uuid).whenComplete {
@@ -61,6 +64,7 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
                 }
                 launch {
                     hylinAPI.getSkyblockProfiles(uuid).whenComplete { list ->
+                        list.forEach { println(it.cuteName) }
                         profiles.set(list)
                         selection.set(list.indexOf(list.getLatestSkyblockProfile(uuid)))
                     }
@@ -74,19 +78,18 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
         }
     }
     private val hypixelPlayer: State<Player?> = BasicState(null)
-    private val profiles: State<List<Profile>?> = BasicState(null)
+    private val profiles: State<List<Profile>?> = alwaysUpdateState(null)
     private val selection: State<Int> = BasicState(0)
     private val profileList: State<List<String>> =
-        profiles.map { selection.set(0); it?.map { profile -> profile.cuteName } ?: listOf("None") }
+        profiles.alwaysMap { selection.set(0); it?.map { profile -> profile.cuteName } ?: listOf("None") }
     private val profileState: State<Member?> = selection.zip(profiles).alwaysMap { (selection, profiles) ->
-        profiles?.get(selection)?.members?.get(uuidState.get().nonDashedString())
+        val a = profiles?.get(selection)?.members?.get(uuidState.get().nonDashedString())
+        a
     }
     private val gameProfileState: State<GameProfile?> = BasicState(null)
 
     override fun afterInitialization() {
         Skytils.launch {
-            var b: List<Profile>? = null
-            var c = 0
             val profile = GameProfile(uuidState.get(), "")
             launch {
                 hylinAPI.getPlayer(uuidState.get()).whenComplete {
@@ -94,12 +97,10 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
                 }
             }
             launch {
-                b = hylinAPI.getSkyblockProfiles(uuidState.get()).await()
-                val e = b?.getLatestSkyblockProfile(uuidState.get())
-                c = b?.indexOf(e) ?: 0
-            }.invokeOnCompletion {
-                profiles.set(b)
-                selection.set(c)
+                hylinAPI.getSkyblockProfiles(uuidState.get()).whenComplete { profileList ->
+                    profiles.set(profileList)
+                    selection.set(profileList.indexOf(profileList.getLatestSkyblockProfile(uuidState.get())))
+                }
             }
             launch {
                 UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
@@ -118,6 +119,23 @@ class ProfileGui(uuid: UUID) : WindowScreen(ElementaVersion.V1, drawDefaultBackg
             width = RelativeConstraint()
             height = 25.pixels()
         } childOf window
+
+    private val nameState: State<String> = BasicState(name).also { state ->
+        state.onSetValue { name ->
+            println(name)
+            Skytils.launch {
+                hylinAPI.getUUID(name).whenComplete { uuidState.set(it) }
+            }
+        }
+    }
+
+    private val searchBar by SearchComponent().bindValue(nameState).constrain {
+        x = CenterConstraint()
+        y = 2.5.pixels
+        height = 20.pixels
+        width = 50.percentOfWindow
+        color = VigilancePalette.getSearchBarBackground().withAlpha(120).constraint
+    } childOf navBar
 
     private val profilesDropdown by DropdownComponent(0, profileList.get(), optionPadding = 2.5f)
         .bindOptions(profileList)
