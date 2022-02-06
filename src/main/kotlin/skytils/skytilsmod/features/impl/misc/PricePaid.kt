@@ -19,15 +19,15 @@
 package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.GuiContainerEvent
-import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.utils.*
 import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -36,6 +36,31 @@ import java.util.*
 object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
     private val prices = mutableMapOf<UUID, Double>()
     private val coinRegex = Regex("(?:§6)?([\\d,]+) coins", RegexOption.IGNORE_CASE)
+    private val boughtRegex = Regex("§r§eYou purchased (?<item>.+) §r§efor §r§6(?<coins>[\\d,.]+) coins§r§e!§r")
+    private var lastBought: Triple<String, UUID, Double>? = null
+    private val junkRegex = Regex("[,.]")
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onPacket(event: PacketEvent.ReceiveEvent) {
+        if (!Utils.inSkyblock || lastBought == null || event.packet !is S02PacketChat) return
+        val formatted = event.packet.chatComponent.formattedText
+        val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
+
+        if (formatted.startsWith("§r§eYou purchased ") && formatted.endsWith(" coins§r§e!§r")) {
+            val (name, uuid, price) = lastBought ?: return
+            if (unformatted.contains(name.stripControlCodes(), true) || unformatted.replace(junkRegex, "")
+                    .contains(price.toInt().toString())
+            ) {
+                lastBought = null
+                Utils.checkThreadAndQueue {
+                    prices[uuid] = price
+                    dirty = true
+                }
+            }
+        } else if (formatted.startsWith("§r§cThere was an error with the auction house!")) {
+            lastBought = null
+        }
+    }
 
     @SubscribeEvent
     fun toolTip(event: ItemTooltipEvent) {
@@ -53,10 +78,14 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
         ItemUtil.getItemLore(event.slot.stack).firstNotNullOfOrNull {
             coinRegex.find(it)?.groupValues?.get(1)
         }?.let { price ->
-            val uuid = ItemUtil.getExtraAttributes(event.gui.inventorySlots.getSlot(13).stack)!!.getString("uuid")
-                .ifEmpty { return }
-            prices[UUID.fromString(uuid)] = price.replace(",", "").substringBefore(' ').toDouble()
-            dirty = true
+            val stack = event.gui.inventorySlots.getSlot(13).stack ?: return
+            val uuid = ItemUtil.getExtraAttributes(stack)?.getString("uuid")
+                ?.ifEmpty { return } ?: return
+            lastBought = Triple(
+                ItemUtil.getDisplayName(stack),
+                UUID.fromString(uuid),
+                price.replace(",", "").substringBefore(' ').toDouble()
+            )
         }
     }
 
