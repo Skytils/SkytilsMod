@@ -21,6 +21,7 @@ package skytils.skytilsmod.gui.profile.components
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
+import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.utils.withAlpha
@@ -40,7 +41,7 @@ class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalett
     val itemTitle = UIRoundedRectangle(radius).constrain {
         y = 0.pixels
         height = 20.pixels
-        width = (ChildBasedSizeConstraint() + 4.pixels) coerceAtLeast 100.percent
+        width = (ChildBasedSizeConstraint() + 10.pixels) coerceAtLeast 100.percent
         color = ItemUtil.getRarity(item).color.withAlpha(170).constraint
     } childOf this
     val item: ItemComponent = ItemComponent(item).constrain {
@@ -58,37 +59,21 @@ class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalett
 
     val contentContainer by UIContainer().constrain {
         y = SiblingConstraint()
-        width = ChildBasedSizeConstraint() + 10.pixels
-        height = ChildBasedSizeConstraint() + 10.pixels
+        width = 100.percent
+        height = ChildBasedSizeConstraint()
     } childOf this
-    val content = UIContainer().constrain {
+    val text = UIWrappedText(lore.drop(1).joinToString("") {
+        if (!it.startsWith("§5§o")) return@joinToString ""
+        "$it\n"
+    }).constrain {
         x = 5.pixels
         y = 5.pixels
-        width = ChildBasedMaxSizeConstraint()
-        height = ChildBasedSizeConstraint()
+        width = lore.drop(1).maxOf { UMinecraft.getFontRenderer().getStringWidth(it) }.pixels
     } childOf contentContainer
 
     init {
-        lore.drop(1).forEach { line ->
-            if (!line.startsWith("§5§o")) return@forEach
-            if (line.stripControlCodes().isEmpty()) {
-                return@forEach
-            }
-            addLine(line)
-
-        }
-    }
-
-    fun addLine(text: String = "", configure: UIText.() -> Unit = {}) = apply {
-        val component = UIText(text).constrain {
-            y = SiblingConstraint(padding = 3f)
-        } childOf content
-        component.configure()
-    }
-
-    init {
         constrain {
-            width = CopyConstraintFloat() boundTo contentContainer
+            width = (text.constraints.width coerceAtLeast ((ChildBasedSizeConstraint() boundTo itemTitle) + 4.pixels)) + 10.pixels
             height = ChildBasedSizeConstraint()
             color = backgroundColor.constraint
         }
