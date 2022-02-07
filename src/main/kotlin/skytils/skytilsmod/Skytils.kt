@@ -103,7 +103,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.1.1"
+        const val VERSION = "1.1.2"
 
         @JvmField
         val gson: Gson = GsonBuilder()
@@ -212,7 +212,7 @@ class Skytils {
             FarmingFeatures(),
             FavoritePets(),
             GlintCustomizer(),
-            GriffinBurrows(),
+            GriffinBurrows,
             IceFillSolver(),
             IcePathSolver(),
             ItemFeatures(),
@@ -318,8 +318,8 @@ class Skytils {
             if (mc.thePlayer != null) {
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
-                    if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.inSkyblock = true
-                    if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.inDungeons = true
+                    if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.skyblock = true
+                    if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.dungeons = true
                 }
                 if (DevTools.getToggle("sprint"))
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
@@ -340,15 +340,15 @@ class Skytils {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        Utils.inSkyblock = false
-        Utils.inDungeons = false
+        Utils.skyblock = false
+        Utils.dungeons = false
     }
 
     @SubscribeEvent
     fun onScoreboardChange(event: MainReceivePacketEvent<*, *>) {
         if (Utils.inSkyblock || !Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
         if (event.packet.func_149371_c() != 1) return
-        Utils.inSkyblock = event.packet.func_149370_d() == "SBScoreboard"
+        Utils.skyblock = event.packet.func_149370_d() == "SBScoreboard"
         printDevMessage("score ${event.packet.func_149370_d()}", "utils")
         printDevMessage("sb ${Utils.inSkyblock}", "utils")
     }
@@ -362,10 +362,11 @@ class Skytils {
         event.packet.entries.forEach { playerData ->
             val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
             areaRegex.matchEntire(name)?.let { result ->
-                Utils.inDungeons = Utils.inSkyblock && result.groups["area"]?.value == "Dungeon"
+                Utils.dungeons = Utils.inSkyblock && result.groups["area"]?.value == "Dungeon"
                 printDevMessage("dungeons ${Utils.inDungeons} action ${event.packet.action}", "utils")
                 if (Utils.inDungeons)
                     ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
+                return@forEach
             }
         }
     }
@@ -373,8 +374,8 @@ class Skytils {
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         Utils.isOnHypixel = false
-        Utils.inSkyblock = false
-        Utils.inDungeons = false
+        Utils.skyblock = false
+        Utils.dungeons = false
     }
 
     @SubscribeEvent

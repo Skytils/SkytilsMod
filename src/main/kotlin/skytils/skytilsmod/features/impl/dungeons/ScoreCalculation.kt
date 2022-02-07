@@ -36,7 +36,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.*
@@ -140,7 +140,7 @@ object ScoreCalculation {
 
     val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
         printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        (clear + secret).toInt()
+        clear.toInt() + secret.toInt()
     }
 
 
@@ -226,27 +226,30 @@ object ScoreCalculation {
             }
         }
 
-    val rank: State<String> = totalScore.map {
-        when {
-            it < 100 -> "§cD"
-            it < 160 -> "§9C"
-            it < 230 -> "§aB"
-            it < 270 -> "§5A"
-            it < 300 -> "§eS"
-            else -> "§6§lS+"
+    val rank: String
+        get() {
+            val score = totalScore.get()
+            return when {
+                score < 100 -> "§cD"
+                score < 160 -> "§9C"
+                score < 230 -> "§aB"
+                score < 270 -> "§5A"
+                score < 300 -> "§eS"
+                else -> "§6§lS+"
+            }
         }
-    }
 
     fun updateText(score: Int) {
         Utils.checkThreadAndQueue {
             ScoreCalculationElement.text.clear()
+            if (!Utils.inDungeons) return@checkThreadAndQueue
             if (Skytils.config.minimizedScoreCalculation) {
                 val color = when {
                     score < 270 -> 'c'
                     score < 300 -> 'e'
                     else -> 'a'
                 }
-                ScoreCalculationElement.text.add("§eScore: §$color$score §7(${rank.get()}§7)")
+                ScoreCalculationElement.text.add("§eScore: §$color$score §7($rank§7)")
             } else {
                 ScoreCalculationElement.text.add("§9Dungeon Status")
                 ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
@@ -271,7 +274,7 @@ object ScoreCalculation {
                 ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
                 ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
                 ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
-                ScoreCalculationElement.text.add("§f• §eRank: ${rank.get()}")
+                ScoreCalculationElement.text.add("§f• §eRank: $rank")
 
             }
         }
@@ -279,7 +282,7 @@ object ScoreCalculation {
 
 
     @SubscribeEvent
-    fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
+    fun onScoreboardChange(event: MainReceivePacketEvent<*, *>) {
         if (
             !Utils.inSkyblock ||
             event.packet !is S3EPacketTeams
@@ -311,7 +314,7 @@ object ScoreCalculation {
     }
 
     @SubscribeEvent
-    fun onTabChange(event: PacketEvent.ReceiveEvent) {
+    fun onTabChange(event: MainReceivePacketEvent<*, *>) {
         if (
             !Utils.inDungeons ||
             event.packet !is S38PacketPlayerListItem ||
@@ -331,6 +334,7 @@ object ScoreCalculation {
                     val matcher = missingPuzzlePattern.find(name) ?: return@forEach
                     missingPuzzles.set(matcher.groups["count"]?.value?.toIntOrNull() ?: 0)
                     printDevMessage("puzzles ${missingPuzzles.get()}", "scorecalcpuzzle")
+                    updateText(totalScore.get())
                 }
                 name.contains("✔") -> {
                     if (solvedPuzzlePattern.containsMatchIn(name)) {
@@ -373,7 +377,7 @@ object ScoreCalculation {
     }
 
     @SubscribeEvent
-    fun onTitle(event: PacketEvent.ReceiveEvent) {
+    fun onTitle(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
         if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
             firstDeathHadSpirit.set(

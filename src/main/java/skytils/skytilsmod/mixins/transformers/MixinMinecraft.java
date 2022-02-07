@@ -41,11 +41,12 @@ import java.util.Objects;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
+    private final Minecraft $this = (Minecraft) (Object) this;
     @Shadow
     public EntityPlayerSP thePlayer;
-
-    @Shadow @Final public File mcDataDir;
-    private final Minecraft $this = (Minecraft) (Object) this;
+    @Shadow
+    @Final
+    public File mcDataDir;
 
     /**
      * Taken from Skyblockcatia under MIT License
@@ -61,7 +62,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "clickMouse()V", at = @At(value = "INVOKE", target = "net/minecraft/client/entity/EntityPlayerSP.swingItem()V", shift = At.Shift.AFTER))
     private void clickMouse(CallbackInfo info) {
-        if (!Utils.inSkyblock) return;
+        if (!Utils.INSTANCE.getInSkyblock()) return;
 
         ItemStack item = thePlayer.getHeldItem();
         if (item != null) {

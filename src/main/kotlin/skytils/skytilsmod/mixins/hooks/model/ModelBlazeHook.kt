@@ -38,14 +38,14 @@ fun changeBlazeColor(
     GlStateManager.disableTexture2D()
     GlStateManager.enableBlend()
     GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-    if (BlazeSolver.blazeMode <= 0) {
+    if (BlazeSolver.blazeMode < 0) {
         if (entity == BlazeSolver.orderedBlazes[0].blaze) {
             Skytils.config.lowestBlazeColor.bindColor()
         } else if (Skytils.config.showNextBlaze && BlazeSolver.blazeMode != 0 && BlazeSolver.orderedBlazes.size > 1 && entity == BlazeSolver.orderedBlazes[1].blaze) {
             Skytils.config.nextBlazeColor.bindColor()
         }
     }
-    if (BlazeSolver.blazeMode >= 0) {
+    if (BlazeSolver.blazeMode > 0) {
         if (entity == BlazeSolver.orderedBlazes[BlazeSolver.orderedBlazes.size - 1].blaze) {
             Skytils.config.highestBlazeColor.bindColor()
         } else if (Skytils.config.showNextBlaze && BlazeSolver.blazeMode != 0 && BlazeSolver.orderedBlazes.size > 1 && entity == BlazeSolver.orderedBlazes[BlazeSolver.orderedBlazes.size - 2].blaze) {

@@ -34,7 +34,6 @@ import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.*
 import java.io.IOException
 import java.net.URLEncoder
-import java.time.ZonedDateTime
 import java.util.*
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -142,9 +141,11 @@ object MayorInfo {
         if (event.container is ContainerChest) {
             val chest = event.container
             val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith("Mayor ") && (currentMayor == null || !chestName.contains(
+            if (chestName == "Calendar and Events" || ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith(
+                    "Mayor "
+                ) && (currentMayor == null || !chestName.contains(
                     currentMayor!!
-                )))
+                ))))
             ) {
                 val slot = event.slot
                 val item = slot.stack
@@ -154,7 +155,7 @@ object MayorInfo {
                 ) {
                     if (currentMayor == null) {
                         isLocal = true
-                        currentMayor = chestName.substring(6)
+                        currentMayor = item.displayName.stripControlCodes().substringAfter("Mayor ")
                         mayorPerks.clear()
                         fetchMayorData()
                     }
@@ -173,7 +174,7 @@ object MayorInfo {
                     }
                 }
             }
-            if (currentMayor == "Jerry" && chestName == "Mayor Jerry" && event.slot.slotNumber == 11 && event.slot.hasStack) {
+            if (currentMayor == "Jerry" && ((chestName == "Mayor Jerry" && event.slot.slotNumber == 11) || (chestName == "Calendar and Events" || event.slot.slotNumber == 46)) && event.slot.hasStack) {
                 val lore = ItemUtil.getItemLore(event.slot.stack)
                 if (!lore.contains("§9Perkpocalypse Perks:")) return
                 val endingIn = lore.find { it.startsWith("§7Next set of perks in") } ?: return
@@ -188,9 +189,11 @@ object MayorInfo {
                 val matcher = jerryNextPerkRegex.find(endingIn) ?: return
                 val timeLeft =
                     Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
-                val nextPerks = (ZonedDateTime.now().withSecond(59).withNano(999999999)
-                    .toEpochSecond() * 1000) + timeLeft.inWholeMilliseconds
-                if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 10000) {
+                val nextPerksNoRound = System.currentTimeMillis() + timeLeft.inWholeMilliseconds
+                val offset = (nextPerksNoRound % 300000)
+                val rounded = nextPerksNoRound - 300000
+                val nextPerks = (if (offset > 150000) rounded + 300000 else rounded) - 1
+                if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 60000) {
                     println("Jerry has ${mayor.name}'s perks ($perks) and is ending in $newJerryPerks ($${endingIn.stripControlCodes()})")
                     sendJerryData(mayor, nextPerks)
                 }

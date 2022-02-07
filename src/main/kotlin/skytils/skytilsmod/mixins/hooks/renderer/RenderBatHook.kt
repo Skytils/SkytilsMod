@@ -28,7 +28,7 @@ import skytils.skytilsmod.utils.baseMaxHealth
 
 fun preRenderBat(bat: EntityBat, partialTicks: Float, ci: CallbackInfo) {
     if (Utils.inDungeons && Skytils.config.biggerBatModels &&
-        if (currentMayor == "Derpy") equalsOneOf(bat.baseMaxHealth, 200, 800) else equalsOneOf(bat.baseMaxHealth, 100, 400)
+        if (currentMayor == "Derpy") equalsOneOf(bat.baseMaxHealth, 200.0, 800.0) else equalsOneOf(bat.baseMaxHealth, 100.0, 400.0)
     ) {
         GlStateManager.scale(3f, 3f, 3f)
     }

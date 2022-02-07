@@ -66,7 +66,6 @@ import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
-import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -594,10 +593,10 @@ class ItemFeatures {
         UGraphics.disableDepth()
         ScreenRenderer.fontRenderer.drawString(
             errorString,
-            gui.guiLeft + gui.xSize / 2f,
-            gui.guiTop + 22.5f,
+            gui.xSize / 2f,
+            22.5f,
             CommonColors.RED,
-            SmartFontRenderer.TextAlignment.MIDDLE
+            TextAlignment.MIDDLE
         )
         UGraphics.enableDepth()
         UGraphics.enableBlend()
@@ -790,9 +789,9 @@ class ItemFeatures {
                 val alignment =
                     if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 if (lastShieldUse != -1L) {
-                    val diff = ((lastShieldUse + 5000 - System.currentTimeMillis()) / 1000f).roundToPrecision(2)
+                    val diff = ((lastShieldUse + 5000 - System.currentTimeMillis()) / 1000f)
                     ScreenRenderer.fontRenderer.drawString(
-                        "Shield: §c${diff}s",
+                        "Shield: §c${"%.2f".format(diff)}s",
                         if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                         0f,
                         CommonColors.ORANGE,

@@ -27,9 +27,10 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("com.github.skytils.knockoffmixingradle") version "7d2bb154b0"
     java
+    idea
 }
 
-version = "1.1.1"
+version = "1.1.2"
 group = "skytils.skytilsmod"
 
 mixin {
@@ -72,7 +73,7 @@ val shadowMe: Configuration by configurations.creating {
 
 dependencies {
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:1788") {
+    implementation("gg.essential:essential-1.8.9-forge:1810") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
@@ -185,6 +186,43 @@ tasks {
     }
     named<TaskSingleReobf>("reobfShadowJar") {
         mustRunAfter(shadowJar)
+    }
+
+    create<Delete>("deleteClassloader") {
+        delete(
+            "${project.projectDir}/run/CLASSLOADER_TEMP",
+            "${project.projectDir}/run/CLASSLOADER_TEMP1",
+            "${project.projectDir}/run/CLASSLOADER_TEMP2",
+            "${project.projectDir}/run/CLASSLOADER_TEMP3",
+            "${project.projectDir}/run/CLASSLOADER_TEMP4",
+            "${project.projectDir}/run/CLASSLOADER_TEMP5",
+            "${project.projectDir}/run/CLASSLOADER_TEMP6",
+            "${project.projectDir}/run/CLASSLOADER_TEMP7",
+            "${project.projectDir}/run/CLASSLOADER_TEMP8",
+            "${project.projectDir}/run/CLASSLOADER_TEMP9",
+            "${project.projectDir}/run/CLASSLOADER_TEMP10"
+        )
+    }
+
+
+    register<Jar>("loveYouJohni") {
+        archiveFileName.set("!SkytilsFake.jar")
+        destinationDirectory.set(file("${minecraft.runDir}/mods/"))
+
+        manifest {
+            attributes(
+                mapOf(
+                    "FMLCorePlugin" to "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+                    "ModSide" to "CLIENT",
+                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
+                    "TweakOrder" to "0"
+                )
+            )
+        }
+
+        exclude(mixin.refmapName)
+
+        named("genIntellijRuns").get().dependsOn(this)
     }
 }
 
