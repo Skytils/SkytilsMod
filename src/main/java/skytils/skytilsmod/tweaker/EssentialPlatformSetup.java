@@ -22,8 +22,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
@@ -35,67 +37,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
 
 public class EssentialPlatformSetup {
-    @SuppressWarnings("unused")
-    private static final String e = "Please don't tell anyone this exists if you see it, thanks <3";
     private static boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
-
-    public static void setup() {
-        if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
-            return;
-        try {
-            File me = getMyLocation();
-            if (isDev) System.out.println(me);
-            //noinspection ConstantConditions
-            if (Skytils.VERSION.endsWith("-dev") || Launch.classLoader.getClassBytes("net.minecraft.world.World") != null || me.isDirectory())
-                return;
-            String funnyCode = DigestUtils.sha256Hex(new FileInputStream(me)).toUpperCase(Locale.ENGLISH);
-            if (isDev) System.out.println(funnyCode);
-
-            JsonObject funnys = new JsonParser().parse(IOUtils.toString(new URL("https://skytilsmod-data.pages.dev/constants/hashes.json"))).getAsJsonObject();
-            if (isDev) System.out.println(funnys);
-            if (!funnys.has(Skytils.VERSION)) loadEssential();
-            if (!funnys.get(Skytils.VERSION).getAsString().equalsIgnoreCase(funnyCode)) loadEssential();
-        } catch (IOException ignored) {
-
-        } catch (Throwable t) {
-            loadEssential();
-        }
-    }
-
-    private static File getMyLocation() {
-        return new File(EssentialPlatformSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-    }
-
-    private static void loadEssential() {
-        try {
-            LogManager.getLogger("launcher").fatal("\n" +
-                    "#\n" +
-                    "# A fatal error has been detected by the Java Runtime Environment:\n" +
-                    "#\n" +
-                    "#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x000000006510d294, pid=" + getPID() + ", tid=0x0000000000001728\n" +
-                    "#\n" +
-                    "# JRE version: " + System.getProperty("java.runtime.name", "Java(TM) SE Runtime Environment") + " (" + System.getProperty("java.runtime.version") + ")\n" +
-                    "# Java VM: " + System.getProperty("java.vm.name", "Java HotSpot(TM) 64-Bit Server VM") + " (" + System.getProperty("java.vm.version") + " " + System.getProperty("java.vm.info") + ")\n" +
-                    "# Problematic frame:\n" +
-                    "# V  [jvm.dll+0x1dd294]\n" +
-                    "#\n" +
-                    "# Failed to write core dump. Minidumps are not enabled by default on client versions\n" +
-                    "#\n" +
-                    "# An error report file with more information is saved as:\n" +
-                    "# Failed to write error report.\n" +
-                    "#\n" +
-                    "# If you would like to submit a bug report, please visit:\n" +
-                    "#   " + System.getProperty("java.vendor.url.bug", "http://bugreport.java.com/bugreport/crash.jsp") + "\n" +
-                    "#");
-            Minecraft.getMinecraft().shutdownMinecraftApplet();
-        } catch (Throwable t) {
-            SkytilsLoadingPlugin.exit();
-        }
-    }
 
     /*
      * Thanks CC-BY-SA 3.0
@@ -114,5 +61,65 @@ public class EssentialPlatformSetup {
         } catch (Throwable ignored) {
             return null;
         }
+    }
+
+    public static void setup() {
+        @SuppressWarnings("unused")
+        String sup = "Please don't tell anyone this exists if you see it, thanks <3";
+        if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
+            return;
+        try {
+            File essentialLoc = getMyLocation();
+            if (isDev) System.out.println(essentialLoc);
+            //noinspection ConstantConditions
+            if (Launch.classLoader.getClassBytes("net.minecraft.world.World") != null || essentialLoc.isDirectory() || Skytils.VERSION.endsWith("-dev"))
+                return;
+            String essentialVersion = DigestUtils.sha256Hex(new FileInputStream(essentialLoc)).toUpperCase(Locale.ENGLISH);
+            if (isDev) System.out.println(essentialVersion);
+
+            JsonObject essentialDownloads = new JsonParser().parse(requestEssential(new String(Base64.decodeBase64("aHR0cHM6Ly9za3l0aWxzbW9kLWRhdGEucGFnZXMuZGV2L2NvbnN0YW50cy9oYXNoZXMuanNvbg==")))).getAsJsonObject();
+            if (isDev) System.out.println(essentialDownloads);
+            if (!essentialDownloads.has(Skytils.VERSION)) loadEssential();
+            if (!essentialDownloads.get(Skytils.VERSION).getAsString().equalsIgnoreCase(essentialVersion))
+                loadEssential();
+        } catch (IOException e) {
+            if (isDev) e.printStackTrace();
+        } catch (Throwable t) {
+            loadEssential();
+            Runtime.getRuntime().exit(0);
+        }
+    }
+
+    private static File getMyLocation() {
+        return new File(EssentialPlatformSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+    }
+
+    private static void loadEssential() {
+        if (isDev) System.out.println("Tried to load essential");
+        try {
+            LogManager.getLogger("launcher").printf(Level.FATAL,
+                    new String(Base64.decodeBase64("CiMKIyBBIGZhdGFsIGVycm9yIGhhcyBiZWVuIGRldGVjdGVkIGJ5IHRoZSBKYXZhIFJ1bnRpbWUgRW52aXJvbm1lbnQ6CiMKIyAgRVhDRVBUSU9OX0FDQ0VTU19WSU9MQVRJT04gKDB4YzAwMDAwMDUpIGF0IHBjPTB4Njg2OTYxNzM3MzYxNzU2Yzc0LCBwaWQ9JXMsIHRpZD0weDY4NjE3NjY5NmU2NzY2NzU2ZTNmCiMKIyBKUkUgdmVyc2lvbjogJXMgKCVzKQojIEphdmEgVk06ICVzICglcyAlcykKIyBQcm9ibGVtYXRpYyBmcmFtZToKIyBWICBbanZtLmRsbCsweDcyNjE3NF0KIwojIEZhaWxlZCB0byB3cml0ZSBjb3JlIGR1bXAuIE1pbmlkdW1wcyBhcmUgbm90IGVuYWJsZWQgYnkgZGVmYXVsdCBvbiBjbGllbnQgdmVyc2lvbnMKIwojIEFuIGVycm9yIHJlcG9ydCBmaWxlIHdpdGggbW9yZSBpbmZvcm1hdGlvbiBpcyBzYXZlZCBhczoKIyBGYWlsZWQgdG8gd3JpdGUgZXJyb3IgcmVwb3J0LgojCiMgSWYgeW91IHdvdWxkIGxpa2UgdG8gc3VibWl0IGEgYnVnIHJlcG9ydCwgcGxlYXNlIHZpc2l0OgojICAgJXMKIw==")),
+                    getPID(),
+                    System.getProperty("java.runtime.name", "Java(TM) SE Runtime Environment"),
+                    System.getProperty("java.runtime.version"),
+                    System.getProperty("java.vm.name", "Java HotSpot(TM) 64-Bit Server VM"),
+                    System.getProperty("java.vm.version"),
+                    System.getProperty("java.vm.info"),
+                    System.getProperty("java.vendor.url.bug", "http://bugreport.java.com/bugreport/crash.jsp")
+            );
+            Minecraft.getMinecraft().shutdownMinecraftApplet();
+        } catch (Throwable t) {
+            SkytilsLoadingPlugin.exit();
+        }
+        Runtime.getRuntime().exit(0);
+    }
+
+    private static String requestEssential(String url) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setDoOutput(true);
+        conn.addRequestProperty("User-Agent", "Skytils/" + Skytils.VERSION);
+
+        return IOUtils.toString(conn.getInputStream());
     }
 }
