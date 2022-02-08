@@ -23,8 +23,8 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import skytils.skytilsmod.utils.Utils
 
-fun lightningSkyColor(world: World): Int {
-    return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else world.lastLightningBolt
+fun lightningSkyColor(orig: Int): Int {
+    return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else orig
 }
 
 fun fixTime(world: Any, cir: CallbackInfoReturnable<Long>) {

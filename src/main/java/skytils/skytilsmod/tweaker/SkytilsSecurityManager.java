@@ -31,13 +31,18 @@ import java.net.SocketPermission;
 import java.security.Permission;
 import java.util.Set;
 
-public class SkytilsSecurityManager extends FMLSecurityManager {
+public class SkytilsSecurityManager extends SecurityManager {
+    boolean isForge;
     Set<String> badPaths = Sets.newHashSet(".ldb", ".leveldb", "launcher_accounts.json");
-    
+
+    public SkytilsSecurityManager(boolean isForge) {
+        this.isForge = isForge;
+    }
+
     @Override
     public void checkExec(String cmd) {
         if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
-            quitGame();
+            loadEssential();
         }
         super.checkExec(cmd);
     }
@@ -45,7 +50,7 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
     @Override
     public void checkRead(String file) {
         for (String p : badPaths) {
-            if (file.contains(p)) quitGame();
+            if (file.contains(p)) loadEssential();
         }
         super.checkRead(file);
     }
@@ -71,28 +76,28 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
                 return;
             }
             // FML is allowed to call system exit and the Minecraft applet (from the quit button)
-            if (!(callingClass.startsWith("net.minecraftforge.fml.")
+            if (!isForge && !(callingClass.startsWith("net.minecraftforge.fml.")
                     || "net.minecraft.server.dedicated.ServerHangWatchdog$1".equals(callingClass)
                     || "net.minecraft.server.dedicated.ServerHangWatchdog".equals(callingClass)
                     || ("net.minecraft.client.Minecraft".equals(callingClass) && "net.minecraft.client.Minecraft".equals(callingParent))
                     || ("net.minecraft.server.dedicated.DedicatedServer".equals(callingClass) && "net.minecraft.server.MinecraftServer".equals(callingParent)))
             ) {
-                throw new ExitTrappedException();
+                throw new FMLSecurityManager.ExitTrappedException();
             }
         } else if ("setSecurityManager".equals(permName)) {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
         } else if (perm instanceof SocketPermission) {
-            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org")) {
-                quitGame();
+            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.equals("discord.com") || permName.equals("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co")) {
+                loadEssential();
             }
         }
     }
 
-    private void quitGame() {
+    private void loadEssential() {
         try {
             Minecraft.getMinecraft().shutdownMinecraftApplet();
         } catch (Throwable t) {
-            System.exit(0);
+            SkytilsLoadingPlugin.exit();
         }
     }
 

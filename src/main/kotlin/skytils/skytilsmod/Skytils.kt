@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
@@ -33,12 +34,13 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
+import net.minecraft.network.play.server.S3FPacketCustomPayload
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -74,6 +76,7 @@ import skytils.skytilsmod.features.impl.protectitems.ProtectItems
 import skytils.skytilsmod.features.impl.spidersden.RainTimer
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
+import skytils.skytilsmod.features.impl.trackers.impl.DupeTracker
 import skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
 import skytils.skytilsmod.features.impl.trackers.impl.MythologicalTracker
 import skytils.skytilsmod.gui.OptionsGui
@@ -103,7 +106,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.1.2"
+        const val VERSION = "1.2.0-pre2"
 
         @JvmField
         val gson: Gson = GsonBuilder()
@@ -193,6 +196,7 @@ class Skytils {
             AuctionData(),
             AuctionPriceOverlay(),
             BlazeSolver(),
+            BloodHelper,
             BossHPDisplays(),
             BoulderSolver(),
             ChatTabs,
@@ -207,6 +211,7 @@ class Skytils {
             DungeonFeatures(),
             DungeonMap(),
             DungeonTimer(),
+            DupeTracker,
             EnchantNames(),
             EnterToConfirmSignPopup(),
             FarmingFeatures(),
@@ -230,6 +235,7 @@ class Skytils {
             PricePaid,
             ProtectItems(),
             RainTimer(),
+            RandomStuff,
             RelicWaypoints(),
             ScoreCalculation,
             SelectAllColorSolver(),
@@ -294,6 +300,8 @@ class Skytils {
         MayorInfo.fetchMayorData()
 
         MinecraftForge.EVENT_BUS.register(SpamHider())
+
+        ModChecker.checkModdedForge()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -303,7 +311,7 @@ class Skytils {
         ScreenRenderer.refresh()
 
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
-        TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it.text }
+        TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
         if (displayScreen != null) {
             mc.displayGuiScreen(displayScreen)
             displayScreen = null
@@ -339,7 +347,8 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldJoin(event: EntityJoinWorldEvent) {
+        if (event.entity !is EntityPlayerSP) return
         Utils.skyblock = false
         Utils.dungeons = false
     }
@@ -354,7 +363,19 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+        if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
+            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
+            val entity = mc.theWorld.getEntityByID(event.packet.entityId)
+
+            if (entity is ExtensionEntityLivingBase) {
+                entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
+            }
+        }
+        if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName == "MC|Brand") {
+            if (event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt()).lowercase().contains("hypixel"))
+                Utils.isOnHypixel = true
+        }
         if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
@@ -429,18 +450,6 @@ class Skytils {
                 TickTask(1) {
                     displayScreen = OptionsGui()
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
-        if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
-            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
-            val entity = mc.theWorld.getEntityByID(event.packet.entityId)
-
-            if (entity is ExtensionEntityLivingBase) {
-                entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
             }
         }
     }

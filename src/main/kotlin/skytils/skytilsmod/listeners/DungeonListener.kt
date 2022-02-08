@@ -26,6 +26,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.hylin.skyblock.item.Tier
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -74,7 +75,7 @@ object DungeonListener {
         })
         .build()
 
-    private val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\(([1-5])\\)§r")
+    val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\((?<count>[1-5])\\)§r")
     private val classPattern =
         Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
@@ -280,22 +281,4 @@ object DungeonListener {
 
         fun canRender() = player != null && player!!.health > 0 && !dead
     }
-
-    @Suppress("unused")
-    enum class DungeonClass(val className: String) {
-        ARCHER("Archer"),
-        BERSERK("Berserk"),
-        MAGE("Mage"),
-        HEALER("Healer"),
-        TANK("Tank"),
-        EMPTY("Empty");
-
-        companion object {
-            fun getClassFromName(name: String): DungeonClass {
-                return values().find { it.className.lowercase() == name.lowercase() }
-                    ?: throw IllegalArgumentException("No class could be found for the name $name")
-            }
-        }
-    }
-
 }

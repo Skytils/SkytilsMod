@@ -30,7 +30,7 @@ plugins {
     idea
 }
 
-version = "1.1.2"
+version = "1.2.0-pre2"
 group = "skytils.skytilsmod"
 
 mixin {
@@ -48,6 +48,7 @@ minecraft {
             "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
             "-Delementa.dev=true",
             "-Delementa.debug=true",
+            "-Delementa.invalid_usage=warn",
             "-Dasmhelper.verbose=true"
         )
     )
@@ -80,8 +81,8 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.2")
-    shadowMe("com.github.Skytils:Hylin:a9899c8c03") {
+    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
+    shadowMe("com.github.Skytils:Hylin:04665adf92") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
@@ -95,6 +96,9 @@ dependencies {
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
+
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.3")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.3")
 }
 
 sourceSets {
@@ -144,8 +148,9 @@ tasks {
         configurations = listOf(shadowMe)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
-        relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
+        relocate("org.apache.commons.codec", "skytils.apacheorg.codec")
         relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
+        relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
 
         exclude(
             "**/LICENSE.md",
@@ -170,7 +175,7 @@ tasks {
     withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all")
         }
         kotlinDaemonJvmArguments.set(
             listOf(

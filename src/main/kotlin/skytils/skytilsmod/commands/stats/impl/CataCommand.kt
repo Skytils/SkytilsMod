@@ -23,15 +23,15 @@ import gg.essential.universal.wrappers.message.UTextComponent
 import skytils.hylin.extension.getString
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.dungeons.Dungeon
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
-import skytils.skytilsmod.utils.Utils.timeFormat
 import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 import java.util.*
+import kotlin.time.Duration
 
 
 object CataCommand : StatCommand("skytilscata") {
@@ -60,27 +60,27 @@ object CataCommand : StatCommand("skytilscata") {
 
             val archLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(Dungeon.DungeonClass.archer) ?: 0.0,
+                    dungeonsData.classExperiences?.get(DungeonClass.ARCHER) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
                 )
             val bersLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(Dungeon.DungeonClass.berserk) ?: 0.0,
+                    dungeonsData.classExperiences?.get(DungeonClass.BERSERK) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
                 )
             val healerLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(Dungeon.DungeonClass.healer) ?: 0.0,
+                    dungeonsData.classExperiences?.get(DungeonClass.HEALER) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
                 )
             val mageLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(Dungeon.DungeonClass.mage) ?: 0.0,
+                    dungeonsData.classExperiences?.get(DungeonClass.MAGE) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
                 )
             val tankLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(Dungeon.DungeonClass.tank) ?: 0.0,
+                    dungeonsData.classExperiences?.get(DungeonClass.TANK) ?: 0.0,
                     SkillUtils.dungeoneeringXp.values
                 )
 
@@ -112,7 +112,7 @@ object CataCommand : StatCommand("skytilscata") {
                         append("§2§l●§a ")
                         append(if (i == 0) "Entrance: " else "Floor $i: ")
                         append("§e")
-                        append(completionObj[i.toString()])
+                        append(completionObj[i])
                         append(if (i < highestFloor) "\n" else "")
                     }
                 }))
@@ -125,7 +125,7 @@ object CataCommand : StatCommand("skytilscata") {
                                 append("§2§l●§a ")
                                 append(if (i == 0) "Entrance: " else "Floor $i: ")
                                 append("§e")
-                                append(if (i.toString() in fastestSTimes) timeFormat(fastestSTimes[i.toString()]!! / 1000.0) else "§cNo S Completion")
+                                append(fastestSTimes[i]?.timeFormat() ?: "§cNo S Completion")
                                 append(if (i < highestFloor) "\n" else "")
                             }
                         }
@@ -142,7 +142,7 @@ object CataCommand : StatCommand("skytilscata") {
                                     append("§2§l●§a ")
                                     append(if (i == 0) "Entrance: " else "Floor $i: ")
                                     append("§e")
-                                    append(if (i.toString() in fastestSPlusTimes) timeFormat(fastestSPlusTimes[i.toString()]!! / 1000.0) else "§cNo S+ Completion")
+                                    append(fastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
                                     append(if (i < highestFloor) "\n" else "")
                                 }
                             }
@@ -165,7 +165,7 @@ object CataCommand : StatCommand("skytilscata") {
                             append("§2§l●§a ")
                             append("Floor $i: ")
                             append("§e")
-                            append(if (i.toString() in masterCompletionObj) masterCompletionObj[i.toString()] else "§cDNF")
+                            append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
                             append(if (i < highestMasterFloor) "\n" else "")
                         }
                     }))
@@ -180,7 +180,7 @@ object CataCommand : StatCommand("skytilscata") {
                                 append("§2§l●§a ")
                                 append("Floor $i: ")
                                 append("§e")
-                                append(if (i.toString() in masterFastestSTimes) timeFormat(masterFastestSTimes[i.toString()]!! / 1000.0) else "§cNo S Completion")
+                                append(masterFastestSTimes[i]?.timeFormat() ?: "§cNo S Completion")
                                 append(if (i < highestMasterFloor) "\n" else "")
                             }
                         })
@@ -199,7 +199,7 @@ object CataCommand : StatCommand("skytilscata") {
                                 append("§2§l●§a ")
                                 append("Floor $i: ")
                                 append("§e")
-                                append(if (i.toString() in masterFastestSPlusTimes) timeFormat(masterFastestSPlusTimes[i.toString()]!! / 1000.0) else "§cNo S+ Completion")
+                                append(masterFastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
                                 append(if (i < highestMasterFloor) "\n" else "")
                             }
                         })
@@ -222,4 +222,17 @@ object CataCommand : StatCommand("skytilscata") {
         }
     }
 
+    private fun Duration.timeFormat() = toComponents { minutes, seconds, nanoseconds ->
+        buildString {
+            if (minutes > 0) {
+                append(minutes)
+                append(':')
+            }
+            append("%02d".format(seconds))
+            if (nanoseconds != 0) {
+                append('.')
+                append("%03f".format(nanoseconds / 1e6))
+            }
+        }
+    }
 }

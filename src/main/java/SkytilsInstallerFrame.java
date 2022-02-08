@@ -20,13 +20,11 @@ import swing.RoundedRectanglePanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -43,6 +41,7 @@ import java.util.zip.ZipEntry;
 /**
  * Modified from SkyblockAddons under MIT License
  * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
+ *
  * @author BiscuitDevelopment
  */
 public class SkytilsInstallerFrame extends JFrame implements ActionListener, MouseListener {
@@ -71,7 +70,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
             testPanel.setBackground(new Color(0x4166f5));
 
             // Logo
-            LogoPanel logo = new LogoPanel(w*3/7, w*3/7, 16, 16, new Color(0x8193ff));
+            LogoPanel logo = new LogoPanel(w * 3 / 7, w * 3 / 7, 16, 16, new Color(0x8193ff));
             testPanel.add(logo, BorderLayout.PAGE_START);
 
             // Description
@@ -110,185 +109,51 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         }
     }
 
-    private class LogoPanel extends RoundedRectanglePanel {
+    public static OperatingSystem getOperatingSystem() {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.US);
+        if (osName.contains("win")) {
+            return OperatingSystem.WINDOWS;
 
-        public LogoPanel(int width, int height, int radiusW, int radiusH, Color color) throws IOException {
-            super(radiusW, radiusH);
-            int img = (int) (height * 0.8f);
-            BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader()
-                    .getResourceAsStream("assets/skytils/logo.png"), "Logo not found."));
-            Image scaled = myPicture.getScaledInstance(img, img, Image.SCALE_SMOOTH);
-            JLabel logo = new JLabel(new ImageIcon(scaled));
-            logo.setName("SkytilsLogo");
-            logo.setBounds(0, 0, img, img);
-            logo.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
-            logo.setHorizontalAlignment(SwingConstants.CENTER);
-            logo.setPreferredSize(new Dimension(img, img));
+        } else if (osName.contains("mac")) {
+            return OperatingSystem.MACOS;
 
-            JLabel version = new JLabel("Skytils v" + getVersionFromMcmodInfo() + " for MC 1.8.9");
-            version.setName("Mod Version");
-            version.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
-            version.setHorizontalAlignment(SwingConstants.CENTER);
+        } else if (osName.contains("solaris") || osName.contains("sunos")) {
 
-            this.add(logo);
-            this.add(version);
-            this.setBackground(color);
-            this.setForeground(color);
-            this.setPreferredSize(new Dimension(width, height));
+            return OperatingSystem.SOLARIS;
+        } else if (osName.contains("linux") || osName.contains("unix")) {
+
+            return OperatingSystem.LINUX;
         }
+        return OperatingSystem.UNKNOWN;
     }
 
-    private class DescriptionPanel extends RoundedRectanglePanel {
-        public final JTextArea forge;
-
-        public DescriptionPanel(int width, int height, int radiusW, int radiusH, Color color) {
-            super(radiusW, radiusH);
-
-            JTextArea desc = new JTextArea();
-            desc.setName("DescriptionText");
-            desc.setText("This installer will copy Skytils into your forge mods folder for you, and replace any old versions that already exist. " +
-                    "Close this if you prefer to do this yourself!");
-            desc.setEditable(false);
-            desc.setHighlighter(null);
-            desc.setEnabled(true);
-            desc.setFont(new Font(Font.DIALOG, Font.PLAIN, 14));
-            desc.setLineWrap(true);
-            desc.setWrapStyleWord(true);
-            desc.setOpaque(false);
-            desc.setBounds(radiusW, radiusH, width - radiusW * 2, height - radiusH * 2);
-
-            // Forge Link
-            forge = new JTextArea();
-            forge.setName("Forge Text");
-            forge.setText("However, you still need to install Forge client in order to be able to run this mod. Click here to visit the download page for Forge 1.8.9!");
-            forge.setForeground(new Color(0x550ef2));
-            forge.setEditable(false);
-            forge.setHighlighter(null);
-            forge.setEnabled(true);
-            forge.setFont(new Font(Font.DIALOG, Font.PLAIN, 13));
-            forge.setLineWrap(true);
-            forge.setWrapStyleWord(true);
-            forge.setOpaque(false);
-            forge.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            forge.setBounds(radiusW, height - radiusH, width - radiusW * 2, height - radiusH * 2);
-
-            this.add(desc, BorderLayout.PAGE_START);
-            this.add(forge, BorderLayout.PAGE_END);
-            this.setBackground(color);
-            this.setForeground(color);
-            this.setPreferredSize(new Dimension(width, height));
-        }
+    private static String getStacktraceText(Throwable ex) {
+        StringWriter stringWriter = new StringWriter();
+        ex.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString().replace("\t", "  ");
     }
 
-    private class FolderPanel extends RoundedRectanglePanel {
-        public final JButton folderButton;
-        public final JTextField folderLocation;
-        public FolderPanel(int width, int height, int radiusW, int radiusH, Color color) throws IOException {
-            super(radiusW, radiusH);
+    private static void showErrorPopup(Throwable ex) {
+        ex.printStackTrace();
 
-            GroupLayout layout = new GroupLayout(this);
-            this.setLayout(layout);
+        JTextArea textArea = new JTextArea(getStacktraceText(ex));
+        textArea.setEditable(false);
+        Font currentFont = textArea.getFont();
+        Font newFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
+        textArea.setFont(newFont);
 
-            JLabel folderLabel = new JLabel();
-            folderLabel.setName("Folder Label");
-            folderLabel.setText("Mods Folder");
-            folderLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 12));
-
-            this.add(folderLabel);
-
-            folderLocation = new JTextField();
-            folderLocation.setName("Folder Field");
-            folderLocation.setText(getModsFolder().getAbsolutePath());
-            folderLocation.setEditable(false);
-            folderLocation.setPreferredSize(new Dimension(width * 2 / 3, 20));
-
-            this.add(folderLocation);
-
-            BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader()
-                    .getResourceAsStream("assets/skytils/gui/folder.png"), "Folder icon not found."));
-            Image scaled = myPicture.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-            folderButton = new JButton(new ImageIcon(scaled));
-            folderButton.setName("ButtonFolder");
-
-            this.add(folderButton);
-
-            layout.setAutoCreateGaps(true);
-            layout.setAutoCreateContainerGaps(true);
-
-            layout.setHorizontalGroup(
-                layout.createSequentialGroup()
-                    .addGroup(
-                        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(folderLabel)
-                            .addComponent(folderLocation)
-                    )
-                    .addComponent(folderButton)
-            );
-            layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                    .addComponent(folderLabel)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                    .addComponent(folderLocation)
-                    .addComponent(folderButton)
-                )
-            );
-
-            this.setBackground(color);
-            this.setForeground(color);
-            this.setPreferredSize(new Dimension(width, height));
-        }
+        JScrollPane errorScrollPane = new JScrollPane(textArea);
+        errorScrollPane.setPreferredSize(new Dimension(600, 400));
+        JOptionPane.showMessageDialog(null, errorScrollPane, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    private class FooterPanel extends RoundedRectanglePanel {
-
-        public final JButton install;
-        public final JButton openFolder;
-        public final JButton close;
-
-        public FooterPanel(int width, int height, int radiusW, int radiusH, Color color) {
-            super(radiusW, radiusH);
-
-            GroupLayout layout = new GroupLayout(this);
-            this.setLayout(layout);
-
-            install = new JButton();
-            install.setName("Install Button");
-            install.setText("Install");
-
-            this.add(install);
-
-            openFolder = new JButton();
-            openFolder.setName("Open Folder Button");
-            openFolder.setText("Open Mods Folder");
-
-            this.add(openFolder);
-
-            close = new JButton();
-            close.setName("Close Button");
-            close.setText("Cancel");
-
-            this.add(close);
-
-            layout.setAutoCreateGaps(true);
-            layout.setAutoCreateContainerGaps(true);
-
-            layout.setHorizontalGroup(
-                layout.createSequentialGroup()
-                    .addComponent(install)
-                    .addComponent(openFolder)
-                    .addComponent(close)
-            );
-            layout.setVerticalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                    .addComponent(install)
-                    .addComponent(openFolder)
-                    .addComponent(close)
-            );
-
-            this.setBackground(color);
-            this.setForeground(color);
-            this.setPreferredSize(new Dimension(width, height));
+    public static File getThisFile() {
+        try {
+            return new File(SkytilsInstallerFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        } catch (URISyntaxException ex) {
+            showErrorPopup(ex);
         }
+        return null;
     }
 
     public void onFolderSelect() {
@@ -356,7 +221,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         if (thisFile != null) {
             boolean inSubFolder = IN_MODS_SUBFOLDER.matcher(modsFolder.getPath()).find();
 
-            File newFile = new File(modsFolder, "Skytils-"+getVersionFromMcmodInfo()+".jar");
+            File newFile = new File(modsFolder, "Skytils-" + getVersionFromMcmodInfo() + ".jar");
             if (thisFile.equals(newFile)) {
                 showErrorMessage("You are opening this file from where the file should be installed... there's nothing to be done!");
                 return;
@@ -488,24 +353,6 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         return workingDirectory;
     }
 
-    public static OperatingSystem getOperatingSystem() {
-        String osName = System.getProperty("os.name").toLowerCase(Locale.US);
-        if (osName.contains("win")) {
-            return OperatingSystem.WINDOWS;
-
-        } else if (osName.contains("mac")) {
-            return OperatingSystem.MACOS;
-
-        } else if (osName.contains("solaris") || osName.contains("sunos")) {
-
-            return OperatingSystem.SOLARIS;
-        } else if (osName.contains("linux") || osName.contains("unix")) {
-
-            return OperatingSystem.LINUX;
-        }
-        return OperatingSystem.UNKNOWN;
-    }
-
     public void centerFrame(JFrame frame) {
         Rectangle rectangle = frame.getBounds();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -526,34 +373,6 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
 
     public void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(null, message, "Skytils - Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public enum OperatingSystem {
-        LINUX,
-        SOLARIS,
-        WINDOWS,
-        MACOS,
-        UNKNOWN
-    }
-
-    private static String getStacktraceText(Throwable ex) {
-        StringWriter stringWriter = new StringWriter();
-        ex.printStackTrace(new PrintWriter(stringWriter));
-        return stringWriter.toString().replace("\t", "  ");
-    }
-
-    private static void showErrorPopup(Throwable ex) {
-        ex.printStackTrace();
-
-        JTextArea textArea = new JTextArea(getStacktraceText(ex));
-        textArea.setEditable(false);
-        Font currentFont = textArea.getFont();
-        Font newFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
-        textArea.setFont(newFont);
-
-        JScrollPane errorScrollPane = new JScrollPane(textArea);
-        errorScrollPane.setPreferredSize(new Dimension(600, 400));
-        JOptionPane.showMessageDialog(null, errorScrollPane, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     private String getVersionFromMcmodInfo() {
@@ -591,24 +410,209 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         return version;
     }
 
-    private File getThisFile() {
-        try {
-            return new File(SkytilsInstallerFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        } catch (URISyntaxException ex) {
-            showErrorPopup(ex);
-        }
-        return null;
+    @Override
+    public void mousePressed(MouseEvent e) {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+    }
 
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
-    @Override
-    public void mouseExited(MouseEvent e) {}
+    public enum OperatingSystem {
+        LINUX,
+        SOLARIS,
+        WINDOWS,
+        MACOS,
+        UNKNOWN
+    }
+
+    private class LogoPanel extends RoundedRectanglePanel {
+
+        public LogoPanel(int width, int height, int radiusW, int radiusH, Color color) throws IOException {
+            super(radiusW, radiusH);
+            int img = (int) (height * 0.8f);
+            BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader()
+                    .getResourceAsStream("assets/skytils/logo.png"), "Logo not found."));
+            Image scaled = myPicture.getScaledInstance(img, img, Image.SCALE_SMOOTH);
+            JLabel logo = new JLabel(new ImageIcon(scaled));
+            logo.setName("SkytilsLogo");
+            logo.setBounds(0, 0, img, img);
+            logo.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
+            logo.setHorizontalAlignment(SwingConstants.CENTER);
+            logo.setPreferredSize(new Dimension(img, img));
+
+            JLabel version = new JLabel("Skytils v" + getVersionFromMcmodInfo() + " for MC 1.8.9");
+            version.setName("Mod Version");
+            version.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
+            version.setHorizontalAlignment(SwingConstants.CENTER);
+
+            this.add(logo);
+            this.add(version);
+            this.setBackground(color);
+            this.setForeground(color);
+            this.setPreferredSize(new Dimension(width, height));
+        }
+    }
+
+    private class DescriptionPanel extends RoundedRectanglePanel {
+        public final JTextArea forge;
+
+        public DescriptionPanel(int width, int height, int radiusW, int radiusH, Color color) {
+            super(radiusW, radiusH);
+
+            JTextArea desc = new JTextArea();
+            desc.setName("DescriptionText");
+            desc.setText("This installer will copy Skytils into your forge mods folder for you, and replace any old versions that already exist. " +
+                    "Close this if you prefer to do this yourself!");
+            desc.setEditable(false);
+            desc.setHighlighter(null);
+            desc.setEnabled(true);
+            desc.setFont(new Font(Font.DIALOG, Font.PLAIN, 14));
+            desc.setLineWrap(true);
+            desc.setWrapStyleWord(true);
+            desc.setOpaque(false);
+            desc.setBounds(radiusW, radiusH, width - radiusW * 2, height - radiusH * 2);
+
+            // Forge Link
+            forge = new JTextArea();
+            forge.setName("Forge Text");
+            forge.setText("However, you still need to install Forge client in order to be able to run this mod. Click here to visit the download page for Forge 1.8.9!");
+            forge.setForeground(new Color(0x550ef2));
+            forge.setEditable(false);
+            forge.setHighlighter(null);
+            forge.setEnabled(true);
+            forge.setFont(new Font(Font.DIALOG, Font.PLAIN, 13));
+            forge.setLineWrap(true);
+            forge.setWrapStyleWord(true);
+            forge.setOpaque(false);
+            forge.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            forge.setBounds(radiusW, height - radiusH, width - radiusW * 2, height - radiusH * 2);
+
+            this.add(desc, BorderLayout.PAGE_START);
+            this.add(forge, BorderLayout.PAGE_END);
+            this.setBackground(color);
+            this.setForeground(color);
+            this.setPreferredSize(new Dimension(width, height));
+        }
+    }
+
+    private class FolderPanel extends RoundedRectanglePanel {
+        public final JButton folderButton;
+        public final JTextField folderLocation;
+
+        public FolderPanel(int width, int height, int radiusW, int radiusH, Color color) throws IOException {
+            super(radiusW, radiusH);
+
+            GroupLayout layout = new GroupLayout(this);
+            this.setLayout(layout);
+
+            JLabel folderLabel = new JLabel();
+            folderLabel.setName("Folder Label");
+            folderLabel.setText("Mods Folder");
+            folderLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 12));
+
+            this.add(folderLabel);
+
+            folderLocation = new JTextField();
+            folderLocation.setName("Folder Field");
+            folderLocation.setText(getModsFolder().getAbsolutePath());
+            folderLocation.setEditable(false);
+            folderLocation.setPreferredSize(new Dimension(width * 2 / 3, 20));
+
+            this.add(folderLocation);
+
+            BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader()
+                    .getResourceAsStream("assets/skytils/gui/folder.png"), "Folder icon not found."));
+            Image scaled = myPicture.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+            folderButton = new JButton(new ImageIcon(scaled));
+            folderButton.setName("ButtonFolder");
+
+            this.add(folderButton);
+
+            layout.setAutoCreateGaps(true);
+            layout.setAutoCreateContainerGaps(true);
+
+            layout.setHorizontalGroup(
+                    layout.createSequentialGroup()
+                            .addGroup(
+                                    layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                            .addComponent(folderLabel)
+                                            .addComponent(folderLocation)
+                            )
+                            .addComponent(folderButton)
+            );
+            layout.setVerticalGroup(
+                    layout.createSequentialGroup()
+                            .addComponent(folderLabel)
+                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                    .addComponent(folderLocation)
+                                    .addComponent(folderButton)
+                            )
+            );
+
+            this.setBackground(color);
+            this.setForeground(color);
+            this.setPreferredSize(new Dimension(width, height));
+        }
+    }
+
+    private class FooterPanel extends RoundedRectanglePanel {
+
+        public final JButton install;
+        public final JButton openFolder;
+        public final JButton close;
+
+        public FooterPanel(int width, int height, int radiusW, int radiusH, Color color) {
+            super(radiusW, radiusH);
+
+            GroupLayout layout = new GroupLayout(this);
+            this.setLayout(layout);
+
+            install = new JButton();
+            install.setName("Install Button");
+            install.setText("Install");
+
+            this.add(install);
+
+            openFolder = new JButton();
+            openFolder.setName("Open Folder Button");
+            openFolder.setText("Open Mods Folder");
+
+            this.add(openFolder);
+
+            close = new JButton();
+            close.setName("Close Button");
+            close.setText("Cancel");
+
+            this.add(close);
+
+            layout.setAutoCreateGaps(true);
+            layout.setAutoCreateContainerGaps(true);
+
+            layout.setHorizontalGroup(
+                    layout.createSequentialGroup()
+                            .addComponent(install)
+                            .addComponent(openFolder)
+                            .addComponent(close)
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                            .addComponent(install)
+                            .addComponent(openFolder)
+                            .addComponent(close)
+            );
+
+            this.setBackground(color);
+            this.setForeground(color);
+            this.setPreferredSize(new Dimension(width, height));
+        }
+    }
 }

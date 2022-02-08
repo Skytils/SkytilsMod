@@ -57,7 +57,12 @@ object UpdateChecker {
                 println("Copying updated jar to mods.")
                 val newJar = File(File(Skytils.modDir, "updates"), jarName)
                 println("Copying to mod folder")
-                val newLocation = File(oldJar.parent, "${if (oldJar.name.startsWith("!")) "!" else ""}${jarName}")
+                val nameNoExtension = jarName.substringBeforeLast(".")
+                val newExtension = jarName.substringAfterLast(".")
+                val newLocation = File(
+                    oldJar.parent,
+                    "${if (oldJar.name.startsWith("!")) "!" else ""}${nameNoExtension}${if (oldJar.endsWith(".temp.jar") && newExtension == oldJar.extension) ".temp.jar" else ".$newExtension"}"
+                )
                 newLocation.createNewFile()
                 newJar.copyTo(newLocation, true)
                 newJar.delete()
@@ -151,7 +156,7 @@ object UpdateChecker {
                 else -> return println("Channel set as none")
             }
             val latestTag = latestRelease["tag_name"].asString
-            val currentTag = Skytils.VERSION
+            val currentTag = Skytils.VERSION.substringBefore("-dev")
 
             val currentVersion = SkytilsVersion(currentTag)
             val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))

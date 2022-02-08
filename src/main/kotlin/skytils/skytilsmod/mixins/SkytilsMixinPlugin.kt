@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.mixins
 
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.minecraft.launchwrapper.Launch
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
@@ -33,6 +34,7 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         if (deobfEnvironment) {
             println("We are in a deobfuscated environment, loading compatibility mixins.")
         }
+        MixinExtrasBootstrap.init()
     }
 
     override fun getRefMapperConfig(): String? {
@@ -51,11 +53,11 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         return true
     }
 
-    override fun acceptTargets(myTargets: MutableSet<String>, otherTargets: MutableSet<String>) {
+    override fun acceptTargets(myTargets: MutableSet<String>, otherTargets: Set<String>) {
 
     }
 
-    override fun getMixins(): MutableList<String>? {
+    override fun getMixins(): List<String>? {
         return null
     }
 

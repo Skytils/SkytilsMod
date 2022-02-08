@@ -33,6 +33,7 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.RenderHUDEvent
 import skytils.skytilsmod.gui.LocationEditGui
+import skytils.skytilsmod.utils.GlState
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
 import java.io.File
@@ -76,7 +77,9 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
         if (Skytils.usingLabymod && Minecraft.getMinecraft().ingameGUI !is GuiIngameForge) return
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        GlState.pushState()
         MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
+        GlState.popState()
     }
 
     // LabyMod Support
@@ -84,7 +87,9 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun renderPlayerInfoLabyMod(event: RenderGameOverlayEvent) {
         if (!Skytils.usingLabymod) return
         if (event.type != null) return
+        GlState.pushState()
         MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
+        GlState.popState()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

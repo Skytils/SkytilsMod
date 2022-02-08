@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
@@ -27,6 +28,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.event.ClickEvent
@@ -59,6 +61,7 @@ import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.BossBarEvent
+import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -99,6 +102,7 @@ class DungeonFeatures {
             "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
         private var lastLitUpTime = -1L
         private val lastBlockPos = BlockPos(207, 77, 234)
+        private var startWithoutFullParty = false
 
         init {
             LividGuiElement()
@@ -218,6 +222,7 @@ class DungeonFeatures {
                                     val a = when (color) {
                                         EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
                                         EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
+                                        EnumDyeColor.PINK -> EnumChatFormatting.LIGHT_PURPLE
                                         EnumDyeColor.RED -> EnumChatFormatting.RED
                                         EnumDyeColor.SILVER -> EnumChatFormatting.GRAY
                                         EnumDyeColor.GRAY -> EnumChatFormatting.GRAY
@@ -385,7 +390,13 @@ class DungeonFeatures {
         }
     }
 
-    // Show hidden fels
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!Utils.inDungeons) return
+        if (Skytils.config.hideArcherBonePassive && event.entity is EntityItem && event.entity.entityItem.itemDamage == 15 && event.entity.entityItem.item === Items.dye)
+            event.isCanceled = true
+    }
+
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
@@ -436,6 +447,9 @@ class DungeonFeatures {
                             "Withermancer"
                         )
                     ) mc.theWorld.removeEntity(event.entity)
+                }
+                if (Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
+                    event.isCanceled = true
                 }
             }
             if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
@@ -547,16 +561,38 @@ class DungeonFeatures {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName.endsWith(" Chest")) {
-                if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
-                    rerollClicks++
-                    val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
-                    if (neededClicks > 0) {
-                        event.isCanceled = true
+            val chestName = chest.lowerChestInventory.displayName.unformattedText ?: return
+            when {
+                chestName.endsWith(" Chest") -> {
+                    if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
+                        rerollClicks++
+                        val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
+                        if (neededClicks > 0) {
+                            event.isCanceled = true
+                        }
+                    }
+                }
+                chestName == "Start Dungeon?" -> {
+                    if (!startWithoutFullParty && Skytils.config.noChildLeftBehind && event.slot?.stack?.displayName == "§aStart Dungeon?") {
+                        val teamCount =
+                            (DungeonListener.partyCountPattern.find(TabListUtils.tabEntries[0].second)?.groupValues?.get(
+                                1
+                            )?.toIntOrNull() ?: 0)
+                        if (teamCount < 5) {
+                            event.isCanceled = true
+                            EssentialAPI.getNotifications()
+                                .push(
+                                    "Party only has $teamCount members!",
+                                    "Click me to disable this warning.",
+                                    4f,
+                                    action = {
+                                        startWithoutFullParty = true
+                                    })
+                        }
                     }
                 }
             }
+
         }
     }
 
@@ -588,6 +624,7 @@ class DungeonFeatures {
         foundLivid = false
         alertedSpiritPet = false
         lastLitUpTime = -1L
+        startWithoutFullParty = false
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {

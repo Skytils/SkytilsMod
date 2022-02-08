@@ -17,7 +17,7 @@
  */
 package skytils.skytilsmod.utils
 
-import net.minecraft.util.EnumChatFormatting
+import gg.essential.universal.ChatColor
 import java.awt.Color
 
 /**
@@ -26,17 +26,18 @@ import java.awt.Color
  * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
  * @author SteveKunG
  */
-enum class ItemRarity(val rarityName: String, val baseColor: EnumChatFormatting, val color: Color) {
-    COMMON("COMMON", EnumChatFormatting.WHITE, Color(255, 255, 255)),
-    UNCOMMON("UNCOMMON", EnumChatFormatting.GREEN, Color(77, 231, 77)),
-    RARE("RARE", EnumChatFormatting.BLUE, Color(85, 85, 255)),
-    EPIC("EPIC", EnumChatFormatting.DARK_PURPLE, Color(151, 0, 151)),
-    LEGENDARY("LEGENDARY", EnumChatFormatting.GOLD, Color(255, 170, 0)),
-    MYTHIC("MYTHIC", EnumChatFormatting.LIGHT_PURPLE, Color(255, 85, 255)),
-    DIVINE("DIVINE", EnumChatFormatting.AQUA, Color(85, 255, 255)),
-    SUPREME("SUPREME", EnumChatFormatting.DARK_RED, Color(170, 0, 0)),
-    SPECIAL("SPECIAL", EnumChatFormatting.RED, Color(255, 85, 85)),
-    VERY_SPECIAL("VERY SPECIAL", EnumChatFormatting.RED, Color(170, 0, 0));
+enum class ItemRarity(val rarityName: String, val baseColor: ChatColor, val color: Color = baseColor.color!!) {
+    NONE("NONE", ChatColor.GRAY),
+    COMMON("COMMON", ChatColor.WHITE, Color(255, 255, 255)),
+    UNCOMMON("UNCOMMON", ChatColor.GREEN, Color(77, 231, 77)),
+    RARE("RARE", ChatColor.BLUE, Color(85, 85, 255)),
+    EPIC("EPIC", ChatColor.DARK_PURPLE, Color(151, 0, 151)),
+    LEGENDARY("LEGENDARY", ChatColor.GOLD, Color(255, 170, 0)),
+    MYTHIC("MYTHIC", ChatColor.LIGHT_PURPLE, Color(255, 85, 255)),
+    DIVINE("DIVINE", ChatColor.AQUA, Color(85, 255, 255)),
+    SUPREME("SUPREME", ChatColor.DARK_RED, Color(170, 0, 0)),
+    SPECIAL("SPECIAL", ChatColor.RED, Color(255, 85, 85)),
+    VERY_SPECIAL("VERY SPECIAL", ChatColor.RED, Color(170, 0, 0));
 
     companion object {
         private val VALUES = values().sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()

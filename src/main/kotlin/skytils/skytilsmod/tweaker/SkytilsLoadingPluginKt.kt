@@ -19,6 +19,7 @@
 package skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
+import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.hc.client5.http.classic.methods.HttpGet
@@ -75,11 +76,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 Locale.setDefault(Locale.US)
             }
 
-            // Must use reflection otherwise the "constant" value will be inlined by compiler
-            val forgeVersion = runCatching {
-                ForgeVersion::class.java.getDeclaredField("buildVersion").also { it.isAccessible = true }
-                    .get(null) as Int
-            }.onFailure { it.printStackTrace() }.getOrDefault(2318)
+            val forgeVersion = ForgeVersion.getBuildVersion()
             // Asbyth's forge fork uses version 0
             if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
                 val forgeUrl =
@@ -155,6 +152,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 
     override fun injectData(data: MutableMap<String, Any>?) {
+        Launch.classLoader.addTransformerExclusion("skytils.skytilsmod.utils.ModChecker")
     }
 
     override fun getAccessTransformerClass(): String? {
@@ -210,11 +208,11 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 }
 
-fun createButton(text: String, onClick: () -> Unit): JButton {
-    return JButton(text).also {
-        it.addMouseListener(object : MouseAdapter() {
+fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
+    return JButton(text).apply {
+        addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                onClick()
+                onClick(this@apply)
             }
         })
     }

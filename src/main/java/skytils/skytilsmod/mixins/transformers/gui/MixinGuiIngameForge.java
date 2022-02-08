@@ -18,9 +18,11 @@
 
 package skytils.skytilsmod.mixins.transformers.gui;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraftforge.client.GuiIngameForge;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
@@ -32,6 +34,11 @@ import skytils.skytilsmod.mixins.hooks.gui.GuiIngameForgeHookKt;
 public abstract class MixinGuiIngameForge extends GuiIngame {
     public MixinGuiIngameForge(Minecraft mcIn) {
         super(mcIn);
+    }
+
+    @ModifyExpressionValue(method = "renderToolHightlight", at = @At(value = "FIELD", target = "Lnet/minecraftforge/client/GuiIngameForge;remainingHighlightTicks:I", opcode = Opcodes.GETFIELD, ordinal = 0))
+    private int alwaysShowItemHighlight(int original) {
+        return GuiIngameForgeHookKt.alwaysShowItemHighlight(original);
     }
 
     @ModifyArgs(method = "renderToolHightlight", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/FontRenderer;drawStringWithShadow(Ljava/lang/String;FFI)I"))

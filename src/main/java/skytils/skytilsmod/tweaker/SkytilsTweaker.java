@@ -27,48 +27,28 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+@SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
-        if (System.getProperty("skytils.noSecurityManager") == null && System.getSecurityManager().getClass() == FMLSecurityManager.class) {
+        boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
+        if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
             System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
-            overrideSecurityManager();
+            overrideSecurityManager(isFML);
             System.out.println("Current security manager: " + System.getSecurityManager());
         }
-        /*   Thanks Essential! I spent 2.5 hours on this and it doesn't even work lol
-            I'll figure it out later
-        try {
-            if (Launch.classLoader.getClassBytes("net.minecraft.world.World") != null) {
-                Launch.blackboard.put("fml.deobfuscatedEnvironment", true);
-                HashSet<String> coreMods = Sets.newHashSet(Splitter.on(',').split(System.getProperty("fml.coreMods.load", "")));
-                if (coreMods.add("skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")) {
-                    System.setProperty("fml.coreMods.load", Joiner.on(',').join(coreMods));
-                    System.out.println(System.getProperty("fml.coreMods.load"));
-                }
-                @SuppressWarnings("unchecked")
-                Map<String, String> launchArgs = (Map<String, String>) Launch.blackboard.get("launchArgs");
-                if (launchArgs == null) {
-                    launchArgs = Maps.newHashMap();
-                    Launch.blackboard.put("launchArgs", launchArgs);
-                }
-                launchArgs.put("--tweakClass", "skytils.skytilsmod.tweaker.SkytilsTweaker");
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }*/
+        EssentialPlatformSetup.setup();
     }
 
     // Bypass the FML security manager in order to set our own
-    private void overrideSecurityManager() {
+    private void overrideSecurityManager(boolean isForge) {
         try {
-            SecurityManager s = new SkytilsSecurityManager();
+            SecurityManager s = new SkytilsSecurityManager(isForge);
 
             if (s.getClass().getClassLoader() != null) {
-                AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                    public Object run() {
-                        s.getClass().getProtectionDomain().implies
-                                (SecurityConstants.ALL_PERMISSION);
-                        return null;
-                    }
+                AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+                    s.getClass().getProtectionDomain().implies
+                            (SecurityConstants.ALL_PERMISSION);
+                    return null;
                 });
             }
 
