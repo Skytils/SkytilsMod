@@ -1,6 +1,6 @@
 {
   "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.7",
+  "minVersion": "0.8",
   "plugin": "skytils.skytilsmod.mixins.SkytilsMixinPlugin",
   "package": "skytils.skytilsmod.mixins.transformers",
   "refmap": "mixins.skytils.refmap.json",
@@ -26,6 +26,7 @@
     "entity.MixinEntityBlaze",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayerSP",
+    "forge.MixinJarDiscoverer",
     "gui.MixinGuiContainer",
     "gui.MixinGuiIngame",
     "gui.MixinGuiIngameForge",
