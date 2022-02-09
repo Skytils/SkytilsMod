@@ -69,7 +69,6 @@ import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -278,7 +277,7 @@ class ItemFeatures {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
                         val line2 = lore[2].stripControlCodes()
                         val enchantName =
-                            line2.substringBeforeLast(" ").replace(" ", "_").uppercase()
+                            line2.substringBeforeLast(" ").replace(Regex("[\\s-]"), "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
                         isSuperpairsReward = true
                     }
