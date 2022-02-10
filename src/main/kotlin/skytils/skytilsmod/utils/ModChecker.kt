@@ -86,10 +86,11 @@ object ModChecker {
             JOptionPane.showOptionDialog(
                 frame,
                 """
-                    #You're using a modded version of Minecraft Forge! (${ClientBrandRetriever.getClientModName()})
-                    #This is currently unsupported due to possible incompatibilities.
+                    #You're using a 'custom' version of Minecraft Forge! (${ClientBrandRetriever.getClientModName()})
+                    #This is currently unsupported due to guaranteed incompatibilities.
                     #For any issues you encounter with Skytils, please contact
-                    #your mod loader's developer first for instructions.
+                    #your 'custom' mod loader's developer first for instructions.
+                    #You will not receive support from Skytils staff for issues.
                     #Thanks! 💕
                     #
                     #Was I wrong? Report this at discord.gg/skytils.
