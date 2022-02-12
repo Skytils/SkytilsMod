@@ -22,7 +22,6 @@ import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -40,10 +39,8 @@ public class ClassPreloader {
             define.setAccessible(true);
             for (String s : toGenerate) {
                 String gen = new String(Base64.decodeBase64(s));
-                ClassNode cn = new ClassNode();
-                cn.visit(Opcodes.V1_8, Opcodes.ACC_PRIVATE, gen.replace('.', '/'), null, "java/lang/Object", null);
                 ClassWriter cw = new ClassWriter(3);
-                cn.accept(cw);
+                cw.visit(Opcodes.V1_8, Opcodes.ACC_PRIVATE, gen.replace('.', '/'), null, "java/lang/Object", null);
                 byte[] genned = cw.toByteArray();
                 define.invoke(ClassPreloader.class.getClassLoader(),
                         gen, genned, 0, genned.length
