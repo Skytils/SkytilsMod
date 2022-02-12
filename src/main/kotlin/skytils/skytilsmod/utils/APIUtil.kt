@@ -125,6 +125,25 @@ object APIUtil {
         return JsonArray()
     }
 
+    fun getResponse(urlString: String): String {
+        val client = builder.build()
+        try {
+            client.execute(HttpGet(urlString)).use { response ->
+                response.entity.use { entity ->
+                    val obj = EntityUtils.toString(entity)
+                    EntityUtils.consume(entity)
+                    return obj
+                }
+            }
+        } catch (ex: Throwable) {
+            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+            ex.printStackTrace()
+        } finally {
+            client.close()
+        }
+        return ""
+    }
+
     private fun isValidCert(chain: Array<X509Certificate>, authType: String): Boolean {
         return chain.any { it.issuerDN.name == "CN=R3, O=Let's Encrypt, C=US" }
     }
