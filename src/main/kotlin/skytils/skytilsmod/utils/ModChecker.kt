@@ -23,7 +23,6 @@ import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.Loader
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.tweaker.SkytilsLoadingPlugin
 import skytils.skytilsmod.tweaker.createButton
 import java.awt.Desktop
 import java.awt.Image
@@ -50,37 +49,24 @@ object ModChecker {
             runCatching {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             }
-            // This makes the JOptionPane show on taskbar and stay on top
             val frame = JFrame()
             frame.isUndecorated = true
             frame.isAlwaysOnTop = true
             frame.setLocationRelativeTo(null)
             frame.isVisible = true
             frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            var icon: Icon? = null
-            try {
-                val url = SkytilsLoadingPlugin::class.java.getResource("/assets/skytils/sychicpet.gif")
-                if (url != null) {
-                    icon = ImageIcon(
-                        Toolkit.getDefaultToolkit().createImage(url).getScaledInstance(50, 50, Image.SCALE_DEFAULT)
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            val icon = runCatching {
+                ImageIcon(
+                    Toolkit.getDefaultToolkit().createImage(this::class.java.getResource("/assets/skytils/logo.png"))
+                        .getScaledInstance(50, 50, Image.SCALE_DEFAULT)
+                )
+            }.getOrNull()
             val discordLink = createButton("Join the Discord") {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
             }
             val close = createButton("Close") {
-                val w = SwingUtilities.getWindowAncestor(this)
-                JOptionPane.getRootFrame().dispose()
-                if (w != null) {
-                    w.isVisible = false
-                    w.dispose()
-                } else {
-                    frame.isVisible = false
-                    frame.dispose()
-                }
+                frame.isVisible = false
+                frame.dispose()
             }
             val totalOptions = arrayOf(discordLink, close)
             JOptionPane.showOptionDialog(
@@ -102,6 +88,8 @@ object ModChecker {
                 totalOptions,
                 totalOptions[1]
             )
+            frame.isVisible = false
+            frame.dispose()
         }
     }
 }
