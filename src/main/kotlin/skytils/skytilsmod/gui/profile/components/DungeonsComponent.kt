@@ -25,7 +25,6 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
-import gg.essential.universal.UMatrixStack
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
@@ -200,82 +199,51 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
             y = SiblingConstraint(5f)
         } childOf normalFloors
 
-//    val normalFloorContainer by UIContainer().constrain {
-//        x = 5.percent
-//        y = SiblingConstraint(5f)
-//        width = 90.percent
-//        height = ChildBasedRangeConstraint()
-//    } childOf normalFloors
+    val normalFloorContainer by UIContainer().constrain {
+        x = 5.percent
+        y = SiblingConstraint(5f)
+        width = 90.percent
+        height = ChildBasedRangeConstraint()
+    } childOf normalFloors
+
+    val masterData = cataData.map {
+        it?.master
+    }
+
+    val masterFloorContainer by UIContainer().constrain {
+        x = 5.percent
+        y = SiblingConstraint(5f)
+        width = 90.percent
+        height = ChildBasedRangeConstraint()
+    } childOf floors
 
     init {
-//        normalData.onSetValue { dungeon ->
-//            Window.enqueueRenderOperation {
-//                normalFloorContainer.clearChildren()
-//                dungeon?.highestCompletion?.let { highest ->
-//                    (0 until highest).forEach {
-//                        DungeonFloorComponent(dungeon, it).constrain {
-//                            x = CramSiblingConstraint(5f)
-//                            y = CramSiblingConstraint(5f)
-//                        } childOf normalFloorContainer
-//                    }
-//                }
-//            }
-//        }
+        normalData.onSetValue { dungeon ->
+            Window.enqueueRenderOperation {
+                normalFloorContainer.clearChildren()
+                dungeon?.highestCompletion?.let { highest ->
+                    (0 until highest).forEach {
+                        DungeonFloorComponent(dungeon, it).constrain {
+                            x = CramSiblingConstraint(5f)
+                            y = CramSiblingConstraint(5f)
+                        } childOf normalFloorContainer
+                    }
+                }
+            }
+        }
 
-//        profileState.onSetValue {
-//            Window.enqueueRenderOperation {
-//                it?.let { profile ->
-//
-//                    val cataData = profile.dungeons.dungeons["catacombs"]
-//                    val normalData = cataData?.normal
-//                    val masterData = cataData?.master
-//
-//                    val highestFloor = normalData?.highestCompletion
-//                    val highestMasterFloor = masterData?.highestCompletion
-//
-//                    val highestFloorBeaten by UIText("Highest Floor Beaten: ${highestFloor?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}").constrain {
-//                        x = 0.pixels
-//                        y = 5.pixels
-//                    } childOf catacombs
-//                    val highestMasterFloorBeaten by UIText("Highest Master Floor Beaten: ${highestMasterFloor?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}").constrain {
-//                        x = 0.pixels
-//                        y = SiblingConstraint(5f)
-//                    } childOf catacombs
-//                    val secretsFound by UIText("${
-//                        playerState.map { it?.achievements?.getOrDefault("skyblock_treasure_hunter", 0) }
-//                            .getOrDefault(0)
-//                    }").constrain {
-//                        x = 0.pixels
-//                        y = SiblingConstraint(5f)
-//                    } childOf catacombs
-//                    val floors by UIContainer().constrain {
-//                        x = 0.pixels
-//                        y = SiblingConstraint(10f)
-//                        width = RelativeConstraint()
-//                        height = ChildBasedSizeConstraint()
-//                    } childOf catacombs
-//                    val masterFloors by UIContainer().constrain {
-//                        x = 0.pixels
-//                        y = SiblingConstraint(5f)
-//                        width = RelativeConstraint()
-//                        height = ChildBasedSizeConstraint()
-//                    } childOf catacombs
-//
-//                    if (normalData != null && highestFloor != null) for (i in 0..highestFloor) {
-//                        DungeonFloorComponent(normalData, i).constrain {
-//                            x = CramSiblingConstraint(5f)
-//                            y = CramSiblingConstraint(5f)
-//                        } childOf floors
-//                    }
-//                    if (masterData != null && highestMasterFloor != null) for (i in 1..highestMasterFloor) {
-//                        DungeonFloorComponent(masterData, i).constrain {
-//                            x = CramSiblingConstraint(5f)
-//                            y = CramSiblingConstraint(5f)
-//                        } childOf masterFloors
-//                    }
-//                }
-//            }
-//        }
-
+        masterData.onSetValue { dungeon ->
+            Window.enqueueRenderOperation {
+                masterFloorContainer.clearChildren()
+                dungeon?.highestCompletion?.let { highest ->
+                    (0 until highest).forEach {
+                        DungeonFloorComponent(dungeon, it).constrain {
+                            x = CramSiblingConstraint(5f)
+                            y = CramSiblingConstraint(5f)
+                        } childOf masterFloorContainer
+                    }
+                }
+            }
+        }
     }
 }

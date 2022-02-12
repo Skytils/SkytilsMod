@@ -36,6 +36,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
             color = VigilancePalette.getDarkBackground().constraint
         }
         val pairs = arrayListOf<Pair<String, Any>>()
+        pairs.add("Floor: " to floor)
         dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
         dungeonBase.watcherKills?.get(floor)?.apply { pairs.add("Watcher Kills" to this) }
         dungeonBase.completions?.get(floor)?.apply { pairs.add("Completions" to this) }
