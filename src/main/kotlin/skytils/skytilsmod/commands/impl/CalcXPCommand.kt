@@ -19,7 +19,7 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
-import net.minecraft.command.ICommandSender
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.SyntaxErrorException
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.NumberUtil
@@ -27,7 +27,7 @@ import skytils.skytilsmod.utils.SkillUtils
 
 object CalcXPCommand : BaseCommand("skytilscalcxp") {
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.size != 3) throw SyntaxErrorException("invalid arguments")
         val type = args[0].lowercase()
         var starting = args[1].toIntOrNull() ?: 0

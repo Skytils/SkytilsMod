@@ -21,7 +21,7 @@ package skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.command.ICommandSender
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
@@ -32,9 +32,9 @@ import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 
 object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw")) {
-    override fun getCommandUsage(sender: ICommandSender): String = "/skytilshollowwaypoint location x y z"
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/skytilshollowwaypoint location x y z"
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
             val message = UMessage("§3Skytils > §eWaypoints:\n")
             if (MiningFeatures.cityLoc.exists()) {

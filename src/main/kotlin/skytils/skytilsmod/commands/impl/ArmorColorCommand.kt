@@ -19,7 +19,6 @@ package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
@@ -31,12 +30,11 @@ import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 
 object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "armorcolour", "armourcolor")) {
-    override fun getCommandUsage(sender: ICommandSender): String = "/armorcolor <clearall/clear/set>"
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/armorcolor <clearall/clear/set>"
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        val player = sender as EntityPlayerSP
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
-            UChat.chat(getCommandUsage(sender))
+            UChat.chat(getCommandUsage(player))
             return
         }
         val subcommand = args[0].lowercase()
@@ -46,7 +44,7 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             UChat.chat("§aCleared all your custom armor colors!")
         } else if (subcommand == "clear") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = sender.heldItem
+            val item = player.heldItem
                 ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
             if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
             if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
@@ -60,7 +58,7 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             } else UChat.chat("§cThat item doesn't have a custom color!")
         } else if (subcommand == "set") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = sender.heldItem
+            val item = player.heldItem
                 ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
             if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
             if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
@@ -76,6 +74,6 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             ArmorColor.armorColors[uuid] = color
             PersistentSave.markDirty<ArmorColor>()
             UChat.chat("§aSet the color of your ${item.displayName}§a to ${args[1]}!")
-        } else UChat.chat(getCommandUsage(sender))
+        } else UChat.chat(getCommandUsage(player))
     }
 }

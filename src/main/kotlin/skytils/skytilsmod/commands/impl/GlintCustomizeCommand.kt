@@ -19,7 +19,6 @@ package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import skytils.skytilsmod.commands.BaseCommand
@@ -29,15 +28,14 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
 object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizeglint")) {
-    override fun getCommandUsage(sender: ICommandSender) = "glintcustomize <override/color>"
+    override fun getCommandUsage(player: EntityPlayerSP) = "glintcustomize <override/color>"
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-        val player = sender as EntityPlayerSP
         val item = player.heldItem ?: throw WrongUsageException("You need to hold an item that you wish to customize!")
         val itemId = ItemUtil.getSkyBlockItemID(item) ?: throw WrongUsageException("That isn't a valid item!")
         if (args.isEmpty()) {
-            throw WrongUsageException(getCommandUsage(sender))
+            throw WrongUsageException(getCommandUsage(player))
         }
         val originalMessage = args.joinToString(" ")
         when (args[0].lowercase()) {
@@ -103,7 +101,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                 }
             }
             else -> {
-                throw WrongUsageException(getCommandUsage(sender))
+                throw WrongUsageException(getCommandUsage(player))
             }
         }
     }

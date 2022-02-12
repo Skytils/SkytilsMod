@@ -24,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.event.ClickEvent
@@ -54,8 +53,7 @@ import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
 object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        val player = sender as EntityPlayerSP
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
             Skytils.displayScreen = OptionsGui()
             return
@@ -190,7 +188,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()
             "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> ArmorColorCommand.processCommand(
-                sender,
+                player,
                 args.copyOfRange(1, args.size)
             )
             "swaphub" -> {

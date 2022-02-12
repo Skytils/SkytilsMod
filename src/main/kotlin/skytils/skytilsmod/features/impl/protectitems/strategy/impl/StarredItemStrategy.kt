@@ -25,7 +25,7 @@ import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrateg
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 
-class StarredItemStrategy : ItemProtectStrategy() {
+object StarredItemStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
         if (extraAttr == null) return false
         when (type) {
