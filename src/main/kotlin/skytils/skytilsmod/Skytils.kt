@@ -88,6 +88,7 @@ import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import sun.misc.Unsafe
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
@@ -158,6 +159,12 @@ class Skytils {
 
         val deobfEnvironment by lazy {
             Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
+        }
+
+        val unsafe by lazy {
+            Unsafe::class.java.getDeclaredField("theUnsafe").apply {
+                isAccessible = true
+            }.get(null) as Unsafe
         }
 
         val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
