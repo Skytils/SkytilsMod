@@ -26,7 +26,7 @@ import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrateg
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 
-class ItemWorthStrategy : ItemProtectStrategy() {
+object ItemWorthStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
         val id = AuctionData.getIdentifier(item) ?: return false
         if (AuctionData.lowestBINs.size == 0) return true

@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.protectitems.strategy
 
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import skytils.skytilsmod.features.impl.protectitems.strategy.impl.FavoriteStrategy
 import skytils.skytilsmod.features.impl.protectitems.strategy.impl.ItemWorthStrategy
 import skytils.skytilsmod.features.impl.protectitems.strategy.impl.StarredItemStrategy
 
@@ -39,8 +40,9 @@ abstract class ItemProtectStrategy {
         }
 
         init {
-            STRATEGIES.add(ItemWorthStrategy())
-            STRATEGIES.add(StarredItemStrategy())
+            STRATEGIES.add(ItemWorthStrategy)
+            STRATEGIES.add(StarredItemStrategy)
+            STRATEGIES.add(FavoriteStrategy)
         }
 
     }
