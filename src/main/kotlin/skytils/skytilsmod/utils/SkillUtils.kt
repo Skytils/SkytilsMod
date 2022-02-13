@@ -61,14 +61,4 @@ object SkillUtils {
         val overflow = calcXpWithOverflow(experience, cap, values)
         return Triple(overflow.first, overflow.second, calcXpWithProgress(experience, values))
     }
-
-    fun findNextLevel(experience: Double, values: Map<Int, Long>?): Int {
-        if (values == null) return -1
-        values.onEach { entry ->
-            if (experience < entry.value) {
-                return@findNextLevel entry.key - 1
-            }
-        }
-        return values.size
-    }
 }

@@ -38,7 +38,8 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
             return
         }
 
-        val userData = profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid.nonDashedString()].asJsonObject
+        val userData =
+            profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid.nonDashedString()].asJsonObject
         val slayersObject = userData["slayer_bosses"].asJsonObject
 
 
@@ -53,7 +54,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
             .append(
                 xpMap.map { (slayer, xp) ->
                     "§b${slayer.toTitleCase()} Slayer ${
-                        SkillUtils.findNextLevel(xp, SkillUtils.slayerXp[slayer])
+                        SkillUtils.calcXpWithProgress(xp, SkillUtils.slayerXp[slayer]?.values ?: emptySet()).toInt()
                     }:§e ${NumberUtil.nf.format(xp)} XP"
                 }.joinToString(separator = "\n")
                     .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" }
