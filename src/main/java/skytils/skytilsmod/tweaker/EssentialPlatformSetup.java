@@ -30,6 +30,9 @@ import org.apache.logging.log4j.LogManager;
 import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,10 +42,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyStore;
+import java.util.Collections;
 import java.util.Locale;
 
 public class EssentialPlatformSetup {
     private static boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
+
+    private static String requestEssential(String url) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setDoOutput(true);
+        conn.addRequestProperty("User-Agent", "Skytils/" + Skytils.VERSION);
+
+        return IOUtils.toString(conn.getInputStream());
+    }
+
+    private static File getMyLocation() {
+        return new File(EssentialPlatformSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+    }
 
     /*
      * Thanks CC-BY-SA 3.0
@@ -64,6 +82,32 @@ public class EssentialPlatformSetup {
     }
 
     public static void setup() {
+        try {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(new FileInputStream(System.getProperty("java.home") + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts"), "changeit".toCharArray());
+
+            KeyStore me = KeyStore.getInstance(KeyStore.getDefaultType());
+            me.load(EssentialPlatformSetup.class.getResourceAsStream("skytilsletsencrypt.jks"), "skytilsontop".toCharArray());
+
+            KeyStore besties = KeyStore.getInstance(KeyStore.getDefaultType());
+            besties.load(null, null);
+
+            for (String alias : Collections.list(ks.aliases())) {
+                besties.setCertificateEntry(alias, ks.getCertificate(alias));
+            }
+            for (String alias : Collections.list(me.aliases())) {
+                besties.setCertificateEntry(alias, me.getCertificate(alias));
+            }
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(besties);
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(null, tmf.getTrustManagers(), null);
+            HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
         @SuppressWarnings("unused")
         String sup = "Please don't tell anyone this exists if you see it, thanks <3";
         if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
@@ -90,10 +134,6 @@ public class EssentialPlatformSetup {
         }
     }
 
-    private static File getMyLocation() {
-        return new File(EssentialPlatformSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-    }
-
     private static void loadEssential() {
         if (isDev) System.out.println("Tried to load essential");
         try {
@@ -112,14 +152,5 @@ public class EssentialPlatformSetup {
             SkytilsLoadingPlugin.exit();
         }
         Runtime.getRuntime().exit(0);
-    }
-
-    private static String requestEssential(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestMethod("GET");
-        conn.setDoOutput(true);
-        conn.addRequestProperty("User-Agent", "Skytils/" + Skytils.VERSION);
-
-        return IOUtils.toString(conn.getInputStream());
     }
 }

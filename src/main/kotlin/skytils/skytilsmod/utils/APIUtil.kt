@@ -25,39 +25,22 @@ import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.http.message.BasicHeader
-import org.apache.hc.core5.ssl.SSLContexts
 import org.apache.hc.core5.util.Timeout
 import skytils.skytilsmod.Skytils
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
 import java.net.URL
-import java.security.cert.X509Certificate
 import javax.imageio.ImageIO
 
 
 object APIUtil {
     private val parser = JsonParser()
 
-    val sslContext = SSLContexts.custom()
-        .loadTrustMaterial { chain, authType ->
-            isValidCert(chain, authType)
-        }
-        .build()
-    val sslSocketFactory = SSLConnectionSocketFactoryBuilder.create()
-        .setSslContext(sslContext)
-        .build()
-
-    val cm = PoolingHttpClientConnectionManagerBuilder.create()
-        .setSSLSocketFactory(sslSocketFactory)
-
     val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
             .setConnectionManagerShared(true)
-            .setConnectionManager(cm.build())
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
@@ -142,9 +125,5 @@ object APIUtil {
             client.close()
         }
         return ""
-    }
-
-    private fun isValidCert(chain: Array<X509Certificate>, authType: String): Boolean {
-        return chain.any { it.issuerDN.name == "CN=R3, O=Let's Encrypt, C=US" }
     }
 }
