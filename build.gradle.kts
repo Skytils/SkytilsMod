@@ -74,7 +74,7 @@ val shadowMe: Configuration by configurations.creating {
 
 dependencies {
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:1852") {
+    implementation("gg.essential:essential-1.8.9-forge:1872") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
@@ -89,7 +89,7 @@ dependencies {
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
-    shadowMe("com.github.Skytils:AsmHelper:91ecc2bd9c") {
+    shadowMe("com.github.Skytils:AsmHelper:5ca60ad17a") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
@@ -97,8 +97,8 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.3")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.3")
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.5")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.5")
 }
 
 sourceSets {
