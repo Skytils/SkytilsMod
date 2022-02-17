@@ -27,7 +27,7 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
 object ProtectItemCommand : BaseCommand("protectitem") {
-    override fun getCommandUsage(player: EntityPlayerSP): String = "/protectitem <clearall/clear/set>"
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/protectitem <clearall>"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
@@ -39,27 +39,21 @@ object ProtectItemCommand : BaseCommand("protectitem") {
             FavoriteStrategy.favoriteItems.clear()
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
             UChat.chat("§aCleared all your protected items!")
-        } else if (subcommand == "clear") {
-            if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = player.heldItem
-                ?: throw WrongUsageException("You must hold an item to use this command")
-            val extraAttributes = ItemUtil.getExtraAttributes(item)
-            if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
-            val uuid = extraAttributes.getString("uuid")
-            if (FavoriteStrategy.favoriteItems.remove(uuid)) {
-                PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-                UChat.chat("§aI will no longer protect your ${item.displayName}§a!")
-            } else UChat.chat("§cThat item isn't being protected!")
-        } else if (subcommand == "set") {
-            if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = player.heldItem
-                ?: throw WrongUsageException("You must hold an item to use this command")
-            val extraAttributes = ItemUtil.getExtraAttributes(item)
-            if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
-            val uuid = extraAttributes.getString("uuid")
+            return
+        }
+        if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
+        val item = player.heldItem
+            ?: throw WrongUsageException("You must hold an item to use this command")
+        val extraAttributes = ItemUtil.getExtraAttributes(item)
+        if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
+        val uuid = extraAttributes.getString("uuid")
+        if (FavoriteStrategy.favoriteItems.remove(uuid)) {
+            PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
+            UChat.chat("§aI will no longer protect your ${item.displayName}§a!")
+        } else {
             FavoriteStrategy.favoriteItems.add(uuid)
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
             UChat.chat("§aI will now protect your ${item.displayName}!")
-        } else UChat.chat(getCommandUsage(player))
+        }
     }
 }
