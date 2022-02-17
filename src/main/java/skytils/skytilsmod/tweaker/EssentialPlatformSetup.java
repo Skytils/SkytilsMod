@@ -109,7 +109,7 @@ public class EssentialPlatformSetup {
         }
 
         @SuppressWarnings("unused")
-        String sup = "Please don't tell anyone this exists if you see it, thanks <3";
+        String sup = "UGxlYXNlIGRvbid0IHRlbGwgYW55b25lIHRoaXMgZXhpc3RzIGlmIHlvdSBzZWUgaXQsIHRoYW5rcyA8Mw==";
         if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
             return;
         try {
