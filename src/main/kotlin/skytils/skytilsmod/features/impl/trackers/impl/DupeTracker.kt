@@ -23,6 +23,8 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
 import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -122,6 +124,15 @@ object DupeTracker : Tracker("duped_items") {
         val uuid = event.slot.stack.getUUID() ?: return
         if (dupedSet.contains(uuid))
             event.slot highlight Color.BLACK
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onTooltip(event: ItemTooltipEvent) {
+        if (!Utils.inSkyblock) return
+        val uuid = event.itemStack.getUUID() ?: return
+        if (dupedSet.contains(uuid)) {
+            event.toolTip.add("§c§lDuped")
+        }
     }
 
     override fun resetLoot() {
