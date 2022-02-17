@@ -1038,6 +1038,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var crystalHollowWaypoints = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "King Yolkar waypoint",
+        description = "Adds a waypoint for King Yolkar upon interacting with him",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var kingYolkarWaypoint = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows chat coordinates grabber",
         description = "When coordinates are shared in chat asks which one it is and displays a waypoint there and shows it on the map.",
         category = "Mining", subcategory = "Crystal Hollows"

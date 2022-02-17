@@ -57,6 +57,11 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                 message.append(copyMessage("Mines of Divan: ${MiningFeatures.minesLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_mines"))
             }
+            if (MiningFeatures.kingLoc.exists()) {
+                message.append(UTextComponent("§6King Yolkar "))
+                message.append(copyMessage("King Yolkar: ${MiningFeatures.kingLoc}"))
+                message.append(removeMessage("/skytilshollowwaypoint remove internal_king"))
+            }
             if (MiningFeatures.balLoc.exists()) {
                 message.append(UTextComponent("§cKhazad-dûm "))
                 message.append(copyMessage("Khazad-dûm: ${MiningFeatures.balLoc}"))
@@ -112,6 +117,11 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                                 MiningFeatures.minesLoc.locY = y
                                 MiningFeatures.minesLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
                             }
+                            "internal_king" -> {
+                                MiningFeatures.kingLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.kingLoc.locY = y
+                                MiningFeatures.kingLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
                             "internal_bal" -> {
                                 MiningFeatures.balLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                                 MiningFeatures.balLoc.locY = y
@@ -135,6 +145,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                             "internal_temple" -> MiningFeatures.templeLoc.reset()
                             "internal_den" -> MiningFeatures.denLoc.reset()
                             "internal_mines" -> MiningFeatures.minesLoc.reset()
+                            "internal_king" -> MiningFeatures.kingLoc.reset()
                             "internal_bal" -> MiningFeatures.balLoc.reset()
                             "internal_fairy" -> MiningFeatures.fairyLoc.reset()
                             else -> MiningFeatures.waypoints.remove(args[1])
@@ -148,6 +159,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                     MiningFeatures.templeLoc.reset()
                     MiningFeatures.denLoc.reset()
                     MiningFeatures.minesLoc.reset()
+                    MiningFeatures.kingLoc.reset()
                     MiningFeatures.balLoc.reset()
                     MiningFeatures.fairyLoc.reset()
                     MiningFeatures.waypoints.clear()
