@@ -178,6 +178,11 @@ class MiningFeatures {
             else if (xzMatcher.matches())
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
         }
+        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
+            && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
+        ) {
+            kingLoc.set()
+        }
         if (formatted.startsWith("§r§cYou died")) {
             deadCount =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
@@ -252,6 +257,20 @@ class MiningFeatures {
                     )
                 )
         )
+        val king = ChatComponentText("§6[King Yolkar] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/skytilshollowwaypoint set internal_king $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText("§eset waypoint for King Yolkar")
+                    )
+                )
+        )
         val bal = ChatComponentText("§c[Khazad-dûm] ").setChatStyle(
             ChatStyle()
                 .setChatClickEvent(
@@ -301,6 +320,8 @@ class MiningFeatures {
             component.appendSibling(den)
         if (!minesLoc.exists())
             component.appendSibling(mines)
+        if (!kingLoc.exists())
+            component.appendSibling(king)
         if (!balLoc.exists())
             component.appendSibling(bal)
         if (!fairyLoc.exists())
@@ -372,6 +393,7 @@ class MiningFeatures {
             templeLoc.drawWaypoint("Jungle Temple", event.partialTicks)
             denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
             minesLoc.drawWaypoint("Mines of Divan", event.partialTicks)
+            kingLoc.drawWaypoint("King Yolkar",event.partialTicks)
             balLoc.drawWaypoint("Khazad-dûm", event.partialTicks)
             fairyLoc.drawWaypoint("Fairy Grotto", event.partialTicks)
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
@@ -447,6 +469,7 @@ class MiningFeatures {
         templeLoc.reset()
         denLoc.reset()
         minesLoc.reset()
+        kingLoc.reset()
         balLoc.reset()
         fairyLoc.reset()
         waypoints.clear()
@@ -478,6 +501,7 @@ class MiningFeatures {
                 templeLoc.drawOnMap(50, Color.GREEN.rgb)
                 denLoc.drawOnMap(50, Color.YELLOW.rgb)
                 minesLoc.drawOnMap(50, Color.BLUE.rgb)
+                kingLoc.drawOnMap(50, Color.ORANGE.rgb)
                 balLoc.drawOnMap(50, Color.RED.rgb)
                 fairyLoc.drawOnMap(25, Color.PINK.rgb)
             }
@@ -602,6 +626,7 @@ class MiningFeatures {
         var templeLoc = LocationObject()
         var denLoc = LocationObject()
         var minesLoc = LocationObject()
+        var kingLoc = LocationObject()
         var balLoc = LocationObject()
         var fairyLoc = LocationObject()
         var lastTPLoc: BlockPos? = null
