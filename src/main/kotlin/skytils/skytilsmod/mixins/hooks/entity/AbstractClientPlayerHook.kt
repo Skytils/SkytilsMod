@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.misc.SummonSkins.skintextureMap
+import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.printDevMessage
 import java.util.concurrent.CompletableFuture
@@ -100,7 +101,7 @@ class AbstractClientPlayerHook(player: Any) {
                     // TODO Add support for resource packs
                     printDevMessage("summon type ${summonType.get()}", "summonskins")
                     correctSkin = skintextureMap[summonType.get()]?.resource
-                        ?: (if (Skytils.config.usePlayerSkin || Utils.noSychic) mc.thePlayer.locationSkin else sychicSkin).also {
+                        ?: (if (Skytils.config.usePlayerSkin || SuperSecretSettings.noSychic) mc.thePlayer.locationSkin else sychicSkin).also {
                             UChat.chat(
                                 "§cPlease tell a Skytils dev to add a skin for ${summonType.get()}"
                             )
@@ -109,7 +110,7 @@ class AbstractClientPlayerHook(player: Any) {
                 }
                 cir.setReturnValue(correctSkin)
             } else {
-                cir.setReturnValue(if (Skytils.config.usePlayerSkin || Utils.noSychic) mc.thePlayer.locationSkin else sychicSkin)
+                cir.setReturnValue(if (Skytils.config.usePlayerSkin || SuperSecretSettings.noSychic) mc.thePlayer.locationSkin else sychicSkin)
             }
         }
     }
@@ -120,7 +121,7 @@ class AbstractClientPlayerHook(player: Any) {
 
     fun replaceSkinType(cir: CallbackInfoReturnable<String>) {
         if (isSummonMob) cir.returnValue =
-            if (Skytils.config.usePlayerSkin || Utils.noSychic) mc.thePlayer.skinType else "slim"
+            if (Skytils.config.usePlayerSkin || SuperSecretSettings.noSychic) mc.thePlayer.skinType else "slim"
     }
 
     companion object {

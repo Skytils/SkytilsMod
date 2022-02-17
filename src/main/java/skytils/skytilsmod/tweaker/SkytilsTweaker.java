@@ -20,6 +20,7 @@ package skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
+import skytils.skytilsmod.utils.SuperSecretSettings;
 import sun.security.util.SecurityConstants;
 
 import java.lang.reflect.Field;
@@ -30,6 +31,7 @@ import java.security.PrivilegedAction;
 @SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
+        SuperSecretSettings.load();
         ClassPreloader.preloadClasses();
         boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
         if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {

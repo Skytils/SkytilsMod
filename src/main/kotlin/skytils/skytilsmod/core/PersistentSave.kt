@@ -88,6 +88,14 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
         inline fun <reified T : PersistentSave> markDirty() {
             markDirty(T::class)
         }
+
+        init {
+            Runtime.getRuntime().addShutdownHook(Thread({
+                for (save in SAVES) {
+                    if (save.dirty) save.writeSave()
+                }
+            }, "Skytils-PersistentSave-Shutdown"))
+        }
     }
 
     init {
@@ -98,11 +106,6 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
                 writeSave()
             }
         }
-        Runtime.getRuntime().addShutdownHook(Thread({
-            if (dirty) {
-                writeSave()
-            }
-        }, "${this::class.simpleName}-Save"))
     }
 
 }

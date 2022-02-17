@@ -26,6 +26,7 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
+import gg.essential.universal.UKeyboard
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -40,6 +41,19 @@ class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiSc
         y = RelativeConstraint(0.075f)
         textScale = basicTextScaleConstraint { window.getHeight() / 40 }
     }
+    private val order = arrayOf(
+        UKeyboard.KEY_UP,
+        UKeyboard.KEY_UP,
+        UKeyboard.KEY_DOWN,
+        UKeyboard.KEY_DOWN,
+        UKeyboard.KEY_LEFT,
+        UKeyboard.KEY_RIGHT,
+        UKeyboard.KEY_LEFT,
+        UKeyboard.KEY_RIGHT,
+        UKeyboard.KEY_B,
+        UKeyboard.KEY_A
+    )
+    private var orderIndex = 0
 
     init {
         SimpleButton("Config").childOf(window).constrain {
@@ -135,6 +149,17 @@ class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiSc
             }
         }
         animate()
+    }
+
+    override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {
+        super.onKeyPressed(keyCode, typedChar, modifiers)
+        if (keyCode == order[orderIndex]) orderIndex++
+        else orderIndex = 0
+        if (orderIndex == order.size) {
+            orderIndex = 0
+            Skytils.displayScreen = SuperSecretGui()
+            mc.theWorld.playAuxSFXAtEntity(mc.thePlayer, 1003, mc.thePlayer.position, 0)
+        }
     }
 
     private fun animate() {
