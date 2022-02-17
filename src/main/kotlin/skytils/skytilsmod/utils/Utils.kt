@@ -60,18 +60,7 @@ import kotlin.math.floor
 
 
 object Utils {
-
-    val azooPuzzoo by lazy {
-        File(Skytils.modDir, "azoopuzzoo").exists()
-    }
-
-    val breefingdog by lazy {
-        File(Skytils.modDir, "breefingdog").exists()
-    }
-
-    @JvmField
-    var noSychic = false
-
+    
     @JvmField
     var skyblock = false
 

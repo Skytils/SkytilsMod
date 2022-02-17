@@ -26,18 +26,14 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
-import java.io.File
 import kotlin.random.Random
 
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
     companion object {
-        val smolPeople by lazy {
-            File(Skytils.modDir, "smolpeople").exists()
-        }
-
         private val dmgPattern = Regex("✧?(?<num>\\d+)[⚔+✧❤♞☄✷]*")
     }
 
@@ -81,13 +77,13 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
     }
 
     val isBreefing by lazy {
-        entity.name == "Breefing" && (Utils.breefingdog || Random.nextInt(
+        entity.name == "Breefing" && (SuperSecretSettings.breefingDog || Random.nextInt(
             100
         ) < 3)
     }
 
     val isSmol by lazy {
-        Utils.inSkyblock && entity is EntityPlayer && (smolPeople || isBreefing)
+        Utils.inSkyblock && entity is EntityPlayer && (SuperSecretSettings.smolPeople || isBreefing)
     }
 
     fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {

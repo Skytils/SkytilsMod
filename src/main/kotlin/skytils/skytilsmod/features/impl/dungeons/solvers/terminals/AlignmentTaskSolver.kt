@@ -34,6 +34,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.awt.Point
@@ -62,7 +63,7 @@ class AlignmentTaskSolver {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (mc.thePlayer == null || mc.theWorld == null || event.phase != TickEvent.Phase.START) return
-        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || DungeonFeatures.dungeonFloor != "F7" || (!Utils.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L))) return
+        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || DungeonFeatures.dungeonFloor != "F7" || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L))) return
         if (ticks % 20 == 0) {
             if (mc.thePlayer.getDistanceSqToCenter(topLeft) <= 25 * 25) {
                 if (grid.size < 25) {

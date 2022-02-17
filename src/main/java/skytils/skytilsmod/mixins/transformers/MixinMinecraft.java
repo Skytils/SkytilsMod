@@ -21,7 +21,6 @@ package skytils.skytilsmod.mixins.transformers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.spongepowered.asm.mixin.Final;
@@ -78,10 +77,5 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 4))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         ScreenRenderer.init();
-    }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onPostInit(GameConfiguration gameConfig, CallbackInfo ci) {
-        if (new File(this.mcDataDir, "config/skytils/nosychic").exists()) Utils.noSychic = true;
     }
 }

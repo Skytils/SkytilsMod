@@ -24,7 +24,7 @@ import net.minecraft.util.ResourceLocation
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.SuperSecretSettings
 import java.util.*
 import kotlin.random.Random
 
@@ -83,12 +83,12 @@ object SplashProgressTransformer {
             "skytils",
             "partysychic.gif"
         )
-        if (Utils.noSychic) return resourceLocation
+        if (SuperSecretSettings.noSychic) return resourceLocation
         if (month == 12 || (month == 1 && date == 1)) return ResourceLocation(
             "skytils",
             "christmassychicpet.gif"
         )
-        return if (Utils.breefingdog) ResourceLocation("skytils", "breefingdog.png")
+        return if (SuperSecretSettings.breefingDog) ResourceLocation("skytils", "breefingdog.png")
         else {
             val weight = Random.nextDouble() * 100
             (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
