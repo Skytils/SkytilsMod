@@ -30,10 +30,6 @@ object ProtectItemCommand : BaseCommand("protectitem") {
     override fun getCommandUsage(player: EntityPlayerSP): String = "/protectitem <clearall>"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (args.isEmpty()) {
-            UChat.chat(getCommandUsage(player))
-            return
-        }
         val subcommand = args[0].lowercase()
         if (subcommand == "clearall") {
             FavoriteStrategy.favoriteItems.clear()
