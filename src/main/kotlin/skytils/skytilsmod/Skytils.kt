@@ -289,6 +289,10 @@ class Skytils {
         if (!cch.commands.containsKey("glintcustomize")) {
             cch.registerCommand(GlintCustomizeCommand)
         }
+        
+        if (!cch.commands.containsKey("protectitem")) {
+            cch.registerCommand(ProtectItemCommand)
+        }
 
         if (!cch.commands.containsKey("trackcooldown")) {
             cch.registerCommand(TrackCooldownCommand)
