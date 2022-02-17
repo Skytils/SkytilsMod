@@ -501,7 +501,7 @@ class MiningFeatures {
                 templeLoc.drawOnMap(50, Color.GREEN.rgb)
                 denLoc.drawOnMap(50, Color.YELLOW.rgb)
                 minesLoc.drawOnMap(50, Color.BLUE.rgb)
-                kingLoc.drawOnMap(50, Color.ORANGE.rgb)
+                kingLoc.drawOnMap(25, Color.ORANGE.rgb)
                 balLoc.drawOnMap(50, Color.RED.rgb)
                 fairyLoc.drawOnMap(25, Color.PINK.rgb)
             }
