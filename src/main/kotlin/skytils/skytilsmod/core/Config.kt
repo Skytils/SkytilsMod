@@ -283,6 +283,36 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var sendMessageOn300Score = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Create Title on 270 score",
+        description = "Create title on 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var createTitleOn270Score = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Create Title on 300 score",
+        description = "Create title on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var createTitleOn300Score = false
+
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "Message for 270 score",
+        description = "Customize the message sent on hitting 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "Skytils > 270 score"
+    )
+    var message270Score = ""
+
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "Message for 300 score",
+        description = "Customize the message sent on hitting 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "Skytils > 300 score"
+    )
+    var message300Score = ""
+
+    @Property(
         type = PropertyType.SWITCH, name = "Blood Camp Helper",
         description = "Draws an outline where blood mobs spawn in after spinning as armor stands.",
         category = "Dungeons", subcategory = "Quality of Life"

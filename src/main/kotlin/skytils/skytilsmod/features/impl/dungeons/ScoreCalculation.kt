@@ -34,6 +34,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
@@ -215,13 +216,21 @@ object ScoreCalculation {
                     hasSaid300 = false
                     return@onSetValue
                 }
-                if (Skytils.config.sendMessageOn270Score && !hasSaid270 && score >= 270) {
+                if (!hasSaid270 && score >= 270) {
                     hasSaid270 = true
-                    Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
+                    if (Skytils.config.createTitleOn270Score) GuiManager.createTitle(
+                        Skytils.config.message270Score.ifBlank { "270 score" },
+                        20
+                    )
+                    if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc Skytils-ScoreCalc > ${Skytils.config.message270Score.ifBlank { "300 score" }}")
                 }
-                if (Skytils.config.sendMessageOn300Score && !hasSaid300 && score >= 300) {
+                if (!hasSaid300 && score >= 300) {
                     hasSaid300 = true
-                    Skytils.sendMessageQueue.add("/pc Skytils > 300 score")
+                    if (Skytils.config.createTitleOn300Score) GuiManager.createTitle(
+                        Skytils.config.message300Score.ifBlank { "300 score" },
+                        20
+                    )
+                    if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc Skytils-ScoreCalc > ${Skytils.config.message300Score.ifBlank { "300 score" }}")
                 }
             }
         }
