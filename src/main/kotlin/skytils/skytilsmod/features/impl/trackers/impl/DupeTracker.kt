@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.trackers.impl
 
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -30,11 +31,8 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.utils.DevTools
-import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.printDevMessage
 import java.awt.Color
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -122,8 +120,12 @@ object DupeTracker : Tracker("duped_items") {
     fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
         val uuid = event.slot.stack.getUUID() ?: return
-        if (dupedSet.contains(uuid))
-            event.slot highlight Color.BLACK
+        if (dupedSet.contains(uuid)) {
+            GlStateManager.pushMatrix()
+            GlStateManager.translate(0f, 0f, 299f)
+            event.slot highlight Color.BLACK.withAlpha(169)
+            GlStateManager.popMatrix()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
