@@ -258,10 +258,7 @@ object RenderUtil {
     @JvmStatic
     fun renderItem(itemStack: ItemStack?, x: Int, y: Int) {
         RenderHelper.enableGUIStandardItemLighting()
-        GlStateManager.enableRescaleNormal()
-        GlStateManager.enableBlend()
         GlStateManager.enableDepth()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         mc.renderItem.renderItemAndEffectIntoGUI(itemStack, x, y)
     }
 
