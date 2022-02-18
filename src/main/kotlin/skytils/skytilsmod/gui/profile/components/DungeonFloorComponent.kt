@@ -22,7 +22,6 @@ import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
 import gg.essential.elementa.dsl.*
-import gg.essential.universal.UMinecraft
 import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.dungeons.DungeonBase
 import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
@@ -31,12 +30,12 @@ import kotlin.time.Duration
 class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRoundedRectangle(5f) {
     init {
         constrain {
-            width = ChildBasedMaxSizeConstraint()
+            width = ChildBasedMaxSizeConstraint() + 10.pixels
             height = FixedChildBasedRangeConstraint() + 10.pixels
             color = VigilancePalette.getDarkBackground().constraint
         }
         val pairs = arrayListOf<Pair<String, Any>>()
-        pairs.add("Floor: " to floor)
+        pairs.add("Floor" to floor)
         dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
         dungeonBase.watcherKills?.get(floor)?.apply { pairs.add("Watcher Kills" to this) }
         dungeonBase.completions?.get(floor)?.apply { pairs.add("Completions" to this) }
@@ -53,8 +52,9 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
         }).constrain {
             x = 5.pixels
             y = 5.pixels
-            width = (pairs.maxOfOrNull { UMinecraft.getFontRenderer().getStringWidth("§7${it.first}: §f${it.second}") }
-                ?: 0).pixels
+            width = pairs.maxOf {
+                fontProvider.getStringWidth("§7${it.first}: §f${it.second}", 10f)
+            }.pixels
         } childOf this
     }
 
