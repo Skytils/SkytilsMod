@@ -42,6 +42,7 @@ repositories {
 
 loom {
     // sup weef overflow how's it going
+    silentMojangMappingsLicense()
     launchConfigs {
         getByName("client") {
             property("fml.coreMods.load", "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
@@ -62,7 +63,6 @@ loom {
     runConfigs {
         getByName("client") {
             isIdeConfigGenerated = true
-            addTaskBeforeRun("loveYouJohni")
         }
     }
     forge {
@@ -113,6 +113,11 @@ dependencies {
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
 
+sourceSets {
+    main {
+        output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
+    }
+}
 
 tasks {
     processResources {    // this will ensure that this task is redone when the versions change.
@@ -121,14 +126,9 @@ tasks {
         filesMatching("mcmod.info") {
             expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
         }
-        copy {
-            from("src/main/resources")
-            into("build/classes/main")
-        }
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
     named<Jar>("jar") {
-        archiveBaseName.set("Skytils")
         manifest {
             attributes(
                 mapOf(
@@ -151,7 +151,7 @@ tasks {
         input.set(shadowJar.get().archiveFile)
     }
     named<ShadowJar>("shadowJar") {
-        archiveFileName.set(jar.get().archiveFileName)
+        archiveBaseName.set("Skytils")
         archiveClassifier.set("dev")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe)
@@ -209,23 +209,6 @@ tasks {
             "${project.projectDir}/run/CLASSLOADER_TEMP9",
             "${project.projectDir}/run/CLASSLOADER_TEMP10"
         )
-    }
-
-
-    register<Jar>("loveYouJohni") {
-        archiveFileName.set("!SkytilsFake.jar")
-        destinationDirectory.set(file("./run/mods/"))
-
-        manifest {
-            attributes(
-                mapOf(
-                    "FMLCorePlugin" to "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-                    "ModSide" to "CLIENT",
-                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
-                    "TweakOrder" to "0"
-                )
-            )
-        }
     }
 }
 
