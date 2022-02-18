@@ -18,13 +18,19 @@
 
 package skytils.skytilsmod.gui.profile.components
 
+import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
+import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.UIWrappedText
+import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
+import gg.essential.elementa.constraints.CopyConstraintFloat
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.dungeons.DungeonBase
 import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
+import java.awt.Color
 import kotlin.time.Duration
 
 class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRoundedRectangle(5f) {
@@ -34,8 +40,15 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
             height = FixedChildBasedRangeConstraint() + 10.pixels
             color = VigilancePalette.getDarkBackground().constraint
         }
+
+        val title = UIText("Floor $floor").constrain {
+            x = CenterConstraint()
+            y = 5.pixels
+            textScale = 1.5f.pixels
+            color = VigilancePalette.getBrightText().constraint
+        } childOf this
+
         val pairs = arrayListOf<Pair<String, Any>>()
-        pairs.add("Floor" to floor)
         dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
         dungeonBase.watcherKills?.get(floor)?.apply { pairs.add("Watcher Kills" to this) }
         dungeonBase.completions?.get(floor)?.apply { pairs.add("Completions" to this) }
@@ -47,15 +60,22 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
         dungeonBase.fastestTimeSPlus?.get(floor)
             ?.apply { pairs.add("Fastest Time S+" to timeFormat()) }
 
-        UIWrappedText(pairs.joinToString("\n") {
+        val text by UIWrappedText(pairs.joinToString("\n") {
             "§7${it.first}: §f${it.second}"
-        }).constrain {
+        }.ifEmpty { "Maybe get better??" }).constrain {
             x = 5.pixels
-            y = 5.pixels
+            y = SiblingConstraint(5f)
             width = pairs.maxOf {
                 fontProvider.getStringWidth("§7${it.first}: §f${it.second}", 10f)
             }.pixels
         } childOf this
+
+        children.add(children.size - 1, UIBlock(Color(0x4166f5).constraint).constrain {
+            x = 5.pixels()
+            y = SiblingConstraint(5f)
+            width = CopyConstraintFloat() boundTo text
+            height = 2.pixels
+        }.also { it.parent = this })
     }
 
     private fun Duration.timeFormat() = toComponents { minutes, seconds, nanoseconds ->
