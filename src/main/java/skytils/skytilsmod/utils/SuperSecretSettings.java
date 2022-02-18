@@ -37,8 +37,8 @@ public class SuperSecretSettings {
     // Secrets
     public static boolean azooPuzzoo = false;
     public static boolean breefingDog = false;
-    public static boolean smolPeople = false;
     public static boolean noSychic = false;
+    public static boolean smolPeople = false;
 
     static {
         if (!saveLoc.exists()) {
@@ -55,16 +55,19 @@ public class SuperSecretSettings {
     public static void add(String setting) {
         settings.add(setting);
         dirty = true;
+        setSecrets();
     }
 
     public static void remove(String setting) {
         settings.remove(setting);
         dirty = true;
+        setSecrets();
     }
 
     public static void clear() {
         settings.clear();
         dirty = true;
+        setSecrets();
     }
 
     public static void load() {
@@ -90,13 +93,12 @@ public class SuperSecretSettings {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setSecrets();
     }
 
     public static void setSecrets() {
         azooPuzzoo = settings.contains("azoopuzzoo");
         breefingDog = settings.contains("breefingdog");
-        smolPeople = settings.contains("smolpeople");
         noSychic = settings.contains("nosychic");
+        smolPeople = settings.contains("smolpeople");
     }
 }
