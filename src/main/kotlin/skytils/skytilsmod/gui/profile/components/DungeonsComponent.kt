@@ -185,7 +185,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
 
     val secretsFound by UIText()
         .bindText(playerState.map {
-            "Secrets found: ${
+            "Secrets Found: ${
                 NumberUtil.nf.format(
                     it?.achievements?.getOrDefault(
                         "skyblock_treasure_hunter",
@@ -236,7 +236,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
             Window.enqueueRenderOperation {
                 masterFloorContainer.clearChildren()
                 dungeon?.highestCompletion?.let { highest ->
-                    (0 until highest).forEach {
+                    (1 until highest).forEach {
                         DungeonFloorComponent(dungeon, it).constrain {
                             x = CramSiblingConstraint(5f)
                             y = CramSiblingConstraint(5f)

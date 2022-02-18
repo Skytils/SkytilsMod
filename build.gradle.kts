@@ -120,7 +120,7 @@ sourceSets {
 }
 
 tasks {
-    processResources {    // this will ensure that this task is redone when the versions change.
+    processResources {
         inputs.property("version", project.version)
         inputs.property("mcversion", "1.8.9")
         filesMatching("mcmod.info") {

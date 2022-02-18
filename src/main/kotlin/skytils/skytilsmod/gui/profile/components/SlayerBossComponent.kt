@@ -20,7 +20,9 @@ package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
-import gg.essential.elementa.constraints.*
+import gg.essential.elementa.constraints.ChildBasedRangeConstraint
+import gg.essential.elementa.constraints.CopyConstraintFloat
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import gg.essential.universal.UMinecraft
@@ -144,7 +146,7 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
         if (it is RevenantSlayer) {
             """
                 #Tier V
-                #${it.t4Kills}
+                #${it.t4Kills ?: 0}
             """.trimMargin("#")
         } else ""
     }) childOf this
