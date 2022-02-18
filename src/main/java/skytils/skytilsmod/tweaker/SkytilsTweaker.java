@@ -19,6 +19,7 @@
 package skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 import skytils.skytilsmod.utils.SuperSecretSettings;
 import sun.security.util.SecurityConstants;
@@ -31,6 +32,11 @@ import java.security.PrivilegedAction;
 @SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
+        try {
+            Class.forName("skytils.skytilsmod.utils.SuperSecretSettings", true, Launch.classLoader).getDeclaredMethod("load").invoke(null);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         SuperSecretSettings.load();
         ClassPreloader.preloadClasses();
         boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
