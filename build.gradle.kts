@@ -16,49 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.minecraftforge.gradle.user.IReobfuscator
-import net.minecraftforge.gradle.user.ReobfMappingType.SEARGE
-import net.minecraftforge.gradle.user.TaskSingleReobf
+import dev.architectury.pack200.java.Pack200Adapter
+import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.10"
-    id("net.minecraftforge.gradle.forge") version "6f5327"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("com.github.skytils.knockoffmixingradle") version "7d2bb154b0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("gg.essential.loom") version "0.10.0.0"
+    id("dev.architectury.architectury-pack200") version "0.1.3"
     java
     idea
 }
 
 version = "1.2.0-pre2"
 group = "skytils.skytilsmod"
-
-mixin {
-    refmapName = "mixins.skytils.refmap.json"
-}
-
-minecraft {
-    version = "1.8.9-11.15.1.2318-1.8.9"
-    runDir = "run"
-    mappings = "stable_22"
-    makeObfSourceJar = false
-    isGitVersion = false
-    clientJvmArgs.addAll(
-        arrayOf(
-            "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-            "-Delementa.dev=true",
-            "-Delementa.debug=true",
-            "-Delementa.invalid_usage=warn",
-            "-Dasmhelper.verbose=true"
-        )
-    )
-    clientRunArgs.addAll(
-        arrayOf(
-            "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
-            "--mixin mixins.skytils.json"
-        )
-    )
-}
 
 repositories {
     mavenLocal()
@@ -68,11 +40,49 @@ repositories {
     maven("https://jitpack.io")
 }
 
+loom {
+    // sup weef overflow how's it going
+    launchConfigs {
+        getByName("client") {
+            property("fml.coreMods.load", "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
+            property("elementa.dev", "true")
+            property("elementa.debug", "true")
+            property("elementa.invalid_usage", "warn")
+            property("asmhelper.verbose", "true")
+            property("mixin.debug.verbose", "true")
+            property("mixin.debug.export", "true")
+            property("mixin.dumpTargetOnFailure", "true")
+            property("legacy.debugClassLoading", "true")
+            property("legacy.debugClassLoadingSave", "true")
+            property("legacy.debugClassLoadingFiner", "true")
+            arg("--tweakClass", "skytils.skytilsmod.tweaker.SkytilsTweaker")
+            arg("--mixin", "mixins.skytils.json")
+        }
+    }
+    runConfigs {
+        getByName("client") {
+            isIdeConfigGenerated = true
+            addTaskBeforeRun("loveYouJohni")
+        }
+    }
+    forge {
+        pack200Provider.set(Pack200Adapter())
+        mixinConfig("mixins.skytils.json")
+    }
+    mixin {
+        defaultRefmapName.set("mixins.skytils.refmap.json")
+    }
+}
+
 val shadowMe: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
 dependencies {
+    minecraft("com.mojang:minecraft:1.8.9")
+    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
+    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
+
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:1872") {
         exclude(module = "asm")
@@ -99,30 +109,23 @@ dependencies {
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.0.5")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.5")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    compileOnly("org.spongepowered:mixin:0.8.5")
 }
 
-sourceSets {
-    main {
-        output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
-    }
-}
-
-configure<NamedDomainObjectContainer<IReobfuscator>> {
-    clear()
-    create("shadowJar") {
-        mappingType = SEARGE
-        classpath = sourceSets.main.get().compileClasspath
-    }
-}
 
 tasks {
-    processResources {
+    processResources {    // this will ensure that this task is redone when the versions change.
         inputs.property("version", project.version)
-        inputs.property("mcversion", project.minecraft.version)
-
+        inputs.property("mcversion", "1.8.9")
         filesMatching("mcmod.info") {
-            expand(mapOf("version" to project.version, "mcversion" to project.minecraft.version))
+            expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
         }
+        copy {
+            from("src/main/resources")
+            into("build/classes/main")
+        }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
     named<Jar>("jar") {
         archiveBaseName.set("Skytils")
@@ -140,10 +143,16 @@ tasks {
                 )
             )
         }
+        dependsOn(shadowJar)
         enabled = false
+    }
+    named<RemapJarTask>("remapJar") {
+        archiveBaseName.set("Skytils")
+        input.set(shadowJar.get().archiveFile)
     }
     named<ShadowJar>("shadowJar") {
         archiveFileName.set(jar.get().archiveFileName)
+        archiveClassifier.set("dev")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe)
 
@@ -186,13 +195,6 @@ tasks {
             )
         )
     }
-    named<TaskSingleReobf>("reobfJar") {
-        enabled = false
-    }
-    named<TaskSingleReobf>("reobfShadowJar") {
-        mustRunAfter(shadowJar)
-    }
-
     create<Delete>("deleteClassloader") {
         delete(
             "${project.projectDir}/run/CLASSLOADER_TEMP",
@@ -212,7 +214,7 @@ tasks {
 
     register<Jar>("loveYouJohni") {
         archiveFileName.set("!SkytilsFake.jar")
-        destinationDirectory.set(file("${minecraft.runDir}/mods/"))
+        destinationDirectory.set(file("./run/mods/"))
 
         manifest {
             attributes(
@@ -224,10 +226,6 @@ tasks {
                 )
             )
         }
-
-        exclude(mixin.refmapName)
-
-        named("genIntellijRuns").get().dependsOn(this)
     }
 }
 
