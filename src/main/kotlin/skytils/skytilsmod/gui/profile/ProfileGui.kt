@@ -27,7 +27,6 @@ import gg.essential.elementa.components.*
 import gg.essential.elementa.components.inspector.Inspector
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
-import gg.essential.elementa.font.DefaultFonts
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
@@ -195,6 +194,16 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
             height = CopyConstraintFloat() boundTo contentBlock
             color = Color(0, 0, 0, 100).toConstraint()
         } childOf window
+
+    private val scrollBar by UIBlock().constrain {
+        x = 6.pixels(true)
+        y = 10.pixels
+        width = 3.5.pixels
+        color = Color(0xadadad).constraint
+    }.apply {
+        this childOf window
+        contentContainer.setVerticalScrollBarComponent(this, true)
+    }
 
     // Skills
     private val skillContainer by UIContainer()
