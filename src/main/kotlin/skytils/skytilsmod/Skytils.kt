@@ -173,7 +173,7 @@ class Skytils {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         DataFetcher.preload()
-        if (!modDir.exists()) modDir.mkdirs()
+        modDir.mkdirs()
         File(modDir, "trackers").mkdirs()
         guiManager = GuiManager()
         jarFile = event.sourceFile
@@ -289,7 +289,7 @@ class Skytils {
         if (!cch.commands.containsKey("glintcustomize")) {
             cch.registerCommand(GlintCustomizeCommand)
         }
-        
+
         if (!cch.commands.containsKey("protectitem")) {
             cch.registerCommand(ProtectItemCommand)
         }

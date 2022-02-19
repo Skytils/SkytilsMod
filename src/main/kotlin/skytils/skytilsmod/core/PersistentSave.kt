@@ -21,6 +21,7 @@ package skytils.skytilsmod.core
 import com.google.gson.Gson
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.ensureFile
 import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -42,10 +43,7 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
 
     private fun readSave() {
         try {
-            if (!this.saveFile.exists()) {
-                this.saveFile.parentFile.mkdirs()
-                this.saveFile.createNewFile()
-            }
+            this.saveFile.ensureFile()
             this.saveFile.reader().use {
                 read(it)
             }
@@ -63,10 +61,7 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
 
     private fun writeSave() {
         try {
-            if (!this.saveFile.exists()) {
-                this.saveFile.parentFile.mkdirs()
-                this.saveFile.createNewFile()
-            }
+            this.saveFile.ensureFile()
             this.saveFile.writer().use { writer ->
                 write(writer)
             }
