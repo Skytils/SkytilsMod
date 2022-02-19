@@ -90,7 +90,7 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import sun.misc.Unsafe
 import java.io.File
-import java.util.LinkedList
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.coroutines.CoroutineContext
@@ -279,6 +279,7 @@ class Skytils {
 
         cch.registerCommand(CataCommand)
         cch.registerCommand(CalcXPCommand)
+        cch.registerCommand(LimboCommand)
         cch.registerCommand(HollowWaypointCommand)
         cch.registerCommand(SlayerCommand)
 
