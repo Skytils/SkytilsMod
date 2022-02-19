@@ -82,7 +82,7 @@ class BossHPDisplays {
                 ) {
                     GlStateManager.disableCull()
                     GlStateManager.disableDepth()
-                    RenderUtil.draw3DString(
+                    RenderUtil.drawLabel(
                         entity.positionVector.addVector(0.0, -10.0, 0.0),
                         name,
                         Color.WHITE,

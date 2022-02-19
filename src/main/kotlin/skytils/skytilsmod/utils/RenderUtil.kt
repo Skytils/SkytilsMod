@@ -221,16 +221,14 @@ object RenderUtil {
     }
 
     /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
+     * @author Mojang
      */
     @JvmStatic
     fun drawOutlinedBoundingBox(aabb: AxisAlignedBB?, color: Color, width: Float, partialTicks: Float) {
         val render = mc.renderViewEntity
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val realX = interpolate(render.posX, render.lastTickPosX, partialTicks)
+        val realY = interpolate(render.posY, render.lastTickPosY, partialTicks)
+        val realZ = interpolate(render.posZ, render.lastTickPosZ, partialTicks)
         GlStateManager.pushMatrix()
         GlStateManager.translate(-realX, -realY, -realZ)
         GlStateManager.disableTexture2D()
@@ -331,11 +329,9 @@ object RenderUtil {
     }
 
     /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
+     * @author Mojang
      */
-    fun draw3DString(pos: Vec3, text: String, color: Color, partialTicks: Float) {
+    fun drawLabel(pos: Vec3, text: String, color: Color, partialTicks: Float) {
         val mc = mc
         val player: EntityPlayer = mc.thePlayer
         val x =
@@ -357,6 +353,7 @@ object RenderUtil {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.enableTexture2D()
         mc.fontRendererObj.drawString(text, -width, 0, color.rgb)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
