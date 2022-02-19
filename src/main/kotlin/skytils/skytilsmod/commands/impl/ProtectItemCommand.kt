@@ -30,7 +30,7 @@ object ProtectItemCommand : BaseCommand("protectitem") {
     override fun getCommandUsage(player: EntityPlayerSP): String = "/protectitem <clearall>"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        val subcommand = args[0].lowercase()
+        val subcommand = args.getOrNull(0)?.lowercase()
         if (subcommand == "clearall") {
             FavoriteStrategy.favoriteItems.clear()
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
