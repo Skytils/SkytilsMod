@@ -23,8 +23,28 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import org.lwjgl.opengl.GLContext
 import java.nio.ByteBuffer
+import java.util.*
 
-object GlState {
+class GlState {
+
+    companion object {
+        val newBlend: Boolean
+        val stack = LinkedList<GlState>()
+
+        init {
+            val context = GLContext.getCapabilities()
+            newBlend = context.OpenGL14 || context.GL_EXT_blend_func_separate
+        }
+
+        fun pushState() {
+            stack.addLast(GlState().also { it.pushState() })
+        }
+
+        fun popState() {
+            stack.removeLast().popState()
+        }
+    }
+
     var lightingState = false
     var blendState = false
     var blendSrc = 0
@@ -34,13 +54,6 @@ object GlState {
     var alphaState = false
     var depthState = false
     var colorState = ByteBuffer.allocateDirect(64).asFloatBuffer()
-
-    val newBlend: Boolean
-
-    init {
-        val context = GLContext.getCapabilities()
-        newBlend = context.OpenGL14 || context.GL_EXT_blend_func_separate
-    }
 
     fun pushState() {
         lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
