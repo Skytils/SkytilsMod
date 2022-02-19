@@ -81,6 +81,7 @@ public class EssentialPlatformSetup {
         }
     }
 
+    @SuppressWarnings("unused")
     public static void setup() {
         try {
             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());

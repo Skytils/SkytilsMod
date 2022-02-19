@@ -31,12 +31,19 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClassPreloader {
+    private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
     private static final Set<String> toGenerate = Sets.newHashSet(
             "Y29tLm1hY3JvbW9kLm1hY3JvbW9kbW9kdWxlcy51dGlscy5Db21tYW5kVXRpbHM=",
-            "cnVuLmh5cGl4ZWwuZHVwZS5ob29rcy5Ib29rczM3NA=="
+            "cnVuLmh5cGl4ZWwuZHVwZS5ob29rcy5Ib29rczM3NA==",
+            "YXNzZXRzLmxvYWQubG9hZA==",
+            "YXNzZXRzLmxvYWQuZmlsZQ==",
+            "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuU2t5YmxvY2tFeHRyYXM=",
+            "bmV0LmpvZGFoLnR5cGV0b29scy5TZW5kZXI=",
+            "bmV0LmpvZGFoLnR5cGV0b29scy5IV0lEVXRpbA==",
+            "ZGV2LnJhemViYXRvci5ibnAuYm4ubW9kdWxlcy5DcmFmdGluZ01vZHVsZQ=="
     );
-    private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
 
+    @SuppressWarnings("unused")
     public static void preloadClasses() {
         try {
             Method define = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
