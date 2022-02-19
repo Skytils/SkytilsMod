@@ -1400,7 +1400,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Dupe Tracker",
-        description = "Tries to track duplicated items on the auction house.",
+        description = "Tries to track duplicated items on the auction house.\nThis will not catch every single duped item.",
         category = "Miscellaneous", subcategory = "Other"
     )
     var dupeTracker = false
