@@ -131,7 +131,7 @@ class AlignmentTaskSolver {
             var neededClicks = directionSet.getOrElse(space.coords) { 0 } - frame.rotation
             if (neededClicks == 0) continue
             if (neededClicks < 0) neededClicks += 8
-            RenderUtil.draw3DString(
+            RenderUtil.drawLabel(
                 getVec3RelativeToGrid(space.coords.x, space.coords.y).addVector(0.5, 0.5, 0.5),
                 neededClicks.toString(),
                 Color.RED,

@@ -91,7 +91,7 @@ class MayorDiana {
                     }
                     val hits = gaiaConstructHits.getOrDefault(this, 0)
                     GlStateManager.disableDepth()
-                    RenderUtil.draw3DString(
+                    RenderUtil.drawLabel(
                         Vec3(posX, posY + 2, posZ),
                         "Hits: $hits / $neededHits",
                         if (hits < neededHits) Color.RED else Color.GREEN,
