@@ -89,12 +89,7 @@ class SpidersDenFeatures {
                 val arachneNames =
                     world.getEntities(EntityArmorStand::class.java, Predicate getEntities@{ entity: EntityArmorStand? ->
                         val name = entity!!.displayName.formattedText
-                        if (name.contains("❤")) {
-                            if (name.contains("§cArachne §")) {
-                                return@getEntities true
-                            }
-                        }
-                        false
+                        name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
                     })
                 RenderUtil.drawAllInList(this, arachneNames.map { it.displayName.formattedText })
             }
