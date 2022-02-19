@@ -21,9 +21,8 @@ package skytils.skytilsmod.features.impl.protectitems.strategy.impl
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
 
 object StarredItemStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
@@ -35,7 +34,7 @@ object StarredItemStrategy : ItemProtectStrategy() {
                 }
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (SBInfo.mode != SkyblockIsland.Dungeon.mode && extraAttr.hasKey("dungeon_item_level")) {
+                if (DungeonTimer.dungeonStartTime != -1L && extraAttr.hasKey("dungeon_item_level")) {
                     return true
                 }
             }

@@ -22,8 +22,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
-import skytils.skytilsmod.utils.Utils
 import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -33,7 +33,7 @@ object FavoriteStrategy : ItemProtectStrategy() {
     val save = FavoriteStrategySave
 
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
-        if (type == ProtectType.HOTBARDROPKEY && Utils.inDungeons) return false
+        if (type == ProtectType.HOTBARDROPKEY && DungeonTimer.dungeonStartTime != -1L) return false
         return favoriteItems.contains(extraAttr?.getString("uuid"))
     }
 
