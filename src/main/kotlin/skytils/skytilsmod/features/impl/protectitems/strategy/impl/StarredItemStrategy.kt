@@ -34,7 +34,7 @@ object StarredItemStrategy : ItemProtectStrategy() {
                 }
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (DungeonTimer.dungeonStartTime != -1L && extraAttr.hasKey("dungeon_item_level")) {
+                if (DungeonTimer.dungeonStartTime == -1L && extraAttr.hasKey("dungeon_item_level")) {
                     return true
                 }
             }

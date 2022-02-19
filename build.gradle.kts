@@ -123,7 +123,7 @@ tasks {
     processResources {
         inputs.property("version", project.version)
         inputs.property("mcversion", "1.8.9")
-        
+
         filesMatching("mcmod.info") {
             expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
         }
@@ -186,6 +186,7 @@ tasks {
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all")
+            languageVersion = "1.6"
         }
         kotlinDaemonJvmArguments.set(
             listOf(
@@ -213,5 +214,7 @@ tasks {
     }
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+kotlin.jvmToolchain {
+    this as JavaToolchainSpec
+    languageVersion.set(JavaLanguageVersion.of(8))
+}

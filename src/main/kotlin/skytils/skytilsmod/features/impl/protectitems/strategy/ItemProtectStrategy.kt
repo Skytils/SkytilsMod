@@ -29,7 +29,7 @@ abstract class ItemProtectStrategy {
     abstract val isToggled: Boolean
 
     companion object {
-        private val STRATEGIES = HashSet<ItemProtectStrategy>()
+        private val STRATEGIES = setOf(FavoriteStrategy, ItemWorthStrategy, StarredItemStrategy)
 
         fun isAnyToggled(): Boolean {
             return STRATEGIES.any { it.isToggled }
@@ -38,13 +38,6 @@ abstract class ItemProtectStrategy {
         fun isAnyWorth(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
             return STRATEGIES.any { it.isToggled && it.worthProtecting(item, extraAttr, type) }
         }
-
-        init {
-            STRATEGIES.add(ItemWorthStrategy)
-            STRATEGIES.add(StarredItemStrategy)
-            STRATEGIES.add(FavoriteStrategy)
-        }
-
     }
 
     enum class ProtectType {
