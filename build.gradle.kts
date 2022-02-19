@@ -138,6 +138,7 @@ tasks {
                     "ForceLoadAsMod" to true,
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
+                    "ModType" to "FML",
                     "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
                     "TweakOrder" to "0"
                 )

@@ -21,7 +21,6 @@ package skytils.skytilsmod.tweaker;
 import gg.essential.loader.stage0.EssentialSetupTweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
-import skytils.skytilsmod.utils.SuperSecretSettings;
 import sun.security.util.SecurityConstants;
 
 import java.lang.reflect.Field;
@@ -34,18 +33,17 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
         try {
             Class.forName("skytils.skytilsmod.utils.SuperSecretSettings", true, Launch.classLoader).getDeclaredMethod("load").invoke(null);
+            Class.forName("skytils.skytilsmod.tweaker.ClassPreloader", true, Launch.classLoader).getDeclaredMethod("preloadClasses").invoke(null);
+            boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
+            if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
+                System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
+                overrideSecurityManager(isFML);
+                System.out.println("Current security manager: " + System.getSecurityManager());
+            }
+            Class.forName("skytils.skytilsmod.tweaker.EssentialPlatformSetup", true, Launch.classLoader).getDeclaredMethod("setup").invoke(null);
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        SuperSecretSettings.load();
-        ClassPreloader.preloadClasses();
-        boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
-        if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
-            System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
-            overrideSecurityManager(isFML);
-            System.out.println("Current security manager: " + System.getSecurityManager());
-        }
-        EssentialPlatformSetup.setup();
     }
 
     // Bypass the FML security manager in order to set our own
