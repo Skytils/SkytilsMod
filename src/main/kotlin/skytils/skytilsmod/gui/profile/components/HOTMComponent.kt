@@ -24,7 +24,6 @@ import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.state.State
-import gg.essential.universal.UMatrixStack
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.mining.HOTM
 import skytils.skytilsmod.utils.ItemUtil.setLore
@@ -38,7 +37,8 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
             Window.enqueueRenderOperation {
                 it?.let { profile ->
                     clearChildren()
-                    val hotmLevel = SkillUtils.calcXpWithProgress(profile.hotm.experience.toDouble(), SkillUtils.hotmXp.values)
+                    val hotmLevel =
+                        SkillUtils.calcXpWithProgress(profile.hotm.experience.toDouble(), SkillUtils.hotmXp.values)
                     for (slot in HOTM.HOTMSlot.slots) {
                         if (slot is HOTM.HOTMSlot.HOTMLevel) {
                             SlotComponent(
@@ -57,7 +57,9 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
                                 ) >= 1
                             )
                                 level++
-                            SlotComponent(slot.getItem(level).setLore(slot.getLore(level))).constrain {
+                            val item = slot.getItem(level).setLore(slot.getLore(level))
+                            if (slot == profile.hotm.selectedPickaxeAbility) item.getSubCompound("ench", true)
+                            SlotComponent(item).constrain {
                                 x = ((slot.slotNum % 9) * (16 + 2)).pixels
                                 y = ((slot.slotNum / 9) * (16 + 2)).pixels
                             } childOf this
