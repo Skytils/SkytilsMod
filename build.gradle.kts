@@ -123,10 +123,10 @@ tasks {
     processResources {
         inputs.property("version", project.version)
         inputs.property("mcversion", "1.8.9")
+        
         filesMatching("mcmod.info") {
             expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
         }
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
     named<Jar>("jar") {
         manifest {
