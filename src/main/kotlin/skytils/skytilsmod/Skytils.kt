@@ -90,6 +90,7 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import sun.misc.Unsafe
 import java.io.File
+import java.util.LinkedList
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.coroutines.CoroutineContext
@@ -129,7 +130,7 @@ class Skytils {
         var ticks = 0
 
         @JvmField
-        val sendMessageQueue = ArrayDeque<String>()
+        val sendMessageQueue = LinkedList<String>()
 
         @JvmField
         var usingLabymod = false
@@ -329,7 +330,7 @@ class Skytils {
         }
 
         if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 250) {
-            val msg = sendMessageQueue.removeFirstOrNull()
+            val msg = sendMessageQueue.pollFirst()
             if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(msg)
         }
 
