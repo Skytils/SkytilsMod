@@ -21,7 +21,7 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20-M1"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.0"
     id("dev.architectury.architectury-pack200") version "0.1.3"
@@ -193,7 +193,8 @@ tasks {
                 "-Xmx2G",
                 "-Dkotlin.enableCacheBuilding=true",
                 "-Dkotlin.useParallelTasks=true",
-                "-Dkotlin.enableFastIncremental=true"
+                "-Dkotlin.enableFastIncremental=true",
+                "-Xbackend-threads=0"
             )
         )
     }
