@@ -45,6 +45,11 @@ object DataFetcher {
         val dataUrl = Skytils.config.dataURL
         return Skytils.threadPool.submit {
             try {
+                APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
+                    if (isNotBlank()) {
+                        Skytils.domain = this
+                    }
+                }
                 APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
                     Utils.checkThreadAndQueue {
                         EnchantUtil.enchants.clear()

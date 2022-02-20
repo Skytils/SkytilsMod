@@ -30,7 +30,8 @@ import kotlin.reflect.jvm.javaField
 class AuctionData {
 
     companion object {
-        const val dataURL = "https://sbe-stole-skytils.design/api/auctions/lowestbins"
+        val dataURL
+            get() = "https://${Skytils.domain}/api/auctions/lowestbins"
         val lowestBINs = HashMap<String, Double>()
         fun getIdentifier(item: ItemStack?): String? {
             val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
