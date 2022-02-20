@@ -328,8 +328,10 @@ class Skytils {
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
         TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
         if (displayScreen != null) {
-            mc.displayGuiScreen(displayScreen)
-            displayScreen = null
+            if (mc.thePlayer?.openContainer == null) {
+                mc.displayGuiScreen(displayScreen)
+                displayScreen = null
+            }
         }
 
         if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 250) {
@@ -463,7 +465,8 @@ class Skytils {
         if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 TickTask(1) {
-                    displayScreen = OptionsGui()
+                    if (mc.thePlayer?.openContainer == null)
+                        displayScreen = OptionsGui()
                 }
             }
         }
