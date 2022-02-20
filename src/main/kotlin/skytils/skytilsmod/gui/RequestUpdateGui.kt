@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIText
@@ -31,7 +32,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.gui.components.SimpleButton
 
-class RequestUpdateGui : WindowScreen(newGuiScale = 2) {
+class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     init {
         UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")

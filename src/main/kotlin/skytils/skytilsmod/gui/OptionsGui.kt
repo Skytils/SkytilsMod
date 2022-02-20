@@ -18,6 +18,7 @@
 package skytils.skytilsmod.gui
 
 import gg.essential.api.EssentialAPI
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
@@ -34,7 +35,8 @@ import skytils.skytilsmod.utils.openGUI
 import java.awt.Desktop
 import java.net.URI
 
-class OptionsGui : WindowScreen(newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
+class OptionsGui :
+    WindowScreen(ElementaVersion.V1, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
         x = CenterConstraint()

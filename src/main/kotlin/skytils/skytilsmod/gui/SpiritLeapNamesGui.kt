@@ -18,10 +18,16 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.*
+import gg.essential.elementa.components.ScrollComponent
+import gg.essential.elementa.components.UIContainer
+import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.input.UITextInput
-import gg.essential.elementa.constraints.*
+import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.constraints.ChildBasedSizeConstraint
+import gg.essential.elementa.constraints.RelativeConstraint
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.effects.RecursiveFadeEffect
@@ -34,7 +40,7 @@ import skytils.skytilsmod.features.impl.handlers.SpiritLeap
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class SpiritLeapNamesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class SpiritLeapNamesGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
     private val classCheckboxes = HashMap<DungeonClass, UIContainer>()

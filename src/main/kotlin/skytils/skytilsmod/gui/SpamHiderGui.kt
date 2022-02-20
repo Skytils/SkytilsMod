@@ -18,9 +18,13 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
-import gg.essential.elementa.constraints.*
+import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.constraints.ChildBasedSizeConstraint
+import gg.essential.elementa.constraints.RelativeConstraint
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.ScissorEffect
@@ -37,7 +41,7 @@ import skytils.skytilsmod.gui.components.RepoFilterComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class SpamHiderGui : WindowScreen() {
+class SpamHiderGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     @Suppress("UNCHECKED_CAST")
     val configHiders = Skytils.config.getCategories()
         .flatMap { category ->
