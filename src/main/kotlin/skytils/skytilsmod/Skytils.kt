@@ -330,7 +330,7 @@ class Skytils {
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
         TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
         if (displayScreen != null) {
-            if (mc.thePlayer?.openContainer == null) {
+            if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer) {
                 mc.displayGuiScreen(displayScreen)
                 displayScreen = null
             }
@@ -467,7 +467,7 @@ class Skytils {
         if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 TickTask(1) {
-                    if (mc.thePlayer?.openContainer == null)
+                    if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
                         displayScreen = OptionsGui()
                 }
             }
