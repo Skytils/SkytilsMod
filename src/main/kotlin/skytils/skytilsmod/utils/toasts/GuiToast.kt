@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
+import java.nio.Buffer
 import java.nio.FloatBuffer
 import java.util.*
 
@@ -151,7 +152,7 @@ class GuiToast(val mc: Minecraft) : Gui() {
             val height = res.scaledHeight.toDouble()
             val scale = res.scaleFactor
             val trans = FloatArray(16)
-            buffer.clear()
+            (buffer as Buffer).clear()
             GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buffer)
             buffer[trans]
             val xpos = trans[12]
