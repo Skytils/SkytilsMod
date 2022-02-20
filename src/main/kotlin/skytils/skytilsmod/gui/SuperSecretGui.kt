@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
@@ -33,7 +34,7 @@ import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SuperSecretSettings
 import java.awt.Color
 
-class SuperSecretGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class SuperSecretGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
     val catSound: PositionedSoundRecord = PositionedSoundRecord.create(
