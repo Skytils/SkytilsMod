@@ -36,6 +36,7 @@ import skytils.skytilsmod.features.impl.misc.ItemFeatures
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.misc.SummonSkins
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
+import skytils.skytilsmod.features.impl.trackers.impl.DupeTracker
 import skytils.skytilsmod.utils.*
 import java.util.concurrent.Future
 import kotlin.concurrent.fixedRateTimer
@@ -197,6 +198,11 @@ object DataFetcher {
                             it.key to it.value.asString
                         }
                         SummonSkins.loadSkins()
+                    }
+                }
+                APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dupeditems").apply {
+                    Utils.checkThreadAndQueue {
+                        DupeTracker.dupedSet.addAll(map { it.asString })
                     }
                 }
             } catch (e: Throwable) {
