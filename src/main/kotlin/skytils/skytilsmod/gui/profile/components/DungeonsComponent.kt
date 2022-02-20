@@ -219,7 +219,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     val floorDivider by UIBlock(Color(0x4166f5).constraint).constrain {
         x = 5.pixels
         y = SiblingConstraint(5f)
-        width = 30.percent
+        width = 90.percent
         height = 2.pixels
     } childOf floors
 

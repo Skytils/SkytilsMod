@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
@@ -44,7 +45,7 @@ import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.toggle
 import java.awt.Color
 
-class WaypointsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
 

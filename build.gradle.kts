@@ -78,6 +78,10 @@ val shadowMe: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
+val shadowMeMod: Configuration by configurations.creating {
+    configurations.modImplementation.get().extendsFrom(this)
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
@@ -92,14 +96,14 @@ dependencies {
     }
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
-    shadowMe("com.github.Skytils:Hylin:04665adf92") {
+    shadowMeMod("com.github.Skytils:Hylin:04665adf92") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
-    shadowMe("com.github.Skytils:AsmHelper:91ecc2bd9c") {
+    shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")

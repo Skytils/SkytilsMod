@@ -19,6 +19,7 @@
 package skytils.skytilsmod.gui
 
 import gg.essential.api.EssentialAPI
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
@@ -32,7 +33,7 @@ import skytils.skytilsmod.features.impl.handlers.CustomNotifications
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class CustomNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
     private val components = HashMap<UIContainer, Entry>()
@@ -179,14 +180,17 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
         CustomNotifications.notifications.clear()
 
         for ((_, triggerRegex, displayText, displayTicks) in components.values) {
-            if (triggerRegex.getText().isBlank() || displayText.getText().isBlank() || displayTicks.getText().isBlank()) continue
+            if (triggerRegex.getText().isBlank() || displayText.getText().isBlank() || displayTicks.getText()
+                    .isBlank()
+            ) continue
             runCatching {
                 CustomNotifications.notifications.add(
                     CustomNotifications.Notification(
                         triggerRegex.getText().replace("%%MC_IGN%%", mc.session.username).toRegex(),
                         displayText.getText(),
                         displayTicks.getText().toInt()
-                    ))
+                    )
+                )
             }.onFailure {
                 it.printStackTrace()
                 EssentialAPI.getNotifications().push("Invalid notification", triggerRegex.getText(), 3f)
