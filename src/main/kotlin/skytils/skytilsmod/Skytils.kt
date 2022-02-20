@@ -26,6 +26,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiButton
+import net.minecraft.client.gui.GuiGameOver
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
@@ -85,6 +86,7 @@ import skytils.skytilsmod.listeners.ChatListener
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -468,6 +470,11 @@ class Skytils {
                     if (mc.thePlayer?.openContainer == null)
                         displayScreen = OptionsGui()
                 }
+            }
+        }
+        if (old is AccessorGuiStreamUnavailable) {
+            if (config.twitchFix && event.gui == null && !(Utils.skyblock && old.parentScreen is GuiGameOver)) {
+                event.gui = old.parentScreen
             }
         }
     }

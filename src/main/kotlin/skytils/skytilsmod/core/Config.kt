@@ -1152,6 +1152,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var preventLogSpam = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Twitch Fix",
+        description = "Fix twitch stuff.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var twitchFix = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Price Paid",
         description = "Records and shows the price you paid for certain items.",
         category = "Miscellaneous", subcategory = "Items"
