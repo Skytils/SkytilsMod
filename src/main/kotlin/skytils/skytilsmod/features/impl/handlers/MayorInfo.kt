@@ -52,7 +52,8 @@ object MayorInfo {
     private var lastCheckedElectionOver = 0L
     private var lastFetchedMayorData = 0L
     private var lastSentData = 0L
-    const val baseURL = "https://sbe-stole-skytils.design/api/mayor"
+    val baseURL
+        get() = "https://${Skytils.domain}/api/mayor"
 
     private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
 

@@ -169,6 +169,8 @@ class Skytils {
         }
 
         val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
+
+        var domain = "sbe-stole-skytils.design"
     }
 
     @Mod.EventHandler
