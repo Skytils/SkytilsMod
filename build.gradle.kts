@@ -159,7 +159,7 @@ tasks {
         archiveBaseName.set("Skytils")
         archiveClassifier.set("dev")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        configurations = listOf(shadowMe)
+        configurations = listOf(shadowMe, shadowMeMod)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
         relocate("org.apache.commons.codec", "skytils.apacheorg.codec")
