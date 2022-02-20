@@ -191,7 +191,7 @@ tasks {
         dependsOn(processResources)
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all")
+            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8")
             languageVersion = "1.6"
         }
         kotlinDaemonJvmArguments.set(
@@ -221,7 +221,9 @@ tasks {
     }
 }
 
-kotlin.jvmToolchain {
-    this as JavaToolchainSpec
-    languageVersion.set(JavaLanguageVersion.of(8))
+kotlin {
+    jvmToolchain {
+        check(this is JavaToolchainSpec)
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
