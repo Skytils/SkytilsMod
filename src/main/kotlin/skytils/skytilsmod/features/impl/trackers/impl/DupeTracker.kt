@@ -133,7 +133,7 @@ object DupeTracker : Tracker("duped_items") {
         if (!Utils.inSkyblock) return
         val uuid = event.itemStack.getUUID() ?: return
         if (dupedSet.contains(uuid)) {
-            event.toolTip.add("§c§lDuped")
+            event.toolTip.add("§c§lNOT LEGIT")
         }
     }
 
