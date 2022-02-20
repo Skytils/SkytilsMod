@@ -48,7 +48,7 @@ object DataFetcher {
             try {
                 APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
                     if (isNotBlank()) {
-                        Skytils.domain = this
+                        Skytils.domain = trim()
                     }
                 }
                 APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
