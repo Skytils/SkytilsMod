@@ -133,12 +133,21 @@ object DupeTracker : Tracker("duped_items") {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock || !Skytils.config.dupeTracker) return
-        val uuid = event.itemStack.getUUID() ?: return
+        val extraAttrib = ItemUtil.getExtraAttributes(event.itemStack) ?: return
+        val uuid = extraAttrib.getString("uuid")
+        val origin = extraAttrib.getString("originTag")
         if (dupedUUIDs.contains(uuid)) {
             event.toolTip.add("§c§lDUPED ITEM")
         }
         if (dirtyUUIDs.contains(uuid)) {
             event.toolTip.add("§c§lDIRTY ITEM")
+        }
+        if (origin.isNotEmpty()) {
+            if (origin != "ITEM_STASH") {
+                event.toolTip.add("§7§lOrigin: §7$origin")
+            } else {
+                event.toolTip.add("§c§lStashed item: possibly duped")
+            }
         }
     }
 
