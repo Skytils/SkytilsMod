@@ -202,7 +202,14 @@ object DataFetcher {
                 }
                 APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dupeditems").apply {
                     Utils.checkThreadAndQueue {
-                        DupeTracker.dupedSet.addAll(map { it.asString })
+                        DupeTracker.dirtyUUIDs.addAll(map { it.asString })
+                    }
+                }
+                if (Skytils.config.markDirtyItems) {
+                    APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dirtyitems").apply {
+                        Utils.checkThreadAndQueue {
+                            DupeTracker.dirtyUUIDs.addAll(map { it.asString })
+                        }
                     }
                 }
             } catch (e: Throwable) {

@@ -38,7 +38,7 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
 object DupeTracker : Tracker("duped_items") {
-    val dupedSet = hashSetOf<String>()
+    val dirtyUUIDs = hashSetOf<String>()
     val dupeChecking = hashMapOf<String, Int>()
     var inAuctionBrowser = false
 
@@ -50,7 +50,7 @@ object DupeTracker : Tracker("duped_items") {
         dupeChecking.clear()
         printDevMessage("Cleared dupe check", "dupecheck")
         printDevMessage("Cleared auction", "dupecheck")
-        if (event.gui is GuiChat && DevTools.getToggle("dupecheck")) dupedSet.clear()
+        if (event.gui is GuiChat && DevTools.getToggle("dupecheck")) dirtyUUIDs.clear()
     }
 
     @SubscribeEvent
@@ -90,7 +90,7 @@ object DupeTracker : Tracker("duped_items") {
                         val prev = dupeChecking.putIfAbsent(uuid, slotId) ?: return
                         if (prev != slotId) {
                             printDevMessage("Dupe set ${item.displayName}, $uuid $slotId", "dupecheck")
-                            dupedSet.add(uuid)
+                            dirtyUUIDs.add(uuid)
                             dirty = true
                         }
                     }
@@ -106,7 +106,7 @@ object DupeTracker : Tracker("duped_items") {
                             val prev = dupeChecking.putIfAbsent(uuid, i) ?: continue
                             if (prev != i) {
                                 printDevMessage("Dupe window ${stack.displayName}, $uuid $i", "dupecheck")
-                                dupedSet.add(uuid)
+                                dirtyUUIDs.add(uuid)
                                 dirty = true
                             }
                         }
@@ -120,7 +120,7 @@ object DupeTracker : Tracker("duped_items") {
     fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
         val uuid = event.slot.stack.getUUID() ?: return
-        if (dupedSet.contains(uuid)) {
+        if (dirtyUUIDs.contains(uuid)) {
             GlStateManager.pushMatrix()
             GlStateManager.translate(0f, 0f, 299f)
             event.slot highlight Color.BLACK.withAlpha(169)
@@ -132,21 +132,21 @@ object DupeTracker : Tracker("duped_items") {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock) return
         val uuid = event.itemStack.getUUID() ?: return
-        if (dupedSet.contains(uuid)) {
-            event.toolTip.add("§c§lNOT LEGIT")
+        if (dirtyUUIDs.contains(uuid)) {
+            event.toolTip.add("§c§lDIRTY ITEM")
         }
     }
 
     override fun resetLoot() {
-        dupedSet.clear()
+        dirtyUUIDs.clear()
     }
 
     override fun read(reader: InputStreamReader) {
-        dupedSet.addAll(gson.fromJson<List<String>>(reader, List::class.java))
+        dirtyUUIDs.addAll(gson.fromJson<List<String>>(reader, List::class.java))
     }
 
     override fun write(writer: OutputStreamWriter) {
-        gson.toJson(dupedSet, Set::class.java, writer)
+        gson.toJson(dirtyUUIDs, Set::class.java, writer)
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
