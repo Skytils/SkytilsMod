@@ -22,8 +22,10 @@ import net.minecraft.item.ItemStack
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.core.Config
+import skytils.skytilsmod.features.impl.trackers.impl.DupeTracker
 import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.Utils
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.javaField
 
@@ -78,6 +80,20 @@ class AuctionData {
                 val data = APIUtil.getJSONResponse(dataURL)
                 for ((key, value) in data.entrySet()) {
                     lowestBINs[key] = value.asDouble
+                }
+            }
+            if (Skytils.config.dupeTracker) {
+                APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dupeditems").apply {
+                    Utils.checkThreadAndQueue {
+                        DupeTracker.dupedUUIDs.addAll(map { it.asString })
+                    }
+                }
+                if (Skytils.config.markDirtyItems) {
+                    APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dirtyitems").apply {
+                        Utils.checkThreadAndQueue {
+                            DupeTracker.dirtyUUIDs.addAll(map { it.asString })
+                        }
+                    }
                 }
             }
         }
