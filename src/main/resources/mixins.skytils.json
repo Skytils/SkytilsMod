@@ -72,6 +72,7 @@
   "client": [
     "accessors.AccessorGuiChat",
     "accessors.AccessorGuiMainMenu",
+    "accessors.AccessorGuiStreamUnavailable",
     "gui.MixinChatLine",
     "neu.MixinCustomAH",
     "particle.MixinEffectRenderer",
