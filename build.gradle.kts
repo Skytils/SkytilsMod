@@ -29,7 +29,7 @@ plugins {
     idea
 }
 
-version = "1.2.0-pre2"
+version = "1.2.0-pre3"
 group = "skytils.skytilsmod"
 
 repositories {
