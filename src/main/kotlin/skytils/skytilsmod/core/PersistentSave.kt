@@ -28,7 +28,7 @@ import java.io.OutputStreamWriter
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KClass
 
-abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_000) {
+abstract class PersistentSave(protected val saveFile: File, private val interval: Long = 30_000) {
 
     var dirty = false
 
@@ -71,6 +71,20 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
         }
     }
 
+    private fun init() {
+        SAVES.add(this)
+        readSave()
+        fixedRateTimer("${this::class.simpleName}-Save", period = interval) {
+            if (dirty) {
+                writeSave()
+            }
+        }
+    }
+
+    init {
+        init()
+    }
+
     companion object {
         val SAVES = HashSet<PersistentSave>()
 
@@ -92,15 +106,4 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
             }, "Skytils-PersistentSave-Shutdown"))
         }
     }
-
-    init {
-        SAVES.add(this)
-        readSave()
-        fixedRateTimer("${this::class.simpleName}-Save", period = interval) {
-            if (dirty) {
-                writeSave()
-            }
-        }
-    }
-
 }
