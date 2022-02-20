@@ -30,10 +30,12 @@ import gg.essential.elementa.dsl.*
 import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.dungeons.DungeonBase
 import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
+import skytils.skytilsmod.utils.toStringIfTrue
 import java.awt.Color
 import kotlin.time.Duration
 
-class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRoundedRectangle(5f) {
+class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int, val isMaster: Boolean) :
+    UIRoundedRectangle(5f) {
     init {
         constrain {
             width = ChildBasedMaxSizeConstraint() + 10.pixels
@@ -41,7 +43,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int) : UIRo
             color = VigilancePalette.getDarkBackground().constraint
         }
 
-        val title = UIText("Floor $floor").constrain {
+        val title = UIText("${"Master ".toStringIfTrue(isMaster)}Floor $floor").constrain {
             x = CenterConstraint()
             y = 5.pixels
             textScale = 1.5f.pixels

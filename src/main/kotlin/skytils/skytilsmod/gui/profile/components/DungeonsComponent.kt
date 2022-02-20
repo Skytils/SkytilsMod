@@ -19,6 +19,7 @@
 package skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.Window
@@ -167,12 +168,14 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
         width = 100.percent
     } childOf catacombs
 
-    // Normal floors
     val normalData = cataData.map {
         it?.normal
     }
+    val masterData = cataData.map {
+        it?.master
+    }
 
-    val normalFloors by UIContainer().constrain {
+    val floorData by UIContainer().constrain {
         height = ChildBasedRangeConstraint()
         width = 100.percent
     } childOf floors
@@ -181,7 +184,14 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
         .bindText(normalData.map { "Highest Floor Beaten: ${it?.highestCompletion?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}" })
         .constrain {
             x = 5.percent
-        } childOf normalFloors
+        } childOf floorData
+
+    val highestMasterFloorBeaten by UIText()
+        .bindText(masterData.map { "Highest Master Floor Beaten: ${it?.highestCompletion?.let { "Floor $it" } ?: "None"}" })
+        .constrain {
+            x = 5.percent
+            y = SiblingConstraint(5f)
+        } childOf floorData
 
     val secretsFound by UIText()
         .bindText(playerState.map {
@@ -197,18 +207,21 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
         .constrain {
             x = 5.percent
             y = SiblingConstraint(5f)
-        } childOf normalFloors
+        } childOf floorData
 
     val normalFloorContainer by UIContainer().constrain {
         x = 5.percent
         y = SiblingConstraint(5f)
         width = 90.percent
         height = ChildBasedRangeConstraint()
-    } childOf normalFloors
+    } childOf floors
 
-    val masterData = cataData.map {
-        it?.master
-    }
+    val floorDivider by UIBlock(Color(0x4166f5).constraint).constrain {
+        x = 5.pixels
+        y = SiblingConstraint(5f)
+        width = 30.percent
+        height = 2.pixels
+    } childOf floors
 
     val masterFloorContainer by UIContainer().constrain {
         x = 5.percent
@@ -223,7 +236,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
                 normalFloorContainer.clearChildren()
                 dungeon?.highestCompletion?.let { highest ->
                     (0..highest).forEach {
-                        DungeonFloorComponent(dungeon, it).constrain {
+                        DungeonFloorComponent(dungeon, it, false).constrain {
                             x = CramSiblingConstraint(5f)
                             y = CramSiblingConstraint(5f)
                         } childOf normalFloorContainer
@@ -237,7 +250,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
                 masterFloorContainer.clearChildren()
                 dungeon?.highestCompletion?.let { highest ->
                     (1..highest).forEach {
-                        DungeonFloorComponent(dungeon, it).constrain {
+                        DungeonFloorComponent(dungeon, it, true).constrain {
                             x = CramSiblingConstraint(5f)
                             y = CramSiblingConstraint(5f)
                         } childOf masterFloorContainer
