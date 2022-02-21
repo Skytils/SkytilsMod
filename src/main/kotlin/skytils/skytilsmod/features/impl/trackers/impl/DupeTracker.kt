@@ -36,6 +36,7 @@ import skytils.skytilsmod.utils.RenderUtil.highlight
 import java.awt.Color
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import kotlin.concurrent.fixedRateTimer
 
 object DupeTracker : Tracker("duped_items") {
     val dupedUUIDs = hashSetOf<String>()
@@ -164,4 +165,23 @@ object DupeTracker : Tracker("duped_items") {
     }
 
     private fun ItemStack?.getUUID(): String? = ItemUtil.getExtraAttributes(this)?.getString("uuid")?.ifEmpty { null }
+
+    init {
+        fixedRateTimer(name = "Skytils-FetchDupeData", period = 7 * 60 * 1000L) {
+            if (Skytils.config.dupeTracker) {
+                APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dupeditems").apply {
+                    Utils.checkThreadAndQueue {
+                        dupedUUIDs.addAll(map { it.asString })
+                    }
+                }
+                if (Skytils.config.markDirtyItems) {
+                    APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dirtyitems").apply {
+                        Utils.checkThreadAndQueue {
+                            dirtyUUIDs.addAll(map { it.asString })
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
