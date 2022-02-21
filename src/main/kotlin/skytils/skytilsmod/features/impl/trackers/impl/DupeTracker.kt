@@ -142,13 +142,8 @@ object DupeTracker : Tracker("duped_items") {
         if (dirtyUUIDs.contains(uuid)) {
             event.toolTip.add("§c§lDIRTY ITEM")
         }
-        if (origin.isNotEmpty()) {
-            if (origin != "ITEM_STASH") {
-                event.toolTip.add("§7§lOrigin: §7$origin")
-            } else {
-                event.toolTip.add("§c§lStashed item: possibly duped")
-            }
-        }
+        if (origin == "ITEM_STASH")
+            event.toolTip.add("§c§lStashed item: possibly duped")
     }
 
     override fun resetLoot() {
