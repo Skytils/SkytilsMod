@@ -99,7 +99,7 @@ class SlayerFeatures {
             expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
         }
         if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
-        if (lastYangGlyphSwitchTicks > 100) lastYangGlyphSwitchTicks = 0
+        if (lastYangGlyphSwitchTicks > 120) lastYangGlyphSwitchTicks = -1
         if (Skytils.config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && yangGlyphEntity == null && yangGlyph == null && slayerEntity != null) {
             val suspect = mc.theWorld.getEntitiesWithinAABB(
                 EntityArmorStand::class.java,
@@ -278,6 +278,7 @@ class SlayerFeatures {
                             "§cYang Glyph!",
                             30
                         )
+                        yangGlyphAdrenalineStressCount = lastYangGlyphSwitch + 6000L
                     }
                 }
             }
@@ -340,6 +341,7 @@ class SlayerFeatures {
                         "§cYang Glyph!",
                         30
                     )
+                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
                     lastYangGlyphSwitchTicks = -1
                 }
             }
@@ -354,6 +356,7 @@ class SlayerFeatures {
                     )
                     yangGlyph = event.pos
                     lastYangGlyphSwitchTicks = -1
+                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
                 }
             }
         }
@@ -496,6 +499,7 @@ class SlayerFeatures {
         yangGlyphEntity = null
         lastYangGlyphSwitch = -1
         lastYangGlyphSwitchTicks = -1
+        yangGlyphAdrenalineStressCount = -1
     }
 
     @SubscribeEvent
@@ -684,6 +688,15 @@ class SlayerFeatures {
                         alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
+                } else if (lastYangGlyphSwitchTicks != -1) {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "§cBeacon thrown! ${(System.currentTimeMillis() - yangGlyphAdrenalineStressCount) / 1000f}s",
+                        if (leftAlign) 0f else width.toFloat(),
+                        10f,
+                        CommonColors.WHITE,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
                 } else {
                     ScreenRenderer.fontRenderer.drawString(
                         "§bHolding nothing!",
@@ -696,7 +709,7 @@ class SlayerFeatures {
                 }
                 if (yangGlyph != null) {
                     ScreenRenderer.fontRenderer.drawString(
-                        "§cYang Glyph placed!",
+                        "§cYang Glyph placed! ${(System.currentTimeMillis() - yangGlyphAdrenalineStressCount) / 1000f}s",
                         if (leftAlign) 0f else width.toFloat(),
                         20f,
                         CommonColors.WHITE,
@@ -901,6 +914,7 @@ class SlayerFeatures {
         var thrownBoundingBox: AxisAlignedBB? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
+        var yangGlyphAdrenalineStressCount = -1L
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
             if (entity is EntityZombie) {
