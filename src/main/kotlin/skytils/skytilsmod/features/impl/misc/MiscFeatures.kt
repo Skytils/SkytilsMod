@@ -82,6 +82,7 @@ import kotlin.time.ExperimentalTime
 class MiscFeatures {
 
     private var lastGLeaveCommand = 0L
+    private var lastCoopAddCommand = 0L
     private var blockZapperCooldownExpiration = 0L
     private var blockZapperUses = 0
     private val cheapCoins = setOf(
@@ -91,11 +92,16 @@ class MiscFeatures {
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (!Skytils.config.guildLeaveConfirmation || !event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
-        if (System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
+        if (!Utils.isOnHypixel) return
+        if (Skytils.config.guildLeaveConfirmation && event.message.startsWith("/g leave") && System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
             event.isCanceled = true
             lastGLeaveCommand = System.currentTimeMillis()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!"))
+            UChat.chat("§cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!")
+        }
+        if (Skytils.config.coopAddConfirmation && event.message.startsWith("/coopadd ") && System.currentTimeMillis() - lastCoopAddCommand >= 10_000) {
+            event.isCanceled = true
+            lastCoopAddCommand = System.currentTimeMillis()
+            UChat.chat("§c§lBe careful! Skytils stopped you from giving a player full control of your island! §6Run the command again if you are sure!")
         }
     }
 
