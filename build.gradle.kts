@@ -131,6 +131,7 @@ tasks {
         filesMatching("mcmod.info") {
             expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
         }
+        dependsOn(compileJava)
     }
     named<Jar>("jar") {
         manifest {
@@ -188,7 +189,6 @@ tasks {
 //        options.release.set(8)
     }
     withType<KotlinCompile> {
-        dependsOn(processResources)
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8")
