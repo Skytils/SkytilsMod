@@ -46,7 +46,6 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
         }
     }
 
-    // Bypass the FML security manager in order to set our own
     private void overrideSecurityManager(boolean isForge) {
         try {
             SecurityManager s = new SkytilsSecurityManager(isForge);
