@@ -177,6 +177,11 @@ class MiningFeatures {
                 waypointChatMessage(xyzMatcher.group("x"), xyzMatcher.group("y"), xyzMatcher.group("z"))
             else if (xzMatcher.matches())
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
+            else if (unformatted.contains(": $SBECHWP:") || unformatted.contains(": $DSMCHWP:") |)
+                val sub = unformatted.substring(unformatted.lastIndexOf(":") + 1)
+                val parts = coords.split("@")
+                val coords = parts[1].split(",")
+                waypointChatMessage(coords[0], coords[1], coords[2])
         }
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
