@@ -168,7 +168,7 @@ object DupeTracker : Tracker("duped_items") {
 
     init {
         fixedRateTimer(name = "Skytils-FetchDupeData", period = 7 * 60 * 1000L) {
-            if (Skytils.config.dupeTracker) {
+            if (Utils.skyblock && Skytils.config.dupeTracker) {
                 APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dupeditems").apply {
                     Utils.checkThreadAndQueue {
                         dupedUUIDs.addAll(map { it.asString })
