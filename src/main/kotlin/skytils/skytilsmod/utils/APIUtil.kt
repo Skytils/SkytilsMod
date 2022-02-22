@@ -49,8 +49,8 @@ object APIUtil {
             )
             .setDefaultRequestConfig(
                 RequestConfig.custom()
-                    .setConnectTimeout(Timeout.ofMinutes(1))
-                    .setResponseTimeout(Timeout.ofMinutes(1))
+                    .setConnectTimeout(Timeout.ofSeconds(30))
+                    .setResponseTimeout(Timeout.ofSeconds(30))
                     .build()
             )
             .useSystemProperties()
