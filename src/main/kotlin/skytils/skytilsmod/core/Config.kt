@@ -1110,7 +1110,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Copy Chat Messages",
-        description = "Copy chat messages with control + click.",
+        description = "Copy chat messages with control + click. Chat Tabs must be on for this to work.",
         category = "Miscellaneous", subcategory = "Chat Tabs"
     )
     var copyChat = false
