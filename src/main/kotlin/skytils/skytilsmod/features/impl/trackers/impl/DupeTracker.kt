@@ -143,8 +143,10 @@ object DupeTracker : Tracker("duped_items") {
         if (dirtyUUIDs.contains(uuid)) {
             event.toolTip.add("§c§lDIRTY ITEM")
         }
-        if (origin == "ITEM_STASH")
-            event.toolTip.add("§c§lStashed item: possibly duped")
+        when (origin) {
+            "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
+            "ITEM_COMMAND" -> event.toolTip.add("§c§lSpawned by admin lol")
+        }
     }
 
     override fun resetLoot() {
