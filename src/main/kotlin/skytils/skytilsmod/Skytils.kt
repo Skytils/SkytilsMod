@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
 import net.minecraft.client.gui.GuiIngameMenu
@@ -32,16 +31,12 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.S1CPacketEntityMetadata
-import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
-import net.minecraft.network.play.server.S3FPacketCustomPayload
+import net.minecraft.network.play.server.*
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -365,24 +360,17 @@ class Skytils {
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
     }
 
-    @SubscribeEvent
-    fun onWorldJoin(event: EntityJoinWorldEvent) {
-        if (event.entity !is EntityPlayerSP) return
-        Utils.skyblock = false
-        Utils.dungeons = false
-    }
-
-    @SubscribeEvent
-    fun onScoreboardChange(event: MainReceivePacketEvent<*, *>) {
-        if (Utils.inSkyblock || !Utils.isOnHypixel || event.packet !is S3DPacketDisplayScoreboard) return
-        if (event.packet.func_149371_c() != 1) return
-        Utils.skyblock = event.packet.func_149370_d() == "SBScoreboard"
-        printDevMessage("score ${event.packet.func_149370_d()}", "utils")
-        printDevMessage("sb ${Utils.inSkyblock}", "utils")
-    }
-
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
+        if (event.packet is S01PacketJoinGame) {
+            Utils.skyblock = false
+            Utils.dungeons = false
+        }
+        if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is S3DPacketDisplayScoreboard && event.packet.func_149371_c() == 1) {
+            Utils.skyblock = event.packet.func_149370_d() == "SBScoreboard"
+            printDevMessage("score ${event.packet.func_149370_d()}", "utils")
+            printDevMessage("sb ${Utils.inSkyblock}", "utils")
+        }
         if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
             val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
             val entity = mc.theWorld.getEntityByID(event.packet.entityId)

@@ -54,6 +54,8 @@ public class EssentialPlatformSetup {
         conn.setRequestMethod("GET");
         conn.setDoOutput(true);
         conn.addRequestProperty("User-Agent", "Skytils/" + Skytils.VERSION);
+        conn.setConnectTimeout(10000);
+        conn.setReadTimeout(30000);
 
         return IOUtils.toString(conn.getInputStream());
     }
