@@ -21,6 +21,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import net.minecraft.util.BlockPos
+import skytils.skytilsmod.Reference
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
@@ -42,8 +43,8 @@ import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
     private fun loadData(): Future<*> {
-        val dataUrl = Skytils.config.dataURL
         return Skytils.threadPool.submit {
+            val dataUrl = Reference.dataUrl
             try {
                 APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
                     if (isNotBlank()) {
@@ -168,7 +169,7 @@ object DataFetcher {
                         entrySet().associateTo(SlayerFeatures.BossHealths) { it.key to it.value.asJsonObject }
                     }
                 }
-                APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").apply {
+                APIUtil.getArrayResponse("${dataUrl}SpamFilters.json").apply {
                     Utils.checkThreadAndQueue {
                         val filters = SpamHider.repoFilters.toHashSet()
                         SpamHider.repoFilters.clear()
