@@ -40,13 +40,13 @@ import java.net.URI
 
 object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
-    @Property(
-        type = PropertyType.TEXT, name = "Skytils Data",
-        description = "URL for Skytils data.",
-        category = "General", subcategory = "API",
-        hidden = true
-    )
-    var dataURL = "https://skytilsmod-data.pages.dev/"
+    /*    @Property(
+            type = PropertyType.TEXT, name = "Skytils Data",
+            description = "URL for Skytils data.",
+            category = "General", subcategory = "API",
+            hidden = true
+        )*/
+    var dataURL = System.getProperty("skytils.dataURL", "https://skytilsmod-data.pages.dev/")
 
     @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
@@ -2582,7 +2582,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()
                     }
-                    dataURL = "https://skytilsmod-data.pages.dev/"
                 }
             }
         }
