@@ -27,6 +27,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import skytils.skytilsmod.Reference;
 import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
 
@@ -47,6 +48,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 public class EssentialPlatformSetup {
+    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/", "https://yes-really.sbe-stole-skytils.design/"};
     private static boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
 
     private static String requestEssential(String url) throws IOException {
@@ -54,6 +56,8 @@ public class EssentialPlatformSetup {
         conn.setRequestMethod("GET");
         conn.setDoOutput(true);
         conn.addRequestProperty("User-Agent", "Skytils/" + Skytils.VERSION);
+        conn.setConnectTimeout(10000);
+        conn.setReadTimeout(30000);
 
         return IOUtils.toString(conn.getInputStream());
     }
@@ -79,6 +83,16 @@ public class EssentialPlatformSetup {
         } catch (Throwable ignored) {
             return null;
         }
+    }
+
+    private static boolean trySetDataUrl(String url) {
+        if (url == null) return false;
+        try {
+            return requestEssential(url + "CANYOUSEEME").contains("YOUCANSEEME");
+        } catch (IOException ignored) {
+            LogManager.getLogger().warn("Failed to contact url " + url);
+        }
+        return false;
     }
 
     @SuppressWarnings("unused")
@@ -109,6 +123,14 @@ public class EssentialPlatformSetup {
             t.printStackTrace();
         }
 
+        for (final String url : dataURLCandidates) {
+            if (trySetDataUrl(url)) {
+                Reference.dataUrl = url;
+                break;
+            }
+        }
+        LogManager.getLogger().info("Data URL: " + Reference.dataUrl);
+
         @SuppressWarnings("unused")
         String sup = "UGxlYXNlIGRvbid0IHRlbGwgYW55b25lIHRoaXMgZXhpc3RzIGlmIHlvdSBzZWUgaXQsIHRoYW5rcyA8Mw==";
         if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
@@ -122,7 +144,7 @@ public class EssentialPlatformSetup {
             String essentialVersion = DigestUtils.sha256Hex(new FileInputStream(essentialLoc)).toUpperCase(Locale.ENGLISH);
             if (isDev) System.out.println(essentialVersion);
 
-            JsonObject essentialDownloads = new JsonParser().parse(requestEssential(new String(Base64.decodeBase64("aHR0cHM6Ly9za3l0aWxzbW9kLWRhdGEucGFnZXMuZGV2L2NvbnN0YW50cy9oYXNoZXMuanNvbg==")))).getAsJsonObject();
+            JsonObject essentialDownloads = new JsonParser().parse(requestEssential(Reference.dataUrl + new String(Base64.decodeBase64("Y29uc3RhbnRzL2hhc2hlcy5qc29u==")))).getAsJsonObject();
             if (isDev) System.out.println(essentialDownloads);
             if (!essentialDownloads.has(Skytils.VERSION)) loadEssential();
             if (!essentialDownloads.get(Skytils.VERSION).getAsString().equalsIgnoreCase(essentialVersion))

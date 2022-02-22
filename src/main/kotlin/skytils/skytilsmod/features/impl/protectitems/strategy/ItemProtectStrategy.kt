@@ -29,7 +29,9 @@ abstract class ItemProtectStrategy {
     abstract val isToggled: Boolean
 
     companion object {
-        private val STRATEGIES = setOf(FavoriteStrategy, ItemWorthStrategy, StarredItemStrategy)
+        private val STRATEGIES by lazy {
+            arrayOf(FavoriteStrategy, ItemWorthStrategy, StarredItemStrategy)
+        }
 
         fun isAnyToggled(): Boolean {
             return STRATEGIES.any { it.isToggled }
