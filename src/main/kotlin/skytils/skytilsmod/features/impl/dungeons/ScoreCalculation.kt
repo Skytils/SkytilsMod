@@ -180,10 +180,10 @@ object ScoreCalculation {
     val speedScore = totalElapsed.map { time ->
         when {
             time < 492.0 -> 100.0
-            time < 600.0 -> 140 - time / 12
-            time < 840.0 -> 115 - time / 24
-            time < 1140.0 -> 108 - time / 30
-            time < 3940.0 -> 98.5 - 1.0 / 40.0 * time
+            time < 600.0 -> 140 - time / 12.0
+            time < 840.0 -> 115 - time / 24.0
+            time < 1140.0 -> 108 - time / 30.0
+            time < 3940.0 -> 98.5 - time / 40.0
             else -> 0.0
         }.toInt()
     }
