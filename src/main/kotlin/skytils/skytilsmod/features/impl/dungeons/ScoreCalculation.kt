@@ -67,7 +67,7 @@ object ScoreCalculation {
     private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
 
     val floorRequirements = hashMapOf(
-        // idk what entrance is so i put it as the same as f1
+        // updated w.r.t. skyblock wiki
         "E" to FloorRequirement(.3),
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
@@ -180,12 +180,13 @@ object ScoreCalculation {
     }
     val speedScore = totalElapsed.map { time ->
         when {
-            time <= 480.0 -> 100.0
-            time <= 580.0 -> 148 - 0.1 * time
-            time <= 980 -> 119 - 0.05 * time
-            time < 3060 -> 102 - 1.0 / 30.0 * time
+            time < 492.0 -> 100.0
+            time < 600.0 -> 140 - time / 12.0
+            time < 840.0 -> 115 - time / 24.0
+            time < 1140.0 -> 108 - time / 30.0
+            time < 3940.0 -> 98.5 - time / 40.0
             else -> 0.0
-        }.roundToInt()
+        }.toInt()
     }
 
     // bonus stuff
