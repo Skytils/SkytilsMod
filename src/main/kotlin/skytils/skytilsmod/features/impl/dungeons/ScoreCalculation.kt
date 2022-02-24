@@ -25,6 +25,7 @@ import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.network.play.server.S45PacketTitle
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -40,6 +41,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -120,7 +122,7 @@ object ScoreCalculation {
     var floorReq = BasicState(floorRequirements["default"]!!)
     var foundSecrets: State<Int> = BasicState(0).also { state ->
         state.onSetValue {
-            updateText(totalScore.get().toInt())
+            updateText(totalScore.get())
         }
     }
     var totalSecrets = BasicState(0)
@@ -440,6 +442,18 @@ object ScoreCalculation {
             ) {
                 mimicKilled.set(true)
                 return
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun canYouPleaseStopCryingThanks(event: ClientChatReceivedEvent) {
+        if (!Utils.inDungeons || event.type != 0.toByte()) return
+        val unformatted = event.message.unformattedText.stripControlCodes()
+        if (unformatted.startsWith("Party > ") && unformatted.contains(": Skytils-SC > ")) {
+            event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
+                it as AccessorChatComponentText
+                it.text = it.text.replace(": Skytils-SC > ", ": ")
             }
         }
     }

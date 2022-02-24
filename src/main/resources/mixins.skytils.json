@@ -6,6 +6,7 @@
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "MixinMinecraft",
+    "accessors.AccessorChatComponentText",
     "accessors.AccessorCommandHandler",
     "accessors.AccessorEnumDyeColor",
     "accessors.AccessorGuiContainer",
