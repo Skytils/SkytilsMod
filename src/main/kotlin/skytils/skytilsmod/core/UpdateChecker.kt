@@ -38,8 +38,10 @@ import kotlin.concurrent.thread
 
 object UpdateChecker {
     val updateGetter = UpdateGetter()
+    val updateAsset
+        get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject
     val updateDownloadURL: String
-        get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject["browser_download_url"].asString
+        get() = updateAsset["browser_download_url"].asString
 
     fun getJarNameFromUrl(url: String): String {
         return url.split(Regex("/")).last()

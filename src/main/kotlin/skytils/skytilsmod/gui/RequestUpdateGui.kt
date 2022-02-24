@@ -35,13 +35,19 @@ import skytils.skytilsmod.gui.components.SimpleButton
 class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     init {
-        UIText("Skytils ${UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString} is available!")
+        val updateObj = UpdateChecker.updateGetter.updateObj
+        UIText("Skytils ${updateObj?.get("tag_name")?.asString} is available!")
             .constrain {
                 x = CenterConstraint()
                 y = RelativeConstraint(0.1f)
             } childOf window
-        val versionText =
-            UIText("You are currently on version ${Skytils.VERSION}.")
+        UIText("You are currently on version ${Skytils.VERSION}.")
+            .constrain {
+                x = CenterConstraint()
+                y = SiblingConstraint()
+            } childOf window
+        val authorText =
+            UIText("Uploaded by: ${UpdateChecker.updateAsset?.getAsJsonObject("uploader")?.get("login")?.asString}")
                 .constrain {
                     x = CenterConstraint()
                     y = SiblingConstraint()
@@ -49,8 +55,8 @@ class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         val changelogWrapper = ScrollComponent()
             .constrain {
                 x = CenterConstraint()
-                y = SiblingConstraint() + 10.pixels()
-                height = basicHeightConstraint { window.getHeight() - 90 - versionText.getBottom() }
+                y = SiblingConstraint(10f)
+                height = basicHeightConstraint { window.getHeight() - 90 - authorText.getBottom() }
                 width = RelativeConstraint(0.7f)
             } childOf window
         UpdateChecker.updateGetter.updateObj?.get("body")?.asString?.let { MarkdownComponent(it.replace("*", "")) }
