@@ -37,8 +37,9 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
             Window.enqueueRenderOperation {
                 it?.let { profile ->
                     clearChildren()
+                    val hotm: HOTM? = profile.hotm
                     val hotmLevel =
-                        SkillUtils.calcXpWithProgress(profile.hotm.experience.toDouble(), SkillUtils.hotmXp.values)
+                        SkillUtils.calcXpWithProgress(hotm?.experience?.toDouble() ?: 0.0, SkillUtils.hotmXp.values)
                     for (slot in HOTM.HOTMSlot.slots) {
                         if (slot is HOTM.HOTMSlot.HOTMLevel) {
                             SlotComponent(
@@ -50,15 +51,15 @@ class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
                                     y = ((slot.slotNum / 9) * (16 + 2) - 18).pixels
                                 } childOf this
                         } else {
-                            var level = profile.hotm.perks.getOrDefault(slot, 0)
-                            if (slot is HOTM.HOTMSlot.PickaxeAbility && level == 1 && profile.hotm.perks.getOrDefault(
+                            var level = hotm?.perks?.getOrDefault(slot, 0) ?: 0
+                            if (slot is HOTM.HOTMSlot.PickaxeAbility && level == 1 && (hotm?.perks?.getOrDefault(
                                     HOTM.HOTMSlot.Perk.SpecialPerk.PeakOfTheMountain,
                                     0
-                                ) >= 1
+                                ) ?: 0) >= 1
                             )
                                 level++
                             val item = slot.getItem(level).setLore(slot.getLore(level))
-                            if (slot == profile.hotm.selectedPickaxeAbility) item.getSubCompound("ench", true)
+                            if (slot == hotm?.selectedPickaxeAbility) item.getSubCompound("ench", true)
                             SlotComponent(item).constrain {
                                 x = ((slot.slotNum % 9) * (16 + 2)).pixels
                                 y = ((slot.slotNum / 9) * (16 + 2)).pixels
