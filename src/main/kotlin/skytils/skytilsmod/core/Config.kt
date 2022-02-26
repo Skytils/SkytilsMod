@@ -439,6 +439,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var reviveStoneNames = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Say Blaze Done",
+        description = "Says in chat when blaze is done.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var sayBlazeDone = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Bat Hitboxes",
         description = "Draws the outline of a bat's bounding box.",
         category = "Dungeons", subcategory = "Quality of Life"
