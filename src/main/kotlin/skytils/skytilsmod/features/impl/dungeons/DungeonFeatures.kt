@@ -28,6 +28,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.event.ClickEvent
@@ -317,11 +318,14 @@ object DungeonFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onDeath(event: LivingDeathEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inDungeons) return
         if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime > 0 && event.entityLiving.name == "Terracotta ") {
             //for some reason this event fires twice for players
             printDevMessage("terracotta died", "terracotta")
             terracottaEndTime -= 1
+        }
+        if (event.entity is EntityBlaze && ++blazes == 10 && Skytils.config.sayBlazeDone && DungeonTimer.bloodClearTime != -1L) {
+            Skytils.sendMessageQueue.add("/pc Blaze Done")
         }
     }
 
