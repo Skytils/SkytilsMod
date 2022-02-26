@@ -798,7 +798,7 @@ class SlayerFeatures {
         override fun render() {
             if (Utils.inSkyblock && toggled && mc.thePlayer != null) {
                 ScreenRenderer.apply {
-                    val armors = arrayListOf<Pair<ItemStack, String>>()
+                    val armors = ArrayList<Pair<ItemStack, String>>(4)
                     (3 downTo 0).map { mc.thePlayer.getCurrentArmor(it) }.forEach { armor ->
                         if (armor == null) return@forEach
                         val extraAttr = ItemUtil.getExtraAttributes(armor) ?: return@forEach

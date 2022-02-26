@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.Lists
 import gg.essential.universal.UChat
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
@@ -59,8 +58,8 @@ class ThreeWeirdosSolver {
                 UChat.chat("§cSkytils failed to load solutions for Three Weirdos.")
                 DataFetcher.reloadData()
             }
-            for (solution in Lists.newArrayList(solutions)) {
-                if (unformatted.contains(solution!!)) {
+            for (solution in solutions) {
+                if (unformatted.contains(solution)) {
                     val npcName = unformatted.substring(unformatted.indexOf("]") + 2, unformatted.indexOf(":"))
                     riddleNPC = npcName
                     mc.thePlayer.addChatMessage(

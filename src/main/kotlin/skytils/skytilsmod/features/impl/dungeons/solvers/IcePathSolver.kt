@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.Lists
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntitySilverfish
@@ -225,7 +224,7 @@ class IcePathSolver {
                 }
             }
         }
-        return Lists.newArrayList()
+        return arrayListOf()
     }
 
     /**

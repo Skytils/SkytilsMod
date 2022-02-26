@@ -42,10 +42,10 @@ object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
     var failInviting = false
 
     @JvmField
-    var party: MutableList<String> = ArrayList()
+    var party = ArrayList<String>(5)
 
     @JvmField
-    var repartyFailList: MutableList<String> = ArrayList()
+    var repartyFailList = ArrayList<String>(5)
 
     @JvmField
     var partyThread: Thread? = null
