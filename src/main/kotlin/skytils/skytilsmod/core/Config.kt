@@ -1290,6 +1290,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showGemstones = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Item Origin",
+        description = "Shows the origin on items.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showOrigin = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
         description = "Shows the NPC Sell Price on certain items.",
         category = "Miscellaneous", subcategory = "Items"
