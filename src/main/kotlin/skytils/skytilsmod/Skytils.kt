@@ -114,8 +114,9 @@ class Skytils {
             .create()
 
         @JvmStatic
-        val mc: Minecraft
-            get() = Minecraft.getMinecraft()
+        val mc: Minecraft by lazy {
+            Minecraft.getMinecraft()
+        }
 
         val config = Config
 
@@ -215,7 +216,7 @@ class Skytils {
             CustomNotifications(),
             DamageSplash(),
             DarkModeMist(),
-            DungeonFeatures(),
+            DungeonFeatures,
             DungeonMap(),
             DungeonTimer(),
             DupeTracker,

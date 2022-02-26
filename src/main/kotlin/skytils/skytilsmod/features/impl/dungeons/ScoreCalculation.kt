@@ -453,7 +453,6 @@ object ScoreCalculation {
         if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
             event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
                 it as AccessorChatComponentText
-                println(it.text)
                 if (!it.text.startsWith("Skytils-SC > ")) return@forEach
                 it.text = it.text.substring("Skytils-SC > ".length)
             }
