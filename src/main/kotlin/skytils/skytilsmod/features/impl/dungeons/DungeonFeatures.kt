@@ -21,7 +21,6 @@ import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -57,6 +56,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -77,37 +77,35 @@ import java.awt.Color
 import java.util.concurrent.Future
 import java.util.regex.Pattern
 
-class DungeonFeatures {
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-        private val deathOrPuzzleFail =
-            Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
-        private val thornMissMessages = arrayOf(
-            "chickens",
-            "shot",
-            "dodg", "thumbs",
-            "aim"
-        )
-        var dungeonFloor: String? = null
-        var hasBossSpawned = false
-        private var isInTerracottaPhase = false
-        private var terracottaEndTime = -1.0
-        private var rerollClicks = 0
-        private var foundLivid = false
-        private var livid: Entity? = null
-        private var lividTag: Entity? = null
-        private var lividJob: Future<*>? = null
-        private var alertedSpiritPet = false
-        private const val SPIRIT_PET_TEXTURE =
-            "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
-        private var lastLitUpTime = -1L
-        private val lastBlockPos = BlockPos(207, 77, 234)
-        private var startWithoutFullParty = false
+object DungeonFeatures {
+    private val deathOrPuzzleFail =
+        Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
+    private val thornMissMessages = arrayOf(
+        "chickens",
+        "shot",
+        "dodg", "thumbs",
+        "aim"
+    )
+    var dungeonFloor: String? = null
+    var hasBossSpawned = false
+    private var isInTerracottaPhase = false
+    private var terracottaEndTime = -1.0
+    private var rerollClicks = 0
+    private var foundLivid = false
+    var livid: Entity? = null
+    private var lividTag: Entity? = null
+    private var lividJob: Future<*>? = null
+    private var alertedSpiritPet = false
+    private const val SPIRIT_PET_TEXTURE =
+        "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
+    private var lastLitUpTime = -1L
+    private val lastBlockPos = BlockPos(207, 77, 234)
+    private var startWithoutFullParty = false
+    private var blazes = 0
 
-        init {
-            LividGuiElement()
-            SpiritBearSpawnTimer()
-        }
+    init {
+        LividGuiElement()
+        SpiritBearSpawnTimer()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -625,6 +623,7 @@ class DungeonFeatures {
         alertedSpiritPet = false
         lastLitUpTime = -1L
         startWithoutFullParty = false
+        blazes = 0
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
