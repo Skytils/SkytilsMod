@@ -50,7 +50,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int, val is
             color = VigilancePalette.getBrightText().constraint
         } childOf this
 
-        val pairs = arrayListOf<Pair<String, Any>>()
+        val pairs = ArrayList<Pair<String, Any>>(7)
         dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
         dungeonBase.watcherKills?.get(floor)?.apply { pairs.add("Watcher Kills" to this) }
         dungeonBase.completions?.get(floor)?.apply { pairs.add("Completions" to this) }

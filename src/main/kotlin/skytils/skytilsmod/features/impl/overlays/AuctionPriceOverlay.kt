@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.overlays
 
-import com.google.common.collect.Lists
 import gg.essential.universal.UKeyboard
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
@@ -211,7 +210,7 @@ class AuctionPriceOverlay {
                     )
                 }
                 if (tooltipLocationButton.enabled) {
-                    val lore = Lists.newArrayList(ItemUtil.getItemLore(lastAuctionedStack!!))
+                    val lore = ArrayList(ItemUtil.getItemLore(lastAuctionedStack!!))
                     if (lore.size > 3) {
                         lore.removeAt(0)
                         lore.removeAt(lore.size - 1)

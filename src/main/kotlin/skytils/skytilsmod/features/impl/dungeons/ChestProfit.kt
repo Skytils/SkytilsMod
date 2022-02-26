@@ -132,7 +132,7 @@ class ChestProfit {
 
         var price = 0.0
         var value = 0.0
-        var items = ArrayList<DungeonChestLootItem>()
+        var items = ArrayList<DungeonChestLootItem>(3)
         fun reset() {
             price = 0.0
             value = 0.0
