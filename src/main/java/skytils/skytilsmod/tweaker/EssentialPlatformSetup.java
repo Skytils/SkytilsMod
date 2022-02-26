@@ -89,10 +89,10 @@ public class EssentialPlatformSetup {
         if (url == null) return false;
         try {
             return requestEssential(url + "CANYOUSEEME").contains("YOUCANSEEME");
-        } catch (IOException ignored) {
-            LogManager.getLogger().warn("Failed to contact url " + url);
+        } catch (Exception e) {
+            LogManager.getLogger().error("Failed to contact url " + url);
+            return false;
         }
-        return false;
     }
 
     @SuppressWarnings("unused")

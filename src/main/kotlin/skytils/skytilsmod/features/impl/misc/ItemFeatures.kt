@@ -496,14 +496,22 @@ class ItemFeatures {
                 if (enchantments.keySet.size == 1) {
                     val name = enchantmentNames.first()
                     if (Skytils.config.showEnchantedBookAbbreviation) {
-                        val parts = name.split("_")
-                        val prefix: String = if (parts[0] == "ultimate") {
-                            "§d§l" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
+                        val enchant = EnchantUtil.enchants.find { it.nbtName == name }
+                        val prefix: String = if (enchant != null) {
+                            val joined = enchant.loreName.split(" ").joinToString { it[0].uppercase() }
+                            if (enchant.nbtName.startsWith("ultimate")) {
+                                "§d§l${joined}"
+                            } else joined
                         } else {
-                            if (parts.size > 1) {
-                                parts.joinToString("") { s -> s.substring(0, 1).uppercase() }
+                            val parts = name.split("_")
+                            if (parts[0] == "ultimate") {
+                                "§d§l" + parts.drop(1).joinToString("") { s -> s[0].uppercase() }
                             } else {
-                                parts[0].substring(0, parts[0].length.coerceAtMost(3)).toTitleCase() + "."
+                                if (parts.size > 1) {
+                                    parts.joinToString("") { s -> s[0].uppercase() }
+                                } else {
+                                    parts[0].take(3).toTitleCase() + "."
+                                }
                             }
                         }
                         GlStateManager.disableLighting()
