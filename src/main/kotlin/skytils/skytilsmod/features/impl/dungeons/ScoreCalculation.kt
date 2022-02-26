@@ -450,10 +450,12 @@ object ScoreCalculation {
     fun canYouPleaseStopCryingThanks(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || event.type != 0.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
-        if (unformatted.startsWith("Party > ") && unformatted.contains(": Skytils-SC > ")) {
+        if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
             event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
                 it as AccessorChatComponentText
-                it.text = it.text.replace(": Skytils-SC > ", ": ")
+                println(it.text)
+                if (!it.text.startsWith("Skytils-SC > ")) return@forEach
+                it.text = it.text.substring("Skytils-SC > ".length)
             }
         }
     }
