@@ -116,7 +116,7 @@ object ItemUtil {
             val display = itemStack.tagCompound.getCompoundTag("display")
             if (display.hasKey("Lore", NBT_LIST)) {
                 val lore = display.getTagList("Lore", NBT_STRING)
-                val loreAsList: MutableList<String> = ArrayList()
+                val loreAsList = ArrayList<String>(lore.tagCount())
                 for (lineNumber in 0 until lore.tagCount()) {
                     loreAsList.add(lore.getStringTagAt(lineNumber))
                 }
