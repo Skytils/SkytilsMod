@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,6 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.gui.UpdateGui
 import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.APIUtil.cm
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
 import java.io.File
@@ -39,8 +38,10 @@ import kotlin.concurrent.thread
 
 object UpdateChecker {
     val updateGetter = UpdateGetter()
+    val updateAsset
+        get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject
     val updateDownloadURL: String
-        get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject["browser_download_url"].asString
+        get() = updateAsset["browser_download_url"].asString
 
     fun getJarNameFromUrl(url: String): String {
         return url.split(Regex("/")).last()
@@ -58,7 +59,12 @@ object UpdateChecker {
                 println("Copying updated jar to mods.")
                 val newJar = File(File(Skytils.modDir, "updates"), jarName)
                 println("Copying to mod folder")
-                val newLocation = File(oldJar.parent, "${if (oldJar.name.startsWith("!")) "!" else ""}${jarName}")
+                val nameNoExtension = jarName.substringBeforeLast(".")
+                val newExtension = jarName.substringAfterLast(".")
+                val newLocation = File(
+                    oldJar.parent,
+                    "${if (oldJar.name.startsWith("!")) "!" else ""}${nameNoExtension}${if (oldJar.endsWith(".temp.jar") && newExtension == oldJar.extension) ".temp.jar" else ".$newExtension"}"
+                )
                 newLocation.createNewFile()
                 newJar.copyTo(newLocation, true)
                 newJar.delete()
@@ -99,7 +105,7 @@ object UpdateChecker {
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             // TODO Make this dynamic and fetch latest one or something
             val url =
-                "https://cdn.discordapp.com/attachments/881403326938353684/888153558321594438/SkytilsInstaller-1.1.1.jar"
+                "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.1.1.jar"
             val taskFile = File(taskDir, getJarNameFromUrl(url))
             if (taskDir.mkdirs() || taskFile.createNewFile()) {
                 println("Downloading Skytils delete task.")
@@ -152,7 +158,7 @@ object UpdateChecker {
                 else -> return println("Channel set as none")
             }
             val latestTag = latestRelease["tag_name"].asString
-            val currentTag = Skytils.VERSION
+            val currentTag = Skytils.VERSION.substringBefore("-dev")
 
             val currentVersion = SkytilsVersion(currentTag)
             val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))

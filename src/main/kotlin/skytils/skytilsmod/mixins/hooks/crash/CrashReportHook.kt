@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,9 +21,12 @@ package skytils.skytilsmod.mixins.hooks.crash
 import com.google.common.base.Objects
 import net.minecraft.crash.CrashReport
 import net.minecraft.crash.CrashReportCategory
-import org.spongepowered.asm.mixin.Mixins
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import org.spongepowered.asm.mixin.injection.struct.InjectionInfo
+import org.spongepowered.asm.mixin.transformer.Config
 import org.spongepowered.asm.mixin.transformer.meta.MixinMerged
+import skytils.skytilsmod.utils.ReflectionHelper
+import skytils.skytilsmod.utils.ReflectionHelper.getFieldHelper
 import skytils.skytilsmod.utils.countMatches
 import skytils.skytilsmod.utils.startsWithAny
 
@@ -43,30 +46,31 @@ class CrashReportHook(private val crash: CrashReport) {
 
             if (isSkytilsCrash) stringbuilder.append("Skytils may have caused this crash.\nJoin the Discord for support at discord.gg/skytils\n")
 
+            val registry =
+                InjectionInfo::class.java.getFieldHelper("registry")?.get(null) as? Map<*, *> ?: return
+            val prefixField = ReflectionHelper.getFieldFor(
+                "org.spongepowered.asm.mixin.injection.struct.InjectionInfo.InjectorEntry",
+                "prefix"
+            ) ?: return
+            val prefixes = registry.values.map {
+                "${prefixField.get(it)}$"
+            }
             crash.crashCause.stackTrace.filter {
-                it.methodName.countMatches("$") == 2 && it.methodName.startsWithAny(
-                    "modify$",
-                    "args$",
-                    "redirect$",
-                    "localvar$",
-                    "constant$",
-                    "handler$"
-                )
-            }.mapNotNull {
-                val clazz = Class.forName(it.className)
-                val method = clazz.declaredMethods.find { m ->
-                    it.methodName == m.name
-                } ?: return@mapNotNull null
-                method.isAccessible = true
-                if (!method.isAnnotationPresent(MixinMerged::class.java)) return@mapNotNull null
-                val annotation = method.getDeclaredAnnotation(MixinMerged::class.java)
-                return@mapNotNull it to annotation.mixin
-            }.distinct().also { l ->
+                it.methodName.countMatches("$") == 2 && it.methodName.startsWithAny(prefixes)
+            }.mapNotNullTo(hashSetOf()) {
+                val method = ReflectionHelper.getMethodFor(it.className, it.methodName) ?: return@mapNotNullTo null
+                if (!method.isAnnotationPresent(MixinMerged::class.java)) return@mapNotNullTo null
+                val annotation = method.getDeclaredAnnotation(MixinMerged::class.java) ?: return@mapNotNullTo null
+                return@mapNotNullTo it to annotation.mixin
+            }.also { l ->
                 if (l.isNotEmpty()) {
-                    stringbuilder.append(buildString {
+                    stringbuilder.apply {
                         append("***Skytils detected Mixins in this crash***\n")
+                        @Suppress("UNCHECKED_CAST")
+                        val configs = Config::class.java.getFieldHelper("allConfigs")
+                            ?.get(null) as Map<String, Config>
                         l.forEach { (e, c) ->
-                            Mixins.getConfigs().find { c.startsWith(it.config.mixinPackage) }.also {
+                            configs.values.find { c.startsWith(it.config.mixinPackage) }.also {
                                 if (it != null) {
                                     append("Mixin registrant ${it.config.name}, class $c, transformed ${e.className}.${e.methodName}\n")
                                 } else {
@@ -74,7 +78,7 @@ class CrashReportHook(private val crash: CrashReport) {
                                 }
                             }
                         }
-                    })
+                    }
                 }
             }
         }.onFailure {

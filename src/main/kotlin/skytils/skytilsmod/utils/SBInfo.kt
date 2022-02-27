@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,14 +17,13 @@
  */
 package skytils.skytilsmod.utils
 
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C01PacketChatMessage
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -32,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -48,7 +48,6 @@ import java.util.*
 object SBInfo {
 
     private val timePattern = ".+(am|pm)".toRegex()
-    private val JSON_BRACKET_PATTERN = "\\{.+}".toRegex()
 
     var location = ""
     var date = ""
@@ -93,20 +92,24 @@ object SBInfo {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatMessage(event: ClientChatReceivedEvent) {
-        if (event.message.unformattedText.contains("{") && event.message.unformattedText.contains("}")) {
-            val pattern = JSON_BRACKET_PATTERN.find(event.message.unformattedText) ?: return
-            try {
-                val obj = Gson().fromJson(pattern.groupValues[0], JsonObject::class.java)
-                if (obj.has("server")) {
-                    if (System.currentTimeMillis() - lastManualLocRaw > 5000) event.isCanceled = true
-                    if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
-                        locraw = obj
-                        mode = locraw!!["mode"].asString
+    fun onChatMessage(event: PacketEvent.ReceiveEvent) {
+        if (event.packet is S02PacketChat) {
+            val unformatted = event.packet.chatComponent.unformattedText
+            if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
+                try {
+                    val obj = gson.fromJson(unformatted, JsonObject::class.java)
+                    if (obj.has("server")) {
+                        if (System.currentTimeMillis() - lastManualLocRaw > 5000) {
+                            Utils.cancelChatPacket(event)
+                        }
+                        if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
+                            locraw = obj
+                            mode = locraw!!["mode"].asString
+                        }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
     }

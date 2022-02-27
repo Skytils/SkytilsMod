@@ -1,6 +1,6 @@
 name: build-ci
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   build:
@@ -9,9 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Java setup
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 17
+          distribution: temurin
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
@@ -22,9 +23,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build
-        run: chmod +x gradlew; ./gradlew setupCiWorkspace && ./gradlew build
+        run: chmod +x gradlew; ./gradlew build --stacktrace
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
           path: build/libs

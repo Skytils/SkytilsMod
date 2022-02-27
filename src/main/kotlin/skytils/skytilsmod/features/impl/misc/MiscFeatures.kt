@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -82,16 +82,26 @@ import kotlin.time.ExperimentalTime
 class MiscFeatures {
 
     private var lastGLeaveCommand = 0L
+    private var lastCoopAddCommand = 0L
     private var blockZapperCooldownExpiration = 0L
     private var blockZapperUses = 0
+    private val cheapCoins = setOf(
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0=",
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhMDg3ZWI3NmU3Njg3YTgxZTRlZjgxYTdlNjc3MjY0OTk5MGY2MTY3Y2ViMGY3NTBhNGM1ZGViNmM0ZmJhZCJ9fX0="
+    )
 
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (!Skytils.config.guildLeaveConfirmation || !event.message.startsWith("/g leave") || !Utils.isOnHypixel) return
-        if (System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
+        if (!Utils.isOnHypixel) return
+        if (Skytils.config.guildLeaveConfirmation && event.message.startsWith("/g leave") && System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
             event.isCanceled = true
             lastGLeaveCommand = System.currentTimeMillis()
-            mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!"))
+            UChat.chat("§cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!")
+        }
+        if (Skytils.config.coopAddConfirmation && event.message.startsWith("/coopadd ") && System.currentTimeMillis() - lastCoopAddCommand >= 10_000) {
+            event.isCanceled = true
+            lastCoopAddCommand = System.currentTimeMillis()
+            UChat.chat("§c§lBe careful! Skytils stopped you from giving a player full control of your island! §6Run the command again if you are sure!")
         }
     }
 
@@ -205,16 +215,21 @@ class MiscFeatures {
             }
         } else if (event.entity is EntityItem) {
             val entity = event.entity
+            val item = entity.entityItem
             if (Skytils.config.hideJerryRune) {
-                val item = entity.entityItem
                 if (item.item === Items.spawn_egg && ItemMonsterPlacer.getEntityName(item) == "Villager" && item.displayName == "Spawn Villager" && entity.lifespan == 6000) {
                     event.isCanceled = true
                 }
+            }
+            if (Skytils.config.hideCheapCoins && cheapCoins.contains(ItemUtil.getSkullTexture(item))) {
+                event.isCanceled = true
             }
         } else if (event.entity is EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
                 event.isCanceled = true
             }
+        } else if (Skytils.deobfEnvironment && DevTools.getToggle("invis")) {
+            event.entity.isInvisible = false
         }
     }
 

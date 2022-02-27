@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,8 +23,8 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import skytils.skytilsmod.utils.Utils
 
-fun lightningSkyColor(world: World): Int {
-    return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else world.lastLightningBolt
+fun lightningSkyColor(orig: Int): Int {
+    return if (Skytils.config.hideLightning && Utils.inSkyblock) 0 else orig
 }
 
 fun fixTime(world: Any, cir: CallbackInfoReturnable<Long>) {

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.api.EssentialAPI
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
@@ -48,7 +49,7 @@ import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.setState
 import java.awt.Color
 
-class WaypointShareGui : WindowScreen(newGuiScale = 2) {
+class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     companion object {
         private val gson: Gson = GsonBuilder().create()

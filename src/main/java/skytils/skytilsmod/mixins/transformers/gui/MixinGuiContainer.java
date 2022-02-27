@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -34,7 +34,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
     @Unique
     private final GuiContainerHook hook = new GuiContainerHook(this);
 
-    @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE))
+    @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(CallbackInfo ci) {
         hook.closeWindowPressed(ci);
     }
@@ -42,6 +42,11 @@ public abstract class MixinGuiContainer extends GuiScreen {
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         hook.backgroundDrawn(mouseX, mouseY, partialTicks, ci);
+    }
+
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
+    private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        hook.foregroundDrawn(mouseX, mouseY, partialTicks, ci);
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)

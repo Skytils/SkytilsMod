@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,16 +17,18 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.event.ClickEvent
@@ -55,10 +57,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.BossBarEvent
+import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -74,36 +78,35 @@ import java.awt.Color
 import java.util.concurrent.Future
 import java.util.regex.Pattern
 
-class DungeonFeatures {
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-        private val deathOrPuzzleFail =
-            Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
-        private val thornMissMessages = arrayOf(
-            "chickens",
-            "shot",
-            "dodg", "thumbs",
-            "aim"
-        )
-        var dungeonFloor: String? = null
-        var hasBossSpawned = false
-        private var isInTerracottaPhase = false
-        private var terracottaEndTime = -1.0
-        private var rerollClicks = 0
-        private var foundLivid = false
-        private var livid: Entity? = null
-        private var lividTag: Entity? = null
-        private var lividJob: Future<*>? = null
-        private var alertedSpiritPet = false
-        private const val SPIRIT_PET_TEXTURE =
-            "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
-        private var lastLitUpTime = -1L
-        private val lastBlockPos = BlockPos(207, 77, 234)
+object DungeonFeatures {
+    private val deathOrPuzzleFail =
+        Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
+    private val thornMissMessages = arrayOf(
+        "chickens",
+        "shot",
+        "dodg", "thumbs",
+        "aim"
+    )
+    var dungeonFloor: String? = null
+    var hasBossSpawned = false
+    private var isInTerracottaPhase = false
+    private var terracottaEndTime = -1.0
+    private var rerollClicks = 0
+    private var foundLivid = false
+    var livid: Entity? = null
+    private var lividTag: Entity? = null
+    private var lividJob: Future<*>? = null
+    private var alertedSpiritPet = false
+    private const val SPIRIT_PET_TEXTURE =
+        "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
+    private var lastLitUpTime = -1L
+    private val lastBlockPos = BlockPos(207, 77, 234)
+    private var startWithoutFullParty = false
+    private var blazes = 0
 
-        init {
-            LividGuiElement()
-            SpiritBearSpawnTimer()
-        }
+    init {
+        LividGuiElement()
+        SpiritBearSpawnTimer()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -140,10 +143,13 @@ class DungeonFeatures {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (Utils.inDungeons) {
             if (dungeonFloor == null) {
-                for (s in ScoreboardUtil.sidebarLines) {
-                    val line = ScoreboardUtil.cleanSB(s)
+                for (line in ScoreboardUtil.sidebarLines) {
                     if (line.contains("The Catacombs (")) {
                         dungeonFloor = line.substringAfter("(").substringBefore(")")
+                        ScoreCalculation.floorReq.set(
+                            ScoreCalculation.floorRequirements[dungeonFloor]
+                                ?: ScoreCalculation.floorRequirements["default"]!!
+                        )
                         break
                     }
                 }
@@ -215,6 +221,7 @@ class DungeonFeatures {
                                     val a = when (color) {
                                         EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
                                         EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
+                                        EnumDyeColor.PINK -> EnumChatFormatting.LIGHT_PURPLE
                                         EnumDyeColor.RED -> EnumChatFormatting.RED
                                         EnumDyeColor.SILVER -> EnumChatFormatting.GRAY
                                         EnumDyeColor.GRAY -> EnumChatFormatting.GRAY
@@ -311,11 +318,14 @@ class DungeonFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onDeath(event: LivingDeathEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inDungeons) return
         if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime > 0 && event.entityLiving.name == "Terracotta ") {
             //for some reason this event fires twice for players
             printDevMessage("terracotta died", "terracotta")
             terracottaEndTime -= 1
+        }
+        if (event.entity is EntityBlaze && ++blazes == 10 && Skytils.config.sayBlazeDone && DungeonTimer.bloodClearTime != -1L) {
+            Skytils.sendMessageQueue.add("/pc Blaze Done")
         }
     }
 
@@ -382,7 +392,13 @@ class DungeonFeatures {
         }
     }
 
-    // Show hidden fels
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!Utils.inDungeons) return
+        if (Skytils.config.hideArcherBonePassive && event.entity is EntityItem && event.entity.entityItem.itemDamage == 15 && event.entity.entityItem.item === Items.dye)
+            event.isCanceled = true
+    }
+
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
@@ -433,6 +449,9 @@ class DungeonFeatures {
                             "Withermancer"
                         )
                     ) mc.theWorld.removeEntity(event.entity)
+                }
+                if (Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
+                    event.isCanceled = true
                 }
             }
             if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
@@ -544,16 +563,38 @@ class DungeonFeatures {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName.endsWith(" Chest")) {
-                if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
-                    rerollClicks++
-                    val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
-                    if (neededClicks > 0) {
-                        event.isCanceled = true
+            val chestName = chest.lowerChestInventory.displayName.unformattedText ?: return
+            when {
+                chestName.endsWith(" Chest") -> {
+                    if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {
+                        rerollClicks++
+                        val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
+                        if (neededClicks > 0) {
+                            event.isCanceled = true
+                        }
+                    }
+                }
+                chestName == "Start Dungeon?" -> {
+                    if (!startWithoutFullParty && Skytils.config.noChildLeftBehind && event.slot?.stack?.displayName == "§aStart Dungeon?") {
+                        val teamCount =
+                            (DungeonListener.partyCountPattern.find(TabListUtils.tabEntries[0].second)?.groupValues?.get(
+                                1
+                            )?.toIntOrNull() ?: 0)
+                        if (teamCount < 5) {
+                            event.isCanceled = true
+                            EssentialAPI.getNotifications()
+                                .push(
+                                    "Party only has $teamCount members!",
+                                    "Click me to disable this warning.",
+                                    4f,
+                                    action = {
+                                        startWithoutFullParty = true
+                                    })
+                        }
                     }
                 }
             }
+
         }
     }
 
@@ -567,6 +608,7 @@ class DungeonFeatures {
                     if (event.toolTip[i].contains("Click to reroll")) {
                         val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
                         event.toolTip[i] = "§eClick §a$neededClicks§e times to reroll this chest!"
+                        break
                     }
                 }
             }
@@ -584,6 +626,8 @@ class DungeonFeatures {
         foundLivid = false
         alertedSpiritPet = false
         lastLitUpTime = -1L
+        startWithoutFullParty = false
+        blazes = 0
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {

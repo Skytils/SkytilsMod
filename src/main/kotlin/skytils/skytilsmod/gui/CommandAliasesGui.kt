@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
@@ -32,7 +33,7 @@ import skytils.skytilsmod.features.impl.handlers.CommandAliases
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class CommandAliasesGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class CommandAliasesGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
 

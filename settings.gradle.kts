@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,18 +21,17 @@ pluginManagement {
         mavenLocal()
         gradlePluginPortal()
         mavenCentral()
-        maven {
-            name = "sonatype"
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-        }
-        maven { url = uri("https://maven.minecraftforge.net/") }
-        maven { url = uri("https://jitpack.io") }
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        maven("https://maven.architectury.dev/")
+        maven("https://maven.fabricmc.net")
+        maven("https://maven.minecraftforge.net/")
+        maven("https://repo.sk1er.club/repository/maven-releases/")
+        maven("https://jitpack.io")
     }
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
                 "net.minecraftforge.gradle.forge" -> useModule("com.github.Skytils:ForgeGradle:${requested.version}")
-                "org.spongepowered.mixin" -> useModule("com.github.Skytils:mixingradle:${requested.version}")
             }
         }
     }

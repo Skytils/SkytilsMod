@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,13 +19,14 @@ package skytils.skytilsmod.utils
 
 import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
+import gg.essential.lib.caffeine.cache.Cache
+import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -33,6 +34,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagList
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
@@ -42,6 +44,7 @@ import org.objectweb.asm.tree.MethodInsnNode
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.asm.SkytilsTransformer
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -54,27 +57,21 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.Future
 import kotlin.math.floor
-import kotlin.math.roundToInt
 
 
 object Utils {
 
-    val azooPuzzoo by lazy {
-        File(Skytils.modDir, "azoopuzzoo").exists()
-    }
+    @JvmField
+    var skyblock = false
 
-    val breefingdog by lazy {
-        File(Skytils.modDir, "breefingdog").exists()
-    }
+    val inSkyblock: Boolean
+        get() = skyblock || SBInfo.mode == "SKYBLOCK"
 
     @JvmField
-    var noSychic = false
+    var dungeons = false
 
-    @JvmField
-    var inSkyblock = false
-
-    @JvmField
-    var inDungeons = false
+    val inDungeons: Boolean
+        get() = dungeons || SBInfo.mode == "dungeon"
 
     @JvmField
     var isOnHypixel = false
@@ -163,6 +160,7 @@ object Utils {
         ReceivePacketEvent.isCanceled = true
         val packet = ReceivePacketEvent.packet
         checkThreadAndQueue {
+            MinecraftForge.EVENT_BUS.post(MainReceivePacketEvent(mc.netHandler, ReceivePacketEvent.packet))
             MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
         }
     }
@@ -228,23 +226,21 @@ val EntityLivingBase.baseMaxHealth: Double
     get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
 
 fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
-    if (this is AccessorGuiNewChat) {
-        if (this.chatOpen) {
-            val scaleFactor = ScaledResolution(mc).scaleFactor
-            val extraOffset =
-                if (ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
-                        ?.getBoolean(null) == true
-                ) 12 else 0
-            val x = MathHelper.floor_float((mouseX / scaleFactor - 3).toFloat() / chatScale)
-            val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - extraOffset).toFloat() / chatScale)
+    if (chatOpen && this is AccessorGuiNewChat) {
+        val scaleFactor = UResolution.scaleFactor
+        val extraOffset =
+            if (ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
+                    ?.getBoolean(null) == true
+            ) 12 else 0
+        val x = MathHelper.floor_float((mouseX / scaleFactor - 3).toFloat() / chatScale)
+        val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - extraOffset).toFloat() / chatScale)
 
-            if (x >= 0 && y >= 0) {
-                val l = this.lineCount.coerceAtMost(this.drawnChatLines.size)
-                if (x <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && y < mc.fontRendererObj.FONT_HEIGHT * l + l) {
-                    val lineNum = y / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
-                    if (lineNum >= 0 && lineNum < this.drawnChatLines.size) {
-                        return drawnChatLines[lineNum]
-                    }
+        if (x >= 0 && y >= 0) {
+            val l = this.lineCount.coerceAtMost(this.drawnChatLines.size)
+            if (x <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && y < mc.fontRendererObj.FONT_HEIGHT * l + l) {
+                val lineNum = y / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
+                if (lineNum >= 0 && lineNum < this.drawnChatLines.size) {
+                    return drawnChatLines[lineNum]
                 }
             }
         }
@@ -320,3 +316,14 @@ val S2APacketParticles.count
 
 val S2APacketParticles.speed
     get() = this.particleSpeed
+
+operator fun <K : Any, V : Any> Cache<K, V>.set(name: K, value: V) = put(name, value)
+
+fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
+
+fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTagAt(it) }
+
+
+fun Vec3i.toBoundingBox() = AxisAlignedBB(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
+
+fun File.ensureFile() = (parentFile.exists() || parentFile.mkdirs()) && createNewFile()

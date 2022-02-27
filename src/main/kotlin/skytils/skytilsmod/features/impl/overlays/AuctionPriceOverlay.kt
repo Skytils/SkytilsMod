@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.overlays
 
-import com.google.common.collect.Lists
 import gg.essential.universal.UKeyboard
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.GuiButton
@@ -44,6 +43,7 @@ import skytils.skytilsmod.gui.elements.CleanButton
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.NumberUtil
+import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -166,8 +166,8 @@ class AuctionPriceOverlay {
                     // this might actually have multiple items as the price
                     val valuePer = AuctionData.lowestBINs[auctionIdentifier]
                     if (valuePer != null) fr.drawString(
-                        "Clean Lowest BIN Price: §b" + NumberUtil.nf.format(valuePer * lastAuctionedStack!!.stackSize) + if (lastAuctionedStack!!.stackSize > 1) " §7(" + NumberUtil.nf.format(
-                            valuePer
+                        "Clean Lowest BIN Price: §b" + NumberUtil.nf.format((valuePer * lastAuctionedStack!!.stackSize).toInt()) + if (lastAuctionedStack!!.stackSize > 1) " §7(" + NumberUtil.nf.format(
+                            valuePer.roundToPrecision(2)
                         ) + " each§7)" else "",
                         width / 2f,
                         height / 2f - 50,
@@ -199,7 +199,9 @@ class AuctionPriceOverlay {
                 if (isUndercut()) {
                     val input = input
                     fr.drawString(
-                        "Listing For: " + (input ?: "§cInvalid Value"),
+                        "Listing For: ${
+                            input ?: "§cInvalid Value"
+                        }",
                         width / 2f,
                         height / 2f - 25,
                         CommonColors.ORANGE,
@@ -208,7 +210,7 @@ class AuctionPriceOverlay {
                     )
                 }
                 if (tooltipLocationButton.enabled) {
-                    val lore = Lists.newArrayList(ItemUtil.getItemLore(lastAuctionedStack!!))
+                    val lore = ArrayList(ItemUtil.getItemLore(lastAuctionedStack!!))
                     if (lore.size > 3) {
                         lore.removeAt(0)
                         lore.removeAt(lore.size - 1)
@@ -225,7 +227,7 @@ class AuctionPriceOverlay {
                         tooltipLocationButton.width = largestLen
                         tooltipLocationButton.height = lore.size * fr.FONT_HEIGHT + 20
                         fr.drawString(
-                            "You're selling: " + lastAuctionedStack!!.stackSize + "x",
+                            "You're selling: ${lastAuctionedStack!!.stackSize}x",
                             x.toFloat(),
                             y.toFloat(),
                             CommonColors.ORANGE,
@@ -404,7 +406,7 @@ class AuctionPriceOverlay {
             var total = 0.0
             for (enchantName in enchantments.keySet) {
                 val id =
-                    "ENCHANTED_BOOK-" + enchantName.uppercase() + "-" + enchantments.getInteger(enchantName)
+                    "ENCHANTED_BOOK-${enchantName.uppercase()}-${enchantments.getInteger(enchantName)}"
                 val price = AuctionData.lowestBINs[id] ?: continue
                 var npcPrice = Double.MAX_VALUE
                 when (id) {

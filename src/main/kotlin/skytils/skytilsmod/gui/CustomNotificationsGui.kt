@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,8 @@
 
 package skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
+import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
@@ -26,15 +28,22 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
-import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CustomNotifications
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
+class CustomNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
+    private val components = HashMap<UIContainer, Entry>()
+
+    private data class Entry(
+        val container: UIContainer,
+        val regex: UITextInput,
+        val displayText: UITextInput,
+        val ticks: UITextInput
+    )
 
     init {
         UIText("Custom Notifications").childOf(window).constrain {
@@ -93,12 +102,12 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             tooltipBlock.hide()
         }
 
-        for (name in CustomNotifications.notifications) {
-            addNewNotification(name.key.pattern, name.value)
+        for (notif in CustomNotifications.notifications.sortedBy { it.text }) {
+            addNewNotification(notif.regex.pattern, notif.text, notif.displayTicks)
         }
     }
 
-    private fun addNewNotification(alias: String = "", replacement: String = "") {
+    private fun addNewNotification(regex: String = "", text: String = "", ticks: Int = 20) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -114,18 +123,29 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(alias)
+            setText(regex)
         }
 
         val displayText = UITextInput("Display Text").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 40.percent()
+            width = 32.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(replacement)
+            setText(text)
+        }
+
+        val displayTicks = UITextInput("Ticks").childOf(container).constrain {
+            x = SiblingConstraint(5f)
+            y = CenterConstraint()
+            width = 5.percent()
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(ticks.toString())
         }
         triggerMessage.apply {
             onKeyType { _, keyCode ->
@@ -133,6 +153,11 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             }
         }
         displayText.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) displayTicks.grabWindowFocus()
+            }
+        }
+        displayTicks.apply {
             onKeyType { _, keyCode ->
                 if (keyCode == UKeyboard.KEY_TAB) triggerMessage.grabWindowFocus()
             }
@@ -144,22 +169,32 @@ class CustomNotificationsGui : WindowScreen(newGuiScale = 2), ReopenableGUI {
             height = 75.percent()
         }.onLeftClick {
             scrollComponent.removeChild(container)
+            components.remove(container)
         }
+
+        components[container] = Entry(container, triggerMessage, displayText, displayTicks)
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
         CustomNotifications.notifications.clear()
 
-        for (container in scrollComponent.allChildren) {
-            val text = container.childrenOfType<UITextInput>()
-            if (text.size != 2) throw IllegalStateException("${container.componentName} does not have 2 UITextInput's! Available children ${container.children.map { it.componentName }}")
-            val triggerRegex = (text.find { it.placeholder == "Trigger Regex" }
-                ?: throw IllegalStateException("${container.componentName} does not have the trigger UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
-            val displayText = (text.find { it.placeholder == "Display Text" }
-                ?: throw IllegalStateException("${container.componentName} does not have the display text UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
-            if (triggerRegex.isBlank() || displayText.isBlank()) continue
-            CustomNotifications.notifications[triggerRegex.toRegex()] = displayText
+        for ((_, triggerRegex, displayText, displayTicks) in components.values) {
+            if (triggerRegex.getText().isBlank() || displayText.getText().isBlank() || displayTicks.getText()
+                    .isBlank()
+            ) continue
+            runCatching {
+                CustomNotifications.notifications.add(
+                    CustomNotifications.Notification(
+                        triggerRegex.getText().replace("%%MC_IGN%%", mc.session.username).toRegex(),
+                        displayText.getText(),
+                        displayTicks.getText().toInt()
+                    )
+                )
+            }.onFailure {
+                it.printStackTrace()
+                EssentialAPI.getNotifications().push("Invalid notification", triggerRegex.getText(), 3f)
+            }
         }
 
         PersistentSave.markDirty<CustomNotifications>()

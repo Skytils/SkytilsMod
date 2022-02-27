@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,16 +17,16 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UChat
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -51,6 +51,7 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.setHoverText
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
@@ -82,12 +83,12 @@ class PetFeatures {
             val petMatcher = SUMMON_PATTERN.matcher(message)
             if (petMatcher.find()) {
                 lastPet = petMatcher.group("pet").stripControlCodes()
-            } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
+            } else UChat.chat("§cSkytils failed to capture equipped pet.")
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
             val autopetMatcher = AUTOPET_PATTERN.matcher(message)
             if (autopetMatcher.find()) {
                 lastPet = autopetMatcher.group("pet").stripControlCodes()
-            } else mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils failed to capture equipped pet."))
+            } else UChat.chat("§cSkytils failed to capture equipped pet.")
         }
     }
 
@@ -97,7 +98,7 @@ class PetFeatures {
         if (Skytils.config.highlightActivePet && (SBInfo.lastOpenContainerName?.endsWith(") Pets") == true || SBInfo.lastOpenContainerName == "Pets") && event.slot.hasStack && event.slot.slotNumber in 10..43) {
             val item = event.slot.stack
             for (line in getItemLore(item)) {
-                if (line == "§7§cClick to despawn.") {
+                if (line.startsWith("§7§cClick to despawn")) {
                     GlStateManager.translate(0f, 0f, 3f)
                     event.slot highlight Skytils.config.activePetColor
                     GlStateManager.translate(0f, 0f, -3f)
@@ -127,20 +128,11 @@ class PetFeatures {
                     event.isCanceled = true
                     if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
                         lastPetLockNotif = System.currentTimeMillis()
-                        val cc =
-                            ChatComponentText("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.")
-                        cc.chatStyle.also {
-                            it.chatClickEvent =
-                                ClickEvent(
-                                    ClickEvent.Action.RUN_COMMAND,
-                                    "/disableskytilspetitemlock"
-                                )
-                            it.chatHoverEvent = HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("Click to disable the pet item lock for 5 seconds.")
-                            )
-                        }
-                        mc.thePlayer.addChatMessage(cc)
+                        UChat.chat(
+                            UTextComponent("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.").setHoverText(
+                                "Click to disable the pet item lock for 5 seconds."
+                            ).setClick(ClickEvent.Action.RUN_COMMAND, "/disableskytilspetitemlock")
+                        )
                     }
                 } else {
                     lastPetConfirmation = 0
@@ -153,7 +145,7 @@ class PetFeatures {
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message == "/disableskytilspetitemlock" && !event.addToChat) {
             lastPetConfirmation = System.currentTimeMillis()
-            mc.thePlayer.addChatMessage(ChatComponentText("§aYou may now apply pet items for 5 seconds."))
+            UChat.chat("§aYou may now apply pet items for 5 seconds.")
             event.isCanceled = true
         }
     }

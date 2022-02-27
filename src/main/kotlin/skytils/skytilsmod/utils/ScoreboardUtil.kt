@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,23 +30,23 @@ object ScoreboardUtil {
         return scoreboard.stripControlCodes().toCharArray().filter { it.code in 21..126 }.joinToString(separator = "")
     }
 
-    @JvmStatic
-    val sidebarLines: List<String>
-        get() {
-            val scoreboard = mc.theWorld?.scoreboard ?: return emptyList()
-            val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-            var scores = scoreboard.getSortedScores(objective)
-            val list = scores.filter { input: Score? ->
-                input != null && input.playerName != null && !input.playerName
-                    .startsWith("#")
-            }
-            scores = if (list.size > 15) {
-                list.drop(15)
-            } else {
-                list
-            }
-            return scores.map {
-                ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
-            }
+    var sidebarLines: List<String> = emptyList()
+
+    fun fetchScoreboardLines(): List<String> {
+        val scoreboard = mc.theWorld?.scoreboard ?: return emptyList()
+        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
+        var scores = scoreboard.getSortedScores(objective)
+        val list = scores.filter { input: Score? ->
+            input != null && input.playerName != null && !input.playerName
+                .startsWith("#")
         }
+        scores = if (list.size > 15) {
+            list.drop(15)
+        } else {
+            list
+        }
+        return scores.map {
+            ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
+        }
+    }
 }

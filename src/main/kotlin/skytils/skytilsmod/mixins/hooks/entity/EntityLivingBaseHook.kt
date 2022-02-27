@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,18 +26,14 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
-import java.io.File
 import kotlin.random.Random
 
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
     companion object {
-        val smolPeople by lazy {
-            File(Skytils.modDir, "smolpeople").exists()
-        }
-
         private val dmgPattern = Regex("✧?(?<num>\\d+)[⚔+✧❤♞☄✷]*")
     }
 
@@ -76,17 +72,18 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
                 }
             }
         }
-        if (overrideDisplayName != null) overrideDisplayName = s
+        if (overrideDisplayName != null)
+            overrideDisplayName = s
     }
 
     val isBreefing by lazy {
-        entity.name == "Breefing" && (Utils.breefingdog || Random.nextInt(
+        entity.name == "Breefing" && (SuperSecretSettings.breefingDog || Random.nextInt(
             100
         ) < 3)
     }
 
     val isSmol by lazy {
-        Utils.inSkyblock && entity is EntityPlayer && (smolPeople || isBreefing)
+        Utils.inSkyblock && entity is EntityPlayer && (SuperSecretSettings.smolPeople || isBreefing)
     }
 
     fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {
@@ -106,10 +103,8 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
         yOffset: Double,
         zOffset: Double,
         p_175688_14_: IntArray
-    ) {
-        if (!(Skytils.config.hideDeathParticles && particleType == EnumParticleTypes.EXPLOSION_NORMAL)) {
-            world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
-        }
+    ): Boolean {
+        return !Skytils.config.hideDeathParticles || !Utils.inSkyblock || particleType != EnumParticleTypes.EXPLOSION_NORMAL
     }
 
     fun isChild(cir: CallbackInfoReturnable<Boolean>) {

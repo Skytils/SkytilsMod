@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,7 @@
 package skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
+import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.hc.client5.http.classic.methods.HttpGet
@@ -36,7 +37,6 @@ import java.awt.event.MouseEvent
 import java.io.File
 import java.net.URI
 import java.net.URL
-import java.util.*
 import javax.swing.*
 
 /**
@@ -52,7 +52,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 MixinBootstrap::class.java.getDeclaredField("VERSION").also { it.isAccessible = true }
                     .get(null) as String
             }.getOrDefault("unknown")
-            if (!mixinVersion.startsWithAny("0.7", "0.8")) {
+            if (!mixinVersion.startsWithAny("0.8")) {
                 try {
                     Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
                     showMessage(SkytilsLoadingPlugin.liteloaderUserMessage)
@@ -66,20 +66,8 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                     SkytilsLoadingPlugin.exit()
                 }
             }
-            val testString = "I love using the Skytils mod <3"
-            if (mixinVersion.startsWith("0.7") && (testString.lowercase(Locale.getDefault()) != testString.lowercase() || testString.uppercase(
-                    Locale.getDefault()
-                ) != testString.uppercase())
-            ) {
-                println("Problematic locale detected, setting to en-US")
-                Locale.setDefault(Locale.US)
-            }
 
-            // Must use reflection otherwise the "constant" value will be inlined by compiler
-            val forgeVersion = runCatching {
-                ForgeVersion::class.java.getDeclaredField("buildVersion").also { it.isAccessible = true }
-                    .get(null) as Int
-            }.onFailure { it.printStackTrace() }.getOrDefault(2318)
+            val forgeVersion = ForgeVersion.getBuildVersion()
             // Asbyth's forge fork uses version 0
             if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
                 val forgeUrl =
@@ -155,6 +143,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 
     override fun injectData(data: MutableMap<String, Any>?) {
+        Launch.classLoader.addTransformerExclusion("skytils.skytilsmod.utils.ModChecker")
     }
 
     override fun getAccessTransformerClass(): String? {
@@ -210,11 +199,11 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 }
 
-fun createButton(text: String, onClick: () -> Unit): JButton {
-    return JButton(text).also {
-        it.addMouseListener(object : MouseAdapter() {
+fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
+    return JButton(text).apply {
+        addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                onClick()
+                onClick(this@apply)
             }
         })
     }

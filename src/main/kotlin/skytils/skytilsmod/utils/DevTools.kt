@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ package skytils.skytilsmod.utils
 import gg.essential.universal.UChat
 
 object DevTools {
-    private val toggles = HashMap<String, Boolean>()
+    val toggles = HashMap<String, Boolean>()
     var allToggle = false
         private set
 

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,15 +18,40 @@
 
 package skytils.skytilsmod.mixins.hooks.gui
 
+import gg.essential.universal.ChatColor
 import net.minecraft.client.gui.GuiMainMenu
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiMainMenu
 import skytils.skytilsmod.utils.NumberUtil.addSuffix
 import java.util.*
 
 fun setSplashText(gui: GuiMainMenu, cal: Calendar) {
     gui as AccessorGuiMainMenu
-    if (cal.get(Calendar.MONTH) + 1 == 2 && cal.get(Calendar.DATE) == 5) {
+    if (cal.get(Calendar.MONTH) + 1 == 2 && cal.get(Calendar.DATE) == 6) {
         val numBirthday = cal.get(Calendar.YEAR) - 2021
-        gui.splashText = "§z§kstay §zHappy ${numBirthday.addSuffix()} Birthday Skytils! §kmadL"
+        gui.splashText = "§zHappy ${numBirthday.addSuffix()} Birthday Skytils!"
+        if (!Skytils.usingSBA) gui.splashText = addColor("Happy ${numBirthday.addSuffix()} Birthday Skytils!", 0)
+    }
+}
+
+val colors = listOf(
+    ChatColor.RED,
+    ChatColor.GOLD,
+    ChatColor.YELLOW,
+    ChatColor.GREEN,
+    ChatColor.AQUA,
+    ChatColor.BLUE,
+    ChatColor.DARK_PURPLE,
+    ChatColor.LIGHT_PURPLE
+)
+
+fun addColor(str: String, seed: Int): String {
+    var offset = 0
+    return str.split(' ').joinToString(separator = " ") { s ->
+        val a = s.mapIndexed { i, c ->
+            "${colors[(i + seed + offset) % colors.size]}$c"
+        }.joinToString(separator = "")
+        offset += s.length
+        a
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,26 +18,22 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UResolution
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
-import skytils.skytilsmod.utils.ItemUtil
-import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import skytils.skytilsmod.utils.stripControlCodes
 
 
 /**
@@ -47,71 +43,69 @@ import skytils.skytilsmod.utils.stripControlCodes
  */
 class ChestProfit {
     @SubscribeEvent
-    fun onGUIDrawnEvent(event: DrawScreenEvent.Post) {
+    fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Utils.inDungeons || DungeonTimer.scoreShownAt == -1L) return
         if (!Skytils.config.dungeonChestProfit) return
-        if (event.gui is GuiChest) {
-            val chest = (event.gui as GuiChest).inventorySlots as ContainerChest
-            val inv = chest.lowerChestInventory
-            if (inv.displayName.unformattedText.endsWith(" Chest")) {
-                val chestType = DungeonChest.getFromName(inv.displayName.unformattedText)
-                if (chestType != null) {
-                    val openChest = inv.getStackInSlot(31)
-                    if (openChest != null && openChest.displayName == "§aOpen Reward Chest") {
-                        for (unclean in ItemUtil.getItemLore(openChest)) {
-                            val line = unclean.stripControlCodes()
-                            if (line.contains("FREE")) {
-                                chestType.price = 0.0
-                                break
-                            } else if (line.contains(" Coins")) {
-                                chestType.price =
-                                    line.substring(0, line.indexOf(" ")).replace(",".toRegex(), "").toDouble()
-                                break
-                            }
-                        }
-                        chestType.value = 0.0
-                        chestType.items.clear()
-                        for (i in 9..17) {
-                            val lootSlot = inv.getStackInSlot(i)
-                            val identifier = AuctionData.getIdentifier(lootSlot)
-                            if (identifier != null) {
-                                var value = AuctionData.lowestBINs[identifier]
-                                if (value == null) value = 0.0
-                                chestType.value += value
-                                chestType.items.add(DungeonChestLootItem(lootSlot, value))
-                            }
+        if (event.container is ContainerChest) {
+            val inv = event.container.lowerChestInventory
+            val name = inv.displayName.unformattedText
+            if (name.endsWith(" Chest")) {
+                val chestType = DungeonChest.getFromName(name) ?: return
+                val openChest = inv.getStackInSlot(31) ?: return
+                if (openChest.displayName == "§aOpen Reward Chest") {
+                    for (unclean in ItemUtil.getItemLore(openChest)) {
+                        val line = unclean.stripControlCodes()
+                        if (line.contains("FREE")) {
+                            chestType.price = 0.0
+                            break
+                        } else if (line.contains(" Coins")) {
+                            chestType.price =
+                                line.substring(0, line.indexOf(" ")).replace(",".toRegex(), "").toDouble()
+                            break
                         }
                     }
-                    if (chestType.items.size > 0) {
-                        val sr = UResolution
-                        val leftAlign = element.actualX < sr.scaledWidth / 2f
-                        val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                        GlStateManager.color(1f, 1f, 1f, 1f)
-                        GlStateManager.disableLighting()
-                        var drawnLines = 1
-                        val profit = chestType.value - chestType.price
+                    chestType.value = 0.0
+                    chestType.items.clear()
+                    for (i in 9..17) {
+                        val lootSlot = inv.getStackInSlot(i)
+                        val identifier = AuctionData.getIdentifier(lootSlot)
+                        if (identifier != null) {
+                            var value = AuctionData.lowestBINs[identifier]
+                            if (value == null) value = 0.0
+                            chestType.value += value
+                            chestType.items.add(DungeonChestLootItem(lootSlot, value))
+                        }
+                    }
+                }
+                if (chestType.items.size > 0) {
+                    val sr = UResolution
+                    val leftAlign = element.actualX < sr.scaledWidth / 2f
+                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    GlStateManager.color(1f, 1f, 1f, 1f)
+                    GlStateManager.disableLighting()
+                    var drawnLines = 1
+                    val profit = chestType.value - chestType.price
+                    ScreenRenderer.fontRenderer.drawString(
+                        chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
+                            profit
+                        ),
+                        if (leftAlign) element.actualX else element.actualX + element.width,
+                        element.actualY,
+                        chestType.displayColor,
+                        alignment,
+                        SmartFontRenderer.TextShadow.NORMAL
+                    )
+                    for (item in chestType.items) {
+                        val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
                         ScreenRenderer.fontRenderer.drawString(
-                            chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
-                                profit
-                            ),
+                            line,
                             if (leftAlign) element.actualX else element.actualX + element.width,
-                            element.actualY,
-                            chestType.displayColor,
+                            element.actualY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
+                            CommonColors.WHITE,
                             alignment,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
-                        for (item in chestType.items) {
-                            val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
-                            ScreenRenderer.fontRenderer.drawString(
-                                line,
-                                if (leftAlign) element.actualX else element.actualX + element.width,
-                                element.actualY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
-                                CommonColors.WHITE,
-                                alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
-                            )
-                            drawnLines++
-                        }
+                        drawnLines++
                     }
                 }
             }
@@ -138,7 +132,7 @@ class ChestProfit {
 
         var price = 0.0
         var value = 0.0
-        var items = ArrayList<DungeonChestLootItem>()
+        var items = ArrayList<DungeonChestLootItem>(3)
         fun reset() {
             price = 0.0
             value = 0.0
@@ -159,47 +153,25 @@ class ChestProfit {
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
-                val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
-                var drawnLines = 0
-                for (chest in DungeonChest.values()) {
-                    if (chest.items.size == 0) continue
+                DungeonChest.values().filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
                     val profit = chest.value - chest.price
-                    val line = chest.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.format(
-                        profit.toLong()
-                    )
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                     ScreenRenderer.fontRenderer.drawString(
-                        line,
+                        "${chest.displayText}§f: §${(if (profit > 0) "a" else "c")}${NumberUtil.format(profit.toLong())}",
                         if (leftAlign) 0f else width.toFloat(),
-                        (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                        (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         chest.displayColor,
-                        alignment,
+                        if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
-                    drawnLines++
                 }
             }
         }
 
         override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
-            for (i in DungeonChest.values().indices) {
-                val chest = DungeonChest.values()[i]
-                val line = chest.displayText + ": §a+300M"
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    line,
-                    if (leftAlign) 0f else width.toFloat(),
-                    (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                    chest.displayColor,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
+            RenderUtil.drawAllInList(this, DungeonChest.values().map { "${it.displayText}: §a+300M" })
         }
 
         override val height: Int

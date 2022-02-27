@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,112 +26,107 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil.highlight
+import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.stripControlCodes
-import java.awt.Color
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.util.*
-import java.util.regex.Pattern
 
 class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
-    private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
+    private val playerPattern = Regex("(?:\\[.+?] )?(?<name>\\w+)")
 
     companion object {
         val names = HashMap<String, Boolean>()
-        val classes = DungeonListener.DungeonClass.values()
-            .associateWithTo(EnumMap(DungeonListener.DungeonClass::class.java)) { false }
+        val classes = DungeonClass.values()
+            .associateWithTo(EnumMap(DungeonClass::class.java)) { false }
+        private val glassPane by lazy {
+            Item.getItemFromBlock(Blocks.stained_glass_pane)
+        }
     }
 
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock) return
         val slot = event.slot
-        if (event.container is ContainerChest) {
-            val cc = event.container
-            val displayName = cc.lowerChestInventory.displayName.unformattedText.trim()
-            if (slot.hasStack) {
-                val item = slot.stack
-                if (Skytils.config.spiritLeapNames && displayName == "Spirit Leap") {
-                    if (item.item === Item.getItemFromBlock(Blocks.stained_glass_pane)) {
-                        event.isCanceled = true
-                    }
+        if (slot.hasStack && event.container is ContainerChest) {
+            val item = slot.stack
+            if (Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") {
+                if (item.item === glassPane) {
+                    event.isCanceled = true
                 }
             }
         }
     }
 
     @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
-            val containerChest = event.container
-            val fr = ScreenRenderer.fontRenderer
-            val invSlots = containerChest.inventorySlots
-            val displayName = containerChest.lowerChestInventory.displayName.unformattedText.trim()
-            if ((Skytils.config.spiritLeapNames && displayName == "Spirit Leap") || (Skytils.config.reviveStoneNames && displayName == "Revive A Teammate")) {
+            if ((Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") || (Skytils.config.reviveStoneNames && SBInfo.lastOpenContainerName == "Revive A Teammate")) {
+                val fr = ScreenRenderer.fontRenderer
                 var people = 0
-                for (slot in invSlots) {
+                GlStateManager.disableLighting()
+                GlStateManager.enableBlend()
+                for (slot in event.container.inventorySlots) {
                     if (slot.inventory == mc.thePlayer.inventory) continue
                     if (!slot.hasStack || slot.stack.item != Items.skull) continue
                     val item = slot.stack
                     people++
 
-                    val x = slot.xDisplayPosition
-                    val y = slot.yDisplayPosition + if (people % 2 != 0) -15 else 20
-                    val matcher = playerPattern.matcher(item.displayName.stripControlCodes())
-                    if (!matcher.find()) continue
-                    val name = matcher.group(1)
+                    val x = slot.xDisplayPosition.toFloat()
+                    val y = slot.yDisplayPosition + if (people % 2 != 0) -15f else 20f
+                    val name =
+                        playerPattern.find(item.displayName.stripControlCodes())?.groups?.get("name")?.value ?: continue
                     if (name == "Unknown") continue
                     val teammate = (DungeonListener.team.find { it.playerName == name }
                         ?: continue)
                     val dungeonClass = teammate.dungeonClass
                     val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
-                    val scale = 0.9
+                    val scale = 0.9f
                     val scaleReset = 1 / scale
                     GlStateManager.pushMatrix()
-                    GlStateManager.pushAttrib()
-                    GlStateManager.disableLighting()
-                    GlStateManager.disableDepth()
-                    GlStateManager.disableBlend()
-                    GlStateManager.translate(0f, 0f, 1f)
+                    GlStateManager.translate(0f, 0f, 299f)
                     if (names.getOrDefault(name, false)) {
-                        slot highlight Color(255, 0, 0)
+                        slot highlight 1174339584
                     } else if (classes.getOrDefault(dungeonClass, false)) {
-                        slot highlight Color(0, 255, 0)
+                        slot highlight 1157693184
                     }
                     Gui.drawRect(
-                        x - 2 - fr.getStringWidth(text) / 2,
-                        y - 2,
-                        x + fr.getStringWidth(text) / 2 + 2,
-                        y + fr.FONT_HEIGHT + 2,
-                        Color(47, 40, 40).rgb
+                        (x - 2 - fr.getStringWidth(text) / 2).toInt(),
+                        (y - 2).toInt(),
+                        (x + fr.getStringWidth(text) / 2 + 2).toInt(),
+                        (y + fr.FONT_HEIGHT + 2).toInt(),
+                        -13686744
                     )
                     fr.drawString(
                         text,
-                        x.toFloat(),
-                        y.toFloat(),
+                        x,
+                        y,
                         alignment = SmartFontRenderer.TextAlignment.MIDDLE,
                         shadow = SmartFontRenderer.TextShadow.OUTLINE
                     )
-                    GlStateManager.scale(scale, scale, 1.0)
+                    GlStateManager.scale(scale, scale, 1f)
                     fr.drawString(
                         dungeonClass.className.first().uppercase(),
-                        (scaleReset * x).toFloat(),
-                        (scaleReset * slot.yDisplayPosition).toFloat(),
-                        Color(255, 255, 0).rgb,
+                        scaleReset * x,
+                        scaleReset * slot.yDisplayPosition,
+                        -256,
                         true
                     )
-                    GlStateManager.popAttrib()
                     GlStateManager.popMatrix()
                 }
+                GlStateManager.disableBlend()
             }
         }
     }
@@ -139,7 +134,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     override fun read(reader: InputStreamReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for (entry in obj["classes"].asJsonObject.entrySet()) {
-            classes[DungeonListener.DungeonClass.getClassFromName(entry.key)] =
+            classes[DungeonClass.getClassFromName(entry.key)] =
                 entry.value.asJsonObject["enabled"].asBoolean
         }
         for (entry in obj["users"].asJsonObject.entrySet()) {
@@ -170,5 +165,9 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
+        val e = JsonObject()
+        e.add("classes", JsonObject())
+        e.add("users", JsonObject())
+        gson.toJson(e, writer)
     }
 }

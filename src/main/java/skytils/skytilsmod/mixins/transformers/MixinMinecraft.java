@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,6 @@ package skytils.skytilsmod.mixins.transformers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.spongepowered.asm.mixin.Final;
@@ -41,11 +40,12 @@ import java.util.Objects;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
+    private final Minecraft $this = (Minecraft) (Object) this;
     @Shadow
     public EntityPlayerSP thePlayer;
-
-    @Shadow @Final public File mcDataDir;
-    private final Minecraft $this = (Minecraft) (Object) this;
+    @Shadow
+    @Final
+    public File mcDataDir;
 
     /**
      * Taken from Skyblockcatia under MIT License
@@ -61,7 +61,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "clickMouse()V", at = @At(value = "INVOKE", target = "net/minecraft/client/entity/EntityPlayerSP.swingItem()V", shift = At.Shift.AFTER))
     private void clickMouse(CallbackInfo info) {
-        if (!Utils.inSkyblock) return;
+        if (!Utils.INSTANCE.getInSkyblock()) return;
 
         ItemStack item = thePlayer.getHeldItem();
         if (item != null) {
@@ -77,10 +77,5 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 4))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         ScreenRenderer.init();
-    }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onPostInit(GameConfiguration gameConfig, CallbackInfo ci) {
-        if (new File(this.mcDataDir, "config/skytils/nosychic").exists()) Utils.noSychic = true;
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -33,9 +33,12 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.RenderHUDEvent
 import skytils.skytilsmod.gui.LocationEditGui
+import skytils.skytilsmod.utils.GlState
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     private var counter = 0
@@ -74,7 +77,9 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
         if (Skytils.usingLabymod && Minecraft.getMinecraft().ingameGUI !is GuiIngameForge) return
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        GlState.pushState()
         MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
+        GlState.popState()
     }
 
     // LabyMod Support
@@ -82,13 +87,17 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun renderPlayerInfoLabyMod(event: RenderGameOverlayEvent) {
         if (!Skytils.usingLabymod) return
         if (event.type != null) return
+        GlState.pushState()
         MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
+        GlState.popState()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHUD(event: RenderHUDEvent) {
         if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
+        mc.mcProfiler.startSection("SkytilsHUD")
         for ((_, element) in Companion.elements) {
+            mc.mcProfiler.startSection(element.name)
             try {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(element.actualX, element.actualY, 0f)
@@ -98,8 +107,10 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
+            mc.mcProfiler.endSection()
         }
         renderTitles(event.event.resolution)
+        mc.mcProfiler.endSection()
     }
 
     @SubscribeEvent

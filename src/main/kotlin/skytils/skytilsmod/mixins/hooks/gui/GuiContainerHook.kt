@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -33,7 +33,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun closeWindowPressed(ci: CallbackInfo) {
-        CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()
+        if (CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()) ci.cancel()
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
@@ -44,6 +44,10 @@ class GuiContainerHook(guiAny: Any) {
             mouseY,
             partialTicks
         ).postAndCatch()
+    }
+
+    fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
+        GuiContainerEvent.ForegroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {

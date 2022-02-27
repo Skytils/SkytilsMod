@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,17 +17,20 @@
  */
 package skytils.skytilsmod.mixins.hooks.renderer
 
-import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.slayerEntity
-import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.yangGlyphEntity
-import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.yangGlyph
-import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.slayerNameEntity
-import skytils.skytilsmod.Skytils
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityEnderman
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.slayerEntity
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.slayerNameEntity
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.yangGlyph
+import skytils.skytilsmod.features.impl.misc.SlayerFeatures.Companion.yangGlyphEntity
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.graphics.colors.ColorFactory
+import skytils.skytilsmod.utils.withAlpha
 
 fun setColorMultiplier(
     entity: Entity,
@@ -39,12 +42,15 @@ fun setColorMultiplier(
         if (slayerEntity != entity) return
         entity.hurtTime = 0
         if (yangGlyphEntity != null || yangGlyph != null) {
-            cir.setReturnValue(Skytils.config.seraphBeaconPhaseColor.withAlpha(169))
+            cir.returnValue = Skytils.config.seraphBeaconPhaseColor.withAlpha(169)
         } else if (slayerNameEntity != null && (slayerNameEntity!!.customNameTag.dropLastWhile { it == 's' }
                 .endsWith(" Hit"))
         ) {
-            cir.setReturnValue(Skytils.config.seraphHitsPhaseColor.withAlpha(169))
-        } else cir.setReturnValue(Skytils.config.seraphNormalPhaseColor.withAlpha(169))
+            cir.returnValue = Skytils.config.seraphHitsPhaseColor.withAlpha(169)
+        } else cir.returnValue = Skytils.config.seraphNormalPhaseColor.withAlpha(169)
+    }
+    if (DungeonFeatures.livid == entity) {
+        cir.returnValue = ColorFactory.AZURE.withAlpha(169)
     }
 }
 

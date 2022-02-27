@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,7 +29,8 @@ import skytils.skytilsmod.mixins.hooks.renderer.ItemRendererHookKt;
 
 @Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
-    @Shadow private ItemStack itemToRender;
+    @Shadow
+    private ItemStack itemToRender;
 
     @Redirect(method = "renderItemInFirstPerson", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
     private int getItemInUseCountForFirstPerson(AbstractClientPlayer abstractClientPlayer) {

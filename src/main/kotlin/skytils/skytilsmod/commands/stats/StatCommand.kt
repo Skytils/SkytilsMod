@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 package skytils.skytilsmod.commands.stats
 
 import gg.essential.universal.wrappers.message.UMessage
-import net.minecraft.command.ICommandSender
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import skytils.hylin.mojang.AshconException
@@ -40,9 +40,9 @@ abstract class StatCommand(
     val key: String
         get() = Skytils.config.apiKey
 
-    override fun getCommandUsage(sender: ICommandSender): String = "/${this.commandName} [player]"
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/${this.commandName} [player]"
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (needApiKey && key.isEmpty()) {
             printMessage("§cYou must have an API key set to use this command!")
             return

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,6 +21,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import net.minecraft.util.BlockPos
+import skytils.skytilsmod.Reference
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
@@ -42,9 +43,14 @@ import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
     private fun loadData(): Future<*> {
-        val dataUrl = Skytils.config.dataURL
         return Skytils.threadPool.submit {
+            val dataUrl = Reference.dataUrl
             try {
+                APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
+                    if (isNotBlank()) {
+                        Skytils.domain = trim()
+                    }
+                }
                 APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
                     Utils.checkThreadAndQueue {
                         EnchantUtil.enchants.clear()
@@ -92,6 +98,12 @@ object DataFetcher {
                             key to element.asJsonObject.entrySet()
                                 .associateTo(LinkedHashMap()) { it.key.toInt() to it.value.asLong }
                         }
+                        SkillUtils.runeXp.clear()
+                        get("runecrafting_xp").asJsonObject.entrySet()
+                            .associateTo(SkillUtils.runeXp) { it.key.toInt() to it.value.asLong }
+                        SkillUtils.hotmXp.clear()
+                        get("hotm_xp").asJsonObject.entrySet()
+                            .associateTo(SkillUtils.hotmXp) { it.key.toInt() to it.value.asLong }
                     }
                 }
                 APIUtil.getArrayResponse("${dataUrl}constants/mayors.json").apply {
@@ -157,7 +169,7 @@ object DataFetcher {
                         entrySet().associateTo(SlayerFeatures.BossHealths) { it.key to it.value.asJsonObject }
                     }
                 }
-                APIUtil.getArrayResponse("${Skytils.config.dataURL}SpamFilters.json").apply {
+                APIUtil.getArrayResponse("${dataUrl}SpamFilters.json").apply {
                     Utils.checkThreadAndQueue {
                         val filters = SpamHider.repoFilters.toHashSet()
                         SpamHider.repoFilters.clear()

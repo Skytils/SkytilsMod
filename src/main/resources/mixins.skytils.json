@@ -1,11 +1,12 @@
 {
   "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.7",
+  "minVersion": "0.8",
   "plugin": "skytils.skytilsmod.mixins.SkytilsMixinPlugin",
   "package": "skytils.skytilsmod.mixins.transformers",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "MixinMinecraft",
+    "accessors.AccessorChatComponentText",
     "accessors.AccessorCommandHandler",
     "accessors.AccessorEnumDyeColor",
     "accessors.AccessorGuiContainer",
@@ -26,6 +27,7 @@
     "entity.MixinEntityBlaze",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayerSP",
+    "forge.MixinJarDiscoverer",
     "gui.MixinGuiContainer",
     "gui.MixinGuiIngame",
     "gui.MixinGuiIngameForge",
@@ -59,6 +61,7 @@
     "renderer.MixinTileEntityChestRenderer",
     "renderer.MixinTileEntityItemStackRenderer",
     "renderer.MixinTileEntitySkullRenderer",
+    "sba.MixinContainerPreviewManager",
     "sk1eroam.MixinAnimationHandler",
     "util.MixinChatStyle",
     "util.MixinIChatComponent$Serializer",
@@ -70,9 +73,12 @@
   "client": [
     "accessors.AccessorGuiChat",
     "accessors.AccessorGuiMainMenu",
+    "accessors.AccessorGuiStreamUnavailable",
     "gui.MixinChatLine",
     "neu.MixinCustomAH",
+    "particle.MixinEffectRenderer",
     "renderer.MixinItemRenderer",
+    "renderer.MixinLayerCape",
     "renderer.MixinRendererLivingEntity"
   ]
 }

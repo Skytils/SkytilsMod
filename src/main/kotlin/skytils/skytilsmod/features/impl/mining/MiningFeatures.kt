@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.mining
 
+import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.Minecraft
@@ -143,13 +144,13 @@ class MiningFeatures {
                         }
                     }
                     println("Puzzler Solution: $puzzlerSolution")
-                    mc.thePlayer.addChatMessage(ChatComponentText("§aMine the block highlighted in §c§lRED§a!"))
+                    UChat.chat("§aMine the block highlighted in §c§lRED§a!")
                 }
             }
         }
         if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size == 0) {
-                mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
+                UChat.chat("§cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -160,18 +161,11 @@ class MiningFeatures {
             }, null)
             TickTask(50) {
                 if (solution != null) {
-                    mc.thePlayer.addChatMessage(ChatComponentText("§aFetchur needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"))
+                    UChat.chat("§aFetchur needs: §2§l${solution}§a!")
                 } else {
                     if (unformatted.contains("its") || unformatted.contains("theyre")) {
                         println("Missing Fetchur item: $unformatted")
-                        mc.thePlayer.addChatMessage(
-                            ChatComponentText(
-                                String.format(
-                                    "§cSkytils couldn't determine the Fetchur item. There were %s solutions loaded.",
-                                    fetchurItems.size
-                                )
-                            )
-                        )
+                        UChat.chat("§cSkytils couldn't determine the Fetchur item. There were ${fetchurItems.size} solutions loaded.")
                     }
                 }
             }
@@ -183,6 +177,11 @@ class MiningFeatures {
                 waypointChatMessage(xyzMatcher.group("x"), xyzMatcher.group("y"), xyzMatcher.group("z"))
             else if (xzMatcher.matches())
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
+        }
+        if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
+            && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
+        ) {
+            kingLoc.set()
         }
         if (formatted.startsWith("§r§cYou died")) {
             deadCount =
@@ -258,6 +257,20 @@ class MiningFeatures {
                     )
                 )
         )
+        val king = ChatComponentText("§6[King Yolkar] ").setChatStyle(
+            ChatStyle()
+                .setChatClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/skytilshollowwaypoint set internal_king $x $y $z"
+                    )
+                ).setChatHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        ChatComponentText("§eset waypoint for King Yolkar")
+                    )
+                )
+        )
         val bal = ChatComponentText("§c[Khazad-dûm] ").setChatStyle(
             ChatStyle()
                 .setChatClickEvent(
@@ -307,6 +320,8 @@ class MiningFeatures {
             component.appendSibling(den)
         if (!minesLoc.exists())
             component.appendSibling(mines)
+        if (!kingLoc.exists())
+            component.appendSibling(king)
         if (!balLoc.exists())
             component.appendSibling(bal)
         if (!fairyLoc.exists())
@@ -373,15 +388,18 @@ class MiningFeatures {
             GlStateManager.enableCull()
         }
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
+            GlStateManager.disableDepth()
             cityLoc.drawWaypoint("Lost Precursor City", event.partialTicks)
             templeLoc.drawWaypoint("Jungle Temple", event.partialTicks)
             denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
             minesLoc.drawWaypoint("Mines of Divan", event.partialTicks)
+            kingLoc.drawWaypoint("King Yolkar",event.partialTicks)
             balLoc.drawWaypoint("Khazad-dûm", event.partialTicks)
             fairyLoc.drawWaypoint("Fairy Grotto", event.partialTicks)
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
             for ((key, value) in waypoints)
                 RenderUtil.renderWaypointText(key, value, event.partialTicks)
+            GlStateManager.enableDepth()
         }
     }
 
@@ -451,6 +469,7 @@ class MiningFeatures {
         templeLoc.reset()
         denLoc.reset()
         minesLoc.reset()
+        kingLoc.reset()
         balLoc.reset()
         fairyLoc.reset()
         waypoints.clear()
@@ -482,6 +501,7 @@ class MiningFeatures {
                 templeLoc.drawOnMap(50, Color.GREEN.rgb)
                 denLoc.drawOnMap(50, Color.YELLOW.rgb)
                 minesLoc.drawOnMap(50, Color.BLUE.rgb)
+                kingLoc.drawOnMap(25, Color.ORANGE.rgb)
                 balLoc.drawOnMap(50, Color.RED.rgb)
                 fairyLoc.drawOnMap(25, Color.PINK.rgb)
             }
@@ -606,6 +626,7 @@ class MiningFeatures {
         var templeLoc = LocationObject()
         var denLoc = LocationObject()
         var minesLoc = LocationObject()
+        var kingLoc = LocationObject()
         var balLoc = LocationObject()
         var fairyLoc = LocationObject()
         var lastTPLoc: BlockPos? = null

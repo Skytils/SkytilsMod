@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -56,7 +56,7 @@ class Location(x: Double, y: Double, z: Double) : Point3d(x, y, z) {
     }
 
     override fun toString(): String {
-        return "[" + x.roundToInt() + ", " + y.roundToInt() + ", " + z.roundToInt() + "]"
+        return "[${x.roundToInt()}, ${y.roundToInt()}, ${z.roundToInt()}]"
     }
 
 }

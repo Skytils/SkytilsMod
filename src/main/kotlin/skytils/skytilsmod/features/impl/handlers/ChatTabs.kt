@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -136,11 +136,12 @@ object ChatTabs {
                     b.yPosition =
                         UResolution.scaledHeight - chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * 9 - 50 - 9
                 }
-                hoveredChatLine = if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
+                hoveredChatLine =
+                    if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
             }
             is GuiScreenEvent.MouseInputEvent.Pre -> {
-                if (GuiScreen.isCtrlKeyDown() && Mouse.getEventButtonState()) {
-                    if (DevTools.getToggle("chat")) {
+                if (Mouse.getEventButtonState()) {
+                    if (GuiScreen.isCtrlKeyDown() && DevTools.getToggle("chat")) {
                         val button = Mouse.getEventButton()
                         if (button != 0 && button != 1) return
                         val chatLine = hoveredChatLine ?: return
@@ -168,7 +169,8 @@ object ChatTabs {
                         val button = Mouse.getEventButton()
                         if (button != 0) return
                         val chatLine = hoveredChatLine ?: return
-                        val component = (chatLine as ExtensionChatLine).fullComponent ?: chatLine.chatComponent
+                        val component = if (GuiScreen.isCtrlKeyDown()) (chatLine as ExtensionChatLine).fullComponent
+                            ?: chatLine.chatComponent else if (GuiScreen.isShiftKeyDown()) chatLine.chatComponent else return
                         GuiScreen.setClipboardString(component.unformattedText.stripControlCodes())
                         EssentialAPI.getNotifications()
                             .push("Copied chat", component.unformattedText.stripControlCodes(), 1f)

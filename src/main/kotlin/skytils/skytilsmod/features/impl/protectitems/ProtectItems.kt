@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,14 +17,15 @@
  */
 package skytils.skytilsmod.features.impl.protectitems
 
+import gg.essential.universal.UChat
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
+import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.ItemTossEvent
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
@@ -39,13 +40,14 @@ class ProtectItems {
             val item = mc.thePlayer.inventory.itemStack
             val extraAttr = ItemUtil.getExtraAttributes(item)
             if (ItemProtectStrategy.isAnyWorth(item, extraAttr, ItemProtectStrategy.ProtectType.USERCLOSEWINDOW)) {
-                mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
                 for (slot in event.container.inventorySlots) {
-                    if (slot.inventory !== mc.thePlayer.inventory || slot.hasStack) continue
+                    if (slot.inventory !== mc.thePlayer.inventory || slot.hasStack || !slot.isItemValid(item)) continue
                     mc.playerController.windowClick(event.container.windowId, slot.slotNumber, 0, 0, mc.thePlayer)
-                    break
+                    notifyStopped(null, "dropping")
+                    return
                 }
+                notifyStopped(null, "closing the window on")
+                event.isCanceled = true
             }
         }
     }
@@ -59,9 +61,7 @@ class ProtectItems {
                 ItemProtectStrategy.ProtectType.HOTBARDROPKEY
             )
         ) {
-            mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-            mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
-            event.isCanceled = true
+            notifyStopped(event, "dropping")
         }
     }
 
@@ -89,9 +89,7 @@ class ProtectItems {
                             ItemProtectStrategy.ProtectType.SALVAGE
                         )
                     ) {
-                        mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                        mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from salvaging that item!"))
-                        event.isCanceled = true
+                        notifyStopped(event, "salvaging")
                         return
                     }
                 }
@@ -108,9 +106,7 @@ class ProtectItems {
                                     ItemProtectStrategy.ProtectType.SELLTONPC
                                 )
                             ) {
-                                mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from selling that item!"))
-                                event.isCanceled = true
+                                notifyStopped(event, "selling")
                                 return
                             }
                         }
@@ -122,9 +118,7 @@ class ProtectItems {
             val item = mc.thePlayer.inventory.itemStack
             val extraAttr = ItemUtil.getExtraAttributes(item)
             if (ItemProtectStrategy.isAnyWorth(item, extraAttr, ItemProtectStrategy.ProtectType.CLICKOUTOFWINDOW)) {
-                mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
-                event.isCanceled = true
+                notifyStopped(event, "dropping")
                 return
             }
         }
@@ -132,12 +126,16 @@ class ProtectItems {
             val item = event.slot.stack
             val extraAttr = ItemUtil.getExtraAttributes(item)
             if (ItemProtectStrategy.isAnyWorth(item, extraAttr, ItemProtectStrategy.ProtectType.DROPKEYININVENTORY)) {
-                mc.thePlayer.playSound("note.bass", 1f, 0.5f)
-                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "Skytils has stopped you from dropping that item!"))
-                event.isCanceled = true
+                notifyStopped(event, "dropping")
                 return
             }
         }
+    }
+
+    private fun notifyStopped(event: Event?, action: String) {
+        SoundQueue.addToQueue("note.bass", 0.5f, 1f)
+        UChat.chat("§cSkytils has stopped you from $action that item!")
+        event?.isCanceled = true
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
@@ -37,7 +38,7 @@ class TankDisplayStuff {
         for (teammate in DungeonListener.team) {
             val player = teammate.player ?: continue
             if (!teammate.canRender()) continue
-            if (teammate.dungeonClass == DungeonListener.DungeonClass.TANK) {
+            if (teammate.dungeonClass == DungeonClass.TANK) {
                 if (Skytils.config.showTankRadius) {
                     // not sba healing circle wall code
                     GlStateManager.pushMatrix()
@@ -98,7 +99,7 @@ class TankDisplayStuff {
             }
             if (Skytils.config.boxedProtectedTeammates && (player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
                 if (DungeonListener.team.any {
-                        it.canRender() && it.dungeonClass == DungeonListener.DungeonClass.TANK && it != teammate && it.player?.getDistanceToEntity(
+                        it.canRender() && it.dungeonClass == DungeonClass.TANK && it != teammate && it.player?.getDistanceToEntity(
                             player
                         )!! <= 30
                     }) {

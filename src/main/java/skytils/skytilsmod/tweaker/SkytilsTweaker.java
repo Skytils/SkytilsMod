@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,7 @@
 package skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 import sun.security.util.SecurityConstants;
 
@@ -27,27 +28,33 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+@SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
-        if (System.getProperty("skytils.noSecurityManager") == null && System.getSecurityManager().getClass() == FMLSecurityManager.class) {
-            System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
-            overrideSecurityManager();
-            System.out.println("Current security manager: " + System.getSecurityManager());
+        try {
+            Class.forName("skytils.skytilsmod.utils.SuperSecretSettings", true, Launch.classLoader).getDeclaredMethod("load").invoke(null);
+            Class.forName("skytils.skytilsmod.tweaker.ClassPreloader", true, Launch.classLoader).getDeclaredMethod("preloadClasses").invoke(null);
+            boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
+            if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
+                System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
+                overrideSecurityManager(isFML);
+                System.out.println("Current security manager: " + System.getSecurityManager());
+            }
+            Class.forName("skytils.skytilsmod.tweaker.EssentialPlatformSetup", true, Launch.classLoader).getDeclaredMethod("setup").invoke(null);
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
-    // Bypass the FML security manager in order to set our own
-    private void overrideSecurityManager() {
+    private void overrideSecurityManager(boolean isForge) {
         try {
-            SecurityManager s = new SkytilsSecurityManager();
+            SecurityManager s = new SkytilsSecurityManager(isForge);
 
             if (s.getClass().getClassLoader() != null) {
-                AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                    public Object run() {
-                        s.getClass().getProtectionDomain().implies
-                                (SecurityConstants.ALL_PERMISSION);
-                        return null;
-                    }
+                AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+                    s.getClass().getProtectionDomain().implies
+                            (SecurityConstants.ALL_PERMISSION);
+                    return null;
                 });
             }
 
@@ -60,7 +67,7 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
             Field field = (Field) m2.invoke(System.class, fields, "security");
             field.setAccessible(true);
             field.set(null, s);
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

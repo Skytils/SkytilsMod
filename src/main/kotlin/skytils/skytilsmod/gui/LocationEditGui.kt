@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -64,6 +64,11 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                     GlStateManager.scale(scale.toDouble(), scale.toDouble(), 1.0)
                     button.drawButton(mc, mouseX, mouseY)
                     GlStateManager.popMatrix()
+                    if (button.isMouseOver) {
+                        GlStateManager.translate(0f, 0f, 100f)
+                        drawHoveringText(listOf(button.element.name), mouseX, mouseY)
+                        GlStateManager.translate(0f, 0f, -100f)
+                    }
                 }
             } else if (button is ResizeButton) {
                 val element = button.element

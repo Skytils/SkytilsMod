@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,14 +19,24 @@
 package skytils.skytilsmod.utils
 
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 
 object ReflectionHelper {
     val classes = hashMapOf<String, Class<*>>()
     val fields = hashMapOf<String, Field>()
+    val methods = hashMapOf<String, Method>()
 
     fun Class<*>.getFieldHelper(fieldName: String) = runCatching {
         ReflectionHelper.fields.getOrPut("$name $fieldName") {
             getDeclaredField(fieldName).apply {
+                isAccessible = true
+            }
+        }
+    }.getOrNull()
+
+    fun Class<*>.getMethodHelper(methodName: String) = runCatching {
+        ReflectionHelper.methods.getOrPut("$name $methodName") {
+            getDeclaredMethod(methodName).apply {
                 isAccessible = true
             }
         }
@@ -39,4 +49,5 @@ object ReflectionHelper {
     }.getOrNull()
 
     fun getFieldFor(className: String, fieldName: String) = getClassHelper(className)?.getFieldHelper(fieldName)
+    fun getMethodFor(className: String, methodName: String) = getClassHelper(className)?.getMethodHelper(methodName)
 }

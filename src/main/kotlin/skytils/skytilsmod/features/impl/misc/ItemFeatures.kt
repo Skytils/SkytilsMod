@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockDoor
 import net.minecraft.block.BlockLadder
@@ -31,12 +32,15 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.common.util.Constants
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -53,8 +57,10 @@ import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.handlers.AuctionData
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -81,11 +87,14 @@ class ItemFeatures {
         var soulflowAmount = ""
         var stackingEnchantDisplayText = ""
         var lowSoulFlowPinged = false
+        var lastShieldUse = -1L
+        var lastShieldClick = 0L
 
         init {
             SelectedArrowDisplay()
             StackingEnchantDisplay()
             SoulflowGuiElement()
+            WitherShieldDisplay()
         }
 
         val interactables = setOf(
@@ -268,7 +277,7 @@ class ItemFeatures {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
                         val line2 = lore[2].stripControlCodes()
                         val enchantName =
-                            line2.substringBeforeLast(" ").replace(" ", "_").uppercase()
+                            line2.substringBeforeLast(" ").replace(Regex("[\\s-]"), "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
                         isSuperpairsReward = true
                     }
@@ -328,7 +337,7 @@ class ItemFeatures {
         }
         if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
             val bonus = try {
-                (TabListUtils.tabEntries[68].text.substringAfter("❁").removeSuffix("§r").toInt()
+                (TabListUtils.tabEntries[68].second.substringAfter("❁").removeSuffix("§r").toInt()
                     .coerceAtMost(1000) / 10).toString()
             } catch (e: Exception) {
                 "Error"
@@ -420,6 +429,22 @@ class ItemFeatures {
                     }
                 }
             }
+            if (this is S1CPacketEntityMetadata && lastShieldClick != -1L && entityId == mc.thePlayer?.entityId && System.currentTimeMillis() - lastShieldClick <= 500 && func_149376_c()?.any { it.dataValueId == 17 } == true) {
+                lastShieldUse = System.currentTimeMillis()
+                lastShieldClick = -1
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onSendPacket(event: PacketEvent.SendEvent) {
+        if (!Utils.inSkyblock || lastShieldUse != -1L || mc.thePlayer?.heldItem == null) return
+        if (event.packet is C08PacketPlayerBlockPlacement && mc.thePlayer.heldItem.item == Items.iron_sword && getExtraAttributes(
+                mc.thePlayer.heldItem
+            )?.getTagList("ability_scroll", Constants.NBT.TAG_STRING)?.asStringSet()
+                ?.contains("WITHER_SHIELD_SCROLL") == true
+        ) {
+            lastShieldClick = System.currentTimeMillis()
         }
     }
 
@@ -471,14 +496,22 @@ class ItemFeatures {
                 if (enchantments.keySet.size == 1) {
                     val name = enchantmentNames.first()
                     if (Skytils.config.showEnchantedBookAbbreviation) {
-                        val parts = name.split("_")
-                        val prefix: String = if (parts[0] == "ultimate") {
-                            "§d§l" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
+                        val enchant = EnchantUtil.enchants.find { it.nbtName == name }
+                        val prefix: String = if (enchant != null) {
+                            val joined = enchant.loreName.split(" ").joinToString { it[0].uppercase() }
+                            if (enchant.nbtName.startsWith("ultimate")) {
+                                "§d§l${joined}"
+                            } else joined
                         } else {
-                            if (parts.size > 1) {
-                                parts.joinToString("") { s -> s.substring(0, 1).uppercase() }
+                            val parts = name.split("_")
+                            if (parts[0] == "ultimate") {
+                                "§d§l" + parts.drop(1).joinToString("") { s -> s[0].uppercase() }
                             } else {
-                                parts[0].substring(0, parts[0].length.coerceAtMost(3)).toTitleCase() + "."
+                                if (parts.size > 1) {
+                                    parts.joinToString("") { s -> s[0].uppercase() }
+                                } else {
+                                    parts[0].take(3).toTitleCase() + "."
+                                }
                             }
                         }
                         GlStateManager.disableLighting()
@@ -538,6 +571,43 @@ class ItemFeatures {
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
         }
+    }
+
+    @SubscribeEvent
+    fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
+        if (!Skytils.config.bookHelper || !Utils.inSkyblock) return
+        if (event.container !is ContainerChest || SBInfo.lastOpenContainerName != "Anvil") return
+        val book1 = event.container.getSlot(29).stack ?: return
+        val book2 = event.container.getSlot(33).stack ?: return
+        if (book1.item != Items.enchanted_book || book2.item != Items.enchanted_book) return
+        val nbt1 = getExtraAttributes(book1) ?: return
+        val nbt2 = getExtraAttributes(book2) ?: return
+        val enchantNBT = listOf(nbt1, nbt2).map { nbt ->
+            nbt.getCompoundTag("enchantments")
+        }
+        val enchantList = enchantNBT.mapNotNull { nbt ->
+            nbt.keySet.takeIf { it.size == 1 }?.first()
+        }
+        if (enchantList.size != 2) return
+        val errorString = if (enchantList[0] != enchantList[1]) {
+            "Enchant Types don't match!"
+        } else if (enchantNBT[0].getInteger(enchantList[0]) != enchantNBT[1].getInteger(enchantList[1])) {
+            "Tiers don't match!"
+        } else return
+        val gui = event.gui as AccessorGuiContainer
+        UGraphics.disableLighting()
+        UGraphics.disableBlend()
+        UGraphics.disableDepth()
+        ScreenRenderer.fontRenderer.drawString(
+            errorString,
+            gui.xSize / 2f,
+            22.5f,
+            CommonColors.RED,
+            TextAlignment.MIDDLE
+        )
+        UGraphics.enableDepth()
+        UGraphics.enableBlend()
+        UGraphics.enableLighting()
     }
 
     @SubscribeEvent
@@ -713,6 +783,61 @@ class ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§3100⸎ Soulflow")
         override val toggled: Boolean
             get() = Skytils.config.showSoulflowDisplay
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+
+    class WitherShieldDisplay : GuiElement("Wither Shield Display", FloatPair(0.65f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock) {
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (lastShieldUse != -1L) {
+                    val diff = ((lastShieldUse + 5000 - System.currentTimeMillis()) / 1000f)
+                    ScreenRenderer.fontRenderer.drawString(
+                        "Shield: §c${"%.2f".format(diff)}s",
+                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        0f,
+                        CommonColors.ORANGE,
+                        alignment,
+                        TextShadow.NORMAL
+                    )
+                    if (diff < 0) lastShieldUse = -1
+                } else {
+                    ScreenRenderer.fontRenderer.drawString(
+                        "Shield: §aREADY",
+                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        0f,
+                        CommonColors.ORANGE,
+                        alignment,
+                        TextShadow.NORMAL
+                    )
+                }
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§6Shield: idk why i added this",
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§6Shield: idk why i added this")
+        override val toggled: Boolean
+            get() = Skytils.config.witherShieldCooldown
 
         init {
             Skytils.guiManager.registerElement(this)

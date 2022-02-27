@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -54,7 +54,10 @@ class ShootTheTargetSolver {
                 shot.add(pos)
             }
         } else if (pos == plate && state.block is BlockPressurePlateWeighted) {
-            if (state.getValue(BlockPressurePlateWeighted.POWER) == 0 || old !is BlockPressurePlateWeighted || old.getValue(BlockPressurePlateWeighted.POWER) == 0) {
+            if (state.getValue(BlockPressurePlateWeighted.POWER) == 0 || old !is BlockPressurePlateWeighted || old.getValue(
+                    BlockPressurePlateWeighted.POWER
+                ) == 0
+            ) {
                 shot.clear()
             }
         }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -91,7 +91,7 @@ class MayorDiana {
                     }
                     val hits = gaiaConstructHits.getOrDefault(this, 0)
                     GlStateManager.disableDepth()
-                    RenderUtil.draw3DString(
+                    RenderUtil.drawLabel(
                         Vec3(posX, posY + 2, posZ),
                         "Hits: $hits / $neededHits",
                         if (hits < neededHits) Color.RED else Color.GREEN,

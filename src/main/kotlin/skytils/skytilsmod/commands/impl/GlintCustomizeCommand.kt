@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,11 +17,10 @@
  */
 package skytils.skytilsmod.commands.impl
 
+import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
-import net.minecraft.util.ChatComponentText
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
@@ -29,15 +28,14 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
 object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizeglint")) {
-    override fun getCommandUsage(sender: ICommandSender) = "glintcustomize <override/color>"
+    override fun getCommandUsage(player: EntityPlayerSP) = "glintcustomize <override/color>"
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-        val player = sender as EntityPlayerSP
         val item = player.heldItem ?: throw WrongUsageException("You need to hold an item that you wish to customize!")
         val itemId = ItemUtil.getSkyBlockItemID(item) ?: throw WrongUsageException("That isn't a valid item!")
         if (args.isEmpty()) {
-            throw WrongUsageException(getCommandUsage(sender))
+            throw WrongUsageException(getCommandUsage(player))
         }
         val originalMessage = args.joinToString(" ")
         when (args[0].lowercase()) {
@@ -46,25 +44,25 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("on") -> {
                         GlintCustomizer.overrides[itemId] = true
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aForced an enchant glint for your item."))
+                        UChat.chat("§aForced an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("off") -> {
                         GlintCustomizer.overrides[itemId] = false
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aForce disabled an enchant glint for your item."))
+                        UChat.chat("§aForce disabled an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.overrides.clear()
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aRemoved all your glint overrides."))
+                        UChat.chat("§aRemoved all your glint overrides.")
                         return
                     }
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.overrides.remove(itemId)
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aCleared glint overrides for your item."))
+                        UChat.chat("§aCleared glint overrides for your item.")
                         return
                     }
                     else -> {
@@ -79,7 +77,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         try {
                             GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(args[2])
                             PersistentSave.markDirty<GlintCustomizer>()
-                            sender.addChatMessage(ChatComponentText("§aForced an enchant glint color for your item."))
+                            UChat.chat("§aForced an enchant glint color for your item.")
                         } catch (e: NumberFormatException) {
                             throw SyntaxErrorException("Unable to get a color from inputted string.")
                         }
@@ -88,13 +86,13 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.glintColors.clear()
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aRemoved all your custom glint colors."))
+                        UChat.chat("§aRemoved all your custom glint colors.")
                         return
                     }
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.glintColors.remove(itemId)
                         PersistentSave.markDirty<GlintCustomizer>()
-                        sender.addChatMessage(ChatComponentText("§aCleared the custom glint color for your item."))
+                        UChat.chat("§aCleared the custom glint color for your item.")
                         return
                     }
                     else -> {
@@ -103,7 +101,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                 }
             }
             else -> {
-                throw WrongUsageException(getCommandUsage(sender))
+                throw WrongUsageException(getCommandUsage(player))
             }
         }
     }

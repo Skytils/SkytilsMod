@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.protectitems.strategy
 
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import skytils.skytilsmod.features.impl.protectitems.strategy.impl.FavoriteStrategy
 import skytils.skytilsmod.features.impl.protectitems.strategy.impl.ItemWorthStrategy
 import skytils.skytilsmod.features.impl.protectitems.strategy.impl.StarredItemStrategy
 
@@ -28,7 +29,9 @@ abstract class ItemProtectStrategy {
     abstract val isToggled: Boolean
 
     companion object {
-        private val STRATEGIES = HashSet<ItemProtectStrategy>()
+        private val STRATEGIES by lazy {
+            arrayOf(FavoriteStrategy, ItemWorthStrategy, StarredItemStrategy)
+        }
 
         fun isAnyToggled(): Boolean {
             return STRATEGIES.any { it.isToggled }
@@ -37,12 +40,6 @@ abstract class ItemProtectStrategy {
         fun isAnyWorth(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
             return STRATEGIES.any { it.isToggled && it.worthProtecting(item, extraAttr, type) }
         }
-
-        init {
-            STRATEGIES.add(ItemWorthStrategy())
-            STRATEGIES.add(StarredItemStrategy())
-        }
-
     }
 
     enum class ProtectType {

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,6 +22,7 @@ import com.google.gson.JsonObject
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
@@ -29,12 +30,13 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.SetActionBarEvent
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import kotlin.math.floor
 import kotlin.time.ExperimentalTime
 
@@ -75,7 +77,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
                 for ((i, entry) in (cooldowns.entries).withIndex()) {
                     val elapsed = (entry.value - System.currentTimeMillis()) / 1000.0
                     ScreenRenderer.fontRenderer.drawString(
-                        "${entry.key.replace("_", " ")}: ${elapsed.roundToPrecision(1)}s",
+                        "${entry.key.replace("_", " ")}: ${"%.1f".format(elapsed)}s",
                         0f,
                         (ScreenRenderer.fontRenderer.FONT_HEIGHT * i).toFloat(),
                         CommonColors.ORANGE,
@@ -136,7 +138,7 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         val cooldowns = mutableMapOf<String, Long>()
 
         fun updateCooldownReduction() {
-            val mages = DungeonListener.team.filter { it.dungeonClass == DungeonListener.DungeonClass.MAGE }
+            val mages = DungeonListener.team.filter { it.dungeonClass == DungeonClass.MAGE }
             val self = mages.find { it.playerName == mc.session.username } ?: return
             val soloMage = mages.size == 1
             cooldownReduction = ((if (soloMage) 50 else 25) + floor(self.classLevel / 2.0))
@@ -144,4 +146,5 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         }
     }
 
+    data class CooldownThing(var name: String, var seconds: Double, var mageBypass: Boolean)
 }

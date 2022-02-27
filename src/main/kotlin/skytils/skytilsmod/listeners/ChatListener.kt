@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -31,7 +31,6 @@ import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
-import kotlin.concurrent.thread
 
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -45,6 +44,7 @@ class ChatListener {
             Skytils.hylinAPI.key = Skytils.config.apiKey
             Skytils.config.markDirty()
             UChat.chat("§aSkytils updated your set Hypixel API key to §2${apiKey}")
+            return
         }
         if (Skytils.config.autoReparty) {
             if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
@@ -52,14 +52,14 @@ class ChatListener {
                 if (matcher.find()) {
                     lastPartyDisbander = matcher.group(1)
                     println("Party disbanded by $lastPartyDisbander")
-                    rejoinThread = thread {
-                        if (Skytils.config.autoRepartyTimeout == 0) return@thread
+                    Skytils.threadPool.submit {
+                        if (Skytils.config.autoRepartyTimeout == 0) return@submit
                         try {
                             println("waiting for timeout")
                             Thread.sleep(Skytils.config.autoRepartyTimeout * 1000L)
                             lastPartyDisbander = ""
                             println("cleared last party disbander")
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                         }
                     }
                     return
@@ -69,7 +69,6 @@ class ChatListener {
                 val acceptMessage = event.message.siblings[6].chatStyle
                 if (acceptMessage.chatHoverEvent.value.unformattedText.contains(lastPartyDisbander)) {
                     Skytils.sendMessageQueue.add("/p accept $lastPartyDisbander")
-                    rejoinThread!!.interrupt()
                     lastPartyDisbander = ""
                     return
                 }
@@ -190,7 +189,7 @@ class ChatListener {
             }
         }
         if (Skytils.config.firstLaunch && unformatted == "Welcome to Hypixel SkyBlock!") {
-            mc.thePlayer.addChatMessage(ChatComponentText("§bThank you for downloading Skytils!"))
+            UChat.chat("§bThank you for downloading Skytils!")
             ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
             Skytils.config.firstLaunch = false
             Skytils.config.markDirty()
@@ -206,7 +205,6 @@ class ChatListener {
     }
 
     companion object {
-        private var rejoinThread: Thread? = null
         private var lastPartyDisbander = ""
         private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
         private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")

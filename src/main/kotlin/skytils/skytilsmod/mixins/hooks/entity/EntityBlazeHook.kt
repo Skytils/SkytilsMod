@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,7 @@ package skytils.skytilsmod.mixins.hooks.entity
 
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.world.World
+import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.Utils
 
 fun removeBlazeSmokeParticle(
@@ -31,8 +32,8 @@ fun removeBlazeSmokeParticle(
     yOffset: Double,
     zOffset: Double,
     p_175688_14_: IntArray
-) {
-    if (particleType != EnumParticleTypes.SMOKE_LARGE || !Utils.inDungeons) {
-        world.spawnParticle(particleType, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, *p_175688_14_)
-    }
+): Boolean {
+    return !Utils.inDungeons || particleType != EnumParticleTypes.SMOKE_LARGE || !DungeonListener.missingPuzzles.contains(
+        "Higher Or Lower"
+    )
 }

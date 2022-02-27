@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -247,7 +247,7 @@ class WaterBoardSolver {
                         val pos = lever.leverPos
                         val displayed =
                             renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> v?.inc() ?: 0 }
-                        RenderUtil.draw3DString(
+                        RenderUtil.drawLabel(
                             Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
                             "§l" + color.name,
                             renderColor,
@@ -260,7 +260,7 @@ class WaterBoardSolver {
                             key
                         )
                     }) {
-                    RenderUtil.draw3DString(
+                    RenderUtil.drawLabel(
                         Vec3(chestPos!!.offset(roomFacing!!.opposite, 17).up(5)).addVector(
                             0.5,
                             0.5 + 0.5 * matching,

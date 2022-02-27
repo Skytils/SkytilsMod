@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,9 +30,8 @@ class SkytilsTransformer : BaseClassTransformer() {
          * Key is srg name, value is deobf name
         */
         val methodMaps: WeakHashMap<String, String> = WeakHashMap()
+        var madeTransformers = false
     }
-
-    var madeTransformers = false
 
     override fun setup(classLoader: LaunchClassLoader) {
         methodMaps + mapOf(
@@ -51,6 +50,8 @@ class SkytilsTransformer : BaseClassTransformer() {
                 changeRenderedName()
                 insertReceivePacketEvent()
                 injectNullCheck()
+                commitArson()
+                injectContainerCheck()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }

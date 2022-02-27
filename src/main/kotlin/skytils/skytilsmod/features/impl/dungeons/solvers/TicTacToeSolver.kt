@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,10 +32,10 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.tictactoe.AlphaBetaAdvanced
 import skytils.skytilsmod.utils.tictactoe.Board
-import java.awt.Color
 import kotlin.experimental.and
 
 class TicTacToeSolver {
@@ -54,7 +54,7 @@ class TicTacToeSolver {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (ticks % 20 == 0) {
             ticks = 0
-            if (DungeonListener.missingPuzzles.contains("Tic Tac Toe") || Utils.azooPuzzoo) {
+            if (DungeonListener.missingPuzzles.contains("Tic Tac Toe") || SuperSecretSettings.azooPuzzoo) {
                 val frames = mc.theWorld.loadedEntityList.filter {
                     if (it !is EntityItemFrame) return@filter false
                     val realPos = it.position.down()

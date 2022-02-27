@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,49 +18,61 @@
 package skytils.skytilsmod.features.impl.misc
 
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import kotlin.math.pow
 
 class LockOrb {
     @SubscribeEvent
-    fun onInteract(event: PlayerInteractEvent) {
+    fun onPacket(event: PacketEvent.SendEvent) {
         if (!Utils.inSkyblock || !Skytils.config.powerOrbLock) return
-        if (event.entity !== mc.thePlayer || event.action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) return
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
         val item = mc.thePlayer.heldItem
         val itemId = getSkyBlockItemID(item)
         if (itemId == null || !itemId.endsWith("_POWER_ORB")) return
         val heldOrb = PowerOrbs.getPowerOrbMatchingItemId(itemId) ?: return
         val orbs = mc.theWorld.getEntities(
             EntityArmorStand::class.java
-        ) { entity: EntityArmorStand? ->
-            val orb = PowerOrbs.getPowerOrbMatchingName(entity!!.displayName.formattedText)
-            orb != null
+        ) {
+            it?.let { PowerOrbs.getPowerOrbMatchingName(it.displayName.formattedText) } != null
         }
         for (orbEntity in orbs) {
-            if (orbEntity == null) return
-            val orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.displayName.formattedText)
-            if (orb != null && orb.ordinal >= heldOrb.ordinal) {
-                if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= orb.radius.pow(2.0)) {
-                    mc.thePlayer.playSound("random.orb", 0.8f, 1f)
-                    event.isCanceled = true
-                    break
-                }
-            }
+            orbEntity ?: continue
+            val orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.displayName.formattedText) ?: continue
+            if (orb.ordinal < heldOrb.ordinal) continue
+            if (!orb.isPlayerInRange(orbEntity, mc.thePlayer)) continue
+            val remainingDuration = orb.getDurationRemaining(orbEntity)
+            if (remainingDuration != null && remainingDuration < Skytils.config.powerOrbDuration) continue
+            SoundQueue.addToQueue("random.orb", 1f, 0.8f)
+            event.isCanceled = true
+            break
         }
     }
 
     private enum class PowerOrbs(var orbName: String, var radius: Double, var itemId: String) {
-        RADIANT("§aRadiant", 18.0, "RADIANT_POWER_ORB"), MANAFLUX(
-            "§9Mana Flux",
-            18.0,
-            "MANA_FLUX_POWER_ORB"
-        ),
-        OVERFLUX("§5Overflux", 18.0, "OVERFLUX_POWER_ORB"), PLASMAFLUX("§d§lPlasmaflux", 20.0, "PLASMAFLUX_POWER_ORB");
+        RADIANT("§aRadiant", 18.0, "RADIANT_POWER_ORB"),
+        MANAFLUX("§9Mana Flux", 18.0, "MANA_FLUX_POWER_ORB"),
+        OVERFLUX("§5Overflux", 18.0, "OVERFLUX_POWER_ORB"),
+        PLASMAFLUX("§d§lPlasmaflux", 20.0, "PLASMAFLUX_POWER_ORB");
+
+        fun getDurationRemaining(entity: EntityArmorStand): Int? {
+            val durationText = entity.displayName.formattedText.substring(
+                orbName.length + 1,
+            ).stripControlCodes()
+            return durationText.substring(0, durationText.length - 1).toIntOrNull()
+        }
+
+        fun isPlayerInRange(orbEntity: Entity, playerEntity: Entity): Boolean =
+            orbEntity.getDistanceSqToEntity(playerEntity) <= radius.pow(2.0)
+
 
         companion object {
             fun getPowerOrbMatchingName(name: String): PowerOrbs? {

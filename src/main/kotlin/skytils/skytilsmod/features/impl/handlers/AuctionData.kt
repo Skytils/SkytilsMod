@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,8 @@ import kotlin.reflect.jvm.javaField
 class AuctionData {
 
     companion object {
-        const val dataURL = "https://sbe-stole-skytils.design/api/auctions/lowestbins"
+        val dataURL
+            get() = "https://${Skytils.domain}/api/auctions/lowestbins"
         val lowestBINs = HashMap<String, Double>()
         fun getIdentifier(item: ItemStack?): String? {
             val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null

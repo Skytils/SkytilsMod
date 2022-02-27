@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.init.Blocks
@@ -31,11 +30,11 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
-import java.awt.Color
 
 class BlazeSolver {
     private var ticks = 0
@@ -146,31 +145,26 @@ class BlazeSolver {
         ticks++
     }
 
-    /**
-     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size > 0) {
-            if (blazeMode <= 0) {
-                val shootableBlaze = orderedBlazes[0]
+            if (blazeMode < 0) {
+                val shootableBlaze = orderedBlazes.first()
                 val lowestBlaze = shootableBlaze.blaze
-                RenderUtil.draw3DString(
+                RenderUtil.drawLabel(
                     Vec3(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ),
                     "§lSmallest",
-                    Color(255, 0, 0, 200),
+                    Skytils.config.lowestBlazeColor,
                     event.partialTicks
                 )
             }
-            if (blazeMode >= 0) {
-                val shootableBlaze = orderedBlazes[orderedBlazes.size - 1]
+            if (blazeMode > 0) {
+                val shootableBlaze = orderedBlazes.last()
                 val highestBlaze = shootableBlaze.blaze
-                RenderUtil.draw3DString(
+                RenderUtil.drawLabel(
                     Vec3(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ),
                     "§lBiggest",
-                    Color(0, 255, 0, 200),
+                    Skytils.config.highestBlazeColor,
                     event.partialTicks
                 )
             }
@@ -185,7 +179,7 @@ class BlazeSolver {
         impossible = false
     }
 
-    class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
+    data class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
     companion object {
         @JvmField
         var orderedBlazes = ArrayList<ShootableBlaze>()
@@ -194,6 +188,5 @@ class BlazeSolver {
         var blazeMode = 0
         var blazeChest: BlockPos? = null
         var impossible = false
-        private val mc = Minecraft.getMinecraft()
     }
 }

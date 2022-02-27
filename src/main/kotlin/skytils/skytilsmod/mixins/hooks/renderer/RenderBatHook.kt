@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -28,7 +28,7 @@ import skytils.skytilsmod.utils.baseMaxHealth
 
 fun preRenderBat(bat: EntityBat, partialTicks: Float, ci: CallbackInfo) {
     if (Utils.inDungeons && Skytils.config.biggerBatModels &&
-        if (currentMayor == "Derpy") equalsOneOf(bat.baseMaxHealth, 200, 800) else equalsOneOf(bat.baseMaxHealth, 100, 400)
+        if (currentMayor == "Derpy") equalsOneOf(bat.baseMaxHealth, 200.0, 800.0) else equalsOneOf(bat.baseMaxHealth, 100.0, 400.0)
     ) {
         GlStateManager.scale(3f, 3f, 3f)
     }

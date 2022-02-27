@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,6 +32,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val partialTicks: Float
     ) : GuiContainerEvent(gui, container)
 
+    @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
         GuiContainerEvent(gui, container)
 
@@ -44,6 +45,14 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         data class Post(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
             DrawSlotEvent(gui, container, slot)
     }
+
+    data class ForegroundDrawnEvent(
+        override val gui: GuiContainer,
+        override val container: Container,
+        val mouseX: Int,
+        val mouseY: Int,
+        val partialTicks: Float
+    ) : GuiContainerEvent(gui, container)
 
     @Cancelable
     data class SlotClickEvent(

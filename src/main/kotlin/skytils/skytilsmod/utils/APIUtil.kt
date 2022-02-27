@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,39 +25,22 @@ import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.http.message.BasicHeader
-import org.apache.hc.core5.ssl.SSLContexts
 import org.apache.hc.core5.util.Timeout
 import skytils.skytilsmod.Skytils
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
 import java.net.URL
-import java.security.cert.X509Certificate
 import javax.imageio.ImageIO
 
 
 object APIUtil {
     private val parser = JsonParser()
 
-    val sslContext = SSLContexts.custom()
-        .loadTrustMaterial { chain, authType ->
-            isValidCert(chain, authType)
-        }
-        .build()
-    val sslSocketFactory = SSLConnectionSocketFactoryBuilder.create()
-        .setSslContext(sslContext)
-        .build()
-
-    val cm = PoolingHttpClientConnectionManagerBuilder.create()
-        .setSSLSocketFactory(sslSocketFactory)
-
     val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("Skytils/${Skytils.VERSION}")
             .setConnectionManagerShared(true)
-            .setConnectionManager(cm.build())
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
@@ -66,8 +49,8 @@ object APIUtil {
             )
             .setDefaultRequestConfig(
                 RequestConfig.custom()
-                    .setConnectTimeout(Timeout.ofMinutes(1))
-                    .setResponseTimeout(Timeout.ofMinutes(1))
+                    .setConnectTimeout(Timeout.ofSeconds(30))
+                    .setResponseTimeout(Timeout.ofSeconds(30))
                     .build()
             )
             .useSystemProperties()
@@ -125,7 +108,22 @@ object APIUtil {
         return JsonArray()
     }
 
-    private fun isValidCert(chain: Array<X509Certificate>, authType: String): Boolean {
-        return chain.any { it.issuerDN.name == "CN=R3, O=Let's Encrypt, C=US" }
+    fun getResponse(urlString: String): String {
+        val client = builder.build()
+        try {
+            client.execute(HttpGet(urlString)).use { response ->
+                response.entity.use { entity ->
+                    val obj = EntityUtils.toString(entity)
+                    EntityUtils.consume(entity)
+                    return obj
+                }
+            }
+        } catch (ex: Throwable) {
+            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+            ex.printStackTrace()
+        } finally {
+            client.close()
+        }
+        return ""
     }
 }

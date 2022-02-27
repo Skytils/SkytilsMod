@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -195,9 +195,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         val manaUsageMatcher = Regexs.MANAUSED.pattern.matcher(event.message)
         if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
             val manaUsage = manaUsageMatcher.group(1) ?: return
-            var spaced = ""
-
-            for (i in manaUsage) spaced += " "
+            val spaced = " ".repeat(manaUsage.length)
 
             event.message = event.message.replace(manaUsage, spaced)
             if (Skytils.config.manaUseHider == 2) {
@@ -340,7 +338,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Mining Abilities
-                formatted.startsWith("§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
+                formatted.startsWith("§r§a§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
                     when (Skytils.config.miningAbilityHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.miningAbilityHider == 2)
                     }
@@ -665,7 +663,9 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 ).matches() -> {
                     cancelChatPacket(event, Skytils.config.spookyMessageHider == 2)
                 }
-                Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(" Powder§r") -> {
+                Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(
+                    " Powder§r"
+                ) -> {
                     val matcher = Regexs.POWDERCHEST.pattern.matcher(formatted)
                     if (matcher.find()) {
                         val amount = matcher.group("amount").toInt()

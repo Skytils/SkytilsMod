@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.commands
 
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 
@@ -26,7 +27,13 @@ abstract class BaseCommand(private val name: String, private val aliases: List<S
     final override fun getCommandAliases(): List<String> = aliases
     final override fun getRequiredPermissionLevel() = 0
 
-    override fun getCommandUsage(sender: ICommandSender): String = "/$commandName"
+    open fun getCommandUsage(player: EntityPlayerSP): String = "/$commandName"
 
-    abstract override fun processCommand(sender: ICommandSender, args: Array<String>)
+    abstract fun processCommand(player: EntityPlayerSP, args: Array<String>)
+
+    final override fun processCommand(sender: ICommandSender, args: Array<String>) =
+        processCommand(sender as EntityPlayerSP, args)
+
+    final override fun getCommandUsage(sender: ICommandSender) =
+        getCommandUsage(sender as EntityPlayerSP)
 }

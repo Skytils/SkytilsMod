@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,11 +21,10 @@ package skytils.skytilsmod.features.impl.protectitems.strategy.impl
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
 
-class StarredItemStrategy : ItemProtectStrategy() {
+object StarredItemStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
         if (extraAttr == null) return false
         when (type) {
@@ -35,7 +34,7 @@ class StarredItemStrategy : ItemProtectStrategy() {
                 }
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (SBInfo.mode != SkyblockIsland.Dungeon.mode && extraAttr.hasKey("dungeon_item_level")) {
+                if (DungeonTimer.dungeonStartTime == -1L && extraAttr.hasKey("dungeon_item_level")) {
                     return true
                 }
             }

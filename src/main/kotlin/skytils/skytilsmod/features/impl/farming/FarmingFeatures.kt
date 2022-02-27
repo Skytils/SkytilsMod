@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2021 Skytils
+ * Copyright (C) 2022 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.farming
 
+import gg.essential.universal.UChat
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
@@ -68,7 +69,7 @@ class FarmingFeatures {
 
         if (Skytils.config.hungryHikerSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
             if (hungerHikerItems.isEmpty()) {
-                mc.thePlayer.addChatMessage(ChatComponentText("§cSkytils did not load any solutions."))
+                UChat.chat("§cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -115,7 +116,7 @@ class FarmingFeatures {
         if (trapperStart > 0 && mc.thePlayer != null) {
             if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
                 trapperStart = -1.0
-                mc.thePlayer.addChatMessage(ChatComponentText("§dSkytils: Trapper cooldown has now expired!"))
+                UChat.chat("§dSkytils: Trapper cooldown has now expired!")
                 for (i in 0..4) {
                     SoundQueue.addToQueue(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
                 }
