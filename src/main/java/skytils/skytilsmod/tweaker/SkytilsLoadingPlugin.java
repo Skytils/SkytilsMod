@@ -54,7 +54,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "If you do have ChatTriggers, you can update to 1.3.2<br>" +
                     "or later to fix the issue. https://www.chattriggers.com/<br>" +
                     "In order to resolve this conflict you must<br>" +
-                    "deleted the outdated mods.<br>" +
+                    "delete the outdated mods.<br>" +
                     "If you have already done this and are still getting this error,<br>" +
                     "or need assistance, ask for support in the Discord.";
 
@@ -64,7 +64,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "Many of my features require Mixin 0.8 or later!<br>" +
                     "In order to resolve this conflict you must remove<br>" +
                     "any mods with a Mixin version below 0.8.<br>" +
-                    "You can also try to rename Skytils be above other mods alphabetically<br>" +
+                    "You can also try to rename Skytils to be above other mods alphabetically<br>" +
                     "by changing Skytils.jar to !Skytils.jar<br>" +
                     "If you have already done this and are still getting this error,<br>" +
                     "ask for support in the Discord.";
