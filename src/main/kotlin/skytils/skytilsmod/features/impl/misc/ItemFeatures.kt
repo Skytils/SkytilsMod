@@ -498,7 +498,7 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookAbbreviation) {
                         val enchant = EnchantUtil.enchants.find { it.nbtName == name }
                         val prefix: String = if (enchant != null) {
-                            val joined = enchant.loreName.split(" ").joinToString { it[0].uppercase() }
+                            val joined = enchant.loreName.split(" ").joinToString("") { it[0].uppercase() }
                             if (enchant.nbtName.startsWith("ultimate")) {
                                 "§d§l${joined}"
                             } else joined
