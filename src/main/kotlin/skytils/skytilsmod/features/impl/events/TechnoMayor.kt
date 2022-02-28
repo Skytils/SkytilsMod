@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.events
 
-import com.google.common.collect.ImmutableList
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -35,6 +34,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.*
 import java.awt.Color
+import java.util.concurrent.CopyOnWriteArrayList
 
 class TechnoMayor {
     @SubscribeEvent
@@ -65,7 +65,7 @@ class TechnoMayor {
         if (!Skytils.config.shinyOrbWaypoints) return
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-        for (orb in ImmutableList.copyOf(orbLocations)) {
+        for (orb in orbLocations) {
             val x = orb.xCoord - viewerX
             val y = orb.yCoord - viewerY
             val z = orb.zCoord - viewerZ
@@ -105,6 +105,6 @@ class TechnoMayor {
     }
 
     companion object {
-        private val orbLocations: MutableList<Vec3> = ArrayList()
+        private val orbLocations = CopyOnWriteArrayList<Vec3>()
     }
 }

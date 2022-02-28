@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.spidersden
 
-import com.google.common.base.Predicate
 import gg.essential.universal.UResolution
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -87,10 +86,10 @@ class SpidersDenFeatures {
             if (toggled && Utils.inSkyblock && player != null && world != null) {
                 if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
                 val arachneNames =
-                    world.getEntities(EntityArmorStand::class.java, Predicate getEntities@{ entity: EntityArmorStand? ->
+                    world.getEntities(EntityArmorStand::class.java) { entity: EntityArmorStand? ->
                         val name = entity!!.displayName.formattedText
                         name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
-                    })
+                    }
                 RenderUtil.drawAllInList(this, arachneNames.map { it.displayName.formattedText })
             }
         }
