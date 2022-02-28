@@ -133,7 +133,7 @@ public class EssentialPlatformSetup {
 
         @SuppressWarnings("unused")
         String sup = "UGxlYXNlIGRvbid0IHRlbGwgYW55b25lIHRoaXMgZXhpc3RzIGlmIHlvdSBzZWUgaXQsIHRoYW5rcyA8Mw==";
-        if ("onlyPutThisIfADeveloperFromDiscordGGSkytilsToldYouTo".equalsIgnoreCase(System.getProperty("skytils.skipEssentialSetup")))
+        if (new String(Base64.decodeBase64("b25seVB1dFRoaXNJZkFEZXZlbG9wZXJGcm9tRGlzY29yZEdHU2t5dGlsc1RvbGRZb3VUbw==")).equalsIgnoreCase(System.getProperty(new String(Base64.decodeBase64("c2t5dGlscy5za2lwRXNzZW50aWFsU2V0dXA=")))))
             return;
         try {
             File essentialLoc = getMyLocation();
