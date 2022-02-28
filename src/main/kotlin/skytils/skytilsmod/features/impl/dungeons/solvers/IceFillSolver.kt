@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.ImmutableList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -257,7 +256,7 @@ class IceFillSolver {
             N: Int
         ) {
             if (path.size == N) {
-                val newPath: List<BlockPos?> = ImmutableList.copyOf(path)
+                val newPath: List<BlockPos?> = path.toList()
                 if (!paths.contains(path)) paths.add(newPath)
                 return
             } else {
