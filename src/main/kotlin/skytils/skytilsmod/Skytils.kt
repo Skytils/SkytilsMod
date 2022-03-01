@@ -20,6 +20,8 @@ package skytils.skytilsmod
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import gg.essential.universal.UChat
+import gg.essential.universal.UKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -346,6 +348,16 @@ class Skytils {
                 }
                 if (DevTools.getToggle("sprint"))
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
+                if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
+                    if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
+                        UChat.chat("Copied tab data to clipboard")
+                        GuiScreen.setClipboardString(TabListUtils.tabEntries.map { it.second }.toString())
+                    }
+                    if (UKeyboard.isKeyDown(UKeyboard.KEY_CAPITAL)) {
+                        UChat.chat("Copied scoreboard data to clipboard")
+                        GuiScreen.setClipboardString(ScoreboardUtil.sidebarLines.toString())
+                    }
+                }
             }
             ticks = 0
         }
