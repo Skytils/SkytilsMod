@@ -31,6 +31,7 @@ import net.minecraft.client.gui.GuiGameOver
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.*
@@ -359,6 +360,11 @@ class Skytils {
             if (UKeyboard.isKeyDown(UKeyboard.KEY_CAPITAL)) {
                 UChat.chat("Copied scoreboard data to clipboard")
                 GuiScreen.setClipboardString(ScoreboardUtil.sidebarLines.toString())
+            }
+            val container = mc.thePlayer?.openContainer
+            if (UKeyboard.isKeyDown(UKeyboard.KEY_LMETA) && container is ContainerChest) {
+                UChat.chat("Copied container data to clipboard")
+                GuiScreen.setClipboardString("Name: '${container.lowerChestInventory.name}', Items: ${container.inventory.map { it.serializeNBT() }}")
             }
         }
 
