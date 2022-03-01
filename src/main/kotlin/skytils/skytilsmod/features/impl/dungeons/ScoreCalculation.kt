@@ -63,7 +63,7 @@ object ScoreCalculation {
     private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
     private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
-    private val dungeonClearedPattern = Regex("Dungeon Cleared: (?<percentage>\\d+)%")
+    private val dungeonClearedPattern = Regex("Cleared: (?<percentage>\\d+)% \\(\\d+\\)")
     private val timeElapsedPattern =
         Regex(" Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
     private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
@@ -306,7 +306,7 @@ object ScoreCalculation {
             postfix = event.packet.suffix
         ).stripControlCodes()
         printDevMessage(line, "scorecalcscoreboard")
-        if (line.startsWith("Dungeon Cleared: ")) {
+        if (line.startsWith("Cleared: ")) {
             val matcher = dungeonClearedPattern.find(line)
             if (matcher != null) {
                 clearedPercentage.set(matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0)
