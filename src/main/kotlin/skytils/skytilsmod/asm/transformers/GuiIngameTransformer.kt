@@ -44,23 +44,23 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
                     if (!isScorePoints(prev)) continue
                     val labela = LabelNode()
 
-                    instructions.insert(lastAppendInsn, labela)
+                    instructions.insert(lastAppendInsn, insertConfigCheck(labela))
 
                     instructions.insert(insn, labela)
+                    injectedWidth = true
                 }
-                injectedWidth = true
             } else if (insn is VarInsnNode && insn.opcode == Opcodes.ASTORE && prev is MethodInsnNode && prev.name == "toString" && prev.owner == "java/lang/StringBuilder") {
                 prev = prev.previous ?: continue
                 if (prev !is MethodInsnNode || !prev.matches(
                         "java/lang/StringBuilder",
                         "append",
-                        "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+                        null
                     )
                 ) continue
                 prev = prev.previous ?: continue
                 if (!isScorePoints(prev)) continue
                 val labela = LabelNode()
-                val list = insertConfigCheck(labela)
+                val list = insertConfigCheck(labela, true)
                 list.add(LdcInsnNode(""))
                 list.add(VarInsnNode(Opcodes.ASTORE, insn.`var`))
                 list.add(labela)
@@ -83,7 +83,7 @@ private fun isScorePoints(insn: AbstractInsnNode): Boolean {
     ))
 }
 
-private fun insertConfigCheck(labela: LabelNode): InsnList {
+private fun insertConfigCheck(labela: LabelNode, isSecond: Boolean = false): InsnList {
     val label = LabelNode()
     val insnList = InsnList()
 
@@ -104,7 +104,8 @@ private fun insertConfigCheck(labela: LabelNode): InsnList {
             false
         )
     )
-    insnList.add(JumpInsnNode(Opcodes.IFEQ, label))
+    if (!isSecond) insnList.add(JumpInsnNode(Opcodes.IFEQ, label))
+    else insnList.add(JumpInsnNode(Opcodes.IFEQ, labela))
     insnList.add(
         FieldInsnNode(
             Opcodes.GETSTATIC,
@@ -113,8 +114,9 @@ private fun insertConfigCheck(labela: LabelNode): InsnList {
             "Z"
         )
     )
-    insnList.add(JumpInsnNode(Opcodes.IFNE, labela))
-    insnList.add(label)
+    if (!isSecond) insnList.add(JumpInsnNode(Opcodes.IFNE, labela))
+    else insnList.add(JumpInsnNode(Opcodes.IFEQ, labela))
+    if (!isSecond) insnList.add(label)
 
     return insnList
 }
