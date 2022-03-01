@@ -347,18 +347,18 @@ class Skytils {
                 }
                 if (DevTools.getToggle("sprint"))
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
-                if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
-                    if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
-                        UChat.chat("Copied tab data to clipboard")
-                        GuiScreen.setClipboardString(TabListUtils.tabEntries.map { it.second }.toString())
-                    }
-                    if (UKeyboard.isKeyDown(UKeyboard.KEY_CAPITAL)) {
-                        UChat.chat("Copied scoreboard data to clipboard")
-                        GuiScreen.setClipboardString(ScoreboardUtil.sidebarLines.toString())
-                    }
-                }
             }
             ticks = 0
+        }
+        if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
+            if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
+                UChat.chat("Copied tab data to clipboard")
+                GuiScreen.setClipboardString(TabListUtils.tabEntries.map { it.second }.toString())
+            }
+            if (UKeyboard.isKeyDown(UKeyboard.KEY_CAPITAL)) {
+                UChat.chat("Copied scoreboard data to clipboard")
+                GuiScreen.setClipboardString(ScoreboardUtil.sidebarLines.toString())
+            }
         }
 
         ticks++
