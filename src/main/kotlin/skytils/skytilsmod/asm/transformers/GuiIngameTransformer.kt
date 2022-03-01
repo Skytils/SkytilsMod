@@ -33,55 +33,88 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
         )
     }?.apply {
         var lastAppendInsn: MethodInsnNode? = null
+        var injectedWidth = false
         for (insn in instructions) {
-            val prev = insn.previous ?: continue
-            if (lastAppendInsn == null && prev is LdcInsnNode && prev.cst == ": " && insn is MethodInsnNode && insn.name == "append" && insn.owner == "java/lang/StringBuilder") {
-                lastAppendInsn = insn
-            }
-            if (lastAppendInsn != null && insn is MethodInsnNode && insn.name == "append" && insn.owner == "java/lang/StringBuilder") {
-                if (prev !is MethodInsnNode || (!prev.matches("aum", "c", "()I") && !prev.matches(
-                        "net/minecraft/scoreboard/Score",
-                        "getScorePoints",
-                        "()I"
-                    ))
+            var prev = insn.previous ?: continue
+            if (!injectedWidth) {
+                if (lastAppendInsn == null && prev is LdcInsnNode && prev.cst == ": " && insn is MethodInsnNode && insn.name == "append" && insn.owner == "java/lang/StringBuilder") {
+                    lastAppendInsn = insn
+                }
+                if (lastAppendInsn != null && insn is MethodInsnNode && insn.name == "append" && insn.owner == "java/lang/StringBuilder") {
+                    if (!isScorePoints(prev)) continue
+                    val labela = LabelNode()
+
+                    instructions.insert(lastAppendInsn, labela)
+
+                    instructions.insert(insn, labela)
+                }
+                injectedWidth = true
+            } else if (insn is VarInsnNode && insn.opcode == Opcodes.ASTORE && prev is MethodInsnNode && prev.name == "toString" && prev.owner == "java/lang/StringBuilder") {
+                prev = prev.previous ?: continue
+                if (prev !is MethodInsnNode || !prev.matches(
+                        "java/lang/StringBuilder",
+                        "append",
+                        "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+                    )
                 ) continue
-                val label = LabelNode()
+                prev = prev.previous ?: continue
+                if (!isScorePoints(prev)) continue
                 val labela = LabelNode()
-                val insnList = InsnList()
-
-                insnList.add(
-                    FieldInsnNode(
-                        Opcodes.GETSTATIC,
-                        "skytils/skytilsmod/core/Config",
-                        "INSTANCE",
-                        "Lskytils/skytilsmod/core/Config;"
-                    )
-                )
-                insnList.add(
-                    MethodInsnNode(
-                        Opcodes.INVOKEVIRTUAL,
-                        "skytils/skytilsmod/core/Config",
-                        "getHideScoreboardScore",
-                        "()Z",
-                        false
-                    )
-                )
-                insnList.add(JumpInsnNode(Opcodes.IFEQ, label))
-                insnList.add(
-                    FieldInsnNode(
-                        Opcodes.GETSTATIC,
-                        "skytils/skytilsmod/utils/Utils",
-                        "isOnHypixel",
-                        "Z"
-                    )
-                )
-                insnList.add(JumpInsnNode(Opcodes.IFNE, labela))
-                insnList.add(label)
-                instructions.insert(lastAppendInsn, insnList)
-
-                instructions.insert(insn, labela)
+                val list = insertConfigCheck(labela)
+                list.add(LdcInsnNode(""))
+                list.add(VarInsnNode(Opcodes.ASTORE, insn.`var`))
+                list.add(labela)
+                instructions.insert(insn, list)
                 break
             }
         }
     }
+}
+
+private fun isScorePoints(insn: AbstractInsnNode): Boolean {
+    return insn is MethodInsnNode && insn.opcode == Opcodes.INVOKEVIRTUAL && (insn.matches(
+        "aum",
+        "c",
+        "()I"
+    ) || insn.matches(
+        "net/minecraft/scoreboard/Score",
+        "getScorePoints",
+        "()I"
+    ))
+}
+
+private fun insertConfigCheck(labela: LabelNode): InsnList {
+    val label = LabelNode()
+    val insnList = InsnList()
+
+    insnList.add(
+        FieldInsnNode(
+            Opcodes.GETSTATIC,
+            "skytils/skytilsmod/core/Config",
+            "INSTANCE",
+            "Lskytils/skytilsmod/core/Config;"
+        )
+    )
+    insnList.add(
+        MethodInsnNode(
+            Opcodes.INVOKEVIRTUAL,
+            "skytils/skytilsmod/core/Config",
+            "getHideScoreboardScore",
+            "()Z",
+            false
+        )
+    )
+    insnList.add(JumpInsnNode(Opcodes.IFEQ, label))
+    insnList.add(
+        FieldInsnNode(
+            Opcodes.GETSTATIC,
+            "skytils/skytilsmod/utils/Utils",
+            "isOnHypixel",
+            "Z"
+        )
+    )
+    insnList.add(JumpInsnNode(Opcodes.IFNE, labela))
+    insnList.add(label)
+
+    return insnList
 }
