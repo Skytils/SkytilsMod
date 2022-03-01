@@ -34,7 +34,8 @@ fun addColoredNamesCheck() = modify("me.Danker.features.ColouredNames") {
                             Opcodes.INVOKESTATIC,
                             "skytils/skytilsmod/asm/transformers/DSMColoredNamesTransformer",
                             "modifyColoredNamesCheck",
-                            "(Lnet/minecraft/entity/Entity;)Z"
+                            "(Lnet/minecraft/entity/Entity;)Z",
+                            false
                         )
                     )
                     n.instructions.remove(insn)
