@@ -18,6 +18,9 @@
 
 package skytils.skytilsmod.asm.transformers
 
+import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
+import dev.falsehonesty.asmhelper.dsl.instructions.JumpCondition
+import dev.falsehonesty.asmhelper.dsl.instructions.Local
 import dev.falsehonesty.asmhelper.dsl.modify
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
@@ -32,6 +35,21 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
             "(Lnet/minecraft/scoreboard/ScoreObjective;Lnet/minecraft/client/gui/ScaledResolution;)V"
         )
     }?.apply {
+        var checkVar: Local
+        instructions.insert(InsnListBuilder(this).apply {
+            iconst_0()
+            checkVar = istore()
+            val label = makeLabel()
+            getStatic("skytils/skytilsmod/utils/Utils", "isOnHypixel", "Z")
+            jump(JumpCondition.EQUAL, label)
+            getKObjectInstance("skytils/skytilsmod/core/Config")
+            invokeVirtual("skytils/skytilsmod/core/Config", "getHideScoreboardScore", "()Z")
+            jump(JumpCondition.EQUAL, label)
+
+            iconst_1()
+            istore(checkVar.index)
+            insn(label)
+        }.build())
         var lastAppendInsn: MethodInsnNode? = null
         var injectedWidth = false
         for (insn in instructions) {
@@ -42,11 +60,14 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
                 }
                 if (lastAppendInsn != null && insn is MethodInsnNode && insn.name == "append" && insn.owner == "java/lang/StringBuilder") {
                     if (!isScorePoints(prev)) continue
-                    val labela = LabelNode()
+                    val label = LabelNode()
 
-                    instructions.insert(lastAppendInsn, insertConfigCheck(labela))
+                    instructions.insert(lastAppendInsn, InsnList().apply {
+                        add(VarInsnNode(Opcodes.ILOAD, checkVar.index))
+                        add(JumpInsnNode(Opcodes.IFNE, label))
+                    })
 
-                    instructions.insert(insn, labela)
+                    instructions.insert(insn, label)
                     injectedWidth = true
                 }
             } else if (insn is VarInsnNode && insn.opcode == Opcodes.ASTORE && prev is MethodInsnNode && prev.name == "toString" && prev.owner == "java/lang/StringBuilder") {
@@ -59,12 +80,14 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
                 ) continue
                 prev = prev.previous ?: continue
                 if (!isScorePoints(prev)) continue
-                val labela = LabelNode()
-                val list = insertConfigCheck(labela, true)
-                list.add(LdcInsnNode(""))
-                list.add(VarInsnNode(Opcodes.ASTORE, insn.`var`))
-                list.add(labela)
-                instructions.insert(insn, list)
+                instructions.insert(insn, InsnList().apply {
+                    val label = LabelNode()
+                    add(VarInsnNode(Opcodes.ILOAD, checkVar.index))
+                    add(JumpInsnNode(Opcodes.IFEQ, label))
+                    add(LdcInsnNode(""))
+                    add(VarInsnNode(Opcodes.ASTORE, insn.`var`))
+                    add(label)
+                })
                 break
             }
         }
@@ -81,42 +104,4 @@ private fun isScorePoints(insn: AbstractInsnNode): Boolean {
         "getScorePoints",
         "()I"
     ))
-}
-
-private fun insertConfigCheck(labela: LabelNode, isSecond: Boolean = false): InsnList {
-    val label = LabelNode()
-    val insnList = InsnList()
-
-    insnList.add(
-        FieldInsnNode(
-            Opcodes.GETSTATIC,
-            "skytils/skytilsmod/core/Config",
-            "INSTANCE",
-            "Lskytils/skytilsmod/core/Config;"
-        )
-    )
-    insnList.add(
-        MethodInsnNode(
-            Opcodes.INVOKEVIRTUAL,
-            "skytils/skytilsmod/core/Config",
-            "getHideScoreboardScore",
-            "()Z",
-            false
-        )
-    )
-    if (!isSecond) insnList.add(JumpInsnNode(Opcodes.IFEQ, label))
-    else insnList.add(JumpInsnNode(Opcodes.IFEQ, labela))
-    insnList.add(
-        FieldInsnNode(
-            Opcodes.GETSTATIC,
-            "skytils/skytilsmod/utils/Utils",
-            "isOnHypixel",
-            "Z"
-        )
-    )
-    if (!isSecond) insnList.add(JumpInsnNode(Opcodes.IFNE, labela))
-    else insnList.add(JumpInsnNode(Opcodes.IFEQ, labela))
-    if (!isSecond) insnList.add(label)
-
-    return insnList
 }
