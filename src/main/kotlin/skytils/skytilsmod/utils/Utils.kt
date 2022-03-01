@@ -327,3 +327,7 @@ fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTag
 fun Vec3i.toBoundingBox() = AxisAlignedBB(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
 
 fun File.ensureFile() = (parentFile.exists() || parentFile.mkdirs()) && createNewFile()
+
+fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolean {
+    return (owner == null || this.owner == owner) && (name == null || this.name == name) && (desc == null || this.desc == desc)
+}

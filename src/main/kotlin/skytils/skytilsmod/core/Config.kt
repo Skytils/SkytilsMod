@@ -1638,6 +1638,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hidePotionEffects = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Scoreboard Score",
+        description = "Removes the red score numbers on the scoreboard.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideScoreboardScore = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Highlight Disabled Potion Effects",
         description = "Marks disabled potion effects in the toggle menu.",
         category = "Miscellaneous", subcategory = "Quality of Life"
