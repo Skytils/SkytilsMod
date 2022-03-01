@@ -39,13 +39,14 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
                 lastAppendInsn = insn
             }
             if (lastAppendInsn != null && insn is MethodInsnNode && insn.name == "append" && insn.owner == "java/lang/StringBuilder") {
-                if (prev !is MethodInsnNode || !prev.matches("aum", "c", "()I") && !prev.matches(
+                if (prev !is MethodInsnNode || (!prev.matches("aum", "c", "()I") && !prev.matches(
                         "net/minecraft/scoreboard/Score",
                         "getScorePoints",
                         "()I"
-                    )
+                    ))
                 ) continue
                 val label = LabelNode()
+                val labela = LabelNode()
                 val insnList = InsnList()
 
                 insnList.add(
@@ -74,10 +75,11 @@ fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame"
                         "Z"
                     )
                 )
-                insnList.add(JumpInsnNode(Opcodes.IFEQ, label))
+                insnList.add(JumpInsnNode(Opcodes.IFNE, labela))
+                insnList.add(label)
                 instructions.insert(lastAppendInsn, insnList)
 
-                instructions.insert(insn, label)
+                instructions.insert(insn, labela)
                 break
             }
         }
