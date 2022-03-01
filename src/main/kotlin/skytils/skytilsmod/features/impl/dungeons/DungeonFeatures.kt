@@ -100,7 +100,7 @@ object DungeonFeatures {
     private const val SPIRIT_PET_TEXTURE =
         "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
     private var lastLitUpTime = -1L
-    private val lastBlockPos = BlockPos(207, 77, 234)
+    private val lastBlockPos = BlockPos(7, 77, 34)
     private var startWithoutFullParty = false
     private var blazes = 0
 
@@ -215,7 +215,7 @@ object DungeonFeatures {
                                     while (mc.thePlayer.isPotionActive(Potion.blindness)) {
                                         Thread.sleep(10)
                                     }
-                                    val state = mc.theWorld.getBlockState(BlockPos(205, 109, 242))
+                                    val state = mc.theWorld.getBlockState(BlockPos(5, 109, 42))
                                     val color = state.getValue(BlockStainedGlass.COLOR)
                                     color as AccessorEnumDyeColor
                                     val a = when (color) {
