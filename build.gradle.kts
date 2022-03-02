@@ -19,9 +19,10 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import dev.architectury.pack200.java.Pack200Adapter
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.6.20-M1"
+    kotlin("jvm") version "1.6.20-RC"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
@@ -155,6 +156,12 @@ tasks {
     named<RemapJarTask>("remapJar") {
         archiveBaseName.set("Skytils")
         input.set(shadowJar.get().archiveFile)
+        doLast {
+            MessageDigest.getInstance("SHA-256").digest(archiveFile.get().asFile.readBytes())
+                .let {
+                    println("SHA-256: " + it.joinToString(separator = "") { "%02x".format(it) }.toUpperCase())
+                }
+        }
     }
     named<ShadowJar>("shadowJar") {
         archiveBaseName.set("Skytils")
@@ -191,7 +198,8 @@ tasks {
     withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8")
+            freeCompilerArgs =
+                listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8", "-Xbackend-threads=0")
             languageVersion = "1.6"
         }
         kotlinDaemonJvmArguments.set(
@@ -200,11 +208,11 @@ tasks {
                 "-Dkotlin.enableCacheBuilding=true",
                 "-Dkotlin.useParallelTasks=true",
                 "-Dkotlin.enableFastIncremental=true",
-//                "-Xbackend-threads=0"
+                //               "-Xbackend-threads=0"
             )
         )
     }
-    create<Delete>("deleteClassloader") {
+    register<Delete>("deleteClassloader") {
         delete(
             "${project.projectDir}/run/CLASSLOADER_TEMP",
             "${project.projectDir}/run/CLASSLOADER_TEMP1",
