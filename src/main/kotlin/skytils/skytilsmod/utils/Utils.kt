@@ -197,7 +197,7 @@ object Utils {
             "F4", "M4" -> "Thorn"
             "F5", "M5" -> "Livid"
             "F6", "M6" -> "Sadan"
-            "F7", "M7" -> "Necron"
+            "F7", "M7" -> "Maxor"
             else -> null
         } ?: return false
 

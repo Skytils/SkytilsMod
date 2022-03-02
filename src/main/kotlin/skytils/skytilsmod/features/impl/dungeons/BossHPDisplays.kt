@@ -73,7 +73,8 @@ class BossHPDisplays {
                 if (name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
                         DungeonFeatures.dungeonFloor,
                         "F7",
-                        "M6"
+                        "M6",
+                        "M7"
                     )) || GiantHPElement.GIANT_NAMES.any {
                         name.contains(
                             it
@@ -182,7 +183,8 @@ class BossHPDisplays {
                             } else if (name.contains("Giant") && Utils.equalsOneOf(
                                     DungeonFeatures.dungeonFloor,
                                     "F7",
-                                    "M6"
+                                    "M6",
+                                    "M7"
                                 )
                             ) return@getEntities true
                             if (GIANT_NAMES.any { name.contains(it) }) return@getEntities true
