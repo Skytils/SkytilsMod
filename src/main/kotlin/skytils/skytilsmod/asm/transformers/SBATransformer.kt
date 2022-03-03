@@ -19,8 +19,10 @@
 package skytils.skytilsmod.asm.transformers
 
 import dev.falsehonesty.asmhelper.dsl.modify
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
+import skytils.skytilsmod.utils.matches
 
 fun fixDungeonCheck() = modify("codes/biscuit/skyblockaddons/utils/Utils") {
     classNode.methods.find { it.name == "parseSidebar" }?.apply {
@@ -28,7 +30,17 @@ fun fixDungeonCheck() = modify("codes/biscuit/skyblockaddons/utils/Utils") {
             if (insn is LdcInsnNode && insn.cst == "Dungeon Cleared: ") {
                 insn.cst = "Cleared: "
                 val next = insn.next
-                if (next is MethodInsnNode && next.name == "contains") {
+                if (next is MethodInsnNode && next.matches("java/lang/String", "contains", null)) {
+                    instructions.set(
+                        next,
+                        MethodInsnNode(
+                            Opcodes.INVOKEVIRTUAL,
+                            "java/lang/String",
+                            "startsWith",
+                            "(Ljava/lang/String;)Z",
+                            false
+                        )
+                    )
                     next.name = "startsWith"
                 }
                 println("Skytils patched SBA Utils method check")
