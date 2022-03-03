@@ -145,7 +145,7 @@ class DungeonTimer {
                     }
                 }
             }
-            (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
+            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
                 when {
                     (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
                         terraClearTime = System.currentTimeMillis()

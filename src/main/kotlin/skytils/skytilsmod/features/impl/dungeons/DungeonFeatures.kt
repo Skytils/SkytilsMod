@@ -70,6 +70,7 @@ import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.Utils.equalsOneOf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -275,7 +276,7 @@ object DungeonFeatures {
         if (!Utils.inDungeons) return
         val displayData = event.displayData
         val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
-        if (dungeonFloor == "F7") {
+        if (equalsOneOf(dungeonFloor, "F7", "M7")) {
             if (unformatted.contains("Necron")) {
                 when (Skytils.config.necronHealth) {
                     2 -> {
