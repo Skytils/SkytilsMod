@@ -33,8 +33,10 @@ import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 
-class SimonSaysSolver {
+object SimonSaysSolver {
     val startBtn = BlockPos(110, 121, 91)
+    private val clickInOrder = ArrayList<BlockPos>()
+    private var clickNeeded = 0
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
@@ -105,10 +107,5 @@ class SimonSaysSolver {
     fun onWorldChange(event: WorldEvent.Load?) {
         clickInOrder.clear()
         clickNeeded = 0
-    }
-
-    companion object {
-        private val clickInOrder = ArrayList<BlockPos>()
-        private var clickNeeded = 0
     }
 }

@@ -468,7 +468,7 @@ class MiscFeatures {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var golemSpawnTime: Long = 0
         var legionPlayers = 0
         var hasLegion = false

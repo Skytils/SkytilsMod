@@ -41,7 +41,7 @@ import java.awt.Point
 import java.util.*
 import kotlin.math.floor
 
-class AlignmentTaskSolver {
+object AlignmentTaskSolver {
     // the blocks are on the west side, frames block pos is 1 block higher
     private val topLeft = BlockPos(-2, 124, 79).up()
     private val bottomRight = BlockPos(-2, 120, 75).up()

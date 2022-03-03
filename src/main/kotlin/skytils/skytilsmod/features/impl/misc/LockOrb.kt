@@ -92,8 +92,4 @@ class LockOrb {
             }
         }
     }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-    }
 }

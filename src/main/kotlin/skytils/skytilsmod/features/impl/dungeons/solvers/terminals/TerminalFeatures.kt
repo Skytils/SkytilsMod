@@ -24,11 +24,12 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.startsWithAny
 
-class TerminalFeatures {
+object TerminalFeatures {
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
@@ -41,7 +42,8 @@ class TerminalFeatures {
                     "Navigate the maze!",
                     "Correct all the panes!",
                     "Click in order!",
-                    "Click the button on time!"
+                    "Click the button on time!",
+                    "Change all to same color!"
                 ) || chestName.startsWithAny(
                     "What starts with:",
                     "Select all the"
@@ -67,9 +69,5 @@ class TerminalFeatures {
                 event.toolTip.clear()
             }
         }
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
     }
 }

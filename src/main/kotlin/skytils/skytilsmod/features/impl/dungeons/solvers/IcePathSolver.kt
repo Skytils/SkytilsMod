@@ -255,7 +255,7 @@ class IcePathSolver {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private val steps: MutableList<Point?> = ArrayList()
         private var silverfishChestPos: BlockPos? = null
         private var roomFacing: EnumFacing? = null

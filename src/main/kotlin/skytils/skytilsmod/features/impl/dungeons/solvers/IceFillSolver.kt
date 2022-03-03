@@ -349,7 +349,7 @@ class IceFillSolver {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var ticks = 0
         private var chestPos: BlockPos? = null
         private var roomFacing: EnumFacing? = null

@@ -26,12 +26,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
 
-class StartsWithSequenceSolver {
+object StartsWithSequenceSolver {
+
+
+    @JvmField
+    val shouldClick = ArrayList<Int>()
+    private var sequenceNeeded: String? = null
+    private val titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$")
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
@@ -100,14 +108,5 @@ class StartsWithSequenceSolver {
                 event.toolTip.clear()
             }
         }
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-
-        @JvmField
-        val shouldClick = ArrayList<Int>()
-        private var sequenceNeeded: String? = null
-        private val titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$")
     }
 }

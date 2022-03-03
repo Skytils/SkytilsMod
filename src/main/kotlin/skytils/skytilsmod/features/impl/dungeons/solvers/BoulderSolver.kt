@@ -101,7 +101,7 @@ class BoulderSolver {
 
     class BoulderPush(var x: Int, var y: Int, var direction: Direction)
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         var boulderChest: BlockPos? = null
         var boulderFacing: EnumFacing? = null
         var grid = Array(7) { arrayOfNulls<BoulderState>(6) }

@@ -31,11 +31,16 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
 
-class ClickInOrderSolver {
+object ClickInOrderSolver {
+
+    private val slotOrder = HashMap<Int, Int>()
+    private var neededClick = 0
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
@@ -137,11 +142,5 @@ class ClickInOrderSolver {
                 event.toolTip.clear()
             }
         }
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-        private val slotOrder = HashMap<Int, Int>()
-        private var neededClick = 0
     }
 }

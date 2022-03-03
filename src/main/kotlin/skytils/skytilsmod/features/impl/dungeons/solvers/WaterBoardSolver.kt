@@ -318,7 +318,7 @@ class WaterBoardSolver {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private val solutions = HashMap<WoolColor, Set<LeverBlock>>()
         private var chestPos: BlockPos? = null
         private var roomFacing: EnumFacing? = null

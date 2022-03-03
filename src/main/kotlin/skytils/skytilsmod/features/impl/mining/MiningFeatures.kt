@@ -393,7 +393,7 @@ class MiningFeatures {
             templeLoc.drawWaypoint("Jungle Temple", event.partialTicks)
             denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
             minesLoc.drawWaypoint("Mines of Divan", event.partialTicks)
-            kingLoc.drawWaypoint("King Yolkar",event.partialTicks)
+            kingLoc.drawWaypoint("King Yolkar", event.partialTicks)
             balLoc.drawWaypoint("Khazad-dûm", event.partialTicks)
             fairyLoc.drawWaypoint("Fairy Grotto", event.partialTicks)
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
@@ -615,7 +615,7 @@ class MiningFeatures {
 
     companion object {
         var fetchurItems = LinkedHashMap<String, String>()
-        private val mc = Minecraft.getMinecraft()
+
         private val EVENT_PATTERN =
             Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:ACTIVE IN (?<location>.+)|RUNNING) (FOR|for) (?<min>\\d+):(?<sec>\\d+)")
         private var lastJukebox: BlockPos? = null
