@@ -71,7 +71,7 @@ class SpidersDenFeatures {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var shouldShowArachneSpawn = false
 
         init {

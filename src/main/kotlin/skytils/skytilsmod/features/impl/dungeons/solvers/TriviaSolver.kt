@@ -150,6 +150,6 @@ class TriviaSolver {
         var triviaSolutions = HashMap<String, Array<String>>()
         var triviaAnswers: Array<String>? = null
         var triviaAnswer: String? = null
-        private val mc = Minecraft.getMinecraft()
+
     }
 }

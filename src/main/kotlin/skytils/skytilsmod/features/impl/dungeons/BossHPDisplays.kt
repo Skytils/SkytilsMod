@@ -97,7 +97,7 @@ class BossHPDisplays {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var canGiantsSpawn = false
 
         init {

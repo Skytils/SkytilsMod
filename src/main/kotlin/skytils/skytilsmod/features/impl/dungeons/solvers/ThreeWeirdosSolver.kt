@@ -155,7 +155,7 @@ class ThreeWeirdosSolver {
 
     companion object {
         var solutions = ArrayList<String>()
-        private val mc = Minecraft.getMinecraft()
+
         var riddleNPC: String? = null
 
         @JvmField

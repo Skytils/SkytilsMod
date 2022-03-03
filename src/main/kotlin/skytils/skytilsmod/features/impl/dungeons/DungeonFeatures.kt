@@ -277,7 +277,7 @@ object DungeonFeatures {
         val displayData = event.displayData
         val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
         if (equalsOneOf(dungeonFloor, "F7", "M7")) {
-            if (equalsOneOf(unformatted, "Maxor", "Storm", "Goldor","Necron")) {
+            if (equalsOneOf(unformatted, "Maxor", "Storm", "Goldor", "Necron")) {
                 when (Skytils.config.necronHealth) {
                     2 -> {
                         BossStatus.healthScale = displayData.health / displayData.maxHealth

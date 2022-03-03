@@ -133,7 +133,7 @@ class MinionFeatures {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var blockUnenchanted = false
     }
 }

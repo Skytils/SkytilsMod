@@ -30,7 +30,12 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.Utils
 
-class SelectAllColorSolver {
+object SelectAllColorSolver {
+
+    @JvmField
+    val shouldClick = ArrayList<Int>()
+    private var colorNeeded: String? = null
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
@@ -100,13 +105,5 @@ class SelectAllColorSolver {
                 event.toolTip.clear()
             }
         }
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
-
-        @JvmField
-        val shouldClick = ArrayList<Int>()
-        private var colorNeeded: String? = null
     }
 }
