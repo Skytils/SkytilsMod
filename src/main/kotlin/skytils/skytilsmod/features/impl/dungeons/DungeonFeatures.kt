@@ -182,7 +182,7 @@ object DungeonFeatures {
             }
 
             if (Skytils.config.findCorrectLivid && !foundLivid) {
-                if (Utils.equalsOneOf(dungeonFloor, "F5", "M5")) {
+                if (equalsOneOf(dungeonFloor, "F5", "M5")) {
                     when (Skytils.config.lividFinderType) {
                         1 -> {
                             val loadedLivids = mc.theWorld.loadedEntityList.filter {
@@ -277,7 +277,7 @@ object DungeonFeatures {
         val displayData = event.displayData
         val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
         if (equalsOneOf(dungeonFloor, "F7", "M7")) {
-            if (unformatted.contains("Necron")) {
+            if (equalsOneOf(unformatted, "Maxor", "Storm", "Goldor","Necron")) {
                 when (Skytils.config.necronHealth) {
                     2 -> {
                         BossStatus.healthScale = displayData.health / displayData.maxHealth
@@ -304,7 +304,7 @@ object DungeonFeatures {
             }
             return
         }
-        if (Utils.equalsOneOf(dungeonFloor, "F6", "M6")) {
+        if (equalsOneOf(dungeonFloor, "F6", "M6")) {
             if (terracottaEndTime == -1.0) {
                 if (unformatted.contains("Sadan's Interest Level")) {
                     val length = if (dungeonFloor == "F6") 105 else 115
@@ -403,7 +403,7 @@ object DungeonFeatures {
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
-            if (Skytils.config.boxSpiritBow && Utils.equalsOneOf(
+            if (Skytils.config.boxSpiritBow && equalsOneOf(
                     dungeonFloor,
                     "F4",
                     "M4"
@@ -457,11 +457,11 @@ object DungeonFeatures {
             }
             if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
                 if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
-                    if (MayorInfo.currentMayor == "Derpy") Utils.equalsOneOf(
+                    if (MayorInfo.currentMayor == "Derpy") equalsOneOf(
                         event.entity.maxHealth,
                         200f,
                         800f
-                    ) else Utils.equalsOneOf(
+                    ) else equalsOneOf(
                         event.entity.maxHealth,
                         100f,
                         400f
