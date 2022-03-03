@@ -40,7 +40,8 @@ class TerminalFeatures {
                     chestName,
                     "Navigate the maze!",
                     "Correct all the panes!",
-                    "Click in order!"
+                    "Click in order!",
+                    "Click the button on time!"
                 ) || chestName.startsWithAny(
                     "What starts with:",
                     "Select all the"
