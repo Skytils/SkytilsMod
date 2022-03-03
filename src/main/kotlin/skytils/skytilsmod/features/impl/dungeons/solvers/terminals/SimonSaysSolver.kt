@@ -42,7 +42,12 @@ class SimonSaysSolver {
         val old = event.old
         val state = event.update
         if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver && DungeonFeatures.dungeonFloor == "F7" && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L) {
+            if (Skytils.config.simonSaysSolver && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F7",
+                    "M7"
+                ) && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L
+            ) {
                 if ((pos.y in 120..123) && pos.z in 92..95) {
                     if (pos.x == 111) {
                         //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
