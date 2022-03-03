@@ -109,7 +109,7 @@ class MiscFeatures {
     fun onBossBarSet(event: BossBarEvent.Set) {
         val displayData = event.displayData
         if (Utils.inSkyblock) {
-            if (Skytils.config.bossBarFix && Utils.equalsOneOf(
+            if (Skytils.config.bossBarFix && equalsOneOf(
                     displayData.displayName.unformattedText.stripControlCodes(),
                     "Wither",
                     "Dinnerbone",
