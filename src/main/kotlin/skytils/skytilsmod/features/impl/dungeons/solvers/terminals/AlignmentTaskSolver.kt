@@ -43,8 +43,8 @@ import kotlin.math.floor
 
 class AlignmentTaskSolver {
     // the blocks are on the west side, frames block pos is 1 block higher
-    private val topLeft = BlockPos(-3, 124, 78).up()
-    private val bottomRight = BlockPos(-3, 120, 74).up()
+    private val topLeft = BlockPos(-2, 124, 79).up()
+    private val bottomRight = BlockPos(-2, 120, 75).up()
     private val box = BlockPos.getAllInBox(topLeft, bottomRight).toList().sortedWith { a, b ->
         if (a.y == b.y) {
             return@sortedWith b.z - a.z

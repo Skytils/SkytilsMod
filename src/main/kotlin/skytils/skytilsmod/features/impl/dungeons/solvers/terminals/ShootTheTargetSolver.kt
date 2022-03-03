@@ -35,11 +35,11 @@ import java.awt.Color
 
 class ShootTheTargetSolver {
     private val positions = listOf(
-        BlockPos(67, 130, 49), BlockPos(65, 130, 49), BlockPos(63, 130, 49),
-        BlockPos(67, 128, 49), BlockPos(65, 128, 49), BlockPos(63, 128, 49),
-        BlockPos(67, 126, 49), BlockPos(65, 126, 49), BlockPos(63, 126, 49)
+        BlockPos(68, 130, 50), BlockPos(66, 130, 50), BlockPos(64, 130, 50),
+        BlockPos(68, 128, 50), BlockPos(66, 128, 50), BlockPos(64, 128, 50),
+        BlockPos(68, 126, 50), BlockPos(66, 126, 50), BlockPos(64, 126, 50)
     )
-    private val plate = BlockPos(62, 127, 34)
+    private val plate = BlockPos(63, 127, 35)
 
     private val shot = arrayListOf<BlockPos>()
 

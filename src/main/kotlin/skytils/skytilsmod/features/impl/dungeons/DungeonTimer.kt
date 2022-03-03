@@ -116,7 +116,7 @@ class DungeonTimer {
             }
             Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && message.startsWith("§r§4[BOSS] ") -> {
                 when {
-                    message.endsWith("§r§cI’M TOO YOUNG TO DIE AGAIN!§r") && phase1ClearTime == -1L -> {
+                    message.endsWith("§r§cI’LL MAKE YOU REMEMBER MY DEATH!!§r") && phase1ClearTime == -1L -> {
                         phase1ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
                             "§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds."
