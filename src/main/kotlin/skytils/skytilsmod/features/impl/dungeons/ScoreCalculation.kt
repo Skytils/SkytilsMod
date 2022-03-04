@@ -20,7 +20,6 @@ package skytils.skytilsmod.features.impl.dungeons
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.universal.UResolution
-import gg.essential.universal.wrappers.UPlayer
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -392,12 +391,11 @@ object ScoreCalculation {
     fun onTitle(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
         if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
-            firstDeathHadSpirit.set(
-                DungeonListener.hutaoFans.getIfPresent(
-                    DungeonListener.team.find {
-                        it.player?.uniqueID == UPlayer.getUUID()
-                    }?.playerName ?: ""
-                ) ?: false
+            if (DungeonListener.hutaoFans.getIfPresent(mc.thePlayer.name) ?: false
+                && DungeonListener.team.filter { it.playerName != mc.thePlayer.name }
+                    .sumOf { it.deaths } == 0
+            ) firstDeathHadSpirit.set(
+                true
             )
             printDevMessage("you died. spirit: ${firstDeathHadSpirit.get()}", "scorecalcdeath")
         }
