@@ -43,6 +43,7 @@
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager",
     "neu.MixinGuiProfileViewer",
+    "neu.MixinSBInfo",
     "neu.MixinStorageManager",
     "neu.MixinStorageOverlay",
     "neu.MixinTradeWindow",
