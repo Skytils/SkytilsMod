@@ -183,11 +183,8 @@ class ItemFeatures {
         if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.hasStack) {
             renderRarity(event.slot.stack, event.slot.xDisplayPosition, event.slot.yDisplayPosition)
         }
-        if (event.gui is GuiChest) {
-            val gui = event.gui
-            val chest = gui.inventorySlots as ContainerChest
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim()
+        if (event.container is ContainerChest) {
+            val chestName = event.chestName
             if (chestName.startsWithAny("Salvage", "Ender Chest") || Utils.equalsOneOf(
                     chestName,
                     "Ophelia",

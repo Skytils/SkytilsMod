@@ -711,6 +711,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var middleClickTerminals = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Change All to Same Color Solver",
+        description = "Shows the best path of clicks for the Change All to Same Color Terminal.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var changeAllSameColorTerminalSolver = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
         description = "Shows the items to click on the Click in Order terminal.",
         category = "Dungeons", subcategory = "Terminal Solvers"

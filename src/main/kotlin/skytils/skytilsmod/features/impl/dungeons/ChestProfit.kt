@@ -48,9 +48,8 @@ class ChestProfit {
         if (!Skytils.config.dungeonChestProfit) return
         if (event.container is ContainerChest) {
             val inv = event.container.lowerChestInventory
-            val name = inv.displayName.unformattedText
-            if (name.endsWith(" Chest")) {
-                val chestType = DungeonChest.getFromName(name) ?: return
+            if (event.chestName.endsWith(" Chest")) {
+                val chestType = DungeonChest.getFromName(event.chestName) ?: return
                 val openChest = inv.getStackInSlot(31) ?: return
                 if (openChest.displayName == "§aOpen Reward Chest") {
                     for (unclean in ItemUtil.getItemLore(openChest)) {
