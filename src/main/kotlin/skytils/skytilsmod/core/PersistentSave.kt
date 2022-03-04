@@ -32,8 +32,8 @@ abstract class PersistentSave(protected val saveFile: File, private val interval
 
     var dirty = false
 
-    val gson: Gson = Skytils.gson
-    val mc: Minecraft = Skytils.mc
+    protected val gson: Gson = Skytils.gson
+    protected val mc: Minecraft = Skytils.mc
 
     abstract fun read(reader: InputStreamReader)
 

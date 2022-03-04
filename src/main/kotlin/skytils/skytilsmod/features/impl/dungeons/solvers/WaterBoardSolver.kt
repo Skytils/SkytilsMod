@@ -19,20 +19,19 @@ package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLever
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
-import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -49,10 +48,10 @@ import java.util.concurrent.Future
 class WaterBoardSolver {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.theWorld == null || mc.thePlayer == null) return
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons) return
         if (!Skytils.config.waterBoardSolver) return
-        val player = mc.thePlayer
-        val world: World = mc.theWorld
+        val player = mc.thePlayer ?: return
+        val world = mc.theWorld ?: return
         if (ticks % 20 == 0) {
             if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isDone == true)) {
                 job = Skytils.threadPool.submit {
