@@ -24,9 +24,8 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.Utils
 
@@ -37,40 +36,34 @@ object SelectAllColorSolver {
     private var colorNeeded: String? = null
 
     @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
-        if (!Skytils.config.selectAllColorTerminalSolver) return
-        if (mc.currentScreen is GuiChest) {
-            val chest = mc.thePlayer.openContainer as ContainerChest
-            val invSlots = (mc.currentScreen as GuiChest).inventorySlots.inventorySlots
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-            if (chestName.startsWith("Select all the")) {
-                val promptColor = EnumDyeColor.values().find {
-                    chestName.contains(it.getName().replace("_", " ").uppercase())
-                }?.unlocalizedName
-                if (promptColor != colorNeeded) {
-                    colorNeeded = promptColor
-                    shouldClick.clear()
-                } else if (shouldClick.size == 0) {
-                    for (slot in invSlots) {
-                        if (slot.inventory === mc.thePlayer.inventory || !slot.hasStack) continue
-                        val item = slot.stack ?: continue
-                        if (item.isItemEnchanted) continue
-                        if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
-                        if (item.unlocalizedName.contains(colorNeeded!!)) {
-                            shouldClick.add(slot.slotNumber)
-                        }
-                    }
-                } else {
-                    shouldClick.removeIf {
-                        val slot = chest.getSlot(it)
-                        return@removeIf slot.hasStack && slot.stack.isItemEnchanted
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver) return
+        if (event.chestName.startsWith("Select all the")) {
+            val promptColor = EnumDyeColor.values().find {
+                event.chestName.contains(it.getName().replace("_", " ").uppercase())
+            }?.unlocalizedName
+            if (promptColor != colorNeeded) {
+                colorNeeded = promptColor
+                shouldClick.clear()
+            } else if (shouldClick.size == 0) {
+                for (slot in event.container.inventorySlots) {
+                    if (slot.inventory === mc.thePlayer?.inventory || !slot.hasStack) continue
+                    val item = slot.stack ?: continue
+                    if (item.isItemEnchanted) continue
+                    if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
+                    if (item.unlocalizedName.contains(colorNeeded!!)) {
+                        shouldClick.add(slot.slotNumber)
                     }
                 }
             } else {
-                shouldClick.clear()
-                colorNeeded = null
+                shouldClick.removeIf {
+                    val slot = event.container.getSlot(it)
+                    return@removeIf slot.hasStack && slot.stack.isItemEnchanted
+                }
             }
+        } else {
+            shouldClick.clear()
+            colorNeeded = null
         }
     }
 
@@ -79,10 +72,8 @@ object SelectAllColorSolver {
         if (!Utils.inDungeons) return
         if (!Skytils.config.selectAllColorTerminalSolver) return
         if (event.container is ContainerChest) {
-            val slot = event.slot
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-            if (chestName.startsWith("Select all the")) {
+            if (event.chestName.startsWith("Select all the")) {
+                val slot = event.slot
                 if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
                     event.isCanceled = true
                 }
@@ -95,10 +86,8 @@ object SelectAllColorSolver {
         if (!Utils.inDungeons) return
         if (!Skytils.config.selectAllColorTerminalSolver) return
         if (event.toolTip == null) return
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer
-        if (mc.currentScreen is GuiChest) {
-            val chest = player.openContainer as ContainerChest
+        val chest = mc.thePlayer.openContainer
+        if (chest is ContainerChest) {
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText
             if (chestName.startsWith("Select all the")) {

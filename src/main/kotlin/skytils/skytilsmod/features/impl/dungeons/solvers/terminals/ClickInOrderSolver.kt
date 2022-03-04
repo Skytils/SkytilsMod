@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
@@ -27,8 +25,6 @@ import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
@@ -42,29 +38,6 @@ object ClickInOrderSolver {
     private var neededClick = 0
 
     @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
-        if (!Skytils.config.clickInOrderTerminalSolver) return
-        if (mc.currentScreen is GuiChest) {
-            val chest = mc.thePlayer.openContainer as ContainerChest
-            val invSlots = (mc.currentScreen as GuiChest).inventorySlots.inventorySlots
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-            if (chestName == "Click in order!") {
-                for (i in 10..25) {
-                    if (i == 17 || i == 18) continue
-                    val itemStack = invSlots[i].stack ?: continue
-                    if (itemStack.item !== Item.getItemFromBlock(Blocks.stained_glass_pane)) continue
-                    if (itemStack.itemDamage != 14 && itemStack.itemDamage != 5) continue
-                    if (itemStack.itemDamage == 5) {
-                        if (itemStack.stackSize > neededClick) neededClick = itemStack.stackSize
-                    }
-                    slotOrder[itemStack.stackSize - 1] = i
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         neededClick = 0
         slotOrder.clear()
@@ -72,9 +45,21 @@ object ClickInOrderSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.clickInOrderTerminalSolver || slotOrder.size == 0) return
+        if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
         val invSlots = event.container.inventorySlots
+        if (event.chestName == "Click in order!") {
+            for (i in 10..25) {
+                if (i == 17 || i == 18) continue
+                val itemStack = invSlots[i].stack ?: continue
+                if (itemStack.item !== Item.getItemFromBlock(Blocks.stained_glass_pane)) continue
+                if (itemStack.itemDamage != 14 && itemStack.itemDamage != 5) continue
+                if (itemStack.itemDamage == 5) {
+                    if (itemStack.stackSize > neededClick) neededClick = itemStack.stackSize
+                }
+                slotOrder[itemStack.stackSize - 1] = i
+            }
+        }
+        if (slotOrder.size == 0) return
         val firstSlot = slotOrder[neededClick]
         val secondSlot = slotOrder[neededClick + 1]
         val thirdSlot = slotOrder[neededClick + 2]
@@ -103,10 +88,8 @@ object ClickInOrderSolver {
         if (event.container is ContainerChest) {
             val fr = mc.fontRendererObj
             val slot = event.slot
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-            if (chestName == "Click in order!") {
-                if (slot.hasStack && slot.inventory !== mc.thePlayer.inventory) {
+            if (event.chestName == "Click in order!") {
+                if (slot.hasStack && slot.inventory !== mc.thePlayer?.inventory) {
                     val item = slot.stack
                     if (item.item === Item.getItemFromBlock(Blocks.stained_glass_pane) && item.itemDamage == 14) {
                         GlStateManager.disableLighting()
@@ -132,10 +115,8 @@ object ClickInOrderSolver {
         if (!Utils.inDungeons) return
         if (!Skytils.config.clickInOrderTerminalSolver) return
         if (event.toolTip == null) return
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer
-        if (mc.currentScreen is GuiChest) {
-            val chest = player.openContainer as ContainerChest
+        if (mc.thePlayer.openContainer is ContainerChest) {
+            val chest = mc.thePlayer.openContainer as ContainerChest
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText
             if (chestName == "Click in order!") {

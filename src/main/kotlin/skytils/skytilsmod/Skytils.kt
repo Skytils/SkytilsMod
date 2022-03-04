@@ -211,6 +211,7 @@ class Skytils {
             BossHPDisplays(),
             BoulderSolver(),
             ChatTabs,
+            ChangeAllToSameColorSolver,
             ChestProfit(),
             ClickInOrderSolver,
             CreeperSolver(),

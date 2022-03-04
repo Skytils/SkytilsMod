@@ -563,8 +563,7 @@ object DungeonFeatures {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText ?: return
+            val chestName = event.chestName
             when {
                 chestName.endsWith(" Chest") -> {
                     if (Skytils.config.kismetRerollConfirm > 0 && event.slotId == 50) {

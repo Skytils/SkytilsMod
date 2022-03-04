@@ -35,8 +35,7 @@ object TerminalFeatures {
         if (!Utils.inDungeons) return
         if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
+            val chestName = event.chestName
             if (Utils.equalsOneOf(
                     chestName,
                     "Navigate the maze!",
@@ -59,10 +58,8 @@ object TerminalFeatures {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inDungeons) return
         if (event.toolTip == null) return
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer
-        if (mc.currentScreen is GuiChest) {
-            val chest = player.openContainer as ContainerChest
+        val chest = mc.thePlayer.openContainer
+        if (chest is ContainerChest) {
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText
             if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {

@@ -141,7 +141,7 @@ object MayorInfo {
         ) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
+            val chestName = event.chestName
             if (chestName == "Calendar and Events" || ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith(
                     "Mayor "
                 ) && (currentMayor == null || !chestName.contains(
