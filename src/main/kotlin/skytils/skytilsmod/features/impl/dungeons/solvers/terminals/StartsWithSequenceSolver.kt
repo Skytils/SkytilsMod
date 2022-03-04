@@ -38,7 +38,7 @@ object StartsWithSequenceSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
+        if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver || event.container !is ContainerChest) return
         val nameMatcher = titlePattern.matcher(event.chestName)
         if (nameMatcher.find()) {
             val sequence = nameMatcher.group(1)

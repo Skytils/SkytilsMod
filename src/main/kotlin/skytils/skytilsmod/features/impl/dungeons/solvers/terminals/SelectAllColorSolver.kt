@@ -35,7 +35,7 @@ object SelectAllColorSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver) return
+        if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver || event.container !is ContainerChest) return
         if (event.chestName.startsWith("Select all the")) {
             val promptColor = EnumDyeColor.values().find {
                 event.chestName.contains(it.getName().replace("_", " ").uppercase())
