@@ -25,6 +25,7 @@
     "entity.MixinAbstractClientPlayer",
     "entity.MixinBossStatus",
     "entity.MixinEntityBlaze",
+    "entity.MixinEntityDragon",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayerSP",
     "forge.MixinJarDiscoverer",
@@ -79,6 +80,7 @@
     "particle.MixinEffectRenderer",
     "renderer.MixinItemRenderer",
     "renderer.MixinLayerCape",
+    "renderer.MixinLayerEnderDragonDeath",
     "renderer.MixinRendererLivingEntity"
   ]
 }
