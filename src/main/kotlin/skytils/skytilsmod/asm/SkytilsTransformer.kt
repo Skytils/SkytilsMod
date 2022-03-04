@@ -54,7 +54,6 @@ class SkytilsTransformer : BaseClassTransformer() {
                 injectContainerCheck()
                 injectScoreboardScoreRemover()
                 fixSBADungeonCheck()
-                fixNEUDungeonCheck()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }

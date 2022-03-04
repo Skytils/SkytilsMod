@@ -45,7 +45,7 @@ object ClickInOrderSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
+        if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver || event.container !is ContainerChest) return
         val invSlots = event.container.inventorySlots
         if (event.chestName == "Click in order!") {
             for (i in 10..25) {
