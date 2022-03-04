@@ -19,5 +19,5 @@
 package skytils.skytilsmod;
 
 public class Reference {
-    public static String dataUrl = "https://skytilsmod-data.pages.dev/";
+    public static String dataUrl = "https://data.skytils.gg/";
 }
