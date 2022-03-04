@@ -53,6 +53,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair

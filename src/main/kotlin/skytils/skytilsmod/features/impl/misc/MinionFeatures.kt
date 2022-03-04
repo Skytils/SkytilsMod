@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
@@ -26,12 +25,13 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
-import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 
 class MinionFeatures {
     @SubscribeEvent

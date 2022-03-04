@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority

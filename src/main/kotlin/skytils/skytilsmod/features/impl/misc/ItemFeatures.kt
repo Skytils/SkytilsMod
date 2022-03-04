@@ -25,7 +25,6 @@ import net.minecraft.block.BlockLiquid
 import net.minecraft.block.BlockSign
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks

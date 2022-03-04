@@ -17,12 +17,12 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
