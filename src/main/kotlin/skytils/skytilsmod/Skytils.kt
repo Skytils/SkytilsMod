@@ -364,7 +364,12 @@ class Skytils {
             val container = mc.thePlayer?.openContainer
             if (UKeyboard.isKeyDown(UKeyboard.KEY_LMETA) && container is ContainerChest) {
                 UChat.chat("Copied container data to clipboard")
-                GuiScreen.setClipboardString("Name: '${container.lowerChestInventory.name}', Items: ${container.inventory.map { it.serializeNBT() }}")
+                GuiScreen.setClipboardString(
+                    "Name: '${container.lowerChestInventory.name}', Items: ${
+                        container.inventorySlots.filter { it.inventory == container.lowerChestInventory }
+                            .map { it.stack?.serializeNBT() }
+                    }"
+                )
             }
         }
 
