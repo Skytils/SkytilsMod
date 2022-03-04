@@ -19,49 +19,25 @@
 package skytils.skytilsmod.asm.transformers
 
 import dev.falsehonesty.asmhelper.dsl.modify
-import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.InsnNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import skytils.skytilsmod.utils.matches
 
 fun fixNEUDungeonCheck() = modify("io/github/moulberry/notenoughupdates/util/SBInfo") {
     classNode.methods.find { it.name == "tick" }?.apply {
-        var foundOutdated = false
         for (insn in instructions) {
-            var next = insn.next ?: continue
-            if (!foundOutdated && insn is LdcInsnNode && insn.cst == "Dungeon" && next is MethodInsnNode && next.matches(
+            val next = insn.next ?: continue
+            if (insn is LdcInsnNode && insn.cst == "Dungeon" && next is MethodInsnNode && next.matches(
                     "java/lang/String",
                     "contains",
                     null
                 )
             ) {
-                next = next.next ?: continue
-                if (next.opcode != Opcodes.IFEQ) continue
-                instructions.remove(next)
-                instructions.remove(insn.next)
-                instructions.set(insn, InsnNode(Opcodes.POP))
+                insn.cst = ""
+
 
                 println("Skytils patched NEU SBInfo method check")
-                foundOutdated = true
-            } else if (foundOutdated) {
-                if (insn is LdcInsnNode && insn.cst == "Cleared:") {
-                    insn.cst = "Cleared: "
-                    val next = insn.next
-                    if (next is MethodInsnNode && next.matches("java/lang/String", "contains", null)) {
-                        instructions.set(
-                            next,
-                            MethodInsnNode(
-                                Opcodes.INVOKEVIRTUAL,
-                                "java/lang/String",
-                                "startsWith",
-                                "(Ljava/lang/String;)Z",
-                                false
-                            )
-                        )
-                    }
-                    break
-                }
+                break
             }
         }
     }
