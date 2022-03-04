@@ -24,7 +24,7 @@ import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import skytils.skytilsmod.utils.matches
 
-fun fixDungeonCheck() = modify("codes/biscuit/skyblockaddons/utils/Utils") {
+fun fixSBADungeonCheck() = modify("codes/biscuit/skyblockaddons/utils/Utils") {
     classNode.methods.find { it.name == "parseSidebar" }?.apply {
         for (insn in instructions) {
             if (insn is LdcInsnNode && insn.cst == "Dungeon Cleared: ") {
@@ -41,7 +41,6 @@ fun fixDungeonCheck() = modify("codes/biscuit/skyblockaddons/utils/Utils") {
                             false
                         )
                     )
-                    next.name = "startsWith"
                 }
                 println("Skytils patched SBA Utils method check")
                 break
