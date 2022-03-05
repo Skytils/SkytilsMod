@@ -22,10 +22,12 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -72,6 +74,15 @@ object MasterMode7Features {
             )
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (Skytils.config.showWitherKingStatueBox && DungeonTimer.phase4ClearTime != -1L) {
+            for (drag in WitherKingDragons.values()) {
+                RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 5f, event.partialTicks)
+            }
         }
     }
 
@@ -140,4 +151,6 @@ enum class WitherKingDragons(val blockPos: BlockPos, val color: Color) {
     FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL);
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
+    private val a = 10
+    val bb = AxisAlignedBB(blockPos.add(-a, -a + 3, -a), blockPos.add(a, a + 3, a))
 }
