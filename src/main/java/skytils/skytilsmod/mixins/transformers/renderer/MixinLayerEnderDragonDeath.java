@@ -25,12 +25,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import skytils.skytilsmod.mixins.hooks.renderer.LayerEnderDragonDeathHookKt;
+import skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 
 @Mixin(LayerEnderDragonDeath.class)
 public abstract class MixinLayerEnderDragonDeath implements LayerRenderer<EntityDragon> {
     @Inject(method = "doRenderLayer(Lnet/minecraft/entity/boss/EntityDragon;FFFFFFF)V", at = @At(value = "HEAD"), cancellable = true)
     private void onRenderDragonDeath(EntityDragon entitylivingbaseIn, float f, float g, float partialTicks, float h, float i, float j, float scale, CallbackInfo ci) {
-        if (LayerEnderDragonDeathHookKt.shouldHideDragonDeath()) ci.cancel();
+        if (MasterMode7Features.INSTANCE.shouldHideDragonDeath()) ci.cancel();
     }
 }

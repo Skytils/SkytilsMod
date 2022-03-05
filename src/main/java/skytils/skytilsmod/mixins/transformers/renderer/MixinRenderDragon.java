@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import skytils.skytilsmod.mixins.hooks.renderer.RenderDragonHookKt;
+import skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 
 @Mixin(RenderDragon.class)
 public abstract class MixinRenderDragon extends RenderLiving<EntityDragon> {
@@ -49,21 +49,21 @@ public abstract class MixinRenderDragon extends RenderLiving<EntityDragon> {
 
     @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 1))
     private void onRenderMainModel(EntityDragon entity, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
-        RenderDragonHookKt.onRenderMainModel(entity, f, g, h, i, j, scaleFactor, ci);
+        MasterMode7Features.INSTANCE.onRenderMainModel(entity, f, g, h, i, j, scaleFactor, ci);
     }
 
     @ModifyArg(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V"), index = 3)
     private float replaceHurtOpacity(float value) {
-        return RenderDragonHookKt.getHurtOpacity((RenderDragon) (Object) this, lastDragon, value);
+        return MasterMode7Features.INSTANCE.getHurtOpacity((RenderDragon) (Object) this, lastDragon, value);
     }
 
     @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 2, shift = At.Shift.AFTER))
     private void afterRenderHurtFrame(EntityDragon entitylivingbaseIn, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
-        RenderDragonHookKt.afterRenderHurtFrame((RenderDragon) (Object) this, entitylivingbaseIn, f, g, h, i, j, scaleFactor, ci);
+        MasterMode7Features.INSTANCE.afterRenderHurtFrame((RenderDragon) (Object) this, entitylivingbaseIn, f, g, h, i, j, scaleFactor, ci);
     }
 
     @Inject(method = "getEntityTexture", at = @At("HEAD"), cancellable = true)
     private void replaceEntityTexture(EntityDragon entity, CallbackInfoReturnable<ResourceLocation> cir) {
-        RenderDragonHookKt.getEntityTexture(entity, cir);
+        MasterMode7Features.INSTANCE.getEntityTexture(entity, cir);
     }
 }
