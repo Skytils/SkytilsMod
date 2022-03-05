@@ -23,11 +23,13 @@ import net.minecraft.client.renderer.entity.RenderDragon;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.mixins.hooks.renderer.RenderDragonHookKt;
 
 @Mixin(RenderDragon.class)
@@ -51,5 +53,10 @@ public abstract class MixinRenderDragon extends RenderLiving<EntityDragon> {
     @ModifyArg(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V"), index = 3)
     private float replaceHurtOpacity(float value) {
         return RenderDragonHookKt.getHurtOpacity(lastDragon, value);
+    }
+
+    @Inject(method = "getEntityTexture(Lnet/minecraft/entity/boss/EntityDragon;)Lnet/minecraft/util/ResourceLocation;", at = @At("HEAD"), cancellable = true)
+    private void replaceEntityTexture(EntityDragon entity, CallbackInfoReturnable<ResourceLocation> cir) {
+        RenderDragonHookKt.getEntityTexture(entity, cir);
     }
 }

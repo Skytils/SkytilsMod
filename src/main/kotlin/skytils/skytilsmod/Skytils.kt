@@ -490,9 +490,4 @@ class Skytils {
             }
         }
     }
-
-    @SubscribeEvent
-    fun onRenderLiving(event: RenderLivingEvent.Pre<*>) {
-        (event.entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier?.bindColor()
-    }
 }
