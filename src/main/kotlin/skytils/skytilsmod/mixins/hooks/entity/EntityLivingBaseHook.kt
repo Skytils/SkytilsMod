@@ -26,6 +26,7 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraft.world.World
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.features.impl.dungeons.DragonLocations
 import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
@@ -40,6 +41,7 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
     var overrideDisplayName: String? = null
     var colorMultiplier: Color? = null
+    var masterDragonType: DragonLocations? = null
 
     fun onNewDisplayName(s: String) {
         if (!Utils.inSkyblock) return

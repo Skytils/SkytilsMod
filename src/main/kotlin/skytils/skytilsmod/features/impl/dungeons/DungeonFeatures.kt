@@ -41,10 +41,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
+import net.minecraft.util.*
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -144,11 +141,8 @@ object DungeonFeatures {
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
             val type = DragonLocations.values().minByOrNull { entity.getDistanceSq(it.blockPos) } ?: return
-            println(type)
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
-            println(entity.dragonPartArray.filterIsInstance<ExtensionEntityLivingBase>().onEach {
-                it.skytilsHook.colorMultiplier = type.color
-            }.size)
+            (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
         }
     }
 
@@ -743,12 +737,14 @@ object DungeonFeatures {
             Skytils.guiManager.registerElement(this)
         }
     }
+}
 
-    private enum class DragonLocations(val blockPos: BlockPos, val color: Color) {
-        POWER(BlockPos(27, 14, 59), ColorFactory.RED),
-        APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
-        SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
-        ICE(BlockPos(85, 14, 94), ColorFactory.CYAN),
-        FLAME(BlockPos(85, 14, 56), ColorFactory.ORANGE)
-    }
+enum class DragonLocations(val blockPos: BlockPos, val color: Color) {
+    POWER(BlockPos(27, 14, 59), ColorFactory.RED),
+    APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
+    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
+    ICE(BlockPos(85, 14, 94), ColorFactory.CYAN),
+    FLAME(BlockPos(85, 14, 56), ColorFactory.ORANGE);
+
+    val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
 }

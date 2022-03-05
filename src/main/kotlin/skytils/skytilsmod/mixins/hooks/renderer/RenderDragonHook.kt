@@ -19,7 +19,10 @@
 package skytils.skytilsmod.mixins.hooks.renderer
 
 import net.minecraft.entity.boss.EntityDragon
+import net.minecraft.util.ResourceLocation
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.utils.bindColor
 
@@ -33,11 +36,20 @@ fun onRenderMainModel(
     scaleFactor: Float,
     ci: CallbackInfo
 ) {
+    if (!Skytils.config.recolorWitherLordsDragons) return
     entity as ExtensionEntityLivingBase
     entity.skytilsHook.colorMultiplier?.bindColor()
 }
 
 fun getHurtOpacity(lastDragon: EntityDragon, value: Float): Float {
+    if (!Skytils.config.recolorWitherLordsDragons) return value
     lastDragon as ExtensionEntityLivingBase
     return if (lastDragon.skytilsHook.colorMultiplier != null) 0.03f else value
+}
+
+fun getEntityTexture(entity: EntityDragon, cir: CallbackInfoReturnable<ResourceLocation>) {
+    if (!Skytils.config.retextureWitherLordsDragons) return
+    entity as ExtensionEntityLivingBase
+    val type = entity.skytilsHook.masterDragonType ?: return
+    cir.returnValue = type.texture
 }
