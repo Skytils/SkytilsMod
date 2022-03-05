@@ -16,6 +16,7 @@
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorGuiStreamUnavailable",
     "accessors.AccessorMinecraft",
+    "accessors.AccessorModelDragon",
     "accessors.AccessorRenderItem",
     "accessors.AccessorServerListEntryNormal",
     "accessors.AccessorSettingsGui",
