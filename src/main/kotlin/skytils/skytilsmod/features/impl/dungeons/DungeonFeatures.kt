@@ -744,7 +744,7 @@ enum class DragonLocations(val blockPos: BlockPos, val color: Color) {
     APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
     SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
     ICE(BlockPos(85, 14, 94), ColorFactory.CYAN),
-    FLAME(BlockPos(85, 14, 56), ColorFactory.ORANGE);
+    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL);
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
 }
