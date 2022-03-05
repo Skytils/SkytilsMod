@@ -502,6 +502,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showGuardianRespawnTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King Statue Box",
+        description = "Draws a box around the Wither King Statues.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingStatueBox = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Sadan's Interest",
         description = "Replace Sadan's interest display with Skytils' own.",
         category = "Dungeons", subcategory = "Quality of Life"
