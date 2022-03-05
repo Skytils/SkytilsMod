@@ -26,17 +26,30 @@ import net.minecraft.entity.boss.EntityDragon;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import skytils.skytilsmod.mixins.hooks.renderer.RenderDragonHookKt;
 
 @Mixin(RenderDragon.class)
 public abstract class MixinRenderDragon extends RenderLiving<EntityDragon> {
+    private EntityDragon lastDragon = null;
+
     public MixinRenderDragon(RenderManager renderManager, ModelBase modelBase, float f) {
         super(renderManager, modelBase, f);
+    }
+
+    @Inject(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At("HEAD"))
+    private void onRenderModel(EntityDragon entitylivingbaseIn, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
+        lastDragon = entitylivingbaseIn;
     }
 
     @Inject(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 1))
     private void onRenderMainModel(EntityDragon entity, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
         RenderDragonHookKt.onRenderMainModel(entity, f, g, h, i, j, scaleFactor, ci);
+    }
+
+    @ModifyArg(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V"), index = 3)
+    private float replaceHurtOpacity(float value) {
+        return RenderDragonHookKt.getHurtOpacity(lastDragon, value);
     }
 }

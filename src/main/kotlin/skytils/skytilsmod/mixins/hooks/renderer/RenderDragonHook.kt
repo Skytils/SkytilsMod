@@ -36,3 +36,8 @@ fun onRenderMainModel(
     entity as ExtensionEntityLivingBase
     entity.skytilsHook.colorMultiplier?.bindColor()
 }
+
+fun getHurtOpacity(lastDragon: EntityDragon, value: Float): Float {
+    lastDragon as ExtensionEntityLivingBase
+    return if (lastDragon.skytilsHook.colorMultiplier != null) 0.03f else value
+}
