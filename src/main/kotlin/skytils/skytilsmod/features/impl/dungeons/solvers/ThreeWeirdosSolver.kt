@@ -151,7 +151,7 @@ class ThreeWeirdosSolver {
     }
 
     companion object {
-        var solutions = ArrayList<String>()
+        var solutions = hashSetOf<String>()
 
         var riddleNPC: String? = null
 
