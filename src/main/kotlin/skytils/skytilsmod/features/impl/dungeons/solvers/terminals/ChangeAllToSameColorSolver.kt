@@ -41,7 +41,7 @@ object ChangeAllToSameColorSolver {
         val grid = event.container.inventorySlots.filter {
             it.inventory == event.container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
         }
-        val mostFans = grid.maxByOrNull { it.stack.metadata }?.stack ?: return
+        val mostFans = ordering.maxByOrNull { c -> grid.count { it.stack?.metadata == c.metadata } } ?: EnumDyeColor.RED
         val targetIndex = ordering.indexOfFirst { it.metadata == mostFans.metadata }
         val mapping = grid.filter { it.stack.metadata != mostFans.metadata }.associateWith { slot ->
             val stack = slot.stack
