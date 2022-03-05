@@ -28,7 +28,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import skytils.skytilsmod.mixins.hooks.renderer.LayerEnderDragonDeathHookKt;
+import skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 
 @Mixin(EntityDragon.class)
 public abstract class MixinEntityDragon extends EntityLiving implements IBossDisplayData, IEntityMultiPart, IMob {
@@ -38,6 +38,6 @@ public abstract class MixinEntityDragon extends EntityLiving implements IBossDis
 
     @WrapWithCondition(method = "onDeathUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDDDD[I)V"))
     private boolean removeDeathParticle(World instance, EnumParticleTypes particleType, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int[] p_175688_14_) {
-        return !LayerEnderDragonDeathHookKt.shouldHideDragonDeath();
+        return !MasterMode7Features.INSTANCE.shouldHideDragonDeath();
     }
 }

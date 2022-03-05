@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures;
+import skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase;
 import skytils.skytilsmod.mixins.hooks.network.NetHandlerPlayClientHookKt;
 
@@ -46,7 +46,7 @@ public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient
     @Inject(method = "handleSpawnMob", at = @At("TAIL"))
     private void onHandleSpawnMobTail(S0FPacketSpawnMob packetIn, CallbackInfo ci) {
         Entity entity = this.clientWorldController.getEntityByID(packetIn.getEntityID());
-        DungeonFeatures.INSTANCE.onMobSpawned(entity);
+        MasterMode7Features.INSTANCE.onMobSpawned(entity);
         ((ExtensionEntityLivingBase) entity).getSkytilsHook().onNewDisplayName(
                 entity.getDataWatcher().getWatchableObjectString(2)
         );

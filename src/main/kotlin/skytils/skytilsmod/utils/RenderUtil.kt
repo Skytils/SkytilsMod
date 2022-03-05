@@ -343,8 +343,7 @@ object RenderUtil {
         val z =
             pos.zCoord - player.lastTickPosZ + (pos.zCoord - player.posZ - (pos.zCoord - player.lastTickPosZ)) * partialTicks
         val renderManager = mc.renderManager
-        val f = 1.6f
-        val f1 = 0.016666668f * f
+        val f1 = 0.0266666688
         val width = mc.fontRendererObj.getStringWidth(text) / 2
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, z)

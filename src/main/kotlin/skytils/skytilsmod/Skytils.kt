@@ -235,6 +235,7 @@ class Skytils {
             ItemFeatures(),
             KeyShortcuts(),
             LockOrb(),
+            MasterMode7Features,
             MayorDiana(),
             MayorJerry(),
             MayorJerryTracker,
