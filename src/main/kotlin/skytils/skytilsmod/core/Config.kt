@@ -439,18 +439,18 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var biggerBatModels = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Recolor Wither Lord's Dragons",
+        type = PropertyType.SWITCH, name = "Recolor Wither King's Dragons",
         description = "Recolors the dragons in Master Mode 7 to their respective colors.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var recolorWitherLordsDragons = false
+    var recolorWitherKingsDragons = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Retexture Wither Lord's Dragons",
+        type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
         description = "Retextures the dragons in Master Mode 7 to their respective colors. You must have a texture pack with the dragon textures.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var retextureWitherLordsDragons = false
+    var retextureWitherKingsDragons = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Revive Stone Names",

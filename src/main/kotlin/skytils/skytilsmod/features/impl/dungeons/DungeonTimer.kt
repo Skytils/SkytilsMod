@@ -107,7 +107,7 @@ class DungeonTimer {
                             add("§6Goldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds.")
                             add("§4Necron took ${diff(phase4ClearTime, phase3ClearTime)} seconds.")
                             if (DungeonFeatures.dungeonFloor == "M7") {
-                                add("§7Wither Lord took ${diff(bossClearTime, phase4ClearTime)} seconds.")
+                                add("§7Wither King took ${diff(bossClearTime, phase4ClearTime)} seconds.")
                             }
                         }
                         if (Skytils.config.dungeonTimer) {
@@ -280,7 +280,7 @@ class DungeonTimer {
                     if (phase3ClearTime != -1L)
                         add("§4Necron: ${dungeonTimeFormat(((if (phase4ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase4ClearTime) - phase3ClearTime) / 1000.0)}")
                     if (phase4ClearTime != -1L && DungeonFeatures.dungeonFloor == "M7")
-                        add("§7Wither Lord: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase4ClearTime) / 1000.0)}")
+                        add("§7Wither King: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase4ClearTime) / 1000.0)}")
                 }
                 RenderUtil.drawAllInList(this, lines)
             }
@@ -292,7 +292,7 @@ class DungeonTimer {
                 §cStorm: 0s
                 §6Goldor: 0s
                 §4Necron: 0s
-                §7Wither Lord: 0s
+                §7Wither King: 0s
                 """.trimIndent()
             val lines = displayText.split('\n')
             RenderUtil.drawAllInList(this, lines)
