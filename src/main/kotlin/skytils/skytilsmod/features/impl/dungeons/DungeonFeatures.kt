@@ -26,7 +26,6 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
-import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntityBlaze
@@ -41,7 +40,10 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -65,14 +67,12 @@ import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
-import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.Utils.equalsOneOf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 import java.util.concurrent.Future
@@ -135,14 +135,6 @@ object DungeonFeatures {
                     }
                 }
             }
-        }
-    }
-
-    fun onMobSpawned(entity: Entity) {
-        if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
-            val type = DragonLocations.values().minByOrNull { entity.getDistanceSq(it.blockPos) } ?: return
-            (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
-            (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
         }
     }
 
@@ -521,24 +513,6 @@ object DungeonFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
-        val entity = event.entity
-        if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
-            GlStateManager.disableCull()
-            GlStateManager.disableDepth()
-            RenderUtil.drawLabel(
-                entity.dragonPartBody.positionVector.addVector(0.0, 0.5, 0.0),
-                "${NumberUtil.format(event.entity.health)}",
-                Color(0x49ff59),
-                RenderUtil.getPartialTicks(),
-                true
-            )
-            GlStateManager.enableDepth()
-            GlStateManager.enableCull()
-        }
-    }
-
-    @SubscribeEvent
     fun onReceivePacket(event: ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (event.packet is S45PacketTitle) {
@@ -737,14 +711,4 @@ object DungeonFeatures {
             Skytils.guiManager.registerElement(this)
         }
     }
-}
-
-enum class DragonLocations(val blockPos: BlockPos, val color: Color) {
-    POWER(BlockPos(27, 14, 59), ColorFactory.RED),
-    APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
-    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
-    ICE(BlockPos(85, 14, 94), ColorFactory.CYAN),
-    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL);
-
-    val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
 }
