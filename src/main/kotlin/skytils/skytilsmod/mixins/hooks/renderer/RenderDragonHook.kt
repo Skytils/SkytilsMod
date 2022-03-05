@@ -36,19 +36,19 @@ fun onRenderMainModel(
     scaleFactor: Float,
     ci: CallbackInfo
 ) {
-    if (!Skytils.config.recolorWitherLordsDragons) return
+    if (!Skytils.config.recolorWitherKingsDragons) return
     entity as ExtensionEntityLivingBase
     entity.skytilsHook.colorMultiplier?.bindColor()
 }
 
 fun getHurtOpacity(lastDragon: EntityDragon, value: Float): Float {
-    if (!Skytils.config.recolorWitherLordsDragons) return value
+    if (!Skytils.config.recolorWitherKingsDragons) return value
     lastDragon as ExtensionEntityLivingBase
     return if (lastDragon.skytilsHook.colorMultiplier != null) 0.03f else value
 }
 
 fun getEntityTexture(entity: EntityDragon, cir: CallbackInfoReturnable<ResourceLocation>) {
-    if (!Skytils.config.retextureWitherLordsDragons) return
+    if (!Skytils.config.retextureWitherKingsDragons) return
     entity as ExtensionEntityLivingBase
     val type = entity.skytilsHook.masterDragonType ?: return
     cir.returnValue = type.texture
