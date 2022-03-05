@@ -56,10 +56,10 @@ object MasterMode7Features {
             val x = event.packet.func_149051_d() / 32.0
             val y = event.packet.func_149050_e() / 32.0
             val z = event.packet.func_149049_f() / 32.0
-            val pos = BlockPos(x, y, z)
-            val drag = WitherKingDragons.values().find { it.blockPos == pos } ?: return
+            val drag =
+                WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag) && Skytils.config.witherKingDragonSpawnAlert) {
-                UChat.chat("§c§lThe ${drag.name} has is spawning! §f(${pos})")
+                UChat.chat("§c§lThe ${drag.name} has is spawning! §f(${x}, ${y}, ${z})")
             }
         }
     }
