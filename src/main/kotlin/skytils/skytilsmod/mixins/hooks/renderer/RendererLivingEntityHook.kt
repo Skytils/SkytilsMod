@@ -60,3 +60,9 @@ fun replaceEntityName(entity: EntityLivingBase, currName: String): String {
 
     return entity.skytilsHook.overrideDisplayName ?: currName
 }
+
+fun replaceHurtTime(instance: EntityLivingBase): Int {
+    instance as ExtensionEntityLivingBase
+
+    return if (Skytils.config.recolorWitherKingsDragons && instance.skytilsHook.masterDragonType != null) 0 else instance.hurtTime
+}
