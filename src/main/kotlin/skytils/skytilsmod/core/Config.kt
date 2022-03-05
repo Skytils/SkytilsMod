@@ -563,6 +563,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var spiritPetWarning = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Wither King Dragon Spawn Alert",
+        description = "Shows a message when the Wither King spawns a dragon.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var witherKingDragonSpawnAlert = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Blaze Solver",
         description = "Changes the color of the blaze to shoot on Higher or Lower.",
         category = "Dungeons", subcategory = "Solvers"
