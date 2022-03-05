@@ -83,7 +83,7 @@ object ScoreCalculation {
         "M4" to FloorRequirement(speed = 8 * 60),
         "M5" to FloorRequirement(speed = 8 * 60),
         "M6" to FloorRequirement(speed = 8 * 60),
-        "M7" to FloorRequirement(speed = 15 * 60),
+        "M7" to FloorRequirement(speed = 12 * 60),
         "default" to FloorRequirement()
     )
 
