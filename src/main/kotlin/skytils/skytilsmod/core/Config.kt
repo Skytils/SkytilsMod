@@ -525,7 +525,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
-        description = "Displays a more clearer indicator of the dragons HP.",
+        description = "Displays a more clear indicator of the dragons HP.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var showWitherKingDragonsHP = false
