@@ -142,7 +142,7 @@ object DungeonFeatures {
     }
 
     fun onMobSpawned(entity: Entity) {
-        if (/*DungeonTimer.phase4ClearTime != -1L && */entity is EntityDragon) {
+        if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
             val type = DragonLocations.values().minByOrNull { entity.getDistanceSq(it.blockPos) } ?: return
             println(type)
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
@@ -529,11 +529,11 @@ object DungeonFeatures {
     @SubscribeEvent
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         val entity = event.entity
-        if (/*DungeonTimer.phase4ClearTime != -1L && */entity is EntityDragon) {
+        if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
             RenderUtil.drawLabel(
-                entity.dragonPartBody.positionVector.addVector(0.0, -2.0, 0.0),
+                entity.dragonPartBody.positionVector.addVector(0.0, 0.5, 0.0),
                 "${NumberUtil.format(event.entity.health)}",
                 Color(0x49ff59),
                 RenderUtil.getPartialTicks(),
