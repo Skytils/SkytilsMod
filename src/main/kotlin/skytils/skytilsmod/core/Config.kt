@@ -517,6 +517,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var necronHealth = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
+        description = "Displays a more clearer indicator of the dragons HP.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingDragonsHP = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Spirit Bear Timer",
         description = "Shows the time it takes for the Spirit Bears to spawn.",
         category = "Dungeons", subcategory = "Quality of Life"

@@ -25,7 +25,6 @@ import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.util.*
@@ -333,9 +332,15 @@ object RenderUtil {
     /**
      * @author Mojang
      */
-    fun drawLabel(pos: Vec3, text: String, color: Color, partialTicks: Float, shadow: Boolean = false) {
-        val mc = mc
-        val player: EntityPlayer = mc.thePlayer
+    fun drawLabel(
+        pos: Vec3,
+        text: String,
+        color: Color,
+        partialTicks: Float,
+        shadow: Boolean = false,
+        scale: Float = 1f
+    ) {
+        val player = mc.thePlayer
         val x =
             pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
         val y =
@@ -351,6 +356,7 @@ object RenderUtil {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
+        GlStateManager.scale(scale, scale, scale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
