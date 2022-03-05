@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -34,28 +35,34 @@ import skytils.skytilsmod.mixins.hooks.renderer.RenderDragonHookKt;
 
 @Mixin(RenderDragon.class)
 public abstract class MixinRenderDragon extends RenderLiving<EntityDragon> {
+    @Unique
     private EntityDragon lastDragon = null;
 
     public MixinRenderDragon(RenderManager renderManager, ModelBase modelBase, float f) {
         super(renderManager, modelBase, f);
     }
 
-    @Inject(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At("HEAD"))
+    @Inject(method = "renderModel", at = @At("HEAD"))
     private void onRenderModel(EntityDragon entitylivingbaseIn, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
         lastDragon = entitylivingbaseIn;
     }
 
-    @Inject(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 1))
+    @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 1))
     private void onRenderMainModel(EntityDragon entity, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
         RenderDragonHookKt.onRenderMainModel(entity, f, g, h, i, j, scaleFactor, ci);
     }
 
-    @ModifyArg(method = "renderModel(Lnet/minecraft/entity/boss/EntityDragon;FFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V"), index = 3)
+    @ModifyArg(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V"), index = 3)
     private float replaceHurtOpacity(float value) {
-        return RenderDragonHookKt.getHurtOpacity(lastDragon, value);
+        return RenderDragonHookKt.getHurtOpacity((RenderDragon) (Object) this, lastDragon, value);
     }
 
-    @Inject(method = "getEntityTexture(Lnet/minecraft/entity/boss/EntityDragon;)Lnet/minecraft/util/ResourceLocation;", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 2, shift = At.Shift.AFTER))
+    private void afterRenderHurtFrame(EntityDragon entitylivingbaseIn, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
+        RenderDragonHookKt.afterRenderHurtFrame((RenderDragon) (Object) this, entitylivingbaseIn, f, g, h, i, j, scaleFactor, ci);
+    }
+
+    @Inject(method = "getEntityTexture", at = @At("HEAD"), cancellable = true)
     private void replaceEntityTexture(EntityDragon entity, CallbackInfoReturnable<ResourceLocation> cir) {
         RenderDragonHookKt.getEntityTexture(entity, cir);
     }
