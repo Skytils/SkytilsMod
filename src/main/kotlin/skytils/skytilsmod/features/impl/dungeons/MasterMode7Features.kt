@@ -183,7 +183,7 @@ object MasterMode7Features {
     }
 
     fun shouldHideDragonDeath() =
-        Utils.inDungeons && DungeonTimer.phase4ClearTime != -1L && Skytils.config.hideDragonDeathAnimation
+        Utils.inDungeons && DungeonTimer.phase4ClearTime != -1L && Skytils.config.hideWitherKingDragonDeath
 }
 
 enum class WitherKingDragons(val blockPos: BlockPos, val color: Color) {

@@ -369,11 +369,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hideDamageInBoss = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Hide Dragon Death in Boss",
+        type = PropertyType.SWITCH, name = "Hide Wither King Dragon Death",
         description = "Removes the dragon death animation from the Master Mode 7 boss fight.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var hideDragonDeathAnimation = false
+    var hideWitherKingDragonDeath = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Fairies",
