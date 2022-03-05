@@ -24,6 +24,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -31,10 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
-import skytils.skytilsmod.utils.NumberUtil
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.bindColor
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import java.awt.Color
 
@@ -50,15 +48,27 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         val entity = event.entity
-        if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
+        if (Skytils.config.showWitherKingDragonsHP && DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
+            val percentage = event.entity.health / event.entity.baseMaxHealth
+            val color = when {
+                percentage >= 0.75 -> ColorFactory.YELLOWGREEN
+                percentage >= 0.5 -> ColorFactory.YELLOW
+                percentage >= 0.25 -> ColorFactory.DARKORANGE
+                else -> ColorFactory.CRIMSON
+            }
             RenderUtil.drawLabel(
-                entity.dragonPartBody.positionVector.addVector(0.0, 0.5, 0.0),
-                "${NumberUtil.format(event.entity.health)}",
-                Color(0x49ff59),
+                Vec3(
+                    RenderUtil.interpolate(entity.posX, entity.lastTickPosX, RenderUtil.getPartialTicks()),
+                    RenderUtil.interpolate(entity.posY, entity.lastTickPosY, RenderUtil.getPartialTicks()) + 0.5f,
+                    RenderUtil.interpolate(entity.posZ, entity.lastTickPosZ, RenderUtil.getPartialTicks())
+                ),
+                NumberUtil.format(event.entity.health),
+                color,
                 RenderUtil.getPartialTicks(),
-                true
+                true,
+                6f
             )
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
