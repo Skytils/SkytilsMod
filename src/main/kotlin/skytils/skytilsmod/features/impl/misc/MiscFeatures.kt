@@ -114,7 +114,8 @@ class MiscFeatures {
                     displayData.displayName.unformattedText.stripControlCodes(),
                     "Wither",
                     "Dinnerbone",
-                    "Grumm"
+                    "Grumm",
+                    "Ender Dragon"
                 )
             ) {
                 event.isCanceled = true
