@@ -41,7 +41,7 @@ import java.awt.Color
 object MasterMode7Features {
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
-            val type = WitherKingDragons.values().minByOrNull { entity.getDistanceSq(it.blockPos) } ?: return
+            val type = WitherKingDragons.values().minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
         }
@@ -147,10 +147,10 @@ enum class WitherKingDragons(val blockPos: BlockPos, val color: Color) {
     POWER(BlockPos(27, 14, 59), ColorFactory.RED),
     APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
     SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
-    ICE(BlockPos(85, 14, 94), ColorFactory.CYAN),
+    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN),
     FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL);
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
-    private val a = 10
+    private val a = 12.5
     val bb = AxisAlignedBB(blockPos.add(-a, -a + 3, -a), blockPos.add(a, a + 3, a))
 }
