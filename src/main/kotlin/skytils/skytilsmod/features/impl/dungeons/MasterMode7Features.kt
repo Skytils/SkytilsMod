@@ -18,20 +18,25 @@
 
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
+import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
 import skytils.skytilsmod.utils.*
@@ -39,12 +44,50 @@ import skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import java.awt.Color
 
 object MasterMode7Features {
+
+    private val spawningDragons = hashSetOf<WitherKingDragons>()
+    private val spawnedDragons = hashSetOf<WitherKingDragons>()
+    private val killedDragons = hashSetOf<WitherKingDragons>()
+
+    @SubscribeEvent
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+        if (DungeonTimer.phase4ClearTime != -1L) return
+        if (event.packet is S2CPacketSpawnGlobalEntity && event.packet.func_149053_g() == 1) {
+            val x = event.packet.func_149051_d() / 32.0
+            val y = event.packet.func_149050_e() / 32.0
+            val z = event.packet.func_149049_f() / 32.0
+            val pos = BlockPos(x, y, z)
+            val drag = WitherKingDragons.values().find { it.blockPos == pos } ?: return
+            if (spawningDragons.add(drag) && Skytils.config.witherKingDragonSpawnAlert) {
+                UChat.chat("§c§lThe ${drag.name} has is spawning! §f(${pos})")
+            }
+        }
+    }
+
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
-            val type = WitherKingDragons.values().minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
+            val type = spawningDragons.filterNot { spawnedDragons.contains(it) }
+                .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
         }
+    }
+
+    @SubscribeEvent
+    fun onDeath(event: LivingDeathEvent) {
+        if (event.entity is EntityDragon) {
+            val item = (event.entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType ?: return
+            spawningDragons.remove(item)
+            spawnedDragons.remove(item)
+            killedDragons.add(item)
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        spawningDragons.clear()
+        spawnedDragons.clear()
+        killedDragons.clear()
     }
 
     @SubscribeEvent
