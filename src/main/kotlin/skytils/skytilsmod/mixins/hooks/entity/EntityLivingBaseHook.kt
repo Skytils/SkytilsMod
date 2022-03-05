@@ -29,6 +29,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
+import java.awt.Color
 import kotlin.random.Random
 
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
@@ -38,6 +39,7 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
     }
 
     var overrideDisplayName: String? = null
+    var colorMultiplier: Color? = null
 
     fun onNewDisplayName(s: String) {
         if (!Utils.inSkyblock) return

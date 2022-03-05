@@ -38,6 +38,8 @@ fun setColorMultiplier(
     partialTickTime: Float,
     cir: CallbackInfoReturnable<Int>
 ) {
+    if (entity is ExtensionEntityLivingBase && entity.skytilsHook.colorMultiplier != null) cir.returnValue =
+        entity.skytilsHook.colorMultiplier?.rgb
     if (Skytils.config.recolorSeraphBoss && Utils.inSkyblock && entity is EntityEnderman) {
         if (slayerEntity != entity) return
         entity.hurtTime = 0
@@ -48,8 +50,7 @@ fun setColorMultiplier(
         ) {
             cir.returnValue = Skytils.config.seraphHitsPhaseColor.withAlpha(169)
         } else cir.returnValue = Skytils.config.seraphNormalPhaseColor.withAlpha(169)
-    }
-    if (DungeonFeatures.livid == entity) {
+    } else if (DungeonFeatures.livid == entity) {
         cir.returnValue = ColorFactory.AZURE.withAlpha(169)
     }
 }

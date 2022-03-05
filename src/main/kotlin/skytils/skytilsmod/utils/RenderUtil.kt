@@ -333,7 +333,7 @@ object RenderUtil {
     /**
      * @author Mojang
      */
-    fun drawLabel(pos: Vec3, text: String, color: Color, partialTicks: Float) {
+    fun drawLabel(pos: Vec3, text: String, color: Color, partialTicks: Float, shadow: Boolean = false) {
         val mc = mc
         val player: EntityPlayer = mc.thePlayer
         val x =
@@ -356,7 +356,7 @@ object RenderUtil {
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.enableTexture2D()
-        mc.fontRendererObj.drawString(text, -width, 0, color.rgb)
+        mc.fontRendererObj.drawString(text, (-width).toFloat(), 0f, color.rgb, shadow)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
     }

@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
+import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntityBlaze
@@ -48,7 +49,6 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderPlayerEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -68,12 +68,14 @@ import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
+import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.Utils.equalsOneOf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
+import skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 import java.util.concurrent.Future
@@ -136,6 +138,17 @@ object DungeonFeatures {
                     }
                 }
             }
+        }
+    }
+
+    fun onMobSpawned(entity: Entity) {
+        if (/*DungeonTimer.phase4ClearTime != -1L && */entity is EntityDragon) {
+            val type = DragonLocations.values().minByOrNull { entity.getDistanceSq(it.blockPos) } ?: return
+            println(type)
+            (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
+            println(entity.dragonPartArray.filterIsInstance<ExtensionEntityLivingBase>().onEach {
+                it.skytilsHook.colorMultiplier = type.color
+            }.size)
         }
     }
 
@@ -514,17 +527,21 @@ object DungeonFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderPlayerPre(event: RenderPlayerEvent.Pre) {
-        if (livid != null && event.entityPlayer != livid && event.entityPlayer.uniqueID.version() != 4) {
-            GlStateManager.enableBlend()
-            GlStateManager.color(1f, 1f, 1f, 0.3f)
+    fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
+        val entity = event.entity
+        if (/*DungeonTimer.phase4ClearTime != -1L && */entity is EntityDragon) {
+            GlStateManager.disableCull()
+            GlStateManager.disableDepth()
+            RenderUtil.drawLabel(
+                entity.dragonPartBody.positionVector.addVector(0.0, -2.0, 0.0),
+                "${NumberUtil.format(event.entity.health)}",
+                Color(0x49ff59),
+                RenderUtil.getPartialTicks(),
+                true
+            )
+            GlStateManager.enableDepth()
+            GlStateManager.enableCull()
         }
-    }
-
-    @SubscribeEvent
-    fun onRenderPlayerPost(event: RenderPlayerEvent.Post) {
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        GlStateManager.disableBlend()
     }
 
     @SubscribeEvent
@@ -725,5 +742,13 @@ object DungeonFeatures {
         init {
             Skytils.guiManager.registerElement(this)
         }
+    }
+
+    private enum class DragonLocations(val blockPos: BlockPos, val color: Color) {
+        POWER(BlockPos(27, 14, 59), ColorFactory.RED),
+        APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
+        SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
+        ICE(BlockPos(85, 14, 94), ColorFactory.CYAN),
+        FLAME(BlockPos(85, 14, 56), ColorFactory.ORANGE)
     }
 }

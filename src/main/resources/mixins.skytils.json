@@ -82,6 +82,7 @@
     "renderer.MixinItemRenderer",
     "renderer.MixinLayerCape",
     "renderer.MixinLayerEnderDragonDeath",
+    "renderer.MixinRenderDragon",
     "renderer.MixinRendererLivingEntity"
   ]
 }
