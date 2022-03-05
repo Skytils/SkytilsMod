@@ -261,6 +261,12 @@ fun Entity.getXZDistSq(other: Entity): Double {
     return xDelta * xDelta + zDelta * zDelta
 }
 
+fun Entity.getXZDistSq(pos: BlockPos): Double {
+    val xDelta = this.posX - pos.x
+    val zDelta = this.posZ - pos.z
+    return xDelta * xDelta + zDelta * zDelta
+}
+
 val Entity.hasMoved
     get() = this.posX != this.prevPosX || this.posY != this.prevPosY || this.posZ != this.prevPosZ
 
