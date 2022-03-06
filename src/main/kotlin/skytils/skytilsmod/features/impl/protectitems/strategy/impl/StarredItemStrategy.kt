@@ -21,7 +21,7 @@ package skytils.skytilsmod.features.impl.protectitems.strategy.impl
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 
 object StarredItemStrategy : ItemProtectStrategy() {
@@ -34,7 +34,7 @@ object StarredItemStrategy : ItemProtectStrategy() {
                 }
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (DungeonTimer.dungeonStartTime == -1L && extraAttr.hasKey("dungeon_item_level")) {
+                if (!DungeonFeatures.hasClearedText && extraAttr.hasKey("dungeon_item_level")) {
                     return true
                 }
             }

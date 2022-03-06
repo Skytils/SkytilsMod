@@ -21,7 +21,7 @@ package skytils.skytilsmod.features.impl.protectitems.strategy.impl
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 
@@ -36,7 +36,7 @@ object ItemWorthStrategy : ItemProtectStrategy() {
                 value >= threshold
             }
             ProtectType.HOTBARDROPKEY -> {
-                DungeonTimer.dungeonStartTime == -1L && value >= threshold
+                !DungeonFeatures.hasClearedText && value >= threshold
             }
         }
     }
