@@ -103,6 +103,7 @@ object DungeonFeatures {
     private val lastBlockPos = BlockPos(8, 77, 35)
     private var startWithoutFullParty = false
     private var blazes = 0
+    var hasClearedText = false
 
     init {
         LividGuiElement()
@@ -153,6 +154,9 @@ object DungeonFeatures {
                         break
                     }
                 }
+            }
+            if (!hasClearedText) {
+                hasClearedText = ScoreboardUtil.sidebarLines.any { it.startsWith("Cleared: ") }
             }
             if (isInTerracottaPhase && terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
                 val timeLeft = terracottaEndTime - System.currentTimeMillis()
@@ -613,6 +617,7 @@ object DungeonFeatures {
         lastLitUpTime = -1L
         startWithoutFullParty = false
         blazes = 0
+        hasClearedText = false
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
