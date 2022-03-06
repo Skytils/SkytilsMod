@@ -39,12 +39,16 @@ object TerminalFeatures {
                     "Navigate the maze!",
                     "Correct all the panes!",
                     "Click in order!",
-                    "Click the button on time!",
-                    "Change all to same color!"
+                    "Click the button on time!"
                 ) || chestName.startsWithAny(
                     "What starts with:",
                     "Select all the"
-                )
+                ) || (chestName == "Change all to same color!" && event.clickedButton != 1 && Utils.equalsOneOf(
+                    event.clickType,
+                    0,
+                    1,
+                    6
+                ))
             ) {
                 event.isCanceled = true
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)

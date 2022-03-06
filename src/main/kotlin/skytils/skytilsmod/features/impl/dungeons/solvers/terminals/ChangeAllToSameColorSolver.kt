@@ -46,15 +46,16 @@ object ChangeAllToSameColorSolver {
         val mapping = grid.filter { it.stack.metadata != mostFans.metadata }.associateWith { slot ->
             val stack = slot.stack
             val myIndex = ordering.indexOfFirst { it.metadata == stack.metadata }
-            ((targetIndex - myIndex) % ordering.size + ordering.size) % ordering.size
+            ((targetIndex - myIndex) % ordering.size + ordering.size) % ordering.size to -(((myIndex - targetIndex) % ordering.size + ordering.size) % ordering.size)
         }
         GlStateManager.translate(0f, 0f, 299f)
         for ((slot, clicks) in mapping) {
+            val betterOpt = if (clicks.first > -clicks.second) clicks.second else clicks.first
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
             ScreenRenderer.fontRenderer.drawString(
-                "$clicks",
+                "$betterOpt",
                 slot.xDisplayPosition + 9f,
                 slot.yDisplayPosition + 4f,
                 CommonColors.WHITE,
