@@ -60,7 +60,7 @@ object MasterMode7Features {
             val drag =
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag) && Skytils.config.witherKingDragonSpawnAlert) {
-                UChat.chat("§c§lThe ${drag.name} is spawning! §f(${x}, ${y}, ${z})")
+                UChat.chat("§c§lThe ${drag.name} is spawning!")
             }
         }
     }
@@ -95,6 +95,7 @@ object MasterMode7Features {
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         val entity = event.entity
         if (Skytils.config.showWitherKingDragonsHP && DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
+            entity as ExtensionEntityLivingBase
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
             val percentage = event.entity.health / event.entity.baseMaxHealth
@@ -110,7 +111,13 @@ object MasterMode7Features {
                     RenderUtil.interpolate(entity.posY, entity.lastTickPosY, RenderUtil.getPartialTicks()) + 0.5f,
                     RenderUtil.interpolate(entity.posZ, entity.lastTickPosZ, RenderUtil.getPartialTicks())
                 ),
-                NumberUtil.format(event.entity.health),
+                "${NumberUtil.format(event.entity.health)} ${
+                    "§fR".toStringIfTrue(
+                        entity.skytilsHook.masterDragonType?.bb?.intersectsWith(
+                            entity.entityBoundingBox
+                        )
+                    )
+                }",
                 color,
                 RenderUtil.getPartialTicks(),
                 true,
@@ -196,5 +203,5 @@ enum class WitherKingDragons(val blockPos: BlockPos, val color: Color) {
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
     private val a = 12.5
-    val bb = AxisAlignedBB(blockPos.add(-a, 8.0, -a), blockPos.add(a, a + 3, a))
+    val bb = AxisAlignedBB(blockPos.add(-a, -2.0, -a), blockPos.add(a, a + 3, a))
 }
