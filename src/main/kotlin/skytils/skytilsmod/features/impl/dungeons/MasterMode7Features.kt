@@ -51,11 +51,12 @@ object MasterMode7Features {
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
-        if (DungeonTimer.phase4ClearTime != -1L) return
+        if (DungeonTimer.phase4ClearTime == -1L) return
         if (event.packet is S2CPacketSpawnGlobalEntity && event.packet.func_149053_g() == 1) {
             val x = event.packet.func_149051_d() / 32.0
             val y = event.packet.func_149050_e() / 32.0
             val z = event.packet.func_149049_f() / 32.0
+            if (x % 1 != 0.0 || y % 1 != 0.0 || z % 1 != 0.0) return
             val drag =
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag) && Skytils.config.witherKingDragonSpawnAlert) {
