@@ -60,6 +60,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.events.impl.BossBarEvent
 import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -110,6 +111,17 @@ object DungeonFeatures {
         SpiritBearSpawnTimer()
     }
 
+    @SubscribeEvent
+    fun onBlockChange(event: BlockChangeEvent) {
+        if (hasBossSpawned && Skytils.config.spiritBearTimer && dungeonFloor?.endsWith('4') == true) {
+            if (event.pos == lastBlockPos) {
+                lastLitUpTime =
+                    if (event.update.block === Blocks.sea_lantern && event.old.block === Blocks.coal_block) System.currentTimeMillis() else -1L
+                printDevMessage("change light $lastLitUpTime", "spiritbear")
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onReceivePacketHighest(event: ReceiveEvent) {
         event.apply {
@@ -117,14 +129,14 @@ object DungeonFeatures {
                 when (packet) {
                     is S23PacketBlockChange -> {
                         if (packet.blockPosition == lastBlockPos) {
-                            val time = System.currentTimeMillis()
-                            lastLitUpTime = if (packet.blockState.block === Blocks.sea_lantern) time else -1L
+                            lastLitUpTime =
+                                if (packet.blockState.block === Blocks.sea_lantern) System.currentTimeMillis() else -1L
                             printDevMessage("light $lastLitUpTime", "spiritbear")
                         }
                     }
                     is S02PacketChat -> {
                         if (lastLitUpTime != -1L && packet.chatComponent.formattedText == "§r§a§lA §r§5§lSpirit Bear §r§a§lhas appeared!§r") {
-                            printDevMessage("chat ${System.currentTimeMillis() - lastLitUpTime}")
+                            printDevMessage("chat ${System.currentTimeMillis() - lastLitUpTime}", "spiritbear")
                             lastLitUpTime = -1L
                         }
                     }
