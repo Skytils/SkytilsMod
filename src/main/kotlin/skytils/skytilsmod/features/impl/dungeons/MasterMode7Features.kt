@@ -115,9 +115,7 @@ object MasterMode7Features {
                 ),
                 "${NumberUtil.format(event.entity.health)} ${
                     "§fR".toStringIfTrue(
-                        entity.skytilsHook.masterDragonType?.bb?.intersectsWith(
-                            entity.entityBoundingBox
-                        )
+                        entity.skytilsHook.masterDragonType?.bb?.isVecInside(entity.positionVector)
                     )
                 }",
                 color,
@@ -204,6 +202,6 @@ enum class WitherKingDragons(val blockPos: BlockPos, val color: Color, val chatC
     FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD);
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
-    private val a = 12
-    val bb = AxisAlignedBB(blockPos.add(-a, -2, -a), blockPos.add(a, a + 3, a))
+    private val a = 12.5
+    val bb = AxisAlignedBB(blockPos.add(-a, -2.0, -a), blockPos.add(a, a + 3, a))
 }
