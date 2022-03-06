@@ -60,8 +60,9 @@ object MasterMode7Features {
             if (x % 1 != 0.0 || y % 1 != 0.0 || z % 1 != 0.0) return
             val drag =
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
-            if (spawningDragons.add(drag) && Skytils.config.witherKingDragonSpawnAlert) {
-                UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§lis spawning! §f(${x}, ${y}, ${z})")
+            if (spawningDragons.add(drag)) {
+                printDevMessage("${drag.name} spawning", "witherkingdrags")
+                if (Skytils.config.witherKingDragonSpawnAlert) UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§lis spawning! §f(${x}, ${y}, ${z})")
             }
         }
     }
@@ -72,6 +73,7 @@ object MasterMode7Features {
                 .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
+            printDevMessage("${type.name} spawned", "witherkingdrags")
             spawnedDragons.add(type)
         }
     }
@@ -80,6 +82,7 @@ object MasterMode7Features {
     fun onDeath(event: LivingDeathEvent) {
         if (event.entity is EntityDragon) {
             val item = (event.entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType ?: return
+            printDevMessage("${item.name} died", "witherkingdrags")
             spawningDragons.remove(item)
             spawnedDragons.remove(item)
             killedDragons.add(item)
