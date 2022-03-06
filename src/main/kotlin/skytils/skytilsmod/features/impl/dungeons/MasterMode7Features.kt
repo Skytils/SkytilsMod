@@ -72,6 +72,7 @@ object MasterMode7Features {
                 .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
+            spawnedDragons.add(type)
         }
     }
 
