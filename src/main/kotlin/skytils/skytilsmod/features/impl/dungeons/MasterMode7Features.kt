@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.ChatColor
 import gg.essential.universal.UChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
@@ -60,7 +61,7 @@ object MasterMode7Features {
             val drag =
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag) && Skytils.config.witherKingDragonSpawnAlert) {
-                UChat.chat("§c§lThe ${drag.name} is spawning!")
+                UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§lis spawning! §f(${x}, ${y}, ${z})")
             }
         }
     }
@@ -194,12 +195,12 @@ object MasterMode7Features {
         Utils.inDungeons && DungeonTimer.phase4ClearTime != -1L && Skytils.config.hideWitherKingDragonDeath
 }
 
-enum class WitherKingDragons(val blockPos: BlockPos, val color: Color) {
-    POWER(BlockPos(27, 14, 59), ColorFactory.RED),
-    APEX(BlockPos(27, 14, 94), ColorFactory.LIME),
-    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE),
-    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN),
-    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL);
+enum class WitherKingDragons(val blockPos: BlockPos, val color: Color, val chatColor: ChatColor) {
+    POWER(BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED),
+    APEX(BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN),
+    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE),
+    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA),
+    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD);
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
     private val a = 12.5
