@@ -196,5 +196,5 @@ enum class WitherKingDragons(val blockPos: BlockPos, val color: Color) {
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
     private val a = 12.5
-    val bb = AxisAlignedBB(blockPos.add(-a, -a + 3, -a), blockPos.add(a, a + 3, a))
+    val bb = AxisAlignedBB(blockPos.add(-a, 8.0, -a), blockPos.add(a, a + 3, a))
 }
