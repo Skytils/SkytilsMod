@@ -340,7 +340,7 @@ object DungeonFeatures {
             printDevMessage("terracotta died", "terracotta")
             terracottaEndTime -= 1
         }
-        if (event.entity is EntityBlaze && ++blazes == 10 && Skytils.config.sayBlazeDone && DungeonTimer.bloodClearTime != -1L) {
+        if (event.entity is EntityBlaze && ++blazes == 10 && Skytils.config.sayBlazeDone) {
             Skytils.sendMessageQueue.add("/pc Blaze Done")
         }
     }
