@@ -114,7 +114,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     @Property(
         type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
         description = "Displays Stats about a Player who joined.",
-        category = "General", subcategory = "Party Finder"
+        category = "Dungeons", subcategory = "Party Finder"
     )
     var partyFinderStats = false
 
