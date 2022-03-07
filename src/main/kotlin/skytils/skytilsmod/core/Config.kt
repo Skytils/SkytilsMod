@@ -116,7 +116,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Displays Stats about a Player who joined.",
         category = "General", subcategory = "Party Finder"
     )
-    var partyFinderStats = true
+    var partyFinderStats = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",
