@@ -112,6 +112,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var overrideReparty = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Party Finder Stats",
+        description = "Displays Stats about a Player who joined.",
+        category = "General", subcategory = "Party Finder"
+    )
+    var partyFinderStats = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",
         description = "Requires you to run the /coopadd command twice to add a member.",
         category = "General", subcategory = "Hypixel"
