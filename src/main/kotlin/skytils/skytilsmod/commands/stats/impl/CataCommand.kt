@@ -222,7 +222,7 @@ object CataCommand : StatCommand("skytilscata") {
         }
     }
 
-    private fun Duration.timeFormat() = toComponents { minutes, seconds, nanoseconds ->
+    public fun Duration.timeFormat() = toComponents { minutes, seconds, nanoseconds ->
         buildString {
             if (minutes > 0) {
                 append(minutes)
