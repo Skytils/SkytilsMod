@@ -35,7 +35,6 @@ import skytils.hylin.skyblock.Pet
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
-import skytils.skytilsmod.commands.stats.impl.CataCommand.timeFormat
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.MathUtil.floor
@@ -510,4 +509,12 @@ class ChatListener {
             e.printStackTrace()
         }
     }
+    private fun Duration.timeFormat() = toComponents { minutes, seconds, nanoseconds ->
+        buildString {
+            if (minutes > 0) {
+                append(minutes)
+                append(':')
+            }
+            append("%02d".format(seconds))
+        }
 }
