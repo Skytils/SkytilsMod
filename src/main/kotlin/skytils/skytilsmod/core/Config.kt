@@ -112,7 +112,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var overrideReparty = true
     
     @Property(
-        type = PropertyType.SWITCH, name = "[WIP]Party Finder Stats",
+        type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
         description = "Displays Stats about a Player who joined.",
         category = "General", subcategory = "Party Finder"
     )
