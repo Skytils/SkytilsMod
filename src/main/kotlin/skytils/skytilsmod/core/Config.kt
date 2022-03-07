@@ -112,6 +112,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var overrideReparty = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Party Finder Stats",
+        description = "Displays Stats about a Player who joined.",
+        category = "General", subcategory = "Party Finder"
+    )
+    var partyFinderStats = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",
         description = "Requires you to run the /coopadd command twice to add a member.",
         category = "General", subcategory = "Hypixel"
@@ -369,11 +376,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hideDamageInBoss = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Hide Wither King Dragon Death",
+        type = PropertyType.SWITCH, name = "Hide Dragon Death in Boss",
         description = "Removes the dragon death animation from the Master Mode 7 boss fight.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var hideWitherKingDragonDeath = false
+    var hideDragonDeathAnimation = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Fairies",
@@ -439,20 +446,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var biggerBatModels = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Recolor Wither King's Dragons",
-        description = "Recolors the dragons in Master Mode 7 to their respective colors.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var recolorWitherKingsDragons = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
-        description = "Retextures the dragons in Master Mode 7 to their respective colors.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var retextureWitherKingsDragons = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Revive Stone Names",
         description = "Shows names next to the heads on the Revive Stone menu.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -502,13 +495,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showGuardianRespawnTimer = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Wither King Statue Box",
-        description = "Draws a box around the Wither King Statues.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var showWitherKingStatueBox = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Show Sadan's Interest",
         description = "Replace Sadan's interest display with Skytils' own.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -522,13 +508,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["None", "HP", "Percentage Health"]
     )
     var necronHealth = 0
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
-        description = "Displays a more clear indicator of the dragons HP.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var showWitherKingDragonsHP = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Spirit Bear Timer",
@@ -561,13 +540,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var spiritPetWarning = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Wither King Dragon Spawn Alert",
-        description = "Shows a message when the Wither King spawns a dragon.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var witherKingDragonSpawnAlert = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Blaze Solver",
