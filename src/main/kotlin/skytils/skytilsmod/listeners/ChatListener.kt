@@ -291,11 +291,11 @@ class ChatListener {
             val armor = profileData.armor
             val armorArray:ArrayList<List<String>> = ArrayList()
             armor?.forEveryItem {
-                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer,false)
+                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer, false)
                 armorArray.add(armorLore)
             }
             armorArray.reverse()
-            for(armorPiece in armorArray) {
+            for (armorPiece in armorArray) {
                 val armorName = armorPiece[0]
                 component.append(UTextComponent(armorName + "\n").setHoverText(buildString {
                     for (line in armorPiece) {
