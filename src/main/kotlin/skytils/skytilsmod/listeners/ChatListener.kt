@@ -35,6 +35,7 @@ import skytils.hylin.skyblock.Pet
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
+import skytils.skytilsmod.commands.stats.impl.CataCommand.timeFormat
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.MathUtil.floor
@@ -44,6 +45,9 @@ import kotlin.collections.ArrayList
 import kotlin.math.floor
 
 class ChatListener {
+    private var awaitingDelimiterStats = false
+    private var delimiterStats = 0
+    private var gettingDungeonParty = false
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
@@ -58,10 +62,70 @@ class ChatListener {
             return
         }
         if(Skytils.config.partyFinderStats) {
+            if(gettingDungeonParty) {
+                val player = mc.thePlayer
+                val members = members_pattern.matcher(unformatted)
+                if(members.find()) {
+                    gettingDungeonParty = false
+                }
+                while (members.find()) {
+                    val partyMember = members.group(1)
+                    if (partyMember != player.name) {
+                        Skytils.threadPool.submit {
+                            val uuid = try {
+                                (Skytils.hylinAPI.getUUIDSync(partyMember))
+                            } catch (e: AshconException) {
+                                UChat.chat("§cFailed to get UUID, reason: ${e.message}")
+                                return@submit
+                            }
+                            val profile = try {
+                                Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
+                            } catch (e: HypixelAPIException) {
+                                UChat.chat("§cUnable to retrieve profile information: ${e.message}")
+                                return@submit
+                            }
+                            if (profile != null) {
+                                playerStats(partyMember, uuid, profile)
+                            } else {
+                                UChat.chat("§cUnable to retrieve profile information.")
+                            }
+                        }
+                    }
+                }
+            }
+            if(awaitingDelimiterStats) {
+                if (unformatted == "You are not currently in a party.") {
+                    UChat.chat("§cBugged Party detected! Waiting for Party Update to Display Stats...")
+                    event.isCanceled = true
+                } else if(unformatted.startsWith("---")) {
+                    event.isCanceled = true
+                    delimiterStats++
+                    if(delimiterStats > 1) {
+                        delimiterStats = 0
+                    }
+                    return
+                }
+            }
             val joinedd = dungeon_finder_join_pattern.matcher(unformatted)
             if (joinedd.find()) {
                 val username = joinedd.group(1)
                 if(username.equals(mc.thePlayer.name)) {
+                    try {
+                        Thread.sleep(1000)
+                        awaitingDelimiterStats = true
+                        gettingDungeonParty = true
+                        mc.thePlayer.sendChatMessage("/pl")
+                    } catch (_: Exception) {
+                    }
+                    return
+                }
+                if(awaitingDelimiterStats) {
+                    try {
+                        Thread.sleep(1000)
+                        awaitingDelimiterStats = true
+                        mc.thePlayer.sendChatMessage("/pl")
+                    } catch (_: Exception) {
+                    }
                     return
                 }
                 Skytils.threadPool.submit {
@@ -290,11 +354,11 @@ class ChatListener {
             val armor = profileData.armor
             val armorArray:ArrayList<List<String>> = ArrayList()
             armor?.forEveryItem {
-                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer, false)
+                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer,false)
                 armorArray.add(armorLore)
             }
             armorArray.reverse()
-            for (armorPiece in armorArray) {
+            for(armorPiece in armorArray) {
                 val armorName = armorPiece[0]
                 component.append(UTextComponent(armorName + "\n").setHoverText(buildString {
                     for (line in armorPiece) {
@@ -500,8 +564,8 @@ class ChatListener {
             }
 
             component
-                .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
-                .append(UTextComponent("§cKick $username\n").setHoverText("§cClick to Paste the Command to Kick $username.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
+                .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n")
+                .append(UTextComponent("§cPress here to kick $username\n").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
                 .chat()
         } catch (e: Throwable) {
@@ -509,12 +573,4 @@ class ChatListener {
             e.printStackTrace()
         }
     }
-    private fun Duration.timeFormat() = toComponents { minutes, seconds, nanoseconds ->
-        buildString {
-            if (minutes > 0) {
-                append(minutes)
-                append(':')
-            }
-            append("%02d".format(seconds))
-        }
 }
