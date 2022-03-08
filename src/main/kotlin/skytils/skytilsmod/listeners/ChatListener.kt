@@ -321,7 +321,7 @@ class ChatListener {
                 }
 
                 component.append(UTextComponent(rarity + activePet.type.lowercase().replace("_", " ")
-                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()}
+                    .replaceFirstChar { it.uppercase() }
                         + "\n\n")
                     .setHoverText( if(activePet.heldItem == null) {"§cNo Pet Item"} else "§b" +
                             activePet.heldItem!!.lowercase().replace("pet_item_", "")
