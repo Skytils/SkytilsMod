@@ -32,10 +32,11 @@ import skytils.hylin.mojang.AshconException
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Pet
+import skytils.hylin.skyblock.item.Inventory
+import skytils.hylin.skyblock.item.InventoryItem
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
-import skytils.skytilsmod.commands.stats.impl.CataCommand.timeFormat
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.MathUtil.floor
@@ -43,11 +44,9 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 import kotlin.math.floor
+import kotlin.time.Duration
 
 class ChatListener {
-    private var awaitingDelimiterStats = false
-    private var delimiterStats = 0
-    private var gettingDungeonParty = false
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
@@ -62,70 +61,10 @@ class ChatListener {
             return
         }
         if(Skytils.config.partyFinderStats) {
-            if(gettingDungeonParty) {
-                val player = mc.thePlayer
-                val members = members_pattern.matcher(unformatted)
-                if(members.find()) {
-                    gettingDungeonParty = false
-                }
-                while (members.find()) {
-                    val partyMember = members.group(1)
-                    if (partyMember != player.name) {
-                        Skytils.threadPool.submit {
-                            val uuid = try {
-                                (Skytils.hylinAPI.getUUIDSync(partyMember))
-                            } catch (e: AshconException) {
-                                UChat.chat("§cFailed to get UUID, reason: ${e.message}")
-                                return@submit
-                            }
-                            val profile = try {
-                                Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
-                            } catch (e: HypixelAPIException) {
-                                UChat.chat("§cUnable to retrieve profile information: ${e.message}")
-                                return@submit
-                            }
-                            if (profile != null) {
-                                playerStats(partyMember, uuid, profile)
-                            } else {
-                                UChat.chat("§cUnable to retrieve profile information.")
-                            }
-                        }
-                    }
-                }
-            }
-            if(awaitingDelimiterStats) {
-                if (unformatted == "You are not currently in a party.") {
-                    UChat.chat("§cBugged Party detected! Waiting for Party Update to Display Stats...")
-                    event.isCanceled = true
-                } else if(unformatted.startsWith("---")) {
-                    event.isCanceled = true
-                    delimiterStats++
-                    if(delimiterStats > 1) {
-                        delimiterStats = 0
-                    }
-                    return
-                }
-            }
             val joinedd = dungeon_finder_join_pattern.matcher(unformatted)
             if (joinedd.find()) {
                 val username = joinedd.group(1)
                 if(username.equals(mc.thePlayer.name)) {
-                    try {
-                        Thread.sleep(1000)
-                        awaitingDelimiterStats = true
-                        gettingDungeonParty = true
-                        mc.thePlayer.sendChatMessage("/pl")
-                    } catch (_: Exception) {
-                    }
-                    return
-                }
-                if(awaitingDelimiterStats) {
-                    try {
-                        Thread.sleep(1000)
-                        awaitingDelimiterStats = true
-                        mc.thePlayer.sendChatMessage("/pl")
-                    } catch (_: Exception) {
-                    }
                     return
                 }
                 Skytils.threadPool.submit {
@@ -342,23 +281,21 @@ class ChatListener {
                 SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
 
             val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
-
+            val name = playerResponse.rankPrefix + if(playerResponse.rank.toString() == "NONE") {""} else {" "} + playerResponse.player.getString("displayname")
             val component = UMessage("&2&l-----------------------------\n")
                 .append(
-                    UTextComponent(playerResponse.rankPrefix
-                            + if(playerResponse.rank.toString() == "NONE") {""} else {" "}
-                            + "${playerResponse.player.getString("displayname")}'s §dStats: §7(Hover)\n").setHoverText("§7Click to run: /skytilscata $username").setClick(
+                    UTextComponent("$name's §dStats: §7(Hover)\n").setHoverText("§7Click to run: /skytilscata $username").setClick(
                         ClickEvent.Action.RUN_COMMAND, "/skytilscata $username")
                 )
                 .append("§dCata: §b${NumberUtil.nf.format(floor(cataLevel))}\n\n")
             val armor = profileData.armor
             val armorArray:ArrayList<List<String>> = ArrayList()
             armor?.forEveryItem {
-                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer,false)
+                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer, false)
                 armorArray.add(armorLore)
             }
             armorArray.reverse()
-            for(armorPiece in armorArray) {
+            for (armorPiece in armorArray) {
                 val armorName = armorPiece[0]
                 component.append(UTextComponent(armorName + "\n").setHoverText(buildString {
                     for (line in armorPiece) {
@@ -375,24 +312,20 @@ class ChatListener {
             }
             if (activePet != null) {
                 var rarity = "§f"
-                if (activePet.tier.toString().uppercase() == "UNCOMMON") {
-                    rarity = "§a"
-                } else if (activePet.tier.toString().uppercase() == "RARE") {
-                    rarity = "§9"
-                } else if (activePet.tier.toString().uppercase() == "EPIC") {
-                    rarity = "§5"
-                } else if (activePet.tier.toString().uppercase() == "LEGENDARY") {
-                    rarity = "§6"
-                } else if (activePet.tier.toString().uppercase() == "MYTHIC") {
-                    rarity = "§d"
+                when(activePet.tier.toString().uppercase()) {
+                    ItemRarity.UNCOMMON.rarityName -> rarity = "§a"
+                    ItemRarity.RARE.rarityName -> rarity = "§9"
+                    ItemRarity.EPIC.rarityName -> rarity = "§5"
+                    ItemRarity.LEGENDARY.rarityName -> rarity = "§6"
+                    ItemRarity.MYTHIC.rarityName -> rarity = "§d"
                 }
 
-                component.append(UTextComponent(rarity + activePet.type.toString().lowercase().replace("_", " ")
+                component.append(UTextComponent(rarity + activePet.type.lowercase().replace("_", " ")
                     .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()}
                         + "\n\n")
                     .setHoverText( if(activePet.heldItem == null) {"§cNo Pet Item"} else "§b" +
-                            activePet.heldItem.toString().lowercase().replace("pet_item_", "").replace("_", " ")
-                                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()}
+                            activePet.heldItem!!.lowercase().replace("pet_item_", "")
+                                .replace("_", " ").replaceFirstChar { it.uppercase() }
                     )
                 )
             } else {
@@ -402,6 +335,8 @@ class ChatListener {
             //Stonk etc. stuff
             val inventory = profileData.inventory
             if (inventory != null) {
+                //FIX THIS MESS
+                val itemsToCheck = setOf<String>()
                 var hasStonk = false
                 var hasBonzoStaff = false
                 var hasJerryGun = false
@@ -564,13 +499,22 @@ class ChatListener {
             }
 
             component
-                .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n")
-                .append(UTextComponent("§cPress here to kick $username\n").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
+                .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
+                .append(UTextComponent("§c&c&l[KICK]\n").setHoverText("§cClick to Kick $name.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
                 .chat()
         } catch (e: Throwable) {
             UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()
+        }
+    }
+    private fun Duration.timeFormat() = toComponents { minutes, seconds, _ ->
+        buildString {
+            if (minutes > 0) {
+                append(minutes)
+                append(':')
+            }
+            append("%02d".format(seconds))
         }
     }
 }
