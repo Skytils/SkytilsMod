@@ -336,7 +336,6 @@ class ChatListener {
             val inventory = profileData.inventory
             if (inventory != null) {
                 //FIX THIS MESS
-                val itemsToCheck = setOf<String>()
                 var hasStonk = false
                 var hasBonzoStaff = false
                 var hasJerryGun = false
