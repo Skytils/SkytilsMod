@@ -499,7 +499,7 @@ class ChatListener {
 
             component
                 .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
-                .append(UTextComponent("§c&c&l[KICK]\n").setHoverText("§cClick to Kick $name.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
+                .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
                 .chat()
         } catch (e: Throwable) {
