@@ -34,6 +34,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.*
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -173,10 +174,61 @@ class MiningFeatures {
         if (Skytils.config.hollowChatCoords && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             val xyzMatcher = xyzPattern.matcher(unformatted)
             val xzMatcher = xzPattern.matcher(unformatted)
-            if (xyzMatcher.matches())
+            if (xyzMatcher.matches()) {
                 waypointChatMessage(xyzMatcher.group("x"), xyzMatcher.group("y"), xyzMatcher.group("z"))
-            else if (xzMatcher.matches())
+                return
+            } else if (xzMatcher.matches()) {
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
+                return
+            }
+            if (unformatted.contains("\$SBECHWP:") || unformatted.contains("\$DSMCHWP:")) {
+                val sub = unformatted.substring(unformatted.lastIndexOf(":") + 1)
+                val parts = sub.split("@")
+                val coords = parts[1].split(",")
+                val lookUpDict = hashMapOf<String, String>(
+                    "Lost Precursor City" to "internal_city",
+                    "Jungle Temple" to "internal_temple",
+                    "Goblin Queen's Den" to "internal_den",
+                    "Mines of Divan" to "internal_mines",
+                    "Khazad-dûm" to "internal_bal",
+                    "Fairy Grotto" to "internal_fairy"
+                )
+                if (lookUpDict.containsKey(parts[0])) {
+                    val key = lookUpDict[parts[0]]
+
+                    val component = ChatComponentText(
+                        "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
+                    )
+                    val suggested = ChatComponentText("§f[${parts[0]}] ").setChatStyle(
+                        ChatStyle()
+                            .setChatClickEvent(
+                                ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/skytilshollowwaypoint set $key ${coords[0]} ${coords[1]} ${coords[2]}"
+                                )
+                            ).setChatHoverEvent(
+                                HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    ChatComponentText("§eset waypoint for ${parts[0]}")
+                                )
+                            )
+                    )
+                    val custom = ChatComponentText("§e[Custom]").setChatStyle(
+                        ChatStyle().setChatClickEvent(
+                            ClickEvent(
+                                ClickEvent.Action.SUGGEST_COMMAND,
+                                "/skytilshollowwaypoint set name ${coords[0]} ${coords[1]} ${coords[2]}"
+                            )
+                        ).setChatHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                ChatComponentText("§eset custom waypoint")
+                            )
+                        )
+                    )
+                    mc.thePlayer.addChatMessage(component.appendSibling(suggested).appendSibling(custom))
+                }
+            }
         }
         if (formatted.startsWith("§r§cYou died")) {
             deadCount =
