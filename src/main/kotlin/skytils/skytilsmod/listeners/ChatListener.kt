@@ -501,6 +501,7 @@ class ChatListener {
                 .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
                 .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
+                .mutable()
                 .chat()
         } catch (e: Throwable) {
             UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
