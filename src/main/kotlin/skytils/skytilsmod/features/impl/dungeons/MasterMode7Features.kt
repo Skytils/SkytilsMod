@@ -49,6 +49,7 @@ object MasterMode7Features {
     private val spawningDragons = hashSetOf<WitherKingDragons>()
     private val spawnedDragons = hashSetOf<WitherKingDragons>()
     private val killedDragons = hashSetOf<WitherKingDragons>()
+    private val dragonMap = hashMapOf<Int, WitherKingDragons>()
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
@@ -69,12 +70,14 @@ object MasterMode7Features {
 
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
-            val type = WitherKingDragons.values().filterNot { spawnedDragons.contains(it) }
-                .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
+            val type =
+                dragonMap[entity.entityId] ?: WitherKingDragons.values().filterNot { spawnedDragons.contains(it) }
+                    .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
             printDevMessage("${type.name} spawned", "witherkingdrags")
             spawnedDragons.add(type)
+            dragonMap[entity.entityId] = type
         }
     }
 
@@ -94,6 +97,7 @@ object MasterMode7Features {
         spawningDragons.clear()
         spawnedDragons.clear()
         killedDragons.clear()
+        dragonMap.clear()
     }
 
     @SubscribeEvent
