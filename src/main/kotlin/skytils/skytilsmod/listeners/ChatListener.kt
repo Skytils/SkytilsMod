@@ -21,6 +21,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.event.ClickEvent
+import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
@@ -332,6 +333,8 @@ class ChatListener {
             //Stonk etc. stuff
             val inventory = profileData.inventory
             if (inventory != null) {
+                //Currently in progress
+                //val inv: Set<InventoryItem?> = inventory.items.toSet()
                 //FIX THIS MESS
                 var hasStonk = false
                 var hasBonzoStaff = false
