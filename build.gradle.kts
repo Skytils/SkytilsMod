@@ -28,6 +28,7 @@ plugins {
     id("dev.architectury.architectury-pack200") version "0.1.3"
     java
     idea
+    signing
 }
 
 version = "1.2.0-pre6"
@@ -234,4 +235,10 @@ kotlin {
         check(this is JavaToolchainSpec)
         languageVersion.set(JavaLanguageVersion.of(8))
     }
+}
+
+signing {
+    useGpgCmd()
+    isRequired = project.hasProperty("signing.gnupg.keyName")
+    sign(tasks["remapJar"])
 }
