@@ -238,7 +238,8 @@ kotlin {
 }
 
 signing {
-    useGpgCmd()
-    isRequired = project.hasProperty("signing.gnupg.keyName")
-    sign(tasks["remapJar"])
+    if (project.hasProperty("signing.gnupg.keyName")) {
+        useGpgCmd()
+        sign(tasks["remapJar"])
+    }
 }
