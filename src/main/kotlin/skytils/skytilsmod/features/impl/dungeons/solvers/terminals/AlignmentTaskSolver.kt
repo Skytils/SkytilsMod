@@ -63,7 +63,7 @@ object AlignmentTaskSolver {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (mc.thePlayer == null || mc.theWorld == null || event.phase != TickEvent.Phase.START) return
-        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || Utils.equalsOneOf(
+        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || !Utils.equalsOneOf(
                 DungeonFeatures.dungeonFloor,
                 "F7", "M7"
             ) || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L))
