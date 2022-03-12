@@ -305,9 +305,13 @@ class ChatListener {
             }
             val pets = profileData.pets
             var activePet: Pet? = null
+            var spiritPet: Pet? = null
             for (pet in pets) {
                 if (pet.active) {
                     activePet = pet
+                }
+                if(pet.type.contains("SPIRIT")) {
+                    spiritPet = pet
                 }
             }
             if (activePet != null) {
@@ -320,13 +324,18 @@ class ChatListener {
                     ItemRarity.MYTHIC.rarityName -> rarity = ItemRarity.MYTHIC.baseColor
                 }
                 component.append(UTextComponent(rarity + activePet.type.lowercase()
-                    .replace("_", " ").replaceFirstChar { it.uppercase() }
-                        + "\n\n")
+                    .replace("_", " ")
+                    .replaceFirstChar { it.uppercase() })
                     .setHoverText("§b" + (activePet.heldItem?.lowercase()
                         ?.replace("pet_item_", "")
                         ?.replace("_", " ") ?: "§cNo Pet Item")
                     )
                 )
+                if(spiritPet != null) {
+                    component.append(" §7(Spirit)\n\n")
+                } else {
+                    component.append("\n\n")
+                }
             } else {
                 component.append("§cNo Pet Equiped!\n\n")
             }
@@ -379,9 +388,9 @@ class ChatListener {
                         append("§2Giant's Sword: §c§l●\n")
                     }
                     if(inv.any{it.contains("Ice Spray Wand")}) {
-                        append("§1Spray: §a§l●\n")
+                        append("§9Spray: §a§l●\n")
                     } else {
-                        append("§1Spray: §c§l●\n")
+                        append("§9Spray: §c§l●\n")
                     }
                     if(inv.any{it.contains("Stonk")}) {
                         append("§6Stonk: §a§l●\n")
@@ -476,7 +485,6 @@ class ChatListener {
                 .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
                 .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name§c.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
-                .mutable()
                 .chat()
         } catch (e: Throwable) {
             UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
