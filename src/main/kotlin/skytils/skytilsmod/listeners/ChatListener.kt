@@ -319,110 +319,85 @@ class ChatListener {
                     ItemRarity.LEGENDARY.rarityName -> rarity = ItemRarity.LEGENDARY.baseColor
                     ItemRarity.MYTHIC.rarityName -> rarity = ItemRarity.MYTHIC.baseColor
                 }
-                component.append(UTextComponent(rarity + activePet.type.lowercase().replace("_", " ")
-                    .replaceFirstChar { it.uppercase() }
+                component.append(UTextComponent(rarity + activePet.type.lowercase()
+                    .replace("_", " ").replaceFirstChar { it.uppercase() }
                         + "\n\n")
-                    .setHoverText("§b" + (activePet.heldItem?.lowercase()?.replace("pet_item_", "")
+                    .setHoverText("§b" + (activePet.heldItem?.lowercase()
+                        ?.replace("pet_item_", "")
                         ?.replace("_", " ") ?: "§cNo Pet Item")
                     )
                 )
             } else {
                 component.append("§cNo Pet Equiped!\n\n")
             }
-            Console.println(activePet?.heldItem?:"§cNo Pet Equiped!")
-            //Stonk etc. stuff
+
             val inventory = profileData.inventory
             if (inventory != null) {
-                //Currently in progress
-                //val inv: Set<InventoryItem?> = inventory.items.toSet()
-                //FIX THIS MESS
-                var hasStonk = false
-                var hasBonzoStaff = false
-                var hasJerryGun = false
-                var hasNecronsBladeVariant = false
-                var hasTerminator = false
-                var hasJujuShortbow = false
-                var hasSpoon = false
-                var hasYetiSword = false
-                var hasSpiritSceptre = false
-                var hasFrozenSycthe = false
-                var hasAots = false
-                var hasGiantSword = false
-                var hasShadowFury = false
-                var hasFlowerOfTruth = false
 
+                val inv: MutableSet<String> = mutableSetOf()
                 inventory.forEveryItem {
-                    val itemName = it.asMinecraft.displayName
-                    if (itemName.contains("Stonk")) {
-                        hasStonk = true
-                    } else if (itemName.contains("Jerry-chine Gun")) {
-                        hasJerryGun = true
-                    } else if (itemName.contains("Bonzo's Staff")) {
-                        hasBonzoStaff = true
-                    } else if (itemName.contains("Hyperion") || itemName.contains("Valkyrie") || itemName.contains("Astraea") || itemName.contains("Scylla")) {
-                        hasNecronsBladeVariant = true
-                    } else if (itemName.contains("Terminator")) {
-                        hasTerminator = true
-                    } else if (itemName.contains("Juju Shortbow")) {
-                        hasJujuShortbow = true
-                    } else if (itemName.contains("Midas Staff")) {
-                        hasSpoon = true
-                    } else if (itemName.contains("Yeti Sword")) {
-                        hasYetiSword = true
-                    } else if (itemName.contains("Spirit Sceptre")) {
-                        hasSpiritSceptre = true
-                    } else if (itemName.contains("Frozen Sycthe")) {
-                        hasFrozenSycthe = true
-                    } else if (itemName.contains("Axe of the Shredded")) {
-                        hasAots = true
-                    } else if (itemName.contains("Giant's Sword")) {
-                        hasGiantSword = true
-                    } else if (itemName.contains("Shadow Fury")) {
-                        hasShadowFury = true
-                    } else if (itemName.contains("Flower of Truth")) {
-                        hasFlowerOfTruth = true
-                    }
+                    inv.add(it.asMinecraft.displayName)
                 }
 
                 component.append(UTextComponent("§dItems: §7(Hover)\n\n").setHoverText(buildString {
                     //Archer
-                    if(hasTerminator) {
+                    if(inv.any{it.contains("Terminator")}) {
                         append("§dTerminator: §a§l●\n")
-                    } else if(hasJujuShortbow) {
+                    } else if(inv.any{it.contains("Juju Shortbow")}) {
                         append("§5Juju: §a§l●\n")
                     } else {
                         append("§dTerminator: §c§l●\n")
                     }
                     //Mage
-                    if(hasNecronsBladeVariant) {
+                    if(inv.any{it.contains("Hyperion") ||it.contains("Syclla") ||it.contains("Valkyrie") ||it.contains("Astraea")}) {
                         append("§dNecron's Blade: §a§l●\n")
-                    } else if(hasSpoon) {
+                    } else if(inv.any{it.contains("Midas Staff")}) {
                         append("§6Midas Spoon: §a§l●\n")
-                    } else if(hasYetiSword) {
+                    } else if(inv.any{it.contains("Yeti Sword")}) {
                         append("§fYeti Sword: §a§l●\n")
-                    } else if(hasSpiritSceptre) {
+                    } else if(inv.any{it.contains("Spirit Sceptre")}) {
                         append("§9Spirit Sceptre: §a§l●\n")
-                    } else if(hasFrozenSycthe) {
+                    } else if(inv.any{it.contains("Frozen Sycthe")}) {
                         append("§bFrozen Sycthe: §a§l●\n")
                     } else {
                         append("§dNecron's Blade: §c§l●\n")
                     }
                     //Berserk
-                    if(hasGiantSword) {
-                        append("§2Giant's Sword: §a§l●\n")
-                    } else if(hasAots) {
+                    if(inv.any{it.contains("Axe of the Shredded")}) {
                         append("§aAots: §a§l●\n")
-                    } else if(hasShadowFury) {
+                    } else if(inv.any{it.contains("Shadow Fury")}) {
                         append("§8Shadow Fury: §a§l●\n")
-                    } else if(hasFlowerOfTruth) {
+                    } else if(inv.any{it.contains("Flower of Truth")}) {
                         append("§cFot: §a§l●\n")
                     } else {
+                        append("§aAots: §c§l●\n")
+                    }
+                    //Miscellaneous
+                    if(inv.any{it.contains("Giant's Sword")}) {
+                        append("§2Giant's Sword: §a§l●\n") }
+                    else {
                         append("§2Giant's Sword: §c§l●\n")
                     }
-
-                    if(hasStonk) { append("§6Stonk: §a§l●\n") } else { append("§6Stonk: §c§l●\n") }
-                    if(hasBonzoStaff) { append("§9Bonzo Staff: §a§l●\n") } else { append("§9Bonzo Staff: §c§l●\n") }
-                    if(hasJerryGun) { append("§eJerry Gun: §a§l●\n") } else { append("§eJerry Gun: §c§l●\n") }
+                    if(inv.any{it.contains("Ice Spray Wand")}) {
+                        append("§1Spray: §a§l●\n")
+                    } else {
+                        append("§1Spray: §c§l●\n")
+                    }
+                    if(inv.any{it.contains("Stonk")}) {
+                        append("§6Stonk: §a§l●\n")
+                    } else {
+                        append("§6Stonk: §c§l●\n")
+                    }
+                    if(inv.any{it.contains("Bonzo's Staff")}) {
+                        append("§9Bonzo Staff: §a§l●\n")
+                    } else {
+                        append("§9Bonzo Staff: §c§l●\n")
+                    }
+                    if(inv.any{it.contains("Jerry-chine Gun")}) {
+                        append("§eJerry Gun: §a§l●\n")
+                    } else {
+                        append("§eJerry Gun: §c§l●\n")
+                    }
                 }))
             } else {
                 component.append("§cInventory Api disabled!\n\n")
@@ -499,8 +474,9 @@ class ChatListener {
 
             component
                 .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
-                .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
+                .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name§c.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
+                .mutable()
                 .chat()
         } catch (e: Throwable) {
             UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
