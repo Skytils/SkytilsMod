@@ -21,31 +21,28 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.event.ClickEvent
-import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import scala.Console
 import skytils.hylin.extension.getString
 import skytils.hylin.mojang.AshconException
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Pet
-import skytils.hylin.skyblock.item.Inventory
 import skytils.hylin.skyblock.item.InventoryItem
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.*
-import skytils.skytilsmod.utils.MathUtil.floor
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 import kotlin.math.floor
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 
 class ChatListener {
@@ -342,7 +339,6 @@ class ChatListener {
 
             val inventory = profileData.inventory
             if (inventory != null) {
-
                 val inv: MutableSet<String> = mutableSetOf()
                 inventory.forEveryItem {
                     inv.add(it.asMinecraft.displayName)
