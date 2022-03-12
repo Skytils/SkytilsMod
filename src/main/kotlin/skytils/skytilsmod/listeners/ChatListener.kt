@@ -298,12 +298,9 @@ class ChatListener {
             armorArray.reverse()
             for (armorPiece in armorArray) {
                 val armorName = armorPiece[0]
-                component.append(UTextComponent(armorName + "\n").setHoverText(buildString {
+                component.append(UTextComponent(armorName + "\n").setHoverText(
                     armorPiece.joinToString(separator = "\n")
-                    //for (line in armorPiece) {
-                    //    append(line + "\n")
-                    //}
-                }))
+                ))
             }
             val pets = profileData.pets
             var activePet: Pet? = null
