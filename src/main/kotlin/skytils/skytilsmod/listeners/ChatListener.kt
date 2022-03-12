@@ -27,6 +27,7 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import scala.Console
 import skytils.hylin.extension.getString
 import skytils.hylin.mojang.AshconException
 import skytils.hylin.request.HypixelAPIException
@@ -298,9 +299,10 @@ class ChatListener {
             for (armorPiece in armorArray) {
                 val armorName = armorPiece[0]
                 component.append(UTextComponent(armorName + "\n").setHoverText(buildString {
-                    for (line in armorPiece) {
-                        append(line + "\n")
-                    }
+                    armorPiece.joinToString(separator = "\n")
+                    //for (line in armorPiece) {
+                    //    append(line + "\n")
+                    //}
                 }))
             }
             val pets = profileData.pets
@@ -311,27 +313,25 @@ class ChatListener {
                 }
             }
             if (activePet != null) {
-                var rarity = "§f"
+                var rarity = ItemRarity.COMMON.baseColor
                 when(activePet.tier.toString().uppercase()) {
-                    ItemRarity.UNCOMMON.rarityName -> rarity = "§a"
-                    ItemRarity.RARE.rarityName -> rarity = "§9"
-                    ItemRarity.EPIC.rarityName -> rarity = "§5"
-                    ItemRarity.LEGENDARY.rarityName -> rarity = "§6"
-                    ItemRarity.MYTHIC.rarityName -> rarity = "§d"
+                    ItemRarity.UNCOMMON.rarityName -> ItemRarity.UNCOMMON.baseColor
+                    ItemRarity.RARE.rarityName -> rarity = ItemRarity.RARE.baseColor
+                    ItemRarity.EPIC.rarityName -> rarity = ItemRarity.EPIC.baseColor
+                    ItemRarity.LEGENDARY.rarityName -> rarity = ItemRarity.LEGENDARY.baseColor
+                    ItemRarity.MYTHIC.rarityName -> rarity = ItemRarity.MYTHIC.baseColor
                 }
-
                 component.append(UTextComponent(rarity + activePet.type.lowercase().replace("_", " ")
                     .replaceFirstChar { it.uppercase() }
                         + "\n\n")
-                    .setHoverText( if(activePet.heldItem == null) {"§cNo Pet Item"} else "§b" +
-                            activePet.heldItem!!.lowercase().replace("pet_item_", "")
-                                .replace("_", " ").replaceFirstChar { it.uppercase() }
+                    .setHoverText("§b" + (activePet.heldItem?.lowercase()?.replace("pet_item_", "")
+                        ?.replace("_", " ") ?: "§cNo Pet Item")
                     )
                 )
             } else {
                 component.append("§cNo Pet Equiped!\n\n")
             }
-
+            Console.println(activePet?.heldItem?:"§cNo Pet Equiped!")
             //Stonk etc. stuff
             val inventory = profileData.inventory
             if (inventory != null) {
@@ -501,7 +501,6 @@ class ChatListener {
                 .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
                 .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
                 .append("&2&l-----------------------------")
-                .mutable()
                 .chat()
         } catch (e: Throwable) {
             UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
