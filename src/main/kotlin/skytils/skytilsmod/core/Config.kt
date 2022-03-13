@@ -1838,6 +1838,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var slayerTimeToKill = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
+        description = "Open chat, then click anywhere on screen to open Maddox Menu.",
+        category = "Slayer", subcategory = "Quality of Life"
+    )
+    var openMaddoxMenu = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Others' Broken Heart Radiation",
         description = "Removes Broken Heart Radiation from other slayer's while yours is spawned",
         category = "Slayer", subcategory = "Voidgloom Seraph",
