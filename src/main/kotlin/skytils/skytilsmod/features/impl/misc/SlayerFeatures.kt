@@ -70,7 +70,6 @@ import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.RenderHUDEvent
-import skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import skytils.skytilsmod.utils.*
