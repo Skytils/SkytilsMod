@@ -56,7 +56,7 @@ object MasterMode7Features {
     private val spawnedDragons = hashSetOf<WitherKingDragons>()
     private val killedDragons = hashSetOf<WitherKingDragons>()
     private val dragonMap = hashMapOf<Int, WitherKingDragons>()
-    private val glowstones = hashSetOf<BlockPos>()
+    private val glowstones = hashSetOf<AxisAlignedBB>()
     private var ticks = 0
 
     @SubscribeEvent
@@ -67,7 +67,7 @@ object MasterMode7Features {
             return
         }
         if (event.update.block === Blocks.glowstone) {
-            glowstones.addAll(Utils.getBlocksWithinRangeAtSameY(event.pos, 5, 0))
+            glowstones.add(AxisAlignedBB(event.pos.add(-5, -5, -5), event.pos.add(5, 5, 5)))
         }
     }
 
@@ -75,7 +75,7 @@ object MasterMode7Features {
     fun onTick(event: ClientTickEvent) {
         if (DungeonTimer.phase4ClearTime == -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
         if (Skytils.config.witherKingDragonSlashAlert && ticks++ % 10 == 0) {
-            if (glowstones.contains(BlockPos(mc.thePlayer.posX, 0.0, mc.thePlayer.posZ))) {
+            if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
                 SoundQueue.addToQueue("random.orb", 1f)
             }
             ticks = 0
