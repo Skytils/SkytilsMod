@@ -241,6 +241,6 @@ enum class WitherKingDragons(val blockPos: BlockPos, val color: Color, val chatC
     FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD);
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
-    private val a = 12.5
-    val bb = AxisAlignedBB(blockPos.add(-a, -2.0, -a), blockPos.add(a, a + 3, a))
+    private val a = 13.5
+    val bb = AxisAlignedBB(blockPos.add(-a, -8.0, -a), blockPos.add(a, a + 2, a))
 }
