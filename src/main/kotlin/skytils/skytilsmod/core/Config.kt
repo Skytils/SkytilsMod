@@ -563,6 +563,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var spiritPetWarning = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Wither King Dragon Interdimensional Slash Alert",
+        description = "Plays a sound when you are in range of interdimensional slash.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var witherKingDragonSlashAlert = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Wither King Dragon Spawn Alert",
         description = "Shows a message when the Wither King spawns a dragon.",
         category = "Dungeons", subcategory = "Quality of Life"
