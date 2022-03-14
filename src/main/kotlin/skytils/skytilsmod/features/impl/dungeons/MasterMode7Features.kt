@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
+import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -34,9 +35,14 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
@@ -50,6 +56,31 @@ object MasterMode7Features {
     private val spawnedDragons = hashSetOf<WitherKingDragons>()
     private val killedDragons = hashSetOf<WitherKingDragons>()
     private val dragonMap = hashMapOf<Int, WitherKingDragons>()
+    private val glowstones = hashSetOf<BlockPos>()
+    private var ticks = 0
+
+    @SubscribeEvent
+    fun onBlockChange(event: BlockChangeEvent) {
+        if (DungeonTimer.phase4ClearTime == -1L || !Skytils.config.witherKingDragonSlashAlert) return
+        if (event.old.block === Blocks.glowstone) {
+            glowstones.clear()
+            return
+        }
+        if (event.update.block === Blocks.glowstone) {
+            glowstones.addAll(Utils.getBlocksWithinRangeAtSameY(event.pos, 5, 0))
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (DungeonTimer.phase4ClearTime == -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
+        if (Skytils.config.witherKingDragonSlashAlert && ticks++ % 10 == 0) {
+            if (glowstones.contains(BlockPos(mc.thePlayer.posX, 0.0, mc.thePlayer.posZ))) {
+                SoundQueue.addToQueue("random.orb", 1f)
+            }
+            ticks = 0
+        }
+    }
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
@@ -98,6 +129,7 @@ object MasterMode7Features {
         spawnedDragons.clear()
         killedDragons.clear()
         dragonMap.clear()
+        glowstones.clear()
     }
 
     @SubscribeEvent
