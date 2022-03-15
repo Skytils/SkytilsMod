@@ -61,13 +61,19 @@ object MasterMode7Features {
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
-        if (DungeonTimer.phase4ClearTime == -1L || !Skytils.config.witherKingDragonSlashAlert) return
-        if (event.old.block === Blocks.glowstone) {
-            glowstones.clear()
-            return
+        if (DungeonTimer.phase4ClearTime == -1L) return
+        if (Skytils.config.witherKingDragonSlashAlert) {
+            if (event.old.block === Blocks.glowstone) {
+                glowstones.clear()
+                return
+            }
+            if (event.update.block === Blocks.glowstone) {
+                glowstones.add(AxisAlignedBB(event.pos.add(-5, -5, -5), event.pos.add(5, 5, 5)))
+            }
         }
-        if (event.update.block === Blocks.glowstone) {
-            glowstones.add(AxisAlignedBB(event.pos.add(-5, -5, -5), event.pos.add(5, 5, 5)))
+        if ((event.pos.y == 18 || event.pos.y == 19) && event.update.block === Blocks.air && event.old.block === Blocks.stone_slab) {
+            val dragon = WitherKingDragons.values().find { it.bottomChin == event.pos } ?: return
+            dragon.isDestroyed = true
         }
     }
 
@@ -130,6 +136,7 @@ object MasterMode7Features {
         killedDragons.clear()
         dragonMap.clear()
         glowstones.clear()
+        WitherKingDragons.values().forEach { it.isDestroyed = false }
     }
 
     @SubscribeEvent
@@ -171,6 +178,7 @@ object MasterMode7Features {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (Skytils.config.showWitherKingStatueBox && DungeonTimer.phase4ClearTime != -1L) {
             for (drag in WitherKingDragons.values()) {
+                if (drag.isDestroyed) continue
                 RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 5f, event.partialTicks)
             }
         }
@@ -233,12 +241,18 @@ object MasterMode7Features {
         Utils.inDungeons && DungeonTimer.phase4ClearTime != -1L && Skytils.config.hideWitherKingDragonDeath
 }
 
-enum class WitherKingDragons(val blockPos: BlockPos, val color: Color, val chatColor: ChatColor) {
-    POWER(BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED),
-    APEX(BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN),
-    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE),
-    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA),
-    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD);
+enum class WitherKingDragons(
+    val blockPos: BlockPos,
+    val color: Color,
+    val chatColor: ChatColor,
+    val bottomChin: BlockPos,
+    var isDestroyed: Boolean = false
+) {
+    POWER(BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED, BlockPos(32, 18, 59)),
+    APEX(BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN, BlockPos(32, 19, 94)),
+    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE, BlockPos(56, 18, 128)),
+    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA, BlockPos(79, 19, 94)),
+    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD, BlockPos(80, 19, 56));
 
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
     private val a = 13.5
