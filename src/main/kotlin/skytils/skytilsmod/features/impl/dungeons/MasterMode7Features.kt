@@ -80,12 +80,23 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (DungeonTimer.phase4ClearTime == -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
-        if (Skytils.config.witherKingDragonSlashAlert && ticks++ % 10 == 0) {
-            if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
-                SoundQueue.addToQueue("random.orb", 1f)
+        if (ticks % 10 == 0) {
+            if (Skytils.config.witherKingDragonSlashAlert) {
+                if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
+                    SoundQueue.addToQueue("random.orb", 1f)
+                }
+            }
+        }
+        if (ticks % 100 == 0) {
+            WitherKingDragons.values().filterNot { it.isDestroyed }.forEach {
+                val chunk = mc.theWorld.getChunkFromBlockCoords(it.bottomChin)
+                if (!chunk.isEmpty && mc.theWorld.getBlockState(it.bottomChin).block === Blocks.air) {
+                    it.isDestroyed = true
+                }
             }
             ticks = 0
         }
+        ticks++
     }
 
     @SubscribeEvent
@@ -242,19 +253,24 @@ object MasterMode7Features {
 }
 
 enum class WitherKingDragons(
+    val textColor: String,
     val blockPos: BlockPos,
     val color: Color,
     val chatColor: ChatColor,
     val bottomChin: BlockPos,
     var isDestroyed: Boolean = false
 ) {
-    POWER(BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED, BlockPos(32, 18, 59)),
-    APEX(BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN, BlockPos(32, 19, 94)),
-    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE, BlockPos(56, 18, 128)),
-    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA, BlockPos(79, 19, 94)),
-    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD, BlockPos(80, 19, 56));
+    POWER("Red", BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED, BlockPos(32, 18, 59)),
+    APEX("Green", BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN, BlockPos(32, 19, 94)),
+    SOUL("Purple", BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE, BlockPos(56, 18, 128)),
+    ICE("Blue", BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA, BlockPos(79, 19, 94)),
+    FLAME("Orange", BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD, BlockPos(80, 19, 56));
 
+    val itemName = "§cCorrupted $textColor Relic"
+    val itemId = "${textColor.uppercase()}_KING_RELIC"
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
     private val a = 13.5
-    val bb = AxisAlignedBB(blockPos.add(-a, -8.0, -a), blockPos.add(a, a + 2, a))
+    val bb = blockPos.run {
+        AxisAlignedBB(x - a, y - 8.0, z - a, x + a, y + a + 2, z + a)
+    }
 }
