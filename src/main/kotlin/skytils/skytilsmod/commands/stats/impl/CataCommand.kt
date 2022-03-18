@@ -101,8 +101,8 @@ object CataCommand : StatCommand("skytilscata") {
                     }§7§o.\n\n"
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
-                .append("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
-                .append("§9 ☠ Class Avg: §l➡ §e${nf.format(classAvgCapped)} (${classAvgOverflow})\n\n")
+                .append("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n")
+                .append("§9 ☠ Class Avg: §l➡ §e${nf.format(classAvgCapped)} §7(${nf.format(classAvgOverflow)})\n\n")
                 .append("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
                 .append("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n")
                 .append("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n")
