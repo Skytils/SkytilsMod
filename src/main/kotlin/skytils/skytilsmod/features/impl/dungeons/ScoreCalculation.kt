@@ -20,11 +20,11 @@ package skytils.skytilsmod.features.impl.dungeons
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.essential.universal.UResolution
-import gg.essential.universal.wrappers.UPlayer
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.network.play.server.S45PacketTitle
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -34,11 +34,13 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
+import skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -60,19 +62,19 @@ object ScoreCalculation {
     private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
     private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
-    private val dungeonClearedPattern = Regex("Dungeon Cleared: (?<percentage>\\d+)%")
+    private val dungeonClearedPattern = Regex("Cleared: (?<percentage>\\d+)% \\(\\d+\\)")
     private val timeElapsedPattern =
         Regex(" Elapsed: (?:(?<hrs>\\d+)h )?(?:(?<min>\\d+)m )?(?:(?<sec>\\d+)s)?")
     private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
 
     val floorRequirements = hashMapOf(
-        // idk what entrance is so i put it as the same as f1
+        // updated w.r.t. skyblock wiki
         "E" to FloorRequirement(.3),
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
         "F3" to FloorRequirement(.5),
         "F4" to FloorRequirement(.6),
-        "F5" to FloorRequirement(.7, 12 * 60),
+        "F5" to FloorRequirement(.7, 14 * 60),
         "F6" to FloorRequirement(.85),
         "F7" to FloorRequirement(speed = 12 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
@@ -81,8 +83,7 @@ object ScoreCalculation {
         "M4" to FloorRequirement(speed = 8 * 60),
         "M5" to FloorRequirement(speed = 8 * 60),
         "M6" to FloorRequirement(speed = 8 * 60),
-        //still waiting on m7 release lol
-        "M7" to FloorRequirement(speed = 8 * 60),
+        "M7" to FloorRequirement(speed = 15 * 60),
         "default" to FloorRequirement()
     )
 
@@ -119,7 +120,7 @@ object ScoreCalculation {
     var floorReq = BasicState(floorRequirements["default"]!!)
     var foundSecrets: State<Int> = BasicState(0).also { state ->
         state.onSetValue {
-            updateText(totalScore.get().toInt())
+            updateText(totalScore.get())
         }
     }
     var totalSecrets = BasicState(0)
@@ -179,12 +180,13 @@ object ScoreCalculation {
     }
     val speedScore = totalElapsed.map { time ->
         when {
-            time <= 480.0 -> 100.0
-            time <= 580.0 -> 148 - 0.1 * time
-            time <= 980 -> 119 - 0.05 * time
-            time < 3060 -> 102 - 1.0 / 30.0 * time
+            time < 492.0 -> 100.0
+            time < 600.0 -> 140 - time / 12.0
+            time < 840.0 -> 115 - time / 24.0
+            time < 1140.0 -> 108 - time / 30.0
+            time < 3940.0 -> 98.5 - time / 40.0
             else -> 0.0
-        }.roundToInt()
+        }.toInt()
     }
 
     // bonus stuff
@@ -215,13 +217,21 @@ object ScoreCalculation {
                     hasSaid300 = false
                     return@onSetValue
                 }
-                if (Skytils.config.sendMessageOn270Score && !hasSaid270 && score >= 270) {
+                if (!hasSaid270 && score >= 270) {
                     hasSaid270 = true
-                    Skytils.sendMessageQueue.add("/pc Skytils > 270 score")
+                    if (Skytils.config.createTitleOn270Score) GuiManager.createTitle(
+                        Skytils.config.message270Score.ifBlank { "270 score" },
+                        20
+                    )
+                    if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message270Score.ifBlank { "270 score" }}")
                 }
-                if (Skytils.config.sendMessageOn300Score && !hasSaid300 && score >= 300) {
+                if (!hasSaid300 && score >= 300) {
                     hasSaid300 = true
-                    Skytils.sendMessageQueue.add("/pc Skytils > 300 score")
+                    if (Skytils.config.createTitleOn300Score) GuiManager.createTitle(
+                        Skytils.config.message300Score.ifBlank { "300 score" },
+                        20
+                    )
+                    if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message300Score.ifBlank { "300 score" }}")
                 }
             }
         }
@@ -294,7 +304,7 @@ object ScoreCalculation {
             postfix = event.packet.suffix
         ).stripControlCodes()
         printDevMessage(line, "scorecalcscoreboard")
-        if (line.startsWith("Dungeon Cleared: ")) {
+        if (line.startsWith("Cleared: ")) {
             val matcher = dungeonClearedPattern.find(line)
             if (matcher != null) {
                 clearedPercentage.set(matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0)
@@ -380,12 +390,11 @@ object ScoreCalculation {
     fun onTitle(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
         if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
-            firstDeathHadSpirit.set(
-                DungeonListener.hutaoFans.getIfPresent(
-                    DungeonListener.team.find {
-                        it.player?.uniqueID == UPlayer.getUUID()
-                    }?.playerName ?: ""
-                ) ?: false
+            if (DungeonListener.hutaoFans.getIfPresent(mc.thePlayer.name) ?: false
+                && DungeonListener.team.filter { it.playerName != mc.thePlayer.name }
+                    .sumOf { it.deaths } == 0
+            ) firstDeathHadSpirit.set(
+                true
             )
             printDevMessage("you died. spirit: ${firstDeathHadSpirit.get()}", "scorecalcdeath")
         }
@@ -430,6 +439,19 @@ object ScoreCalculation {
             ) {
                 mimicKilled.set(true)
                 return
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun canYouPleaseStopCryingThanks(event: ClientChatReceivedEvent) {
+        if (!Utils.inDungeons || event.type != 0.toByte()) return
+        val unformatted = event.message.unformattedText.stripControlCodes()
+        if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
+            event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
+                it as AccessorChatComponentText
+                if (!it.text.startsWith("Skytils-SC > ")) return@forEach
+                it.text = it.text.substring("Skytils-SC > ".length)
             }
         }
     }

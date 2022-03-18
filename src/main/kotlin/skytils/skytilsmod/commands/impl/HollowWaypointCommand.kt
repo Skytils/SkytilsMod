@@ -21,7 +21,7 @@ package skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.command.ICommandSender
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
@@ -32,9 +32,9 @@ import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 
 object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw")) {
-    override fun getCommandUsage(sender: ICommandSender): String = "/skytilshollowwaypoint location x y z"
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/skytilshollowwaypoint location x y z"
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
             val message = UMessage("§3Skytils > §eWaypoints:\n")
             if (MiningFeatures.cityLoc.exists()) {
@@ -56,6 +56,11 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                 message.append(UTextComponent("§9Mines of Divan "))
                 message.append(copyMessage("Mines of Divan: ${MiningFeatures.minesLoc}"))
                 message.append(removeMessage("/skytilshollowwaypoint remove internal_mines"))
+            }
+            if (MiningFeatures.kingLoc.exists()) {
+                message.append(UTextComponent("§6King Yolkar "))
+                message.append(copyMessage("King Yolkar: ${MiningFeatures.kingLoc}"))
+                message.append(removeMessage("/skytilshollowwaypoint remove internal_king"))
             }
             if (MiningFeatures.balLoc.exists()) {
                 message.append(UTextComponent("§cKhazad-dûm "))
@@ -112,6 +117,11 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                                 MiningFeatures.minesLoc.locY = y
                                 MiningFeatures.minesLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
                             }
+                            "internal_king" -> {
+                                MiningFeatures.kingLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                                MiningFeatures.kingLoc.locY = y
+                                MiningFeatures.kingLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                            }
                             "internal_bal" -> {
                                 MiningFeatures.balLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                                 MiningFeatures.balLoc.locY = y
@@ -135,6 +145,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                             "internal_temple" -> MiningFeatures.templeLoc.reset()
                             "internal_den" -> MiningFeatures.denLoc.reset()
                             "internal_mines" -> MiningFeatures.minesLoc.reset()
+                            "internal_king" -> MiningFeatures.kingLoc.reset()
                             "internal_bal" -> MiningFeatures.balLoc.reset()
                             "internal_fairy" -> MiningFeatures.fairyLoc.reset()
                             else -> MiningFeatures.waypoints.remove(args[1])
@@ -148,6 +159,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                     MiningFeatures.templeLoc.reset()
                     MiningFeatures.denLoc.reset()
                     MiningFeatures.minesLoc.reset()
+                    MiningFeatures.kingLoc.reset()
                     MiningFeatures.balLoc.reset()
                     MiningFeatures.fairyLoc.reset()
                     MiningFeatures.waypoints.clear()

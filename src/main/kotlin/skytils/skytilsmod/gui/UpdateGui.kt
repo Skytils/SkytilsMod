@@ -89,7 +89,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
             if (st.responseCode != HttpURLConnection.HTTP_OK) {
                 failed = true
                 updateText()
-                println("${url} returned status code ${st.responseCode}")
+                println("$url returned status code ${st.responseCode}")
                 return
             }
             if (!directory.exists() && !directory.mkdirs()) {

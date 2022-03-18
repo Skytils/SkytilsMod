@@ -17,13 +17,10 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.Lists
 import gg.essential.universal.UChat
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -33,6 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
@@ -59,13 +57,11 @@ class ThreeWeirdosSolver {
                 UChat.chat("§cSkytils failed to load solutions for Three Weirdos.")
                 DataFetcher.reloadData()
             }
-            for (solution in Lists.newArrayList(solutions)) {
-                if (unformatted.contains(solution!!)) {
+            for (solution in solutions) {
+                if (unformatted.contains(solution)) {
                     val npcName = unformatted.substring(unformatted.indexOf("]") + 2, unformatted.indexOf(":"))
                     riddleNPC = npcName
-                    mc.thePlayer.addChatMessage(
-                        ChatComponentText("§a§l${npcName.stripControlCodes()} §2has the blessing.")
-                    )
+                    UChat.chat("§a§l${npcName.stripControlCodes()} §2has the blessing.")
                     break
                 }
             }
@@ -155,8 +151,8 @@ class ThreeWeirdosSolver {
     }
 
     companion object {
-        var solutions = ArrayList<String>()
-        private val mc = Minecraft.getMinecraft()
+        var solutions = hashSetOf<String>()
+
         var riddleNPC: String? = null
 
         @JvmField

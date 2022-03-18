@@ -17,9 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.Lists
 import gg.essential.universal.UChat
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
@@ -33,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -102,7 +101,7 @@ class BoulderSolver {
 
     class BoulderPush(var x: Int, var y: Int, var direction: Direction)
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         var boulderChest: BlockPos? = null
         var boulderFacing: EnumFacing? = null
         var grid = Array(7) { arrayOfNulls<BoulderState>(6) }
@@ -222,7 +221,7 @@ class BoulderSolver {
 
     init {
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.EMPTY,
                 BoulderState.FILLED,
                 BoulderState.EMPTY,
@@ -233,7 +232,7 @@ class BoulderSolver {
             )
         )
         variantSteps.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderPush(2, 4, Direction.RIGHT),
                 BoulderPush(2, 3, Direction.FORWARD),
                 BoulderPush(3, 3, Direction.RIGHT),
@@ -243,7 +242,7 @@ class BoulderSolver {
             )
         )
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.FILLED,
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
@@ -254,7 +253,7 @@ class BoulderSolver {
             )
         )
         variantSteps.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderPush(3, 4, Direction.FORWARD),
                 BoulderPush(2, 4, Direction.LEFT),
                 BoulderPush(3, 3, Direction.RIGHT),
@@ -267,7 +266,7 @@ class BoulderSolver {
             )
         )
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.FILLED,
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
@@ -277,9 +276,9 @@ class BoulderSolver {
                 BoulderState.FILLED
             )
         )
-        variantSteps.add(Lists.newArrayList(BoulderPush(1, 1, Direction.RIGHT)))
+        variantSteps.add(arrayListOf(BoulderPush(1, 1, Direction.RIGHT)))
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.FILLED,
                 BoulderState.FILLED,
                 BoulderState.EMPTY,
@@ -290,7 +289,7 @@ class BoulderSolver {
             )
         )
         variantSteps.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderPush(4, 3, Direction.FORWARD),
                 BoulderPush(3, 3, Direction.LEFT),
                 BoulderPush(3, 1, Direction.FORWARD),
@@ -298,7 +297,7 @@ class BoulderSolver {
             )
         )
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
@@ -311,7 +310,7 @@ class BoulderSolver {
             )
         )
         variantSteps.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderPush(3, 4, Direction.FORWARD),
                 BoulderPush(3, 3, Direction.FORWARD),
                 BoulderPush(2, 1, Direction.FORWARD),
@@ -319,7 +318,7 @@ class BoulderSolver {
             )
         )
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.FILLED,
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
@@ -329,9 +328,9 @@ class BoulderSolver {
                 BoulderState.EMPTY
             )
         )
-        variantSteps.add(Lists.newArrayList(BoulderPush(1, 4, Direction.FORWARD), BoulderPush(1, 1, Direction.RIGHT)))
+        variantSteps.add(arrayListOf(BoulderPush(1, 4, Direction.FORWARD), BoulderPush(1, 1, Direction.RIGHT)))
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
@@ -350,7 +349,7 @@ class BoulderSolver {
             )
         )
         variantSteps.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderPush(6, 4, Direction.FORWARD),
                 BoulderPush(6, 3, Direction.FORWARD),
                 BoulderPush(4, 1, Direction.FORWARD),
@@ -358,7 +357,7 @@ class BoulderSolver {
             )
         )
         expectedBoulders.add(
-            Lists.newArrayList(
+            arrayListOf(
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
                 BoulderState.EMPTY,
@@ -369,6 +368,6 @@ class BoulderSolver {
                 BoulderState.FILLED
             )
         )
-        variantSteps.add(Lists.newArrayList(BoulderPush(0, 1, Direction.FORWARD)))
+        variantSteps.add(arrayListOf(BoulderPush(0, 1, Direction.FORWARD)))
     }
 }

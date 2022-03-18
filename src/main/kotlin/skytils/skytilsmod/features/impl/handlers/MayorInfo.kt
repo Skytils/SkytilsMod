@@ -52,7 +52,8 @@ object MayorInfo {
     private var lastCheckedElectionOver = 0L
     private var lastFetchedMayorData = 0L
     private var lastSentData = 0L
-    const val baseURL = "https://sbe-stole-skytils.design/api/mayor"
+    val baseURL
+        get() = "https://${Skytils.domain}/api/mayor"
 
     private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
 
@@ -140,7 +141,7 @@ object MayorInfo {
         ) return
         if (event.container is ContainerChest) {
             val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
+            val chestName = event.chestName
             if (chestName == "Calendar and Events" || ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith(
                     "Mayor "
                 ) && (currentMayor == null || !chestName.contains(
@@ -213,6 +214,7 @@ object MayorInfo {
                     TickTask(1) {
                         currentMayor = res["name"].asString
                         lastFetchedMayorData = System.currentTimeMillis()
+                        if (currentMayor != "Jerry") jerryMayor = null
                         mayorPerks.clear()
                         val perks = res["perks"].asJsonArray
                         for (i in 0 until perks.size()) {

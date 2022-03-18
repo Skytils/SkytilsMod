@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UResolution
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.world.World
@@ -28,6 +27,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.RenderUtil
@@ -73,7 +73,8 @@ class BossHPDisplays {
                 if (name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
                         DungeonFeatures.dungeonFloor,
                         "F7",
-                        "M6"
+                        "M6",
+                        "M7"
                     )) || GiantHPElement.GIANT_NAMES.any {
                         name.contains(
                             it
@@ -82,7 +83,7 @@ class BossHPDisplays {
                 ) {
                     GlStateManager.disableCull()
                     GlStateManager.disableDepth()
-                    RenderUtil.draw3DString(
+                    RenderUtil.drawLabel(
                         entity.positionVector.addVector(0.0, -10.0, 0.0),
                         name,
                         Color.WHITE,
@@ -96,7 +97,7 @@ class BossHPDisplays {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var canGiantsSpawn = false
 
         init {
@@ -182,7 +183,8 @@ class BossHPDisplays {
                             } else if (name.contains("Giant") && Utils.equalsOneOf(
                                     DungeonFeatures.dungeonFloor,
                                     "F7",
-                                    "M6"
+                                    "M6",
+                                    "M7"
                                 )
                             ) return@getEntities true
                             if (GIANT_NAMES.any { name.contains(it) }) return@getEntities true

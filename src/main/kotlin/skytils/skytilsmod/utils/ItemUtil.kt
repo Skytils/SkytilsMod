@@ -21,6 +21,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
 import java.util.*
@@ -115,7 +116,7 @@ object ItemUtil {
             val display = itemStack.tagCompound.getCompoundTag("display")
             if (display.hasKey("Lore", NBT_LIST)) {
                 val lore = display.getTagList("Lore", NBT_STRING)
-                val loreAsList: MutableList<String> = ArrayList()
+                val loreAsList = ArrayList<String>(lore.tagCount())
                 for (lineNumber in 0 until lore.tagCount()) {
                     loreAsList.add(lore.getStringTagAt(lineNumber))
                 }
@@ -141,13 +142,13 @@ object ItemUtil {
      * @param item the Skyblock item to check
      * @return the rarity of the item if a valid rarity is found, `null` if no rarity is found, `null` if item is `null`
      */
-    fun getRarity(item: ItemStack?): ItemRarity? {
+    fun getRarity(item: ItemStack?): ItemRarity {
         if (item == null || !item.hasTagCompound()) {
-            return null
+            return ItemRarity.NONE
         }
         val display = item.getSubCompound("display", false)
         if (display == null || !display.hasKey("Lore")) {
-            return null
+            return ItemRarity.NONE
         }
         val lore = display.getTagList("Lore", Constants.NBT.TAG_STRING)
         val name = display.getString("Name")
@@ -159,7 +160,7 @@ object ItemUtil {
             if (rarityMatcher != null) {
                 val rarity = rarityMatcher.groups["rarity"]?.value ?: continue
                 ItemRarity.values().find {
-                    it.rarityName == rarity.stripControlCodes()
+                    it.rarityName == rarity.stripControlCodes().substringAfter("SHINY ")
                 }?.let {
                     return it
                 }
@@ -167,12 +168,12 @@ object ItemUtil {
         }
         val petRarityMatcher = PET_PATTERN.find(name)
         if (petRarityMatcher != null) {
-            val color = petRarityMatcher.groupValues.getOrNull(1) ?: return null
-            return ItemRarity.byBaseColor(color)
+            val color = petRarityMatcher.groupValues.getOrNull(1) ?: return ItemRarity.NONE
+            return ItemRarity.byBaseColor(color) ?: ItemRarity.NONE
         }
 
         // If the item doesn't have a valid rarity, return null
-        return null
+        return ItemRarity.NONE
     }
 
     fun isPet(item: ItemStack?): Boolean {
@@ -215,5 +216,14 @@ object ItemUtil {
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+    }
+
+    fun ItemStack.setLore(lines: List<String>): ItemStack {
+        setTagInfo("display", getSubCompound("display", true).apply {
+            setTag("Lore", NBTTagList().apply {
+                for (line in lines) appendTag(NBTTagString(line))
+            })
+        })
+        return this
     }
 }

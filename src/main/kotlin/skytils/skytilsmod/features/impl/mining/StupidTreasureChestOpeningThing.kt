@@ -176,7 +176,7 @@ object StupidTreasureChestOpeningThing {
                 Color(255, 0, 0, 69),
                 1f
             )
-            RenderUtil.draw3DString(
+            RenderUtil.drawLabel(
                 Vec3(pos).addVector(0.5, 1.5, 0.5),
                 "${chest.progress}/5",
                 Color.ORANGE,

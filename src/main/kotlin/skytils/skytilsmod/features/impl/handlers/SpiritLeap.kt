@@ -26,6 +26,7 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -47,8 +48,8 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
     companion object {
         val names = HashMap<String, Boolean>()
-        val classes = DungeonListener.DungeonClass.values()
-            .associateWithTo(EnumMap(DungeonListener.DungeonClass::class.java)) { false }
+        val classes = DungeonClass.values()
+            .associateWithTo(EnumMap(DungeonClass::class.java)) { false }
         private val glassPane by lazy {
             Item.getItemFromBlock(Blocks.stained_glass_pane)
         }
@@ -95,7 +96,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     val scale = 0.9f
                     val scaleReset = 1 / scale
                     GlStateManager.pushMatrix()
-                    GlStateManager.translate(0f, 0f, 1f)
+                    GlStateManager.translate(0f, 0f, 299f)
                     if (names.getOrDefault(name, false)) {
                         slot highlight 1174339584
                     } else if (classes.getOrDefault(dungeonClass, false)) {
@@ -133,7 +134,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     override fun read(reader: InputStreamReader) {
         val obj = gson.fromJson(reader, JsonObject::class.java)
         for (entry in obj["classes"].asJsonObject.entrySet()) {
-            classes[DungeonListener.DungeonClass.getClassFromName(entry.key)] =
+            classes[DungeonClass.getClassFromName(entry.key)] =
                 entry.value.asJsonObject["enabled"].asBoolean
         }
         for (entry in obj["users"].asJsonObject.entrySet()) {

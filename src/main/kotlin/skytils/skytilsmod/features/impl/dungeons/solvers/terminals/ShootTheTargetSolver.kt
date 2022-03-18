@@ -33,13 +33,13 @@ import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 
-class ShootTheTargetSolver {
+object ShootTheTargetSolver {
     private val positions = listOf(
-        BlockPos(267, 130, 249), BlockPos(265, 130, 249), BlockPos(263, 130, 249),
-        BlockPos(267, 128, 249), BlockPos(265, 128, 249), BlockPos(263, 128, 249),
-        BlockPos(267, 126, 249), BlockPos(265, 126, 249), BlockPos(263, 126, 249)
+        BlockPos(68, 130, 50), BlockPos(66, 130, 50), BlockPos(64, 130, 50),
+        BlockPos(68, 128, 50), BlockPos(66, 128, 50), BlockPos(64, 128, 50),
+        BlockPos(68, 126, 50), BlockPos(66, 126, 50), BlockPos(64, 126, 50)
     )
-    private val plate = BlockPos(262, 127, 234)
+    private val plate = BlockPos(63, 127, 35)
 
     private val shot = arrayListOf<BlockPos>()
 

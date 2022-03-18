@@ -18,20 +18,20 @@
 
 package skytils.skytilsmod.mixins.transformers.world;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.mixins.hooks.world.WorldHookKt;
 
 @Mixin(World.class)
 public abstract class MixinWorld implements IBlockAccess {
-    @Redirect(method = "getSkyColorBody", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;lastLightningBolt:I"))
-    private int lightningSkyColor(World world) {
-        return WorldHookKt.lightningSkyColor(world);
+    @ModifyExpressionValue(method = "getSkyColorBody", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;lastLightningBolt:I"))
+    private int lightningSkyColor(int orig) {
+        return WorldHookKt.lightningSkyColor(orig);
     }
 
     @Inject(method = "getWorldTime", at = @At("HEAD"), cancellable = true)

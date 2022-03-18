@@ -17,23 +17,21 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.ImmutableSet
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLever
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
-import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -50,10 +48,10 @@ import java.util.concurrent.Future
 class WaterBoardSolver {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.theWorld == null || mc.thePlayer == null) return
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons) return
         if (!Skytils.config.waterBoardSolver) return
-        val player = mc.thePlayer
-        val world: World = mc.theWorld
+        val player = mc.thePlayer ?: return
+        val world = mc.theWorld ?: return
         if (ticks % 20 == 0) {
             if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isDone == true)) {
                 job = Skytils.threadPool.submit {
@@ -141,61 +139,61 @@ class WaterBoardSolver {
                                     }
                                     when (variant) {
                                         0 -> {
-                                            solutions[WoolColor.PURPLE] = ImmutableSet.of(
+                                            solutions[WoolColor.PURPLE] = setOf(
                                                 LeverBlock.QUARTZ,
                                                 LeverBlock.GOLD,
                                                 LeverBlock.DIAMOND,
                                                 LeverBlock.CLAY
                                             )
                                             solutions[WoolColor.ORANGE] =
-                                                ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD)
-                                            solutions[WoolColor.BLUE] = ImmutableSet.of(
+                                                setOf(LeverBlock.GOLD, LeverBlock.COAL, LeverBlock.EMERALD)
+                                            solutions[WoolColor.BLUE] = setOf(
                                                 LeverBlock.QUARTZ,
                                                 LeverBlock.GOLD,
                                                 LeverBlock.EMERALD,
                                                 LeverBlock.CLAY
                                             )
-                                            solutions[WoolColor.GREEN] = ImmutableSet.of(LeverBlock.EMERALD)
-                                            solutions[WoolColor.RED] = ImmutableSet.of()
+                                            solutions[WoolColor.GREEN] = setOf(LeverBlock.EMERALD)
+                                            solutions[WoolColor.RED] = setOf()
                                         }
                                         1 -> {
-                                            solutions[WoolColor.PURPLE] = ImmutableSet.of(LeverBlock.COAL)
-                                            solutions[WoolColor.ORANGE] = ImmutableSet.of(
+                                            solutions[WoolColor.PURPLE] = setOf(LeverBlock.COAL)
+                                            solutions[WoolColor.ORANGE] = setOf(
                                                 LeverBlock.QUARTZ,
                                                 LeverBlock.GOLD,
                                                 LeverBlock.EMERALD,
                                                 LeverBlock.CLAY
                                             )
-                                            solutions[WoolColor.BLUE] = ImmutableSet.of(
+                                            solutions[WoolColor.BLUE] = setOf(
                                                 LeverBlock.QUARTZ,
                                                 LeverBlock.DIAMOND,
                                                 LeverBlock.EMERALD
                                             )
                                             solutions[WoolColor.GREEN] =
-                                                ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.EMERALD)
+                                                setOf(LeverBlock.QUARTZ, LeverBlock.EMERALD)
                                             solutions[WoolColor.RED] =
-                                                ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD)
+                                                setOf(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD)
                                         }
                                         2 -> {
                                             solutions[WoolColor.PURPLE] =
-                                                ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND)
-                                            solutions[WoolColor.ORANGE] = ImmutableSet.of(LeverBlock.EMERALD)
+                                                setOf(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND)
+                                            solutions[WoolColor.ORANGE] = setOf(LeverBlock.EMERALD)
                                             solutions[WoolColor.BLUE] =
-                                                ImmutableSet.of(LeverBlock.QUARTZ, LeverBlock.DIAMOND)
-                                            solutions[WoolColor.GREEN] = ImmutableSet.of()
+                                                setOf(LeverBlock.QUARTZ, LeverBlock.DIAMOND)
+                                            solutions[WoolColor.GREEN] = setOf()
                                             solutions[WoolColor.RED] =
-                                                ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD)
+                                                setOf(LeverBlock.GOLD, LeverBlock.EMERALD)
                                         }
                                         3 -> {
-                                            solutions[WoolColor.PURPLE] = ImmutableSet.of(
+                                            solutions[WoolColor.PURPLE] = setOf(
                                                 LeverBlock.QUARTZ,
                                                 LeverBlock.GOLD,
                                                 LeverBlock.EMERALD,
                                                 LeverBlock.CLAY
                                             )
                                             solutions[WoolColor.ORANGE] =
-                                                ImmutableSet.of(LeverBlock.GOLD, LeverBlock.COAL)
-                                            solutions[WoolColor.BLUE] = ImmutableSet.of(
+                                                setOf(LeverBlock.GOLD, LeverBlock.COAL)
+                                            solutions[WoolColor.BLUE] = setOf(
                                                 LeverBlock.QUARTZ,
                                                 LeverBlock.GOLD,
                                                 LeverBlock.COAL,
@@ -203,8 +201,8 @@ class WaterBoardSolver {
                                                 LeverBlock.CLAY
                                             )
                                             solutions[WoolColor.GREEN] =
-                                                ImmutableSet.of(LeverBlock.GOLD, LeverBlock.EMERALD)
-                                            solutions[WoolColor.RED] = ImmutableSet.of(
+                                                setOf(LeverBlock.GOLD, LeverBlock.EMERALD)
+                                            solutions[WoolColor.RED] = setOf(
                                                 LeverBlock.GOLD,
                                                 LeverBlock.DIAMOND,
                                                 LeverBlock.EMERALD,
@@ -247,7 +245,7 @@ class WaterBoardSolver {
                         val pos = lever.leverPos
                         val displayed =
                             renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> v?.inc() ?: 0 }
-                        RenderUtil.draw3DString(
+                        RenderUtil.drawLabel(
                             Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
                             "§l" + color.name,
                             renderColor,
@@ -260,7 +258,7 @@ class WaterBoardSolver {
                             key
                         )
                     }) {
-                    RenderUtil.draw3DString(
+                    RenderUtil.drawLabel(
                         Vec3(chestPos!!.offset(roomFacing!!.opposite, 17).up(5)).addVector(
                             0.5,
                             0.5 + 0.5 * matching,
@@ -319,8 +317,8 @@ class WaterBoardSolver {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
-        private val solutions = HashMap<WoolColor, ImmutableSet<LeverBlock>>()
+
+        private val solutions = HashMap<WoolColor, Set<LeverBlock>>()
         private var chestPos: BlockPos? = null
         private var roomFacing: EnumFacing? = null
         private var prevInWaterRoom = false

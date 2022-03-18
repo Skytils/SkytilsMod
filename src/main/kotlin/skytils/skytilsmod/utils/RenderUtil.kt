@@ -25,7 +25,6 @@ import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.util.*
@@ -58,6 +57,7 @@ object RenderUtil {
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
      * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
      * @author Moulberry
+     * @author Mojang
      */
     fun renderBeaconBeam(x: Double, y: Double, z: Double, rgb: Int, alphaMultiplier: Float, partialTicks: Float) {
         val height = 300
@@ -154,6 +154,7 @@ object RenderUtil {
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
      * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
      * @author Moulberry
+     * @author Mojang
      */
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
@@ -221,16 +222,14 @@ object RenderUtil {
     }
 
     /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
+     * @author Mojang
      */
     @JvmStatic
     fun drawOutlinedBoundingBox(aabb: AxisAlignedBB?, color: Color, width: Float, partialTicks: Float) {
         val render = mc.renderViewEntity
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val realX = interpolate(render.posX, render.lastTickPosX, partialTicks)
+        val realY = interpolate(render.posY, render.lastTickPosY, partialTicks)
+        val realZ = interpolate(render.posZ, render.lastTickPosZ, partialTicks)
         GlStateManager.pushMatrix()
         GlStateManager.translate(-realX, -realY, -realZ)
         GlStateManager.disableTexture2D()
@@ -258,10 +257,7 @@ object RenderUtil {
     @JvmStatic
     fun renderItem(itemStack: ItemStack?, x: Int, y: Int) {
         RenderHelper.enableGUIStandardItemLighting()
-        GlStateManager.enableRescaleNormal()
-        GlStateManager.enableBlend()
         GlStateManager.enableDepth()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         mc.renderItem.renderItemAndEffectIntoGUI(itemStack, x, y)
     }
 
@@ -334,13 +330,17 @@ object RenderUtil {
     }
 
     /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
+     * @author Mojang
      */
-    fun draw3DString(pos: Vec3, text: String, color: Color, partialTicks: Float) {
-        val mc = mc
-        val player: EntityPlayer = mc.thePlayer
+    fun drawLabel(
+        pos: Vec3,
+        text: String,
+        color: Color,
+        partialTicks: Float,
+        shadow: Boolean = false,
+        scale: Float = 1f
+    ) {
+        val player = mc.thePlayer
         val x =
             pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
         val y =
@@ -348,8 +348,7 @@ object RenderUtil {
         val z =
             pos.zCoord - player.lastTickPosZ + (pos.zCoord - player.posZ - (pos.zCoord - player.lastTickPosZ)) * partialTicks
         val renderManager = mc.renderManager
-        val f = 1.6f
-        val f1 = 0.016666668f * f
+        val f1 = 0.0266666688
         val width = mc.fontRendererObj.getStringWidth(text) / 2
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, z)
@@ -357,10 +356,12 @@ object RenderUtil {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
+        GlStateManager.scale(scale, scale, scale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        mc.fontRendererObj.drawString(text, -width, 0, color.rgb)
+        GlStateManager.enableTexture2D()
+        mc.fontRendererObj.drawString(text, (-width).toFloat(), 0f, color.rgb, shadow)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
     }
@@ -451,7 +452,6 @@ object RenderUtil {
         GlStateManager.scale(-f1, -f1, f1)
         GlStateManager.disableLighting()
         GlStateManager.depthMask(false)
-        GlStateManager.disableDepth()
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         val tessellator = Tessellator.getInstance()
@@ -469,7 +469,6 @@ object RenderUtil {
         fontRenderer.drawString(str, -j, i, 553648127)
         GlStateManager.depthMask(true)
         fontRenderer.drawString(str, -j, i, -1)
-        GlStateManager.enableDepth()
         GlStateManager.enableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
@@ -538,7 +537,7 @@ object RenderUtil {
     private fun renderRarity(xPos: Int, yPos: Int, itemStack: ItemStack?) {
         if (itemStack == null) return
         val rarity = ItemUtil.getRarity(itemStack)
-        if (rarity != null) {
+        if (rarity != ItemRarity.NONE) {
             val alpha = Skytils.config.itemRarityOpacity
 
             if (Skytils.config.itemRarityShape < 5) {
@@ -823,3 +822,5 @@ object RenderUtil {
 
 fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
 fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)

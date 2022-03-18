@@ -21,18 +21,19 @@ package skytils.skytilsmod.core
 import com.google.gson.Gson
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.ensureFile
 import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KClass
 
-abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_000) {
+abstract class PersistentSave(protected val saveFile: File, private val interval: Long = 30_000) {
 
     var dirty = false
 
-    val gson: Gson = Skytils.gson
-    val mc: Minecraft = Skytils.mc
+    protected val gson: Gson = Skytils.gson
+    protected val mc: Minecraft = Skytils.mc
 
     abstract fun read(reader: InputStreamReader)
 
@@ -42,10 +43,7 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
 
     private fun readSave() {
         try {
-            if (!this.saveFile.exists()) {
-                this.saveFile.parentFile.mkdirs()
-                this.saveFile.createNewFile()
-            }
+            this.saveFile.ensureFile()
             this.saveFile.reader().use {
                 read(it)
             }
@@ -63,10 +61,7 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
 
     private fun writeSave() {
         try {
-            if (!this.saveFile.exists()) {
-                this.saveFile.parentFile.mkdirs()
-                this.saveFile.createNewFile()
-            }
+            this.saveFile.ensureFile()
             this.saveFile.writer().use { writer ->
                 write(writer)
             }
@@ -74,6 +69,20 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
+    }
+
+    private fun init() {
+        SAVES.add(this)
+        readSave()
+        fixedRateTimer("${this::class.simpleName}-Save", period = interval) {
+            if (dirty) {
+                writeSave()
+            }
+        }
+    }
+
+    init {
+        init()
     }
 
     companion object {
@@ -88,21 +97,13 @@ abstract class PersistentSave(protected val saveFile: File, interval: Long = 30_
         inline fun <reified T : PersistentSave> markDirty() {
             markDirty(T::class)
         }
-    }
 
-    init {
-        SAVES.add(this)
-        readSave()
-        fixedRateTimer("${this::class.simpleName}-Save", period = interval) {
-            if (dirty) {
-                writeSave()
-            }
+        init {
+            Runtime.getRuntime().addShutdownHook(Thread({
+                for (save in SAVES) {
+                    if (save.dirty) save.writeSave()
+                }
+            }, "Skytils-PersistentSave-Shutdown"))
         }
-        Runtime.getRuntime().addShutdownHook(Thread({
-            if (dirty) {
-                writeSave()
-            }
-        }, "${this::class.simpleName}-Save"))
     }
-
 }

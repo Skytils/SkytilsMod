@@ -29,12 +29,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase;
 import skytils.skytilsmod.mixins.hooks.network.NetHandlerPlayClientHookKt;
 
 @Mixin(value = NetHandlerPlayClient.class, priority = 1001)
 public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient {
-    @Shadow private WorldClient clientWorldController;
+    @Shadow
+    private WorldClient clientWorldController;
 
     @Inject(method = "addToSendQueue", at = @At("HEAD"), cancellable = true)
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
@@ -44,8 +46,9 @@ public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient
     @Inject(method = "handleSpawnMob", at = @At("TAIL"))
     private void onHandleSpawnMobTail(S0FPacketSpawnMob packetIn, CallbackInfo ci) {
         Entity entity = this.clientWorldController.getEntityByID(packetIn.getEntityID());
-        ((ExtensionEntityLivingBase)entity).getSkytilsHook().onNewDisplayName(
-            entity.getDataWatcher().getWatchableObjectString(2)
+        MasterMode7Features.INSTANCE.onMobSpawned(entity);
+        ((ExtensionEntityLivingBase) entity).getSkytilsHook().onNewDisplayName(
+                entity.getDataWatcher().getWatchableObjectString(2)
         );
     }
 }

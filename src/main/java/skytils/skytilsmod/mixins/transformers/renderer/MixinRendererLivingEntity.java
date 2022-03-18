@@ -22,9 +22,11 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import skytils.skytilsmod.mixins.hooks.renderer.RendererLivingEntityHookKt;
 
@@ -37,5 +39,10 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
     @Inject(method = "getColorMultiplier", at = @At("HEAD"), cancellable = true)
     private void setColorMultiplier(T entity, float lightBrightness, float partialTickTime, CallbackInfoReturnable<Integer> cir) {
         RendererLivingEntityHookKt.setColorMultiplier(entity, lightBrightness, partialTickTime, cir);
+    }
+
+    @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
+    private int changeHurtTime(EntityLivingBase instance) {
+        return RendererLivingEntityHookKt.replaceHurtTime(instance);
     }
 }

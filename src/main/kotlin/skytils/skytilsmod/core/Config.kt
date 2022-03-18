@@ -41,14 +41,6 @@ import java.net.URI
 object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
 
     @Property(
-        type = PropertyType.TEXT, name = "Skytils Data",
-        description = "URL for Skytils data.",
-        category = "General", subcategory = "API",
-        hidden = true
-    )
-    var dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
-
-    @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
@@ -62,7 +54,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "API",
         protectedText = true
     )
-    var apiKey = ""
+    var apiKey = System.getenv("HYPIXEL_KEY") ?: ""
 
     @Property(
         type = PropertyType.SELECTOR, name = "Command Alias Mode",
@@ -118,6 +110,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "Reparty"
     )
     var overrideReparty = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Coop Add Confirmation",
+        description = "Requires you to run the /coopadd command twice to add a member.",
+        category = "General", subcategory = "Hypixel"
+    )
+    var coopAddConfirmation = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Guild Leave Confirmation",
@@ -199,6 +198,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var dungeonTrashMap = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Dungeon Start Confirmation",
+        description = "Requires a confirmation to start the dungeon when not in a full party.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var noChildLeftBehind = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Timer",
         description = "Shows the time taken for certain actions in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -276,6 +282,50 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var sendMessageOn300Score = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Create Title on 270 score",
+        description = "Create title on 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var createTitleOn270Score = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Create Title on 300 score",
+        description = "Create title on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var createTitleOn300Score = false
+
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "Message for 270 score",
+        description = "Customize the message sent on hitting 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "Skytils > 270 score"
+    )
+    var message270Score = ""
+
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "Message for 300 score",
+        description = "Customize the message sent on hitting 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "Skytils > 300 score"
+    )
+    var message300Score = ""
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Blood Camp Helper",
+        description = "Draws an outline where blood mobs spawn in after spinning as armor stands.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var bloodHelper = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Blood Camp Helper Color",
+        description = "Changes the color of the outline.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var bloodHelperColor = Color.RED
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -305,11 +355,32 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var kismetRerollConfirm = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Archer Bone Passive",
+        description = "Hides the archer bone shield passive.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var hideArcherBonePassive = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Damage In Boss",
         description = "Removes damage numbers while in a boss fight. Requires the custom damage splash to be enabled.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var hideDamageInBoss = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Wither King Dragon Death",
+        description = "Removes the dragon death animation from the Master Mode 7 boss fight.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var hideWitherKingDragonDeath = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Fairies",
+        description = "Hides the fairies in dungeons.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var hideFairies = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Floor 4 Crowd Messages",
@@ -368,11 +439,32 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var biggerBatModels = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Recolor Wither King's Dragons",
+        description = "Recolors the dragons in Master Mode 7 to their respective colors.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var recolorWitherKingsDragons = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
+        description = "Retextures the dragons in Master Mode 7 to their respective colors.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var retextureWitherKingsDragons = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Revive Stone Names",
         description = "Shows names next to the heads on the Revive Stone menu.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var reviveStoneNames = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Say Blaze Done",
+        description = "Says in chat when blaze is done.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var sayBlazeDone = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Bat Hitboxes",
@@ -410,6 +502,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showGuardianRespawnTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King Statue Box",
+        description = "Draws a box around the Wither King Statues.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingStatueBox = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Sadan's Interest",
         description = "Replace Sadan's interest display with Skytils' own.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -423,6 +522,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["None", "HP", "Percentage Health"]
     )
     var necronHealth = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
+        description = "Displays a more clear indicator of the dragons HP.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingDragonsHP = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Spirit Bear Timer",
@@ -455,6 +561,20 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var spiritPetWarning = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Wither King Dragon Dimensional Slash Alert",
+        description = "Creates a title when you are in range of dimensional slash.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var witherKingDragonSlashAlert = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Wither King Dragon Spawn Alert",
+        description = "Shows a message when the Wither King spawns a dragon.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var witherKingDragonSpawnAlert = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Blaze Solver",
@@ -638,6 +758,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
     var middleClickTerminals = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Change All to Same Color Solver",
+        description = "Shows the best path of clicks for the Change All to Same Color Terminal.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var changeAllSameColorTerminalSolver = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
@@ -1003,6 +1130,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var crystalHollowWaypoints = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "King Yolkar waypoint",
+        description = "Adds a waypoint for King Yolkar upon interacting with him",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var kingYolkarWaypoint = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows chat coordinates grabber",
         description = "When coordinates are shared in chat asks which one it is and displays a waypoint there and shows it on the map.",
         category = "Mining", subcategory = "Crystal Hollows"
@@ -1078,6 +1212,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Fixes"
     )
     var preventLogSpam = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Twitch Fix",
+        description = "Fix twitch stuff.",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var twitchFix = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Price Paid",
@@ -1212,6 +1353,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showGemstones = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Item Origin",
+        description = "Shows the origin on items.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showOrigin = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
         description = "Shows the NPC Sell Price on certain items.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1292,6 +1440,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var showMinionTier = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Always Show Item Name Highlight",
+        description = "Always shows the item name highlight.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var alwaysShowItemHighlight = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Tooltips while on Storage",
         description = "Hides the tooltips of backpacks and ender chest while on the Storage GUI",
         category = "Miscellaneous", subcategory = "Other"
@@ -1318,6 +1473,20 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Other"
     )
     var autoCopyVeryRareDrops = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Dupe Tracker",
+        description = "Tries to track duplicated items on the auction house.\nThis will not catch every single duped item.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var dupeTracker = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Mark 'Dirty' Items",
+        description = "Tries to track 'dirty' items on the Auction House.\nDirty items are items that are probably not legitimately obtained.\nThis will not catch every single dirty item.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var markDirtyItems = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",
@@ -1354,6 +1523,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         options = ["Off", "Server List", "Packet"]
     )
     var pingDisplay = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Random Stuff",
+        description = "Random stuff that may or may not increase your FPS.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var randomStuff = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Bestiary Level",
@@ -1462,6 +1638,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var hideAirDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Cheap Coins",
+        description = "Prevents the game from rendering cheap coins.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideCheapCoins = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Dying Mobs",
         description = "Removes dead/dying mobs from your screen.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -1509,6 +1692,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hidePotionEffects = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Scoreboard Score",
+        description = "Removes the red score numbers on the scoreboard.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideScoreboardScore = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Disabled Potion Effects",
@@ -1593,7 +1783,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         description = "Allows pressing enter to confirm a sign popup, such as the bazaar or auction house prices.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var pressEnterToConfirmSignQuestion = true
+    var pressEnterToConfirmSignQuestion = false
 
     @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
@@ -1787,6 +1977,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Slayer", subcategory = "Quality of Life"
     )
     var openMaddoxMenu = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Carry Mode",
+        description = "Allow middle clicking to set your local LappySheep's slayer boss.\nDisable this if you are doing your own boss.",
+        category = "Slayer", subcategory = "General",
+        options = ["Off", "T1", "T2", "T3", "T4", "T5"]
+    )
+    var slayerCarryMode = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Use Hits to Detect Slayer",
@@ -2358,6 +2556,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             }
         }
 
+        addDependency("bloodHelperColor", "bloodHelper")
+
         addDependency("showNextBlaze", "blazeSolver")
         addDependency("lowestBlazeColor", "blazeSolver")
         addDependency("highestBlazeColor", "blazeSolver")
@@ -2401,7 +2601,9 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "seraphNormalPhaseColor"
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
-        registerListener("protectItemBINThreshold") { threshold: String ->
+        addDependency("markDirtyItems", "dupeTracker")
+
+        registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
@@ -2448,22 +2650,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         if (Skytils.config.lastLaunchedVersion != Skytils.VERSION) {
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
-                !ver.isSafe -> {
-                    if (largerHeadScale > 2) {
-                        largerHeadScale /= 100
-                    }
-                    if (itemDropScale > 5) {
-                        itemDropScale /= 100f
-                    }
-                    if (itemRarityOpacity > 1) {
-                        itemRarityOpacity /= 100f
-                    }
-                    if (transparentHeadLayer > 1) {
-                        transparentHeadLayer /= 100f
-                    }
-                    dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
-                }
-                ver < UpdateChecker.SkytilsVersion("1.0.8") -> {
+                !ver.isSafe || ver < UpdateChecker.SkytilsVersion("1.2-pre3") || Skytils.config.lastLaunchedVersion == "0" -> {
                     if (largerHeadScale > 2) {
                         largerHeadScale /= 100
                     }
@@ -2480,7 +2667,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()
                     }
-                    dataURL = "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"
                 }
             }
         }

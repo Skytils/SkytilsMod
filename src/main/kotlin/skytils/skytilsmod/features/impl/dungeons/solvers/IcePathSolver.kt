@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
-import com.google.common.collect.Lists
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
@@ -32,6 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -225,7 +224,7 @@ class IcePathSolver {
                 }
             }
         }
-        return Lists.newArrayList()
+        return arrayListOf()
     }
 
     /**
@@ -256,7 +255,7 @@ class IcePathSolver {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private val steps: MutableList<Point?> = ArrayList()
         private var silverfishChestPos: BlockPos? = null
         private var roomFacing: EnumFacing? = null

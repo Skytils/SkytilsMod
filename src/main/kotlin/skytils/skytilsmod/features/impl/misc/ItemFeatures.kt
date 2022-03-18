@@ -25,7 +25,6 @@ import net.minecraft.block.BlockLiquid
 import net.minecraft.block.BlockSign
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
@@ -69,7 +68,6 @@ import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -184,11 +182,8 @@ class ItemFeatures {
         if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.hasStack) {
             renderRarity(event.slot.stack, event.slot.xDisplayPosition, event.slot.yDisplayPosition)
         }
-        if (event.gui is GuiChest) {
-            val gui = event.gui
-            val chest = gui.inventorySlots as ContainerChest
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim()
+        if (event.container is ContainerChest) {
+            val chestName = event.chestName
             if (chestName.startsWithAny("Salvage", "Ender Chest") || Utils.equalsOneOf(
                     chestName,
                     "Ophelia",
@@ -278,7 +273,7 @@ class ItemFeatures {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
                         val line2 = lore[2].stripControlCodes()
                         val enchantName =
-                            line2.substringBeforeLast(" ").replace(" ", "_").uppercase()
+                            line2.substringBeforeLast(" ").replace(Regex("[\\s-]"), "_").uppercase()
                         itemId = "ENCHANTED_BOOK-" + enchantName + "-" + item.stackSize
                         isSuperpairsReward = true
                     }
@@ -497,14 +492,25 @@ class ItemFeatures {
                 if (enchantments.keySet.size == 1) {
                     val name = enchantmentNames.first()
                     if (Skytils.config.showEnchantedBookAbbreviation) {
-                        val parts = name.split("_")
-                        val prefix: String = if (parts[0] == "ultimate") {
-                            "§d§l" + parts.drop(1).joinToString("") { s -> s.substring(0, 1).uppercase() }
+                        val enchant = EnchantUtil.enchants.find { it.nbtName == name }
+                        val prefix: String = if (enchant != null) {
+                            val parts = enchant.loreName.split(" ")
+                            val joined = if (parts.size > 1) parts.joinToString("") { it[0].uppercase() } else "${
+                                parts[0].take(3).toTitleCase()
+                            }."
+                            if (enchant.nbtName.startsWith("ultimate")) {
+                                "§d§l${joined}"
+                            } else joined
                         } else {
-                            if (parts.size > 1) {
-                                parts.joinToString("") { s -> s.substring(0, 1).uppercase() }
+                            val parts = name.split("_")
+                            if (parts[0] == "ultimate") {
+                                "§d§l" + parts.drop(1).joinToString("") { s -> s[0].uppercase() }
                             } else {
-                                parts[0].substring(0, parts[0].length.coerceAtMost(3)).toTitleCase() + "."
+                                if (parts.size > 1) {
+                                    parts.joinToString("") { s -> s[0].uppercase() }
+                                } else {
+                                    parts[0].take(3).toTitleCase() + "."
+                                }
                             }
                         }
                         GlStateManager.disableLighting()

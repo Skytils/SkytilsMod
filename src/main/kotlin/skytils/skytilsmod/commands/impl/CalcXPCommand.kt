@@ -19,19 +19,20 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
-import net.minecraft.command.ICommandSender
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.SyntaxErrorException
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
+import kotlin.math.ceil
 
 object CalcXPCommand : BaseCommand("skytilscalcxp") {
 
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.size != 3) throw SyntaxErrorException("invalid arguments")
         val type = args[0].lowercase()
-        var starting = args[1].toIntOrNull() ?: 0
-        var ending = args[2].toIntOrNull() ?: 0
+        var starting = args[1].toDoubleOrNull() ?: 0.0
+        var ending = args[2].toDoubleOrNull() ?: 0.0
         val xpMap = when {
             type.endsWith("_slayer") -> SkillUtils.slayerXp[type.substringBefore("_slayer")]
             type == "dungeons" -> SkillUtils.dungeoneeringXp
@@ -41,11 +42,18 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
                 return
             }
         }
-        ending = ending.coerceIn(starting, xpMap?.keys?.last())
-        starting = starting.coerceIn(0, ending)
-        val xp = (starting.inc()..ending).sumOf {
-            xpMap?.get(it) ?: 0
+        ending = ending.coerceIn(starting, xpMap?.keys?.last()?.toDouble())
+        starting = starting.coerceIn(0.0, ending)
+        val startingFraction = 1 - (starting % 1)
+        val endingFraction = ending % 1
+        val realStart = starting.toInt().inc()
+        val realEnd = ceil(ending).toInt()
+        var sum = 0.0
+        xpMap?.get(realStart)?.let { sum += (it * startingFraction) }
+        xpMap?.get(realEnd)?.let { sum += (it * endingFraction) }
+        for (i in realStart.inc()..realEnd.dec()) {
+            xpMap?.get(i)?.let { sum += it }
         }
-        UChat.chat("§9§lSkytils ➜ §bYou need §6${NumberUtil.nf.format(xp)}§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
+        UChat.chat("§9§lSkytils ➜ §bYou need §6${NumberUtil.nf.format(sum)}§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
     }
 }

@@ -31,7 +31,7 @@ class TickTask(var ticks: Int = 0, val task: () -> Unit) {
 }
 
 object TickTaskManager {
-    val tasks = arrayListOf<TickTask>()
+    val tasks = ArrayList<TickTask>(20)
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

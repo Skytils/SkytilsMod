@@ -28,32 +28,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.SocketPermission;
+import java.net.URLPermission;
 import java.security.Permission;
 import java.util.Set;
 
-public class SkytilsSecurityManager extends FMLSecurityManager {
+public class SkytilsSecurityManager extends SecurityManager {
+    boolean isForge;
     Set<String> badPaths = Sets.newHashSet(".ldb", ".leveldb", "launcher_accounts.json");
-    
-    @Override
-    public void checkExec(String cmd) {
-        if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
-            quitGame();
-        }
-        super.checkExec(cmd);
-    }
 
-    @Override
-    public void checkRead(String file) {
-        for (String p : badPaths) {
-            if (file.contains(p)) quitGame();
-        }
-        super.checkRead(file);
-    }
-
-    @Override
-    public void checkRead(String file, Object context) {
-        checkRead(file);
-        super.checkRead(file, context);
+    public SkytilsSecurityManager(boolean isForge) {
+        this.isForge = isForge;
     }
 
     @Override
@@ -71,28 +55,20 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
                 return;
             }
             // FML is allowed to call system exit and the Minecraft applet (from the quit button)
-            if (!(callingClass.startsWith("net.minecraftforge.fml.")
+            if (!isForge && !(callingClass.startsWith("net.minecraftforge.fml.")
                     || "net.minecraft.server.dedicated.ServerHangWatchdog$1".equals(callingClass)
                     || "net.minecraft.server.dedicated.ServerHangWatchdog".equals(callingClass)
                     || ("net.minecraft.client.Minecraft".equals(callingClass) && "net.minecraft.client.Minecraft".equals(callingParent))
                     || ("net.minecraft.server.dedicated.DedicatedServer".equals(callingClass) && "net.minecraft.server.MinecraftServer".equals(callingParent)))
             ) {
-                throw new ExitTrappedException();
+                throw new FMLSecurityManager.ExitTrappedException();
             }
         } else if ("setSecurityManager".equals(permName)) {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
-        } else if (perm instanceof SocketPermission) {
-            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org")) {
-                quitGame();
+        } else if (perm instanceof SocketPermission || perm instanceof URLPermission) {
+            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.contains("discord.com") || permName.contains("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co") || permName.contains("pastebin.com")) {
+                loadEssential();
             }
-        }
-    }
-
-    private void quitGame() {
-        try {
-            Minecraft.getMinecraft().shutdownMinecraftApplet();
-        } catch (Throwable t) {
-            System.exit(0);
         }
     }
 
@@ -146,5 +122,36 @@ public class SkytilsSecurityManager extends FMLSecurityManager {
                 options,
                 options[0]
         );
+    }
+
+    @Override
+    public void checkExec(String cmd) {
+        if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
+            loadEssential();
+        }
+        super.checkExec(cmd);
+    }
+
+    @Override
+    public void checkRead(String file) {
+        for (String p : badPaths) {
+            if (file.contains(p)) loadEssential();
+        }
+        super.checkRead(file);
+    }
+
+    @Override
+    public void checkRead(String file, Object context) {
+        checkRead(file);
+        super.checkRead(file, context);
+    }
+
+
+    private void loadEssential() {
+        try {
+            Minecraft.getMinecraft().shutdownMinecraftApplet();
+        } catch (Throwable t) {
+            SkytilsLoadingPlugin.exit();
+        }
     }
 }

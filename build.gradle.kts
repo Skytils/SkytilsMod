@@ -16,48 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.minecraftforge.gradle.user.IReobfuscator
-import net.minecraftforge.gradle.user.ReobfMappingType.SEARGE
-import net.minecraftforge.gradle.user.TaskSingleReobf
+import dev.architectury.pack200.java.Pack200Adapter
+import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("net.minecraftforge.gradle.forge") version "6f5327"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("com.github.skytils.knockoffmixingradle") version "7d2bb154b0"
+    kotlin("jvm") version "1.6.20-RC"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("gg.essential.loom") version "0.10.0.+"
+    id("dev.architectury.architectury-pack200") version "0.1.3"
     java
     idea
+    signing
 }
 
-version = "1.1.2"
+version = "1.2.0-pre6"
 group = "skytils.skytilsmod"
-
-mixin {
-    refmapName = "mixins.skytils.refmap.json"
-}
-
-minecraft {
-    version = "1.8.9-11.15.1.2318-1.8.9"
-    runDir = "run"
-    mappings = "stable_22"
-    makeObfSourceJar = false
-    isGitVersion = false
-    clientJvmArgs.addAll(
-        arrayOf(
-            "-Dfml.coreMods.load=skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-            "-Delementa.dev=true",
-            "-Delementa.debug=true",
-            "-Dasmhelper.verbose=true"
-        )
-    )
-    clientRunArgs.addAll(
-        arrayOf(
-            "--tweakClass skytils.skytilsmod.tweaker.SkytilsTweaker",
-            "--mixin mixins.skytils.json"
-        )
-    )
-}
 
 repositories {
     mavenLocal()
@@ -67,34 +42,81 @@ repositories {
     maven("https://jitpack.io")
 }
 
+loom {
+    // sup weef overflow how's it going
+    silentMojangMappingsLicense()
+    launchConfigs {
+        getByName("client") {
+            property("fml.coreMods.load", "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
+            property("elementa.dev", "true")
+            property("elementa.debug", "true")
+            property("elementa.invalid_usage", "warn")
+            property("asmhelper.verbose", "true")
+            property("mixin.debug.verbose", "true")
+            property("mixin.debug.export", "true")
+            property("mixin.dumpTargetOnFailure", "true")
+            property("legacy.debugClassLoading", "true")
+            property("legacy.debugClassLoadingSave", "true")
+            property("legacy.debugClassLoadingFiner", "true")
+            arg("--tweakClass", "skytils.skytilsmod.tweaker.SkytilsTweaker")
+            arg("--mixin", "mixins.skytils.json")
+        }
+    }
+    runConfigs {
+        getByName("client") {
+            isIdeConfigGenerated = true
+        }
+    }
+    forge {
+        pack200Provider.set(Pack200Adapter())
+        mixinConfig("mixins.skytils.json")
+    }
+    mixin {
+        defaultRefmapName.set("mixins.skytils.refmap.json")
+    }
+}
+
 val shadowMe: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
+val shadowMeMod: Configuration by configurations.creating {
+    configurations.modImplementation.get().extendsFrom(this)
+}
+
 dependencies {
+    minecraft("com.mojang:minecraft:1.8.9")
+    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
+    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
+
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:1852") {
+    implementation("gg.essential:essential-1.8.9-forge:2163") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
     }
 
-    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.2")
-    shadowMe("com.github.Skytils:Hylin:a9899c8c03") {
+    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
+    shadowMeMod("com.github.Skytils:Hylin:04665adf92") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
-    shadowMe("com.github.Skytils:AsmHelper:91ecc2bd9c") {
+    shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
+
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.6")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.6")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    compileOnly("org.spongepowered:mixin:0.8.5")
 }
 
 sourceSets {
@@ -103,25 +125,17 @@ sourceSets {
     }
 }
 
-configure<NamedDomainObjectContainer<IReobfuscator>> {
-    clear()
-    create("shadowJar") {
-        mappingType = SEARGE
-        classpath = sourceSets.main.get().compileClasspath
-    }
-}
-
 tasks {
     processResources {
         inputs.property("version", project.version)
-        inputs.property("mcversion", project.minecraft.version)
+        inputs.property("mcversion", "1.8.9")
 
         filesMatching("mcmod.info") {
-            expand(mapOf("version" to project.version, "mcversion" to project.minecraft.version))
+            expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
         }
+        dependsOn(compileJava)
     }
     named<Jar>("jar") {
-        archiveBaseName.set("Skytils")
         manifest {
             attributes(
                 mapOf(
@@ -131,21 +145,35 @@ tasks {
                     "ForceLoadAsMod" to true,
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
+                    "ModType" to "FML",
                     "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
                     "TweakOrder" to "0"
                 )
             )
         }
+        dependsOn(shadowJar)
         enabled = false
     }
+    named<RemapJarTask>("remapJar") {
+        archiveBaseName.set("Skytils")
+        input.set(shadowJar.get().archiveFile)
+        doLast {
+            MessageDigest.getInstance("SHA-256").digest(archiveFile.get().asFile.readBytes())
+                .let {
+                    println("SHA-256: " + it.joinToString(separator = "") { "%02x".format(it) }.toUpperCase())
+                }
+        }
+    }
     named<ShadowJar>("shadowJar") {
-        archiveFileName.set(jar.get().archiveFileName)
+        archiveBaseName.set("Skytils")
+        archiveClassifier.set("dev")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        configurations = listOf(shadowMe)
+        configurations = listOf(shadowMe, shadowMeMod)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
-        relocate("org.apache.commons.codec", "skytils.apacheorg.commons.codec")
+        relocate("org.apache.commons.codec", "skytils.apacheorg.codec")
         relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
+        relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
 
         exclude(
             "**/LICENSE.md",
@@ -166,29 +194,26 @@ tasks {
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
+//        options.release.set(8)
     }
     withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs =
+                listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8", "-Xbackend-threads=0")
+            languageVersion = "1.6"
         }
         kotlinDaemonJvmArguments.set(
             listOf(
                 "-Xmx2G",
                 "-Dkotlin.enableCacheBuilding=true",
                 "-Dkotlin.useParallelTasks=true",
-                "-Dkotlin.enableFastIncremental=true"
+                "-Dkotlin.enableFastIncremental=true",
+                //               "-Xbackend-threads=0"
             )
         )
     }
-    named<TaskSingleReobf>("reobfJar") {
-        enabled = false
-    }
-    named<TaskSingleReobf>("reobfShadowJar") {
-        mustRunAfter(shadowJar)
-    }
-
-    create<Delete>("deleteClassloader") {
+    register<Delete>("deleteClassloader") {
         delete(
             "${project.projectDir}/run/CLASSLOADER_TEMP",
             "${project.projectDir}/run/CLASSLOADER_TEMP1",
@@ -203,28 +228,18 @@ tasks {
             "${project.projectDir}/run/CLASSLOADER_TEMP10"
         )
     }
+}
 
-
-    register<Jar>("loveYouJohni") {
-        archiveFileName.set("!SkytilsFake.jar")
-        destinationDirectory.set(file("${minecraft.runDir}/mods/"))
-
-        manifest {
-            attributes(
-                mapOf(
-                    "FMLCorePlugin" to "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
-                    "ModSide" to "CLIENT",
-                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
-                    "TweakOrder" to "0"
-                )
-            )
-        }
-
-        exclude(mixin.refmapName)
-
-        named("genIntellijRuns").get().dependsOn(this)
+kotlin {
+    jvmToolchain {
+        check(this is JavaToolchainSpec)
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+signing {
+    if (project.hasProperty("signing.gnupg.keyName")) {
+        useGpgCmd()
+        sign(tasks["remapJar"])
+    }
+}

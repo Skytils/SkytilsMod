@@ -21,28 +21,24 @@ package skytils.skytilsmod.features.impl.protectitems.strategy.impl
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.handlers.AuctionData
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
 
-class ItemWorthStrategy : ItemProtectStrategy() {
+object ItemWorthStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
         val id = AuctionData.getIdentifier(item) ?: return false
         if (AuctionData.lowestBINs.size == 0) return true
         val value = AuctionData.lowestBINs.getOrDefault(id, 0.0)
         val threshold = Skytils.config.protectItemBINThreshold.toInt()
-        when (type) {
+        return when (type) {
             ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
-                return value >= threshold
+                value >= threshold
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (SBInfo.mode != SkyblockIsland.Dungeon.mode) {
-                    return value >= threshold
-                }
+                !DungeonFeatures.hasClearedText && value >= threshold
             }
         }
-        return false
     }
 
     override val isToggled: Boolean

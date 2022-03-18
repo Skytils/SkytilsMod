@@ -61,17 +61,6 @@ import kotlin.math.floor
 
 object Utils {
 
-    val azooPuzzoo by lazy {
-        File(Skytils.modDir, "azoopuzzoo").exists()
-    }
-
-    val breefingdog by lazy {
-        File(Skytils.modDir, "breefingdog").exists()
-    }
-
-    @JvmField
-    var noSychic = false
-
     @JvmField
     var skyblock = false
 
@@ -208,7 +197,7 @@ object Utils {
             "F4", "M4" -> "Thorn"
             "F5", "M5" -> "Livid"
             "F6", "M6" -> "Sadan"
-            "F7", "M7" -> "Necron"
+            "F7", "M7" -> "Maxor"
             else -> null
         } ?: return false
 
@@ -272,6 +261,12 @@ fun Entity.getXZDistSq(other: Entity): Double {
     return xDelta * xDelta + zDelta * zDelta
 }
 
+fun Entity.getXZDistSq(pos: BlockPos): Double {
+    val xDelta = this.posX - pos.x
+    val zDelta = this.posZ - pos.z
+    return xDelta * xDelta + zDelta * zDelta
+}
+
 val Entity.hasMoved
     get() = this.posX != this.prevPosX || this.posY != this.prevPosY || this.posZ != this.prevPosZ
 
@@ -328,8 +323,17 @@ val S2APacketParticles.count
 val S2APacketParticles.speed
     get() = this.particleSpeed
 
-operator fun <K, V> Cache<K, V>.set(name: K, value: V) = put(name, value)
+operator fun <K : Any, V : Any> Cache<K, V>.set(name: K, value: V) = put(name, value)
 
 fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
 
 fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTagAt(it) }
+
+
+fun Vec3i.toBoundingBox() = AxisAlignedBB(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
+
+fun File.ensureFile() = (parentFile.exists() || parentFile.mkdirs()) && createNewFile()
+
+fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolean {
+    return (owner == null || this.owner == owner) && (name == null || this.name == name) && (desc == null || this.desc == desc)
+}

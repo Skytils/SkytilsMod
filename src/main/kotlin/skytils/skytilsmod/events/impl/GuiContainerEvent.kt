@@ -19,11 +19,17 @@ package skytils.skytilsmod.events.impl
 
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 import skytils.skytilsmod.events.SkytilsEvent
 
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkytilsEvent() {
+    val chestName: String by lazy {
+        if (container !is ContainerChest) error("Container is not a chest")
+        return@lazy (container as ContainerChest).lowerChestInventory.displayName.unformattedText.trim()
+    }
+
     data class BackgroundDrawnEvent(
         override val gui: GuiContainer,
         override val container: Container,

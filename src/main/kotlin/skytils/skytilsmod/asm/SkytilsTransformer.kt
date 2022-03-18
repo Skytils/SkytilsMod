@@ -30,9 +30,8 @@ class SkytilsTransformer : BaseClassTransformer() {
          * Key is srg name, value is deobf name
         */
         val methodMaps: WeakHashMap<String, String> = WeakHashMap()
+        var madeTransformers = false
     }
-
-    var madeTransformers = false
 
     override fun setup(classLoader: LaunchClassLoader) {
         methodMaps + mapOf(
@@ -51,6 +50,10 @@ class SkytilsTransformer : BaseClassTransformer() {
                 changeRenderedName()
                 insertReceivePacketEvent()
                 injectNullCheck()
+                commitArson()
+                injectContainerCheck()
+                injectScoreboardScoreRemover()
+                fixSBADungeonCheck()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }

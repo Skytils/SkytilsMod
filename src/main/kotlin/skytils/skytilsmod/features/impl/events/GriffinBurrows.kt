@@ -19,7 +19,9 @@ package skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.event.ClickEvent
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C07PacketPlayerDigging
@@ -44,6 +46,8 @@ import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent
+import skytils.skytilsmod.events.impl.SendChatMessageEvent
+import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -69,11 +73,20 @@ object GriffinBurrows {
     var shouldRefreshBurrows = false
 
     var hasSpadeInHotbar = false
+    var overridePerkCheck = false
 
     fun refreshBurrows(): Future<*> {
         return Skytils.threadPool.submit {
             try {
-                println("Finding burrows")
+                if (!overridePerkCheck && MayorInfo.jerryMayor?.name != "Diana" && !MayorInfo.mayorPerks.contains("Mythological Ritual")) {
+                    UChat.chat(
+                        UTextComponent("§c§lHELLOOOOOO??? DIANA ISN'T MAYOR ARE YOU OK??? §6Am I wrong? Click me to disable this check.").setClick(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/skytilsoverridedianacheck"
+                        )
+                    )
+                    return@submit
+                }
                 val uuid = mc.thePlayer.gameProfile.id
                 val apiKey = Skytils.config.apiKey
                 if (apiKey.isBlank()) {
@@ -116,6 +129,13 @@ object GriffinBurrows {
                 UChat.chat("§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${e.message}")
                 e.printStackTrace()
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onSendMessage(event: SendChatMessageEvent) {
+        if (!event.addToChat && event.message == "/skytilsoverridedianacheck") {
+            event.isCanceled = true
         }
     }
 
@@ -307,7 +327,7 @@ object GriffinBurrows {
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
-                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
                 this.color,
                 (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )

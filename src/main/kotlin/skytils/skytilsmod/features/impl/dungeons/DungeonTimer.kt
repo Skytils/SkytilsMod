@@ -87,15 +87,28 @@ class DungeonTimer {
                             add("§bWatcher took ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
                             add("§9Boss entry was ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
                         }
-                        if (Skytils.config.sadanPhaseTimer && (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6")) {
+                        if (Skytils.config.sadanPhaseTimer && Utils.equalsOneOf(
+                                DungeonFeatures.dungeonFloor,
+                                "F6",
+                                "M6"
+                            )
+                        ) {
                             add("§dTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds.")
                             add("§aGiants took ${diff(giantsClearTime, terraClearTime)} seconds.")
                             add("§cSadan took ${diff(bossClearTime, giantsClearTime)} seconds.")
-                        } else if (Skytils.config.necronPhaseTimer && DungeonFeatures.dungeonFloor == "F7") {
-                            add("§bPhase 1 took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
-                            add("§cPhase 2 took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
-                            add("§6Phase 3 took ${diff(phase3ClearTime, phase2ClearTime)} seconds..")
-                            add("§4Phase 4 took ${diff(bossClearTime, phase3ClearTime)} seconds..")
+                        } else if (Skytils.config.necronPhaseTimer && Utils.equalsOneOf(
+                                DungeonFeatures.dungeonFloor,
+                                "F7",
+                                "M7"
+                            )
+                        ) {
+                            add("§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
+                            add("§cStorm took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
+                            add("§6Goldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds.")
+                            add("§4Necron took ${diff(phase4ClearTime, phase3ClearTime)} seconds.")
+                            if (DungeonFeatures.dungeonFloor == "M7") {
+                                add("§7Wither King took ${diff(bossClearTime, phase4ClearTime)} seconds.")
+                            }
                         }
                         if (Skytils.config.dungeonTimer) {
                             add("§bDungeon finished in ${diff(bossClearTime, dungeonStartTime)} seconds.")
@@ -104,29 +117,35 @@ class DungeonTimer {
                     }
                 }
             }
-            DungeonFeatures.dungeonFloor == "F7" && message.startsWith("§r§4[BOSS] Necron") -> {
+            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && message.startsWith("§r§4[BOSS] ") -> {
                 when {
-                    message.endsWith("§r§cFINE! LET'S MOVE TO SOMEWHERE ELSE!!§r") && phase1ClearTime == -1L -> {
+                    message.endsWith("§r§cPathetic Maxor, just like expected.§r") && phase1ClearTime == -1L -> {
                         phase1ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§bPhase 1 took ${diff(phase1ClearTime, bossEntryTime)} seconds."
+                            "§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds."
                         )
                     }
-                    message.endsWith("§r§cCRAP!! IT BROKE THE FLOOR!§r") && phase2ClearTime == -1L -> {
+                    message.endsWith("§r§cAt least my son died by your hands.§r") && phase2ClearTime == -1L -> {
                         phase2ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§bPhase 2 took ${diff(phase2ClearTime, phase1ClearTime)} seconds."
+                            "§bStorm took ${diff(phase2ClearTime, phase1ClearTime)} seconds."
                         )
                     }
-                    (message.endsWith("§r§cTHAT'S IT YOU HAVE DONE IT!§r") && phase3ClearTime == -1L) -> {
+                    message.endsWith("§r§c....§r") && phase3ClearTime == -1L -> {
                         phase3ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§bPhase 3 took ${diff(phase3ClearTime, phase2ClearTime)} seconds."
+                            "§bGoldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds."
+                        )
+                    }
+                    message.endsWith("§r§cAll this, for nothing...§r") -> {
+                        phase4ClearTime = System.currentTimeMillis()
+                        if (Skytils.config.necronPhaseTimer) UChat.chat(
+                            "§bNecron took ${diff(phase4ClearTime, phase3ClearTime)} seconds."
                         )
                     }
                 }
             }
-            (DungeonFeatures.dungeonFloor == "F6" || DungeonFeatures.dungeonFloor == "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
+            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
                 when {
                     (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
                         terraClearTime = System.currentTimeMillis()
@@ -155,6 +174,7 @@ class DungeonTimer {
         phase1ClearTime = -1
         phase2ClearTime = -1
         phase3ClearTime = -1
+        phase4ClearTime = -1
         terraClearTime = -1
         giantsClearTime = -1
         witherDoors = 0
@@ -170,6 +190,7 @@ class DungeonTimer {
         var phase1ClearTime = -1L
         var phase2ClearTime = -1L
         var phase3ClearTime = -1L
+        var phase4ClearTime = -1L
         var terraClearTime = -1L
         var giantsClearTime = -1L
         var witherDoors = 0
@@ -243,16 +264,23 @@ class DungeonTimer {
 
     class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", FloatPair(200, 120)) {
         override fun render() {
-            if (toggled && Utils.inDungeons && bossEntryTime != -1L && DungeonFeatures.dungeonFloor == "F7") {
+            if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F7",
+                    "M7"
+                )
+            ) {
                 val lines = arrayListOf(
-                    "§bPhase 1: ${dungeonTimeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime) / 1000.0)}"
+                    "§bMaxor: ${dungeonTimeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime) / 1000.0)}"
                 ).apply {
                     if (phase1ClearTime != -1L)
-                        add("§cPhase 2: ${dungeonTimeFormat(((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime) / 1000.0)}")
+                        add("§cStorm: ${dungeonTimeFormat(((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime) / 1000.0)}")
                     if (phase2ClearTime != -1L)
-                        add("§6Phase 3: ${dungeonTimeFormat(((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime) / 1000.0)}")
+                        add("§6Goldor: ${dungeonTimeFormat(((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime) / 1000.0)}")
                     if (phase3ClearTime != -1L)
-                        add("§4Phase 4: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase3ClearTime) / 1000.0)}")
+                        add("§4Necron: ${dungeonTimeFormat(((if (phase4ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase4ClearTime) - phase3ClearTime) / 1000.0)}")
+                    if (phase4ClearTime != -1L && DungeonFeatures.dungeonFloor == "M7")
+                        add("§7Wither King: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase4ClearTime) / 1000.0)}")
                 }
                 RenderUtil.drawAllInList(this, lines)
             }
@@ -260,10 +288,11 @@ class DungeonTimer {
 
         override fun demoRender() {
             val displayText = """
-                §bPhase 1: 0s
-                §cPhase 2: 0s
-                §6Phase 3: 0s
-                §4Phase 4: 0s
+                §bMaxor: 0s
+                §cStorm: 0s
+                §6Goldor: 0s
+                §4Necron: 0s
+                §7Wither King: 0s
                 """.trimIndent()
             val lines = displayText.split('\n')
             RenderUtil.drawAllInList(this, lines)
@@ -272,7 +301,7 @@ class DungeonTimer {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§cPhase 1: 0s")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§cMaxor: 0s")
 
         override val toggled: Boolean
             get() = Skytils.config.necronPhaseTimer

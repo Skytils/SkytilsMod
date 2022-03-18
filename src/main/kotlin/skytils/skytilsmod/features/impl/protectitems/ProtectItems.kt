@@ -69,9 +69,8 @@ class ProtectItems {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest && ItemProtectStrategy.isAnyToggled()) {
-            val chest = event.container
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim()
+            val inv = event.container.lowerChestInventory
+            val chestName = event.chestName
             if (event.slot != null && event.slot.hasStack) {
                 var item: ItemStack = event.slot.stack ?: return
                 var extraAttr = ItemUtil.getExtraAttributes(item)

@@ -17,18 +17,16 @@
  */
 package skytils.skytilsmod.features.impl.spidersden
 
-import com.google.common.base.Predicate
 import gg.essential.universal.UResolution
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.BlockPos
-import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.utils.*
@@ -72,7 +70,7 @@ class SpidersDenFeatures {
     }
 
     companion object {
-        private val mc = Minecraft.getMinecraft()
+
         private var shouldShowArachneSpawn = false
 
         init {
@@ -82,20 +80,14 @@ class SpidersDenFeatures {
 
     class ArachneHPElement : GuiElement("Show Arachne HP", FloatPair(200, 30)) {
         override fun render() {
-            val player = mc.thePlayer
-            val world: World? = mc.theWorld
-            if (toggled && Utils.inSkyblock && player != null && world != null) {
+            val world = mc.theWorld ?: return
+            if (toggled && Utils.inSkyblock) {
                 if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
                 val arachneNames =
-                    world.getEntities(EntityArmorStand::class.java, Predicate getEntities@{ entity: EntityArmorStand? ->
+                    world.getEntities(EntityArmorStand::class.java) { entity: EntityArmorStand? ->
                         val name = entity!!.displayName.formattedText
-                        if (name.contains("❤")) {
-                            if (name.contains("§cArachne §")) {
-                                return@getEntities true
-                            }
-                        }
-                        false
-                    })
+                        name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
+                    }
                 RenderUtil.drawAllInList(this, arachneNames.map { it.displayName.formattedText })
             }
         }

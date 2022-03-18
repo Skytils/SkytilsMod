@@ -35,7 +35,6 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
-import java.awt.Color
 
 class BlazeSolver {
     private var ticks = 0
@@ -146,18 +145,13 @@ class BlazeSolver {
         ticks++
     }
 
-    /**
-     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size > 0) {
             if (blazeMode < 0) {
-                val shootableBlaze = orderedBlazes[0]
+                val shootableBlaze = orderedBlazes.first()
                 val lowestBlaze = shootableBlaze.blaze
-                RenderUtil.draw3DString(
+                RenderUtil.drawLabel(
                     Vec3(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ),
                     "§lSmallest",
                     Skytils.config.lowestBlazeColor,
@@ -165,9 +159,9 @@ class BlazeSolver {
                 )
             }
             if (blazeMode > 0) {
-                val shootableBlaze = orderedBlazes[orderedBlazes.size - 1]
+                val shootableBlaze = orderedBlazes.last()
                 val highestBlaze = shootableBlaze.blaze
-                RenderUtil.draw3DString(
+                RenderUtil.drawLabel(
                     Vec3(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ),
                     "§lBiggest",
                     Skytils.config.highestBlazeColor,

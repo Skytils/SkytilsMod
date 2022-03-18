@@ -34,16 +34,17 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import skytils.skytilsmod.utils.RenderUtil
+import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.awt.Point
 import java.util.*
 import kotlin.math.floor
 
-class AlignmentTaskSolver {
+object AlignmentTaskSolver {
     // the blocks are on the west side, frames block pos is 1 block higher
-    private val topLeft = BlockPos(197, 124, 278).up()
-    private val bottomRight = BlockPos(197, 120, 274).up()
+    private val topLeft = BlockPos(-2, 124, 79).up()
+    private val bottomRight = BlockPos(-2, 120, 75).up()
     private val box = BlockPos.getAllInBox(topLeft, bottomRight).toList().sortedWith { a, b ->
         if (a.y == b.y) {
             return@sortedWith b.z - a.z
@@ -62,7 +63,11 @@ class AlignmentTaskSolver {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (mc.thePlayer == null || mc.theWorld == null || event.phase != TickEvent.Phase.START) return
-        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || DungeonFeatures.dungeonFloor != "F7" || DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L) return
+        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || !Utils.equalsOneOf(
+                DungeonFeatures.dungeonFloor,
+                "F7", "M7"
+            ) || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L))
+        ) return
         if (ticks % 20 == 0) {
             if (mc.thePlayer.getDistanceSqToCenter(topLeft) <= 25 * 25) {
                 if (grid.size < 25) {
@@ -130,7 +135,7 @@ class AlignmentTaskSolver {
             var neededClicks = directionSet.getOrElse(space.coords) { 0 } - frame.rotation
             if (neededClicks == 0) continue
             if (neededClicks < 0) neededClicks += 8
-            RenderUtil.draw3DString(
+            RenderUtil.drawLabel(
                 getVec3RelativeToGrid(space.coords.x, space.coords.y).addVector(0.5, 0.5, 0.5),
                 neededClicks.toString(),
                 Color.RED,

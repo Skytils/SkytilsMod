@@ -21,6 +21,8 @@ package skytils.skytilsmod.utils
 object SkillUtils {
     val maxSkillLevels = LinkedHashMap<String, Int>()
     val skillXp = LinkedHashMap<Int, Long>()
+    val runeXp = LinkedHashMap<Int, Long>()
+    val hotmXp = LinkedHashMap<Int, Long>()
     val dungeoneeringXp = LinkedHashMap<Int, Long>()
     val slayerXp = LinkedHashMap<String, LinkedHashMap<Int, Long>>()
 
@@ -51,18 +53,12 @@ object SkillUtils {
         return level to xp
     }
 
-    fun calcXpWithOverflowAndProgress(experience: Double, cap: Int, values: Collection<Long>): Triple<Int, Double, Double> {
+    fun calcXpWithOverflowAndProgress(
+        experience: Double,
+        cap: Int,
+        values: Collection<Long>
+    ): Triple<Int, Double, Double> {
         val overflow = calcXpWithOverflow(experience, cap, values)
         return Triple(overflow.first, overflow.second, calcXpWithProgress(experience, values))
-    }
-
-    fun findNextLevel(experience: Double, values: Map<Int, Long>?): Int {
-        if (values == null) return -1
-        values.onEach { entry ->
-            if (experience < entry.value) {
-                return@findNextLevel entry.key - 1
-            }
-        }
-        return values.size
     }
 }

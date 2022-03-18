@@ -38,6 +38,7 @@ import skytils.skytilsmod.utils.DevTools
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
+import kotlin.math.abs
 
 class TeleportMazeSolver {
 
@@ -67,7 +68,7 @@ class TeleportMazeSolver {
                             mc.thePlayer.posY,
                             69.5,
                             69.8125
-                        ) && x % 1 == 0.5 && z % 1 == 0.5
+                        ) && abs(x % 1) == 0.5 && abs(z % 1) == 0.5
                     ) {
                         val currPos = mc.thePlayer.position
                         val pos = BlockPos(x, y, z)

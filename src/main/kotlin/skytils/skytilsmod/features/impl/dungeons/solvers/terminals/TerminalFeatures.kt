@@ -17,34 +17,38 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.startsWithAny
 
-class TerminalFeatures {
+object TerminalFeatures {
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
-            val chest = event.container
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
+            val chestName = event.chestName
             if (Utils.equalsOneOf(
                     chestName,
                     "Navigate the maze!",
                     "Correct all the panes!",
-                    "Click in order!"
+                    "Click in order!",
+                    "Click the button on time!"
                 ) || chestName.startsWithAny(
                     "What starts with:",
                     "Select all the"
-                )
+                ) || (chestName == "Change all to same color!" && event.clickedButton != 1 && Utils.equalsOneOf(
+                    event.clickType,
+                    0,
+                    1,
+                    6
+                ))
             ) {
                 event.isCanceled = true
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 2, 0, mc.thePlayer)
@@ -56,19 +60,13 @@ class TerminalFeatures {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inDungeons) return
         if (event.toolTip == null) return
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer
-        if (mc.currentScreen is GuiChest) {
-            val chest = player.openContainer as ContainerChest
+        val chest = mc.thePlayer.openContainer
+        if (chest is ContainerChest) {
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText
             if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {
                 event.toolTip.clear()
             }
         }
-    }
-
-    companion object {
-        private val mc = Minecraft.getMinecraft()
     }
 }

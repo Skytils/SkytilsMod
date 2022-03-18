@@ -18,12 +18,12 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
+import gg.essential.universal.wrappers.UPlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.event.ClickEvent
@@ -34,25 +34,26 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.DataFetcher
+import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.UpdateChecker
 import skytils.skytilsmod.features.impl.events.GriffinBurrows
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.Ping
+import skytils.skytilsmod.features.impl.misc.PricePaid
 import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.*
-import skytils.skytilsmod.utils.APIUtil
-import skytils.skytilsmod.utils.DevTools
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.openGUI
+import skytils.skytilsmod.gui.profile.ProfileGui
+import skytils.skytilsmod.utils.*
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.*
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
-    override fun processCommand(sender: ICommandSender, args: Array<String>) {
-        val player = sender as EntityPlayerSP
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
             Skytils.displayScreen = OptionsGui()
             return
@@ -187,7 +188,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()
             "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> ArmorColorCommand.processCommand(
-                sender,
+                player,
                 args.copyOfRange(1, args.size)
             )
             "swaphub" -> {
@@ -268,6 +269,31 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
             "waypoint", "waypoints" -> Skytils.displayScreen = WaypointsGui()
             "notifications" -> Skytils.displayScreen = CustomNotificationsGui()
+            "pv" -> {
+                if (args.size == 1) {
+                    Skytils.displayScreen =
+                        ProfileGui(mc.thePlayer.uniqueID, UPlayer.getPlayer()?.displayNameString ?: "")
+                } else {
+                    // TODO Add some kind of message indicating progress
+                    var uuid by Delegates.notNull<UUID>()
+                    Skytils.launch {
+                        uuid = Skytils.hylinAPI.getUUIDSync(args[1])
+                    }.invokeOnCompletion {
+                        it?.let { error ->
+                            UChat.chat("§9§lSkytils ➜ §cError finding player!")
+                            error.printStackTrace()
+                            return@invokeOnCompletion
+                        }
+                        Skytils.displayScreen = ProfileGui(uuid, args[1])
+                    }
+                }
+            }
+            "pricepaid" -> {
+                val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer?.heldItem) ?: return
+                PricePaid.prices[UUID.fromString(extraAttr.getString("uuid").ifEmpty { return })] =
+                    args[1].toDoubleOrNull() ?: return
+                PersistentSave.markDirty<PricePaid>()
+            }
             else -> UChat.chat("§c§lSkytils ➜ §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
         }
     }
