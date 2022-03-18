@@ -1970,6 +1970,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         hidden = true
     )
     var voidRNG = 0f
+    
+    @Property(
+        type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
+        description = "Open chat, then click anywhere on screen to open Maddox Menu.",
+        category = "Slayer", subcategory = "Quality of Life"
+    )
+    var openMaddoxMenu = false
 
     @Property(
         type = PropertyType.SELECTOR, name = "Carry Mode",
