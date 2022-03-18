@@ -440,7 +440,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
     @Property(
         type = PropertyType.SWITCH, name = "Change Hurt Color on the Wither King's Dragons",
-        description = "Reduces the tinting on hurting the wither king's dragons. Also hides the body and wings of the dragon.",
+        description = "Reduces the tinting on hurting the wither king's dragons.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var changeHurtColorOnWitherKingsDragons = false
