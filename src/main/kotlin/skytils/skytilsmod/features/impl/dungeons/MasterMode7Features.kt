@@ -187,27 +187,12 @@ object MasterMode7Features {
         }
     }
 
-    fun onRenderMainModel(
-        entity: EntityDragon,
-        f: Float,
-        g: Float,
-        h: Float,
-        i: Float,
-        j: Float,
-        scaleFactor: Float,
-        ci: CallbackInfo
-    ) {
-        if (!Skytils.config.recolorWitherKingsDragons) return
-        entity as ExtensionEntityLivingBase
-        entity.skytilsHook.colorMultiplier?.bindColor()
-    }
-
     fun getHurtOpacity(
         renderDragon: RenderDragon,
         lastDragon: EntityDragon,
         value: Float
     ): Float {
-        if (!Skytils.config.recolorWitherKingsDragons) return value
+        if (!Skytils.config.changeHurtColorOnWitherKingsDragons) return value
         lastDragon as ExtensionEntityLivingBase
         return if (lastDragon.skytilsHook.colorMultiplier != null) {
             val model = renderDragon.mainModel as AccessorModelDragon
