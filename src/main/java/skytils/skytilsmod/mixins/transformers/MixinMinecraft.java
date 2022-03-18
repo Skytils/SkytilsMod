@@ -23,6 +23,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Session;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,6 +35,7 @@ import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import sun.reflect.Reflection;
 
 import java.io.File;
 import java.util.Objects;
@@ -77,5 +79,6 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 4))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         ScreenRenderer.init();
+        Reflection.registerMethodsToFilter(Session.class, "getSessionID", "func_111286_b", "getToken", "func_148254_d");
     }
 }
