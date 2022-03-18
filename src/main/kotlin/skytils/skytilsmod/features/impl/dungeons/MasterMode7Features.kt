@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.core.SoundQueue
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
@@ -80,18 +80,10 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (DungeonTimer.phase4ClearTime == -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
-        if (ticks % 10 == 0) {
+        if (ticks % 15 == 0) {
             if (Skytils.config.witherKingDragonSlashAlert) {
                 if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
-                    SoundQueue.addToQueue("random.orb", 1f)
-                }
-            }
-        }
-        if (ticks % 100 == 0) {
-            WitherKingDragons.values().filterNot { it.isDestroyed }.forEach {
-                val chunk = mc.theWorld.getChunkFromBlockCoords(it.bottomChin)
-                if (!chunk.isEmpty && mc.theWorld.getBlockState(it.bottomChin).block === Blocks.air) {
-                    it.isDestroyed = true
+                    GuiManager.createTitle("Dimensional Slash!", 10)
                 }
             }
             ticks = 0
