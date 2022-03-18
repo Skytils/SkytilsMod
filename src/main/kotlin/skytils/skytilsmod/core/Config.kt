@@ -563,8 +563,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var spiritPetWarning = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Wither King Dragon Interdimensional Slash Alert",
-        description = "Plays a sound when you are in range of interdimensional slash.",
+        type = PropertyType.SWITCH, name = "Wither King Dragon Dimensional Slash Alert",
+        description = "Creates a title when you are in range of dimensional slash.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var witherKingDragonSlashAlert = false
@@ -2587,7 +2587,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
 
         addDependency("markDirtyItems", "dupeTracker")
 
-        registerListener("protectItemBINThreshold") { threshold: String ->
+        registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
