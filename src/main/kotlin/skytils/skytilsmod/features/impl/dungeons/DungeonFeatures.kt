@@ -306,7 +306,7 @@ object DungeonFeatures {
                         BossStatus.statusBarTime = 100
                         BossStatus.bossName = displayData.displayName.formattedText + "§r§8 - §r§a" + NumberUtil.format(
                             (BossStatus.healthScale * 1000000000).toLong()
-                        ) + "§r§8/§r§a1B§r§c❤"
+                        ) + "§r§8/§r§a${if (dungeonFloor == "M7") "800M" else "300K"}§r§c❤"
                         BossStatus.hasColorModifier = event.hasColorModifier
                         event.isCanceled = true
                     }
