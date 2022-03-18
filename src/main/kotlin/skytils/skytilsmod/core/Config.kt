@@ -1780,6 +1780,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         hidden = true
     )
     var voidRNG = 0f
+    
+    @Property(
+        type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
+        description = "Open chat, then click anywhere on screen to open Maddox Menu.",
+        category = "Slayer", subcategory = "Quality of Life"
+    )
+    var openMaddoxMenu = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Use Hits to Detect Slayer",
@@ -1836,13 +1843,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Slayer", subcategory = "Quality of Life"
     )
     var slayerTimeToKill = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
-        description = "Open chat, then click anywhere on screen to open Maddox Menu.",
-        category = "Slayer", subcategory = "Quality of Life"
-    )
-    var openMaddoxMenu = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Others' Broken Heart Radiation",
