@@ -86,6 +86,12 @@ object CataCommand : StatCommand("skytilscata") {
 
             val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
 
+            val classAvgOverflow = (archLevel + bersLevel + healerLevel + mageLevel + tankLevel) / 5.0
+            val classAvgCapped =
+                (archLevel.coerceAtMost(50.0) + bersLevel.coerceAtMost(50.0) + healerLevel.coerceAtMost(50.0) + mageLevel.coerceAtMost(
+                    50.0
+                ) + tankLevel.coerceAtMost(50.0)) / 5.0
+
             val component = UMessage("§a➜ Catacombs Statistics Viewer\n")
                 .append(
                     "§2§l ❣ §7§oYou are looking at data for ${playerResponse.rankPrefix} ${
@@ -96,6 +102,7 @@ object CataCommand : StatCommand("skytilscata") {
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
                 .append("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
+                .append("§9 ☠ Class Avg: §l➡ §e${nf.format(classAvgCapped)} (${classAvgOverflow})\n\n")
                 .append("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
                 .append("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n")
                 .append("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n")
