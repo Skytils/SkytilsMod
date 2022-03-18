@@ -26,8 +26,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import skytils.hylin.skyblock.Pet
 import skytils.hylin.skyblock.dungeons.DungeonClass
-import skytils.hylin.skyblock.item.Tier
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
@@ -256,9 +256,7 @@ object DungeonListener {
                         val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
                             uuid
                         ) ?: continue
-                        hutaoFans[name] = profile.pets.any {
-                            it.type == "SPIRIT" && (it.tier == Tier.LEGENDARY || (it.heldItem == "PET_ITEM_TIER_BOOST" && it.tier == Tier.EPIC))
-                        }
+                        hutaoFans[name] = profile.pets.any(Pet::isSpirit)
                     }
                     printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
                 }.onFailure {

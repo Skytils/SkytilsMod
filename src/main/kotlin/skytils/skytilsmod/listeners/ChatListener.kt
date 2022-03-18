@@ -18,32 +18,19 @@
 package skytils.skytilsmod.listeners
 
 import gg.essential.universal.UChat
-import gg.essential.universal.wrappers.message.UMessage
-import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.event.ClickEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.extension.getString
-import skytils.hylin.mojang.AshconException
-import skytils.hylin.request.HypixelAPIException
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.Pet
-import skytils.hylin.skyblock.item.InventoryItem
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
-import skytils.skytilsmod.utils.*
-import java.util.*
+import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
-import kotlin.math.floor
-import kotlin.reflect.KMutableProperty0
-import kotlin.time.Duration
 
 class ChatListener {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -59,35 +46,6 @@ class ChatListener {
             UChat.chat("§aSkytils updated your set Hypixel API key to §2${apiKey}")
             return
         }
-        if(Skytils.config.partyFinderStats) {
-            val joinedd = dungeon_finder_join_pattern.matcher(unformatted)
-            if (joinedd.find()) {
-                val username = joinedd.group(1)
-                if(username.equals(mc.thePlayer.name)) {
-                    return
-                }
-                Skytils.threadPool.submit {
-                    val uuid = try {
-                        (Skytils.hylinAPI.getUUIDSync(username))
-                    } catch (e: AshconException) {
-                        UChat.chat("§cFailed to get UUID, reason: ${e.message}")
-                        return@submit
-                    }
-                    val profile = try {
-                        Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
-                    } catch (e: HypixelAPIException) {
-                        UChat.chat("§cUnable to retrieve profile information: ${e.message}")
-                        return@submit
-                    }
-                    if (profile != null) {
-                        playerStats(username, uuid, profile)
-                    } else {
-                        UChat.chat("§cUnable to retrieve profile information.")
-                    }
-                }
-            }
-        }
-
         if (Skytils.config.autoReparty) {
             if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
                 val matcher = playerPattern.matcher(unformatted)
@@ -253,247 +211,6 @@ class ChatListener {
         private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
         private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
         private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
-        private val dungeon_finder_join_pattern = Pattern.compile("^Dungeon Finder > (\\w+) joined the dungeon group! \\(([A-Z][a-z]+) Level (\\d+)\\)$")
         private var awaitingDelimiter = false
-    }
-    private fun playerStats(username: String, uuid: UUID, profileData: Member) {
-
-        val playerResponse = try {
-            Skytils.hylinAPI.getPlayerSync(uuid)
-        } catch (e: HypixelAPIException) {
-            UChat.chat("§cFailed to get dungeon stats: ${e.message}")
-            return
-        }
-
-        try {
-            val dungeonsData = profileData.dungeons
-
-            val catacombsObj = dungeonsData.dungeons["catacombs"]
-            if (catacombsObj?.experience == null) {
-                UChat.chat("§c${username} has not entered The Catacombs!")
-                return
-            }
-            val cataData = catacombsObj.normal!!
-            val masterCataData = catacombsObj.master
-
-            val cataLevel =
-                SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
-
-            val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
-            val name = playerResponse.rankPrefix + if(playerResponse.rank.toString() == "NONE") {""} else {" "} + playerResponse.player.getString("displayname")
-            val component = UMessage("&2&l-----------------------------\n")
-                .append(
-                    UTextComponent("$name's §dStats: §7(Hover)\n").setHoverText("§7Click to run: /skytilscata $username").setClick(
-                        ClickEvent.Action.RUN_COMMAND, "/skytilscata $username")
-                )
-                .append("§dCata: §b${NumberUtil.nf.format(floor(cataLevel))}\n\n")
-            val armor = profileData.armor
-            val armorArray:ArrayList<List<String>> = ArrayList()
-            armor?.forEveryItem {
-                val armorLore = it.asMinecraft.getTooltip(mc.thePlayer, false)
-                armorArray.add(armorLore)
-            }
-            armorArray.reverse()
-            for (armorPiece in armorArray) {
-                val armorName = armorPiece[0]
-                component.append(UTextComponent(armorName + "\n").setHoverText(
-                    armorPiece.joinToString(separator = "\n")
-                ))
-            }
-            val pets = profileData.pets
-            var activePet: Pet? = null
-            var spiritPet: Pet? = null
-            for (pet in pets) {
-                if (pet.active) {
-                    activePet = pet
-                }
-                if(pet.type.contains("SPIRIT")) {
-                    spiritPet = pet
-                }
-            }
-            if (activePet != null) {
-                var rarity = ItemRarity.COMMON.baseColor
-                when(activePet.tier.toString().uppercase()) {
-                    ItemRarity.UNCOMMON.rarityName -> ItemRarity.UNCOMMON.baseColor
-                    ItemRarity.RARE.rarityName -> rarity = ItemRarity.RARE.baseColor
-                    ItemRarity.EPIC.rarityName -> rarity = ItemRarity.EPIC.baseColor
-                    ItemRarity.LEGENDARY.rarityName -> rarity = ItemRarity.LEGENDARY.baseColor
-                    ItemRarity.MYTHIC.rarityName -> rarity = ItemRarity.MYTHIC.baseColor
-                }
-                component.append(UTextComponent(rarity + activePet.type.lowercase()
-                    .replace("_", " ")
-                    .replaceFirstChar { it.uppercase() })
-                    .setHoverText("§b" + (activePet.heldItem?.lowercase()
-                        ?.replace("pet_item_", "")
-                        ?.replace("_", " ") ?: "§cNo Pet Item")
-                    )
-                )
-                if(spiritPet != null) {
-                    component.append(" §7(Spirit)\n\n")
-                } else {
-                    component.append("\n\n")
-                }
-            } else {
-                component.append("§cNo Pet Equiped!\n\n")
-            }
-
-            val inventory = profileData.inventory
-            if (inventory != null) {
-                val inv: MutableSet<String> = mutableSetOf()
-                inventory.forEveryItem {
-                    inv.add(it.asMinecraft.displayName)
-                }
-
-                component.append(UTextComponent("§dItems: §7(Hover)\n\n").setHoverText(buildString {
-                    //Archer
-                    if(inv.any{it.contains("Terminator")}) {
-                        append("§dTerminator: §a§l●\n")
-                    } else if(inv.any{it.contains("Juju Shortbow")}) {
-                        append("§5Juju: §a§l●\n")
-                    } else {
-                        append("§dTerminator: §c§l●\n")
-                    }
-                    //Mage
-                    if(inv.any{it.contains("Hyperion") ||it.contains("Syclla") ||it.contains("Valkyrie") ||it.contains("Astraea")}) {
-                        append("§dNecron's Blade: §a§l●\n")
-                    } else if(inv.any{it.contains("Midas Staff")}) {
-                        append("§6Midas Spoon: §a§l●\n")
-                    } else if(inv.any{it.contains("Yeti Sword")}) {
-                        append("§fYeti Sword: §a§l●\n")
-                    } else if(inv.any{it.contains("Spirit Sceptre")}) {
-                        append("§9Spirit Sceptre: §a§l●\n")
-                    } else if(inv.any{it.contains("Frozen Sycthe")}) {
-                        append("§bFrozen Sycthe: §a§l●\n")
-                    } else {
-                        append("§dNecron's Blade: §c§l●\n")
-                    }
-                    //Berserk
-                    if(inv.any{it.contains("Axe of the Shredded")}) {
-                        append("§aAots: §a§l●\n")
-                    } else if(inv.any{it.contains("Shadow Fury")}) {
-                        append("§8Shadow Fury: §a§l●\n")
-                    } else if(inv.any{it.contains("Flower of Truth")}) {
-                        append("§cFot: §a§l●\n")
-                    } else {
-                        append("§aAots: §c§l●\n")
-                    }
-                    //Miscellaneous
-                    if(inv.any{it.contains("Giant's Sword")}) {
-                        append("§2Giant's Sword: §a§l●\n") }
-                    else {
-                        append("§2Giant's Sword: §c§l●\n")
-                    }
-                    if(inv.any{it.contains("Ice Spray Wand")}) {
-                        append("§9Spray: §a§l●\n")
-                    } else {
-                        append("§9Spray: §c§l●\n")
-                    }
-                    if(inv.any{it.contains("Stonk")}) {
-                        append("§6Stonk: §a§l●\n")
-                    } else {
-                        append("§6Stonk: §c§l●\n")
-                    }
-                    if(inv.any{it.contains("Bonzo's Staff")}) {
-                        append("§9Bonzo Staff: §a§l●\n")
-                    } else {
-                        append("§9Bonzo Staff: §c§l●\n")
-                    }
-                    if(inv.any{it.contains("Jerry-chine Gun")}) {
-                        append("§eJerry Gun: §a§l●\n")
-                    } else {
-                        append("§eJerry Gun: §c§l●\n")
-                    }
-                }))
-            } else {
-                component.append("§cInventory Api disabled!\n\n")
-            }
-            val completionObj = cataData.completions
-            val highestFloor = cataData.highestCompletion
-
-            if (completionObj != null && highestFloor != null) {
-                component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                    for (i in 0..highestFloor) {
-                        append("§2§l●§a ")
-                        append(if (i == 0) "Entrance: " else "Floor $i: ")
-                        append("§6")
-                        append(completionObj[i])
-                        append(if (i < highestFloor) "\n" else "")
-                    }
-                }))
-
-                val fastestSPlusTimes = cataData.fastestTimeSPlus
-                if (fastestSPlusTimes != null) {
-                    component.append(
-                        UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
-                            buildString {
-                                for (i in 0..highestFloor) {
-                                    append("§2§l●§a ")
-                                    append(if (i == 0) "Entrance: " else "Floor $i: ")
-                                    append("§6")
-                                    append(fastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
-                                    append(if (i < highestFloor) "\n" else "")
-                                }
-                            }
-                        )
-                    )
-                }
-            }
-
-            if (masterCataData?.completions != null) {
-                val masterCompletionObj = masterCataData.completions
-                val highestMasterFloor = masterCataData.highestCompletion
-
-                if (masterCompletionObj != null && highestMasterFloor != null) {
-
-                    component.append(UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                        for (i in 1..highestMasterFloor) {
-                            append("§4§l●§c ")
-                            append("Floor $i: ")
-                            append("§6")
-                            append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
-                            append(if (i < highestMasterFloor) "\n" else "")
-                        }
-                    }))
-
-                    val masterFastestSPlus = UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n")
-
-                    if (masterCataData.fastestTimeSPlus != null) {
-                        val masterFastestSPlusTimes = masterCataData.fastestTimeSPlus!!
-                        masterFastestSPlus.setHoverText(buildString {
-                            for (i in 1..highestMasterFloor) {
-                                append("§4§l●§c ")
-                                append("Floor $i: ")
-                                append("§6")
-                                append(masterFastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
-                                append(if (i < highestMasterFloor) "\n" else "")
-                            }
-                        })
-                    } else {
-                        masterFastestSPlus.setHoverText(
-                            "§cNo S+ Completions"
-                        )
-                    }
-                    component.append(masterFastestSPlus)
-                }
-            }
-
-            component
-                .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
-                .append(UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to Kick $name§c.").setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username"))
-                .append("&2&l-----------------------------")
-                .chat()
-        } catch (e: Throwable) {
-            UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
-            e.printStackTrace()
-        }
-    }
-    private fun Duration.timeFormat() = toComponents { minutes, seconds, _ ->
-        buildString {
-            if (minutes > 0) {
-                append(minutes)
-                append(':')
-            }
-            append("%02d".format(seconds))
-        }
     }
 }
