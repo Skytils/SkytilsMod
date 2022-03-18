@@ -22,6 +22,7 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -44,6 +45,8 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.*
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -85,6 +88,33 @@ import kotlin.math.floor
 
 
 class SlayerFeatures {
+    @SubscribeEvent
+    fun onChat(event: ClientChatReceivedEvent) {
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+
+        val formatted = event.message.formattedText
+
+        if (Skytils.config.openMaddoxMenu) {
+            if (formatted.contains("§2§l[OPEN MENU]")) {
+                val listOfSiblings = event.message.siblings
+                maddoxCommand =
+                    listOfSiblings.find { it.unformattedText.contains("[OPEN MENU]") }?.chatStyle?.chatClickEvent?.value ?: ""
+                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to open Maddox Menu."))
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
+        if (!Utils.inSkyblock) return
+        if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
+            if (Skytils.config.openMaddoxMenu && maddoxCommand.isNotBlank()) {
+                Skytils.sendMessageQueue.add(maddoxCommand)
+                maddoxCommand = ""
+            }
+        }
+    }
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock) return
@@ -914,6 +944,7 @@ class SlayerFeatures {
         var thrownBoundingBox: AxisAlignedBB? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
+        var maddoxCommand = "";
         var yangGlyphAdrenalineStressCount = -1L
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
