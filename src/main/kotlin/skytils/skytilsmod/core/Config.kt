@@ -439,11 +439,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var biggerBatModels = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Recolor Wither King's Dragons",
-        description = "Recolors the dragons in Master Mode 7 to their respective colors.",
+        type = PropertyType.SWITCH, name = "Change Hurt Color on the Wither King's Dragons",
+        description = "Reduces the tinting on hurting the wither king's dragons. Also hides the body and wings of the dragon.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var recolorWitherKingsDragons = false
+    var changeHurtColorOnWitherKingsDragons = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
