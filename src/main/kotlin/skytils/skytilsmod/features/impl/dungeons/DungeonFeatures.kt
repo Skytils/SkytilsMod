@@ -304,9 +304,10 @@ object DungeonFeatures {
                     1 -> {
                         BossStatus.healthScale = displayData.health / displayData.maxHealth
                         BossStatus.statusBarTime = 100
+                        val health = if (dungeonFloor == "M7") 800_000_000 else 300_000
                         BossStatus.bossName = displayData.displayName.formattedText + "§r§8 - §r§a" + NumberUtil.format(
-                            (BossStatus.healthScale * 1000000000).toLong()
-                        ) + "§r§8/§r§a${if (dungeonFloor == "M7") "800M" else "300K"}§r§c❤"
+                            (BossStatus.healthScale * health).toLong()
+                        ) + "§r§8/§r§a${NumberUtil.format(health)}§r§c❤"
                         BossStatus.hasColorModifier = event.hasColorModifier
                         event.isCanceled = true
                     }
