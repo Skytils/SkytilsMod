@@ -126,7 +126,7 @@ object PartyFinderStats {
             if (activePet != null) {
                 val rarity = ItemRarity.valueOf(activePet.tier.name).baseColor
                 component.append(
-                    UTextComponent("${rarity}${activePet.type.replace("_", " ").toTitleCase()}")
+                    UTextComponent("${rarity}${activePet.type.split('_').joinToString(" ") { it.toTitleCase() }}")
                         .setHoverText(
                             "§b" + (activePet.heldItem?.lowercase()
                                 ?.replace("pet_item_", "")
