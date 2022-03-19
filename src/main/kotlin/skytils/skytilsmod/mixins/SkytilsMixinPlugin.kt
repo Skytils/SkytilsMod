@@ -18,7 +18,7 @@
 
 package skytils.skytilsmod.mixins
 
-import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import com.llamalad7.mixinextras.MixinExtrasBootstrap
 import net.minecraft.launchwrapper.Launch
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin

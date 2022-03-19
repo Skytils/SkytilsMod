@@ -98,7 +98,8 @@ class SlayerFeatures {
             if (formatted.contains("§2§l[OPEN MENU]")) {
                 val listOfSiblings = event.message.siblings
                 maddoxCommand =
-                    listOfSiblings.find { it.unformattedText.contains("[OPEN MENU]") }?.chatStyle?.chatClickEvent?.value ?: ""
+                    listOfSiblings.find { it.unformattedText.contains("[OPEN MENU]") }?.chatStyle?.chatClickEvent?.value
+                        ?: ""
                 mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to open Maddox Menu."))
             }
         }
@@ -944,7 +945,7 @@ class SlayerFeatures {
         var thrownBoundingBox: AxisAlignedBB? = null
         private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
-        var maddoxCommand = "";
+        var maddoxCommand = ""
         var yangGlyphAdrenalineStressCount = -1L
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {

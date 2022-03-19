@@ -48,7 +48,7 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
                             index = it.index
                         }
                     }
-                    instructions.insertBefore(insn, list.build());
+                    instructions.insertBefore(insn, list.build())
                 }
                 if (insn.owner == "net/minecraftforge/fml/client/SplashProgress$3" && insn.name == "<init>") {
                     if (index == -1) {

@@ -567,7 +567,7 @@ object RenderUtil {
                 GL11.glColorMask(false, false, false, false)
                 //Anything rendered here becomes "cut" frame.
 
-                val scale: Double = 1.2
+                val scale = 1.2
                 GlStateManager.translate(
                     xPos.toDouble(),
                     yPos.toDouble(),
@@ -601,7 +601,7 @@ object RenderUtil {
                         alpha
                     ).rgb
                 )
-                GL11.glDisable(GL11.GL_STENCIL_TEST); // Turn this shit off!
+                GL11.glDisable(GL11.GL_STENCIL_TEST)
 
                 if (lightingEnabled) GlStateManager.enableLighting()
                 if (depthEnabled) GlStateManager.enableDepth()

@@ -72,7 +72,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     @Suppress("unused")
     fun openDiscordLink() {
-        UDesktop.browse(URI.create("https://discord.gg/skytils"));
+        UDesktop.browse(URI.create("https://discord.gg/skytils"))
     }
 
     @Property(
@@ -1963,7 +1963,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         hidden = true
     )
     var voidRNG = 0f
-    
+
     @Property(
         type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
         description = "Open chat, then click anywhere on screen to open Maddox Menu.",
