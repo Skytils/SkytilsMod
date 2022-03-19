@@ -53,7 +53,6 @@ import java.awt.Color
 object MasterMode7Features {
 
     private val spawningDragons = hashSetOf<WitherKingDragons>()
-    private val spawnedDragons = hashSetOf<WitherKingDragons>()
     private val killedDragons = hashSetOf<WitherKingDragons>()
     private val dragonMap = hashMapOf<Int, WitherKingDragons>()
     private val glowstones = hashSetOf<AxisAlignedBB>()
@@ -111,12 +110,11 @@ object MasterMode7Features {
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
             val type =
-                dragonMap[entity.entityId] ?: WitherKingDragons.values().filterNot { spawnedDragons.contains(it) }
+                dragonMap[entity.entityId] ?: WitherKingDragons.values()
                     .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
             printDevMessage("${type.name} spawned", "witherkingdrags")
-            spawnedDragons.add(type)
             dragonMap[entity.entityId] = type
         }
     }
@@ -127,7 +125,6 @@ object MasterMode7Features {
             val item = (event.entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType ?: return
             printDevMessage("${item.name} died", "witherkingdrags")
             spawningDragons.remove(item)
-            spawnedDragons.remove(item)
             killedDragons.add(item)
         }
     }
@@ -135,7 +132,6 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         spawningDragons.clear()
-        spawnedDragons.clear()
         killedDragons.clear()
         dragonMap.clear()
         glowstones.clear()
