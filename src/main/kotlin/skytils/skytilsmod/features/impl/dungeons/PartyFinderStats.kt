@@ -128,7 +128,7 @@ object PartyFinderStats {
                         .setHoverText(
                             "§b" + (activePet.heldItem?.lowercase()
                                 ?.replace("pet_item_", "")
-                                ?.replace("_", " ") ?: "§cNo Pet Item")
+                                ?.split('_')?.joinToString(" ") { it.toTitleCase() } ?: "§cNo Pet Item")
                         )
                 )
                 if (spiritPet != null) {
