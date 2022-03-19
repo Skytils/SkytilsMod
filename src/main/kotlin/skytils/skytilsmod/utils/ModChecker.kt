@@ -36,8 +36,9 @@ object ModChecker {
         ClientBrandRetriever.getClientModName()?.startsWith("fml,forge") != true ||
                 ClientBrandRetriever.getClientModName() != FMLCommonHandler.instance().modName ||
                 Loader.isModLoaded("feather") ||
-                ForgeVersion.getStatus().ordinal > 3 || Loader.instance().activeModList.filter { it.modId == "Forge" || it.modId == "FML" }
-            .any { it.signingCertificate == null }
+                ForgeVersion.getStatus().ordinal > 3 ||
+                (!Skytils.deobfEnvironment && Loader.instance().activeModList.filter { it.modId == "Forge" || it.modId == "FML" }
+                    .any { it.signingCertificate == null })
     }
 
     fun checkModdedForge() {
