@@ -23,6 +23,7 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -35,6 +36,7 @@ import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.NumberUtil.toRoman
 import java.util.*
 import kotlin.time.Duration
 
@@ -204,7 +206,7 @@ object PartyFinderStats {
                     append(checkItemId(itemIds, "DARK_CLAYMORE", "§7Dark Claymore"))
                     append(checkItemId(itemIds, "GIANTS_SWORD", "§2Giant's Sword"))
                     append(checkItemId(itemIds, "ICE_SPRAY_WAND", "§bIce Spray"))
-                    append(checkItemId(itemIds, "STONK", "§6Stonk"))
+                    append(checkStonk(itemIds, extraAttribs))
                     append(checkItemId(itemIds, "BONZO_STAFF", "§9Bonzo Staff"))
                     append(checkItemId(itemIds, "JERRY_STAFF", "§eJerry-chine"))
                 }))
@@ -307,5 +309,14 @@ object PartyFinderStats {
 
     private fun checkItemId(set: Set<String?>, itemId: String, itemName: String): String {
         return "${itemName}: §${if (set.contains(itemId)) 'a' else 'c'}§l●\n"
+    }
+
+    private fun checkStonk(items: Set<String?>, tags: Set<NBTTagCompound?>): String {
+        val eff = tags.mapNotNull { it?.getCompoundTag("enchantments")?.getInteger("efficiency") }.maxOrNull() ?: 0
+        return when {
+            eff >= 7 -> "§6Efficiency ${eff.toRoman()}: §a§l●\n"
+            items.contains("STONK") -> "§6Stonk: §a§l●\n"
+            else -> "§6Stonk: §c§l●\n"
+        }
     }
 }
