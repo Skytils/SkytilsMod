@@ -86,7 +86,7 @@ class TeleportMazeSolver {
                             val yawZ = MathHelper.cos(magicYaw)
                             val pitchVal = -MathHelper.cos(-pitch * 0.017453292f)
                             val vec = Vec3((yawX * pitchVal).toDouble(), 69.0, (yawZ * pitchVal).toDouble())
-                            valid.clear();
+                            valid.clear()
                             for (i in 4..23) {
                                 val bp = BlockPos(
                                     x + vec.xCoord * i,

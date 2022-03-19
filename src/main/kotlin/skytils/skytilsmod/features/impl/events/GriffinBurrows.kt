@@ -153,7 +153,7 @@ object GriffinBurrows {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             if (hasSpadeInHotbar) {
-                UChat.chat("§aSkytils is looking for burrows...");
+                UChat.chat("§aSkytils is looking for burrows...")
                 refreshBurrows()
             }
         }

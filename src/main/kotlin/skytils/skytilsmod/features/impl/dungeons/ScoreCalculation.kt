@@ -390,7 +390,7 @@ object ScoreCalculation {
     fun onTitle(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
         if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
-            if (DungeonListener.hutaoFans.getIfPresent(mc.thePlayer.name) ?: false
+            if (DungeonListener.hutaoFans.getIfPresent(mc.thePlayer.name) == true
                 && DungeonListener.team.filter { it.playerName != mc.thePlayer.name }
                     .sumOf { it.deaths } == 0
             ) firstDeathHadSpirit.set(

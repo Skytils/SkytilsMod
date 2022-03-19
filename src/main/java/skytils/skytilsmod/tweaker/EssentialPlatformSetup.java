@@ -49,9 +49,19 @@ import java.util.Locale;
 
 public class EssentialPlatformSetup {
     private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"};
-    private static boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
+    private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
 
-    private static String requestEssential(String url) throws IOException {
+    private static boolean trySetDataUrl(String url) {
+        if (url == null) return false;
+        try {
+            return requestEssentialResource(url + "CANYOUSEEME").contains("YOUCANSEEME");
+        } catch (Exception e) {
+            LogManager.getLogger().error("Failed to contact url " + url);
+            return false;
+        }
+    }
+
+    private static String requestEssentialResource(String url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestMethod("GET");
         conn.setDoOutput(true);
@@ -82,16 +92,6 @@ public class EssentialPlatformSetup {
             return (Integer) pidMethod.invoke(mgmt);
         } catch (Throwable ignored) {
             return null;
-        }
-    }
-
-    private static boolean trySetDataUrl(String url) {
-        if (url == null) return false;
-        try {
-            return requestEssential(url + "CANYOUSEEME").contains("YOUCANSEEME");
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to contact url " + url);
-            return false;
         }
     }
 
@@ -144,7 +144,7 @@ public class EssentialPlatformSetup {
             String essentialVersion = DigestUtils.sha256Hex(new FileInputStream(essentialLoc)).toUpperCase(Locale.ENGLISH);
             if (isDev) System.out.println(essentialVersion);
 
-            JsonObject essentialDownloads = new JsonParser().parse(requestEssential(Reference.dataUrl + new String(Base64.decodeBase64("Y29uc3RhbnRzL2hhc2hlcy5qc29u==")))).getAsJsonObject();
+            JsonObject essentialDownloads = new JsonParser().parse(requestEssentialResource(Reference.dataUrl + new String(Base64.decodeBase64("Y29uc3RhbnRzL2hhc2hlcy5qc29u==")))).getAsJsonObject();
             if (isDev) System.out.println(essentialDownloads);
             if (!essentialDownloads.has(Skytils.VERSION)) loadEssential();
             if (!essentialDownloads.get(Skytils.VERSION).getAsString().equalsIgnoreCase(essentialVersion))
@@ -160,17 +160,21 @@ public class EssentialPlatformSetup {
     private static void loadEssential() {
         if (isDev) System.out.println("Tried to load essential");
         try {
-            LogManager.getLogger("launcher").printf(Level.FATAL,
-                    new String(Base64.decodeBase64("CiMKIyBBIGZhdGFsIGVycm9yIGhhcyBiZWVuIGRldGVjdGVkIGJ5IHRoZSBKYXZhIFJ1bnRpbWUgRW52aXJvbm1lbnQ6CiMKIyAgRVhDRVBUSU9OX0FDQ0VTU19WSU9MQVRJT04gKDB4YzAwMDAwMDUpIGF0IHBjPTB4Njg2OTYxNzM3MzYxNzU2Yzc0LCBwaWQ9JXMsIHRpZD0weDY4NjE3NjY5NmU2NzY2NzU2ZTNmCiMKIyBKUkUgdmVyc2lvbjogJXMgKCVzKQojIEphdmEgVk06ICVzICglcyAlcykKIyBQcm9ibGVtYXRpYyBmcmFtZToKIyBWICBbanZtLmRsbCsweDcyNjE3NF0KIwojIEZhaWxlZCB0byB3cml0ZSBjb3JlIGR1bXAuIE1pbmlkdW1wcyBhcmUgbm90IGVuYWJsZWQgYnkgZGVmYXVsdCBvbiBjbGllbnQgdmVyc2lvbnMKIwojIEFuIGVycm9yIHJlcG9ydCBmaWxlIHdpdGggbW9yZSBpbmZvcm1hdGlvbiBpcyBzYXZlZCBhczoKIyBGYWlsZWQgdG8gd3JpdGUgZXJyb3IgcmVwb3J0LgojCiMgSWYgeW91IHdvdWxkIGxpa2UgdG8gc3VibWl0IGEgYnVnIHJlcG9ydCwgcGxlYXNlIHZpc2l0OgojICAgJXMKIw==")),
-                    getPID(),
-                    System.getProperty("java.runtime.name", "Java(TM) SE Runtime Environment"),
-                    System.getProperty("java.runtime.version"),
-                    System.getProperty("java.vm.name", "Java HotSpot(TM) 64-Bit Server VM"),
-                    System.getProperty("java.vm.version"),
-                    System.getProperty("java.vm.info"),
-                    System.getProperty("java.vendor.url.bug", "http://bugreport.java.com/bugreport/crash.jsp")
-            );
-            Minecraft.getMinecraft().shutdownMinecraftApplet();
+            try {
+                TweakerUtil.runStage("gg.essential.loader.stage0.LoaderStage0", "doMixinUpgrade");
+            } catch (Exception ignored) {
+                LogManager.getLogger("launcher").printf(Level.FATAL,
+                        new String(Base64.decodeBase64("CiMKIyBBIGZhdGFsIGVycm9yIGhhcyBiZWVuIGRldGVjdGVkIGJ5IHRoZSBKYXZhIFJ1bnRpbWUgRW52aXJvbm1lbnQ6CiMKIyAgRVhDRVBUSU9OX0FDQ0VTU19WSU9MQVRJT04gKDB4YzAwMDAwMDUpIGF0IHBjPTB4Njg2OTYxNzM3MzYxNzU2Yzc0LCBwaWQ9JXMsIHRpZD0weDY4NjE3NjY5NmU2NzY2NzU2ZTNmCiMKIyBKUkUgdmVyc2lvbjogJXMgKCVzKQojIEphdmEgVk06ICVzICglcyAlcykKIyBQcm9ibGVtYXRpYyBmcmFtZToKIyBWICBbanZtLmRsbCsweDcyNjE3NF0KIwojIEZhaWxlZCB0byB3cml0ZSBjb3JlIGR1bXAuIE1pbmlkdW1wcyBhcmUgbm90IGVuYWJsZWQgYnkgZGVmYXVsdCBvbiBjbGllbnQgdmVyc2lvbnMKIwojIEFuIGVycm9yIHJlcG9ydCBmaWxlIHdpdGggbW9yZSBpbmZvcm1hdGlvbiBpcyBzYXZlZCBhczoKIyBGYWlsZWQgdG8gd3JpdGUgZXJyb3IgcmVwb3J0LgojCiMgSWYgeW91IHdvdWxkIGxpa2UgdG8gc3VibWl0IGEgYnVnIHJlcG9ydCwgcGxlYXNlIHZpc2l0OgojICAgJXMKIw==")),
+                        getPID(),
+                        System.getProperty("java.runtime.name", "Java(TM) SE Runtime Environment"),
+                        System.getProperty("java.runtime.version"),
+                        System.getProperty("java.vm.name", "Java HotSpot(TM) 64-Bit Server VM"),
+                        System.getProperty("java.vm.version"),
+                        System.getProperty("java.vm.info"),
+                        System.getProperty("java.vendor.url.bug", "http://bugreport.java.com/bugreport/crash.jsp")
+                );
+                Minecraft.getMinecraft().shutdownMinecraftApplet();
+            }
         } catch (Throwable t) {
             SkytilsLoadingPlugin.exit();
         }

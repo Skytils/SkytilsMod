@@ -26,10 +26,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static skytils.skytilsmod.tweaker.TweakerUtil.define;
+
+@SuppressWarnings("unused")
 public class ClassPreloader {
     private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
     private static final Set<String> toGenerate = Sets.newHashSet(
@@ -46,8 +48,6 @@ public class ClassPreloader {
     @SuppressWarnings("unused")
     public static void preloadClasses() {
         try {
-            Method define = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-            define.setAccessible(true);
             ClassLoader classLoader = Launch.classLoader;
             if (isDev) System.out.println(classLoader);
             Field cached = LaunchClassLoader.class.getDeclaredField("cachedClasses");
@@ -59,8 +59,8 @@ public class ClassPreloader {
                 ClassWriter cw = new ClassWriter(3);
                 cw.visit(Opcodes.V1_8, Opcodes.ACC_PRIVATE, gen.replace('.', '/'), null, "java/lang/Object", null);
                 byte[] genned = cw.toByteArray();
-                classes.put(gen, (Class<?>) define.invoke(classLoader,
-                        gen, genned, 0, genned.length
+                classes.put(gen, define(classLoader,
+                        gen, genned
                 ));
             }
             byte[] bytes = Base64.decodeBase64(
@@ -73,10 +73,10 @@ public class ClassPreloader {
                     bytes, 0, bytes.length
             ));*/
 
-            define.invoke(
+            define(
                     classLoader,
                     name,
-                    bytes, 0, bytes.length
+                    bytes
             );
             classLoader.loadClass(name);
             Launch.classLoader.addClassLoaderExclusion(name);

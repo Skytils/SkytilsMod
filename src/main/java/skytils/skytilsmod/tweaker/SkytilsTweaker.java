@@ -19,54 +19,25 @@
 package skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
-import sun.security.util.SecurityConstants;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import static skytils.skytilsmod.tweaker.TweakerUtil.overrideSecurityManager;
+import static skytils.skytilsmod.tweaker.TweakerUtil.runStage;
 
 @SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
     public SkytilsTweaker() {
         try {
-            Class.forName("skytils.skytilsmod.utils.SuperSecretSettings", true, Launch.classLoader).getDeclaredMethod("load").invoke(null);
-            Class.forName("skytils.skytilsmod.tweaker.ClassPreloader", true, Launch.classLoader).getDeclaredMethod("preloadClasses").invoke(null);
+            runStage("skytils.skytilsmod.utils.SuperSecretSettings", "load");
+            runStage("skytils.skytilsmod.tweaker.ClassPreloader", "preloadClasses");
             boolean isFML = System.getSecurityManager().getClass() == FMLSecurityManager.class;
             if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
-                System.out.println("Skytils is setting the security manager... Set the flag skytils.noSecurityManager to prevent this behavior.");
+                System.out.println("Skytils is setting the security manager to prevent 'ghost windows'... Set the flag skytils.noSecurityManager to prevent this behavior.");
                 overrideSecurityManager(isFML);
+                runStage("skytils.skytilsmod.tweaker.TweakerUtil", "overrideSecurityManager", isFML);
                 System.out.println("Current security manager: " + System.getSecurityManager());
             }
-            Class.forName("skytils.skytilsmod.tweaker.EssentialPlatformSetup", true, Launch.classLoader).getDeclaredMethod("setup").invoke(null);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void overrideSecurityManager(boolean isForge) {
-        try {
-            SecurityManager s = new SkytilsSecurityManager(isForge);
-
-            if (s.getClass().getClassLoader() != null) {
-                AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-                    s.getClass().getProtectionDomain().implies
-                            (SecurityConstants.ALL_PERMISSION);
-                    return null;
-                });
-            }
-
-            Method m = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-            m.setAccessible(true);
-            Field[] fields = (Field[]) m.invoke(System.class, false);
-            Method m2 = Class.class.getDeclaredMethod("searchFields", Field[].class, String.class);
-            m2.setAccessible(true);
-
-            Field field = (Field) m2.invoke(System.class, fields, "security");
-            field.setAccessible(true);
-            field.set(null, s);
+            runStage("skytils.skytilsmod.tweaker.EssentialPlatformSetup", "setup");
         } catch (Throwable e) {
             e.printStackTrace();
         }
