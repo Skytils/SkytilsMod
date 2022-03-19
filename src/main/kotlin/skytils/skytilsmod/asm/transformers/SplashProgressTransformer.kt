@@ -70,6 +70,7 @@ object SplashProgressTransformer {
         94.5 to ResourceLocation("skytils", "breefingdog.png"),
         96.0 to ResourceLocation("skytils", "azoopet.gif"),
         99.0 to ResourceLocation("skytils", "abdpfp.gif"),
+        99.7 to ResourceLocation("skytils", "bigrat.png"),
         // this is around the chance of winning the jackpot on the lottery
         100 - 100 * 1 / 302_575_350.0 to ResourceLocation("skytils", "jamcat.gif")
     )
