@@ -34,6 +34,7 @@ import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import skytils.skytilsmod.utils.withAlpha
 import java.awt.Color
 import java.io.File
 import java.net.URI
@@ -110,7 +111,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "Reparty"
     )
     var overrideReparty = true
-    
+
     @Property(
         type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
         description = "Displays Stats about a Player who joined.",
@@ -1489,6 +1490,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var dupeTracker = false
 
     @Property(
+        type = PropertyType.COLOR, name = "Dupe Tracker Overlay Color",
+        description = "Changes the color of the Dupe Tracker Overlay.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var dupeTrackerOverlayColor = Color.BLACK.withAlpha(169)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Mark 'Dirty' Items",
         description = "Tries to track 'dirty' items on the Auction House.\nDirty items are items that are probably not legitimately obtained.\nThis will not catch every single dirty item.",
         category = "Miscellaneous", subcategory = "Other"
@@ -2600,6 +2608,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         addDependency("markDirtyItems", "dupeTracker")
+        addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
         registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
