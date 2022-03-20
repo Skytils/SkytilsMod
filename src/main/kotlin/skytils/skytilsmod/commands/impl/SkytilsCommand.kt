@@ -278,16 +278,13 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         ProfileGui(mc.thePlayer.uniqueID, UPlayer.getPlayer()?.displayNameString ?: "")
                 } else {
                     // TODO Add some kind of message indicating progress
-                    var uuid by Delegates.notNull<UUID>()
                     Skytils.launch {
-                        uuid = Skytils.hylinAPI.getUUIDSync(args[1])
-                    }.invokeOnCompletion {
-                        it?.let { error ->
+                        Skytils.hylinAPI.getUUID(args[1]).whenComplete { uuid ->
+                            Skytils.displayScreen = ProfileGui(uuid, args[1])
+                        }.catch { error ->
                             UChat.chat("§9§lSkytils ➜ §cError finding player!")
                             error.printStackTrace()
-                            return@invokeOnCompletion
                         }
-                        Skytils.displayScreen = ProfileGui(uuid, args[1])
                     }
                 }
             }
