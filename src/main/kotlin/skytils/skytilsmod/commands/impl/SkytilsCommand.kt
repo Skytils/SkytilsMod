@@ -177,6 +177,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability.
                             #      §4Must have§c Item Cooldown Display§4 enabled to work.
                             #  §3/skytilshollowwaypoint <set/remove/clear/help> <name> <x y z> §l➡ §bAllows to set waypoints while in the Crystal Hollows. §7(Alias: §f/sthw§7)"
+                            #  §3/skytilscalcxp <dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer> <start level> <end level> §l➡ §bCalculates the xp between two levels
+                            #  §3/skytils pv <player> §l➡ §bOpens the profile viewer. §a§o✯
+                            #  §3/skytils pricepaid <price> §l➡ §bSets your currently held item to a given price.
                         """.trimMargin("#")
                     )
                 )
