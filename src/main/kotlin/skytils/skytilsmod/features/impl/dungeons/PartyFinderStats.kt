@@ -169,8 +169,8 @@ object PartyFinderStats {
                     component.append(UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(items.joinToString("§8, ")))
                 } ?: component.append("§cInventory API disabled!\n\n")
 
-                cataData.completions?.let { completionObj ->
-                    val highestFloor = cataData.highestCompletion!!
+                cataData.highestCompletion?.let { highestFloor ->
+                    val completionObj = cataData.completions!!
                     component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
                         for (i in 0 until highestFloor) {
                             append("§a")
@@ -200,8 +200,8 @@ object PartyFinderStats {
                     }
                 }
 
-                masterCataData?.completions?.let { masterCompletionObj ->
-                    val highestFloor = masterCataData.highestCompletion!!
+                masterCataData?.highestCompletion?.let { highestFloor ->
+                    val masterCompletionObj = masterCataData.completions!!
                     component.append(UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(buildString {
                         for (i in 1 until highestFloor) {
                             append("§a")
@@ -215,7 +215,7 @@ object PartyFinderStats {
 
                     cataData.fastestTimeSPlus?.run {
                         component.append(
-                            UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
+                            UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n").setHoverText(
                                 buildString {
                                     for (i in 1 until highestFloor) {
                                         append("§a")
@@ -232,7 +232,7 @@ object PartyFinderStats {
                 }
 
                 component
-                    .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
+                    .append("\n§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
                     .append(
                         UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
                             .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
