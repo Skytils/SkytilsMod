@@ -35,6 +35,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.toRoman
+import skytils.skytilsmod.utils.SkillUtils.level
 import java.util.*
 import kotlin.time.Duration
 
@@ -101,7 +102,11 @@ object PartyFinderStats {
                     profileData.pets.find { it.active }?.let { activePet ->
                         val rarity = ItemRarity.valueOf(activePet.tier.name).baseColor
                         component.append(
-                            UTextComponent("${rarity}${activePet.type.split('_').joinToString(" ") { it.toTitleCase() }}")
+                            UTextComponent(
+                                "§7[Lvl ${activePet.level}] ${rarity}${
+                                    activePet.type.split('_').joinToString(" ") { it.toTitleCase() }
+                                }"
+                            )
                                 .setHoverText(
                                     "§b" + (activePet.heldItem?.lowercase()
                                         ?.replace("pet_item_", "")
@@ -109,7 +114,7 @@ object PartyFinderStats {
                                 )
                         )
                     } ?: component.append("§cNo Pet Equipped!")
-                    profileData.pets.find (Pet::isSpirit)?.run {
+                    profileData.pets.find(Pet::isSpirit)?.run {
                         component.append(" §7(§6Spirit§7)\n\n")
                     } ?: component.append(" §7(No Spirit)\n\n")
 
@@ -150,7 +155,13 @@ object PartyFinderStats {
 
                             remove(null)
                         }
-                        component.append(UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(items.joinToString("§8, ")))
+                        component.append(
+                            UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(
+                                items.joinToString(
+                                    "§8, "
+                                )
+                            )
+                        )
                     } ?: component.append("§cInventory API disabled!\n\n")
 
                     cataData.highestCompletion?.let { highestFloor ->
@@ -186,16 +197,19 @@ object PartyFinderStats {
 
                     masterCataData?.highestCompletion?.let { highestFloor ->
                         val masterCompletionObj = masterCataData.completions!!
-                        component.append(UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                            for (i in 1 until highestFloor) {
-                                append("§a")
-                                append("Floor $i: ")
-                                append("§6")
-                                append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
-                                if (i != highestFloor - 1)
-                                    append("\n")
-                            }
-                        }))
+                        component.append(
+                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
+                                buildString {
+                                    for (i in 1 until highestFloor) {
+                                        append("§a")
+                                        append("Floor $i: ")
+                                        append("§6")
+                                        append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
+                                        if (i != highestFloor - 1)
+                                            append("\n")
+                                    }
+                                })
+                        )
 
                         cataData.fastestTimeSPlus?.run {
                             component.append(
