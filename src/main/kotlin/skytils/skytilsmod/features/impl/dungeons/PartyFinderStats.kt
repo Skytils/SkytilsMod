@@ -230,7 +230,15 @@ object PartyFinderStats {
                     }
 
                     component
-                        .append("\n§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
+                        .append("\n§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}")
+                        .append(
+                            " §aBlood Mobs Killed: §l§6${
+                                NumberUtil.nf.format(
+                                    (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
+                                            (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
+                                )
+                            }\n\n"
+                        )
                         .append(
                             UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
                                 .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
