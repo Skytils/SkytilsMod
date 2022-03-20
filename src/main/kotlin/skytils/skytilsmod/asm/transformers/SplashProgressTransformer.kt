@@ -85,6 +85,7 @@ object SplashProgressTransformer {
             "partysychic.gif"
         )
         if (SuperSecretSettings.noSychic) return resourceLocation
+        if (month == 4 && date == 1) return ResourceLocation("skytils", "bigrat.png")
         if (month == 12 || (month == 1 && date == 1)) return ResourceLocation(
             "skytils",
             "christmassychicpet.gif"
