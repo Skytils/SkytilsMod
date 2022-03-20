@@ -41,6 +41,11 @@ import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import org.objectweb.asm.tree.MethodInsnNode
+import skytils.hylin.extension.getString
+import skytils.hylin.player.Player
+import skytils.hylin.player.rank.PackageRank
+import skytils.hylin.skyblock.Pet
+import skytils.hylin.skyblock.item.Tier
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.asm.SkytilsTransformer
@@ -337,3 +342,9 @@ fun File.ensureFile() = (parentFile.exists() || parentFile.mkdirs()) && createNe
 fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolean {
     return (owner == null || this.owner == owner) && (name == null || this.name == name) && (desc == null || this.desc == desc)
 }
+
+val Player.formattedName
+    get() = "${rankPrefix}${" ".toStringIfTrue(rank != PackageRank.NONE)}${player.getString("displayname")}"
+
+val Pet.isSpirit
+    get() = type == "SPIRIT" && (tier == Tier.LEGENDARY || (heldItem == "PET_ITEM_TIER_BOOST" && tier == Tier.EPIC))

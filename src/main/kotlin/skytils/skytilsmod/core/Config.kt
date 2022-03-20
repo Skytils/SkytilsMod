@@ -110,6 +110,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "Reparty"
     )
     var overrideReparty = true
+    
+    @Property(
+        type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
+        description = "Displays Stats about a Player who joined.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderStats = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",

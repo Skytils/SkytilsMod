@@ -243,6 +243,7 @@ class Skytils {
             MinionFeatures(),
             MiscFeatures(),
             MythologicalTracker(),
+            PartyFinderStats,
             PetFeatures(),
             Ping,
             PricePaid,

@@ -20,7 +20,6 @@ package skytils.skytilsmod.commands.stats.impl
 
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import skytils.hylin.extension.getString
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.dungeons.DungeonClass
@@ -29,6 +28,7 @@ import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
 import skytils.skytilsmod.utils.append
+import skytils.skytilsmod.utils.formattedName
 import skytils.skytilsmod.utils.setHoverText
 import java.util.*
 import kotlin.time.Duration
@@ -94,11 +94,7 @@ object CataCommand : StatCommand("skytilscata") {
 
             val component = UMessage("§a➜ Catacombs Statistics Viewer\n")
                 .append(
-                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse.rankPrefix} ${
-                        playerResponse.player.getString(
-                            "displayname"
-                        )
-                    }§7§o.\n\n"
+                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse.formattedName}§7§o.\n\n"
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
                 .append("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n")
