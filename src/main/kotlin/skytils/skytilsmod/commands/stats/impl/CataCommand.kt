@@ -216,8 +216,16 @@ object CataCommand : StatCommand("skytilscata") {
             }
 
             component
-                .append("§a§l➜ Secrets:\n")
+                .append("§a§l➜ Miscellaneous:\n")
                 .append(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
+                .append(
+                    " §aBlood Mobs Killed: §l➡ §e${
+                        nf.format(
+                            (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) + 
+                                    (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
+                        )
+                    }\n"
+                )
                 .chat()
         } catch (e: Throwable) {
             printMessage("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
