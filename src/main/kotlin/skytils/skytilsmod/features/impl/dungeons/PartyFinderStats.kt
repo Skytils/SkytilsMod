@@ -86,211 +86,160 @@ object PartyFinderStats {
         }
 
         try {
-            val dungeonsData = profileData.dungeons
+            profileData.dungeons.dungeons["catacombs"]?.let { catacombsObj ->
+                val cataData = catacombsObj.normal!!
+                val masterCataData = catacombsObj.master
 
-            val catacombsObj = dungeonsData.dungeons["catacombs"]
-            if (catacombsObj?.experience == null) {
-                UChat.chat("§c${username} has not entered The Catacombs!")
-                return
-            }
-            val cataData = catacombsObj.normal!!
-            val masterCataData = catacombsObj.master
+                val cataLevel =
+                    SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
 
-            val cataLevel =
-                SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
+                val name = playerResponse.formattedName
 
-            val name = playerResponse.formattedName
-
-            val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
-            val component = UMessage("&2&l-----------------------------\n")
-                .append("$name §8» §dCata §9${NumberUtil.nf.format(cataLevel)} ")
-                .append(
-                    UTextComponent("§7[Stats]\n\n")
-                        .setHoverText("§7Click to run: /skytilscata $username")
-                        .setClick(
-                            ClickEvent.Action.RUN_COMMAND, "/skytilscata $username"
-                        )
-                )
-            for (armorPiece in profileData.armor?.items?.reversed() ?: emptyList()) {
-                if (armorPiece == null) continue
-                val lore = armorPiece.asMinecraft.getTooltip(mc.thePlayer, false)
-                component.append(
-                    UTextComponent("${armorPiece.asMinecraft.displayName}\n").setHoverText(
-                        lore.joinToString(separator = "\n")
+                val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
+                val component = UMessage("&2&l-----------------------------\n")
+                    .append("$name §8» §dCata §9${NumberUtil.nf.format(cataLevel)} ")
+                    .append(
+                        UTextComponent("§7[Stats]\n\n")
+                            .setHoverText("§7Click to run: /skytilscata $username")
+                            .setClick(
+                                ClickEvent.Action.RUN_COMMAND, "/skytilscata $username"
+                            )
                     )
-                )
-            }
-            val activePet = profileData.pets.find { it.active }
-            val spiritPet = profileData.pets.find (Pet::isSpirit)
-
-            if (activePet != null) {
-                val rarity = ItemRarity.valueOf(activePet.tier.name).baseColor
-                component.append(
-                    UTextComponent("${rarity}${activePet.type.split('_').joinToString(" ") { it.toTitleCase() }}")
-                        .setHoverText(
-                            "§b" + (activePet.heldItem?.lowercase()
-                                ?.replace("pet_item_", "")
-                                ?.split('_')?.joinToString(" ") { it.toTitleCase() } ?: "§cNo Pet Item")
+                profileData.armor?.items?.reversed()?.filterNotNull()?.forEach { armorPiece ->
+                    val lore = armorPiece.asMinecraft.getTooltip(mc.thePlayer, false)
+                    component.append(
+                        UTextComponent("${armorPiece.asMinecraft.displayName}\n").setHoverText(
+                            lore.joinToString(separator = "\n")
                         )
-                )
-            } else {
-                component.append("§cNo Pet Equipped!")
-            }
-            if (spiritPet != null) {
-                component.append(" §7(§6Spirit§7)\n\n")
-            } else {
-                component.append(" §7(No Spirit)\n\n")
-            }
+                    )
+                }
 
-            val inv =
+                profileData.pets.find { it.active }?.let { activePet ->
+                    val rarity = ItemRarity.valueOf(activePet.tier.name).baseColor
+                    component.append(
+                        UTextComponent("${rarity}${activePet.type.split('_').joinToString(" ") { it.toTitleCase() }}")
+                            .setHoverText(
+                                "§b" + (activePet.heldItem?.lowercase()
+                                    ?.replace("pet_item_", "")
+                                    ?.split('_')?.joinToString(" ") { it.toTitleCase() } ?: "§cNo Pet Item")
+                            )
+                    )
+                } ?: component.append("§cNo Pet Equipped!")
+                profileData.pets.find (Pet::isSpirit)?.run {
+                    component.append(" §7(§6Spirit§7)\n\n")
+                } ?: component.append(" §7(No Spirit)\n\n")
+
                 profileData.inventory?.items?.mapNotNull {
                     ItemUtil.getExtraAttributes(it?.asMinecraft)
                 }?.associateWith {
                     ItemUtil.getSkyBlockItemID(it)
-                }
-            if (inv != null) {
-                val extraAttribs = inv.keys
-                val itemIds = inv.values.toMutableSet()
-                component.append(UTextComponent("§dItems: §7(Hover)\n\n").setHoverText(buildString {
-                    //Archer
-                    when {
-                        itemIds.contains("TERMINATOR") -> {
-                            append("§dTerminator: §a§l●\n")
+                }?.let { (extraAttribs, itemIds) ->
+                    val items = buildSet {
+                        //Archer
+                        when {
+                            itemIds.contains("TERMINATOR") -> add("§5Terminator")
+                            itemIds.contains("JUJU_SHORTBOW") -> add("§5Juju")
                         }
-                        itemIds.contains("JUJU_SHORTBOW") -> {
-                            append("§5Juju: §a§l●\n")
+                        //Mage
+                        when {
+                            extraAttribs.any {
+                                it.getTagList("ability_scroll", Constants.NBT.TAG_STRING).tagCount() == 3
+                            } -> add("§dWither Impact")
+                            itemIds.contains("MIDAS_STAFF") -> add("§6Midas Staff")
+                            itemIds.contains("YETI_SWORD") -> add("§fYeti Sword")
+                            itemIds.contains("BAT_WAND") -> add("§9Spirit Sceptre")
+                            itemIds.contains("FROZEN_SCYTHE") -> add("§bFrozen Scythe")
                         }
-                        else -> {
-                            append("§dTerminator: §c§l●\n")
+                        //Berserk
+                        when {
+                            itemIds.contains("AXE_OF_THE_SHREDDED") -> add("§aAotS")
+                            itemIds.contains("SHADOW_FURY") -> add("§8Shadow Fury")
+                            itemIds.contains("FLOWER_OF_TRUTH") -> add("§cFoT")
                         }
+                        //Miscellaneous
+                        add(checkItemId(itemIds, "DARK_CLAYMORE", "§7Dark Claymore"))
+                        add(checkItemId(itemIds, "GIANTS_SWORD", "§2Giant's Sword"))
+                        add(checkItemId(itemIds, "ICE_SPRAY_WAND", "§bIce Spray"))
+                        checkStonk(itemIds, extraAttribs)?.run { add(this) }
+                        add(checkItemId(itemIds, "BONZO_STAFF", "§9Bonzo Staff"))
+                        add(checkItemId(itemIds, "JERRY_STAFF", "§eJerry-chine"))
+
+                        remove(null)
                     }
-                    //Mage
-                    when {
-                        extraAttribs.any {
-                            it.getTagList("ability_scroll", Constants.NBT.TAG_STRING).tagCount() == 3
-                        } -> {
-                            append("§dWither Impact: §a§l●\n")
-                        }
-                        itemIds.contains("MIDAS_STAFF") -> {
-                            append("§6Midas Staff: §a§l●\n")
-                        }
-                        itemIds.contains("YETI_SWORD") -> {
-                            append("§fYeti Sword: §a§l●\n")
-                        }
-                        itemIds.contains("BAT_WAND") -> {
-                            append("§9Spirit Sceptre: §a§l●\n")
-                        }
-                        itemIds.contains("FROZEN_SCYTHE") -> {
-                            append("§bFrozen Scythe: §a§l●\n")
-                        }
-                        else -> {
-                            append("§dWither Impact: §c§l●\n")
-                        }
-                    }
-                    //Berserk
-                    when {
-                        itemIds.contains("AXE_OF_THE_SHREDDED") -> {
-                            append("§aAotS: §a§l●\n")
-                        }
-                        itemIds.contains("SHADOW_FURY") -> {
-                            append("§8Shadow Fury: §a§l●\n")
-                        }
-                        itemIds.contains("FLOWER_OF_TRUTH") -> {
-                            append("§cFoT: §a§l●\n")
-                        }
-                        else -> {
-                            append("§aAotS: §c§l●\n")
-                        }
-                    }
-                    //Miscellaneous
-                    append(checkItemId(itemIds, "DARK_CLAYMORE", "§7Dark Claymore"))
-                    append(checkItemId(itemIds, "GIANTS_SWORD", "§2Giant's Sword"))
-                    append(checkItemId(itemIds, "ICE_SPRAY_WAND", "§bIce Spray"))
-                    append(checkStonk(itemIds, extraAttribs))
-                    append(checkItemId(itemIds, "BONZO_STAFF", "§9Bonzo Staff"))
-                    append(checkItemId(itemIds, "JERRY_STAFF", "§eJerry-chine"))
-                }))
-            } else {
-                component.append("§cInventory API disabled!\n\n")
-            }
-            val completionObj = cataData.completions
-            val highestFloor = cataData.highestCompletion
+                    component.append(UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(items.joinToString("§8, ")))
+                } ?: component.append("§cInventory API disabled!\n\n")
 
-            if (completionObj != null && highestFloor != null) {
-                component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                    for (i in 0..highestFloor) {
-                        append("§2§l●§a ")
-                        append(if (i == 0) "Entrance: " else "Floor $i: ")
-                        append("§6")
-                        append(completionObj[i])
-                        append(if (i < highestFloor) "\n" else "")
-                    }
-                }))
-
-                val fastestSPlusTimes = cataData.fastestTimeSPlus
-                if (fastestSPlusTimes != null) {
-                    component.append(
-                        UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
-                            buildString {
-                                for (i in 0..highestFloor) {
-                                    append("§2§l●§a ")
-                                    append(if (i == 0) "Entrance: " else "Floor $i: ")
-                                    append("§6")
-                                    append(fastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
-                                    append(if (i < highestFloor) "\n" else "")
-                                }
-                            }
-                        )
-                    )
-                }
-            }
-
-            if (masterCataData?.completions != null) {
-                val masterCompletionObj = masterCataData.completions
-                val highestMasterFloor = masterCataData.highestCompletion
-
-                if (masterCompletionObj != null && highestMasterFloor != null) {
-
-                    component.append(UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                        for (i in 1..highestMasterFloor) {
-                            append("§4§l●§c ")
-                            append("Floor $i: ")
+                cataData.completions?.let { completionObj ->
+                    val highestFloor = cataData.highestCompletion!!
+                    component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
+                        for (i in 0 until highestFloor) {
+                            append("§a")
+                            append(if (i == 0) "Entrance: " else "Floor $i: ")
                             append("§6")
-                            append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
-                            append(if (i < highestMasterFloor) "\n" else "")
+                            append(if (i in completionObj) completionObj[i] else "§cDNF")
+                            if (i != highestFloor - 1)
+                                append("\n")
                         }
                     }))
 
-                    val masterFastestSPlus = UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n")
-
-                    if (masterCataData.fastestTimeSPlus != null) {
-                        val masterFastestSPlusTimes = masterCataData.fastestTimeSPlus!!
-                        masterFastestSPlus.setHoverText(buildString {
-                            for (i in 1..highestMasterFloor) {
-                                append("§4§l●§c ")
-                                append("Floor $i: ")
-                                append("§6")
-                                append(masterFastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
-                                append(if (i < highestMasterFloor) "\n" else "")
-                            }
-                        })
-                    } else {
-                        masterFastestSPlus.setHoverText(
-                            "§cNo S+ Completions"
+                    cataData.fastestTimeSPlus?.run {
+                        component.append(
+                            UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n").setHoverText(
+                                buildString {
+                                    for (i in 0 until highestFloor) {
+                                        append("§a")
+                                        append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                        append("§6")
+                                        append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
+                                        if (i != highestFloor - 1)
+                                            append("\n")
+                                    }
+                                }
+                            )
                         )
                     }
-                    component.append(masterFastestSPlus)
                 }
-            }
 
-            component
-                .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
-                .append(
-                    UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
-                        .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
-                )
-                .append("&2&l-----------------------------")
-                .chat()
+                masterCataData?.completions?.let { masterCompletionObj ->
+                    val highestFloor = masterCataData.highestCompletion!!
+                    component.append(UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(buildString {
+                        for (i in 1 until highestFloor) {
+                            append("§a")
+                            append("Floor $i: ")
+                            append("§6")
+                            append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
+                            if (i != highestFloor - 1)
+                                append("\n")
+                        }
+                    }))
+
+                    cataData.fastestTimeSPlus?.run {
+                        component.append(
+                            UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
+                                buildString {
+                                    for (i in 1 until highestFloor) {
+                                        append("§a")
+                                        append("Floor $i: ")
+                                        append("§6")
+                                        append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
+                                        if (i != highestFloor - 1)
+                                            append("\n")
+                                    }
+                                }
+                            )
+                        )
+                    }
+                }
+
+                component
+                    .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n\n")
+                    .append(
+                        UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
+                            .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
+                    )
+                    .append("&2&l-----------------------------")
+                    .chat()
+            } ?: UChat.chat("§c${username} has not entered The Catacombs!")
         } catch (e: Throwable) {
             UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()
@@ -307,16 +256,19 @@ object PartyFinderStats {
         }
     }
 
-    private fun checkItemId(set: Set<String?>, itemId: String, itemName: String): String {
-        return "${itemName}: §${if (set.contains(itemId)) 'a' else 'c'}§l●\n"
+    private fun checkItemId(set: Set<String?>, itemId: String, itemName: String): String? {
+        return if (set.contains(itemId)) itemName else null
     }
 
-    private fun checkStonk(items: Set<String?>, tags: Set<NBTTagCompound?>): String {
+    private fun checkStonk(items: Set<String?>, tags: Set<NBTTagCompound?>): String? {
         val eff = tags.mapNotNull { it?.getCompoundTag("enchantments")?.getInteger("efficiency") }.maxOrNull() ?: 0
         return when {
-            eff >= 7 -> "§6Efficiency ${eff.toRoman()}: §a§l●\n"
-            items.contains("STONK") -> "§6Stonk: §a§l●\n"
-            else -> "§6Stonk: §c§l●\n"
+            eff >= 7 -> "§6Efficiency ${eff.toRoman()}"
+            items.contains("STONK") -> "§6Stonk"
+            else -> null
         }
     }
 }
+
+private operator fun <K, V> Map<K, V>.component1(): Set<K> = keys
+private operator fun <K, V> Map<K, V>.component2(): Set<V> = values.toMutableSet()
