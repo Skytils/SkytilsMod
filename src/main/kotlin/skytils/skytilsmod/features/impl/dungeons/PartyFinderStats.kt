@@ -121,7 +121,7 @@ object PartyFinderStats {
                 )
             }
             val activePet = profileData.pets.find { it.active }
-            val spiritPet = profileData.pets.find(Pet::isSpirit)
+            val spiritPet = profileData.pets.find (Pet::isSpirit)
 
             if (activePet != null) {
                 val rarity = ItemRarity.valueOf(activePet.tier.name).baseColor
@@ -133,13 +133,13 @@ object PartyFinderStats {
                                 ?.split('_')?.joinToString(" ") { it.toTitleCase() } ?: "§cNo Pet Item")
                         )
                 )
-                if (spiritPet != null) {
-                    component.append(" §7(Spirit)\n\n")
-                } else {
-                    component.append("\n\n")
-                }
             } else {
-                component.append("§cNo Pet Equipped!\n\n")
+                component.append("§cNo Pet Equipped!")
+            }
+            if (spiritPet != null) {
+                component.append(" §7(§6Spirit§7)\n\n")
+            } else {
+                component.append(" §7(No Spirit)\n\n")
             }
 
             val inv =
