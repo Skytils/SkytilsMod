@@ -103,14 +103,14 @@ object PartyFinderStats {
 
             val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
             val component = UMessage("&2&l-----------------------------\n")
+                .append("$name §8» §dCata §9${NumberUtil.nf.format(cataLevel)} ")
                 .append(
-                    UTextComponent("${name}'s §dStats: §7(Hover)\n")
+                    UTextComponent("§7[Stats]\n\n")
                         .setHoverText("§7Click to run: /skytilscata $username")
                         .setClick(
                             ClickEvent.Action.RUN_COMMAND, "/skytilscata $username"
                         )
                 )
-                .append("§dCata: §b${NumberUtil.nf.format(cataLevel)}\n\n")
             for (armorPiece in profileData.armor?.items?.reversed() ?: emptyList()) {
                 if (armorPiece == null) continue
                 val lore = armorPiece.asMinecraft.getTooltip(mc.thePlayer, false)
