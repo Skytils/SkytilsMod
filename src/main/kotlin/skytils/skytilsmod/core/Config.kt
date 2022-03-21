@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
@@ -34,7 +35,6 @@ import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
-import skytils.skytilsmod.utils.withAlpha
 import java.awt.Color
 import java.io.File
 import java.net.URI
