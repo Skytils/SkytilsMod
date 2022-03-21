@@ -178,7 +178,7 @@ object MasterMode7Features {
         if (Skytils.config.showWitherKingStatueBox && DungeonTimer.phase4ClearTime != -1L) {
             for (drag in WitherKingDragons.values()) {
                 if (drag.isDestroyed) continue
-                RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 5f, event.partialTicks)
+                RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 3.69f, event.partialTicks)
             }
         }
     }
