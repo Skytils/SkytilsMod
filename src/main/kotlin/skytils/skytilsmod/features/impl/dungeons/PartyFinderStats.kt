@@ -232,7 +232,7 @@ object PartyFinderStats {
                     component
                         .append("\n§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}")
                         .append(
-                            " §aBlood Mobs Killed: §l§6${
+                            "\n§aBlood Mobs Killed: §l§6${
                                 NumberUtil.nf.format(
                                     (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
                                             (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
