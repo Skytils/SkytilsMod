@@ -33,7 +33,6 @@ import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
-import sun.reflect.Reflection;
 
 import java.util.Objects;
 
