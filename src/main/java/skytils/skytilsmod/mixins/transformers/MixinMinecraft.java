@@ -23,8 +23,6 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
-import org.apache.commons.codec.binary.Base64;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -75,14 +73,5 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 4))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         ScreenRenderer.init();
-        try {
-            String s = new String(Base64.decodeBase64("bmV0Lm1pbmVjcmFmdC51dGlsLlNlc3Npb24="));
-            String s1 = s.replace(".", "/");
-            String a = new String(Base64.decodeBase64("Z2V0U2Vzc2lvbklE"));
-            Reflection.registerMethodsToFilter(Class.forName(
-                    s
-            ), a, FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(s1, a, null));
-        } catch (Throwable ignored) {
-        }
     }
 }
