@@ -355,7 +355,7 @@ object DungeonFeatures {
                             it,
                             true
                         )
-                    } && DungeonListener.team.any { unformatted.contains(it.playerName) })) {
+                    } && DungeonListener.team.keys.any { unformatted.contains(it) })) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted)
                         UChat.chat("§9§lSkytils §8» §aCopied fail to clipboard.")
