@@ -78,7 +78,7 @@ object MasterMode7Features {
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (DungeonTimer.phase4ClearTime == -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
+        if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
         if (ticks % 15 == 0) {
             if (Skytils.config.witherKingDragonSlashAlert) {
                 if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
