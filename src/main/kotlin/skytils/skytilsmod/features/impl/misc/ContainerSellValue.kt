@@ -154,7 +154,7 @@ class ContainerSellValue {
             }
         }
 
-        if(slots.isEmpty()) return
+        if(slots.isEmpty() || distinctItems.isEmpty() || distinctItems.all { it.value.lowestBIN == 0.0 }) return
 
         // Sort the items from most to least valuable and convert them into a readable format
         val textLines = distinctItems.entries.asSequence()
