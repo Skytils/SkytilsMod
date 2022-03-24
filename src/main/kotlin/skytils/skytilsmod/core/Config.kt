@@ -1603,6 +1603,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var betterAuctionPriceInput = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Container Sell Value",
+        description = "Display the lowest BIN prices for the most valuable items in backpacks, ender chest pages, minions, and island chests.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var containerSellValue = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
         description = "§b[WIP] §rAdds commas to Skyblock Damage Splashes.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -2563,7 +2570,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "betterAuctionPriceInput",
             "dungeonChestProfit",
             "showCoinsPerBit",
-            "protectItemBINThreshold"
+            "protectItemBINThreshold",
+            "containerSellValue"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
