@@ -37,6 +37,11 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlin.math.roundToInt
 
+/**
+ * Provides the functionality for an overlay that is rendered on top of chests, minions, ender chest pages,
+ * and backpacks that shows the top items in the container by value and the container's total value.
+ * @author FluxCapacitor2
+ */
 class ContainerSellValue {
 
     /**
@@ -54,26 +59,36 @@ class ContainerSellValue {
         fun shouldDisplay(): Boolean = this.lowestBIN != 0.0
     }
 
+    /**
+     * A `GuiElement` that shows the most valuable items in a container. The rendering of this element
+     * takes place when the container background is drawn, so it doesn't render at the normal time.
+     * Even though the GuiElement's render method isn't used, it is still worth having an instance
+     * of this class so that the user can move the element around normally.
+     * @see onBackgroundDrawn
+     */
     class SellValueDisplay : GuiElement("Container Sell Value", FloatPair(0.258f, 0.283f)) {
+
+        private val rightAlign: Boolean
+            get() = element.actualX > (UResolution.scaledWidth * 0.75f) ||
+                    (element.actualX < UResolution.scaledWidth / 2f && element.actualX > UResolution.scaledWidth / 4f)
+        internal val textPosX: Float
+            get() = if(rightAlign) actualWidth else 0f
+        internal val alignment: SmartFontRenderer.TextAlignment
+            get() = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
+                    else SmartFontRenderer.TextAlignment.LEFT_RIGHT
 
         override fun render() {
             // Rendering is handled in the BackgroundDrawnEvent to give the text proper lighting
         }
 
         override fun demoRender() {
-            val rightAlign = actualX > (UResolution.scaledWidth * 0.75f) ||
-                    (actualX < UResolution.scaledWidth / 2f && actualX > UResolution.scaledWidth / 4f)
-            val alignment = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
-            else SmartFontRenderer.TextAlignment.LEFT_RIGHT
-            val xPos = if(rightAlign) actualWidth else 0f
-
             listOf(
                 "§cDctr's Space Helmet§8 - §a900M",
                 "§fDirt §7x64 §8 - §a1k",
                 "§eTotal Value: §a900M"
             ).forEachIndexed { i, str ->
                 fr.drawString(
-                    str, xPos, (i * fr.FONT_HEIGHT).toFloat(),
+                    str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
                     CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
                 )
             }
@@ -94,20 +109,13 @@ class ContainerSellValue {
         // The max amount of BIN prices to show in the list. If there are more items, the list will be truncated to this size.
         const val MAX_DISPLAYED_ITEMS = 20
 
-        /**
-         * Check if the overlay should be rendered in a container based on its name.
-         * Island chests, backpacks, ender chest pages, and minions are included.
-         */
-        private fun isValidContainer(chestName: String): Boolean {
+        private fun shouldRenderOverlay(chestName: String): Boolean {
             return (!inDungeons && (chestName == "Chest" || chestName == "Large Chest"))
                     || chestName.contains("Backpack")
                     || chestName.startsWith("Ender Chest (")
                     || (chestName.contains("Minion") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
         }
 
-        /**
-         * Get an item's value. If a lowest BIN price is not found, an NPC price is used.
-         */
         private fun getItemValue(itemStack: ItemStack): Double {
             val identifier = AuctionData.getIdentifier(itemStack)
             val priceEach = AuctionData.lowestBINs[identifier] ?: ItemFeatures.sellPrices[identifier]
@@ -128,15 +136,9 @@ class ContainerSellValue {
         val gui = mc.currentScreen
         val container = if(mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return
         val chestName = container.lowerChestInventory.name
-
-        if(!Skytils.config.containerSellValue || gui !is GuiChest || !isValidContainer(chestName)) return
-
-        val rightAlign = element.actualX > (UResolution.scaledWidth * 0.75f) ||
-                (element.actualX < UResolution.scaledWidth / 2f && element.actualX > UResolution.scaledWidth / 4f)
-        val alignment = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
-        else SmartFontRenderer.TextAlignment.LEFT_RIGHT
-        val xPos = if(rightAlign) element.actualWidth else 0f
         val isMinion = chestName.contains(" Minion ")
+
+        if(!Skytils.config.containerSellValue || gui !is GuiChest || !shouldRenderOverlay(chestName)) return
 
         // Map all of the items in the chest to their lowest BIN prices
         val slots = container.inventorySlots.filter {
@@ -154,7 +156,9 @@ class ContainerSellValue {
             }
         }
 
-        if(slots.isEmpty() || distinctItems.isEmpty() || distinctItems.all { it.value.lowestBIN == 0.0 }) return
+        val totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
+
+        if(distinctItems.isEmpty() || totalContainerValue == 0.0) return
 
         // Sort the items from most to least valuable and convert them into a readable format
         val textLines = distinctItems.entries.asSequence()
@@ -169,9 +173,7 @@ class ContainerSellValue {
         if(distinctItems.size > MAX_DISPLAYED_ITEMS) {
             textLines.add("§7and ${distinctItems.size - MAX_DISPLAYED_ITEMS} more...")
         }
-        textLines.add("§eTotal Value: §a${
-            NumberUtil.format(distinctItems.entries.sumOf { it.value.lowestBIN })
-        }")
+        textLines.add("§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
 
         // Translate and scale manually because we're not rendering inside the GuiElement#render() method
         GlStateManager.pushMatrix()
@@ -181,8 +183,8 @@ class ContainerSellValue {
         textLines.forEachIndexed { i, str ->
             ScreenRenderer.fontRenderer.drawString(
                 str,
-                xPos, (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
+                element.textPosX, (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+                CommonColors.WHITE, element.alignment, SmartFontRenderer.TextShadow.NORMAL
             )
         }
 
