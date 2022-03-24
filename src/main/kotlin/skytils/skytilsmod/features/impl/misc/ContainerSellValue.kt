@@ -61,7 +61,8 @@ class ContainerSellValue {
         }
 
         override fun demoRender() {
-            val rightAlign = actualX < UResolution.scaledWidth / 2f
+            val rightAlign = actualX > (UResolution.scaledWidth * 0.75f) ||
+                    (actualX < UResolution.scaledWidth / 2f && actualX > UResolution.scaledWidth / 4f)
             val alignment = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
             else SmartFontRenderer.TextAlignment.LEFT_RIGHT
             val xPos = if(rightAlign) actualWidth else 0f
@@ -130,7 +131,8 @@ class ContainerSellValue {
 
         if(!Skytils.config.containerSellValue || gui !is GuiChest || !isValidContainer(chestName)) return
 
-        val rightAlign = element.actualX < UResolution.scaledWidth / 2f
+        val rightAlign = element.actualX > (UResolution.scaledWidth * 0.75f) ||
+                (element.actualX < UResolution.scaledWidth / 2f && element.actualX > UResolution.scaledWidth / 4f)
         val alignment = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
         else SmartFontRenderer.TextAlignment.LEFT_RIGHT
         val xPos = if(rightAlign) element.actualWidth else 0f
