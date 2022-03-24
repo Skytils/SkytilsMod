@@ -22,7 +22,6 @@ import gg.essential.universal.UResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,15 +39,19 @@ import kotlin.math.roundToInt
 
 class ContainerSellValue {
 
-    private data class DisplayItem(var amount: Int, val itemStack: ItemStack) {
-        val lowestBIN: Double?
-            get() = AuctionData.lowestBINs[AuctionData.getIdentifier(itemStack)]?.times(amount) ?:
-            ItemFeatures.sellPrices[AuctionData.getIdentifier(itemStack)]?.times(amount)
-        val displayName: String = itemStack.displayName
+    /**
+     * Represents a line in the sell value display. To conserve space, multiple items can
+     * be stacked into one line if their display names are equal, so all of the original
+     * `ItemStack`s must be saved to find the lowest BIN price of this display line.
+     */
+    private class DisplayLine(itemStack: ItemStack) {
+        val stackedItems = mutableListOf(itemStack)
+        val lowestBIN: Double
+            get() = stackedItems.sumOf(Companion::getItemValue)
+        val amount: Int
+            get() = stackedItems.sumOf { it.stackSize }
 
-        fun shouldDisplay(): Boolean = this.lowestBIN != null
-
-        constructor(slot: Slot) : this(slot.stack.stackSize, slot.stack)
+        fun shouldDisplay(): Boolean = this.lowestBIN != 0.0
     }
 
     class SellValueDisplay : GuiElement("Container Sell Value", FloatPair(0.258f, 0.283f)) {
@@ -75,7 +78,8 @@ class ContainerSellValue {
             }
         }
 
-        override val toggled: Boolean = Skytils.config.containerSellValue
+        override val toggled: Boolean
+            get() = Skytils.config.containerSellValue
         override val height: Int = fr.FONT_HEIGHT * 20
         override val width: Int = fr.getStringWidth("Dctr's Space Helmet - 900M")
 
@@ -99,6 +103,16 @@ class ContainerSellValue {
                     || chestName.startsWith("Ender Chest (")
                     || (chestName.contains("Minion") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
         }
+
+        /**
+         * Get an item's value. If a lowest BIN price is not found, an NPC price is used.
+         */
+        private fun getItemValue(itemStack: ItemStack): Double {
+            val identifier = AuctionData.getIdentifier(itemStack)
+            val priceEach = AuctionData.lowestBINs[identifier] ?: ItemFeatures.sellPrices[identifier]
+
+            return priceEach?.times(itemStack.stackSize) ?: 0.0
+        }
     }
 
     /**
@@ -120,40 +134,41 @@ class ContainerSellValue {
         val alignment = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
         else SmartFontRenderer.TextAlignment.LEFT_RIGHT
         val xPos = if(rightAlign) element.actualWidth else 0f
-        val isMinion = chestName.contains("Minion")
+        val isMinion = chestName.contains(" Minion ")
 
         // Map all of the items in the chest to their lowest BIN prices
-        val items = container.inventorySlots.filter {
+        val slots = container.inventorySlots.filter {
             it.hasStack && it.inventory != mc.thePlayer.inventory
                     && (!isMinion || it.slotNumber % 9 != 1) // Ignore minion upgrades and fuels
-        }.map { DisplayItem(it) }.filter { it.shouldDisplay() }
+        }
 
-        // Combine items with the same ID to save space in the GUI
-        val distinctItems = mutableMapOf<String, DisplayItem>()
-        items.forEach {
-            if(distinctItems.containsKey(it.displayName)) {
-                distinctItems[it.displayName]!!.apply { amount += it.amount }
+        // Combine items with the same name to save space in the GUI
+        val distinctItems = mutableMapOf<String, DisplayLine>()
+        slots.forEach {
+            if (distinctItems.containsKey(it.stack.displayName)) {
+                distinctItems[it.stack.displayName]!!.stackedItems.add(it.stack)
             } else {
-                distinctItems[it.displayName] = it
+                distinctItems[it.stack.displayName] = DisplayLine(it.stack)
             }
         }
 
-        if(items.isEmpty()) return
+        if(slots.isEmpty()) return
 
         // Sort the items from most to least valuable and convert them into a readable format
-        val textLines = distinctItems.entries
+        val textLines = distinctItems.entries.asSequence()
             .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
+            .filter { it.value.shouldDisplay() }
             .map { (itemName, displayItem) ->
             "${itemName}${
                 (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
-            }§8 - §a${NumberUtil.format(displayItem.lowestBIN!!.roundToInt())}"
+            }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
         }.take(MAX_DISPLAYED_ITEMS).toMutableList()
 
         if(distinctItems.size > MAX_DISPLAYED_ITEMS) {
             textLines.add("§7and ${distinctItems.size - MAX_DISPLAYED_ITEMS} more...")
         }
         textLines.add("§eTotal Value: §a${
-            NumberUtil.format(distinctItems.entries.sumOf { it.value.lowestBIN ?: 0.0 })
+            NumberUtil.format(distinctItems.entries.sumOf { it.value.lowestBIN })
         }")
 
         // Translate and scale manually because we're not rendering inside the GuiElement#render() method
