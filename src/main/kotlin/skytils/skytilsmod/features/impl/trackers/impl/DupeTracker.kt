@@ -33,6 +33,7 @@ import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
+import java.awt.Color
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import kotlin.concurrent.fixedRateTimer
