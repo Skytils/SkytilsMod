@@ -18,8 +18,8 @@
 package skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
-import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UDesktop
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
@@ -111,7 +111,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "General", subcategory = "Reparty"
     )
     var overrideReparty = true
-
+    
     @Property(
         type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
         description = "Displays Stats about a Player who joined.",
@@ -190,6 +190,20 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Miscellaneous"
     )
     var dungeonDeathCounter = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Death Counter HUD",
+        description = "Displays the amount of deaths on your HUD.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var deathCounter = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Rabbit Hat",
+        description = "Reminds you to equip a Rabbit Hat at the end of a F7 or M7 run.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var rabbitHat = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
@@ -766,6 +780,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
     var middleClickTerminals = true
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Change All to Same Color Solver Mode",
+        description = "Changes the display mode of the solver.",
+        category = "Dungeons", subcategory = "Terminal Solvers",
+        options = ["Normal", "Left/Right", "Monkey"]
+    )
+    var changeToSameColorMode = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Change All to Same Color Solver",
@@ -2582,7 +2604,9 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
         addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
+        addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
+
 
         listOf(
             "showGriffinCountdown",
