@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
@@ -27,6 +28,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -50,15 +52,30 @@ object ChangeAllToSameColorSolver {
         }
         GlStateManager.translate(0f, 0f, 299f)
         for ((slot, clicks) in mapping) {
-            val betterOpt = if (clicks.first > -clicks.second) clicks.second else clicks.first
+            var betterOpt = if (clicks.first > -clicks.second) "${clicks.second}" else "${clicks.first}"
+            var color = CommonColors.WHITE
+            if(Skytils.config.changeToSameColorMode == 2){
+                val leftClick = if(Minecraft.getMinecraft().gameSettings.keyBindAttack.keyCode == -100) "L" else "R"
+                val rightClick = if(Minecraft.getMinecraft().gameSettings.keyBindUseItem.keyCode == -99) "R" else "L"
+                val leftOrRight = if(betterOpt.toInt() < 0) { "${betterOpt.toInt() * -1}$rightClick" } else "${betterOpt}$leftClick"
+                betterOpt = leftOrRight
+            } else if(Skytils.config.changeToSameColorMode == 3){
+                betterOpt = clicks.first.toString()
+                when(betterOpt.toInt()) {
+                    1 -> color = CommonColors.GREEN
+                    2,3 -> color = CommonColors.YELLOW
+                    4 -> color = CommonColors.RED
+                }
+            }
+
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
             ScreenRenderer.fontRenderer.drawString(
-                "$betterOpt",
+                betterOpt,
                 slot.xDisplayPosition + 9f,
                 slot.yDisplayPosition + 4f,
-                CommonColors.WHITE,
+                color,
                 SmartFontRenderer.TextAlignment.MIDDLE,
                 SmartFontRenderer.TextShadow.NORMAL
             )

@@ -220,18 +220,18 @@ object ScoreCalculation {
                 if (!hasSaid270 && score >= 270) {
                     hasSaid270 = true
                     if (Skytils.config.createTitleOn270Score) GuiManager.createTitle(
-                        Skytils.config.message270Score.ifBlank { "270 score" },
+                        "§c§l270",
                         20
                     )
-                    if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message270Score.ifBlank { "270 score" }}")
+                    if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc ${Skytils.config.message270Score.ifBlank { "270 score" }}")
                 }
                 if (!hasSaid300 && score >= 300) {
                     hasSaid300 = true
                     if (Skytils.config.createTitleOn300Score) GuiManager.createTitle(
-                        Skytils.config.message300Score.ifBlank { "300 score" },
+                        "§c§l300",
                         20
                     )
-                    if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message300Score.ifBlank { "300 score" }}")
+                    if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc ${Skytils.config.message300Score.ifBlank { "300 score" }}")
                 }
             }
         }
@@ -467,7 +467,7 @@ object ScoreCalculation {
                 if (!mimicKilled.get()) {
                     mimicKilled.set(true)
                     if (Skytils.config.scoreCalculationAssist) {
-                        Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")
+                        Skytils.sendMessageQueue.add("/pc Mimic Killed!")
                     }
                 }
             }
@@ -494,6 +494,46 @@ object ScoreCalculation {
     init {
         ScoreCalculationElement()
         HugeCryptsCounter()
+        DeathCounter()
+    }
+
+    class DeathCounter : GuiElement("Dungeon Deaths Counter", 2f, FloatPair(200, 200)) {
+        override fun render() {
+            if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
+                val sr = UResolution
+                val leftAlign = actualX < sr.scaledWidth / 2f
+                ScreenRenderer.fontRenderer.drawString(
+                    "Deaths: ${deaths.get()}",
+                    if (leftAlign) 0f else width.toFloat(),
+                    0f,
+                    alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
+                    customColor = if (deaths.get() > 0) CommonColors.RED else CommonColors.LIGHT_GREEN
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val sr = UResolution
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            ScreenRenderer.fontRenderer.drawString(
+                "Deaths: 0",
+                if (leftAlign) 0f else width.toFloat(),
+                0f,
+                alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
+                customColor = CommonColors.LIGHT_GREEN
+            )
+        }
+
+        override val toggled: Boolean
+            get() = Skytils.config.deathCounter
+        override val height: Int
+            get() = fr.FONT_HEIGHT
+        override val width: Int
+            get() = fr.getStringWidth("Deaths: 0")
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
     }
 
     class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {

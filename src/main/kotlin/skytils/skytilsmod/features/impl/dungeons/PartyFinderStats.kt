@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -37,6 +38,7 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.toRoman
 import skytils.skytilsmod.utils.SkillUtils.level
 import java.util.*
+import kotlin.math.floor
 import kotlin.time.Duration
 
 object PartyFinderStats {
@@ -82,7 +84,7 @@ object PartyFinderStats {
 
                     val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
                     val component = UMessage("&2&l-----------------------------\n")
-                        .append("$name §8» §dCata §9${NumberUtil.nf.format(cataLevel)} ")
+                        .append("$name §8» §dCata §9${NumberUtil.nf.format(floor(cataLevel))} ")
                         .append(
                             UTextComponent("§7[Stats]\n\n")
                                 .setHoverText("§7Click to run: /skytilscata $username")
@@ -155,11 +157,16 @@ object PartyFinderStats {
 
                             remove(null)
                         }
+
                         component.append(
                             UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(
-                                items.joinToString(
-                                    "§8, "
-                                )
+                                if(items.isEmpty()) {
+                                    "§c§lNone"
+                                } else {
+                                    items.joinToString(
+                                        "§8, "
+                                    )
+                                }
                             )
                         )
                     } ?: component.append("§cInventory API disabled!\n\n")
@@ -167,9 +174,9 @@ object PartyFinderStats {
                     cataData.highestCompletion?.let { highestFloor ->
                         val completionObj = cataData.completions!!
                         component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                            for (i in 0 .. highestFloor) {
+                            for (i in 1..highestFloor) {
                                 append("§a")
-                                append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                append("Floor $i: ")
                                 append("§6")
                                 append(if (i in completionObj) completionObj[i] else "§cDNF")
                                 if (i != highestFloor)
@@ -181,9 +188,9 @@ object PartyFinderStats {
                             component.append(
                                 UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n").setHoverText(
                                     buildString {
-                                        for (i in 0 .. highestFloor) {
+                                        for (i in 1..highestFloor) {
                                             append("§a")
-                                            append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                            append("Floor $i: ")
                                             append("§6")
                                             append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
                                             if (i != highestFloor)
@@ -198,9 +205,9 @@ object PartyFinderStats {
                     masterCataData?.highestCompletion?.let { highestFloor ->
                         val masterCompletionObj = masterCataData.completions!!
                         component.append(
-                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
+                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n\n").setHoverText(
                                 buildString {
-                                    for (i in 1 .. highestFloor) {
+                                    for (i in 1..highestFloor) {
                                         append("§a")
                                         append("Floor $i: ")
                                         append("§6")
@@ -213,9 +220,9 @@ object PartyFinderStats {
 
                         cataData.fastestTimeSPlus?.run {
                             component.append(
-                                UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n").setHoverText(
+                                UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
-                                        for (i in 1 .. highestFloor) {
+                                        for (i in 1..highestFloor) {
                                             append("§a")
                                             append("Floor $i: ")
                                             append("§6")
@@ -230,9 +237,9 @@ object PartyFinderStats {
                     }
 
                     component
-                        .append("\n§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}")
+                        .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n")
                         .append(
-                            "\n§aBlood Mobs Killed: §l§6${
+                            "§aBlood Mobs Killed: §l§6${
                                 NumberUtil.nf.format(
                                     (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
                                             (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
@@ -245,7 +252,7 @@ object PartyFinderStats {
                         )
                         .append("&2&l-----------------------------")
                         .chat()
-                } ?: UChat.chat("§c${username} has not entered The Catacombs!")
+                } ?: UChat.chat("§c$username has not entered The Catacombs!")
             } catch (e: Throwable) {
                 UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
                 e.printStackTrace()
