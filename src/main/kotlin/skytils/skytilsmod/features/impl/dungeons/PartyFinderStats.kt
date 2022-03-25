@@ -172,7 +172,7 @@ object PartyFinderStats {
                     cataData.highestCompletion?.let { highestFloor ->
                         val completionObj = cataData.completions!!
                         component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                            for (i in 1..highestFloor) {
+                            for (i in 1 .. highestFloor) {
                                 append("§a")
                                 append("Floor $i: ")
                                 append("§6")
@@ -186,7 +186,7 @@ object PartyFinderStats {
                             component.append(
                                 UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n").setHoverText(
                                     buildString {
-                                        for (i in 1..highestFloor) {
+                                        for (i in 1 .. highestFloor) {
                                             append("§a")
                                             append("Floor $i: ")
                                             append("§6")
@@ -205,7 +205,7 @@ object PartyFinderStats {
                         component.append(
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n\n").setHoverText(
                                 buildString {
-                                    for (i in 1..highestFloor) {
+                                    for (i in 1 .. highestFloor) {
                                         append("§a")
                                         append("Floor $i: ")
                                         append("§6")
@@ -220,7 +220,7 @@ object PartyFinderStats {
                             component.append(
                                 UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
-                                        for (i in 1..highestFloor) {
+                                        for (i in 1 .. highestFloor) {
                                             append("§a")
                                             append("Floor $i: ")
                                             append("§6")
