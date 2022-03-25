@@ -18,8 +18,8 @@
 package skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
-import gg.essential.universal.UDesktop
 import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
