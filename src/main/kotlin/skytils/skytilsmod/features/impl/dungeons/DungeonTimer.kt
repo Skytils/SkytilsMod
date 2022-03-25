@@ -63,9 +63,6 @@ class DungeonTimer {
                 )
             }
             message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r" -> {
-                if(Skytils.config.rabbitHat) {
-                    GuiManager.createTitle("§c§lRABBIT HAT", 20)
-                }
                 bloodClearTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) UChat.chat(
                     "§bWatcher took ${diff(bloodClearTime, bloodOpenTime)} seconds to clear."
