@@ -184,7 +184,7 @@ object PartyFinderStats {
 
                         cataData.fastestTimeSPlus?.run {
                             component.append(
-                                UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n").setHoverText(
+                                UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
                                         for (i in 1 .. highestFloor) {
                                             append("§a")
@@ -203,7 +203,7 @@ object PartyFinderStats {
                     masterCataData?.highestCompletion?.let { highestFloor ->
                         val masterCompletionObj = masterCataData.completions!!
                         component.append(
-                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n\n").setHoverText(
+                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
                                 buildString {
                                     for (i in 1 .. highestFloor) {
                                         append("§a")
