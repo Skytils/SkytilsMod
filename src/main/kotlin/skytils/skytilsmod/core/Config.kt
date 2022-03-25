@@ -199,13 +199,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var deathCounter = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Rabbit Hat",
-        description = "Reminds you to equip a Rabbit Hat at the end of a F7 or M7 run.",
-        category = "Dungeons", subcategory = "Miscellaneous"
-    )
-    var rabbitHat = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
         description = "Shows the estimated profit for items from chests in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous"
