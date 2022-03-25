@@ -22,7 +22,6 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.ClientChatReceivedEvent
