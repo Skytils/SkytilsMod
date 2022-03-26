@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
@@ -52,12 +53,17 @@ object ChangeAllToSameColorSolver {
         for ((slot, clicks) in mapping) {
             var betterOpt = if (clicks.first > -clicks.second) "${clicks.second}" else "${clicks.first}"
             var color = CommonColors.WHITE
-            if(Skytils.config.changeToSameColorMode == 2){
-                val leftClick = if(Minecraft.getMinecraft().gameSettings.keyBindAttack.keyCode == -100) "L" else "R"
-                val rightClick = if(Minecraft.getMinecraft().gameSettings.keyBindUseItem.keyCode == -99) "R" else "L"
-                val leftOrRight = if(betterOpt.toInt() < 0) { "${betterOpt.toInt() * -1}$rightClick" } else "${betterOpt}$leftClick"
-                betterOpt = leftOrRight
-            } else if(Skytils.config.changeToSameColorMode == 3){
+            if(Skytils.config.changeToSameColorMode == 1){
+                val leftClick = when(Minecraft.getMinecraft().gameSettings.keyBindAttack.keyCode){
+                    -100 -> "L"
+                    else -> "R"
+                }
+                val rightClick = when(Minecraft.getMinecraft().gameSettings.keyBindUseItem.keyCode){
+                    -100 -> "L"
+                    else -> "R"
+                }
+                betterOpt = if(betterOpt.toInt() < 0) { "${betterOpt.toInt() * -1}$rightClick" } else "${betterOpt}$leftClick"
+            } else if(Skytils.config.changeToSameColorMode == 2){
                 betterOpt = clicks.first.toString()
                 when(betterOpt.toInt()) {
                     1 -> color = CommonColors.GREEN
