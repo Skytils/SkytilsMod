@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -156,6 +157,7 @@ object PartyFinderStats {
 
                             remove(null)
                         }
+
                         component.append(
                             UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(
                                 if(items.isEmpty()) {
@@ -172,7 +174,7 @@ object PartyFinderStats {
                     cataData.highestCompletion?.let { highestFloor ->
                         val completionObj = cataData.completions!!
                         component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                            for (i in 1 .. highestFloor) {
+                            for (i in 1..highestFloor) {
                                 append("§a")
                                 append("Floor $i: ")
                                 append("§6")
@@ -186,7 +188,7 @@ object PartyFinderStats {
                             component.append(
                                 UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
-                                        for (i in 1 .. highestFloor) {
+                                        for (i in 1..highestFloor) {
                                             append("§a")
                                             append("Floor $i: ")
                                             append("§6")
@@ -205,7 +207,7 @@ object PartyFinderStats {
                         component.append(
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
                                 buildString {
-                                    for (i in 1 .. highestFloor) {
+                                    for (i in 1..highestFloor) {
                                         append("§a")
                                         append("Floor $i: ")
                                         append("§6")
@@ -220,7 +222,7 @@ object PartyFinderStats {
                             component.append(
                                 UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
-                                        for (i in 1 .. highestFloor) {
+                                        for (i in 1..highestFloor) {
                                             append("§a")
                                             append("Floor $i: ")
                                             append("§6")
