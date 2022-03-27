@@ -543,7 +543,11 @@ object ScoreCalculation {
         }
 
         override fun demoRender() {
-            RenderUtil.drawAllInList(this, demoText)
+            if (Skytils.config.minimizedScoreCalculation) {
+                RenderUtil.drawAllInList(this, demoMin)
+            } else {
+                RenderUtil.drawAllInList(this, demoText)
+            }
         }
 
         companion object {
@@ -564,11 +568,12 @@ object ScoreCalculation {
                 "§f• §eTotal Score:§a 317 §7(§6+10§7)",
                 "§f• §eRank: §6§lS+"
             )
+            private val demoMin = listOf("§eScore: §e300 §7(§6§lS+§7)")
             val text = ArrayList<String>()
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
+            get() = if (Skytils.config.minimizedScoreCalculation) ScreenRenderer.fontRenderer.FONT_HEIGHT else ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
         override val width: Int
             get() = demoText.maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
 
