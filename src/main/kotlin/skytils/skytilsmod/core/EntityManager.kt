@@ -52,13 +52,26 @@ object EntityManager {
     }
 
     /**
+     * Called on ClientTickEvent, process entity ticking
+     */
+    @JvmStatic
+    fun tickEntities() {
+        val it = entityList.iterator()
+        while (it.hasNext()) {
+            val next = it.next()
+            next.livingTicks += 1
+            next.tick()
+        }
+    }
+
+    /**
      * Called on RenderWorldLastEvent, proccess the rendering queue
      *
      * @param partialTicks the world partial ticks
      * @param context the rendering context
      */
     @JvmStatic
-    fun tickEntities(partialTicks: Float, context: RenderGlobal?) {
+    fun renderEntities(partialTicks: Float, context: RenderGlobal?) {
         if (entityList.isEmpty() && toSpawn.isEmpty()) return
         mc.mcProfiler.startSection("fakeEntities")
         run {
@@ -84,8 +97,6 @@ object EntityManager {
                 }
                 mc.mcProfiler.startSection(next.name)
                 // render
-                next.livingTicks += 1
-                next.tick(partialTicks, Random(), player)
                 GlStateManager.pushMatrix()
                 // translates to the correct entity position
                 // subtracting the viewer position offset

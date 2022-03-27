@@ -327,6 +327,7 @@ class Skytils {
         if (event.phase != TickEvent.Phase.START) return
 
         ScreenRenderer.refresh()
+        EntityManager.tickEntities()
 
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
         TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
