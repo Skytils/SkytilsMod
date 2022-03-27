@@ -59,7 +59,7 @@ object PartyFinderStats {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMember(uuid).whenComplete { profile ->
                         profile?.run { playerStats(username, uuid, this) }
                     }.catch { e ->
-                        UChat.chat("§cUnable to retrieve profile information: ${e.message}")
+                        UChat.chat("§cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
                     }
                 }.catch { e ->
                     UChat.chat("§cFailed to get UUID, reason: ${e.message}")
@@ -251,7 +251,7 @@ object PartyFinderStats {
                 e.printStackTrace()
             }
         }.catch { e ->
-            UChat.chat("§cFailed to get dungeon stats: ${e.message}")
+            UChat.chat("§cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
         }
     }
 
