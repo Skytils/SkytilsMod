@@ -66,7 +66,7 @@ object MasterMode7Features {
                 glowstones.clear()
                 return
             }
-            if (event.update.block === Blocks.glowstone && event.old.block != Blocks.ice) {
+            if (event.update.block === Blocks.glowstone && event.old.block != Blocks.packed_ice) {
                 glowstones.add(AxisAlignedBB(event.pos.add(-5, -5, -5), event.pos.add(5, 5, 5)))
             }
         }
