@@ -1128,13 +1128,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var skymallReminder = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "§b[WIP] §rSearch Box",
-        description = "§b[WIP] §rDisplays a search box in chest guis.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var searchBox = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Fetchur Solver",
         description = "Tells you what item Fetchur wants.",
         category = "Mining", subcategory = "Solvers"
