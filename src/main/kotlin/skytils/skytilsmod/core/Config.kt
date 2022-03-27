@@ -18,8 +18,8 @@
 package skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
-import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UDesktop
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
@@ -113,13 +113,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var overrideReparty = true
 
     @Property(
-        type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
-        description = "Displays Stats about a Player who joined.",
-        category = "Dungeons", subcategory = "Party Finder"
-    )
-    var partyFinderStats = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",
         description = "Requires you to run the /coopadd command twice to add a member.",
         category = "General", subcategory = "Hypixel"
@@ -197,6 +190,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Miscellaneous"
     )
     var deathCounter = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
+        description = "Displays Stats about a Player who joined.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderStats = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
@@ -290,11 +290,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var sendMessageOn270Score = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Send message on 300 score",
-        description = "Send message on 300 score.",
-        category = "Dungeons", subcategory = "Score Calculation"
+        type = PropertyType.PARAGRAPH, name = "Message for 270 score",
+        description = "Customize the message sent on hitting 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "Skytils > 270 score"
     )
-    var sendMessageOn300Score = false
+    var message270Score = ""
 
     @Property(
         type = PropertyType.SWITCH, name = "Create Title on 270 score",
@@ -304,19 +305,19 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var createTitleOn270Score = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Create Title on 300 score",
-        description = "Create title on 300 score.",
-        category = "Dungeons", subcategory = "Score Calculation"
+        type = PropertyType.PARAGRAPH, name = "270 Title Message",
+        description = "Customize the message that will be sent when the score reaches 270.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "270"
     )
-    var createTitleOn300Score = false
+    var messageTitle270Score = ""
 
     @Property(
-        type = PropertyType.PARAGRAPH, name = "Message for 270 score",
-        description = "Customize the message sent on hitting 270 score.",
-        category = "Dungeons", subcategory = "Score Calculation",
-        placeholder = "Skytils > 270 score"
+        type = PropertyType.SWITCH, name = "Send message on 300 score",
+        description = "Send message on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
     )
-    var message270Score = ""
+    var sendMessageOn300Score = false
 
     @Property(
         type = PropertyType.PARAGRAPH, name = "Message for 300 score",
@@ -325,6 +326,22 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         placeholder = "Skytils > 300 score"
     )
     var message300Score = ""
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Create Title on 300 score",
+        description = "Create title on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var createTitleOn300Score = false
+
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "300 Title Message",
+        description = "Customize the message that will be sent when the score reaches 300.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "300"
+    )
+    var messageTitle300Score = ""
+
 
     @Property(
         type = PropertyType.SWITCH, name = "Blood Camp Helper",
@@ -1109,6 +1126,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Quality of Life"
     )
     var skymallReminder = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "§b[WIP] §rSearch Box",
+        description = "§b[WIP] §rDisplays a search box in chest guis.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var searchBox = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Fetchur Solver",
@@ -2567,6 +2591,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var compactHider = 0
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Rabbit Hat",
+        description = "Reminds you to equip a Rabbit Hat at the end of a F7 or M7 run.",
+        category = "Notifications", subcategory = "Dungeons"
+    )
+    var rabbitHat = false
+
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
@@ -2586,6 +2617,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             }
         }
 
+        addDependency("message270Score","sendMessageOn270Score")
+        addDependency("messageTitle270Score","createTitleOn270Score")
+
+        addDependency("message300Score","sendMessageOn300Score")
+        addDependency("messageTitle300Score","createTitleOn300Score")
+
         addDependency("bloodHelperColor", "bloodHelper")
 
         addDependency("showNextBlaze", "blazeSolver")
@@ -2599,6 +2636,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
+
 
         listOf(
             "showGriffinCountdown",
