@@ -24,7 +24,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.EntityManager.spawnEntity
-import skytils.skytilsmod.core.EntityManager.tickEntities
+import skytils.skytilsmod.core.EntityManager.renderEntities
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.misc.damagesplash.DamageSplashEntity
 import skytils.skytilsmod.features.impl.misc.damagesplash.Location
@@ -41,7 +41,7 @@ import java.util.regex.Pattern
 class DamageSplash {
     @SubscribeEvent
     fun renderFakeEntity(e: RenderWorldLastEvent) {
-        tickEntities(e.partialTicks, e.context)
+        renderEntities(e.partialTicks, e.context)
     }
 
     @SubscribeEvent
