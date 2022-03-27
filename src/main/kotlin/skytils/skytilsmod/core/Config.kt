@@ -792,19 +792,19 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var middleClickTerminals = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Change All to Same Color Solver",
+        description = "Shows the best path of clicks for the Change All to Same Color Terminal.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var changeAllSameColorTerminalSolver = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Change All to Same Color Solver Mode",
         description = "Changes the display mode of the solver.",
         category = "Dungeons", subcategory = "Terminal Solvers",
         options = ["Normal", "Left/Right", "Monkey"]
     )
     var changeToSameColorMode = 0
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Change All to Same Color Solver",
-        description = "Shows the best path of clicks for the Change All to Same Color Terminal.",
-        category = "Dungeons", subcategory = "Terminal Solvers"
-    )
-    var changeAllSameColorTerminalSolver = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
@@ -1126,7 +1126,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Mining", subcategory = "Quality of Life"
     )
     var skymallReminder = false
-
+    
     @Property(
         type = PropertyType.SWITCH, name = "Fetchur Solver",
         description = "Tells you what item Fetchur wants.",
