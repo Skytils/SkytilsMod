@@ -288,6 +288,7 @@ class MythologicalTracker : Tracker("mythological") {
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
+        write(writer)
     }
 
     companion object {
