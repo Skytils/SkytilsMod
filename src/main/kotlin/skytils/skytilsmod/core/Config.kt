@@ -2635,6 +2635,8 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("markDirtyItems", "dupeTracker")
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
+        addDependency("containerSellValueMaxItems", "containerSellValue")
+
         registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
