@@ -2584,13 +2584,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var compactHider = 0
 
-    @Property(
-        type = PropertyType.SWITCH, name = "Rabbit Hat",
-        description = "Reminds you to equip a Rabbit Hat at the end of a F7 or M7 run.",
-        category = "Notifications", subcategory = "Dungeons"
-    )
-    var rabbitHat = false
-
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
