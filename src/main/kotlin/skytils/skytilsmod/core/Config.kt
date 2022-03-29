@@ -335,7 +335,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     var messageTitle300Score = ""
 
-
     @Property(
         type = PropertyType.SWITCH, name = "Blood Camp Helper",
         description = "Draws an outline where blood mobs spawn in after spinning as armor stands.",
