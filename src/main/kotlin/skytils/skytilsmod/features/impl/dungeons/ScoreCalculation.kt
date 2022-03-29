@@ -494,7 +494,6 @@ object ScoreCalculation {
     init {
         ScoreCalculationElement()
         HugeCryptsCounter()
-        DeathCounter()
     }
 
     class DeathCounter : GuiElement("Dungeon Deaths Counter", 2f, FloatPair(200, 200)) {
@@ -530,45 +529,6 @@ object ScoreCalculation {
             get() = fr.FONT_HEIGHT
         override val width: Int
             get() = fr.getStringWidth("Deaths: 0")
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
-    }
-
-    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
-        override fun render() {
-            if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
-                ScreenRenderer.fontRenderer.drawString(
-                    "Crypts: ${crypts.get()}",
-                    if (leftAlign) 0f else width.toFloat(),
-                    0f,
-                    alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                    customColor = if (crypts.get() < 5) CommonColors.RED else CommonColors.LIGHT_GREEN
-                )
-            }
-        }
-
-        override fun demoRender() {
-            val sr = UResolution
-            val leftAlign = actualX < sr.scaledWidth / 2f
-            ScreenRenderer.fontRenderer.drawString(
-                "Crypts: 5",
-                if (leftAlign) 0f else width.toFloat(),
-                0f,
-                alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                customColor = CommonColors.LIGHT_GREEN
-            )
-        }
-
-        override val toggled: Boolean
-            get() = Skytils.config.bigCryptsCounter
-        override val height: Int
-            get() = fr.FONT_HEIGHT
-        override val width: Int
-            get() = fr.getStringWidth("Crypts: 5")
 
         init {
             Skytils.guiManager.registerElement(this)
