@@ -348,3 +348,6 @@ val Player.formattedName
 
 val Pet.isSpirit
     get() = type == "SPIRIT" && (tier == Tier.LEGENDARY || (heldItem == "PET_ITEM_TIER_BOOST" && tier == Tier.EPIC))
+
+val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
+    get() = Collections.newSetFromMap(this)
