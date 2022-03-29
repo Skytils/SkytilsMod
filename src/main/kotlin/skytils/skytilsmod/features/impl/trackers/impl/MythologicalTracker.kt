@@ -133,11 +133,13 @@ class MythologicalTracker : Tracker("mythological") {
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
                 UChat.chat("§bSkytils: §eYou dug up a §2Minos Champion§e!")
+                markDirty<MythologicalTracker>()
             } else if (event.entity.name == "Minos Inquisitor") {
                 println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
                 UChat.chat("§bSkytils: §eYou dug up a §2Minos Inquisitor§e!")
+                markDirty<MythologicalTracker>()
             }
         }
         if (lastMinosChamp != 0L && System.currentTimeMillis() - lastMinosChamp > 2500) {
@@ -145,6 +147,7 @@ class MythologicalTracker : Tracker("mythological") {
             lastMinosChamp = 0L
             BurrowMob.CHAMP.dugTimes++
             UChat.chat("§bSkytils: §eNo idea what you dug, counting as §2Minos Champion§e!")
+            markDirty<MythologicalTracker>()
         }
     }
 
@@ -190,6 +193,7 @@ class MythologicalTracker : Tracker("mythological") {
                         if (!drop.mobDrop) continue
                         if (unformatted.startsWith("RARE DROP! ${drop.itemName}")) {
                             drop.droppedTimes++
+                            markDirty<MythologicalTracker>()
                             break
                         }
                     }
