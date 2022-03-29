@@ -185,13 +185,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var dungeonDeathCounter = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Death Counter HUD",
-        description = "Displays the amount of deaths on your HUD.",
-        category = "Dungeons", subcategory = "Miscellaneous"
-    )
-    var deathCounter = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
         description = "Displays Stats about a Player who joined.",
         category = "Dungeons", subcategory = "Party Finder"
