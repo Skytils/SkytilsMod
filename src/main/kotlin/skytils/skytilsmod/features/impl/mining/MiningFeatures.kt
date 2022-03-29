@@ -33,11 +33,9 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.*
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -182,20 +180,12 @@ class MiningFeatures {
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
                 return
             }
-            if (unformatted.contains("\$SBECHWP:") || unformatted.contains("\$DSMCHWP:")) {
-                val sub = unformatted.substring(unformatted.lastIndexOf(":") + 1)
+            if (unformatted.contains(Regex("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@(.*?),(.*?),(.*?).*"))) {
+                val sub = unformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
                 val parts = sub.split("@")
                 val coords = parts[1].split(",")
-                val lookUpDict = hashMapOf<String, String>(
-                    "Lost Precursor City" to "internal_city",
-                    "Jungle Temple" to "internal_temple",
-                    "Goblin Queen's Den" to "internal_den",
-                    "Mines of Divan" to "internal_mines",
-                    "Khazad-dûm" to "internal_bal",
-                    "Fairy Grotto" to "internal_fairy"
-                )
-                if (lookUpDict.containsKey(parts[0])) {
-                    val key = lookUpDict[parts[0]]
+                if (locationsToInternal.containsKey(parts[0])) {
+                    val key = locationsToInternal[parts[0]]
 
                     val component = ChatComponentText(
                         "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
@@ -685,5 +675,14 @@ class MiningFeatures {
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
+        val locationsToInternal = hashMapOf<String, String>(
+            "Lost Precursor City" to "internal_city",
+            "Jungle Temple" to "internal_temple",
+            "Goblin Queen's Den" to "internal_den",
+            "Mines of Divan" to "internal_mines",
+            "Khazad-dûm" to "internal_bal",
+            "Fairy Grotto" to "internal_fairy"
+        )
+        val DSM_SBE_PATTERN = Regex("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@(.*?),(.*?),(.*?).*")
     }
 }
