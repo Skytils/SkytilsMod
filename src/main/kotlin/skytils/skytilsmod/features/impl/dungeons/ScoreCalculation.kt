@@ -495,18 +495,18 @@ object ScoreCalculation {
         ScoreCalculationElement()
         HugeCryptsCounter()
     }
-
-    class DeathCounter : GuiElement("Dungeon Deaths Counter", 2f, FloatPair(200, 200)) {
+ 
+        class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
                 val sr = UResolution
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 ScreenRenderer.fontRenderer.drawString(
-                    "Deaths: ${deaths.get()}",
+                    "Crypts: ${crypts.get()}",
                     if (leftAlign) 0f else width.toFloat(),
                     0f,
                     alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                    customColor = if (deaths.get() > 0) CommonColors.RED else CommonColors.LIGHT_GREEN
+                    customColor = if (crypts.get() < 5) CommonColors.RED else CommonColors.LIGHT_GREEN
                 )
             }
         }
@@ -515,7 +515,7 @@ object ScoreCalculation {
             val sr = UResolution
             val leftAlign = actualX < sr.scaledWidth / 2f
             ScreenRenderer.fontRenderer.drawString(
-                "Deaths: 0",
+                "Crypts: 5",
                 if (leftAlign) 0f else width.toFloat(),
                 0f,
                 alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
@@ -524,17 +524,17 @@ object ScoreCalculation {
         }
 
         override val toggled: Boolean
-            get() = Skytils.config.deathCounter
+            get() = Skytils.config.bigCryptsCounter
         override val height: Int
             get() = fr.FONT_HEIGHT
         override val width: Int
-            get() = fr.getStringWidth("Deaths: 0")
+            get() = fr.getStringWidth("Crypts: 5")
 
         init {
             Skytils.guiManager.registerElement(this)
         }
     }
-
+ 
     class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", FloatPair(200, 100)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
