@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.elementa.utils.LineUtils.drawLine
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
@@ -183,22 +184,22 @@ object ContainerSellValue {
             .also { lines = it.size }
             .take(Skytils.config.containerSellValueMaxItems)
 
-        UMatrixStack().apply {
-            // Translate and scale manually because we're not rendering inside the GuiElement#render() method
-            push()
-            translate(element.actualX, element.actualY, 0f)
-            scale(element.scale, element.scale, 0f)
+        // Translate and scale manually because we're not rendering inside the GuiElement#render() method
+        val stack = UMatrixStack()
+        stack.push()
+        stack.translate(element.actualX, element.actualY, 0f)
+        stack.scale(element.scale, element.scale, 0f)
 
-            textLines.forEachIndexed { i, str -> drawLine(this, i, str) }
-            if(lines > Skytils.config.containerSellValueMaxItems) {
-                drawLine(this, textLines.size, "§7and ${lines - Skytils.config.containerSellValueMaxItems} more...")
-                drawLine(this, textLines.size + 1, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
-            } else {
-                drawLine(this, textLines.size, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
-            }
+        textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
+        if(lines > Skytils.config.containerSellValueMaxItems) {
+            drawLine(stack, textLines.size, "§7and ${lines - Skytils.config.containerSellValueMaxItems} more...")
+            drawLine(stack, textLines.size + 1, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+        } else {
+            drawLine(stack, textLines.size, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+        }
 
-            pop()
-        }.applyToGlobalState()
+        stack.pop()
+        stack.applyToGlobalState()
     }
 
     private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {
