@@ -180,17 +180,30 @@ class MiningFeatures {
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
                 return
             }
-            if (unformatted.contains(Regex("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@(.*?),(.*?),(.*?).*"))) {
+
+            /**
+             * Checks for the format used in DSM and SBE
+             * $DSMCHWP:Mines of Divan@-673,117,426 ✔
+             * $SBECHWP:Khazad-dûm@-292,63,281 ✔
+             * $asdf:Khazad-dûm@-292,63,281 ❌
+             * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
+             */
+            if (unformatted.contains(Regex("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*"))) {
                 val sub = unformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
                 val parts = sub.split("@")
+                val location = parts[0]
                 val coords = parts[1].split(",")
-                if (locationsToInternal.containsKey(parts[0])) {
-                    val key = locationsToInternal[parts[0]]
+                if (locationsToInternal.containsKey(location)) {
+                    val key = locationsToInternal[location]
 
+                    /**
+                     * Sends the waypoints message except it suggests which one should be used based on
+                     * the name contained in the message and converts it to the internally used names for the waypoints.
+                     */
                     val component = ChatComponentText(
                         "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
                     )
-                    val suggested = ChatComponentText("§f[${parts[0]}] ").setChatStyle(
+                    val suggested = ChatComponentText("§f[${location}] ").setChatStyle(
                         ChatStyle()
                             .setChatClickEvent(
                                 ClickEvent(
@@ -200,7 +213,7 @@ class MiningFeatures {
                             ).setChatHoverEvent(
                                 HoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    ChatComponentText("§eset waypoint for ${parts[0]}")
+                                    ChatComponentText("§eset waypoint for $location")
                                 )
                             )
                     )
@@ -683,6 +696,5 @@ class MiningFeatures {
             "Khazad-dûm" to "internal_bal",
             "Fairy Grotto" to "internal_fairy"
         )
-        val DSM_SBE_PATTERN = Regex("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@(.*?),(.*?),(.*?).*")
     }
 }
