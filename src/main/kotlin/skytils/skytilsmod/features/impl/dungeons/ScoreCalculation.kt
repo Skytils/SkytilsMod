@@ -467,7 +467,7 @@ object ScoreCalculation {
                 if (!mimicKilled.get()) {
                     mimicKilled.set(true)
                     if (Skytils.config.scoreCalculationAssist) {
-                        Skytils.sendMessageQueue.add("/pc Mimic Killed!")
+                        Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")
                     }
                 }
             }
