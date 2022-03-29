@@ -2623,7 +2623,6 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
 
-
         listOf(
             "showGriffinCountdown",
             "particleBurrows",
