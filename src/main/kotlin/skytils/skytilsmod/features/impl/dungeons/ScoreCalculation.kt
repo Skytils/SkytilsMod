@@ -495,7 +495,7 @@ object ScoreCalculation {
         ScoreCalculationElement()
         HugeCryptsCounter()
     }
- 
+
     class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
@@ -534,7 +534,7 @@ object ScoreCalculation {
             Skytils.guiManager.registerElement(this)
         }
     }
- 
+
     class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", FloatPair(200, 100)) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
