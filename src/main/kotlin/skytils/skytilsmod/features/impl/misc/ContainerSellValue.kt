@@ -77,10 +77,10 @@ object ContainerSellValue {
             get() = element.actualX > (UResolution.scaledWidth * 0.75f) ||
                     (element.actualX < UResolution.scaledWidth / 2f && element.actualX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
-            get() = if(rightAlign) actualWidth else 0f
+            get() = if (rightAlign) actualWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
-            get() = if(rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
-                    else SmartFontRenderer.TextAlignment.LEFT_RIGHT
+            get() = if (rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
+            else SmartFontRenderer.TextAlignment.LEFT_RIGHT
 
         override fun render() {
             // Rendering is handled in the BackgroundDrawnEvent to give the text proper lighting
@@ -126,14 +126,15 @@ object ContainerSellValue {
     private val ItemStack.prettyDisplayName: String
         get() {
             val extraAttr = ItemUtil.getExtraAttributes(this) ?: return this.displayName
-            if(ItemUtil.getSkyBlockItemID(extraAttr) == "ENCHANTED_BOOK" && extraAttr.hasKey("enchantments")) {
+            if (ItemUtil.getSkyBlockItemID(extraAttr) == "ENCHANTED_BOOK" && extraAttr.hasKey("enchantments")) {
                 val enchants = extraAttr.getCompoundTag("enchantments")
-                if(enchants.keySet.size == 1) {
+                if (enchants.keySet.size == 1) {
                     return ItemUtil.getItemLore(this).first()
                 }
             }
             return this.displayName
         }
+
     /**
      * Renders the sell value overlay when in a valid GUI.
      *
@@ -144,11 +145,11 @@ object ContainerSellValue {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
         val gui = mc.currentScreen
-        val container = if(mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return
+        val container = if (mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return
         val chestName = container.lowerChestInventory.name
         val isMinion = chestName.contains(" Minion ")
 
-        if(!Skytils.config.containerSellValue || gui !is GuiChest || !shouldRenderOverlay(chestName)) return
+        if (!Skytils.config.containerSellValue || gui !is GuiChest || !shouldRenderOverlay(chestName)) return
 
         // Map all of the items in the chest to their lowest BIN prices
         val slots = container.inventorySlots.filter {
@@ -168,7 +169,7 @@ object ContainerSellValue {
 
         val totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
 
-        if(distinctItems.isEmpty() || totalContainerValue == 0.0) return
+        if (distinctItems.isEmpty() || totalContainerValue == 0.0) return
 
         // Sort the items from most to least valuable and convert them into a readable format
         val lines: Int
@@ -191,11 +192,11 @@ object ContainerSellValue {
         stack.scale(element.scale, element.scale, 0f)
 
         textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
-        if(lines > Skytils.config.containerSellValueMaxItems) {
+        if (lines > Skytils.config.containerSellValueMaxItems) {
             drawLine(stack, textLines.size, "§7and ${lines - Skytils.config.containerSellValueMaxItems} more...")
-            drawLine(stack, textLines.size + 1, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+            drawLine(stack, textLines.size + 1, "§eTotal Value: §a${NumberUtil.format(totalContainerValue)}")
         } else {
-            drawLine(stack, textLines.size, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+            drawLine(stack, textLines.size, "§eTotal Value: §a${NumberUtil.format(totalContainerValue)}")
         }
 
         stack.pop()
@@ -203,9 +204,11 @@ object ContainerSellValue {
     }
 
     private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {
-        UGraphics.drawString(matrixStack, str,
-            if(element.rightAlign) element.textPosX - UGraphics.getStringWidth(str) else element.textPosX,
+        UGraphics.drawString(
+            matrixStack, str,
+            if (element.rightAlign) element.textPosX - UGraphics.getStringWidth(str) else element.textPosX,
             (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-            Color.WHITE.rgb, true)
+            Color.WHITE.rgb, true
+        )
     }
 }
