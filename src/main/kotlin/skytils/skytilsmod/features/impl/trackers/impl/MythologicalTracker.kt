@@ -25,7 +25,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -43,6 +42,10 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.pow
 
@@ -53,6 +56,12 @@ class MythologicalTracker : Tracker("mythological") {
         Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
 
     private var lastMinosChamp = 0L
+
+    private val timestampFormat = DateTimeFormatter.ofPattern("M/d/yy h:mm a").withZone(
+        ZoneId.of("America/New_York")
+    )
+
+    private val seenUUIDs = WeakHashMap<String, Boolean>().asSet
 
     @Suppress("UNUSED")
     enum class BurrowDrop(
@@ -188,51 +197,55 @@ class MythologicalTracker : Tracker("mythological") {
             }
             is S2FPacketSetSlot -> {
                 val item = event.packet.func_149174_e() ?: return
-                if (event.packet.func_149175_c() != 0 || mc.thePlayer == null || mc.thePlayer.ticksExisted <= 1) return
+                if (event.packet.func_149175_c() != 0 || mc.thePlayer == null || mc.thePlayer.ticksExisted <= 1 || mc.thePlayer?.openContainer != mc.thePlayer?.inventoryContainer) return
                 val drop = BurrowDrop.getFromId(AuctionData.getIdentifier(item)) ?: return
                 if (drop.isChat || drop.mobDrop) return
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
-                if (!extraAttr.hasKey("timestamp")) {
-                    if (Skytils.config.broadcastMythCreatureDrop) {
-                        val text = "§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"
-                        if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text)
-                        UChat.chat(text)
-                        SoundQueue.addToQueue(
-                            SoundQueue.QueuedSound(
-                                "note.pling",
-                                2.0.pow(-9.0 / 12).toFloat(),
-                                volume = 0.5f
-                            )
+                if (!extraAttr.hasKey("timestamp")) return
+                if (!seenUUIDs.add(extraAttr.getString("uuid"))) return
+                val time = ZonedDateTime.from(
+                    timestampFormat.parse(extraAttr.getString("timestamp"))
+                )
+                if (ZonedDateTime.now().withSecond(0).withNano(0).toEpochSecond() - time.toEpochSecond() > 120) return
+                if (Skytils.config.broadcastMythCreatureDrop) {
+                    val text = "§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"
+                    if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text)
+                    UChat.chat(text)
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(-9.0 / 12).toFloat(),
+                            volume = 0.5f
                         )
-                        SoundQueue.addToQueue(
-                            SoundQueue.QueuedSound(
-                                "note.pling",
-                                2.0.pow(-2.0 / 12).toFloat(),
-                                ticks = 4,
-                                volume = 0.5f
-                            )
+                    )
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(-2.0 / 12).toFloat(),
+                            ticks = 4,
+                            volume = 0.5f
                         )
-                        SoundQueue.addToQueue(
-                            SoundQueue.QueuedSound(
-                                "note.pling",
-                                2.0.pow(1.0 / 12).toFloat(),
-                                ticks = 8,
-                                volume = 0.5f
-                            )
+                    )
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(1.0 / 12).toFloat(),
+                            ticks = 8,
+                            volume = 0.5f
                         )
-                        SoundQueue.addToQueue(
-                            SoundQueue.QueuedSound(
-                                "note.pling",
-                                2.0.pow(3.0 / 12).toFloat(),
-                                ticks = 12,
-                                volume = 0.5f
-                            )
+                    )
+                    SoundQueue.addToQueue(
+                        SoundQueue.QueuedSound(
+                            "note.pling",
+                            2.0.pow(3.0 / 12).toFloat(),
+                            ticks = 12,
+                            volume = 0.5f
                         )
-                    }
-                    if (Skytils.config.trackMythEvent) {
-                        drop.droppedTimes++
-                        markDirty<MythologicalTracker>()
-                    }
+                    )
+                }
+                if (Skytils.config.trackMythEvent) {
+                    drop.droppedTimes++
+                    markDirty<MythologicalTracker>()
                 }
             }
         }
