@@ -37,7 +37,6 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.toRoman
 import skytils.skytilsmod.utils.SkillUtils.level
 import java.util.*
-import kotlin.math.floor
 import kotlin.time.Duration
 
 object PartyFinderStats {
@@ -83,7 +82,7 @@ object PartyFinderStats {
 
                     val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
                     val component = UMessage("&2&l-----------------------------\n")
-                        .append("$name §8» §dCata §9${NumberUtil.nf.format(floor(cataLevel))} ")
+                        .append("$name §8» §dCata §9${NumberUtil.nf.format(cataLevel)} ")
                         .append(
                             UTextComponent("§7[Stats]\n\n")
                                 .setHoverText("§7Click to run: /skytilscata $username")
