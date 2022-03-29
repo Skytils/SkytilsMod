@@ -1610,6 +1610,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var containerSellValue = false
 
     @Property(
+        type = PropertyType.NUMBER, name = "Max Displayed Items",
+        description = "The maximum amount of items to display in the Container Sell Value GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 5, max = 30, increment = 1
+    )
+    var containerSellValueMaxItems = 20
+
+    @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
         description = "§b[WIP] §rAdds commas to Skyblock Damage Splashes.",
         category = "Miscellaneous", subcategory = "Quality of Life"

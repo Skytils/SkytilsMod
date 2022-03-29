@@ -206,7 +206,7 @@ class Skytils {
             ArmorColor(),
             AuctionData(),
             AuctionPriceOverlay(),
-            ContainerSellValue(),
+            ContainerSellValue,
             BlazeSolver(),
             BloodHelper,
             BossHPDisplays(),

@@ -18,9 +18,10 @@
 
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -35,6 +36,7 @@ import skytils.skytilsmod.utils.Utils.inDungeons
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import java.awt.Color
 import kotlin.math.roundToInt
 
 /**
@@ -42,7 +44,9 @@ import kotlin.math.roundToInt
  * and backpacks that shows the top items in the container by value and the container's total value.
  * @author FluxCapacitor2
  */
-class ContainerSellValue {
+object ContainerSellValue {
+
+    val element = SellValueDisplay()
 
     /**
      * Represents a line in the sell value display. To conserve space, multiple items can
@@ -52,7 +56,7 @@ class ContainerSellValue {
     private class DisplayLine(itemStack: ItemStack) {
         val stackedItems = mutableListOf(itemStack)
         val lowestBIN: Double
-            get() = stackedItems.sumOf(Companion::getItemValue)
+            get() = stackedItems.sumOf(::getItemValue)
         val amount: Int
             get() = stackedItems.sumOf { it.stackSize }
 
@@ -68,7 +72,7 @@ class ContainerSellValue {
      */
     class SellValueDisplay : GuiElement("Container Sell Value", FloatPair(0.258f, 0.283f)) {
 
-        private val rightAlign: Boolean
+        internal val rightAlign: Boolean
             get() = element.actualX > (UResolution.scaledWidth * 0.75f) ||
                     (element.actualX < UResolution.scaledWidth / 2f && element.actualX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
@@ -104,26 +108,31 @@ class ContainerSellValue {
         }
     }
 
-    companion object {
-        val element = SellValueDisplay()
-        // The max amount of BIN prices to show in the list. If there are more items, the list will be truncated to this size.
-        const val MAX_DISPLAYED_ITEMS = 20
-
-        private fun shouldRenderOverlay(chestName: String): Boolean {
-            return (!inDungeons && (chestName == "Chest" || chestName == "Large Chest"))
-                    || chestName.contains("Backpack")
-                    || chestName.startsWith("Ender Chest (")
-                    || (chestName.contains("Minion") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
-        }
-
-        private fun getItemValue(itemStack: ItemStack): Double {
-            val identifier = AuctionData.getIdentifier(itemStack)
-            val priceEach = AuctionData.lowestBINs[identifier] ?: ItemFeatures.sellPrices[identifier]
-
-            return priceEach?.times(itemStack.stackSize) ?: 0.0
-        }
+    private fun shouldRenderOverlay(chestName: String): Boolean {
+        return (!inDungeons && (chestName == "Chest" || chestName == "Large Chest"))
+                || chestName.contains("Backpack")
+                || chestName.startsWith("Ender Chest (")
+                || (chestName.contains("Minion") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
     }
 
+    private fun getItemValue(itemStack: ItemStack): Double {
+        val identifier = AuctionData.getIdentifier(itemStack)
+        val priceEach = AuctionData.lowestBINs[identifier] ?: ItemFeatures.sellPrices[identifier]
+
+        return priceEach?.times(itemStack.stackSize) ?: 0.0
+    }
+
+    private val ItemStack.prettyDisplayName: String
+        get() {
+            val extraAttr = ItemUtil.getExtraAttributes(this) ?: return this.displayName
+            if(ItemUtil.getSkyBlockItemID(extraAttr) == "ENCHANTED_BOOK" && extraAttr.hasKey("enchantments")) {
+                val enchants = extraAttr.getCompoundTag("enchantments")
+                if(enchants.keySet.size == 1) {
+                    return ItemUtil.getItemLore(this).first()
+                }
+            }
+            return this.displayName
+        }
     /**
      * Renders the sell value overlay when in a valid GUI.
      *
@@ -149,10 +158,10 @@ class ContainerSellValue {
         // Combine items with the same name to save space in the GUI
         val distinctItems = mutableMapOf<String, DisplayLine>()
         slots.forEach {
-            if (distinctItems.containsKey(it.stack.displayName)) {
-                distinctItems[it.stack.displayName]!!.stackedItems.add(it.stack)
+            if (distinctItems.containsKey(it.stack.prettyDisplayName)) {
+                distinctItems[it.stack.prettyDisplayName]!!.stackedItems.add(it.stack)
             } else {
-                distinctItems[it.stack.displayName] = DisplayLine(it.stack)
+                distinctItems[it.stack.prettyDisplayName] = DisplayLine(it.stack)
             }
         }
 
@@ -161,33 +170,41 @@ class ContainerSellValue {
         if(distinctItems.isEmpty() || totalContainerValue == 0.0) return
 
         // Sort the items from most to least valuable and convert them into a readable format
+        val lines: Int
         val textLines = distinctItems.entries.asSequence()
             .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
             .filter { it.value.shouldDisplay() }
             .map { (itemName, displayItem) ->
-            "${itemName}${
-                (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
-            }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
-        }.take(MAX_DISPLAYED_ITEMS).toMutableList()
+                "$itemName§r${
+                    (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
+                }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
+            }
+            .toList()
+            .also { lines = it.size }
+            .take(Skytils.config.containerSellValueMaxItems)
 
-        if(distinctItems.size > MAX_DISPLAYED_ITEMS) {
-            textLines.add("§7and ${distinctItems.size - MAX_DISPLAYED_ITEMS} more...")
-        }
-        textLines.add("§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+        UMatrixStack().apply {
+            // Translate and scale manually because we're not rendering inside the GuiElement#render() method
+            push()
+            translate(element.actualX, element.actualY, 0f)
+            scale(element.scale, element.scale, 0f)
 
-        // Translate and scale manually because we're not rendering inside the GuiElement#render() method
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(element.actualX, element.actualY, 0f)
-        GlStateManager.scale(element.scale, element.scale, 0f)
+            textLines.forEachIndexed { i, str -> drawLine(this, i, str) }
+            if(lines > Skytils.config.containerSellValueMaxItems) {
+                drawLine(this, textLines.size, "§7and ${lines - Skytils.config.containerSellValueMaxItems} more...")
+                drawLine(this, textLines.size + 1, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+            } else {
+                drawLine(this, textLines.size, "§eTotal Value: §a${ NumberUtil.format(totalContainerValue) }")
+            }
 
-        textLines.forEachIndexed { i, str ->
-            ScreenRenderer.fontRenderer.drawString(
-                str,
-                element.textPosX, (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-                CommonColors.WHITE, element.alignment, SmartFontRenderer.TextShadow.NORMAL
-            )
-        }
+            pop()
+        }.applyToGlobalState()
+    }
 
-        GlStateManager.popMatrix()
+    private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {
+        UGraphics.drawString(matrixStack, str,
+            if(element.rightAlign) element.textPosX - UGraphics.getStringWidth(str) else element.textPosX,
+            (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
+            Color.WHITE.rgb, true)
     }
 }
