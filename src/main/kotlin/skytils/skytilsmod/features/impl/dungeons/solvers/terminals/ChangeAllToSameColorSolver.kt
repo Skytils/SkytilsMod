@@ -54,16 +54,6 @@ object ChangeAllToSameColorSolver {
             var betterOpt = if (clicks.first > -clicks.second) "${clicks.second}" else "${clicks.first}"
             var color = CommonColors.WHITE
             if(Skytils.config.changeToSameColorMode == 1){
-                val leftClick = when(Minecraft.getMinecraft().gameSettings.keyBindAttack.keyCode){
-                    -100 -> "L"
-                    else -> "R"
-                }
-                val rightClick = when(Minecraft.getMinecraft().gameSettings.keyBindUseItem.keyCode){
-                    -100 -> "L"
-                    else -> "R"
-                }
-                betterOpt = if(betterOpt.toInt() < 0) { "${betterOpt.toInt() * -1}$rightClick" } else "${betterOpt}$leftClick"
-            } else if(Skytils.config.changeToSameColorMode == 2){
                 betterOpt = clicks.first.toString()
                 when(betterOpt.toInt()) {
                     1 -> color = CommonColors.GREEN
