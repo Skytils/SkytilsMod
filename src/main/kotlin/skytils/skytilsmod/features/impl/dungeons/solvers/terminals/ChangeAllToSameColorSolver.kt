@@ -17,7 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
