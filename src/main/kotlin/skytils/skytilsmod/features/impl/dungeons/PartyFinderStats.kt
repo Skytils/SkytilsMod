@@ -155,7 +155,6 @@ object PartyFinderStats {
 
                             remove(null)
                         }
-
                         component.append(
                             UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(
                                 if(items.isEmpty()) {
