@@ -157,13 +157,9 @@ object PartyFinderStats {
                         }
                         component.append(
                             UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(
-                                if(items.isEmpty()) {
-                                    "§c§lNone"
-                                } else {
-                                    items.joinToString(
-                                        "§8, "
-                                    )
-                                }
+                                items.joinToString(
+                                    "§8, "
+                                ).ifBlank { "§c§lNone" }
                             )
                         )
                     } ?: component.append("§cInventory API disabled!\n\n")
