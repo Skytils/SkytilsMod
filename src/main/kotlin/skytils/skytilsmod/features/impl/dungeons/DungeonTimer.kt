@@ -23,6 +23,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
