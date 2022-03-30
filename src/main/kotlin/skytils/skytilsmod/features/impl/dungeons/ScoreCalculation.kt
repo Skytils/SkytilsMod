@@ -220,7 +220,7 @@ object ScoreCalculation {
                 if (!hasSaid270 && score >= 270) {
                     hasSaid270 = true
                     if (Skytils.config.createTitleOn270Score) GuiManager.createTitle(
-                        "§c§l" + Skytils.config.messageTitle270Score,
+                        "§c§l" + Skytils.config.messageTitle270Score.ifBlank { "270" },
                         20
                     )
                     if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc ${Skytils.config.message270Score.ifBlank { "270 score" }}")
@@ -228,7 +228,7 @@ object ScoreCalculation {
                 if (!hasSaid300 && score >= 300) {
                     hasSaid300 = true
                     if (Skytils.config.createTitleOn300Score) GuiManager.createTitle(
-                        "§c§l" + Skytils.config.messageTitle300Score,
+                        "§c§l" + Skytils.config.messageTitle300Score.ifBlank { "300" },
                         20
                     )
                     if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc ${Skytils.config.message300Score.ifBlank { "300 score" }}")
