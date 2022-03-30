@@ -223,7 +223,7 @@ object ScoreCalculation {
                         "§c§l" + Skytils.config.messageTitle270Score.ifBlank { "270" },
                         20
                     )
-                    if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc ${Skytils.config.message270Score.ifBlank { "270 score" }}")
+                    if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message270Score.ifBlank { "270 score" }}")
                 }
                 if (!hasSaid300 && score >= 300) {
                     hasSaid300 = true
@@ -231,7 +231,7 @@ object ScoreCalculation {
                         "§c§l" + Skytils.config.messageTitle300Score.ifBlank { "300" },
                         20
                     )
-                    if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc ${Skytils.config.message300Score.ifBlank { "300 score" }}")
+                    if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message300Score.ifBlank { "300 score" }}")
                 }
             }
         }
