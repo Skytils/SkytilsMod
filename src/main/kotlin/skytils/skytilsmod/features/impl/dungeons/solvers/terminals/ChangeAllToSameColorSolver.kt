@@ -50,7 +50,7 @@ object ChangeAllToSameColorSolver {
         }
         GlStateManager.translate(0f, 0f, 299f)
         for ((slot, clicks) in mapping) {
-            val betterOpt = if (clicks.first > -clicks.second) clicks.second else clicks.first
+            var betterOpt = if (clicks.first > -clicks.second) clicks.second else clicks.first
             var color = CommonColors.WHITE
             if(Skytils.config.changeToSameColorMode == 1){
                 betterOpt = clicks.first
