@@ -794,7 +794,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         type = PropertyType.SELECTOR, name = "Change All to Same Color Solver Mode",
         description = "Changes the display mode of the solver.",
         category = "Dungeons", subcategory = "Terminal Solvers",
-        options = ["Normal", "LMB/RMB", "LMB only"]
+        options = ["Normal", "LMB only"]
     )
     var changeToSameColorMode = 0
 
