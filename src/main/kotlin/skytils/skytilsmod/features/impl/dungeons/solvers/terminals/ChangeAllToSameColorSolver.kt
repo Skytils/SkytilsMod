@@ -51,11 +51,11 @@ object ChangeAllToSameColorSolver {
         }
         GlStateManager.translate(0f, 0f, 299f)
         for ((slot, clicks) in mapping) {
-            var betterOpt = if (clicks.first > -clicks.second) "${clicks.second}" else "${clicks.first}"
+            val betterOpt = if (clicks.first > -clicks.second) clicks.second else clicks.first
             var color = CommonColors.WHITE
             if(Skytils.config.changeToSameColorMode == 1){
-                betterOpt = clicks.first.toString()
-                when(betterOpt.toInt()) {
+                betterOpt = clicks.first
+                when(betterOpt) {
                     1 -> color = CommonColors.GREEN
                     2,3 -> color = CommonColors.YELLOW
                     4 -> color = CommonColors.RED
@@ -66,7 +66,7 @@ object ChangeAllToSameColorSolver {
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
             ScreenRenderer.fontRenderer.drawString(
-                betterOpt,
+                "$betterOpt",
                 slot.xDisplayPosition + 9f,
                 slot.yDisplayPosition + 4f,
                 color,
