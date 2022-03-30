@@ -172,9 +172,9 @@ object PartyFinderStats {
                     cataData.highestCompletion?.let { highestFloor ->
                         val completionObj = cataData.completions!!
                         component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                            for (i in 1 .. highestFloor) {
+                            for (i in 0 .. highestFloor) {
                                 append("§a")
-                                append("Floor $i: ")
+                                append(if (i == 0) "Entrance: " else "Floor $i: ")
                                 append("§6")
                                 append(if (i in completionObj) completionObj[i] else "§cDNF")
                                 if (i != highestFloor)
@@ -186,9 +186,9 @@ object PartyFinderStats {
                             component.append(
                                 UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
-                                        for (i in 1 .. highestFloor) {
+                                        for (i in 0 .. highestFloor) {
                                             append("§a")
-                                            append("Floor $i: ")
+                                            append(if (i == 0) "Entrance: " else "Floor $i: ")
                                             append("§6")
                                             append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
                                             if (i != highestFloor)
