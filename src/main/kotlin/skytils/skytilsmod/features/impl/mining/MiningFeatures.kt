@@ -188,7 +188,7 @@ class MiningFeatures {
              * $asdf:Khazad-dûm@-292,63,281 ❌
              * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
              */
-            if (unformatted.contains(Regex("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*"))) {
+            if (Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*").matcher(unformatted).matches()) {
                 val sub = unformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
                 val parts = sub.split("@")
                 val location = parts[0]
@@ -200,24 +200,24 @@ class MiningFeatures {
                      * Sends the waypoints message except it suggests which one should be used based on
                      * the name contained in the message and converts it to the internally used names for the waypoints.
                      */
-                    val component = ChatComponentText(
+                    mc.thePlayer.addChatMessage(ChatComponentText(
                         "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
-                    )
-                    val suggested = ChatComponentText("§f[${location}] ").setChatStyle(
-                        ChatStyle()
-                            .setChatClickEvent(
-                                ClickEvent(
-                                    ClickEvent.Action.RUN_COMMAND,
-                                    "/skytilshollowwaypoint set $key ${coords[0]} ${coords[1]} ${coords[2]}"
+                    ).appendSibling(
+                        ChatComponentText("§f[${location}] ").setChatStyle(
+                            ChatStyle()
+                                .setChatClickEvent(
+                                    ClickEvent(
+                                        ClickEvent.Action.RUN_COMMAND,
+                                        "/skytilshollowwaypoint set $key ${coords[0]} ${coords[1]} ${coords[2]}"
+                                    )
+                                ).setChatHoverEvent(
+                                    HoverEvent(
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        ChatComponentText("§eset waypoint for $location")
+                                    )
                                 )
-                            ).setChatHoverEvent(
-                                HoverEvent(
-                                    HoverEvent.Action.SHOW_TEXT,
-                                    ChatComponentText("§eset waypoint for $location")
-                                )
-                            )
-                    )
-                    val custom = ChatComponentText("§e[Custom]").setChatStyle(
+                        )
+                    ).appendSibling(ChatComponentText("§e[Custom]").setChatStyle(
                         ChatStyle().setChatClickEvent(
                             ClickEvent(
                                 ClickEvent.Action.SUGGEST_COMMAND,
@@ -229,8 +229,7 @@ class MiningFeatures {
                                 ChatComponentText("§eset custom waypoint")
                             )
                         )
-                    )
-                    mc.thePlayer.addChatMessage(component.appendSibling(suggested).appendSibling(custom))
+                    )))
                 }
             }
         }
