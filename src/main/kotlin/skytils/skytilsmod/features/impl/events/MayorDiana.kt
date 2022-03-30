@@ -52,7 +52,9 @@ class MayorDiana {
                 val golem = (mc.theWorld.loadedEntityList.filter {
                     it is EntityIronGolem && it.health > 0 && it.getDistanceSq(pos) <= 25 * 25
                 }.minByOrNull { it.getDistanceSq(pos) } ?: return) as EntityIronGolem
-                gaiaConstructHits.compute(golem) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
+                Utils.checkThreadAndQueue {
+                    gaiaConstructHits.compute(golem) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
+                }
             }
         }
     }
