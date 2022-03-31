@@ -208,7 +208,7 @@ class MiningFeatures {
             "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
         for (loc in CrystalHollowsMap.Locations.values()) {
-            if (!loc.loc.exists()) continue
+            if (loc.loc.exists()) continue
             message.append(
                 UTextComponent("${loc.displayName} ")
                     .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
