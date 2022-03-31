@@ -430,7 +430,8 @@ object ScoreCalculation {
                 if(unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$")) {
                     if(Skytils.config.customMimicKilled) {
                     event.isCanceled = true
-                    UChat.chat(formatted.toString().replace("\$SKYTILS-DUNGEON-SCORE-MIMIC$",Skytils.config.customMimicKilledMessage.ifBlank { "§cMimic Killed!§r" }))
+                    //UChat.chat(formatted.toString().replace("\$SKYTILS-DUNGEON-SCORE-MIMIC$",Skytils.config.customMimicKilledMessage.ifBlank { "§cMimic Killed!§r" }))
+                    //Some dev make this work, i just made it on mobile so i am useless from now on
                     }
                     mimicKilled.set(true)
                     return
