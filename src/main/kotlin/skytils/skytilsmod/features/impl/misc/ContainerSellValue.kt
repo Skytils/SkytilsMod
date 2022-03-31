@@ -18,7 +18,6 @@
 
 package skytils.skytilsmod.features.impl.misc
 
-import gg.essential.elementa.utils.LineUtils.drawLine
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
@@ -117,10 +116,36 @@ object ContainerSellValue {
     }
 
     private fun getItemValue(itemStack: ItemStack): Double {
-        val identifier = AuctionData.getIdentifier(itemStack)
-        val priceEach = AuctionData.lowestBINs[identifier] ?: ItemFeatures.sellPrices[identifier]
+        val identifier = AuctionData.getIdentifier(itemStack) ?: return 0.0
+        val basePrice = maxOf(
+            AuctionData.lowestBINs[identifier] ?: 0.0,
+            AuctionData.bazaarPrices[identifier]?.quickStatus?.sellPrice ?: 0.0,
+            ItemFeatures.sellPrices[identifier] ?: 0.0
+        )
 
-        return priceEach?.times(itemStack.stackSize) ?: 0.0
+        if(itemStack.stackSize > 1 || !Skytils.config.includeModifiersInSellValue) return basePrice * itemStack.stackSize
+
+        val extraAttrs = ItemUtil.getExtraAttributes(itemStack) ?: return basePrice
+        val recombValue =
+            if (extraAttrs.hasKey("rarity_upgrades")) AuctionData.lowestBINs["RECOMBOBULATOR_3000"] ?: 0.0 else 0.0
+
+        val hpbCount = extraAttrs.getInteger("hot_potato_count")
+        val hpbValue = if (hpbCount > 0) (1..hpbCount).sumOf {
+            AuctionData.lowestBINs[if (it >= 10) "FUMING_POTATO_BOOK" else "HOT_POTATO_BOOK"] ?: 0.0
+        } else 0.0
+
+        val enchantments = if(!identifier.startsWith("ENCHANTED_BOOK-"))
+            extraAttrs.getCompoundTag("enchantments") else null
+        val enchantValue = enchantments?.keySet?.sumOf {
+            AuctionData.lowestBINs["ENCHANTED_BOOK-${it.uppercase()}-${enchantments.getInteger(it)}"] ?: 0.0
+        } ?: 0.0
+
+        val masterStars = itemStack.displayName?.count { it == '⍟' } ?: 0
+        val masterStarValue = if(masterStars > 0) (1..masterStars).sumOf { i ->
+            AuctionData.lowestBINs[listOf("FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH")[i - 1] + "_MASTER_STAR"] ?: 0.0
+        } else 0.0
+
+        return basePrice + enchantValue + recombValue + hpbValue + masterStarValue
     }
 
     private val ItemStack.prettyDisplayName: String
@@ -200,7 +225,6 @@ object ContainerSellValue {
         }
 
         stack.pop()
-        stack.applyToGlobalState()
     }
 
     private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {

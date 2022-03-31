@@ -1634,6 +1634,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var containerSellValue = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Include Item Modifiers",
+        description = "Includes potato books, recombobulators, enchantments, and master stars in the item price calculations.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var includeModifiersInSellValue = true
+
+    @Property(
         type = PropertyType.NUMBER, name = "Max Displayed Items",
         description = "The maximum amount of items to display in the Container Sell Value GUI.",
         category = "Miscellaneous", subcategory = "Quality of Life",

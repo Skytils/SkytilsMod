@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
+import skytils.hylin.skyblock.bazaar.BazaarProduct
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.core.Config
@@ -33,6 +34,7 @@ class AuctionData {
         val dataURL
             get() = "https://${Skytils.domain}/api/auctions/lowestbins"
         val lowestBINs = HashMap<String, Double>()
+        val bazaarPrices = HashMap<String, BazaarProduct>()
         fun getIdentifier(item: ItemStack?): String? {
             val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
             var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
@@ -71,13 +73,23 @@ class AuctionData {
 
     init {
         Skytils.config.registerListener(Config::fetchLowestBINPrices.javaField!!) { value: Boolean ->
-            if (!value) lowestBINs.clear()
+            if (!value) {
+                lowestBINs.clear()
+                bazaarPrices.clear()
+            }
         }
         fixedRateTimer(name = "Skytils-FetchAuctionData", period = 60 * 1000L) {
             if (Skytils.config.fetchLowestBINPrices) {
                 val data = APIUtil.getJSONResponse(dataURL)
                 for ((key, value) in data.entrySet()) {
                     lowestBINs[key] = value.asDouble
+                }
+            }
+        }
+        fixedRateTimer(name = "Skytils-FetchBazaarData", period = 15 * 60 * 1000L) {
+            if(Skytils.config.fetchLowestBINPrices) {
+                Skytils.hylinAPI.getBazaarData().whenComplete {
+                    bazaarPrices.putAll(it.products)
                 }
             }
         }
