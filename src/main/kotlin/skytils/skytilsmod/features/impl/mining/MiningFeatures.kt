@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.mining
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
+import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -200,36 +201,17 @@ class MiningFeatures {
                      * Sends the waypoints message except it suggests which one should be used based on
                      * the name contained in the message and converts it to the internally used names for the waypoints.
                      */
-                    mc.thePlayer.addChatMessage(ChatComponentText(
-                        "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
-                    ).appendSibling(
-                        ChatComponentText("§f[${location}] ").setChatStyle(
-                            ChatStyle()
-                                .setChatClickEvent(
-                                    ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND,
-                                        "/skytilshollowwaypoint set $key ${coords[0]} ${coords[1]} ${coords[2]}"
-                                    )
-                                ).setChatHoverEvent(
-                                    HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        ChatComponentText("§eset waypoint for $location")
-                                    )
-                                )
+                    UChat.chat(UTextComponent("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
+                        .appendSibling(UTextComponent("§f[${location}] ")
+                            .setClick(ClickEvent.Action.RUN_COMMAND, "/skytilshollowwaypoint set $key ${coords[0]} ${coords[1]} ${coords[2]}")
+                            .setHover(HoverEvent.Action.SHOW_TEXT, UTextComponent("§eset waypoint for $location"))
                         )
-                    ).appendSibling(ChatComponentText("§e[Custom]").setChatStyle(
-                        ChatStyle().setChatClickEvent(
-                            ClickEvent(
-                                ClickEvent.Action.SUGGEST_COMMAND,
-                                "/skytilshollowwaypoint set name ${coords[0]} ${coords[1]} ${coords[2]}"
-                            )
-                        ).setChatHoverEvent(
-                            HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("§eset custom waypoint")
+                        .appendSibling(UTextComponent("§e[Custom]")
+                            .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/skytilshollowwaypoint set name ${coords[0]} ${coords[1]} ${coords[2]}")
+                            .setHover(HoverEvent.Action.SHOW_TEXT, UTextComponent("§eset custom waypoint")
                             )
                         )
-                    )))
+                    )
                 }
             }
         }
