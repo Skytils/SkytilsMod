@@ -420,9 +420,9 @@ object ScoreCalculation {
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ")) {
-                if (unformatted.contains(Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
+                if (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
                         "Mimic dead!", "Mimic Killed!", "Mimic Dead!"
-                    ))
+                    )
                 ) {
                     mimicKilled.set(true)
                     return
