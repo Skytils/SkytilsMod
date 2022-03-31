@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
