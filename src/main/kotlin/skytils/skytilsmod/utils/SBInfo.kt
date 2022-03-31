@@ -62,6 +62,7 @@ object SBInfo {
     private var lastLocRaw: Long = -1
     private var joinedWorld: Long = -1
     private var locraw: JsonObject? = null
+    private val junkRegex = Regex("[^A-Za-z0-9() -û]")
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
@@ -158,7 +159,7 @@ object SBInfo {
                 }
                 for (loc in lines) {
                     if (loc.contains('⏣')) {
-                        location = loc.stripControlCodes().replace("[^A-Za-z0-9() -]".toRegex(), "").trim()
+                        location = loc.stripControlCodes().replace(junkRegex, "").trim()
                         break
                     }
                 }
