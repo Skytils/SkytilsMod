@@ -2674,6 +2674,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
         addDependency("containerSellValueMaxItems", "containerSellValue")
+        addDependency("includeModifiersInSellValue", "containerSellValue")
 
         registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
