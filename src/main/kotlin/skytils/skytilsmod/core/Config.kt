@@ -269,6 +269,21 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var scoreCalculationReceiveAssist = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Custom Mimic killed messagr",
+        description = "Changes the Mimic killed message from Skytils.(Client-Side only)",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var customMimicKilled = false
+    
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "Customize Mimic killed messagr",
+        description = "Customizes the mimic killed message from Skytils",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "§cMimic Killed!§r"
+    )
+    var customMimicKilledMessage = ""
+
+    @Property(
         type = PropertyType.SWITCH, name = "Allow Mimic Dead! from other Mods",
         description = "Uses the Mimic dead! in order to determine the state of the mimic in the dungeon.",
         category = "Dungeons", subcategory = "Score Calculation"
