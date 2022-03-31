@@ -86,8 +86,8 @@ class AuctionData {
                 }
             }
         }
-        fixedRateTimer(name = "Skytils-FetchBazaarData", period = 15 * 60 * 1000L) {
-            if(Skytils.config.fetchLowestBINPrices) {
+        fixedRateTimer(name = "Skytils-FetchBazaarData", period = 10 * 60 * 1000L) {
+            if(Skytils.config.fetchLowestBINPrices && Skytils.config.containerSellValue) {
                 Skytils.hylinAPI.getBazaarData().whenComplete {
                     bazaarPrices.putAll(it.products)
                 }
