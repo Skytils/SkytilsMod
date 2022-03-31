@@ -59,7 +59,7 @@ object PartyFinderStats {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMember(uuid).whenComplete { profile ->
                         profile?.run { playerStats(username, uuid, this) }
                     }.catch { e ->
-                        UChat.chat("§cUnable to retrieve profile information: ${e.message}")
+                        UChat.chat("§cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
                     }
                 }.catch { e ->
                     UChat.chat("§cFailed to get UUID, reason: ${e.message}")
@@ -159,7 +159,7 @@ object PartyFinderStats {
                             UTextComponent("§dImportant Items: §7(Hover)\n\n").setHoverText(
                                 items.joinToString(
                                     "§8, "
-                                )
+                                ).ifBlank { "§c§lNone" }
                             )
                         )
                     } ?: component.append("§cInventory API disabled!\n\n")
@@ -179,7 +179,7 @@ object PartyFinderStats {
 
                         cataData.fastestTimeSPlus?.run {
                             component.append(
-                                UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n").setHoverText(
+                                UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
                                         for (i in 0 .. highestFloor) {
                                             append("§a")
@@ -213,7 +213,7 @@ object PartyFinderStats {
 
                         cataData.fastestTimeSPlus?.run {
                             component.append(
-                                UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n").setHoverText(
+                                UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
                                         for (i in 1 .. highestFloor) {
                                             append("§a")
@@ -230,9 +230,9 @@ object PartyFinderStats {
                     }
 
                     component
-                        .append("\n§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}")
+                        .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n")
                         .append(
-                            "\n§aBlood Mobs Killed: §l§6${
+                            "§aBlood Mobs Killed: §l§6${
                                 NumberUtil.nf.format(
                                     (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
                                             (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
@@ -245,13 +245,13 @@ object PartyFinderStats {
                         )
                         .append("&2&l-----------------------------")
                         .chat()
-                } ?: UChat.chat("§c${username} has not entered The Catacombs!")
+                } ?: UChat.chat("§c$username has not entered The Catacombs!")
             } catch (e: Throwable) {
                 UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
                 e.printStackTrace()
             }
         }.catch { e ->
-            UChat.chat("§cFailed to get dungeon stats: ${e.message}")
+            UChat.chat("§cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
         }
     }
 

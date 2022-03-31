@@ -220,7 +220,7 @@ object ScoreCalculation {
                 if (!hasSaid270 && score >= 270) {
                     hasSaid270 = true
                     if (Skytils.config.createTitleOn270Score) GuiManager.createTitle(
-                        Skytils.config.message270Score.ifBlank { "270 score" },
+                        "§c§l" + Skytils.config.messageTitle270Score.ifBlank { "270" },
                         20
                     )
                     if (Skytils.config.sendMessageOn270Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message270Score.ifBlank { "270 score" }}")
@@ -228,7 +228,7 @@ object ScoreCalculation {
                 if (!hasSaid300 && score >= 300) {
                     hasSaid300 = true
                     if (Skytils.config.createTitleOn300Score) GuiManager.createTitle(
-                        Skytils.config.message300Score.ifBlank { "300 score" },
+                        "§c§l" + Skytils.config.messageTitle300Score.ifBlank { "300" },
                         20
                     )
                     if (Skytils.config.sendMessageOn300Score) Skytils.sendMessageQueue.add("/pc Skytils-SC > ${Skytils.config.message300Score.ifBlank { "300 score" }}")
@@ -418,7 +418,7 @@ object ScoreCalculation {
         if (!Utils.inDungeons || mc.thePlayer == null) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
-            if (unformatted.startsWith("Party > ")) {
+            if (unformatted.startsWith("Party > ") || (unformatted.contains(":") && !unformatted.contains(">"))) {
                 if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") || (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
                         "Mimic dead!", "Mimic Killed!", "Mimic Dead!"
                     ))
@@ -430,14 +430,6 @@ object ScoreCalculation {
                     event.isCanceled = true
                     return
                 }
-            } else if (unformatted.contains(":") && !unformatted.contains(">") && unformatted.containsAny(
-                    "Mimic dead!",
-                    "Mimic Killed!",
-                    "Mimic Dead!"
-                )
-            ) {
-                mimicKilled.set(true)
-                return
             }
         }
     }
@@ -449,8 +441,11 @@ object ScoreCalculation {
         if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
             event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
                 it as AccessorChatComponentText
-                if (!it.text.startsWith("Skytils-SC > ")) return@forEach
-                it.text = it.text.substring("Skytils-SC > ".length)
+                if (it.text.startsWith("Skytils-SC > ")) {
+                    it.text = it.text.substringAfter("Skytils-SC > ")
+                } else if (it.text.startsWith("\$SKYTILS-DUNGEON-SCORE-MIMIC\$")) {
+                    it.text = it.text.replace("\$SKYTILS-DUNGEON-SCORE-MIMIC\$", "Mimic Killed!")
+                }
             }
         }
     }
@@ -543,7 +538,11 @@ object ScoreCalculation {
         }
 
         override fun demoRender() {
-            RenderUtil.drawAllInList(this, demoText)
+            if (Skytils.config.minimizedScoreCalculation) {
+                RenderUtil.drawAllInList(this, demoMin)
+            } else {
+                RenderUtil.drawAllInList(this, demoText)
+            }
         }
 
         companion object {
@@ -564,11 +563,12 @@ object ScoreCalculation {
                 "§f• §eTotal Score:§a 317 §7(§6+10§7)",
                 "§f• §eRank: §6§lS+"
             )
+            private val demoMin = listOf("§eScore: §e300 §7(§6§lS+§7)")
             val text = ArrayList<String>()
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
+            get() = if (Skytils.config.minimizedScoreCalculation) ScreenRenderer.fontRenderer.FONT_HEIGHT else ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
         override val width: Int
             get() = demoText.maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
 

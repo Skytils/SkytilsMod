@@ -54,7 +54,7 @@ class DamageSplashEntity(
     override val name: String
         get() = "EntityDamageSplash"
 
-    override fun tick(partialTicks: Float, r: Random, player: EntityPlayerSP?) {
+    override fun tick() {
         if (color == null) {
             println("Failed to parse color for DamageSplashEntity, bound entity '${boundEntity.customNameTag}' | parse string '$damage'")
             UChat.chat("§cSkytils ran into a problem while rendering damage, please report this on our Discord with your log file attached.")

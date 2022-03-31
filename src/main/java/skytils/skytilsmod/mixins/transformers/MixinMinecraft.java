@@ -79,9 +79,12 @@ public abstract class MixinMinecraft {
             String s = new String(Base64.decodeBase64("bmV0Lm1pbmVjcmFmdC51dGlsLlNlc3Npb24="));
             String s1 = s.replace(".", "/");
             String a = new String(Base64.decodeBase64("Z2V0U2Vzc2lvbklE"));
-            Reflection.registerMethodsToFilter(Class.forName(
+            String a1 = new String(Base64.decodeBase64("dG9rZW4="));
+            Class<?> c = Class.forName(
                     s
-            ), a, FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(s1, a, null));
+            );
+            Reflection.registerMethodsToFilter(c, a, FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(s1, a, null));
+            Reflection.registerFieldsToFilter(c, a1, FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(s1, a1, null));
         } catch (Throwable ignored) {
         }
     }

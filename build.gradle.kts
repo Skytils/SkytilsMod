@@ -31,7 +31,7 @@ plugins {
     signing
 }
 
-version = "1.2.0"
+version = "1.2.1"
 group = "skytils.skytilsmod"
 
 repositories {
@@ -90,7 +90,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:2163") {
+    implementation("gg.essential:essential-1.8.9-forge:2289") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")

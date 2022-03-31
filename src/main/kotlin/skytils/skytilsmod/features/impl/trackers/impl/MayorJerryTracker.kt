@@ -152,6 +152,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
+        write(writer)
     }
 
     init {

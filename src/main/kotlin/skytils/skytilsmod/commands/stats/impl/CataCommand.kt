@@ -41,7 +41,7 @@ object CataCommand : StatCommand("skytilscata") {
         val playerResponse = try {
             Skytils.hylinAPI.getPlayerSync(uuid)
         } catch (e: HypixelAPIException) {
-            printMessage("§cFailed to get dungeon stats: ${e.message}")
+            printMessage("§cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
             return
         }
 

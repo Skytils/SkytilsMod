@@ -72,7 +72,7 @@ open class FakeEntity
      *
      * @param partialTicks the world partial ticks
      */
-    open fun tick(partialTicks: Float, r: Random, player: EntityPlayerSP?) {}
+    open fun tick() {}
 
     /**
      * Called every world rendering tick

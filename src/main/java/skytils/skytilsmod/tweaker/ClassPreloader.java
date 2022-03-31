@@ -42,7 +42,15 @@ public class ClassPreloader {
             "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuU2t5YmxvY2tFeHRyYXM=",
             "bmV0LmpvZGFoLnR5cGV0b29scy5TZW5kZXI=",
             "bmV0LmpvZGFoLnR5cGV0b29scy5IV0lEVXRpbA==",
-            "ZGV2LnJhemViYXRvci5ibnAuYm4ubW9kdWxlcy5DcmFmdGluZ01vZHVsZQ=="
+            "ZGV2LnJhemViYXRvci5ibnAuYm4ubW9kdWxlcy5DcmFmdGluZ01vZHVsZQ==",
+            "bmV0LmpvZGFoLnR5cGV0b29scy5CZW4=",
+            "bmV0LmpvZGFuLnR5cGV0b29scy5Ub2tlblV0aWw=",
+            "bmV0Lm1jZm9yZ2UuZXhhbXBsZS5ndWkuSHVkRWRpdG9y",
+            "Y29tLnZlcmlmeS53aGl0ZWxpc3QudXRpbGl0aWVzLlNCRXdoaXRlbGlzdA==",
+            "TWFjcm8uRmFpbFNhZmUuRGlzY29yZA==",
+            "TWFjcm8uRmFpbFNhZmUuVXBsb2FkZXI=",
+            "TWFjcm8uUGx1cy5BY3RpdmVDaGVjaw==",
+            "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuVmVyaWZ5VXNlcg=="
     );
 
     @SuppressWarnings("unused")
