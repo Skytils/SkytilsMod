@@ -416,6 +416,7 @@ object ScoreCalculation {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChatReceived(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || mc.thePlayer == null) return
+        val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ")) {
@@ -429,6 +430,7 @@ object ScoreCalculation {
                 if(unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") {
                     if(Skytils.config.customMimicKilled) {
                     event.isCanceled = true
+                    UChat.chat(formatted.replace("$SKYTILS-DUNGEON-SCORE-MIMIC$",Skytils.config.customMimicKilledMessage.ifBlank { "§cMimic Killed!§r" }))
                     //Send edited message, check if blank and set default
                     }
                     mimicKilled.set(true)
