@@ -37,47 +37,18 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
             val message = UMessage("§3Skytils > §eWaypoints:\n")
-            if (MiningFeatures.cityLoc.exists()) {
-                message.append(UTextComponent("§fLost Precursor City "))
-                message.append(copyMessage("Lost Precursor City: ${MiningFeatures.cityLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_city"))
-            }
-            if (MiningFeatures.templeLoc.exists()) {
-                message.append(UTextComponent("§aJungle Temple "))
-                message.append(copyMessage("Jungle Temple: ${MiningFeatures.templeLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_temple"))
-            }
-            if (MiningFeatures.denLoc.exists()) {
-                message.append(UTextComponent("§eGoblin Queen's Den "))
-                message.append(copyMessage("Goblin Queen's Den: ${MiningFeatures.denLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_den"))
-            }
-            if (MiningFeatures.minesLoc.exists()) {
-                message.append(UTextComponent("§9Mines of Divan "))
-                message.append(copyMessage("Mines of Divan: ${MiningFeatures.minesLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_mines"))
-            }
-            if (MiningFeatures.kingLoc.exists()) {
-                message.append(UTextComponent("§6King Yolkar "))
-                message.append(copyMessage("King Yolkar: ${MiningFeatures.kingLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_king"))
-            }
-            if (MiningFeatures.balLoc.exists()) {
-                message.append(UTextComponent("§cKhazad-dûm "))
-                message.append(copyMessage("Khazad-dûm: ${MiningFeatures.balLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_bal"))
-            }
-            if (MiningFeatures.fairyLoc.exists()) {
-                message.append(UTextComponent("§dFairy Grotto "))
-                message.append(copyMessage("Fairy Grotto: ${MiningFeatures.fairyLoc}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove internal_fairy"))
+            for (loc in MiningFeatures.CrystalHollowsMap.Locations.values()) {
+                if (!loc.loc.exists()) continue
+                message.append("${loc.displayName} ")
+                message.append(copyMessage("${loc.cleanName}: ${loc.loc}"))
+                message.append(removeMessage(loc.id))
             }
             for ((key, value) in MiningFeatures.waypoints) {
-                message.append(UTextComponent("§e$key "))
+                message.append("§e$key ")
                 message.append(copyMessage("$key: ${value.x} ${value.y} ${value.z}"))
-                message.append(removeMessage("/skytilshollowwaypoint remove $key"))
+                message.append(removeMessage(key))
             }
-            message.append(UTextComponent("§eFor more info do /skytilshollowwaypoint help"))
+            message.append("§eFor more info do /sthw help")
             message.chat()
         } else {
             when (args[0]) {
@@ -96,43 +67,13 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                             y = args[3].toDouble()
                             z = args[4].toDouble()
                         }
-                        when (loc) {
-                            "internal_city" -> {
-                                MiningFeatures.cityLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.cityLoc.locY = y
-                                MiningFeatures.cityLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            "internal_temple" -> {
-                                MiningFeatures.templeLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.templeLoc.locY = y
-                                MiningFeatures.templeLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            "internal_den" -> {
-                                MiningFeatures.denLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.denLoc.locY = y
-                                MiningFeatures.denLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            "internal_mines" -> {
-                                MiningFeatures.minesLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.minesLoc.locY = y
-                                MiningFeatures.minesLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            "internal_king" -> {
-                                MiningFeatures.kingLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.kingLoc.locY = y
-                                MiningFeatures.kingLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            "internal_bal" -> {
-                                MiningFeatures.balLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.balLoc.locY = y
-                                MiningFeatures.balLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            "internal_fairy" -> {
-                                MiningFeatures.fairyLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                                MiningFeatures.fairyLoc.locY = y
-                                MiningFeatures.fairyLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                            }
-                            else -> MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
+                        val internalLoc = MiningFeatures.CrystalHollowsMap.Locations.values().find { it.id == loc }?.loc
+                        if (internalLoc != null) {
+                            internalLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                            internalLoc.locY = y
+                            internalLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                        } else {
+                            MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
                         }
                         UChat.chat("§aSuccessfully created waypoint ${args[1]}")
                     } else
@@ -140,28 +81,20 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                 }
                 "remove", "delete" -> {
                     if (args.size >= 2) {
-                        when (args[1]) {
-                            "internal_city" -> MiningFeatures.cityLoc.reset()
-                            "internal_temple" -> MiningFeatures.templeLoc.reset()
-                            "internal_den" -> MiningFeatures.denLoc.reset()
-                            "internal_mines" -> MiningFeatures.minesLoc.reset()
-                            "internal_king" -> MiningFeatures.kingLoc.reset()
-                            "internal_bal" -> MiningFeatures.balLoc.reset()
-                            "internal_fairy" -> MiningFeatures.fairyLoc.reset()
-                            else -> MiningFeatures.waypoints.remove(args[1])
+                        if (MiningFeatures.CrystalHollowsMap.Locations.values()
+                                .find { it.id == args[1] }?.loc?.reset() != null
+                        ) {
+                            UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
+                        } else if (MiningFeatures.waypoints.remove(args[1]) != null) {
+                            UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
+                        } else {
+                            UChat.chat("§cWaypoint ${args[1]} does not exist")
                         }
-                        UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
                     } else
                         UChat.chat("§cCorrect usage: /skytilshollowwaypoint remove name/clear")
                 }
                 "clear" -> {
-                    MiningFeatures.cityLoc.reset()
-                    MiningFeatures.templeLoc.reset()
-                    MiningFeatures.denLoc.reset()
-                    MiningFeatures.minesLoc.reset()
-                    MiningFeatures.kingLoc.reset()
-                    MiningFeatures.balLoc.reset()
-                    MiningFeatures.fairyLoc.reset()
+                    MiningFeatures.CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
                     MiningFeatures.waypoints.clear()
                     UChat.chat("§aSuccessfully cleared all waypoints.")
                 }
@@ -186,11 +119,11 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
         }
     }
 
-    private fun removeMessage(command: String): IChatComponent {
+    private fun removeMessage(id: String): IChatComponent {
         return UTextComponent("§c[Remove]\n").apply {
             setHoverText("§cRemove the waypoint.")
             clickAction = ClickEvent.Action.RUN_COMMAND
-            clickValue = command
+            clickValue = "/sthw remove $id"
         }
     }
 }
