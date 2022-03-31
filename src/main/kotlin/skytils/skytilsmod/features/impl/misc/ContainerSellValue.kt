@@ -25,7 +25,9 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
@@ -68,7 +70,7 @@ object ContainerSellValue {
      * takes place when the container background is drawn, so it doesn't render at the normal time.
      * Even though the GuiElement's render method isn't used, it is still worth having an instance
      * of this class so that the user can move the element around normally.
-     * @see onBackgroundDrawn
+     * @see renderGuiComponent
      */
     class SellValueDisplay : GuiElement("Container Sell Value", FloatPair(0.258f, 0.283f)) {
 
@@ -108,11 +110,12 @@ object ContainerSellValue {
         }
     }
 
-    private fun shouldRenderOverlay(chestName: String): Boolean {
+    private fun isChestNameValid(chestName: String): Boolean {
         return (!inDungeons && (chestName == "Chest" || chestName == "Large Chest"))
                 || chestName.contains("Backpack")
                 || chestName.startsWith("Ender Chest (")
                 || (chestName.contains("Minion") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
+                || chestName == "Personal Vault"
     }
 
     private fun getItemValue(itemStack: ItemStack): Double {
@@ -160,21 +163,86 @@ object ContainerSellValue {
             return this.displayName
         }
 
+    private val textLines = mutableListOf<String>()
+    private var totalContainerValue: Double = 0.0
+    private var lines: Int = 0
+
+    private var ticks = 0
+
+    private fun shouldRenderGuiComponent() : Boolean {
+        val gui = mc.currentScreen
+        val container = if (mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return false
+        val chestName = container.lowerChestInventory.name
+
+        // Ensure that the gui element should be shown for the player's open container
+        return Skytils.config.containerSellValue && gui is GuiChest && isChestNameValid(chestName)
+    }
+
     /**
-     * Renders the sell value overlay when in a valid GUI.
+     * Compatibility with NEU's storage overlay
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    fun onGuiScreenDrawPre(event: GuiScreenEvent.DrawScreenEvent.Pre) {
+        if(event.isCanceled && NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) {
+            // NEU cancels this event when it renders the storage overlay,
+            // which means that the BackgroundDrawnEvent isn't called.
+            renderGuiComponent()
+        }
+    }
+
+    /**
+     * Standard rendering of the gui component when NEU's storage overlay is not active.
      *
      * Note: It is important that Minecraft Forge's `BackgroundDrawnEvent` is used instead of Skytils's
      * GuiContainerEvent.BackgroundDrawnEvent because Skytils's event is called before the overlay rectangle is drawn,
      * causing the text to be dimmed.
      */
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    fun onPostBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if(!NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) renderGuiComponent()
+    }
+
+    /**
+     * Renders the sell value overlay.
+     * @see onPostBackgroundDrawn
+     * @see onGuiScreenDrawPre
+     */
+    fun renderGuiComponent() {
+        // Translate and scale manually because we're not rendering inside the GuiElement#render() method
+        val stack = UMatrixStack()
+        stack.push()
+        stack.translate(element.actualX, element.actualY, 0f)
+        stack.scale(element.scale, element.scale, 0f)
+
+        textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
+        if (lines > Skytils.config.containerSellValueMaxItems) {
+            drawLine(stack, textLines.size, "§7and ${lines - Skytils.config.containerSellValueMaxItems} more...")
+            drawLine(stack, textLines.size + 1, "§eTotal Value: §a${NumberUtil.format(totalContainerValue)}")
+        } else {
+            drawLine(stack, textLines.size, "§eTotal Value: §a${NumberUtil.format(totalContainerValue)}")
+        }
+
+        stack.pop()
+    }
+
+    /**
+     * Update the list of items in the GUI to be displayed after the container background is drawn.
+     */
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if(!Skytils.config.containerSellValue) return
+
+        // Limit this method to only run four times per second
+        ticks ++
+        if(ticks % 5 != 0) return
+        ticks = 0
+
         val gui = mc.currentScreen
         val container = if (mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return
         val chestName = container.lowerChestInventory.name
         val isMinion = chestName.contains(" Minion ")
 
-        if (!Skytils.config.containerSellValue || gui !is GuiChest || !shouldRenderOverlay(chestName)) return
+        if (gui !is GuiChest || !isChestNameValid(chestName)) return
 
         // Map all of the items in the chest to their lowest BIN prices
         val slots = container.inventorySlots.filter {
@@ -192,13 +260,14 @@ object ContainerSellValue {
             }
         }
 
-        val totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
+        totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
 
         if (distinctItems.isEmpty() || totalContainerValue == 0.0) return
 
         // Sort the items from most to least valuable and convert them into a readable format
-        val lines: Int
-        val textLines = distinctItems.entries.asSequence()
+        textLines.clear()
+        textLines.addAll(
+            distinctItems.entries.asSequence()
             .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
             .filter { it.value.shouldDisplay() }
             .map { (itemName, displayItem) ->
@@ -209,22 +278,7 @@ object ContainerSellValue {
             .toList()
             .also { lines = it.size }
             .take(Skytils.config.containerSellValueMaxItems)
-
-        // Translate and scale manually because we're not rendering inside the GuiElement#render() method
-        val stack = UMatrixStack()
-        stack.push()
-        stack.translate(element.actualX, element.actualY, 0f)
-        stack.scale(element.scale, element.scale, 0f)
-
-        textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
-        if (lines > Skytils.config.containerSellValueMaxItems) {
-            drawLine(stack, textLines.size, "§7and ${lines - Skytils.config.containerSellValueMaxItems} more...")
-            drawLine(stack, textLines.size + 1, "§eTotal Value: §a${NumberUtil.format(totalContainerValue)}")
-        } else {
-            drawLine(stack, textLines.size, "§eTotal Value: §a${NumberUtil.format(totalContainerValue)}")
-        }
-
-        stack.pop()
+        )
     }
 
     private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {
