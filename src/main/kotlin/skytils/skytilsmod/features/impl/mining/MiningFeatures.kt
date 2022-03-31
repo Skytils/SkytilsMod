@@ -195,7 +195,7 @@ class MiningFeatures {
              * $asdf:Khazad-dûm@-292,63,281 ❌
              * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
              */
-            if (Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*").matcher(unformatted).matches()) {
+            if (SBE_DSM_PATTERN.matcher(unformatted).matches()) {
                 val sub = unformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
                 val parts = sub.split("@")
                 val location = parts[0]
@@ -561,5 +561,6 @@ class MiningFeatures {
             "Khazad-dûm" to "internal_bal",
             "Fairy Grotto" to "internal_fairy"
         )
+        val SBE_DSM_PATTERN: Pattern = Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*")
     }
 }
