@@ -421,7 +421,7 @@ object ScoreCalculation {
             if (unformatted.startsWith("Party > ")) {
                 if (unformatted.contains(Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
                         "Mimic dead!", "Mimic Killed!", "Mimic Dead!"
-                    )
+                    ))
                 ) {
                     mimicKilled.set(true)
                     return
