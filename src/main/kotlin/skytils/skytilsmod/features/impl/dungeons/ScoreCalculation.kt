@@ -419,10 +419,18 @@ object ScoreCalculation {
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ")) {
-                if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") || (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
+                if (unformatted.contains(Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
                         "Mimic dead!", "Mimic Killed!", "Mimic Dead!"
-                    ))
+                    )
                 ) {
+                    mimicKilled.set(true)
+                    return
+                }
+                if(unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") {
+                    if(Skytils.config.customMimicKilled) {
+                    event.isCanceled = true
+                    //Send edited message, check if blank and set default
+                    }
                     mimicKilled.set(true)
                     return
                 }
