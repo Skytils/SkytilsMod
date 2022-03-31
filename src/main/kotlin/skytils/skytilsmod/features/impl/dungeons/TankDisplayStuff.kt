@@ -35,7 +35,7 @@ class TankDisplayStuff {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons) return
-        for (teammate in DungeonListener.team) {
+        for (teammate in DungeonListener.team.values) {
             val player = teammate.player ?: continue
             if (!teammate.canRender()) continue
             if (teammate.dungeonClass == DungeonClass.TANK) {
@@ -98,7 +98,7 @@ class TankDisplayStuff {
                 }
             }
             if (Skytils.config.boxedProtectedTeammates && (player != mc.thePlayer || mc.gameSettings.thirdPersonView != 0)) {
-                if (DungeonListener.team.any {
+                if (DungeonListener.team.values.any {
                         it.canRender() && it.dungeonClass == DungeonClass.TANK && it != teammate && it.player?.getDistanceToEntity(
                             player
                         )!! <= 30

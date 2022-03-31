@@ -26,8 +26,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import skytils.hylin.skyblock.Pet
 import skytils.hylin.skyblock.dungeons.DungeonClass
-import skytils.hylin.skyblock.item.Tier
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
@@ -42,9 +42,9 @@ import skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 
 object DungeonListener {
 
-    val team = HashSet<DungeonTeammate>()
-    val deads = HashSet<DungeonTeammate>()
-    val missingPuzzles = HashSet<String>()
+    val team = hashMapOf<String, DungeonTeammate>()
+    val deads = hashSetOf<DungeonTeammate>()
+    val missingPuzzles = hashSetOf<String>()
     val hutaoFans: Cache<String, Boolean> = Caffeine.newBuilder()
         .weakKeys()
         .weakValues()
@@ -98,8 +98,8 @@ object DungeonListener {
             ) {
                 if (Skytils.config.dungeonDeathCounter) {
                     TickTask(6) {
-                        UChat.chat("§c☠ §lDeaths:§r ${team.sumOf { it.deaths }}\n${
-                            team.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
+                        UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
+                            team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
                                 "  §c☠ ${it.playerName}:§r ${it.deaths}"
                             }
                         }"
@@ -138,7 +138,7 @@ object DungeonListener {
         if (ticks % 2 == 0) {
             if (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500) {
                 val tabEntries = TabListUtils.tabEntries
-                for (teammate in team) {
+                for (teammate in team.values) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
                     val entry = tabEntries[teammate.tabEntryIndex].second
                     if (!entry.contains(teammate.playerName)) continue
@@ -149,7 +149,8 @@ object DungeonListener {
                     if (teammate.dead) {
                         if (deads.add(teammate)) {
                             teammate.deaths++
-                            val isFirstDeath = team.sumOf { it.deaths } == 1
+                            val totalDeaths = team.values.sumOf { it.deaths }
+                            val isFirstDeath = totalDeaths == 1
 
                             @Suppress("LocalVariableName")
                             val `silly~churl, billy~churl, silly~billy hilichurl` = if (isFirstDeath) {
@@ -162,7 +163,7 @@ object DungeonListener {
                             if (Skytils.config.dungeonDeathCounter) {
                                 TickTask(1) {
                                     UChat.chat(
-                                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${team.sumOf { it.deaths }}§b total deaths.${
+                                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total deaths.${
                                             " §6(SPIRIT)".toStringIfTrue(
                                                 `silly~churl, billy~churl, silly~billy hilichurl`
                                             )
@@ -213,7 +214,7 @@ object DungeonListener {
                 val dungeonClass = matcher.groups["class"]!!.value
                 val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
                 println("Parsed teammate $name, they are a $dungeonClass $classLevel")
-                team.add(
+                team[name] =
                     DungeonTeammate(
                         name,
                         DungeonClass.getClassFromName(
@@ -221,22 +222,19 @@ object DungeonListener {
                         ), classLevel,
                         pos
                     )
-                )
             } else {
                 println("Parsed teammate $name with value EMPTY, $text")
-                team.add(
-                    DungeonTeammate(
-                        name,
-                        DungeonClass.EMPTY, 0,
-                        pos
-                    )
+                team[name] = DungeonTeammate(
+                    name,
+                    DungeonClass.EMPTY, 0,
+                    pos
                 )
             }
         }
         if (partyCount != team.size) {
             UChat.chat("§9§lSkytils §8» §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
         }
-        if (team.any { it.dungeonClass == DungeonClass.EMPTY }) {
+        if (team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
             UChat.chat("§9§lSkytils §8» §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
         }
         CooldownTracker.updateCooldownReduction()
@@ -247,7 +245,7 @@ object DungeonListener {
         if (Skytils.hylinAPI.key.isNotEmpty()) {
             Skytils.threadPool.submit {
                 runCatching {
-                    for (teammate in team) {
+                    for (teammate in team.values) {
                         val name = teammate.playerName
                         if (hutaoFans.getIfPresent(name) != null) continue
                         val uuid = teammate.player?.uniqueID ?: Skytils.hylinAPI.getUUIDSync(
@@ -256,9 +254,7 @@ object DungeonListener {
                         val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
                             uuid
                         ) ?: continue
-                        hutaoFans[name] = profile.pets.any {
-                            it.type == "SPIRIT" && (it.tier == Tier.LEGENDARY || (it.heldItem == "PET_ITEM_TIER_BOOST" && it.tier == Tier.EPIC))
-                        }
+                        hutaoFans[name] = profile.pets.any(Pet::isSpirit)
                     }
                     printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
                 }.onFailure {

@@ -60,12 +60,9 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
-import skytils.skytilsmod.events.impl.BlockChangeEvent
-import skytils.skytilsmod.events.impl.BossBarEvent
-import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
+import skytils.skytilsmod.events.impl.*
 import skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
@@ -307,9 +304,10 @@ object DungeonFeatures {
                     1 -> {
                         BossStatus.healthScale = displayData.health / displayData.maxHealth
                         BossStatus.statusBarTime = 100
+                        val health = if (dungeonFloor == "M7") 800_000_000 else 300_000
                         BossStatus.bossName = displayData.displayName.formattedText + "§r§8 - §r§a" + NumberUtil.format(
-                            (BossStatus.healthScale * 1000000000).toLong()
-                        ) + "§r§8/§r§a1B§r§c❤"
+                            (BossStatus.healthScale * health).toLong()
+                        ) + "§r§8/§r§a${NumberUtil.format(health)}§r§c❤"
                         BossStatus.hasColorModifier = event.hasColorModifier
                         event.isCanceled = true
                     }
@@ -357,7 +355,7 @@ object DungeonFeatures {
                             it,
                             true
                         )
-                    } && DungeonListener.team.any { unformatted.contains(it.playerName) })) {
+                    } && DungeonListener.team.keys.any { unformatted.contains(it) })) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted)
                         UChat.chat("§9§lSkytils §8» §aCopied fail to clipboard.")
@@ -528,8 +526,8 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock) return
         if (event.packet is S45PacketTitle) {
             val packet = event.packet
@@ -540,6 +538,14 @@ object DungeonFeatures {
                     ) || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))
                 ) {
                     event.isCanceled = true
+                    runCatching {
+                        val slash = unformatted.indexOf("/")
+                        val numBeforeSlash = unformatted[slash - 1].digitToInt()
+                        val numAfterSlash = unformatted[slash + 1].digitToInt()
+                        if (numBeforeSlash == 0 || numBeforeSlash == numAfterSlash) {
+                            event.isCanceled = false
+                        }
+                    }
                 }
             }
         }

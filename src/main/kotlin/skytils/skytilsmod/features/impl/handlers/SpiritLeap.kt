@@ -21,10 +21,9 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.Item
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
@@ -50,27 +49,12 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         val names = HashMap<String, Boolean>()
         val classes = DungeonClass.values()
             .associateWithTo(EnumMap(DungeonClass::class.java)) { false }
-        private val glassPane by lazy {
-            Item.getItemFromBlock(Blocks.stained_glass_pane)
-        }
+        val shortenedNameCache = WeakHashMap<String, String>()
+        val nameSlotCache = HashMap<Int, String>()
     }
 
     @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (!Utils.inSkyblock) return
-        val slot = event.slot
-        if (slot.hasStack && event.container is ContainerChest) {
-            val item = slot.stack
-            if (Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") {
-                if (item.item === glassPane) {
-                    event.isCanceled = true
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             if ((Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") || (Skytils.config.reviveStoneNames && SBInfo.lastOpenContainerName == "Revive A Teammate")) {
@@ -86,22 +70,27 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
                     val x = slot.xDisplayPosition.toFloat()
                     val y = slot.yDisplayPosition + if (people % 2 != 0) -15f else 20f
-                    val name =
-                        playerPattern.find(item.displayName.stripControlCodes())?.groups?.get("name")?.value ?: continue
-                    if (name == "Unknown") continue
-                    val teammate = (DungeonListener.team.find { it.playerName == name }
-                        ?: continue)
+                    val name = nameSlotCache[slot.slotNumber]
+                    if (name == null || name == "Unknown") {
+                        nameSlotCache[slot.slotNumber] =
+                            playerPattern.find(item.displayName.stripControlCodes())?.groups?.get("name")?.value
+                                ?: continue
+                        continue
+                    }
+                    val teammate = DungeonListener.team[name] ?: continue
                     val dungeonClass = teammate.dungeonClass
-                    val text = fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
+                    val text = shortenedNameCache.getOrPut(name) {
+                        fr.trimStringToWidth(item.displayName.substring(0, 2) + name, 32)
+                    }
                     val scale = 0.9f
                     val scaleReset = 1 / scale
                     GlStateManager.pushMatrix()
-                    GlStateManager.translate(0f, 0f, 299f)
                     if (names.getOrDefault(name, false)) {
                         slot highlight 1174339584
                     } else if (classes.getOrDefault(dungeonClass, false)) {
                         slot highlight 1157693184
                     }
+                    GlStateManager.translate(0f, 0f, 299f)
                     Gui.drawRect(
                         (x - 2 - fr.getStringWidth(text) / 2).toInt(),
                         (y - 2).toInt(),
@@ -129,6 +118,11 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                 GlStateManager.disableBlend()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        nameSlotCache.clear()
     }
 
     override fun read(reader: InputStreamReader) {

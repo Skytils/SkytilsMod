@@ -22,15 +22,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.6.20-RC"
+    kotlin("jvm") version "1.6.20-RC2"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     java
     idea
+    signing
 }
 
-version = "1.2.0-pre6"
+version = "1.2.1"
 group = "skytils.skytilsmod"
 
 repositories {
@@ -89,7 +90,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:1914") {
+    implementation("gg.essential:essential-1.8.9-forge:2289") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
@@ -233,5 +234,12 @@ kotlin {
     jvmToolchain {
         check(this is JavaToolchainSpec)
         languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+signing {
+    if (project.hasProperty("signing.gnupg.keyName")) {
+        useGpgCmd()
+        sign(tasks["remapJar"])
     }
 }

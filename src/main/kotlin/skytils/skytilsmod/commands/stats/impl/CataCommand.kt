@@ -18,9 +18,9 @@
 
 package skytils.skytilsmod.commands.stats.impl
 
+import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import skytils.hylin.extension.getString
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.dungeons.DungeonClass
@@ -29,6 +29,7 @@ import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
 import skytils.skytilsmod.utils.append
+import skytils.skytilsmod.utils.formattedName
 import skytils.skytilsmod.utils.setHoverText
 import java.util.*
 import kotlin.time.Duration
@@ -40,7 +41,7 @@ object CataCommand : StatCommand("skytilscata") {
         val playerResponse = try {
             Skytils.hylinAPI.getPlayerSync(uuid)
         } catch (e: HypixelAPIException) {
-            printMessage("§cFailed to get dungeon stats: ${e.message}")
+            printMessage("§cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
             return
         }
 
@@ -58,50 +59,90 @@ object CataCommand : StatCommand("skytilscata") {
             val cataLevel =
                 SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
 
+            val archXP = dungeonsData.classExperiences?.get(DungeonClass.ARCHER) ?: 0.0
+            val bersXP = dungeonsData.classExperiences?.get(DungeonClass.BERSERK) ?: 0.0
+            val healerXP = dungeonsData.classExperiences?.get(DungeonClass.HEALER) ?: 0.0
+            val mageXP = dungeonsData.classExperiences?.get(DungeonClass.MAGE) ?: 0.0
+            val tankXP = dungeonsData.classExperiences?.get(DungeonClass.TANK) ?: 0.0
+
             val archLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(DungeonClass.ARCHER) ?: 0.0,
+                    archXP,
                     SkillUtils.dungeoneeringXp.values
                 )
             val bersLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(DungeonClass.BERSERK) ?: 0.0,
+                    bersXP,
                     SkillUtils.dungeoneeringXp.values
                 )
             val healerLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(DungeonClass.HEALER) ?: 0.0,
+                    healerXP,
                     SkillUtils.dungeoneeringXp.values
                 )
             val mageLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(DungeonClass.MAGE) ?: 0.0,
+                    mageXP,
                     SkillUtils.dungeoneeringXp.values
                 )
             val tankLevel =
                 SkillUtils.calcXpWithProgress(
-                    dungeonsData.classExperiences?.get(DungeonClass.TANK) ?: 0.0,
+                    tankXP,
                     SkillUtils.dungeoneeringXp.values
                 )
 
             val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
 
+            val classAvgOverflow = (archLevel + bersLevel + healerLevel + mageLevel + tankLevel) / 5.0
+            val classAvgCapped =
+                (archLevel.coerceAtMost(50.0) + bersLevel.coerceAtMost(50.0) + healerLevel.coerceAtMost(50.0) + mageLevel.coerceAtMost(
+                    50.0
+                ) + tankLevel.coerceAtMost(50.0)) / 5.0
+
             val component = UMessage("§a➜ Catacombs Statistics Viewer\n")
                 .append(
-                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse.rankPrefix} ${
-                        playerResponse.player.getString(
-                            "displayname"
-                        )
-                    }§7§o.\n\n"
+                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse.formattedName}§7§o.\n\n"
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
-                .append("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n\n")
-                .append("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n")
-                .append("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n")
-                .append("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n")
-                .append("§b ✎ Mage Level: §l➡ §e${nf.format(mageLevel)}\n")
-                .append("§7 ❈ Tank Level: §l➡ §e${nf.format(tankLevel)}\n\n")
+                .append(
+                    UTextComponent("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${nf.format(catacombsObj.experience ?: 0.0)} XP"
+                    )
+                )
+                .append("§9 ☠ Class Avg: §l➡ §e${nf.format(classAvgCapped)} §7(${nf.format(classAvgOverflow)})\n\n")
+                .append(
+                    UTextComponent("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${nf.format(archXP)} XP"
+                    )
+                )
+                .append(
+                    UTextComponent("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${nf.format(bersXP)} XP"
+                    )
+                )
+                .append(
+                    UTextComponent("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${nf.format(healerXP)} XP"
+                    )
+                )
+                .append(
+                    UTextComponent("§b ✎ Mage Level: §l➡ §e${nf.format(mageLevel)}\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${nf.format(mageXP)} XP"
+                    )
+                )
+                .append(
+                    UTextComponent("§7 ❈ Tank Level: §l➡ §e${nf.format(tankLevel)}\n\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${nf.format(tankXP)} XP"
+                    )
+                )
                 .append("§a§l➜ Floor Completions:\n")
+
 
             val completionObj = cataData.completions
             val highestFloor = cataData.highestCompletion
@@ -213,8 +254,16 @@ object CataCommand : StatCommand("skytilscata") {
             }
 
             component
-                .append("§a§l➜ Secrets:\n")
+                .append("§a§l➜ Miscellaneous:\n")
                 .append(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
+                .append(
+                    " §aBlood Mobs Killed: §l➡ §e${
+                        nf.format(
+                            (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
+                                    (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
+                        )
+                    }\n"
+                )
                 .chat()
         } catch (e: Throwable) {
             printMessage("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")

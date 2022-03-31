@@ -18,6 +18,7 @@
 package skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
@@ -72,7 +73,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     )
     @Suppress("unused")
     fun openDiscordLink() {
-        UDesktop.browse(URI.create("https://discord.gg/skytils"));
+        UDesktop.browse(URI.create("https://discord.gg/skytils"))
     }
 
     @Property(
@@ -184,6 +185,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var dungeonDeathCounter = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
+        description = "Displays Stats about a Player who joined.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderStats = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
         description = "Shows the estimated profit for items from chests in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -275,11 +283,12 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var sendMessageOn270Score = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Send message on 300 score",
-        description = "Send message on 300 score.",
-        category = "Dungeons", subcategory = "Score Calculation"
+        type = PropertyType.PARAGRAPH, name = "Message for 270 score",
+        description = "Customize the message sent on hitting 270 score.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "Skytils > 270 score"
     )
-    var sendMessageOn300Score = false
+    var message270Score = ""
 
     @Property(
         type = PropertyType.SWITCH, name = "Create Title on 270 score",
@@ -289,19 +298,19 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var createTitleOn270Score = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Create Title on 300 score",
-        description = "Create title on 300 score.",
-        category = "Dungeons", subcategory = "Score Calculation"
+        type = PropertyType.PARAGRAPH, name = "270 Title Message",
+        description = "Customize the message that will be sent when the score reaches 270.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "270"
     )
-    var createTitleOn300Score = false
+    var messageTitle270Score = ""
 
     @Property(
-        type = PropertyType.PARAGRAPH, name = "Message for 270 score",
-        description = "Customize the message sent on hitting 270 score.",
-        category = "Dungeons", subcategory = "Score Calculation",
-        placeholder = "Skytils > 270 score"
+        type = PropertyType.SWITCH, name = "Send message on 300 score",
+        description = "Send message on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
     )
-    var message270Score = ""
+    var sendMessageOn300Score = false
 
     @Property(
         type = PropertyType.PARAGRAPH, name = "Message for 300 score",
@@ -310,6 +319,21 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         placeholder = "Skytils > 300 score"
     )
     var message300Score = ""
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Create Title on 300 score",
+        description = "Create title on 300 score.",
+        category = "Dungeons", subcategory = "Score Calculation"
+    )
+    var createTitleOn300Score = false
+
+    @Property(
+        type = PropertyType.PARAGRAPH, name = "300 Title Message",
+        description = "Customize the message that will be sent when the score reaches 300.",
+        category = "Dungeons", subcategory = "Score Calculation",
+        placeholder = "300"
+    )
+    var messageTitle300Score = ""
 
     @Property(
         type = PropertyType.SWITCH, name = "Blood Camp Helper",
@@ -439,11 +463,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var biggerBatModels = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Recolor Wither King's Dragons",
-        description = "Recolors the dragons in Master Mode 7 to their respective colors.",
+        type = PropertyType.SWITCH, name = "Change Hurt Color on the Wither King's Dragons",
+        description = "Reduces the tinting on hurting the wither king's dragons.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var recolorWitherKingsDragons = false
+    var changeHurtColorOnWitherKingsDragons = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
@@ -561,6 +585,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var spiritPetWarning = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Wither King Dragon Dimensional Slash Alert",
+        description = "Creates a title when you are in range of dimensional slash.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var witherKingDragonSlashAlert = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Wither King Dragon Spawn Alert",
@@ -758,6 +789,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
     var changeAllSameColorTerminalSolver = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Change All to Same Color Solver Mode",
+        description = "Changes the display mode of the solver.",
+        category = "Dungeons", subcategory = "Terminal Solvers",
+        options = ["Normal", "LMB only"]
+    )
+    var changeToSameColorMode = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
@@ -1475,6 +1514,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var dupeTracker = false
 
     @Property(
+        type = PropertyType.COLOR, name = "Dupe Tracker Overlay Color",
+        description = "Changes the color of the Dupe Tracker Overlay.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var dupeTrackerOverlayColor = Color.BLACK.withAlpha(169)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Mark 'Dirty' Items",
         description = "Tries to track 'dirty' items on the Auction House.\nDirty items are items that are probably not legitimately obtained.\nThis will not catch every single dirty item.",
         category = "Miscellaneous", subcategory = "Other"
@@ -1579,6 +1625,21 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var betterAuctionPriceInput = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Container Sell Value",
+        description = "Display the lowest BIN prices for the most valuable items in backpacks, ender chest pages, minions, and island chests.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var containerSellValue = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Max Displayed Items",
+        description = "The maximum amount of items to display in the Container Sell Value GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 5, max = 30, increment = 1
+    )
+    var containerSellValueMaxItems = 20
 
     @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
@@ -1963,6 +2024,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         hidden = true
     )
     var voidRNG = 0f
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
+        description = "Open chat, then click anywhere on screen to open Maddox Menu.",
+        category = "Slayer", subcategory = "Quality of Life"
+    )
+    var openMaddoxMenu = false
 
     @Property(
         type = PropertyType.SELECTOR, name = "Carry Mode",
@@ -2534,13 +2602,20 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             "betterAuctionPriceInput",
             "dungeonChestProfit",
             "showCoinsPerBit",
-            "protectItemBINThreshold"
+            "protectItemBINThreshold",
+            "containerSellValue"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
                 if (prop is Boolean && prop) fetchLowestBINPrices = true
             }
         }
+
+        addDependency("message270Score","sendMessageOn270Score")
+        addDependency("messageTitle270Score","createTitleOn270Score")
+
+        addDependency("message300Score","sendMessageOn300Score")
+        addDependency("messageTitle300Score","createTitleOn300Score")
 
         addDependency("bloodHelperColor", "bloodHelper")
 
@@ -2553,6 +2628,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
         addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
+        addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
 
         listOf(
@@ -2588,8 +2664,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         addDependency("markDirtyItems", "dupeTracker")
+        addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
-        registerListener("protectItemBINThreshold") { threshold: String ->
+        addDependency("containerSellValueMaxItems", "containerSellValue")
+
+        registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }

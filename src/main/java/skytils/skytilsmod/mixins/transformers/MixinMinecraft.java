@@ -23,7 +23,8 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import org.apache.commons.codec.binary.Base64;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,8 +35,8 @@ import skytils.skytilsmod.core.GuiManager;
 import skytils.skytilsmod.utils.ItemUtil;
 import skytils.skytilsmod.utils.Utils;
 import skytils.skytilsmod.utils.graphics.ScreenRenderer;
+import sun.reflect.Reflection;
 
-import java.io.File;
 import java.util.Objects;
 
 @Mixin(Minecraft.class)
@@ -43,9 +44,6 @@ public abstract class MixinMinecraft {
     private final Minecraft $this = (Minecraft) (Object) this;
     @Shadow
     public EntityPlayerSP thePlayer;
-    @Shadow
-    @Final
-    public File mcDataDir;
 
     /**
      * Taken from Skyblockcatia under MIT License
@@ -77,5 +75,17 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 4))
     private void initializeSmartFontRenderer(CallbackInfo ci) {
         ScreenRenderer.init();
+        try {
+            String s = new String(Base64.decodeBase64("bmV0Lm1pbmVjcmFmdC51dGlsLlNlc3Npb24="));
+            String s1 = s.replace(".", "/");
+            String a = new String(Base64.decodeBase64("Z2V0U2Vzc2lvbklE"));
+            String a1 = new String(Base64.decodeBase64("dG9rZW4="));
+            Class<?> c = Class.forName(
+                    s
+            );
+            Reflection.registerMethodsToFilter(c, a, FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(s1, a, null));
+            Reflection.registerFieldsToFilter(c, a1, FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(s1, a1, null));
+        } catch (Throwable ignored) {
+        }
     }
 }

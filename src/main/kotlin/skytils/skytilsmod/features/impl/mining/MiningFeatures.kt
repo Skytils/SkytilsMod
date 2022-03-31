@@ -19,6 +19,9 @@ package skytils.skytilsmod.features.impl.mining
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
+import gg.essential.universal.utils.MCClickEventAction
+import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.block.BlockCarpet
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -26,14 +29,16 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -43,7 +48,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
@@ -59,6 +63,7 @@ import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
+import skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -218,7 +223,7 @@ class MiningFeatures {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
         ) {
-            kingLoc.set()
+            MiningFeatures.CrystalHollowsMap.Locations.KingYolkar.loc.set()
         }
         if (formatted.startsWith("§r§cYou died")) {
             deadCount =
@@ -235,136 +240,24 @@ class MiningFeatures {
     }
 
     private fun waypointChatMessage(x: String, y: String, z: String) {
-        val component = ChatComponentText(
+        val message = UMessage(
             "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
-        val city = ChatComponentText("§f[Lost Precursor City] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_city $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for Lost Precursor City")
-                    )
-                )
-        )
-        val temple = ChatComponentText("§a[Jungle Temple] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_temple $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for Jungle Temple")
-                    )
-                )
-        )
-        val den = ChatComponentText("§e[Goblin Queen's Den] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_den $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for Goblin Queen's Den")
-                    )
-                )
-        )
-        val mines = ChatComponentText("§9[Mines of Divan] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_mines $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for Mines of Divan")
-                    )
-                )
-        )
-        val king = ChatComponentText("§6[King Yolkar] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_king $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for King Yolkar")
-                    )
-                )
-        )
-        val bal = ChatComponentText("§c[Khazad-dûm] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_bal $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for Khazad-dûm")
-                    )
-                )
-        )
-        val fairy = ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "[Fairy Grotto] ").setChatStyle(
-            ChatStyle()
-                .setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set internal_fairy $x $y $z"
-                    )
-                ).setChatHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        ChatComponentText("§eset waypoint for Fairy Grotto")
-                    )
-                )
-        )
-        val custom = ChatComponentText("§e[Custom]").setChatStyle(
-            ChatStyle().setChatClickEvent(
-                ClickEvent(
-                    ClickEvent.Action.SUGGEST_COMMAND,
-                    "/skytilshollowwaypoint set name $x $y $z"
-                )
-            ).setChatHoverEvent(
-                HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    ChatComponentText("§eset custom waypoint")
-                )
+        for (loc in CrystalHollowsMap.Locations.values()) {
+            if (!loc.loc.exists()) continue
+            message.append(
+                UTextComponent("${loc.displayName} ")
+                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
+                    .setHoverText("§eSet waypoint for ${loc.cleanName}")
             )
+        }
+        message.append(
+            UTextComponent("§e[Custom]").setClick(
+                MCClickEventAction.SUGGEST_COMMAND,
+                "/skytilshollowwaypoint set name_here $x $y $z"
+            ).setHoverText("§eSet waypoint for custom location")
         )
-        if (!cityLoc.exists())
-            component.appendSibling(city)
-        if (!templeLoc.exists())
-            component.appendSibling(temple)
-        if (!denLoc.exists())
-            component.appendSibling(den)
-        if (!minesLoc.exists())
-            component.appendSibling(mines)
-        if (!kingLoc.exists())
-            component.appendSibling(king)
-        if (!balLoc.exists())
-            component.appendSibling(bal)
-        if (!fairyLoc.exists())
-            component.appendSibling(fairy)
-        component.appendSibling(custom)
-        mc.thePlayer.addChatMessage(component)
+        message.chat()
     }
 
     @SubscribeEvent
@@ -426,13 +319,9 @@ class MiningFeatures {
         }
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             GlStateManager.disableDepth()
-            cityLoc.drawWaypoint("Lost Precursor City", event.partialTicks)
-            templeLoc.drawWaypoint("Jungle Temple", event.partialTicks)
-            denLoc.drawWaypoint("Goblin Queen's Den", event.partialTicks)
-            minesLoc.drawWaypoint("Mines of Divan", event.partialTicks)
-            kingLoc.drawWaypoint("King Yolkar", event.partialTicks)
-            balLoc.drawWaypoint("Khazad-dûm", event.partialTicks)
-            fairyLoc.drawWaypoint("Fairy Grotto", event.partialTicks)
+            for (loc in CrystalHollowsMap.Locations.values()) {
+                loc.loc.drawWaypoint(loc.cleanName, event.partialTicks)
+            }
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
             for ((key, value) in waypoints)
                 RenderUtil.renderWaypointText(key, value, event.partialTicks)
@@ -467,14 +356,9 @@ class MiningFeatures {
             ).contains("12:00am") &&
             Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode
         ) {
-            val message = ChatComponentText("§cSkymall reset ")
-            val hotm = ChatComponentText("§b[HOTM]")
-            hotm.chatStyle.chatClickEvent = ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/hotm"
-            )
-            message.appendSibling(hotm)
-            Skytils.mc.thePlayer.addChatMessage(message)
+            val message = UMessage("§cSkymall reset ")
+            message.append(UTextComponent("§b[HOTM])").setClick(MCClickEventAction.RUN_COMMAND, "/hotm"))
+            message.chat()
         }
     }
 
@@ -484,14 +368,7 @@ class MiningFeatures {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && deadCount == 0 && mc.thePlayer != null
         ) {
-            when (SBInfo.location) {
-                "Lost Precursor City" -> cityLoc.set()
-                "Jungle Temple" -> templeLoc.set()
-                "Goblin Queens Den" -> denLoc.set()
-                "Mines of Divan" -> minesLoc.set()
-                "Khazad-dm" -> balLoc.set()
-                "Fairy Grotto" -> fairyLoc.set()
-            }
+            CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.loc?.set()
         } else if (deadCount > 0)
             deadCount--
     }
@@ -502,13 +379,7 @@ class MiningFeatures {
         lastJukebox = null
         raffleBox = null
         inRaffle = false
-        cityLoc.reset()
-        templeLoc.reset()
-        denLoc.reset()
-        minesLoc.reset()
-        kingLoc.reset()
-        balLoc.reset()
-        fairyLoc.reset()
+        CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
         waypoints.clear()
     }
 
@@ -528,45 +399,64 @@ class MiningFeatures {
 
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
+
+        enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {
+            LostPrecursorCity("§fLost Precursor City", "internal_city", ColorFactory.WHITE.rgb),
+            JungleTemple("§aJungle Temple", "internal_temple", ColorFactory.GREEN.rgb),
+            GoblinQueensDen("§eGoblin Queens Den", "internal_den", ColorFactory.YELLOW.rgb),
+            MinesOfDivan("§9Mines of Divan", "internal_mines", ColorFactory.BLUE.rgb),
+            KingYolkar("§6King Yolkar", "internal_king", ColorFactory.ORANGE.rgb, 25),
+            KhazadDum("§cKhazad-dûm", "internal_bal", ColorFactory.RED.rgb),
+            FairyGrotto("§dFairy Grotto", "internal_fairy", ColorFactory.PINK.rgb, 26);
+
+            val loc = LocationObject()
+            val cleanName = displayName.stripControlCodes()
+
+            companion object {
+                val cleanNameToLocation = values().associateBy { it.cleanName }
+            }
+        }
+
         override fun render() {
             if (!toggled || SBInfo.mode != SkyblockIsland.CrystalHollows.mode || mc.thePlayer == null) return
-            UGraphics.scale(0.1, 0.1, 1.0)
-            UGraphics.disableLighting()
-            RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
-            if (Skytils.config.crystalHollowMapPlaces) {
-                cityLoc.drawOnMap(50, Color.WHITE.rgb)
-                templeLoc.drawOnMap(50, Color.GREEN.rgb)
-                denLoc.drawOnMap(50, Color.YELLOW.rgb)
-                minesLoc.drawOnMap(50, Color.BLUE.rgb)
-                kingLoc.drawOnMap(25, Color.ORANGE.rgb)
-                balLoc.drawOnMap(50, Color.RED.rgb)
-                fairyLoc.drawOnMap(25, Color.PINK.rgb)
+            val stack = UMatrixStack()
+            UMatrixStack.Compat.runLegacyMethod(stack) {
+                stack.scale(0.1, 0.1, 1.0)
+                UGraphics.disableLighting()
+                stack.runWithGlobalState {
+                    RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
+                }
+                if (Skytils.config.crystalHollowMapPlaces) {
+                    Locations.values().forEach {
+                        it.loc.drawOnMap(it.size, it.color)
+                    }
+                }
+                val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
+                val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
+
+                // player marker code
+                val wr = UGraphics.getFromTessellator()
+                mc.textureManager.bindTexture(ResourceLocation("textures/map/map_icons.png"))
+
+                stack.push()
+                stack.translate(x, y, 0.0)
+
+                // Rotate about the center to match the player's yaw
+                stack.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
+                stack.scale(1.5f, 1.5f, 1.5f)
+                stack.translate(-0.125f, 0.125f, 0.0f)
+                UGraphics.color4f(1f, 1f, 1f, 1f)
+                UGraphics.enableAlpha()
+                val d1 = 0.0
+                val d2 = 0.25
+                wr.beginWithActiveShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_TEX)
+                wr.pos(stack, -8.0, -8.0, 100.0).tex(d1, d1).endVertex()
+                wr.pos(stack, -8.0, 8.0, 100.0).tex(d1, d2).endVertex()
+                wr.pos(stack, 8.0, 8.0, 100.0).tex(d2, d2).endVertex()
+                wr.pos(stack, 8.0, -8.0, 100.0).tex(d2, d1).endVertex()
+                wr.drawDirect()
+                stack.pop()
             }
-            val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
-            val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
-
-            // player marker code
-            val wr = UGraphics.getFromTessellator()
-            mc.textureManager.bindTexture(ResourceLocation("textures/map/map_icons.png"))
-
-            UGraphics.pushMatrix()
-            UGraphics.translate(x, y, 0.0)
-
-            // Rotate about the center to match the player's yaw
-            UGraphics.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
-            UGraphics.scale(1.5f, 1.5f, 1.5f)
-            UGraphics.translate(-0.125f, 0.125f, 0.0f)
-            UGraphics.color4f(1f, 1f, 1f, 1f)
-            UGraphics.enableAlpha()
-            val d1 = 0.0
-            val d2 = 0.25
-            wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
-            wr.pos(-8.0, -8.0, 100.0).tex(d1, d1).endVertex()
-            wr.pos(-8.0, 8.0, 100.0).tex(d1, d2).endVertex()
-            wr.pos(8.0, 8.0, 100.0).tex(d2, d2).endVertex()
-            wr.pos(8.0, -8.0, 100.0).tex(d2, d1).endVertex()
-            UGraphics.draw()
-            UGraphics.popMatrix()
         }
 
         override fun demoRender() {
@@ -659,13 +549,6 @@ class MiningFeatures {
         private var puzzlerSolution: BlockPos? = null
         private var raffleBox: BlockPos? = null
         private var inRaffle = false
-        var cityLoc = LocationObject()
-        var templeLoc = LocationObject()
-        var denLoc = LocationObject()
-        var minesLoc = LocationObject()
-        var kingLoc = LocationObject()
-        var balLoc = LocationObject()
-        var fairyLoc = LocationObject()
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0

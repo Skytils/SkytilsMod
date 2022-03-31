@@ -48,7 +48,7 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
                             index = it.index
                         }
                     }
-                    instructions.insertBefore(insn, list.build());
+                    instructions.insertBefore(insn, list.build())
                 }
                 if (insn.owner == "net/minecraftforge/fml/client/SplashProgress$3" && insn.name == "<init>") {
                     if (index == -1) {
@@ -70,6 +70,7 @@ object SplashProgressTransformer {
         94.5 to ResourceLocation("skytils", "breefingdog.png"),
         96.0 to ResourceLocation("skytils", "azoopet.gif"),
         99.0 to ResourceLocation("skytils", "abdpfp.gif"),
+        99.7 to ResourceLocation("skytils", "bigrat.png"),
         // this is around the chance of winning the jackpot on the lottery
         100 - 100 * 1 / 302_575_350.0 to ResourceLocation("skytils", "jamcat.gif")
     )
@@ -84,6 +85,7 @@ object SplashProgressTransformer {
             "partysychic.gif"
         )
         if (SuperSecretSettings.noSychic) return resourceLocation
+        if (month == 4 && date == 1) return ResourceLocation("skytils", "bigrat.png")
         if (month == 12 || (month == 1 && date == 1)) return ResourceLocation(
             "skytils",
             "christmassychicpet.gif"

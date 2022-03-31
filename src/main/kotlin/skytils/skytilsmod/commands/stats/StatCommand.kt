@@ -60,7 +60,7 @@ abstract class StatCommand(
                 val profile = try {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                 } catch (e: HypixelAPIException) {
-                    printMessage("§cUnable to retrieve profile information: ${e.message}")
+                    printMessage("§cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
                     return@submit
                 } ?: return@submit
                 displayStats(username, uuid, profile)

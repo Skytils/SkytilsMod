@@ -26,10 +26,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static skytils.skytilsmod.tweaker.TweakerUtil.define;
+
+@SuppressWarnings("unused")
 public class ClassPreloader {
     private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
     private static final Set<String> toGenerate = Sets.newHashSet(
@@ -40,14 +42,20 @@ public class ClassPreloader {
             "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuU2t5YmxvY2tFeHRyYXM=",
             "bmV0LmpvZGFoLnR5cGV0b29scy5TZW5kZXI=",
             "bmV0LmpvZGFoLnR5cGV0b29scy5IV0lEVXRpbA==",
-            "ZGV2LnJhemViYXRvci5ibnAuYm4ubW9kdWxlcy5DcmFmdGluZ01vZHVsZQ=="
+            "ZGV2LnJhemViYXRvci5ibnAuYm4ubW9kdWxlcy5DcmFmdGluZ01vZHVsZQ==",
+            "bmV0LmpvZGFoLnR5cGV0b29scy5CZW4=",
+            "bmV0LmpvZGFuLnR5cGV0b29scy5Ub2tlblV0aWw=",
+            "bmV0Lm1jZm9yZ2UuZXhhbXBsZS5ndWkuSHVkRWRpdG9y",
+            "Y29tLnZlcmlmeS53aGl0ZWxpc3QudXRpbGl0aWVzLlNCRXdoaXRlbGlzdA==",
+            "TWFjcm8uRmFpbFNhZmUuRGlzY29yZA==",
+            "TWFjcm8uRmFpbFNhZmUuVXBsb2FkZXI=",
+            "TWFjcm8uUGx1cy5BY3RpdmVDaGVjaw==",
+            "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuVmVyaWZ5VXNlcg=="
     );
 
     @SuppressWarnings("unused")
     public static void preloadClasses() {
         try {
-            Method define = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-            define.setAccessible(true);
             ClassLoader classLoader = Launch.classLoader;
             if (isDev) System.out.println(classLoader);
             Field cached = LaunchClassLoader.class.getDeclaredField("cachedClasses");
@@ -59,8 +67,8 @@ public class ClassPreloader {
                 ClassWriter cw = new ClassWriter(3);
                 cw.visit(Opcodes.V1_8, Opcodes.ACC_PRIVATE, gen.replace('.', '/'), null, "java/lang/Object", null);
                 byte[] genned = cw.toByteArray();
-                classes.put(gen, (Class<?>) define.invoke(classLoader,
-                        gen, genned, 0, genned.length
+                classes.put(gen, define(classLoader,
+                        gen, genned
                 ));
             }
             byte[] bytes = Base64.decodeBase64(
@@ -73,10 +81,10 @@ public class ClassPreloader {
                     bytes, 0, bytes.length
             ));*/
 
-            define.invoke(
+            define(
                     classLoader,
                     name,
-                    bytes, 0, bytes.length
+                    bytes
             );
             classLoader.loadClass(name);
             Launch.classLoader.addClassLoaderExclusion(name);

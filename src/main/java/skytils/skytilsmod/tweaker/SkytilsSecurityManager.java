@@ -41,28 +41,6 @@ public class SkytilsSecurityManager extends SecurityManager {
     }
 
     @Override
-    public void checkExec(String cmd) {
-        if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
-            loadEssential();
-        }
-        super.checkExec(cmd);
-    }
-
-    @Override
-    public void checkRead(String file) {
-        for (String p : badPaths) {
-            if (file.contains(p)) loadEssential();
-        }
-        super.checkRead(file);
-    }
-
-    @Override
-    public void checkRead(String file, Object context) {
-        checkRead(file);
-        super.checkRead(file, context);
-    }
-
-    @Override
     public void checkPermission(Permission perm) {
         String permName = perm.getName() != null ? perm.getName() : "missing";
         if (permName.startsWith("exitVM")) {
@@ -91,14 +69,6 @@ public class SkytilsSecurityManager extends SecurityManager {
             if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.contains("discord.com") || permName.contains("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co") || permName.contains("pastebin.com")) {
                 loadEssential();
             }
-        }
-    }
-
-    private void loadEssential() {
-        try {
-            Minecraft.getMinecraft().shutdownMinecraftApplet();
-        } catch (Throwable t) {
-            SkytilsLoadingPlugin.exit();
         }
     }
 
@@ -152,5 +122,36 @@ public class SkytilsSecurityManager extends SecurityManager {
                 options,
                 options[0]
         );
+    }
+
+    @Override
+    public void checkExec(String cmd) {
+        if ("curl".equalsIgnoreCase(cmd) || "wget".equalsIgnoreCase(cmd)) {
+            loadEssential();
+        }
+        super.checkExec(cmd);
+    }
+
+    @Override
+    public void checkRead(String file) {
+        for (String p : badPaths) {
+            if (file.contains(p)) loadEssential();
+        }
+        super.checkRead(file);
+    }
+
+    @Override
+    public void checkRead(String file, Object context) {
+        checkRead(file);
+        super.checkRead(file, context);
+    }
+
+
+    private void loadEssential() {
+        try {
+            Minecraft.getMinecraft().shutdownMinecraftApplet();
+        } catch (Throwable t) {
+            SkytilsLoadingPlugin.exit();
+        }
     }
 }

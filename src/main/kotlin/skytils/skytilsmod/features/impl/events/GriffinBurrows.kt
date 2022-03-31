@@ -124,9 +124,9 @@ object GriffinBurrows {
                     } else UChat.chat("§aSkytils loaded §2${receivedBurrows.size}§a burrows!")
                 }
             } catch (apiException: HypixelAPIException) {
-                UChat.chat("§cFailed to get burrows with reason: ${apiException.message}")
+                UChat.chat("§cFailed to get burrows with reason: ${apiException.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
             } catch (e: Exception) {
-                UChat.chat("§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${e.message}")
+                UChat.chat("§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
                 e.printStackTrace()
             }
         }
@@ -153,7 +153,7 @@ object GriffinBurrows {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             if (hasSpadeInHotbar) {
-                UChat.chat("§aSkytils is looking for burrows...");
+                UChat.chat("§aSkytils is looking for burrows...")
                 refreshBurrows()
             }
         }

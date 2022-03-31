@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
+import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -34,9 +35,14 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.core.GuiManager
+import skytils.skytilsmod.events.impl.BlockChangeEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
@@ -47,8 +53,42 @@ import java.awt.Color
 object MasterMode7Features {
 
     private val spawningDragons = hashSetOf<WitherKingDragons>()
-    private val spawnedDragons = hashSetOf<WitherKingDragons>()
     private val killedDragons = hashSetOf<WitherKingDragons>()
+    private val dragonMap = hashMapOf<Int, WitherKingDragons>()
+    private val glowstones = hashSetOf<AxisAlignedBB>()
+    private var ticks = 0
+
+    @SubscribeEvent
+    fun onBlockChange(event: BlockChangeEvent) {
+        if (DungeonTimer.phase4ClearTime == -1L) return
+        if (Skytils.config.witherKingDragonSlashAlert) {
+            if (event.old.block === Blocks.glowstone) {
+                glowstones.clear()
+                return
+            }
+            if (event.update.block === Blocks.glowstone && event.old.block != Blocks.packed_ice) {
+                glowstones.add(AxisAlignedBB(event.pos.add(-5, -5, -5), event.pos.add(5, 5, 5)))
+            }
+        }
+        if ((event.pos.y == 18 || event.pos.y == 19) && event.update.block === Blocks.air && event.old.block === Blocks.stone_slab) {
+            val dragon = WitherKingDragons.values().find { it.bottomChin == event.pos } ?: return
+            dragon.isDestroyed = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
+        if (ticks % 15 == 0) {
+            if (Skytils.config.witherKingDragonSlashAlert) {
+                if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
+                    GuiManager.createTitle("Dimensional Slash!", 10)
+                }
+            }
+            ticks = 0
+        }
+        ticks++
+    }
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
@@ -69,12 +109,13 @@ object MasterMode7Features {
 
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
-            val type = WitherKingDragons.values().filterNot { spawnedDragons.contains(it) }
-                .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
+            val type =
+                dragonMap[entity.entityId] ?: WitherKingDragons.values()
+                    .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
             printDevMessage("${type.name} spawned", "witherkingdrags")
-            spawnedDragons.add(type)
+            dragonMap[entity.entityId] = type
         }
     }
 
@@ -84,7 +125,6 @@ object MasterMode7Features {
             val item = (event.entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType ?: return
             printDevMessage("${item.name} died", "witherkingdrags")
             spawningDragons.remove(item)
-            spawnedDragons.remove(item)
             killedDragons.add(item)
         }
     }
@@ -92,8 +132,10 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         spawningDragons.clear()
-        spawnedDragons.clear()
         killedDragons.clear()
+        dragonMap.clear()
+        glowstones.clear()
+        WitherKingDragons.values().forEach { it.isDestroyed = false }
     }
 
     @SubscribeEvent
@@ -135,24 +177,10 @@ object MasterMode7Features {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (Skytils.config.showWitherKingStatueBox && DungeonTimer.phase4ClearTime != -1L) {
             for (drag in WitherKingDragons.values()) {
-                RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 5f, event.partialTicks)
+                if (drag.isDestroyed) continue
+                RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 3.69f, event.partialTicks)
             }
         }
-    }
-
-    fun onRenderMainModel(
-        entity: EntityDragon,
-        f: Float,
-        g: Float,
-        h: Float,
-        i: Float,
-        j: Float,
-        scaleFactor: Float,
-        ci: CallbackInfo
-    ) {
-        if (!Skytils.config.recolorWitherKingsDragons) return
-        entity as ExtensionEntityLivingBase
-        entity.skytilsHook.colorMultiplier?.bindColor()
     }
 
     fun getHurtOpacity(
@@ -160,7 +188,7 @@ object MasterMode7Features {
         lastDragon: EntityDragon,
         value: Float
     ): Float {
-        if (!Skytils.config.recolorWitherKingsDragons) return value
+        if (!Skytils.config.changeHurtColorOnWitherKingsDragons) return value
         lastDragon as ExtensionEntityLivingBase
         return if (lastDragon.skytilsHook.colorMultiplier != null) {
             val model = renderDragon.mainModel as AccessorModelDragon
@@ -197,14 +225,25 @@ object MasterMode7Features {
         Utils.inDungeons && DungeonTimer.phase4ClearTime != -1L && Skytils.config.hideWitherKingDragonDeath
 }
 
-enum class WitherKingDragons(val blockPos: BlockPos, val color: Color, val chatColor: ChatColor) {
-    POWER(BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED),
-    APEX(BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN),
-    SOUL(BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE),
-    ICE(BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA),
-    FLAME(BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD);
+enum class WitherKingDragons(
+    val textColor: String,
+    val blockPos: BlockPos,
+    val color: Color,
+    val chatColor: ChatColor,
+    val bottomChin: BlockPos,
+    var isDestroyed: Boolean = false
+) {
+    POWER("Red", BlockPos(27, 14, 59), ColorFactory.RED, ChatColor.RED, BlockPos(32, 18, 59)),
+    APEX("Green", BlockPos(27, 14, 94), ColorFactory.LIME, ChatColor.GREEN, BlockPos(32, 19, 94)),
+    SOUL("Purple", BlockPos(56, 14, 125), ColorFactory.PURPLE, ChatColor.DARK_PURPLE, BlockPos(56, 18, 128)),
+    ICE("Blue", BlockPos(84, 14, 94), ColorFactory.CYAN, ChatColor.AQUA, BlockPos(79, 19, 94)),
+    FLAME("Orange", BlockPos(85, 14, 56), ColorFactory.CORAL, ChatColor.GOLD, BlockPos(80, 19, 56));
 
+    val itemName = "§cCorrupted $textColor Relic"
+    val itemId = "${textColor.uppercase()}_KING_RELIC"
     val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
-    private val a = 12.5
-    val bb = AxisAlignedBB(blockPos.add(-a, -2.0, -a), blockPos.add(a, a + 3, a))
+    private val a = 13.5
+    val bb = blockPos.run {
+        AxisAlignedBB(x - a, y - 8.0, z - a, x + a, y + a + 2, z + a)
+    }
 }

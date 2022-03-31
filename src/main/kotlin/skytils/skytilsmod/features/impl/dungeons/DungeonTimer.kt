@@ -140,7 +140,7 @@ class DungeonTimer {
                     message.endsWith("§r§cAll this, for nothing...§r") -> {
                         phase4ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§4Necron took ${diff(phase4ClearTime, phase3ClearTime)} seconds."
+                            "§bNecron took ${diff(phase4ClearTime, phase3ClearTime)} seconds."
                         )
                     }
                 }

@@ -47,11 +47,6 @@ public abstract class MixinRenderDragon extends RenderLiving<EntityDragon> {
         lastDragon = entitylivingbaseIn;
     }
 
-    @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V", ordinal = 1))
-    private void onRenderMainModel(EntityDragon entity, float f, float g, float h, float i, float j, float scaleFactor, CallbackInfo ci) {
-        MasterMode7Features.INSTANCE.onRenderMainModel(entity, f, g, h, i, j, scaleFactor, ci);
-    }
-
     @ModifyArg(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V"), index = 3)
     private float replaceHurtOpacity(float value) {
         return MasterMode7Features.INSTANCE.getHurtOpacity((RenderDragon) (Object) this, lastDragon, value);

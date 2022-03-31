@@ -33,7 +33,6 @@ import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import java.awt.Color
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import kotlin.concurrent.fixedRateTimer
@@ -125,7 +124,7 @@ object DupeTracker : Tracker("duped_items") {
         if (dupedUUIDs.contains(uuid) || dirtyUUIDs.contains(uuid)) {
             GlStateManager.pushMatrix()
             GlStateManager.translate(0f, 0f, 299f)
-            event.slot highlight Color.BLACK.withAlpha(169)
+            event.slot highlight Skytils.config.dupeTrackerOverlayColor
             GlStateManager.popMatrix()
         }
 
@@ -147,7 +146,7 @@ object DupeTracker : Tracker("duped_items") {
         val origin = extraAttrib.getString("originTag")
         when (origin) {
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
-            "ITEM_COMMAND" -> event.toolTip.add("§c§lSpawned by admin lol")
+            "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
             else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: $origin")
         }
     }

@@ -177,6 +177,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability.
                             #      §4Must have§c Item Cooldown Display§4 enabled to work.
                             #  §3/skytilshollowwaypoint <set/remove/clear/help> <name> <x y z> §l➡ §bAllows to set waypoints while in the Crystal Hollows. §7(Alias: §f/sthw§7)"
+                            #  §3/skytilscalcxp <dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer> <start level> <end level> §l➡ §bCalculates the xp between two levels
+                            #  §3/skytils pv <player> §l➡ §bOpens the profile viewer. §a§o✯
+                            #  §3/skytils pricepaid <price> §l➡ §bSets your currently held item to a given price.
                         """.trimMargin("#")
                     )
                 )
@@ -275,16 +278,13 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         ProfileGui(mc.thePlayer.uniqueID, UPlayer.getPlayer()?.displayNameString ?: "")
                 } else {
                     // TODO Add some kind of message indicating progress
-                    var uuid by Delegates.notNull<UUID>()
                     Skytils.launch {
-                        uuid = Skytils.hylinAPI.getUUIDSync(args[1])
-                    }.invokeOnCompletion {
-                        it?.let { error ->
+                        Skytils.hylinAPI.getUUID(args[1]).whenComplete { uuid ->
+                            Skytils.displayScreen = ProfileGui(uuid, args[1])
+                        }.catch { error ->
                             UChat.chat("§9§lSkytils ➜ §cError finding player!")
                             error.printStackTrace()
-                            return@invokeOnCompletion
                         }
-                        Skytils.displayScreen = ProfileGui(uuid, args[1])
                     }
                 }
             }

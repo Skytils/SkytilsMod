@@ -108,7 +108,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.2.0-pre6"
+        const val VERSION = "1.2.1"
 
         @JvmField
         val gson: Gson = GsonBuilder()
@@ -206,6 +206,7 @@ class Skytils {
             ArmorColor(),
             AuctionData(),
             AuctionPriceOverlay(),
+            ContainerSellValue,
             BlazeSolver(),
             BloodHelper,
             BossHPDisplays(),
@@ -243,6 +244,7 @@ class Skytils {
             MinionFeatures(),
             MiscFeatures(),
             MythologicalTracker(),
+            PartyFinderStats,
             PetFeatures(),
             Ping,
             PricePaid,
@@ -327,6 +329,7 @@ class Skytils {
         if (event.phase != TickEvent.Phase.START) return
 
         ScreenRenderer.refresh()
+        EntityManager.tickEntities()
 
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
         TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
