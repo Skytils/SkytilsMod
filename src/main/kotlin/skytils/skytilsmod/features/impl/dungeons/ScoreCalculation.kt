@@ -418,7 +418,7 @@ object ScoreCalculation {
         if (!Utils.inDungeons || mc.thePlayer == null) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
-            if (unformatted.startsWith("Party > ")) {
+            if (unformatted.startsWith("Party > ") || (unformatted.contains(":") && !unformatted.contains(">"))) {
                 if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-MIMIC$") || (Skytils.config.receiveHelpFromOtherModMimicDead && unformatted.containsAny(
                         "Mimic dead!", "Mimic Killed!", "Mimic Dead!"
                     ))
@@ -430,14 +430,6 @@ object ScoreCalculation {
                     event.isCanceled = true
                     return
                 }
-            } else if (unformatted.contains(":") && !unformatted.contains(">") && unformatted.containsAny(
-                    "Mimic dead!",
-                    "Mimic Killed!",
-                    "Mimic Dead!"
-                )
-            ) {
-                mimicKilled.set(true)
-                return
             }
         }
     }
@@ -449,8 +441,11 @@ object ScoreCalculation {
         if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
             event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
                 it as AccessorChatComponentText
-                if (!it.text.startsWith("Skytils-SC > ")) return@forEach
-                it.text = it.text.substring("Skytils-SC > ".length)
+                if (it.text.startsWith("Skytils-SC > ")) {
+                    it.text = it.text.substringAfter("Skytils-SC > ")
+                } else if (it.text.startsWith("\$SKYTILS-DUNGEON-SCORE-MIMIC\$")) {
+                    it.text = it.text.replace("\$SKYTILS-DUNGEON-SCORE-MIMIC\$", "Mimic Killed!")
+                }
             }
         }
     }

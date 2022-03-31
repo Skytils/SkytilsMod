@@ -52,11 +52,11 @@ object ChangeAllToSameColorSolver {
         for ((slot, clicks) in mapping) {
             var betterOpt = if (clicks.first > -clicks.second) clicks.second else clicks.first
             var color = CommonColors.WHITE
-            if(Skytils.config.changeToSameColorMode == 1){
+            if (Skytils.config.changeToSameColorMode == 1) {
                 betterOpt = clicks.first
-                when(betterOpt) {
+                when (betterOpt) {
                     1 -> color = CommonColors.GREEN
-                    2,3 -> color = CommonColors.YELLOW
+                    2, 3 -> color = CommonColors.YELLOW
                     4 -> color = CommonColors.RED
                 }
             }
