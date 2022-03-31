@@ -384,39 +384,43 @@ class MiningFeatures {
         override fun render() {
             if (!toggled || SBInfo.mode != SkyblockIsland.CrystalHollows.mode || mc.thePlayer == null) return
             val stack = UMatrixStack()
-            stack.scale(0.1, 0.1, 1.0)
-            UGraphics.disableLighting()
-            RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
-            if (Skytils.config.crystalHollowMapPlaces) {
-                Locations.values().forEach {
-                    it.loc.drawOnMap(it.size, it.color)
+            UMatrixStack.Compat.runLegacyMethod(stack) {
+                stack.scale(0.1, 0.1, 1.0)
+                UGraphics.disableLighting()
+                stack.runWithGlobalState {
+                    RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
                 }
+                if (Skytils.config.crystalHollowMapPlaces) {
+                    Locations.values().forEach {
+                        it.loc.drawOnMap(it.size, it.color)
+                    }
+                }
+                val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
+                val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
+
+                // player marker code
+                val wr = UGraphics.getFromTessellator()
+                mc.textureManager.bindTexture(ResourceLocation("textures/map/map_icons.png"))
+
+                stack.push()
+                stack.translate(x, y, 0.0)
+
+                // Rotate about the center to match the player's yaw
+                stack.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
+                stack.scale(1.5f, 1.5f, 1.5f)
+                stack.translate(-0.125f, 0.125f, 0.0f)
+                UGraphics.color4f(1f, 1f, 1f, 1f)
+                UGraphics.enableAlpha()
+                val d1 = 0.0
+                val d2 = 0.25
+                wr.beginWithActiveShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_TEX)
+                wr.pos(stack, -8.0, -8.0, 100.0).tex(d1, d1).endVertex()
+                wr.pos(stack, -8.0, 8.0, 100.0).tex(d1, d2).endVertex()
+                wr.pos(stack, 8.0, 8.0, 100.0).tex(d2, d2).endVertex()
+                wr.pos(stack, 8.0, -8.0, 100.0).tex(d2, d1).endVertex()
+                wr.drawDirect()
+                stack.pop()
             }
-            val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
-            val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
-
-            // player marker code
-            val wr = UGraphics.getFromTessellator()
-            mc.textureManager.bindTexture(ResourceLocation("textures/map/map_icons.png"))
-
-            stack.push()
-            stack.translate(x, y, 0.0)
-
-            // Rotate about the center to match the player's yaw
-            stack.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
-            stack.scale(1.5f, 1.5f, 1.5f)
-            stack.translate(-0.125f, 0.125f, 0.0f)
-            UGraphics.color4f(1f, 1f, 1f, 1f)
-            UGraphics.enableAlpha()
-            val d1 = 0.0
-            val d2 = 0.25
-            wr.beginWithActiveShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_TEX)
-            wr.pos(stack, -8.0, -8.0, 100.0).tex(d1, d1).endVertex()
-            wr.pos(stack, -8.0, 8.0, 100.0).tex(d1, d2).endVertex()
-            wr.pos(stack, 8.0, 8.0, 100.0).tex(d2, d2).endVertex()
-            wr.pos(stack, 8.0, -8.0, 100.0).tex(d2, d1).endVertex()
-            wr.drawDirect()
-            stack.pop()
         }
 
         override fun demoRender() {
