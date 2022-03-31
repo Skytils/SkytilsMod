@@ -108,7 +108,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.2.0"
+        const val VERSION = "1.2.1"
 
         @JvmField
         val gson: Gson = GsonBuilder()

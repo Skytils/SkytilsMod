@@ -31,7 +31,7 @@ plugins {
     signing
 }
 
-version = "1.2.0"
+version = "1.2.1"
 group = "skytils.skytilsmod"
 
 repositories {
