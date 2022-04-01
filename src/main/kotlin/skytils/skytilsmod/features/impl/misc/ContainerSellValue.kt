@@ -122,7 +122,6 @@ object ContainerSellValue {
         val identifier = AuctionData.getIdentifier(itemStack) ?: return 0.0
         val basePrice = maxOf(
             AuctionData.lowestBINs[identifier] ?: 0.0,
-            AuctionData.bazaarPrices[identifier]?.quickStatus?.sellPrice ?: 0.0,
             ItemFeatures.sellPrices[identifier] ?: 0.0
         )
 
