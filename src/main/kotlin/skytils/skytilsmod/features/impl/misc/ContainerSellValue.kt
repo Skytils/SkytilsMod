@@ -102,7 +102,7 @@ object ContainerSellValue {
 
         override val toggled: Boolean
             get() = Skytils.config.containerSellValue
-        override val height: Int = fr.FONT_HEIGHT * 20
+        override val height: Int = fr.FONT_HEIGHT * (Skytils.config.containerSellValueMaxItems + 2)
         override val width: Int = fr.getStringWidth("Dctr's Space Helmet - 900M")
 
         init {
@@ -114,7 +114,7 @@ object ContainerSellValue {
         return (!inDungeons && (chestName == "Chest" || chestName == "Large Chest"))
                 || chestName.contains("Backpack")
                 || chestName.startsWith("Ender Chest (")
-                || (chestName.contains("Minion") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
+                || (chestName.contains("Minion") && !chestName.contains("Recipe") && SBInfo.mode == SkyblockIsland.PrivateIsland.mode)
                 || chestName == "Personal Vault"
     }
 
