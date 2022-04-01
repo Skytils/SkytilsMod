@@ -68,13 +68,12 @@ object ScoreCalculation {
     private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
 
     val floorRequirements = hashMapOf(
-        // updated w.r.t. skyblock wiki
         "E" to FloorRequirement(.3),
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
         "F3" to FloorRequirement(.5),
         "F4" to FloorRequirement(.6),
-        "F5" to FloorRequirement(.7, 14 * 60),
+        "F5" to FloorRequirement(.7, 10 * 60),
         "F6" to FloorRequirement(.85),
         "F7" to FloorRequirement(speed = 12 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
