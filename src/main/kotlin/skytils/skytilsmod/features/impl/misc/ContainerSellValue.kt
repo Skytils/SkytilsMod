@@ -262,10 +262,10 @@ object ContainerSellValue {
 
         totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
 
-        if (distinctItems.isEmpty() || totalContainerValue == 0.0) return
 
         // Sort the items from most to least valuable and convert them into a readable format
         textLines.clear()
+        if (distinctItems.isEmpty() || totalContainerValue == 0.0) return
         textLines.addAll(
             distinctItems.entries.asSequence()
             .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
