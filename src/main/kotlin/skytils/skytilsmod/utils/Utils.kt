@@ -93,6 +93,11 @@ object Utils {
     @JvmStatic
     var random = Random()
 
+    val isBSMod by lazy {
+        val cal = Calendar.getInstance()
+        return@lazy cal.get(Calendar.MONTH) == Calendar.APRIL && cal.get(Calendar.DAY_OF_MONTH) == 1
+    }
+
     fun getBlocksWithinRangeAtSameY(center: BlockPos, radius: Int, y: Int): Iterable<BlockPos> {
         val corner1 = BlockPos(center.x - radius, y, center.z - radius)
         val corner2 = BlockPos(center.x + radius, y, center.z + radius)
