@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
+import skytils.hylin.skyblock.bazaar.BazaarProduct
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.core.Config
