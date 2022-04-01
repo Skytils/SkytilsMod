@@ -389,10 +389,10 @@ class MiningFeatures {
                 UGraphics.disableLighting()
                 stack.runWithGlobalState {
                     RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
-                }
-                if (Skytils.config.crystalHollowMapPlaces) {
-                    Locations.values().forEach {
-                        it.loc.drawOnMap(it.size, it.color)
+                    if (Skytils.config.crystalHollowMapPlaces) {
+                        Locations.values().forEach {
+                            it.loc.drawOnMap(it.size, it.color)
+                        }
                     }
                 }
                 val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
