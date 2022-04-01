@@ -385,7 +385,8 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.NUMBER, name = "Dungeon Chest Reroll Protection Threshold",
         description = "Prevents rerolling if the value of the items is higher than this value in millions.",
-        category = "Dungeons", subcategory = "Quality of Life"
+        category = "Dungeons", subcategory = "Quality of Life",
+        max = 1000
     )
     var kismetRerollThreshold = 0
 
