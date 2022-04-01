@@ -87,7 +87,7 @@ class BoulderSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         reset()
     }
 

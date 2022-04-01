@@ -272,7 +272,7 @@ class WaterBoardSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         variant = -1
         solutions.clear()
         chestPos = null

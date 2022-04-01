@@ -145,7 +145,7 @@ class ThreeWeirdosSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         riddleNPC = null
         riddleChest = null
     }

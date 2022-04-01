@@ -383,6 +383,13 @@ object Config : Vigilant(
     var kismetRerollConfirm = 0
 
     @Property(
+        type = PropertyType.NUMBER, name = "Dungeon Chest Reroll Protection Threshold",
+        description = "Prevents rerolling if the value of the items is higher than this value in millions.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var kismetRerollThreshold = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Archer Bone Passive",
         description = "Hides the archer bone shield passive.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -2614,6 +2621,8 @@ object Config : Vigilant(
                 if (prop is Boolean && prop) fetchLowestBINPrices = true
             }
         }
+
+        addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")
         addDependency("messageTitle270Score", "createTitleOn270Score")
