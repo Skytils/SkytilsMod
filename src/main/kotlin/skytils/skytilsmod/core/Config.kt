@@ -35,12 +35,16 @@ import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.io.File
 import java.net.URI
 
-object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
-
+object Config : Vigilant(
+    File("./config/skytils/config.toml"),
+    if (Utils.isBSMod) "BSMod" else "Skytils",
+    sortingBehavior = ConfigSorting
+) {
     @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
@@ -2618,11 +2622,11 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             }
         }
 
-        addDependency("message270Score","sendMessageOn270Score")
-        addDependency("messageTitle270Score","createTitleOn270Score")
+        addDependency("message270Score", "sendMessageOn270Score")
+        addDependency("messageTitle270Score", "createTitleOn270Score")
 
-        addDependency("message300Score","sendMessageOn300Score")
-        addDependency("messageTitle300Score","createTitleOn300Score")
+        addDependency("message300Score", "sendMessageOn300Score")
+        addDependency("messageTitle300Score", "createTitleOn300Score")
 
         addDependency("bloodHelperColor", "bloodHelper")
 

@@ -31,6 +31,7 @@ import gg.essential.universal.UKeyboard
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.gui.components.SimpleButton
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.openGUI
 import java.awt.Desktop
 import java.net.URI
@@ -38,11 +39,12 @@ import java.net.URI
 class OptionsGui :
     WindowScreen(ElementaVersion.V1, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
-    private val skytilsText: UIText = UIText("Skytils", shadow = false).childOf(window).constrain {
-        x = CenterConstraint()
-        y = RelativeConstraint(0.075f)
-        textScale = basicTextScaleConstraint { window.getHeight() / 40 }
-    }
+    private val skytilsText: UIText =
+        UIText(if (Utils.isBSMod) "BSMod" else "Skytils", shadow = false).childOf(window).constrain {
+            x = CenterConstraint()
+            y = RelativeConstraint(0.075f)
+            textScale = basicTextScaleConstraint { window.getHeight() / 40 }
+        }
     private val order = arrayOf(
         UKeyboard.KEY_UP,
         UKeyboard.KEY_UP,
