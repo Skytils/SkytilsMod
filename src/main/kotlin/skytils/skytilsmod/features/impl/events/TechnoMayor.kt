@@ -100,7 +100,7 @@ class TechnoMayor {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         orbLocations.clear()
     }
 

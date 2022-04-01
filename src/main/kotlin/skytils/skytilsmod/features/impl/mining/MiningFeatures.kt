@@ -338,7 +338,7 @@ class MiningFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         puzzlerSolution = null
         lastJukebox = null
         raffleBox = null
