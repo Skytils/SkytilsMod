@@ -42,6 +42,7 @@ class ItemComponent(val state: State<ItemStack>) : UIComponent() {
         matrixStack.runWithGlobalState {
             val item = state.get()
             RenderUtil.renderItem(item, 0, 0)
+//            mc.renderItem.renderItemIntoGUI(item, 0, 0)
             mc.renderItem.renderItemOverlayIntoGUI(
                 item.item.getFontRenderer(item) ?: mc.fontRendererObj,
                 item,
