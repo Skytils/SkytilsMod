@@ -235,7 +235,7 @@ class Skytils {
             FavoritePets(),
             GlintCustomizer(),
             GriffinBurrows,
-            IceFillSolver(),
+            IceFillSolver,
             IcePathSolver(),
             ItemFeatures(),
             KeyShortcuts(),

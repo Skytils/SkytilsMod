@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
@@ -37,7 +38,15 @@ import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.util.concurrent.Future
 
-class IceFillSolver {
+object IceFillSolver {
+    private var ticks = 0
+    private var chestPos: BlockPos? = null
+    private var roomFacing: EnumFacing? = null
+    private var three: IceFillPuzzle? = null
+    private var five: IceFillPuzzle? = null
+    private var seven: IceFillPuzzle? = null
+    private var job: Future<*>? = null
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
@@ -88,24 +97,11 @@ class IceFillSolver {
                 }
                 if (chestPos != null) {
                     job = Skytils.threadPool.submit {
-                        if (three == null) {
-                            three = IceFillPuzzle(world, 70)
-                        }
-                        if (five == null) {
-                            five = IceFillPuzzle(world, 71)
-                        }
-                        if (seven == null) {
-                            seven = IceFillPuzzle(world, 72)
-                        }
-                        if (three!!.paths.size == 0) {
-                            three!!.genPaths(world)
-                        }
-                        if (five!!.paths.size == 0) {
-                            five!!.genPaths(world)
-                        }
-                        if (seven!!.paths.size == 0) {
-                            seven!!.genPaths(world)
-                        }
+                        three =
+                            (three ?: IceFillPuzzle(world, 70))
+                        five = (five ?: IceFillPuzzle(world, 71))
+                        seven =
+                            (seven ?: IceFillPuzzle(world, 72))
                     }
                 }
             }
@@ -114,104 +110,28 @@ class IceFillSolver {
         ticks++
     }
 
-    private fun checkForStart(world: World, pos: BlockPos): Boolean {
-        return world.getBlockState(pos).block === Blocks.air && world.getBlockState(pos.offset(roomFacing!!.rotateY())).block === Blocks.cobblestone_wall && world.getBlockState(
-            pos.offset(
-                roomFacing!!.rotateYCCW()
-            )
-        ).block === Blocks.cobblestone_wall
-    }
+    private fun checkForStart(world: World, pos: BlockPos) =
+        world.getBlockState(pos).block === Blocks.air &&
+                world.getBlockState(pos.offset(roomFacing!!.rotateY())).block === Blocks.cobblestone_wall &&
+                world.getBlockState(pos.offset(roomFacing!!.rotateYCCW())).block === Blocks.cobblestone_wall
 
-    private fun generatePairs(world: World, positions: List<BlockPos>): List<Move> {
-        val moves: MutableList<Move> = ArrayList()
-        for (pos in positions) {
-            val potential = getPossibleMoves(world, pos)
-            for (potent in potential) {
-                val potentialMove = Move(pos, potent)
-                if (!moves.contains(potentialMove)) moves.add(potentialMove)
-            }
-        }
-        return moves
-    }
+    private fun generatePairs(world: World, positions: List<BlockPos>) =
+        positions.flatMap { pos -> getPossibleMoves(world, pos).map { Move(pos, it) } }
 
-    private fun getPossibleMoves(world: World, pos: BlockPos): List<BlockPos> {
-        val moves: MutableList<BlockPos> = ArrayList()
-        if (world.getBlockState(
-                pos.north().down()
-            ).block === Blocks.ice && world.getBlockState(pos.north()).block !== Blocks.stone
-        ) {
-            moves.add(pos.north())
+    private fun getPossibleMoves(world: World, pos: BlockPos) =
+        EnumFacing.HORIZONTALS.map { pos.offset(it) }.filter { spot ->
+            val down = world.getBlockState(spot.down()).block
+            (down == Blocks.ice || down == Blocks.packed_ice) && world.getBlockState(spot).block != Blocks.stone
         }
-        if (world.getBlockState(
-                pos.south().down()
-            ).block === Blocks.ice && world.getBlockState(pos.south()).block !== Blocks.stone
-        ) {
-            moves.add(pos.south())
-        }
-        if (world.getBlockState(
-                pos.east().down()
-            ).block === Blocks.ice && world.getBlockState(pos.east()).block !== Blocks.stone
-        ) {
-            moves.add(pos.east())
-        }
-        if (world.getBlockState(
-                pos.west().down()
-            ).block === Blocks.ice && world.getBlockState(pos.west()).block !== Blocks.stone
-        ) {
-            moves.add(pos.west())
-        }
-        return moves
-    }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.iceFillSolver) return
         if (chestPos != null && roomFacing != null) {
-            if (three != null && three!!.paths.size > 0) {
-                for (i in 0 until three!!.paths[0].size - 1) {
-                    val pos = Vec3(three!!.paths[0][i])
-                    val pos2 = Vec3(three!!.paths[0][i + 1])
-                    GlStateManager.disableCull()
-                    RenderUtil.draw3DLine(
-                        pos.addVector(0.5, 0.01, 0.5),
-                        pos2.addVector(0.5, 0.01, 0.5),
-                        5,
-                        Color(255, 0, 0),
-                        event.partialTicks
-                    )
-                    GlStateManager.enableCull()
-                }
-            }
-            if (five != null && five!!.paths.size > 0) {
-                for (i in 0 until five!!.paths[0].size - 1) {
-                    val pos = Vec3(five!!.paths[0][i])
-                    val pos2 = Vec3(five!!.paths[0][i + 1])
-                    GlStateManager.disableCull()
-                    RenderUtil.draw3DLine(
-                        pos.addVector(0.5, 0.01, 0.5),
-                        pos2.addVector(0.5, 0.01, 0.5),
-                        5,
-                        Color(255, 0, 0),
-                        event.partialTicks
-                    )
-                    GlStateManager.enableCull()
-                }
-            }
-            if (seven != null && seven!!.paths.size > 0) {
-                for (i in 0 until seven!!.paths[0].size - 1) {
-                    val pos = Vec3(seven!!.paths[0][i])
-                    val pos2 = Vec3(seven!!.paths[0][i + 1])
-                    GlStateManager.disableCull()
-                    RenderUtil.draw3DLine(
-                        pos.addVector(0.5, 0.01, 0.5),
-                        pos2.addVector(0.5, 0.01, 0.5),
-                        5,
-                        Color(255, 0, 0),
-                        event.partialTicks
-                    )
-                    GlStateManager.enableCull()
-                }
-            }
+            val matrixStack = UMatrixStack.Compat.get()
+            three?.draw(matrixStack, event.partialTicks)
+            five?.draw(matrixStack, event.partialTicks)
+            seven?.draw(matrixStack, event.partialTicks)
         }
     }
 
@@ -224,138 +144,94 @@ class IceFillSolver {
         seven = null
     }
 
-    private inner class IceFillPuzzle(world: World, y: Int) {
+    private class IceFillPuzzle(world: World, y: Int) {
         private val spaces: MutableList<BlockPos> = ArrayList()
-        private var start: BlockPos? = null
-        var paths: MutableList<List<BlockPos?>> = ArrayList()
+        private lateinit var start: BlockPos
+        var paths: MutableSet<List<BlockPos>> = HashSet()
         fun genPaths(world: World) {
             // Generate paths
             val moves = generatePairs(world, spaces)
             val g = Graph(moves, world)
-            val path: MutableList<BlockPos?> = ArrayList()
+            val path: MutableList<BlockPos> = ArrayList()
             path.add(start)
-            val visited: MutableMap<BlockPos?, Boolean?> = HashMap()
-            visited[start] = true
             try {
-                getPaths(g, start, visited, path, spaces.size)
+                getPaths(g, start, mutableSetOf(start), path, spaces.size)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
 
-        /**
-         * Take from Techie delight
-         * Modified
-         * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
-         */
+        fun draw(matrixStack: UMatrixStack, partialTicks: Float) =
+            paths.firstOrNull()?.zipWithNext { first, second ->
+                GlStateManager.disableCull()
+                RenderUtil.draw3DLine(
+                    Vec3(first).addVector(0.5, 0.01, 0.5),
+                    Vec3(second).addVector(0.5, 0.01, 0.5),
+                    5,
+                    Color.RED,
+                    partialTicks,
+                    matrixStack
+                )
+                GlStateManager.enableCull()
+            }
+
         private fun getPaths(
             g: Graph,
-            v: BlockPos?,
-            visited: MutableMap<BlockPos?, Boolean?>,
-            path: MutableList<BlockPos?>,
+            v: BlockPos,
+            visited: MutableSet<BlockPos>,
+            path: MutableList<BlockPos>,
             N: Int
         ) {
             if (path.size == N) {
-                val newPath: List<BlockPos?> = path.toList()
-                if (!paths.contains(path)) paths.add(newPath)
+                val newPath: List<BlockPos> = path.toList()
+                paths.add(newPath)
                 return
             } else {
 
                 // Check if every move starting from position `v` leads
                 // to a solution or not
-                val check = g.adjList[v]
-                if (check != null) {
-                    for (w in check) {
-                        // process only unvisited vertices as the Hamiltonian
-                        // path visit each vertex exactly once
-                        if (visited[w] == null || !visited[w]!!) {
-                            visited[w] = true
-                            path.add(w)
+                g.adjList[v]?.forEach { w ->
+                    // Only check if we haven't been there before
+                    if (!visited.contains(w)) {
+                        visited.add(w)
+                        path.add(w)
 
-                            // check if adding vertex `w` to the path leads
-                            // to the solution or not
-                            getPaths(g, w, visited, path, N)
+                        // Continue checking down this path
+                        getPaths(g, w, visited, path, N)
 
-                            // backtrack
-                            visited[w] = false
-                            path.removeAt(path.size - 1)
+                        // backtrack
+                        visited.remove(w)
+                        path.remove(w)
+                    }
+                }
+            }
+        }
+
+        init {
+            chestPos?.offset(roomFacing?.opposite, 11)?.run { Utils.getBlocksWithinRangeAtSameY(chestPos!!, 25, y) }
+                ?.forEach { pos ->
+                    when (world.getBlockState(pos.down()).block) {
+                        Blocks.ice, Blocks.packed_ice ->
+                            if (world.getBlockState(pos).block === Blocks.air)
+                                spaces.add(pos)
+                        Blocks.stone_brick_stairs, Blocks.stone -> {
+                            if (!::start.isInitialized && checkForStart(world, pos))
+                                start = pos.offset(roomFacing)
                         }
                     }
-                }
-            }
-        }
-
-        init {
-            if (chestPos == null) throw NullPointerException()
-            for (pos in Utils.getBlocksWithinRangeAtSameY(chestPos!!, 25, y)) {
-                val block = world.getBlockState(pos)
-                if (world.getBlockState(pos.down()).block === Blocks.ice || world.getBlockState(pos.down()).block === Blocks.packed_ice) {
-                    if (block.block === Blocks.air) {
-                        spaces.add(pos)
-                    }
-                } else if ((world.getBlockState(pos.down()).block === Blocks.stone_brick_stairs || world.getBlockState(
-                        pos.down()
-                    ).block === Blocks.stone) && start == null
-                ) {
-                    if (checkForStart(world, pos)) {
-                        start = pos.offset(roomFacing)
-                    }
-                }
-            }
+                } ?: throw NullPointerException("Chest is null! (how)")
+            genPaths(world)
         }
     }
 
-    /**
-     * Take from Techie delight
-     * Modified
-     * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
-     */
-    private inner class Move(var source: BlockPos, var dest: BlockPos) {
-        override fun equals(other: Any?): Boolean {
-            return equals(this, other)
-        }
+    private data class Move(var source: BlockPos, var dest: BlockPos)
 
-        fun equals(original: Any, other: Any?): Boolean {
-            if (other === original) return true
-            if (other !is Move || original !is Move) return false
-            return if (original.dest == other.dest && original.source == other.source) {
-                true
-            } else original.dest == other.source && original.source == other.dest
-        }
-
-        override fun hashCode(): Int {
-            var result = source.hashCode()
-            result = 31 * result + dest.hashCode()
-            return result
-        }
-    }
-
-    /**
-     * Take from Techie delight
-     * Modified
-     * https://www.techiedelight.com/print-all-hamiltonian-path-present-in-a-graph/
-     */
-    private inner class Graph constructor(moves: List<Move>, world: World) {
-        var adjList: MutableMap<BlockPos, List<BlockPos>> = HashMap()
-
-        init {
-            for (move in moves) {
-                val src = move.source
-                val dest = move.dest
-                adjList[src] = getPossibleMoves(world, src)
-                adjList[dest] = getPossibleMoves(world, dest)
+    private class Graph(moves: Collection<Move>, world: World) {
+        val adjList: Map<BlockPos, Collection<BlockPos>> = buildMap {
+            moves.forEach { (source, dest) ->
+                this[source] = getPossibleMoves(world, source)
+                this[dest] = getPossibleMoves(world, dest)
             }
         }
-    }
-
-    companion object {
-
-        private var ticks = 0
-        private var chestPos: BlockPos? = null
-        private var roomFacing: EnumFacing? = null
-        private var three: IceFillPuzzle? = null
-        private var five: IceFillPuzzle? = null
-        private var seven: IceFillPuzzle? = null
-        private var job: Future<*>? = null
     }
 }

@@ -17,6 +17,8 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -297,36 +299,28 @@ object RenderUtil {
         GlStateManager.popMatrix()
     }
 
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
-    fun draw3DLine(pos1: Vec3, pos2: Vec3, width: Int, color: Color, partialTicks: Float) {
+    fun draw3DLine(pos1: Vec3, pos2: Vec3, width: Int, color: Color, partialTicks: Float, matrixStack: UMatrixStack) {
         val render = mc.renderViewEntity
-        val worldRenderer = Tessellator.getInstance().worldRenderer
+        val worldRenderer = UGraphics.getFromTessellator()
         val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
         val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
         val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(-realX, -realY, -realZ)
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        matrixStack.push()
+        matrixStack.translate(-realX, -realY, -realZ)
+        UGraphics.enableBlend()
+        UGraphics.enableAlpha()
+        UGraphics.disableLighting()
+        UGraphics.tryBlendFuncSeparate(770, 771, 1, 0)
         GL11.glLineWidth(width.toFloat())
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(pos1.xCoord, pos1.yCoord, pos1.zCoord).endVertex()
-        worldRenderer.pos(pos2.xCoord, pos2.yCoord, pos2.zCoord).endVertex()
-        Tessellator.getInstance().draw()
-        GlStateManager.translate(realX, realY, realZ)
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
+        UGraphics.color4f(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+        worldRenderer.beginWithActiveShader(UGraphics.DrawMode.LINE_STRIP, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(matrixStack, pos1.xCoord, pos1.yCoord, pos1.zCoord).endVertex()
+        worldRenderer.pos(matrixStack, pos2.xCoord, pos2.yCoord, pos2.zCoord).endVertex()
+        worldRenderer.drawDirect()
+        matrixStack.pop()
+        UGraphics.disableBlend()
+        UGraphics.enableAlpha()
+        UGraphics.color4f(1f, 1f, 1f, 1f)
     }
 
     /**
