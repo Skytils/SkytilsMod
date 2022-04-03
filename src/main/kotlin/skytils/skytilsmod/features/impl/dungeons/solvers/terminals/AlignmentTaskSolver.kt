@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -127,6 +128,7 @@ object AlignmentTaskSolver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
+        val matrixStack = UMatrixStack()
         for (space in grid) {
             if (space.type != SpaceType.PATH || space.framePos == null) continue
             val frame =
@@ -139,7 +141,8 @@ object AlignmentTaskSolver {
                 getVec3RelativeToGrid(space.coords.x, space.coords.y).addVector(0.5, 0.5, 0.5),
                 neededClicks.toString(),
                 Color.RED,
-                event.partialTicks
+                event.partialTicks,
+                matrixStack
             )
         }
     }

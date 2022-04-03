@@ -17,6 +17,9 @@
  */
 package skytils.skytilsmod.utils
 
+import gg.essential.elementa.font.DefaultFonts
+import gg.essential.elementa.font.ElementaFonts
+import gg.essential.universal.ChatColor
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
@@ -323,149 +326,90 @@ object RenderUtil {
         UGraphics.color4f(1f, 1f, 1f, 1f)
     }
 
-    /**
-     * @author Mojang
-     */
     fun drawLabel(
         pos: Vec3,
         text: String,
         color: Color,
         partialTicks: Float,
+        matrixStack: UMatrixStack,
         shadow: Boolean = false,
         scale: Float = 1f
+    ) = drawNametag(pos.xCoord, pos.yCoord, pos.zCoord, text, color, partialTicks, matrixStack, shadow, scale, false)
+
+    fun renderWaypointText(str: String, loc: BlockPos, partialTicks: Float, matrixStack: UMatrixStack) =
+        renderWaypointText(
+            str,
+            loc.x.toDouble(),
+            loc.y.toDouble(),
+            loc.z.toDouble(),
+            partialTicks,
+            matrixStack
+        )
+
+    fun renderWaypointText(
+        str: String,
+        X: Double,
+        Y: Double,
+        Z: Double,
+        partialTicks: Float,
+        matrixStack: UMatrixStack
     ) {
+        GlStateManager.alphaFunc(516, 0.1f)
         val player = mc.thePlayer
         val x =
-            pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
+            X - player.lastTickPosX + (X - player.posX - (X - player.lastTickPosX)) * partialTicks
         val y =
-            pos.yCoord - player.lastTickPosY + (pos.yCoord - player.posY - (pos.yCoord - player.lastTickPosY)) * partialTicks
+            Y - player.lastTickPosY + (Y - player.posY - (Y - player.lastTickPosY)) * partialTicks
         val z =
-            pos.zCoord - player.lastTickPosZ + (pos.zCoord - player.posZ - (pos.zCoord - player.lastTickPosZ)) * partialTicks
-        val renderManager = mc.renderManager
+            Z - player.lastTickPosZ + (Z - player.posZ - (Z - player.lastTickPosZ)) * partialTicks
+        val distSq = x * x + y * y + z * z
+        val dist = sqrt(distSq)
+        drawNametag(X, Y, Z, str, Color.WHITE, partialTicks, matrixStack)
+        drawNametag(X, Y - 0.25, Z, "${ChatColor.YELLOW}${dist.roundToInt()}m", Color.WHITE, partialTicks, matrixStack)
+    }
+
+    private fun drawNametag(
+        x: Double, y: Double, z: Double,
+        str: String, color: Color,
+        partialTicks: Float, matrixStack: UMatrixStack,
+        shadow: Boolean = true, scale: Float = 1f, background: Boolean = true) {
+        val player = mc.thePlayer
+        val x1 = x - player.lastTickPosX + (x - player.posX - (x - player.lastTickPosX)) * partialTicks
+        val y1 = y - player.lastTickPosY + (y - player.posY - (y - player.lastTickPosY)) * partialTicks
+        val z1 = z - player.lastTickPosZ + (z - player.posZ - (z - player.lastTickPosZ)) * partialTicks
         val f1 = 0.0266666688
-        val width = mc.fontRendererObj.getStringWidth(text) / 2
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, z)
+        val width = mc.fontRendererObj.getStringWidth(str) / 2
+        matrixStack.push()
+        matrixStack.translate(x1, y1, z1)
         GL11.glNormal3f(0f, 1f, 0f)
-        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
-        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
-        GlStateManager.scale(-f1, -f1, -f1)
-        GlStateManager.scale(scale, scale, scale)
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GlStateManager.enableTexture2D()
-        mc.fontRendererObj.drawString(text, (-width).toFloat(), 0f, color.rgb, shadow)
-        GlStateManager.disableBlend()
-        GlStateManager.popMatrix()
-    }
-
-    /**
-     * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
-     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
-     * @author Moulberry
-     */
-    fun renderWaypointText(str: String?, loc: BlockPos, partialTicks: Float) {
-        GlStateManager.alphaFunc(516, 0.1f)
-        GlStateManager.pushMatrix()
-        val viewer = mc.renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        var x = loc.x - viewerX
-        var y = loc.y - viewerY - viewer.eyeHeight
-        var z = loc.z - viewerZ
-        val distSq = x * x + y * y + z * z
-        val dist = sqrt(distSq)
-        if (distSq > 144) {
-            x *= 12 / dist
-            y *= 12 / dist
-            z *= 12 / dist
+        matrixStack.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        matrixStack.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        matrixStack.scale(-f1, -f1, -f1)
+        UGraphics.disableLighting()
+        UGraphics.depthMask(false)
+        UGraphics.enableBlend()
+        UGraphics.tryBlendFuncSeparate(770, 771, 1, 0)
+        if (background) {
+            val worldRenderer = UGraphics.getFromTessellator()
+            worldRenderer.beginWithDefaultShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_COLOR)
+            worldRenderer.pos(matrixStack, (-width - 1.0), -1.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+            worldRenderer.pos(matrixStack, (-width - 1.0), 8.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+            worldRenderer.pos(matrixStack, width + 1.0, 8.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+            worldRenderer.pos(matrixStack, width + 1.0, -1.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+            worldRenderer.drawDirect()
         }
-        GlStateManager.translate(x, y, z)
-        GlStateManager.translate(0f, viewer.eyeHeight, 0f)
-        drawNametag(str)
-        GlStateManager.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.translate(0f, -0.25f, 0f)
-        GlStateManager.rotate(-mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.rotate(mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-    }
-
-    /**
-     * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
-     * Modified
-     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
-     * @author Moulberry
-     */
-    fun renderWaypointText(str: String?, X: Double, Y: Double, Z: Double, partialTicks: Float) {
-        GlStateManager.alphaFunc(516, 0.1f)
-        GlStateManager.pushMatrix()
-        val viewer = mc.renderViewEntity
-        var x = X - mc.renderManager.viewerPosX
-        var y = Y - mc.renderManager.viewerPosY - viewer.eyeHeight
-        var z = Z - mc.renderManager.viewerPosZ
-        val distSq = x * x + y * y + z * z
-        val dist = sqrt(distSq)
-        if (distSq > 144) {
-            x *= 12 / dist
-            y *= 12 / dist
-            z *= 12 / dist
-        }
-        GlStateManager.translate(x, y, z)
-        GlStateManager.translate(0f, viewer.eyeHeight, 0f)
-        drawNametag(str)
-        GlStateManager.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.translate(0f, -0.25f, 0f)
-        GlStateManager.rotate(-mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.rotate(mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-    }
-
-    /**
-     * @author Mojang
-     */
-    private fun drawNametag(str: String?) {
-        val fontRenderer = mc.fontRendererObj
-        val f1 = 0.02666667f
-        GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(
-            mc.renderManager.playerViewX,
-            1.0f,
-            0.0f,
-            0.0f
+        DefaultFonts.VANILLA_FONT_RENDERER.drawString(
+            matrixStack,
+            str,
+            color,
+            -width.toFloat(),
+            ElementaFonts.MINECRAFT.getBelowLineHeight() * scale,
+            width * 2f,
+            scale,
+            shadow
         )
-        GlStateManager.scale(-f1, -f1, f1)
-        GlStateManager.disableLighting()
-        GlStateManager.depthMask(false)
-        GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
-        val i = 0
-        val j = fontRenderer.getStringWidth(str) / 2
-        GlStateManager.disableTexture2D()
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos((-j - 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        worldrenderer.pos((-j - 1).toDouble(), (8 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        worldrenderer.pos((j + 1).toDouble(), (8 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        tessellator.draw()
-        GlStateManager.enableTexture2D()
-        fontRenderer.drawString(str, -j, i, 553648127)
-        GlStateManager.depthMask(true)
-        fontRenderer.drawString(str, -j, i, -1)
-        GlStateManager.enableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
+        UGraphics.depthMask(true)
+        matrixStack.pop()
     }
 
     @JvmStatic

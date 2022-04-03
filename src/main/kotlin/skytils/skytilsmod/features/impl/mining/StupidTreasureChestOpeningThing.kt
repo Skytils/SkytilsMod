@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.mining
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -167,7 +168,7 @@ object StupidTreasureChestOpeningThing {
     fun onRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.chTreasureHelper || sendHelpPlease.isEmpty() || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-
+        val matrixStack = UMatrixStack()
         val time = System.currentTimeMillis()
         sendHelpPlease.entries.removeAll { (pos, chest) ->
             GlStateManager.disableCull()
@@ -180,7 +181,8 @@ object StupidTreasureChestOpeningThing {
                 Vec3(pos).addVector(0.5, 1.5, 0.5),
                 "${chest.progress}/5",
                 Color.ORANGE,
-                event.partialTicks
+                event.partialTicks,
+                matrixStack
             )
             if (chest.particleBox != null) {
                 RenderUtil.drawFilledBoundingBox(

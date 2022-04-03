@@ -146,7 +146,7 @@ object GriffinBurrows {
 
         protected abstract val waypointText: String
         protected abstract val color: Color
-        fun drawWaypoint(partialTicks: Float) {
+        fun drawWaypoint(partialTicks: Float, matrixStack: UMatrixStack) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
             val x = pos.x - viewerX
@@ -167,7 +167,8 @@ object GriffinBurrows {
                 blockPos.x + 0.5,
                 blockPos.y + 5.0,
                 blockPos.z + 0.5,
-                partialTicks
+                partialTicks,
+                matrixStack
             )
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()
