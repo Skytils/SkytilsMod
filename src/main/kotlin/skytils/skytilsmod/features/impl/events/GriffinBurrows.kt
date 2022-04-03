@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.client.renderer.GlStateManager
@@ -217,13 +218,14 @@ object GriffinBurrows {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.showGriffinBurrows) {
+            val matrixStack = UMatrixStack()
             for (burrow in burrows.values) {
-                burrow.drawWaypoint(event.partialTicks)
+                burrow.drawWaypoint(event.partialTicks, matrixStack)
             }
             if (Skytils.config.particleBurrows) {
                 for (pb in particleBurrows.values) {
                     if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
-                        pb.drawWaypoint(event.partialTicks)
+                        pb.drawWaypoint(event.partialTicks, matrixStack)
                     }
                 }
             }
@@ -332,7 +334,7 @@ object GriffinBurrows {
 
         protected abstract val waypointText: String
         protected abstract val color: Color
-        fun drawWaypoint(partialTicks: Float) {
+        fun drawWaypoint(partialTicks: Float, matrixStack: UMatrixStack) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val pos = blockPos
             val x = pos.x - viewerX
@@ -353,7 +355,8 @@ object GriffinBurrows {
                 blockPos.x + 0.5,
                 blockPos.y + 5.0,
                 blockPos.z + 0.5,
-                partialTicks
+                partialTicks,
+                matrixStack
             )
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()

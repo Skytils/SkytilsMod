@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.spidersden
 
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -55,9 +56,10 @@ class SpidersDenFeatures {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (shouldShowArachneSpawn && Skytils.config.showArachneSpawn) {
             val spawnPos = BlockPos(-282, 49, -178)
+            val matrixStack = UMatrixStack()
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.renderWaypointText("Arachne Spawn", spawnPos, event.partialTicks)
+            RenderUtil.renderWaypointText("Arachne Spawn", spawnPos, event.partialTicks, matrixStack)
             GlStateManager.disableLighting()
             GlStateManager.enableDepth()
             GlStateManager.enableCull()

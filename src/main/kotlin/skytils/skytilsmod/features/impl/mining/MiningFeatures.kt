@@ -264,6 +264,7 @@ class MiningFeatures {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+        val matrixStack = UMatrixStack()
 
         if (Skytils.config.puzzlerSolver && puzzlerSolution != null) {
             val x = puzzlerSolution!!.x - viewerX
@@ -276,7 +277,7 @@ class MiningFeatures {
         if (Skytils.config.raffleWaypoint && inRaffle && raffleBox != null) {
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.renderWaypointText("Raffle Box", raffleBox!!, event.partialTicks)
+            RenderUtil.renderWaypointText("Raffle Box", raffleBox!!, event.partialTicks, matrixStack)
             GlStateManager.disableLighting()
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
@@ -284,11 +285,11 @@ class MiningFeatures {
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             GlStateManager.disableDepth()
             for (loc in CrystalHollowsMap.Locations.values()) {
-                loc.loc.drawWaypoint(loc.cleanName, event.partialTicks)
+                loc.loc.drawWaypoint(loc.cleanName, event.partialTicks, matrixStack)
             }
-            RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
+            RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks, matrixStack)
             for ((key, value) in waypoints)
-                RenderUtil.renderWaypointText(key, value, event.partialTicks)
+                RenderUtil.renderWaypointText(key, value, event.partialTicks, matrixStack)
             GlStateManager.enableDepth()
         }
     }
@@ -483,9 +484,9 @@ class MiningFeatures {
             return locX != null && locY != null && locZ != null
         }
 
-        fun drawWaypoint(text: String, partialTicks: Float) {
+        fun drawWaypoint(text: String, partialTicks: Float, matrixStack: UMatrixStack) {
             if (exists())
-                RenderUtil.renderWaypointText(text, locX!! + 200, locY!!, locZ!! + 200, partialTicks)
+                RenderUtil.renderWaypointText(text, locX!! + 200, locY!!, locZ!! + 200, partialTicks, matrixStack)
         }
 
         fun drawOnMap(size: Int, color: Int) {

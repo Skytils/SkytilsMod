@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -50,6 +51,7 @@ object BloodHelper {
     @SubscribeEvent
     fun render(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) return
+        val matrixStack = UMatrixStack()
         watchers.removeIf { it.isDead }
         mobs.also {
             it.filter { it.key.isDead && !it.value.e }
@@ -74,7 +76,8 @@ object BloodHelper {
                     mob.finalPos!!.xCoord,
                     mob.finalPos!!.yCoord + 2,
                     mob.finalPos!!.zCoord,
-                    event.partialTicks
+                    event.partialTicks,
+                    matrixStack
                 )
             }
     }

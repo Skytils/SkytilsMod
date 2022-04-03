@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.events
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -65,6 +66,7 @@ class TechnoMayor {
         if (!Skytils.config.shinyOrbWaypoints) return
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+        val matrixStack = UMatrixStack()
         for (orb in orbLocations) {
             val x = orb.xCoord - viewerX
             val y = orb.yCoord - viewerY
@@ -74,7 +76,7 @@ class TechnoMayor {
             GlStateManager.disableTexture2D()
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y, z, Color(114, 245, 82).rgb, 0.75f, event.partialTicks)
             GlStateManager.disableDepth()
-            RenderUtil.renderWaypointText("Orb", orb.xCoord, orb.yCoord + 1.5f, orb.zCoord, event.partialTicks)
+            RenderUtil.renderWaypointText("Orb", orb.xCoord, orb.yCoord + 1.5f, orb.zCoord, event.partialTicks, matrixStack)
             GlStateManager.disableLighting()
             GlStateManager.enableTexture2D()
             GlStateManager.enableDepth()

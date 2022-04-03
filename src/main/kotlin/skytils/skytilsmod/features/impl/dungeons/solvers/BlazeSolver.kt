@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.init.Blocks
@@ -148,6 +149,7 @@ class BlazeSolver {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size > 0) {
+            val matrixStack = UMatrixStack()
             if (blazeMode < 0) {
                 val shootableBlaze = orderedBlazes.first()
                 val lowestBlaze = shootableBlaze.blaze
@@ -155,7 +157,8 @@ class BlazeSolver {
                     Vec3(lowestBlaze.posX, lowestBlaze.posY + 3, lowestBlaze.posZ),
                     "§lSmallest",
                     Skytils.config.lowestBlazeColor,
-                    event.partialTicks
+                    event.partialTicks,
+                    matrixStack
                 )
             }
             if (blazeMode > 0) {
@@ -165,7 +168,8 @@ class BlazeSolver {
                     Vec3(highestBlaze.posX, highestBlaze.posY + 3, highestBlaze.posZ),
                     "§lBiggest",
                     Skytils.config.highestBlazeColor,
-                    event.partialTicks
+                    event.partialTicks,
+                    matrixStack
                 )
             }
         }
