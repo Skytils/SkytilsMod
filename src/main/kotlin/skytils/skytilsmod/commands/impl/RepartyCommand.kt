@@ -64,11 +64,11 @@ object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
                     )
                     UChat.chat(
                         """
-§9§m-----------------------------
-§aPartying:§f
-- §e$members
-§9§m-----------------------------
-    """.trimIndent()
+                            #§9§m-----------------------------
+                            #§aPartying:§f
+                            #- §e$members
+                            #§9§m-----------------------------
+                        """.trimMargin("#")
                     )
                     failInviting = true
                     while (failInviting) {
@@ -84,11 +84,11 @@ object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
                         )
                         UChat.chat(
                             """
-§9§m-----------------------------
-§aFailed to invite:§f
-- §c$repartyFails
-§9§m-----------------------------
-    """.trimIndent()
+                                #§9§m-----------------------------
+                                #§aFailed to invite:§f
+                                #- §c$repartyFails
+                                #§9§m-----------------------------
+                            """.trimMargin("#")
                         )
                     }
                 } catch (e: InterruptedException) {
@@ -150,11 +150,11 @@ object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
                     )
                     UChat.chat(
                         """
-§9§m-----------------------------
-§aFailed to invite:§f
-- §c$repartyFails
-§9§m-----------------------------
-    """.trimIndent()
+                            #§9§m-----------------------------
+                            #§aFailed to invite:§f
+                            #- §c$repartyFails
+                            #§9§m-----------------------------
+                        """.trimMargin("#")
                     )
                 }
             } catch (e: InterruptedException) {

@@ -43,7 +43,6 @@ repositories {
 }
 
 loom {
-    // sup weef overflow how's it going
     silentMojangMappingsLicense()
     launchConfigs {
         getByName("client") {
