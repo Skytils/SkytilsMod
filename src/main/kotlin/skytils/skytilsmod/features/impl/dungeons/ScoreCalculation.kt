@@ -74,7 +74,7 @@ object ScoreCalculation {
         "F3" to FloorRequirement(.5),
         "F4" to FloorRequirement(.6),
         "F5" to FloorRequirement(.7, 10 * 60),
-        "F6" to FloorRequirement(.85),
+        "F6" to FloorRequirement(.85, 12 * 60),
         "F7" to FloorRequirement(speed = 12 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
         "M2" to FloorRequirement(speed = 8 * 60),
