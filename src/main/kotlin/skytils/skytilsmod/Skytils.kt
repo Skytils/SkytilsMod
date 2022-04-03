@@ -43,6 +43,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -279,6 +280,15 @@ class Skytils {
         usingNEU = Loader.isModLoaded("notenoughupdates")
         usingSBA = Loader.isModLoaded("skyblockaddons")
 
+        MayorInfo.fetchMayorData()
+
+        MinecraftForge.EVENT_BUS.register(SpamHider())
+
+        ModChecker.checkModdedForge()
+    }
+
+    @Mod.EventHandler
+    fun loadComplete(event: FMLLoadCompleteEvent) {
         val cch = ClientCommandHandler.instance
 
         if (cch !is AccessorCommandHandler) throw RuntimeException("Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils.")
@@ -315,12 +325,6 @@ class Skytils {
         if (config.overrideReparty || !cch.commands.containsKey("rp")) {
             cch.commandMap["rp"] = RepartyCommand
         }
-
-        MayorInfo.fetchMayorData()
-
-        MinecraftForge.EVENT_BUS.register(SpamHider())
-
-        ModChecker.checkModdedForge()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
