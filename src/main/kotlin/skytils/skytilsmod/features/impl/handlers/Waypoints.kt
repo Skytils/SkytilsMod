@@ -20,7 +20,8 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
-import net.minecraft.client.renderer.GlStateManager
+import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,8 +38,9 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Utils.inSkyblock) {
+            val matrixStack = UMatrixStack()
             waypoints.filter { it.enabled && it.island.mode == SBInfo.mode }.forEach {
-                it.draw(event.partialTicks)
+                it.draw(event.partialTicks, matrixStack)
             }
         }
     }
@@ -100,25 +102,22 @@ data class Waypoint(
     val color: Color,
     val addedAt: Long
 ) {
-    fun draw(partialTicks: Float) {
+    fun draw(partialTicks: Float, matrixStack: UMatrixStack) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
         RenderUtil.drawFilledBoundingBox(
             pos.toBoundingBox().expandBlock().offset(-viewerX, -viewerY, -viewerZ),
             color.withAlpha(color.alpha.coerceAtMost(128)),
             1f
         )
-        GlStateManager.disableDepth()
-        GlStateManager.disableTexture2D()
+        UGraphics.disableDepth()
         RenderUtil.renderWaypointText(
             name,
             pos.x + 0.5,
             pos.y + 1.0,
             pos.z + 0.5,
-            partialTicks
+            partialTicks,
+            matrixStack
         )
-        GlStateManager.disableLighting()
-        GlStateManager.enableTexture2D()
-        GlStateManager.enableDepth()
-        GlStateManager.enableCull()
+        UGraphics.enableDepth()
     }
 }

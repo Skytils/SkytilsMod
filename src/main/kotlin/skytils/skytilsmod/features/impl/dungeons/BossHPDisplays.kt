@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -67,6 +68,7 @@ class BossHPDisplays {
         if (!Utils.inDungeons) return
         if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet) {
             val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
+            val matrixStack = UMatrixStack()
             for (entity in mc.theWorld.loadedEntityList) {
                 if (entity !is EntityArmorStand) continue
                 val name = entity.displayName.formattedText
@@ -87,7 +89,8 @@ class BossHPDisplays {
                         entity.positionVector.addVector(0.0, -10.0, 0.0),
                         name,
                         Color.WHITE,
-                        event.partialTicks
+                        event.partialTicks,
+                        matrixStack
                     )
                     GlStateManager.enableDepth()
                     GlStateManager.enableCull()

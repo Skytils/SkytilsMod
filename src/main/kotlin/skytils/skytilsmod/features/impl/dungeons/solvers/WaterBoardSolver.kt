@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLever
 import net.minecraft.init.Blocks
@@ -236,6 +237,7 @@ class WaterBoardSolver {
         }
         val renderTimes = HashMap<LeverBlock, Int>()
         var matching = 0
+        val matrixStack = UMatrixStack()
         for (color in WoolColor.values()) {
             val renderColor = Color(color.dyeColor.mapColor.colorValue).brighter()
             if (color.isExtended) {
@@ -249,7 +251,8 @@ class WaterBoardSolver {
                             Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
                             "§l" + color.name,
                             renderColor,
-                            event.partialTicks
+                            event.partialTicks,
+                            matrixStack
                         )
                     }
                 }
@@ -263,7 +266,7 @@ class WaterBoardSolver {
                             0.5,
                             0.5 + 0.5 * matching,
                             0.5
-                        ), "§l" + color.name, renderColor, event.partialTicks
+                        ), "§l" + color.name, renderColor, event.partialTicks, matrixStack
                     )
                     matching++
                 }

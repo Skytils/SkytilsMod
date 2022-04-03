@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
@@ -142,6 +143,7 @@ object MasterMode7Features {
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         val entity = event.entity
         if (Skytils.config.showWitherKingDragonsHP && DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
+            val matrixStack = UMatrixStack()
             entity as ExtensionEntityLivingBase
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
@@ -165,6 +167,7 @@ object MasterMode7Features {
                 }",
                 color,
                 RenderUtil.getPartialTicks(),
+                matrixStack,
                 true,
                 6f
             )
