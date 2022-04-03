@@ -391,6 +391,14 @@ object Config : Vigilant(
     var kismetRerollThreshold = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Ghost Leap Names",
+        description = "Shows names next to the heads on the Ghost Leap menu.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var ghostTeleportMenuNames = false
+
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Archer Bone Passive",
         description = "Hides the archer bone shield passive.",
         category = "Dungeons", subcategory = "Quality of Life"
