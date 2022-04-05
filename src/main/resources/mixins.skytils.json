@@ -54,6 +54,7 @@
     "neu.MixinTradeWindow",
     "particle.MixinEffectRenderer",
     "patcher.MixinFontRendererHook",
+    "patcher.MixinImagePreviewer",
     "renderer.MixinBlockRendererDispatcher",
     "renderer.MixinEntityRenderer",
     "renderer.MixinInventoryEffectRenderer",
