@@ -28,7 +28,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.event.ClickEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -37,7 +36,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -187,18 +185,18 @@ class MiningFeatures {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
         ) {
-            MiningFeatures.CrystalHollowsMap.Locations.KingYolkar.loc.set()
+            CrystalHollowsMap.Locations.KingYolkar.loc.set()
         }
         if (formatted.startsWith("§r§cYou died")) {
             deadCount =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
             if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§3Skytils > §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").apply {
-                    chatStyle.chatClickEvent = ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set last_death ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}"
+                UChat.chat(
+                    UTextComponent("§3Skytils > §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").setClick(
+                        MCClickEventAction.RUN_COMMAND,
+                        "/sthw set ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z} Last Death"
                     )
-                })
+                )
             }
         }
     }
@@ -210,15 +208,15 @@ class MiningFeatures {
         for (loc in CrystalHollowsMap.Locations.values()) {
             if (loc.loc.exists()) continue
             message.append(
-                UTextComponent("${loc.displayName} ")
-                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
+                UTextComponent("${loc.displayName.substring(0, 2)}[${loc.displayName}] ")
+                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/sthw set $x $y $z ${loc.id}")
                     .setHoverText("§eSet waypoint for ${loc.cleanName}")
             )
         }
         message.append(
             UTextComponent("§e[Custom]").setClick(
                 MCClickEventAction.SUGGEST_COMMAND,
-                "/skytilshollowwaypoint set name_here $x $y $z"
+                "/sthw set $x $y $z Name"
             ).setHoverText("§eSet waypoint for custom location")
         )
         message.chat()
