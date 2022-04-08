@@ -51,6 +51,11 @@ class TweakerUtil {
         return (Class<?>) define.invoke(classLoader, name, bytes, 0, bytes.length);
     }
 
+    static void registerTransformerExclusions(String... classes) {
+        for (String className : classes) {
+            Launch.classLoader.addTransformerExclusion(className);
+        }
+    }
 
     static void overrideSecurityManager(boolean isForge) {
         try {
