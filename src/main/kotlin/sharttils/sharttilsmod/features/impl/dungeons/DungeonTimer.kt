@@ -1,0 +1,390 @@
+/*
+ * Sharttils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2022 Sharttils
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package sharttils.sharttilsmod.features.impl.dungeons
+
+import gg.essential.universal.UChat
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import sharttils.sharttilsmod.Sharttils
+import sharttils.sharttilsmod.core.TickTask
+import sharttils.sharttilsmod.core.structure.FloatPair
+import sharttils.sharttilsmod.core.structure.GuiElement
+import sharttils.sharttilsmod.utils.NumberUtil
+import sharttils.sharttilsmod.utils.NumberUtil.roundToPrecision
+import sharttils.sharttilsmod.utils.RenderUtil
+import sharttils.sharttilsmod.utils.Utils
+import sharttils.sharttilsmod.utils.graphics.ScreenRenderer
+import sharttils.sharttilsmod.utils.stripControlCodes
+import kotlin.math.floor
+import kotlin.math.roundToInt
+
+class DungeonTimer {
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onChat(event: ClientChatReceivedEvent) {
+        if (!Utils.inDungeons || event.type.toInt() == 2) return
+        val message = event.message.formattedText
+        val unformatted = event.message.unformattedText.stripControlCodes()
+        when {
+            scoreShownAt == -1L && message.contains("§r§fTeam Score: §r") -> {
+                scoreShownAt = System.currentTimeMillis()
+            }
+            (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
+                dungeonStartTime = System.currentTimeMillis() + 1000
+            }
+            message.endsWith(" §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!§r") || unformatted == "A Wither Key was picked up!" || message.endsWith(
+                "§r§ehas obtained §r§8Wither Key§r§e!§r"
+            ) -> {
+                witherDoors++
+            }
+            bloodOpenTime == -1L && (unformatted == "The BLOOD DOOR has been opened!" || message.startsWith(
+                "§r§c[BOSS] The Watcher§r§f"
+            )) -> {
+                bloodOpenTime = System.currentTimeMillis()
+                if (Sharttils.config.dungeonTimer) UChat.chat(
+                    "§bBlood took ${diff(bloodOpenTime, dungeonStartTime)} seconds to open."
+                )
+            }
+            message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r" -> {
+                bloodClearTime = System.currentTimeMillis()
+                if (Sharttils.config.dungeonTimer) UChat.chat(
+                    "§bWatcher took ${diff(bloodClearTime, bloodOpenTime)} seconds to clear."
+                )
+            }
+            bloodClearTime != -1L && bossEntryTime == -1L && unformatted.startsWith("[BOSS] ") && unformatted.contains(":") -> {
+                val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
+                if (bossName != "The Watcher" && DungeonFeatures.dungeonFloor != null && Utils.checkBossName(
+                        DungeonFeatures.dungeonFloor!!,
+                        bossName
+                    )
+                ) {
+                    bossEntryTime = System.currentTimeMillis()
+                }
+            }
+            bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r") -> {
+                bossClearTime = System.currentTimeMillis()
+                TickTask(5) {
+                    arrayListOf<String>().apply {
+                        if (Sharttils.config.dungeonTimer) {
+                            add("§7Wither Doors: $witherDoors")
+                            add("§cBlood took ${diff(bloodOpenTime, dungeonStartTime)} seconds to open.")
+                            add("§bWatcher took ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
+                            add("§9Boss entry was ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
+                        }
+                        if (Sharttils.config.sadanPhaseTimer && Utils.equalsOneOf(
+                                DungeonFeatures.dungeonFloor,
+                                "F6",
+                                "M6"
+                            )
+                        ) {
+                            add("§dTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds.")
+                            add("§aGiants took ${diff(giantsClearTime, terraClearTime)} seconds.")
+                            add("§cSadan took ${diff(bossClearTime, giantsClearTime)} seconds.")
+                        } else if (Sharttils.config.necronPhaseTimer && Utils.equalsOneOf(
+                                DungeonFeatures.dungeonFloor,
+                                "F7",
+                                "M7"
+                            )
+                        ) {
+                            add("§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
+                            add("§cStorm took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
+                            add("§6Goldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds.")
+                            add("§4Necron took ${diff(phase4ClearTime, phase3ClearTime)} seconds.")
+                            if (DungeonFeatures.dungeonFloor == "M7") {
+                                add("§7Wither King took ${diff(bossClearTime, phase4ClearTime)} seconds.")
+                            }
+                        }
+                        if (Sharttils.config.dungeonTimer) {
+                            add("§bDungeon finished in ${diff(bossClearTime, dungeonStartTime)} seconds.")
+                        }
+                        if (isNotEmpty()) UChat.chat(joinToString("\n"))
+                    }
+                }
+            }
+            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && message.startsWith("§r§4[BOSS] ") -> {
+                when {
+                    message.endsWith("§r§cPathetic Maxor, just like expected.§r") && phase1ClearTime == -1L -> {
+                        phase1ClearTime = System.currentTimeMillis()
+                        if (Sharttils.config.necronPhaseTimer) UChat.chat(
+                            "§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds."
+                        )
+                    }
+                    message.endsWith("§r§cAt least my son died by your hands.§r") && phase2ClearTime == -1L -> {
+                        phase2ClearTime = System.currentTimeMillis()
+                        if (Sharttils.config.necronPhaseTimer) UChat.chat(
+                            "§bStorm took ${diff(phase2ClearTime, phase1ClearTime)} seconds."
+                        )
+                    }
+                    message.endsWith("§r§c....§r") && phase3ClearTime == -1L -> {
+                        phase3ClearTime = System.currentTimeMillis()
+                        if (Sharttils.config.necronPhaseTimer) UChat.chat(
+                            "§bGoldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds."
+                        )
+                    }
+                    message.endsWith("§r§cAll this, for nothing...§r") -> {
+                        phase4ClearTime = System.currentTimeMillis()
+                        if (Sharttils.config.necronPhaseTimer) UChat.chat(
+                            "§bNecron took ${diff(phase4ClearTime, phase3ClearTime)} seconds."
+                        )
+                    }
+                }
+            }
+            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
+                when {
+                    (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
+                        terraClearTime = System.currentTimeMillis()
+                        if (Sharttils.config.sadanPhaseTimer) UChat.chat(
+                            "§bTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds."
+                        )
+                    }
+                    (message.endsWith("§r§f: You did it. I understand now, you have earned my respect.§r") && giantsClearTime == -1L) -> {
+                        giantsClearTime = System.currentTimeMillis()
+                        if (Sharttils.config.sadanPhaseTimer) UChat.chat(
+                            "§bGiants took ${diff(giantsClearTime, terraClearTime)} seconds."
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        dungeonStartTime = -1
+        bloodOpenTime = -1
+        bloodClearTime = -1
+        bossEntryTime = -1
+        bossClearTime = -1
+        phase1ClearTime = -1
+        phase2ClearTime = -1
+        phase3ClearTime = -1
+        phase4ClearTime = -1
+        terraClearTime = -1
+        giantsClearTime = -1
+        witherDoors = 0
+        scoreShownAt = -1
+    }
+
+    companion object {
+        var dungeonStartTime = -1L
+        var bloodOpenTime = -1L
+        var bloodClearTime = -1L
+        var bossEntryTime = -1L
+        var bossClearTime = -1L
+        var phase1ClearTime = -1L
+        var phase2ClearTime = -1L
+        var phase3ClearTime = -1L
+        var phase4ClearTime = -1L
+        var terraClearTime = -1L
+        var giantsClearTime = -1L
+        var witherDoors = 0
+        var scoreShownAt = -1L
+
+        init {
+            DungeonTimerElement()
+            NecronPhaseTimerElement()
+            SadanPhaseTimerElement()
+        }
+    }
+
+    class DungeonTimerElement : GuiElement("Dungeon Timer", FloatPair(200, 80)) {
+        override fun render() {
+            if (toggled && Utils.inDungeons && dungeonStartTime != -1L) {
+                val time =
+                    (((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime) / 1000.0)
+                val lines = arrayListOf(
+                    "§aReal Time: ${if (dungeonStartTime == -1L) "0s" else "${time}s"}",
+                    "§aTime Elapsed: ${if (dungeonStartTime == -1L) "0s" else dungeonTimeFormat(time)}",
+                    "§7Wither Doors: $witherDoors",
+                    "§4Blood Open: ${
+                        if (bloodOpenTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat(
+                            (bloodOpenTime - dungeonStartTime) / 1000.0
+                        )
+                    }",
+                ).apply {
+                    if (bloodOpenTime != -1L)
+                        add(
+                            "§cWatcher Clear: ${
+                                diff(
+                                    if (bloodClearTime == -1L) System.currentTimeMillis() else bloodClearTime,
+                                    bloodOpenTime
+                                )
+                            }s"
+                        )
+                    add("§9Boss Entry: ${if (bossEntryTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}")
+                    if (bossEntryTime != -1L)
+                        add("§bBoss Clear: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - bossEntryTime) / 1000.0)}")
+                }
+                RenderUtil.drawAllInList(this, lines)
+            }
+        }
+
+        override fun demoRender() {
+            val displayText = """
+                §aReal Time: 0s
+                §aTime Elapsed: 0s
+                §7Wither Doors: 0
+                §4Blood Open: 0s
+                §cWatcher Clear: 0s
+                §9Boss Entry: 0s
+                §bBoss Clear: 0s
+                """.trimIndent()
+            val lines = displayText.split('\n')
+            RenderUtil.drawAllInList(this, lines)
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 7
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§cWatcher Clear: 0s")
+
+        override val toggled: Boolean
+            get() = Sharttils.config.dungeonTimer
+
+        init {
+            Sharttils.guiManager.registerElement(this)
+        }
+    }
+
+    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", FloatPair(200, 120)) {
+        override fun render() {
+            if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F7",
+                    "M7"
+                )
+            ) {
+                val lines = arrayListOf(
+                    "§bMaxor: ${dungeonTimeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime) / 1000.0)}"
+                ).apply {
+                    if (phase1ClearTime != -1L)
+                        add("§cStorm: ${dungeonTimeFormat(((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime) / 1000.0)}")
+                    if (phase2ClearTime != -1L)
+                        add("§6Goldor: ${dungeonTimeFormat(((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime) / 1000.0)}")
+                    if (phase3ClearTime != -1L)
+                        add("§4Necron: ${dungeonTimeFormat(((if (phase4ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase4ClearTime) - phase3ClearTime) / 1000.0)}")
+                    if (phase4ClearTime != -1L && DungeonFeatures.dungeonFloor == "M7")
+                        add("§7Wither King: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - phase4ClearTime) / 1000.0)}")
+                }
+                RenderUtil.drawAllInList(this, lines)
+            }
+        }
+
+        override fun demoRender() {
+            val displayText = """
+                §bMaxor: 0s
+                §cStorm: 0s
+                §6Goldor: 0s
+                §4Necron: 0s
+                §7Wither King: 0s
+                """.trimIndent()
+            val lines = displayText.split('\n')
+            RenderUtil.drawAllInList(this, lines)
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§cMaxor: 0s")
+
+        override val toggled: Boolean
+            get() = Sharttils.config.necronPhaseTimer
+
+        init {
+            Sharttils.guiManager.registerElement(this)
+        }
+    }
+
+    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", FloatPair(200, 120)) {
+        override fun render() {
+            if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F6",
+                    "M6"
+                )
+            ) {
+                val lines = arrayListOf(
+                    "§dTerracotta: ${dungeonTimeFormat(((if (terraClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else terraClearTime) - bossEntryTime) / 1000.0)}"
+                ).apply {
+                    if (terraClearTime != -1L)
+                        add("§aGiants: ${dungeonTimeFormat(((if (giantsClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else giantsClearTime) - terraClearTime) / 1000.0)}")
+                    if (giantsClearTime != -1L)
+                        add("§cSadan: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - giantsClearTime) / 1000.0)}")
+                }
+                RenderUtil.drawAllInList(this, lines)
+            }
+        }
+
+        override fun demoRender() {
+            val displayText = """
+                §dTerracotta: 0s
+                §aGiants: 0s
+                §cSadan: 0s
+                """.trimIndent()
+            val lines = displayText.split('\n')
+            RenderUtil.drawAllInList(this, lines)
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 3
+
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§dTerracotta: 0s")
+
+        override val toggled: Boolean
+            get() = Sharttils.config.sadanPhaseTimer
+
+        init {
+            Sharttils.guiManager.registerElement(this)
+        }
+    }
+}
+
+private fun dungeonTimeFormat(seconds: Double): String {
+    return if (seconds >= 60) {
+        "${floor(seconds / 60).toInt()}m ${
+            (seconds % 60).run {
+                if (!Sharttils.config.showMillisOnDungeonTimer) roundToInt() else NumberUtil.nf.format(
+                    this.roundToPrecision(
+                        2
+                    )
+                )
+            }
+        }s"
+    } else {
+        "${
+            seconds.run {
+                if (!Sharttils.config.showMillisOnDungeonTimer) roundToInt() else NumberUtil.nf.format(
+                    this.roundToPrecision(
+                        2
+                    )
+                )
+            }
+        }s"
+    }
+}
+
+private fun diff(end: Long, start: Long): Any {
+    val sec = ((end - start) / 1000.0)
+    return if (!Sharttils.config.showMillisOnDungeonTimer) sec.roundToInt() else NumberUtil.nf.format(
+        sec.roundToPrecision(
+            2
+        )
+    )
+}

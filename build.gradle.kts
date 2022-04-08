@@ -1,6 +1,6 @@
 /*
- * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Sharttils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2022 Sharttils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,7 +32,7 @@ plugins {
 }
 
 version = "1.2.3"
-group = "skytils.skytilsmod"
+group = "sharttils.sharttilsmod"
 
 repositories {
     mavenLocal()
@@ -47,7 +47,7 @@ loom {
     silentMojangMappingsLicense()
     launchConfigs {
         getByName("client") {
-            property("fml.coreMods.load", "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
+            property("fml.coreMods.load", "sharttils.sharttilsmod.tweaker.SharttilsLoadingPlugin")
             property("elementa.dev", "true")
             property("elementa.debug", "true")
             property("elementa.invalid_usage", "warn")
@@ -58,8 +58,8 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
-            arg("--tweakClass", "skytils.skytilsmod.tweaker.SkytilsTweaker")
-            arg("--mixin", "mixins.skytils.json")
+            arg("--tweakClass", "sharttils.sharttilsmod.tweaker.SharttilsTweaker")
+            arg("--mixin", "mixins.sharttils.json")
         }
     }
     runConfigs {
@@ -69,10 +69,10 @@ loom {
     }
     forge {
         pack200Provider.set(Pack200Adapter())
-        mixinConfig("mixins.skytils.json")
+        mixinConfig("mixins.sharttils.json")
     }
     mixin {
-        defaultRefmapName.set("mixins.skytils.refmap.json")
+        defaultRefmapName.set("mixins.sharttils.refmap.json")
     }
 }
 
@@ -98,14 +98,14 @@ dependencies {
     }
 
     shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
-    shadowMeMod("com.github.Skytils:Hylin:04665adf92") {
+    shadowMeMod("com.github.Sharttils:Hylin:04665adf92") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
-    shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
+    shadowMeMod("com.github.Sharttils:AsmHelper:91ecc2bd9c") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
@@ -139,14 +139,14 @@ tasks {
         manifest {
             attributes(
                 mapOf(
-                    "Main-Class" to "SkytilsInstallerFrame",
-                    "FMLCorePlugin" to "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+                    "Main-Class" to "SharttilsInstallerFrame",
+                    "FMLCorePlugin" to "sharttils.sharttilsmod.tweaker.SharttilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,
-                    "MixinConfigs" to "mixins.skytils.json",
+                    "MixinConfigs" to "mixins.sharttils.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
-                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
+                    "TweakClass" to "sharttils.sharttilsmod.tweaker.SharttilsTweaker",
                     "TweakOrder" to "0"
                 )
             )
@@ -155,7 +155,7 @@ tasks {
         enabled = false
     }
     named<RemapJarTask>("remapJar") {
-        archiveBaseName.set("Skytils")
+        archiveBaseName.set("Sharttils")
         input.set(shadowJar.get().archiveFile)
         doLast {
             MessageDigest.getInstance("SHA-256").digest(archiveFile.get().asFile.readBytes())
@@ -165,15 +165,15 @@ tasks {
         }
     }
     named<ShadowJar>("shadowJar") {
-        archiveBaseName.set("Skytils")
+        archiveBaseName.set("Sharttils")
         archiveClassifier.set("dev")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe, shadowMeMod)
 
-        relocate("org.apache.hc", "skytils.apacheorg.hc")
-        relocate("org.apache.commons.codec", "skytils.apacheorg.codec")
-        relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
-        relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
+        relocate("org.apache.hc", "sharttils.apacheorg.hc")
+        relocate("org.apache.commons.codec", "sharttils.apacheorg.codec")
+        relocate("dev.falsehonesty.asmhelper", "sharttils.asmhelper")
+        relocate("com.llamalad7.mixinextras", "sharttils.mixinextras")
 
         exclude(
             "**/LICENSE.md",

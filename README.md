@@ -1,16 +1,16 @@
-# SkytilsMod
+# SharttilsMod
 ***
 <p align="center">
-  <a href="https://github.com/Skytils/SkytilsMod/releases" target="_blank">
-    <img alt="downloads" src="https://img.shields.io/github/v/release/Skytils/SkytilsMod?color=4166f5&style=flat-square" />
+  <a href="https://github.com/Sharttils/SharttilsMod/releases" target="_blank">
+    <img alt="downloads" src="https://img.shields.io/github/v/release/Sharttils/SharttilsMod?color=4166f5&style=flat-square" />
   </a>
-  <a href="https://github.com/Skytils/SkytilsMod/releases" target="_blank">
-    <img alt="downloads" src="https://img.shields.io/github/downloads/Skytils/SkytilsMod/total?color=4166f5&style=flat-square" />
+  <a href="https://github.com/Sharttils/SharttilsMod/releases" target="_blank">
+    <img alt="downloads" src="https://img.shields.io/github/downloads/Sharttils/SharttilsMod/total?color=4166f5&style=flat-square" />
   </a>
-  <a href="https://github.com/Skytils/SkytilsMod/blob/main/LICENSE" target="_blank">
-    <img alt="license" src="https://img.shields.io/github/license/Skytils/SkytilsMod?color=4166f5&style=flat-square" />
+  <a href="https://github.com/Sharttils/SharttilsMod/blob/main/LICENSE" target="_blank">
+    <img alt="license" src="https://img.shields.io/github/license/Sharttils/SharttilsMod?color=4166f5&style=flat-square" />
   </a>
-  <a href="https://discord.gg/skytils" target="_blank">
+  <a href="https://discord.gg/sharttils" target="_blank">
     <img alt="discord" src="https://img.shields.io/discord/807302538558308352?color=4166f5&label=discord&style=flat-square" />
   </a>
 </p>
@@ -231,31 +231,31 @@ And more to come!
   <summary>Commands</summary>
 
 ## Commands
-- /skytils - Opens the main GUI. (Alias is /st)
-- /skytils config - Opens the GUI to edit the config.
-- /skytils help - Displays the various commands and their usages
-- /skytils setkey <apikey> - Sets your api key (will also grab it from /api new).
-- /skytils reload <data/mayor/slayer> - Forces Skytils to refresh of data.
-- /skytils fetchur - Displays the current Fetchur item for the day.
-- /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
-- /skytils aliases - Opens the GUI to edit command aliases.
-- /skytils editlocations (/skytils editlocation, gui, loc) - Opens the GUI to modify HUD element locations.
-- /skytils shortcuts - Opens the GUI to modify keybind shortcuts.
-- /skytils spam - Opens the GUI to modify spam filters.
-- /skytils enchant - Opens the GUI to customize enchant names.
-- /skytilscata <player> - Shows information about a player's Catacombs statistics.
-- /skytilsslayer <player> - Shows information about a player's Slayer statistics.
-- /armorcolor <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided. (can also be accessed by /skytils armorcolor)
+- /sharttils - Opens the main GUI. (Alias is /st)
+- /sharttils config - Opens the GUI to edit the config.
+- /sharttils help - Displays the various commands and their usages
+- /sharttils setkey <apikey> - Sets your api key (will also grab it from /api new).
+- /sharttils reload <data/mayor/slayer> - Forces Sharttils to refresh of data.
+- /sharttils fetchur - Displays the current Fetchur item for the day.
+- /sharttils griffin refresh - Forces a refresh for the Griffin burrow waypoints.
+- /sharttils aliases - Opens the GUI to edit command aliases.
+- /sharttils editlocations (/sharttils editlocation, gui, loc) - Opens the GUI to modify HUD element locations.
+- /sharttils shortcuts - Opens the GUI to modify keybind shortcuts.
+- /sharttils spam - Opens the GUI to modify spam filters.
+- /sharttils enchant - Opens the GUI to customize enchant names.
+- /sharttilscata <player> - Shows information about a player's Catacombs statistics.
+- /sharttilsslayer <player> - Shows information about a player's Slayer statistics.
+- /armorcolor <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided. (can also be accessed by /sharttils armorcolor)
 - ~~/blockability [clearall] - Block using the ability on the currently held item~~
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 - /glintcustomize override <on/off/clear/clearall> - Change the visibility of enchantment glints for the item.
 - /glintcustomize color <set/clear/clearall> - Change the enchant glint color for the item.
 - /trackcooldown <cooldown in seconds> <item ability> - Set a cooldown for an item ability to track
-- /skytilshollowwaypoint <set/remove/clear/help> <name> <x y z> - Allows to set waypoints while in the Crystal Hollows.
+- /sharttilshollowwaypoint <set/remove/clear/help> <name> <x y z> - Allows to set waypoints while in the Crystal Hollows.
 </details>
 
 ### Credits to Open Source Software
 ***
-Skytils would not be possible without other open source projects.
+Sharttils would not be possible without other open source projects.
 
-[For more information, click here](https://github.com/Skytils/SkytilsMod/blob/main/OPEN_SOURCE_SOFTWARE.md "Credits")
+[For more information, click here](https://github.com/Sharttils/SharttilsMod/blob/main/OPEN_SOURCE_SOFTWARE.md "Credits")

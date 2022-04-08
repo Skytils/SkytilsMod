@@ -1,6 +1,6 @@
 # Open Source Software
 
-Skytils would not be possible without the following open source software:
+Sharttils would not be possible without the following open source software:
 
 Software | License
 ------------ | -------------

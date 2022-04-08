@@ -1,6 +1,6 @@
 /*
- * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Sharttils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2022 Sharttils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -31,10 +31,10 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
-                "net.minecraftforge.gradle.forge" -> useModule("com.github.Skytils:ForgeGradle:${requested.version}")
+                "net.minecraftforge.gradle.forge" -> useModule("com.github.Sharttils:ForgeGradle:${requested.version}")
             }
         }
     }
 }
 
-rootProject.name = "SkytilsMod"
+rootProject.name = "SharttilsMod"
