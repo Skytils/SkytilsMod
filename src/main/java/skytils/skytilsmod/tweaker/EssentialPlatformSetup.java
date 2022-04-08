@@ -123,6 +123,15 @@ public class EssentialPlatformSetup {
             t.printStackTrace();
         }
 
+        TweakerUtil.registerTransformerExclusions(
+                "kotlin.",
+                "kotlinx.",
+                "skytils.asmhelper.",
+                "skytils.skytilsmod.tweaker.",
+                "skytils.skytilsmod.asm."
+        );
+
+
         for (final String url : dataURLCandidates) {
             if (trySetDataUrl(url)) {
                 Reference.dataUrl = url;
