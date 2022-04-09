@@ -195,29 +195,28 @@ class MiningFeatures {
              * $asdf:Khazad-dûm@-292,63,281 ❌
              * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
              */
-            if (SBE_DSM_PATTERN.matcher(unformatted).matches()) {
-                val sub = unformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
+            val cleanedUnformatted = unformatted.removeExceptPattern(SBE_DSM_PATTERN)
+            if (SBE_DSM_PATTERN.matcher(cleanedUnformatted).matches()) {
+                val sub = cleanedUnformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
                 val parts = sub.split("@")
-                val location = parts[0]
+                val stringLocation = parts[0]
                 val coords = parts[1].split(",")
-                if (locationsToInternal.containsKey(location)) {
-                    val key = locationsToInternal[location]
-
-                    /**
-                     * Sends the waypoints message except it suggests which one should be used based on
-                     * the name contained in the message and converts it to the internally used names for the waypoints.
-                     */
-                    UChat.chat(UTextComponent("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
-                        .appendSibling(UTextComponent("§f[${location}] ")
-                            .setClick(ClickEvent.Action.RUN_COMMAND, "/skytilshollowwaypoint set $key ${coords[0]} ${coords[1]} ${coords[2]}")
-                            .setHover(HoverEvent.Action.SHOW_TEXT, UTextComponent("§eset waypoint for $location"))
-                        )
-                        .appendSibling(UTextComponent("§e[Custom]")
-                            .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/skytilshollowwaypoint set name ${coords[0]} ${coords[1]} ${coords[2]}")
-                            .setHover(HoverEvent.Action.SHOW_TEXT, UTextComponent("§eset custom waypoint")
-                            )
-                        )
-                    )
+                val loc = CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }
+                if (loc != null) {
+                    if (!loc.loc.exists()) {
+                        /**
+                         * Sends the waypoints message except it suggests which one should be used based on
+                         * the name contained in the message and converts it to the internally used names for the waypoints.
+                         */
+                        UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
+                            .append(UTextComponent("§f${loc.displayName} ")
+                                .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set ${loc.id} ${coords[0]} ${coords[1]} ${coords[2]}")
+                                .setHoverText("§eSet waypoint for ${loc.displayName}"))
+                            .append(UTextComponent("§e[Custom]")
+                                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here ${coords[0]} ${coords[1]} ${coords[2]}")
+                                .setHoverText("§eSet custom waypoint")
+                            ).chat()
+                    }
                 }
             }
         }
@@ -553,14 +552,14 @@ class MiningFeatures {
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
-        val locationsToInternal = hashMapOf<String, String>(
-            "Lost Precursor City" to "internal_city",
-            "Jungle Temple" to "internal_temple",
-            "Goblin Queen's Den" to "internal_den",
-            "Mines of Divan" to "internal_mines",
-            "Khazad-dûm" to "internal_bal",
-            "Fairy Grotto" to "internal_fairy"
-        )
         val SBE_DSM_PATTERN: Pattern = Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*")
+        fun String.removeExceptPattern(pattern: Pattern): String {
+            val matcher = pattern.matcher(this)
+            return if (matcher.find()) {
+                matcher.group(0)
+            } else {
+                ""
+            }
+        }
     }
 }
