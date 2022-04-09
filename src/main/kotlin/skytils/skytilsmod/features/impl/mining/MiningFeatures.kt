@@ -29,7 +29,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -196,11 +195,12 @@ class MiningFeatures {
              * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
              */
             val cleanedUnformatted = unformatted.removeExceptPattern(SBE_DSM_PATTERN)
-            if (SBE_DSM_PATTERN.matcher(cleanedUnformatted).matches()) {
-                val sub = cleanedUnformatted.split(Regex("\\\$(SBECHWP\\b|DSMCHWP):"))[1]
-                val parts = sub.split("@")
-                val stringLocation = parts[0]
-                val coords = parts[1].split(",")
+            val matcher = SBE_DSM_PATTERN.matcher(cleanedUnformatted)
+            if (matcher.matches()) {
+                val stringLocation = matcher.group("stringLocation")
+                val x = matcher.group("x")
+                val y = matcher.group("y")
+                val z = matcher.group("z")
                 val loc = CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }
                 if (loc != null) {
                     if (!loc.loc.exists()) {
@@ -210,10 +210,10 @@ class MiningFeatures {
                          */
                         UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
                             .append(UTextComponent("§f${loc.displayName} ")
-                                .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set ${loc.id} ${coords[0]} ${coords[1]} ${coords[2]}")
+                                .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
                                 .setHoverText("§eSet waypoint for ${loc.displayName}"))
                             .append(UTextComponent("§e[Custom]")
-                                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here ${coords[0]} ${coords[1]} ${coords[2]}")
+                                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here $x $y $z")
                                 .setHoverText("§eSet custom waypoint")
                             ).chat()
                     }
@@ -552,7 +552,12 @@ class MiningFeatures {
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
-        val SBE_DSM_PATTERN: Pattern = Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(.*?)@-?\\d*,-?\\d*,-?\\d*")
+        val SBE_DSM_PATTERN: Pattern = Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d*),(?<y>-?\\d*),(?<z>-?\\d*)")
+
+        /**
+         * Removes everything from the string except for the part that matches the Pattern
+         * @param pattern The Pattern that is singled out
+         */
         fun String.removeExceptPattern(pattern: Pattern): String {
             val matcher = pattern.matcher(this)
             return if (matcher.find()) {
