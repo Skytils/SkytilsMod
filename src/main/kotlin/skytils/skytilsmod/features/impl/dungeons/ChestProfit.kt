@@ -17,11 +17,13 @@
  */
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.structure.FloatPair
@@ -83,7 +85,7 @@ class ChestProfit {
                     GlStateManager.color(1f, 1f, 1f, 1f)
                     GlStateManager.disableLighting()
                     var drawnLines = 1
-                    val profit = chestType.value - chestType.price
+                    val profit = chestType.profit
                     ScreenRenderer.fontRenderer.drawString(
                         chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
                             profit
@@ -112,9 +114,29 @@ class ChestProfit {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         for (chest in DungeonChest.values()) {
             chest.reset()
+        }
+        rerollBypass = false
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (Skytils.config.kismetRerollThreshold == 0 || !Utils.inDungeons) return
+        if (!rerollBypass && event.slotId == 50 && event.chestName.endsWith(" Chest")) {
+            val chestType = DungeonChest.getFromName(event.chestName) ?: return
+            if (chestType.value >= Skytils.config.kismetRerollThreshold * 1_000_000) {
+                event.isCanceled = true
+                EssentialAPI.getNotifications()
+                    .push(
+                        "Blocked Chest Reroll",
+                        "The ${chestType.displayText} you are rerolling has ${chestType.profit}!\nClick me to disable this warning.",
+                        4f,
+                        action = {
+                            rerollBypass = true
+                        })
+            }
         }
     }
 
@@ -132,6 +154,9 @@ class ChestProfit {
         var price = 0.0
         var value = 0.0
         var items = ArrayList<DungeonChestLootItem>(3)
+        val profit
+            get() = value - price
+
         fun reset() {
             price = 0.0
             value = 0.0
@@ -188,5 +213,6 @@ class ChestProfit {
 
     companion object {
         private val element = DungeonChestProfitElement()
+        private var rerollBypass = false
     }
 }

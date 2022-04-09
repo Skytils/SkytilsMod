@@ -104,7 +104,7 @@ object SimonSaysSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         clickInOrder.clear()
         clickNeeded = 0
     }

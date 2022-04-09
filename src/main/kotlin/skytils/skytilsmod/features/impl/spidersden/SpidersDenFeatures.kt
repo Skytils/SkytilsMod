@@ -65,7 +65,7 @@ class SpidersDenFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load?) {
+    fun onWorldChange(event: WorldEvent.Load) {
         shouldShowArachneSpawn = false
     }
 

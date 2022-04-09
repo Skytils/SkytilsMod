@@ -35,12 +35,16 @@ import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.features.impl.trackers.Tracker
 import skytils.skytilsmod.gui.SpiritLeapNamesGui
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.io.File
 import java.net.URI
 
-object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortingBehavior = ConfigSorting) {
-
+object Config : Vigilant(
+    File("./config/skytils/config.toml"),
+    if (Utils.isBSMod) "BSMod" else "Skytils",
+    sortingBehavior = ConfigSorting
+) {
     @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
@@ -377,6 +381,14 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         max = 5
     )
     var kismetRerollConfirm = 0
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Dungeon Chest Reroll Protection Threshold",
+        description = "Prevents rerolling if the value of the items is higher than this value in millions.",
+        category = "Dungeons", subcategory = "Quality of Life",
+        max = 1000
+    )
+    var kismetRerollThreshold = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Archer Bone Passive",
@@ -1634,6 +1646,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
     var containerSellValue = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Include Item Modifiers",
+        description = "Includes potato books, recombobulators, enchantments, and master stars in the item price calculations.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var includeModifiersInSellValue = true
+
+    @Property(
         type = PropertyType.NUMBER, name = "Max Displayed Items",
         description = "The maximum amount of items to display in the Container Sell Value GUI.",
         category = "Miscellaneous", subcategory = "Quality of Life",
@@ -2611,11 +2630,13 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
             }
         }
 
-        addDependency("message270Score","sendMessageOn270Score")
-        addDependency("messageTitle270Score","createTitleOn270Score")
+        addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
-        addDependency("message300Score","sendMessageOn300Score")
-        addDependency("messageTitle300Score","createTitleOn300Score")
+        addDependency("message270Score", "sendMessageOn270Score")
+        addDependency("messageTitle270Score", "createTitleOn270Score")
+
+        addDependency("message300Score", "sendMessageOn300Score")
+        addDependency("messageTitle300Score", "createTitleOn300Score")
 
         addDependency("bloodHelperColor", "bloodHelper")
 
@@ -2667,6 +2688,7 @@ object Config : Vigilant(File("./config/skytils/config.toml"), "Skytils", sortin
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
         addDependency("containerSellValueMaxItems", "containerSellValue")
+        addDependency("includeModifiersInSellValue", "containerSellValue")
 
         registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {

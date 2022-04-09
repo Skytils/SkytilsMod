@@ -48,6 +48,7 @@ import skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import skytils.skytilsmod.gui.profile.components.*
 import skytils.skytilsmod.gui.profile.states.alwaysMap
 import skytils.skytilsmod.gui.profile.states.alwaysUpdateState
+import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.util.*
 
@@ -126,7 +127,7 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
         height = AspectConstraint()
     } childOf navBar
 
-    private val navText by UIText("Skytils Profile Viewer").constrain {
+    private val navText by UIText("${if (Utils.isBSMod) "BSMod" else "Skytils"} Profile Viewer").constrain {
         x = SiblingConstraint(5f)
         y = CenterConstraint()
     } childOf navBar
