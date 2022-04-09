@@ -194,29 +194,26 @@ class MiningFeatures {
              * $asdf:Khazad-dûm@-292,63,281 ❌
              * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
              */
-            val cleanedUnformatted = unformatted.removeExceptPattern(SBE_DSM_PATTERN)
-            val matcher = SBE_DSM_PATTERN.matcher(cleanedUnformatted)
-            if (matcher.matches()) {
-                val stringLocation = matcher.group("stringLocation")
-                val x = matcher.group("x")
-                val y = matcher.group("y")
-                val z = matcher.group("z")
-                val loc = CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }
-                if (loc != null) {
-                    if (!loc.loc.exists()) {
-                        /**
-                         * Sends the waypoints message except it suggests which one should be used based on
-                         * the name contained in the message and converts it to the internally used names for the waypoints.
-                         */
-                        UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
-                            .append(UTextComponent("§f${loc.displayName} ")
-                                .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
-                                .setHoverText("§eSet waypoint for ${loc.displayName}"))
-                            .append(UTextComponent("§e[Custom]")
-                                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here $x $y $z")
-                                .setHoverText("§eSet custom waypoint")
-                            ).chat()
-                    }
+            val cleaned = SBE_DSM_PATTERN.find(unformatted)
+            if (cleaned != null) {
+                println("cleaned = ${cleaned.value}")
+                val stringLocation = cleaned.groups["stringLocation"]!!.value
+                val x = cleaned.groups["x"]!!.value
+                val y = cleaned.groups["y"]!!.value
+                val z = cleaned.groups["z"]!!.value
+                CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }?.takeIf { !it.loc.exists() }?.let { loc ->
+                    /**
+                     * Sends the waypoints message except it suggests which one should be used based on
+                     * the name contained in the message and converts it to the internally used names for the waypoints.
+                     */
+                    UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
+                        .append(UTextComponent("§f${loc.displayName} ")
+                            .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
+                            .setHoverText("§eSet waypoint for ${loc.displayName}"))
+                        .append(UTextComponent("§e[Custom]")
+                            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here $x $y $z")
+                            .setHoverText("§eSet custom waypoint")
+                        ).chat()
                 }
             }
         }
@@ -552,19 +549,6 @@ class MiningFeatures {
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
-        val SBE_DSM_PATTERN: Pattern = Pattern.compile("\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d*),(?<y>-?\\d*),(?<z>-?\\d*)")
-
-        /**
-         * Removes everything from the string except for the part that matches the Pattern
-         * @param pattern The Pattern that is singled out
-         */
-        fun String.removeExceptPattern(pattern: Pattern): String {
-            val matcher = pattern.matcher(this)
-            return if (matcher.find()) {
-                matcher.group(0)
-            } else {
-                ""
-            }
-        }
+        val SBE_DSM_PATTERN: Regex = "\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d*),(?<y>-?\\d*),(?<z>-?\\d*)".toRegex()
     }
 }
