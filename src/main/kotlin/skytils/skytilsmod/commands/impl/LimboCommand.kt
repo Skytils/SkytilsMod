@@ -20,13 +20,14 @@ package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.Utils
 
 object LimboCommand : BaseCommand("limbo", listOf("skytilslimbo")) {
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (!Utils.isOnHypixel) {
-            UChat.chat("§cYou must be on Hypixel to use this command!")
+            UChat.chat("$failPrefix §cYou must be on Hypixel to use this command!")
             return
         }
         player.sendChatMessage("§")
