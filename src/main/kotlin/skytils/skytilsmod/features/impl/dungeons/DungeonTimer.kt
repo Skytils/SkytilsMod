@@ -234,14 +234,7 @@ class DungeonTimer {
                         )
                     if (bloodClearTime != -1L)
                         if (!DungeonFeatures.dungeonFloor.equals("E"))
-                        add(
-                            "§dPortal: ${
-                                diff(
-                                    if (bossEntryTime == -1L) System.currentTimeMillis() else bossEntryTime,
-                                    bloodClearTime
-                                )
-                            }s"
-                        )
+                            add("§dPortal: ${dungeonTimeFormat(((if (bossEntryTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossEntryTime) - bloodClearTime) / 1000.0)}")
                     add("§9Boss Entry: ${if (bossEntryTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}")
                     if (bossEntryTime != -1L)
                         add("§bBoss Clear: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - bossEntryTime) / 1000.0)}")
