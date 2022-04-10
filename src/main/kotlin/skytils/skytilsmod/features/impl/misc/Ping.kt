@@ -81,7 +81,9 @@ object Ping {
                         UChat.chat(
                             "$prefix §${
                                 when {
-                                    diff < 100 -> "a"
+                                    diff < 50 -> "a"
+                                    diff < 100 -> "2"
+                                    diff < 149 -> "e"
                                     diff < 249 -> "6"
                                     else -> "c"
                                 }
@@ -121,8 +123,10 @@ object Ping {
                         0f,
                         0f,
                         when {
-                            pingCache < 100 -> CommonColors.GREEN
-                            pingCache < 250 -> CommonColors.ORANGE
+                            pingCache < 50 -> CommonColors.GREEN
+                            pingCache < 100 -> CommonColors.DARK_GREEN
+                            pingCache < 149 -> CommonColors.YELLOW
+                            pingCache < 249 -> CommonColors.ORANGE
                             else -> CommonColors.RED
                         },
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
