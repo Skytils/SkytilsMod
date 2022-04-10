@@ -176,7 +176,7 @@ class Skytils {
 
         const val prefix = "§9§lSkytils §8»"
         const val successPrefix = "§a§lSkytils §8»"
-        val failPrefix = "§c§lSkytils §8»"
+        const val failPrefix = "§c§lSkytils §8»"
     }
 
     @Mod.EventHandler
