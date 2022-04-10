@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.hylin.skyblock.Pet
 import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.core.TickTask
@@ -232,10 +233,10 @@ object DungeonListener {
             }
         }
         if (partyCount != team.size) {
-            UChat.chat("§9§lSkytils §8» §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+            UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
         }
         if (team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
-            UChat.chat("§9§lSkytils §8» §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
+            UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
         }
         CooldownTracker.updateCooldownReduction()
         checkSpiritPet()

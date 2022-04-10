@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.features.impl.dungeons.DungeonTimer
@@ -52,7 +53,7 @@ class TriviaSolver {
                 )
             ) triviaAnswer = null
             if (unformatted == "[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know." && triviaSolutions.size == 0) {
-                UChat.chat("§cSkytils failed to load solutions for Trivia.")
+                UChat.chat("$failPrefix §cSkytils failed to load solutions for Trivia.")
                 DataFetcher.reloadData()
             }
             if (unformatted.trim() == "What SkyBlock year is it?") {

@@ -25,6 +25,8 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.*
 import java.awt.Color
@@ -46,7 +48,7 @@ class TreasureHunter {
         }
         if (Skytils.config.treasureHunterSolver && formatted.startsWith("§e[NPC] Treasure Hunter§f: ")) {
             if (treasureHunterLocations.isEmpty()) {
-                UChat.chat("§cSkytils did not load any solutions.")
+                UChat.chat("$failPrefix §cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -56,7 +58,7 @@ class TreasureHunter {
                 }, null)
             if (solution != null) {
                 treasureLocation = solution
-                UChat.chat("§aSkytils will track your treasure located at: §b(${solution.x},${solution.y},${solution.z})")
+                UChat.chat("$successPrefix §aSkytils will track your treasure located at: §b(${solution.x},${solution.y},${solution.z})")
             }
         }
     }

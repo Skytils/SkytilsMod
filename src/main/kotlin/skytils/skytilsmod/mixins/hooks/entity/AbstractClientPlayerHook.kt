@@ -25,6 +25,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.ResourceLocation
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.misc.SummonSkins.skintextureMap
 import skytils.skytilsmod.utils.SuperSecretSettings
@@ -103,7 +104,7 @@ class AbstractClientPlayerHook(player: Any) {
                     correctSkin = skintextureMap[summonType.get()]?.resource
                         ?: (if (Skytils.config.usePlayerSkin || SuperSecretSettings.noSychic) mc.thePlayer.locationSkin else sychicSkin).also {
                             UChat.chat(
-                                "§cPlease tell a Skytils dev to add a skin for ${summonType.get()}"
+                                "$failPrefix §cPlease tell a Skytils dev to add a skin for ${summonType.get()}"
                             )
                         }
 

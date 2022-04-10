@@ -173,6 +173,10 @@ class Skytils {
         val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
 
         var domain = "api.skytils.gg"
+
+        const val prefix = "§9§lSkytils §8»"
+        const val successPrefix = "§a§lSkytils §8»"
+        const val failPrefix = "§c§lSkytils §8»"
     }
 
     @Mod.EventHandler
