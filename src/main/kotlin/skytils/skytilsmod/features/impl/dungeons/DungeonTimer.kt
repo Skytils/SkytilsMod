@@ -75,6 +75,9 @@ class DungeonTimer {
                     )
                 ) {
                     bossEntryTime = System.currentTimeMillis()
+                    if (Skytils.config.dungeonTimer) UChat.chat(
+                        "§dPortal §btook ${diff(bossEntryTime, bloodClearTime)} seconds to enter."
+                    )
                 }
             }
             bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r") -> {
@@ -85,6 +88,7 @@ class DungeonTimer {
                             add("§7Wither Doors: $witherDoors")
                             add("§4Blood §btook ${diff(bloodOpenTime, dungeonStartTime)} seconds to open.")
                             add("§cWatcher §btook ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
+                            add("§dPortal §btook ${diff(bossEntryTime, bloodClearTime)} seconds to enter.")
                             add("§9Boss entry §bwas ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
                         }
                         if (Skytils.config.sadanPhaseTimer && Utils.equalsOneOf(
@@ -169,6 +173,7 @@ class DungeonTimer {
         dungeonStartTime = -1
         bloodOpenTime = -1
         bloodClearTime = -1
+        portalEnterTime = -1
         bossEntryTime = -1
         bossClearTime = -1
         phase1ClearTime = -1
@@ -185,6 +190,7 @@ class DungeonTimer {
         var dungeonStartTime = -1L
         var bloodOpenTime = -1L
         var bloodClearTime = -1L
+        var portalEnterTime = -1L
         var bossEntryTime = -1L
         var bossClearTime = -1L
         var phase1ClearTime = -1L
@@ -209,7 +215,6 @@ class DungeonTimer {
                 val time =
                     (((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - dungeonStartTime) / 1000.0)
                 val lines = arrayListOf(
-                    "§aReal Time: ${if (dungeonStartTime == -1L) "0s" else "${time}s"}",
                     "§aTime Elapsed: ${if (dungeonStartTime == -1L) "0s" else dungeonTimeFormat(time)}",
                     "§7Wither Doors: $witherDoors",
                     "§4Blood Open: ${
@@ -227,6 +232,16 @@ class DungeonTimer {
                                 )
                             }s"
                         )
+                    if (bloodClearTime != -1L)
+                        if (!DungeonFeatures.dungeonFloor.equals("E"))
+                        add(
+                            "§dPortal: ${
+                                diff(
+                                    if (bossEntryTime == -1L) System.currentTimeMillis() else bossEntryTime,
+                                    bloodClearTime
+                                )
+                            }s"
+                        )
                     add("§9Boss Entry: ${if (bossEntryTime == -1L) dungeonTimeFormat(time) else dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}")
                     if (bossEntryTime != -1L)
                         add("§bBoss Clear: ${dungeonTimeFormat(((if (bossClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else bossClearTime) - bossEntryTime) / 1000.0)}")
@@ -237,11 +252,11 @@ class DungeonTimer {
 
         override fun demoRender() {
             val displayText = """
-                §aReal Time: 0s
                 §aTime Elapsed: 0s
                 §7Wither Doors: 0
                 §4Blood Open: 0s
                 §cWatcher Clear: 0s
+                §dPortal: 0s
                 §9Boss Entry: 0s
                 §bBoss Clear: 0s
                 """.trimIndent()
