@@ -58,13 +58,13 @@ class DungeonTimer {
             )) -> {
                 bloodOpenTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) UChat.chat(
-                    "§bBlood took ${diff(bloodOpenTime, dungeonStartTime)} seconds to open."
+                    "§4Blood §btook ${diff(bloodOpenTime, dungeonStartTime)} seconds to open."
                 )
             }
             message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r" -> {
                 bloodClearTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) UChat.chat(
-                    "§bWatcher took ${diff(bloodClearTime, bloodOpenTime)} seconds to clear."
+                    "§cWatcher §btook ${diff(bloodClearTime, bloodOpenTime)} seconds to clear."
                 )
             }
             bloodClearTime != -1L && bossEntryTime == -1L && unformatted.startsWith("[BOSS] ") && unformatted.contains(":") -> {
@@ -83,9 +83,9 @@ class DungeonTimer {
                     arrayListOf<String>().apply {
                         if (Skytils.config.dungeonTimer) {
                             add("§7Wither Doors: $witherDoors")
-                            add("§cBlood took ${diff(bloodOpenTime, dungeonStartTime)} seconds to open.")
-                            add("§bWatcher took ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
-                            add("§9Boss entry was ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
+                            add("§4Blood §btook ${diff(bloodOpenTime, dungeonStartTime)} seconds to open.")
+                            add("§cWatcher §btook ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
+                            add("§9Boss entry §bwas ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
                         }
                         if (Skytils.config.sadanPhaseTimer && Utils.equalsOneOf(
                                 DungeonFeatures.dungeonFloor,
@@ -93,9 +93,9 @@ class DungeonTimer {
                                 "M6"
                             )
                         ) {
-                            add("§dTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds.")
-                            add("§aGiants took ${diff(giantsClearTime, terraClearTime)} seconds.")
-                            add("§cSadan took ${diff(bossClearTime, giantsClearTime)} seconds.")
+                            add("§dTerracotta §btook ${diff(terraClearTime, bossEntryTime)} seconds.")
+                            add("§aGiants §btook ${diff(giantsClearTime, terraClearTime)} seconds.")
+                            add("§cSadan §btook ${diff(bossClearTime, giantsClearTime)} seconds.")
                         } else if (Skytils.config.necronPhaseTimer && Utils.equalsOneOf(
                                 DungeonFeatures.dungeonFloor,
                                 "F7",
@@ -103,11 +103,11 @@ class DungeonTimer {
                             )
                         ) {
                             add("§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
-                            add("§cStorm took ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
-                            add("§6Goldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds.")
-                            add("§4Necron took ${diff(phase4ClearTime, phase3ClearTime)} seconds.")
+                            add("§cStorm §btook ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
+                            add("§6Goldor §btook ${diff(phase3ClearTime, phase2ClearTime)} seconds.")
+                            add("§4Necron §btook ${diff(phase4ClearTime, phase3ClearTime)} seconds.")
                             if (DungeonFeatures.dungeonFloor == "M7") {
-                                add("§7Wither King took ${diff(bossClearTime, phase4ClearTime)} seconds.")
+                                add("§7Wither King §btook ${diff(bossClearTime, phase4ClearTime)} seconds.")
                             }
                         }
                         if (Skytils.config.dungeonTimer) {
@@ -128,19 +128,19 @@ class DungeonTimer {
                     message.endsWith("§r§cAt least my son died by your hands.§r") && phase2ClearTime == -1L -> {
                         phase2ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§bStorm took ${diff(phase2ClearTime, phase1ClearTime)} seconds."
+                            "§cStorm §btook ${diff(phase2ClearTime, phase1ClearTime)} seconds."
                         )
                     }
                     message.endsWith("§r§c....§r") && phase3ClearTime == -1L -> {
                         phase3ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§bGoldor took ${diff(phase3ClearTime, phase2ClearTime)} seconds."
+                            "§6Goldor §btook ${diff(phase3ClearTime, phase2ClearTime)} seconds."
                         )
                     }
                     message.endsWith("§r§cAll this, for nothing...§r") -> {
                         phase4ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§bNecron took ${diff(phase4ClearTime, phase3ClearTime)} seconds."
+                            "§4Necron §btook ${diff(phase4ClearTime, phase3ClearTime)} seconds."
                         )
                     }
                 }
@@ -150,13 +150,13 @@ class DungeonTimer {
                     (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
                         terraClearTime = System.currentTimeMillis()
                         if (Skytils.config.sadanPhaseTimer) UChat.chat(
-                            "§bTerracotta took ${diff(terraClearTime, bossEntryTime)} seconds."
+                            "§dTerracotta §btook ${diff(terraClearTime, bossEntryTime)} seconds."
                         )
                     }
                     (message.endsWith("§r§f: You did it. I understand now, you have earned my respect.§r") && giantsClearTime == -1L) -> {
                         giantsClearTime = System.currentTimeMillis()
                         if (Skytils.config.sadanPhaseTimer) UChat.chat(
-                            "§bGiants took ${diff(giantsClearTime, terraClearTime)} seconds."
+                            "§aGiants §btook ${diff(giantsClearTime, terraClearTime)} seconds."
                         )
                     }
                 }
