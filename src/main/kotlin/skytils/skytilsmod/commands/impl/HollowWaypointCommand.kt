@@ -25,7 +25,10 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
@@ -39,7 +42,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
-            val message = UMessage("§3Skytils > §eWaypoints:\n")
+            val message = UMessage("$prefix §eWaypoints:\n")
             for (loc in MiningFeatures.CrystalHollowsMap.Locations.values()) {
                 if (!loc.loc.exists()) continue
                 message.append("${loc.displayName} ")
@@ -58,7 +61,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                 "set", "add" -> {
                     val remainderString = args.drop(1).joinToString(" ")
                     val match = syntaxRegex.find(remainderString)
-                        ?: return UChat.chat("§cCorrect usage: /sthw set <x y z> <name>")
+                        ?: return UChat.chat("$failPrefix /sthw set <x y z> <name>")
                     val loc: String
                     val x: Double
                     val y: Double
@@ -82,7 +85,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                     } else {
                         MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
                     }
-                    UChat.chat("§aSuccessfully created waypoint ${loc}")
+                    UChat.chat("$successPrefix §aSuccessfully created waypoint ${loc}")
                 }
                 "remove", "delete" -> {
                     if (args.size >= 2) {
@@ -90,26 +93,26 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                         if (MiningFeatures.CrystalHollowsMap.Locations.values()
                                 .find { it.id == name }?.loc?.reset() != null
                         )
-                            UChat.chat("§aSuccessfully removed waypoint ${name}!")
+                            UChat.chat("$successPrefix §aSuccessfully removed waypoint ${name}!")
                         else if (MiningFeatures.waypoints.remove(name) != null)
-                            UChat.chat("§aSuccessfully removed waypoint $name")
+                            UChat.chat("$successPrefix §aSuccessfully removed waypoint $name")
                         else
-                            UChat.chat("§cWaypoint $name does not exist")
+                            UChat.chat("$failPrefix §cWaypoint $name does not exist")
                     } else
-                        UChat.chat("§cCorrect usage: /sthw remove name")
+                        UChat.chat("$prefix §b/sthw remove <name>")
                 }
                 "clear" -> {
                     MiningFeatures.CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
                     MiningFeatures.waypoints.clear()
-                    UChat.chat("§aSuccessfully cleared all waypoints.")
+                    UChat.chat("$successPrefix §aSuccessfully cleared all waypoints.")
                 }
                 else -> {
                     UChat.chat(
-                        "§eusage: /sthw ➔ shows all waypoints\n" +
-                                "§e/sthw set name ➔ sets waypoint at current location\n" +
-                                "§e/sthw set x y z name ➔ sets waypoint at specified location\n" +
-                                "§e/sthw remove name ➔ remove the specified waypoint\n" +
-                                "§e/sthw clear ➔ removes all waypoints"
+                        "$prefix §e/sthw ➔ Shows all waypoints\n" +
+                                "§e/sthw set name ➔ Sets waypoint at current location\n" +
+                                "§e/sthw set x y z name ➔ Sets waypoint at specified location\n" +
+                                "§e/sthw remove name ➔ Remove the specified waypoint\n" +
+                                "§e/sthw clear ➔ Removes all waypoints"
                     )
                 }
             }

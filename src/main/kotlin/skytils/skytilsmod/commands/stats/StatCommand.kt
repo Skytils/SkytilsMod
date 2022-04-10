@@ -25,6 +25,7 @@ import skytils.hylin.mojang.AshconException
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.commands.BaseCommand
 import java.util.*
@@ -44,7 +45,7 @@ abstract class StatCommand(
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (needApiKey && key.isEmpty()) {
-            printMessage("§cYou must have an API key set to use this command!")
+            printMessage("$failPrefix §cYou must have an API key set to use this command!")
             return
         }
         Skytils.threadPool.submit {
@@ -53,14 +54,14 @@ abstract class StatCommand(
             val uuid = try {
                 (if (args.isEmpty()) mc.thePlayer.uniqueID else Skytils.hylinAPI.getUUIDSync(username))
             } catch (e: AshconException) {
-                printMessage("§cFailed to get UUID, reason: ${e.message}")
+                printMessage("$failPrefix §cFailed to get UUID, reason: ${e.message}")
                 return@submit
             } ?: return@submit
             if (needProfile) {
                 val profile = try {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                 } catch (e: HypixelAPIException) {
-                    printMessage("§cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
+                    printMessage("$failPrefix §cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
                     return@submit
                 } ?: return@submit
                 displayStats(username, uuid, profile)

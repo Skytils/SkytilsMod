@@ -31,6 +31,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
@@ -134,7 +135,7 @@ class BlazeSolver {
                     val compare = blaze1.health.compareTo(blaze2.health)
                     if (compare == 0 && !impossible) {
                         impossible = true
-                        UChat.chat("§c[§f§lWARNING§c] Skytils detected two blazes with the exact same amount of health!")
+                        UChat.chat("$failPrefix §cDetected two blazes with the exact same amount of health!")
                         val first = blaze1.blaze.health
                         val second = blaze2.blaze.health
                         if (first.toInt() == second.toInt()) return@sortWith first.compareTo(second)

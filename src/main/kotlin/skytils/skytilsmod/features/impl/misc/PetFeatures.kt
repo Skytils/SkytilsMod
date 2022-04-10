@@ -33,7 +33,9 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.CheckRenderEntityEvent
@@ -83,12 +85,12 @@ class PetFeatures {
             val petMatcher = SUMMON_PATTERN.matcher(message)
             if (petMatcher.find()) {
                 lastPet = petMatcher.group("pet").stripControlCodes()
-            } else UChat.chat("§cSkytils failed to capture equipped pet.")
+            } else UChat.chat("$failPrefix §cSkytils failed to capture equipped pet.")
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
             val autopetMatcher = AUTOPET_PATTERN.matcher(message)
             if (autopetMatcher.find()) {
                 lastPet = autopetMatcher.group("pet").stripControlCodes()
-            } else UChat.chat("§cSkytils failed to capture equipped pet.")
+            } else UChat.chat("$failPrefix §cSkytils failed to capture equipped pet.")
         }
     }
 
@@ -129,7 +131,7 @@ class PetFeatures {
                     if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
                         lastPetLockNotif = System.currentTimeMillis()
                         UChat.chat(
-                            UTextComponent("§cSkytils stopped you from using that pet item! §6Click this message to disable the lock.").setHoverText(
+                            UTextComponent("$prefix §cSkytils stopped you from using that pet item! §6Click this message to disable the lock.").setHoverText(
                                 "Click to disable the pet item lock for 5 seconds."
                             ).setClick(ClickEvent.Action.RUN_COMMAND, "/disableskytilspetitemlock")
                         )
@@ -145,7 +147,7 @@ class PetFeatures {
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message == "/disableskytilspetitemlock" && !event.addToChat) {
             lastPetConfirmation = System.currentTimeMillis()
-            UChat.chat("§aYou may now apply pet items for 5 seconds.")
+            UChat.chat("$prefix §aYou may now apply pet items for 5 seconds.")
             event.isCanceled = true
         }
     }

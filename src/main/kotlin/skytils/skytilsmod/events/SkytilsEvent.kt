@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 
 abstract class SkytilsEvent : Event() {
     val eventName by lazy {
@@ -33,7 +34,7 @@ abstract class SkytilsEvent : Event() {
             MinecraftForge.EVENT_BUS.post(this)
         }.onFailure {
             it.printStackTrace()
-            UChat.chat("§cSkytils ${Skytils.VERSION} caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}. Please report this on the Discord server at discord.gg/skytils.")
+            UChat.chat("$failPrefix §cSkytils ${Skytils.VERSION} caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}. Please report this on the Discord server at discord.gg/skytils.")
         }.getOrDefault(isCanceled)
     }
 }

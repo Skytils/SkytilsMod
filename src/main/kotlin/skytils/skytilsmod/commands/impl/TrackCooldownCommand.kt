@@ -21,6 +21,9 @@ import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -29,19 +32,19 @@ object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntrack
     override fun getCommandUsage(player: EntityPlayerSP): String = "/trackcooldown <cooldown> <ability>"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (!Skytils.config.itemCooldownDisplay) return UChat.chat("You must turn on Item Cooldown Display to use this command!")
-        if (args.size < 2) throw WrongUsageException(getCommandUsage(player))
+        if (!Skytils.config.itemCooldownDisplay) return UChat.chat("$failPrefix §cYou must turn on Item Cooldown Display to use this command!")
+        if (args.size < 2) UChat.chat("$prefix" + getCommandUsage(player))
         val seconds = args[0].toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
         val ability = args.drop(1).joinToString(" ")
         if (ability.isBlank()) throw WrongUsageException("You must specify valid arguments.")
         if (CooldownTracker.itemCooldowns[ability] == seconds) {
             CooldownTracker.itemCooldowns.remove(ability)
             PersistentSave.markDirty<CooldownTracker>()
-            UChat.chat("Removed the cooldown for $ability.")
+            UChat.chat("$successPrefix Removed the cooldown for $ability.")
         } else {
             CooldownTracker.itemCooldowns[ability] = seconds
             PersistentSave.markDirty<CooldownTracker>()
-            UChat.chat("Set the cooldown for $ability to $seconds seconds.")
+            UChat.chat("$successPrefix Set the cooldown for $ability to $seconds seconds.")
         }
     }
 }

@@ -22,6 +22,9 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.ArmorColor
@@ -34,14 +37,14 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
-            UChat.chat(getCommandUsage(player))
+            UChat.chat("$prefix §b" + getCommandUsage(player))
             return
         }
         val subcommand = args[0].lowercase()
         if (subcommand == "clearall") {
             ArmorColor.armorColors.clear()
             PersistentSave.markDirty<ArmorColor>()
-            UChat.chat("§aCleared all your custom armor colors!")
+            UChat.chat("$successPrefix §aCleared all your custom armor colors!")
         } else if (subcommand == "clear") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
             val item = player.heldItem
@@ -54,7 +57,7 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             if (ArmorColor.armorColors.containsKey(uuid)) {
                 ArmorColor.armorColors.remove(uuid)
                 PersistentSave.markDirty<ArmorColor>()
-                UChat.chat("§aCleared the custom color for your ${item.displayName}§a!")
+                UChat.chat("$successPrefix §aCleared the custom color for your ${item.displayName}§a!")
             } else UChat.chat("§cThat item doesn't have a custom color!")
         } else if (subcommand == "set") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
@@ -69,11 +72,11 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             val color: CustomColor = try {
                 Utils.customColorFromString(args[1])
             } catch (e: IllegalArgumentException) {
-                throw SyntaxErrorException("Unable to get a color from inputted string.")
+                throw SyntaxErrorException("$failPrefix §cUnable to get a color from inputted string.")
             }
             ArmorColor.armorColors[uuid] = color
             PersistentSave.markDirty<ArmorColor>()
-            UChat.chat("§aSet the color of your ${item.displayName}§a to ${args[1]}!")
+            UChat.chat("$successPrefix §aSet the color of your ${item.displayName}§a to ${args[1]}!")
         } else UChat.chat(getCommandUsage(player))
     }
 }

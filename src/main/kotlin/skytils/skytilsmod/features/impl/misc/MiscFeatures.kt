@@ -53,7 +53,9 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.core.structure.FloatPair
@@ -97,12 +99,12 @@ class MiscFeatures {
         if (Skytils.config.guildLeaveConfirmation && event.message.startsWith("/g leave") && System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
             event.isCanceled = true
             lastGLeaveCommand = System.currentTimeMillis()
-            UChat.chat("§cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!")
+            UChat.chat("$failPrefix §cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!")
         }
         if (Skytils.config.coopAddConfirmation && event.message.startsWith("/coopadd ") && System.currentTimeMillis() - lastCoopAddCommand >= 10_000) {
             event.isCanceled = true
             lastCoopAddCommand = System.currentTimeMillis()
-            UChat.chat("§c§lBe careful! Skytils stopped you from giving a player full control of your island! §6Run the command again if you are sure!")
+            UChat.chat("$failPrefix §c§lBe careful! Skytils stopped you from giving a player full control of your island! §6Run the command again if you are sure!")
         }
     }
 
@@ -150,7 +152,7 @@ class MiscFeatures {
                 val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
                 printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
                 if (duration.isPositive()) {
-                    UChat.chat("§3Skytils > §eThis will expire in${
+                    UChat.chat("$prefix §eThis will expire in${
                         duration
                             .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
                     }")
@@ -183,7 +185,7 @@ class MiscFeatures {
                     ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
                 ) {
                     GuiScreen.setClipboardString(unformatted)
-                    UChat.chat("§9§lSkytils §8» §aCopied RNG drop to clipboard.")
+                    UChat.chat("$prefix §aCopied RNG drop to clipboard.")
                     event.message.chatStyle
                         .setChatHoverEvent(
                             HoverEvent(
@@ -197,7 +199,7 @@ class MiscFeatures {
             if (Skytils.config.autoCopyVeryRareDrops) {
                 if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
                     GuiScreen.setClipboardString(unformatted)
-                    UChat.chat("§9§lSkytils §8» §aCopied very rare drop to clipboard.")
+                    UChat.chat("$prefix §aCopied very rare drop to clipboard.")
                     event.message.chatStyle
                         .setChatHoverEvent(
                             HoverEvent(
