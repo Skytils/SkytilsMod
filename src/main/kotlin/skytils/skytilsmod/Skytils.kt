@@ -174,9 +174,9 @@ class Skytils {
 
         var domain = "api.skytils.gg"
 
-        var prefix = "§9§lSkytils §8»"
-        var successPrefix = "§a§lSkytils §8»"
-        var failPrefix = "§c§lSkytils §8»"
+        val prefix = "§9§lSkytils §8»"
+        val successPrefix = "§a§lSkytils §8»"
+        val failPrefix = "§c§lSkytils §8»"
     }
 
     @Mod.EventHandler
