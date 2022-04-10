@@ -141,7 +141,7 @@ object Ping {
                 "69.69ms",
                 0f,
                 0f,
-                CommonColors.GREEN,
+                CommonColors.DARK_GREEN,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
                 SmartFontRenderer.TextShadow.NONE
             )
