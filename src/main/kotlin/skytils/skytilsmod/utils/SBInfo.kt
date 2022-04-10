@@ -182,8 +182,6 @@ enum class SkyblockIsland(val formattedName: String, val mode: String) {
     PrivateIsland("Private Island", "dynamic"),
     SpiderDen("Spider's Den", "combat_1"),
     BlazingFortress("Blazing Fortress", "combat_2"),
-
-    //TODO: transfer waypoints from blazing to crimson
     CrimsonIsle("Crimson Isle", "crimson_isle"),
     TheEnd("The End", "combat_3"),
     GoldMine("Gold Mine", "mining_1"),
