@@ -28,6 +28,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -132,13 +133,13 @@ class MythologicalTracker : Tracker("mythological") {
                 println("Dug is: Minos Champion")
                 lastMinosChamp = 0L
                 BurrowMob.CHAMP.dugTimes++
-                UChat.chat("§bSkytils: §eYou dug up a §2Minos Champion§e!")
+                UChat.chat("$prefix §eYou dug up a §2Minos Champion§e!")
                 markDirty<MythologicalTracker>()
             } else if (event.entity.name == "Minos Inquisitor") {
                 println("Dug is: Minos Inquisitor")
                 lastMinosChamp = 0L
                 BurrowMob.INQUIS.dugTimes++
-                UChat.chat("§bSkytils: §eYou dug up a §2Minos Inquisitor§e!")
+                UChat.chat("$prefix §eYou dug up a §2Minos Inquisitor§e!")
                 markDirty<MythologicalTracker>()
             }
         }
@@ -146,7 +147,7 @@ class MythologicalTracker : Tracker("mythological") {
             println("Dug is: Unknown")
             lastMinosChamp = 0L
             BurrowMob.CHAMP.dugTimes++
-            UChat.chat("§bSkytils: §eNo idea what you dug, counting as §2Minos Champion§e!")
+            UChat.chat("$prefix §eNo idea what you dug, counting as §2Minos Champion§e!")
             markDirty<MythologicalTracker>()
         }
     }

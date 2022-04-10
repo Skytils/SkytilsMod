@@ -32,6 +32,7 @@ import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.Pet
 import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.NumberUtil.toRoman
@@ -59,10 +60,10 @@ object PartyFinderStats {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMember(uuid).whenComplete { profile ->
                         profile?.run { playerStats(username, uuid, this) }
                     }.catch { e ->
-                        UChat.chat("§cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
+                        UChat.chat("$failPrefix §cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
                     }
                 }.catch { e ->
-                    UChat.chat("§cFailed to get UUID, reason: ${e.message}")
+                    UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
                 }
             }
         }
@@ -168,9 +169,9 @@ object PartyFinderStats {
                         val completionObj = cataData.completions!!
                         component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
                             for (i in 0 .. highestFloor) {
-                                append("§a")
+                                append("§2§l●§a ")
                                 append(if (i == 0) "Entrance: " else "Floor $i: ")
-                                append("§6")
+                                append("§e")
                                 append(if (i in completionObj) completionObj[i] else "§cDNF")
                                 if (i != highestFloor)
                                     append("\n")
@@ -182,9 +183,9 @@ object PartyFinderStats {
                                 UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
                                         for (i in 0 .. highestFloor) {
-                                            append("§a")
+                                            append("§2§l●§a ")
                                             append(if (i == 0) "Entrance: " else "Floor $i: ")
-                                            append("§6")
+                                            append("§e")
                                             append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
                                             if (i != highestFloor)
                                                 append("\n")
@@ -201,9 +202,9 @@ object PartyFinderStats {
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
                                 buildString {
                                     for (i in 1 .. highestFloor) {
-                                        append("§a")
+                                        append("§2§l●§a ")
                                         append("Floor $i: ")
-                                        append("§6")
+                                        append("§e")
                                         append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
                                         if (i != highestFloor)
                                             append("\n")
@@ -216,9 +217,9 @@ object PartyFinderStats {
                                 UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
                                     buildString {
                                         for (i in 1 .. highestFloor) {
-                                            append("§a")
+                                            append("§2§l●§a ")
                                             append("Floor $i: ")
-                                            append("§6")
+                                            append("§e")
                                             append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
                                             if (i != highestFloor)
                                                 append("\n")
@@ -230,9 +231,9 @@ object PartyFinderStats {
                     }
 
                     component
-                        .append("§aTotal Secrets Found: §l§6${NumberUtil.nf.format(secrets)}\n")
+                        .append("§aTotal Secrets Found: §l§e${NumberUtil.nf.format(secrets)}\n")
                         .append(
-                            "§aBlood Mobs Killed: §l§6${
+                            "§aBlood Mobs Killed: §l§e${
                                 NumberUtil.nf.format(
                                     (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
                                             (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
@@ -245,13 +246,13 @@ object PartyFinderStats {
                         )
                         .append("&2&l-----------------------------")
                         .chat()
-                } ?: UChat.chat("§c$username has not entered The Catacombs!")
+                } ?: UChat.chat("$failPrefix §c$username has not entered The Catacombs!")
             } catch (e: Throwable) {
-                UChat.chat("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
+                UChat.chat("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
                 e.printStackTrace()
             }
         }.catch { e ->
-            UChat.chat("§cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
+            UChat.chat("$failPrefix §cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
         }
     }
 

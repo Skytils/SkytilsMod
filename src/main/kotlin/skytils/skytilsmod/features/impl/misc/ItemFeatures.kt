@@ -822,7 +822,7 @@ class ItemFeatures {
             val alignment =
                 if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "§6Shield: idk why i added this",
+                "§6Shield: §aREADY",
                 if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.WHITE,
@@ -834,7 +834,7 @@ class ItemFeatures {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§6Shield: idk why i added this")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§6Shield: §aREADY")
         override val toggled: Boolean
             get() = Skytils.config.witherShieldCooldown
 

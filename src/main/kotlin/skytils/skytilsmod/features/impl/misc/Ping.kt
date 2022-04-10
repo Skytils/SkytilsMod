@@ -26,6 +26,7 @@ import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.PacketEvent
@@ -78,7 +79,7 @@ object Ping {
                     if (invokedCommand) {
                         invokedCommand = false
                         UChat.chat(
-                            "§9§lSkytils ➜ §${
+                            "$prefix §${
                                 when {
                                     diff < 100 -> "a"
                                     diff < 249 -> "6"

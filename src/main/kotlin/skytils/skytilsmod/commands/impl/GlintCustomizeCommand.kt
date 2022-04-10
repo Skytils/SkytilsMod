@@ -21,6 +21,9 @@ import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
@@ -28,7 +31,7 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.Utils
 
 object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizeglint")) {
-    override fun getCommandUsage(player: EntityPlayerSP) = "glintcustomize <override/color>"
+    override fun getCommandUsage(player: EntityPlayerSP) = "/glintcustomize <override/color>"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
@@ -44,29 +47,29 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("on") -> {
                         GlintCustomizer.overrides[itemId] = true
                         PersistentSave.markDirty<GlintCustomizer>()
-                        UChat.chat("§aForced an enchant glint for your item.")
+                        UChat.chat("$successPrefix §aForced an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("off") -> {
                         GlintCustomizer.overrides[itemId] = false
                         PersistentSave.markDirty<GlintCustomizer>()
-                        UChat.chat("§aForce disabled an enchant glint for your item.")
+                        UChat.chat("$successPrefix §aForce disabled an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.overrides.clear()
                         PersistentSave.markDirty<GlintCustomizer>()
-                        UChat.chat("§aRemoved all your glint overrides.")
+                        UChat.chat("$successPrefix §aRemoved all your glint overrides.")
                         return
                     }
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.overrides.remove(itemId)
                         PersistentSave.markDirty<GlintCustomizer>()
-                        UChat.chat("§aCleared glint overrides for your item.")
+                        UChat.chat("$successPrefix §aCleared glint overrides for your item.")
                         return
                     }
                     else -> {
-                        throw WrongUsageException("glintcustomize override <on/off/clear/clearall>")
+                        throw WrongUsageException("/glintcustomize override <on/off/clear/clearall>")
                     }
                 }
             }
@@ -77,26 +80,26 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         try {
                             GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(args[2])
                             PersistentSave.markDirty<GlintCustomizer>()
-                            UChat.chat("§aForced an enchant glint color for your item.")
+                            UChat.chat("$successPrefix §aForced an enchant glint color for your item.")
                         } catch (e: NumberFormatException) {
-                            throw SyntaxErrorException("Unable to get a color from inputted string.")
+                            throw SyntaxErrorException("$failPrefix Unable to get a color from inputted string.")
                         }
                         return
                     }
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.glintColors.clear()
                         PersistentSave.markDirty<GlintCustomizer>()
-                        UChat.chat("§aRemoved all your custom glint colors.")
+                        UChat.chat("$successPrefix §aRemoved all your custom glint colors.")
                         return
                     }
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.glintColors.remove(itemId)
                         PersistentSave.markDirty<GlintCustomizer>()
-                        UChat.chat("§aCleared the custom glint color for your item.")
+                        UChat.chat("$successPrefix §aCleared the custom glint color for your item.")
                         return
                     }
                     else -> {
-                        throw WrongUsageException("glintcustomize color <set/clearall/clear>")
+                        throw WrongUsageException("/glintcustomize color <set/clearall/clear>")
                     }
                 }
             }

@@ -23,6 +23,7 @@ import gg.essential.universal.UChat
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Reference
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
@@ -202,7 +203,7 @@ object DataFetcher {
                 }
             } catch (e: Throwable) {
                 e.printStackTrace()
-                UChat.chat("§cSkytils ran into an error while fetching data. Please report this to our Discord server!")
+                UChat.chat("$failPrefix §cSkytils ran into an error while fetching data. Please report this to our Discord server!")
             }
         }
     }

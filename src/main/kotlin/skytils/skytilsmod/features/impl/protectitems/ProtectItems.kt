@@ -24,6 +24,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -133,7 +134,7 @@ class ProtectItems {
 
     private fun notifyStopped(event: Event?, action: String) {
         SoundQueue.addToQueue("note.bass", 0.5f, 1f)
-        UChat.chat("§cSkytils has stopped you from $action that item!")
+        UChat.chat("$failPrefix §cStopped you from $action that item!")
         event?.isCanceled = true
     }
 

@@ -30,7 +30,9 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.stripControlCodes
@@ -54,14 +56,14 @@ class ThreeWeirdosSolver {
         }
         if (unformatted.contains("[NPC]")) {
             if (solutions.size == 0) {
-                UChat.chat("§cSkytils failed to load solutions for Three Weirdos.")
+                UChat.chat("$failPrefix §cSkytils failed to load solutions for Three Weirdos.")
                 DataFetcher.reloadData()
             }
             for (solution in solutions) {
                 if (unformatted.contains(solution)) {
                     val npcName = unformatted.substring(unformatted.indexOf("]") + 2, unformatted.indexOf(":"))
                     riddleNPC = npcName
-                    UChat.chat("§a§l${npcName.stripControlCodes()} §2has the blessing.")
+                    UChat.chat("$prefix §a§l${npcName.stripControlCodes()} §2has the blessing.")
                     break
                 }
             }
