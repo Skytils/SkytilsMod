@@ -47,7 +47,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
@@ -148,13 +151,13 @@ class MiningFeatures {
                         }
                     }
                     println("Puzzler Solution: $puzzlerSolution")
-                    UChat.chat("§aMine the block highlighted in §c§lRED§a!")
+                    UChat.chat("$successPrefix §aMine the block highlighted in §c§lRED§a!")
                 }
             }
         }
         if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size == 0) {
-                UChat.chat("§cSkytils did not load any solutions.")
+                UChat.chat("$failPrefix §cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -165,11 +168,11 @@ class MiningFeatures {
             }, null)
             TickTask(50) {
                 if (solution != null) {
-                    UChat.chat("§aFetchur needs: §2§l${solution}§a!")
+                    UChat.chat("$successPrefix §aFetchur needs: §2${solution}§a!")
                 } else {
                     if (unformatted.contains("its") || unformatted.contains("theyre")) {
                         println("Missing Fetchur item: $unformatted")
-                        UChat.chat("§cSkytils couldn't determine the Fetchur item. There were ${fetchurItems.size} solutions loaded.")
+                        UChat.chat("$failPrefix §cSkytils couldn't determine the Fetchur item. There were ${fetchurItems.size} solutions loaded.")
                     }
                 }
             }
@@ -192,7 +195,7 @@ class MiningFeatures {
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
             if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
                 UChat.chat(
-                    UTextComponent("§3Skytils > §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").setClick(
+                    UTextComponent("$prefix §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").setClick(
                         MCClickEventAction.RUN_COMMAND,
                         "/sthw set ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z} Last Death"
                     )
@@ -203,7 +206,7 @@ class MiningFeatures {
 
     private fun waypointChatMessage(x: String, y: String, z: String) {
         val message = UMessage(
-            "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
+            "$prefix §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
         for (loc in CrystalHollowsMap.Locations.values()) {
             if (loc.loc.exists()) continue

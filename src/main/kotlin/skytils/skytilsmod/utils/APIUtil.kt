@@ -29,6 +29,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.http.message.BasicHeader
 import org.apache.hc.core5.util.Timeout
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
 import java.net.URL
@@ -82,7 +83,7 @@ object APIUtil {
             }
         } catch (ex: Throwable) {
             ex.printStackTrace()
-            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+            UChat.chat("$failPrefix §cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
         } finally {
             client.close()
         }
@@ -100,7 +101,7 @@ object APIUtil {
                 }
             }
         } catch (ex: Throwable) {
-            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+            UChat.chat("$failPrefix §cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
             ex.printStackTrace()
         } finally {
             client.close()
@@ -119,7 +120,7 @@ object APIUtil {
                 }
             }
         } catch (ex: Throwable) {
-            UChat.chat("§cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+            UChat.chat("$failPrefix §cSkytils ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
             ex.printStackTrace()
         } finally {
             client.close()

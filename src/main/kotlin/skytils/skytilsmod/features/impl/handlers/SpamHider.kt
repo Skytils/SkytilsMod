@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.structure.FloatPair
@@ -564,13 +565,13 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Compact Building Tools
-                (Skytils.config.compactBuildingTools && formatted.startsWith("§3Skytils > §eThis will expire in") && (formatted.contains(
+                (Skytils.config.compactBuildingTools && formatted.startsWith("§9§lSkytils §8» §eThis will expire in") && (formatted.contains(
                     "blocks"
                 ) || formatted.contains("build") || formatted.contains(
                     "place"
                 ) || formatted.contains("zap"))
                         ) -> {
-                    if (formatted.startsWith("§3Skytils > §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(
+                    if (formatted.startsWith("§9§lSkytils §8» §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(
                             formatted
                         ).matches()
                     ) {
@@ -706,7 +707,7 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 return true
             }
         }.onFailure {
-            UChat.chat("§cSkytils ran into an error whilst checking your Spam Hider filters. Please send your logs to discord.gg/skytils.")
+            UChat.chat("$failPrefix §cSkytils ran into an error whilst checking your Spam Hider filters. Please send your logs to discord.gg/skytils.")
             println("A ${it::class.simpleName} was thrown while checking Spam Hider Filter:")
             println("Spam Filter: $filter")
             println("Formatted Text: $formatted")

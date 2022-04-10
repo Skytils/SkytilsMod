@@ -41,6 +41,7 @@ class CommonColors : SetBase {
         val GRAY = CommonColors(0x636363)
         val PINK = CommonColors(0xffb7b7)
         val LIGHT_GREEN = CommonColors(0x49ff59)
+        val DARK_GREEN = CommonColors(0x00AA00)
         val LIGHT_BLUE = CommonColors(0x00e9ff)
         val MAGENTA = CommonColors(0xff0083)
         val ORANGE = CommonColors(0xff9000)

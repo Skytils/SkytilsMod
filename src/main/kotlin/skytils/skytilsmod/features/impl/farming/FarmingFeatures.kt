@@ -29,7 +29,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.TickTask
@@ -50,7 +53,7 @@ class FarmingFeatures {
                 val listOfSiblings = event.message.siblings
                 acceptTrapperCommand =
                     listOfSiblings.find { it.unformattedText.contains("[YES]") }?.chatStyle?.chatClickEvent?.value ?: ""
-                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to accept task"))
+                UChat.chat("$prefix §bOpen chat then click anywhere on screen to accept the task.")
             }
         }
         if (Skytils.config.trapperPing) {
@@ -60,7 +63,7 @@ class FarmingFeatures {
             } else if (unformatted.startsWith("Return to the Trapper soon to get a new animal to hunt!")) {
                 if (trapperStart > 0 && System.currentTimeMillis() - trapperStart > 60000) { //1 minute cooldown
                     Utils.playLoudSound("note.pling", 1.0)
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Trapper cooldown has already expired!"))
+                    UChat.chat("$prefix §bTrapper cooldown has already expired!")
                     trapperStart = -1.0
                 }
                 animalFound = true
@@ -69,7 +72,7 @@ class FarmingFeatures {
 
         if (Skytils.config.hungryHikerSolver && formatted.startsWith("§e[NPC] Hungry Hiker§f: ")) {
             if (hungerHikerItems.isEmpty()) {
-                UChat.chat("§cSkytils did not load any solutions.")
+                UChat.chat("$failPrefix §cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -78,14 +81,14 @@ class FarmingFeatures {
             }, null)
             TickTask(4) {
                 if (solution != null) {
-                    mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.GREEN.toString() + "The Hiker needs: " + EnumChatFormatting.DARK_GREEN + EnumChatFormatting.BOLD + solution + EnumChatFormatting.GREEN + "!"))
+                    UChat.chat("$successPrefix §aThe Hiker needs: §l§2 " + solution + "§a!")
                 } else {
                     if (unformatted.contains("I asked for") || unformatted.contains("The food I want")) {
                         println("Missing Hiker item: $unformatted")
                         mc.thePlayer.addChatMessage(
                             ChatComponentText(
                                 String.format(
-                                    "§cSkytils couldn't determine the Hiker item. There were %s solutions loaded.",
+                                    "$failPrefix §cSkytils couldn't determine the Hiker item. There were %s solutions loaded.",
                                     hungerHikerItems.size
                                 )
                             )

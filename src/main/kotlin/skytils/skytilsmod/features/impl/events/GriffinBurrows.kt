@@ -41,7 +41,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.lang3.time.StopWatch
 import skytils.hylin.request.HypixelAPIException
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
@@ -90,14 +93,14 @@ object GriffinBurrows {
                 val uuid = mc.thePlayer.gameProfile.id
                 val apiKey = Skytils.config.apiKey
                 if (apiKey.isBlank()) {
-                    UChat.chat("§c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>")
+                    UChat.chat("$failPrefix §c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>")
                     Skytils.config.showGriffinBurrows = false
                     return@submit
                 }
                 val profileData =
                     Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                 if (profileData == null) {
-                    UChat.chat("§c§lUnable to find your Skyblock Profile!")
+                    UChat.chat("$failPrefix §c§lUnable to find your Skyblock Profile!")
                     return@submit
                 }
                 val receivedBurrows = profileData.griffin.burrows.associateTo(hashMapOf()) {
@@ -118,14 +121,14 @@ object GriffinBurrows {
                     burrows.putAll(receivedBurrows)
                     particleBurrows.clear()
                     if (receivedBurrows.size == 0) {
-                        if (dupes.isEmpty()) UChat.chat("§cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.") else UChat.chat(
-                            "§cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."
+                        if (dupes.isEmpty()) UChat.chat("$failPrefix §cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.") else UChat.chat(
+                            "$failPrefix §cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."
                         )
-                    } else UChat.chat("§aSkytils loaded §2${receivedBurrows.size}§a burrows!")
+                    } else UChat.chat("$successPrefix §aSkytils loaded §2${receivedBurrows.size}§a burrows!")
                 }
             } catch (apiException: HypixelAPIException) {
                 UChat.chat(
-                    "§cFailed to get burrows with reason: ${
+                    "$failPrefix §cFailed to get burrows with reason: ${
                         apiException.message?.replace(
                             Skytils.config.apiKey,
                             "*".repeat(Skytils.config.apiKey.length)
@@ -134,7 +137,7 @@ object GriffinBurrows {
                 )
             } catch (e: Exception) {
                 UChat.chat(
-                    "§cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${
+                    "$failPrefix §cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${
                         e.message?.replace(
                             Skytils.config.apiKey,
                             "*".repeat(Skytils.config.apiKey.length)
@@ -168,7 +171,7 @@ object GriffinBurrows {
             burrowRefreshTimer.reset()
             shouldRefreshBurrows = false
             if (hasSpadeInHotbar) {
-                UChat.chat("§aSkytils is looking for burrows...")
+                UChat.chat("$prefix §aSkytils is looking for burrows...")
                 refreshBurrows()
             }
         }

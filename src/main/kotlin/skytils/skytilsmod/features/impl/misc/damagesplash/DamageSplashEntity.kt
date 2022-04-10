@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.entity.RenderManager
 import net.minecraft.entity.item.EntityArmorStand
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.NumberUtil.format
 import skytils.skytilsmod.utils.Utils.random
@@ -57,7 +58,7 @@ class DamageSplashEntity(
     override fun tick() {
         if (color == null) {
             println("Failed to parse color for DamageSplashEntity, bound entity '${boundEntity.customNameTag}' | parse string '$damage'")
-            UChat.chat("§cSkytils ran into a problem while rendering damage, please report this on our Discord with your log file attached.")
+            UChat.chat("$failPrefix §cSkytils ran into a problem while rendering damage, please report this on our Discord with your log file attached.")
             remove()
             return
         }

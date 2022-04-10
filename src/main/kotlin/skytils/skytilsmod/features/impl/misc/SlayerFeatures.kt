@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
@@ -61,6 +62,7 @@ import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
 import skytils.skytilsmod.core.SoundQueue
@@ -100,7 +102,7 @@ class SlayerFeatures {
                 maddoxCommand =
                     listOfSiblings.find { it.unformattedText.contains("[OPEN MENU]") }?.chatStyle?.chatClickEvent?.value
                         ?: ""
-                mc.thePlayer.addChatMessage(ChatComponentText(EnumChatFormatting.LIGHT_PURPLE.toString() + "Skytils: Open chat then click anywhere on screen to open Maddox Menu."))
+                UChat.chat("$prefix §bOpen chat then click anywhere on screen to open Maddox Menu.")
             }
         }
     }
@@ -636,7 +638,7 @@ class SlayerFeatures {
                     if (slayerEntity!!.isDead) {
                         printDevMessage("slayer died", "slayer", "seraph")
                         if (Skytils.config.slayerTimeToKill) {
-                            mc.thePlayer.addChatComponentMessage(ChatComponentText("§9§lSkytils §8» §bSlayer took §f${slayerEntity!!.ticksExisted / 20f}§bs to kill"))
+                            UChat.chat("$prefix §bSlayer took §f${slayerEntity!!.ticksExisted / 20f}§bs to kill")
                         }
                         slayerEntity = null
                         nukekebiHeads.clear()

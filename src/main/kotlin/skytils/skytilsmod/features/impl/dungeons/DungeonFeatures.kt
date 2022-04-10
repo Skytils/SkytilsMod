@@ -57,6 +57,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
@@ -187,7 +188,7 @@ object DungeonFeatures {
                     return@any ItemUtil.getSkullTexture(item) == SPIRIT_PET_TEXTURE
                 }) {
                 UChat.chat(
-                    "Someone in your party has a Spirit Pet equipped!"
+                    "$prefix §cSomeone in your party has a Spirit Pet equipped!"
                 )
                 GuiManager.createTitle("Spirit Pet", 20)
                 alertedSpiritPet = true
@@ -358,7 +359,7 @@ object DungeonFeatures {
                     } && DungeonListener.team.keys.any { unformatted.contains(it) })) {
                     if (!unformatted.contains("disconnect")) {
                         GuiScreen.setClipboardString(unformatted)
-                        UChat.chat("§9§lSkytils §8» §aCopied fail to clipboard.")
+                        UChat.chat("$prefix §aCopied fail to clipboard.")
                     }
                     event.message.chatStyle
                         .setChatHoverEvent(
@@ -400,7 +401,7 @@ object DungeonFeatures {
     @SubscribeEvent
     fun onSendChatMessage(event: SendChatMessageEvent) {
         if (event.message.startsWith("/skytilscopy") && !event.addToChat) {
-            UChat.chat("§9§lSkytils §8» §aCopied to clipboard.")
+            UChat.chat("$prefix §aCopied to clipboard.")
             GuiScreen.setClipboardString(event.message.substring("/skytilscopy ".length))
             event.isCanceled = true
         }
