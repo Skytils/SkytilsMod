@@ -196,7 +196,6 @@ class MiningFeatures {
              */
             val cleaned = SBE_DSM_PATTERN.find(unformatted)
             if (cleaned != null) {
-                println("cleaned = ${cleaned.value}")
                 val stringLocation = cleaned.groups["stringLocation"]!!.value
                 val x = cleaned.groups["x"]!!.value
                 val y = cleaned.groups["y"]!!.value
