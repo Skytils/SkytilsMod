@@ -369,11 +369,12 @@ class MiningFeatures {
         enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {
             LostPrecursorCity("§fLost Precursor City", "internal_city", ColorFactory.WHITE.rgb),
             JungleTemple("§aJungle Temple", "internal_temple", ColorFactory.GREEN.rgb),
-            GoblinQueensDen("§eGoblin Queens Den", "internal_den", ColorFactory.YELLOW.rgb),
+            GoblinQueensDen("§eGoblin Queen's Den", "internal_den", ColorFactory.YELLOW.rgb),
             MinesOfDivan("§9Mines of Divan", "internal_mines", ColorFactory.BLUE.rgb),
             KingYolkar("§6King Yolkar", "internal_king", ColorFactory.ORANGE.rgb, 25),
             KhazadDum("§cKhazad-dûm", "internal_bal", ColorFactory.RED.rgb),
-            FairyGrotto("§dFairy Grotto", "internal_fairy", ColorFactory.PINK.rgb, 26);
+            FairyGrotto("§dFairy Grotto", "internal_fairy", ColorFactory.PINK.rgb, 26),
+            Corleone("§bCorleone", "internal_corleone", ColorFactory.AQUA.rgb, 26);
 
             val loc = LocationObject()
             val cleanName = displayName.stripControlCodes()

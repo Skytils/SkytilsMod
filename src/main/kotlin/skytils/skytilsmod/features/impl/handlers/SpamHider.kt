@@ -519,6 +519,13 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
+                // Pristine
+                unformatted.startsWith("PRISTINE! You found") -> {
+                    when (Skytils.config.pristineHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.pristineHider == 2)
+                    }
+                }
+
                 // Blocks in the way
                 unformatted.contains("There are blocks in the way") -> {
                     when (Skytils.config.inTheWayHider) {
