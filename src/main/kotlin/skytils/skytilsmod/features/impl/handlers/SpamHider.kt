@@ -339,11 +339,16 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 // Mining Abilities
-                formatted.startsWith("§r§a§r§6") && formatted.endsWith("§r§ais now available!§r") -> {
+                (
+                        (formatted.startsWith("§r§a§r§6") && formatted.endsWith("§r§ais now available!§r"))
+                                || formatted.contains("§r§cYour Mining Speed Boost has expired!§r")
+                                || formatted.contains("§r§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!§r")
+                        ) -> {
                     when (Skytils.config.miningAbilityHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.miningAbilityHider == 2)
                     }
                 }
+
 
                 // Blessings
                 formatted.contains("§r§6§lDUNGEON BUFF!") -> {
@@ -523,6 +528,13 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 unformatted.startsWith("PRISTINE! You found") -> {
                     when (Skytils.config.pristineHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.pristineHider == 2)
+                    }
+                }
+
+                // Wind
+                unformatted.contains("The wind has changed direction!") -> {
+                    when (Skytils.config.windHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.windHider == 2)
                     }
                 }
 
