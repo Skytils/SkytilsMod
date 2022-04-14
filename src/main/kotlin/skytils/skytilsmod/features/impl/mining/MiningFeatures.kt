@@ -548,6 +548,6 @@ class MiningFeatures {
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
-        val SBE_DSM_PATTERN: Regex = "\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d*),(?<y>-?\\d*),(?<z>-?\\d*)".toRegex()
+        val SBE_DSM_PATTERN: Regex = "\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)".toRegex()
     }
 }
