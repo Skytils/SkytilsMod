@@ -210,7 +210,7 @@ class MiningFeatures {
                             .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set $x $y $z ${loc.id}")
                             .setHoverText("§eSet waypoint for ${loc.displayName}"))
                         .append(UTextComponent("§e[Custom]")
-                            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here $x $y $z")
+                            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set $x $y $z name_here")
                             .setHoverText("§eSet custom waypoint")
                         ).chat()
                 }
