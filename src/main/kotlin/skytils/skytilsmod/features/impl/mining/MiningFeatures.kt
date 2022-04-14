@@ -207,7 +207,7 @@ class MiningFeatures {
                      */
                     UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
                         .append(UTextComponent("§f${loc.displayName} ")
-                            .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
+                            .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set $x $y $z ${loc.id}")
                             .setHoverText("§eSet waypoint for ${loc.displayName}"))
                         .append(UTextComponent("§e[Custom]")
                             .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set name_here $x $y $z")
