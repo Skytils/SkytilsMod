@@ -25,6 +25,7 @@ import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.dungeons.DungeonClass
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.SkillUtils
@@ -41,7 +42,7 @@ object CataCommand : StatCommand("skytilscata") {
         val playerResponse = try {
             Skytils.hylinAPI.getPlayerSync(uuid)
         } catch (e: HypixelAPIException) {
-            printMessage("§cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
+            printMessage("$failPrefix §cFailed to get dungeon stats: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
             return
         }
 
@@ -50,7 +51,7 @@ object CataCommand : StatCommand("skytilscata") {
 
             val catacombsObj = dungeonsData.dungeons["catacombs"]
             if (catacombsObj?.experience == null) {
-                printMessage("§c${username} has not entered The Catacombs!")
+                printMessage("$failPrefix §c${username} has not entered The Catacombs!")
                 return
             }
             val cataData = catacombsObj.normal!!
@@ -266,7 +267,7 @@ object CataCommand : StatCommand("skytilscata") {
                 )
                 .chat()
         } catch (e: Throwable) {
-            printMessage("§cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
+            printMessage("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()
         }
     }

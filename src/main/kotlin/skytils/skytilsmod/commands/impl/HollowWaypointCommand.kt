@@ -25,18 +25,24 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.utils.append
 import skytils.skytilsmod.utils.setHoverText
 
 object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw")) {
-    override fun getCommandUsage(player: EntityPlayerSP): String = "/skytilshollowwaypoint location x y z"
+    private val syntaxRegex =
+        Regex("^(?:(?:(?<x>-?[\\d.]+) (?<y>-?[\\d.]+) (?<z>-?[\\d.]+) (?<name>.+))|(?<nameonly>.+))\$")
+
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/sthw x y z location"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (args.isEmpty()) {
-            val message = UMessage("§3Skytils > §eWaypoints:\n")
+            val message = UMessage("$prefix §eWaypoints:\n")
             for (loc in MiningFeatures.CrystalHollowsMap.Locations.values()) {
                 if (!loc.loc.exists()) continue
                 message.append("${loc.displayName} ")
@@ -53,58 +59,60 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
         } else {
             when (args[0]) {
                 "set", "add" -> {
-                    if (args.size == 2 || args.size >= 5) {
-                        val loc: String = args[1]
-                        val x: Double
-                        val y: Double
-                        val z: Double
-                        if (args.size == 2) {
-                            x = mc.thePlayer.posX
-                            y = mc.thePlayer.posY
-                            z = mc.thePlayer.posZ
-                        } else {
-                            x = args[2].toDouble()
-                            y = args[3].toDouble()
-                            z = args[4].toDouble()
-                        }
-                        val internalLoc = MiningFeatures.CrystalHollowsMap.Locations.values().find { it.id == loc }?.loc
-                        if (internalLoc != null) {
-                            internalLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                            internalLoc.locY = y
-                            internalLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                        } else {
-                            MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
-                        }
-                        UChat.chat("§aSuccessfully created waypoint ${args[1]}")
-                    } else
-                        UChat.chat("§cCorrect usage: /skytilshollowwaypoint set name <x y z>")
+                    val remainderString = args.drop(1).joinToString(" ")
+                    val match = syntaxRegex.find(remainderString)
+                        ?: return UChat.chat("$failPrefix /sthw set <x y z> <name>")
+                    val loc: String
+                    val x: Double
+                    val y: Double
+                    val z: Double
+                    if (match.groups["nameonly"] != null) {
+                        loc = match.groups["nameonly"]!!.value
+                        x = mc.thePlayer.posX
+                        y = mc.thePlayer.posY
+                        z = mc.thePlayer.posZ
+                    } else {
+                        loc = match.groups["name"]!!.value
+                        x = match.groups["x"]!!.value.toDouble()
+                        y = match.groups["y"]!!.value.toDouble()
+                        z = match.groups["z"]!!.value.toDouble()
+                    }
+                    val internalLoc = MiningFeatures.CrystalHollowsMap.Locations.values().find { it.id == loc }?.loc
+                    if (internalLoc != null) {
+                        internalLoc.locX = (x - 200).coerceIn(0.0, 624.0)
+                        internalLoc.locY = y
+                        internalLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
+                    } else {
+                        MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
+                    }
+                    UChat.chat("$successPrefix §aSuccessfully created waypoint ${loc}")
                 }
                 "remove", "delete" -> {
                     if (args.size >= 2) {
+                        val name = args.drop(1).joinToString(" ")
                         if (MiningFeatures.CrystalHollowsMap.Locations.values()
-                                .find { it.id == args[1] }?.loc?.reset() != null
-                        ) {
-                            UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
-                        } else if (MiningFeatures.waypoints.remove(args[1]) != null) {
-                            UChat.chat("§aSuccessfully removed waypoint ${args[1]}")
-                        } else {
-                            UChat.chat("§cWaypoint ${args[1]} does not exist")
-                        }
+                                .find { it.id == name }?.loc?.reset() != null
+                        )
+                            UChat.chat("$successPrefix §aSuccessfully removed waypoint ${name}!")
+                        else if (MiningFeatures.waypoints.remove(name) != null)
+                            UChat.chat("$successPrefix §aSuccessfully removed waypoint $name")
+                        else
+                            UChat.chat("$failPrefix §cWaypoint $name does not exist")
                     } else
-                        UChat.chat("§cCorrect usage: /skytilshollowwaypoint remove name/clear")
+                        UChat.chat("$prefix §b/sthw remove <name>")
                 }
                 "clear" -> {
                     MiningFeatures.CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
                     MiningFeatures.waypoints.clear()
-                    UChat.chat("§aSuccessfully cleared all waypoints.")
+                    UChat.chat("$successPrefix §aSuccessfully cleared all waypoints.")
                 }
                 else -> {
                     UChat.chat(
-                        "§eusage: /skytilshollowwaypoint ➔ shows all waypoints\n" +
-                                "§e/skytilshollowwaypoint set name ➔ sets waypoint at current location\n" +
-                                "§e/skytilshollowwaypoint set name x y z ➔ sets waypoint at specified location\n" +
-                                "§e/skytilshollowwaypoint remove name ➔ remove the specified waypoint\n" +
-                                "§e/skytilshollowwaypoint clear ➔ removes all waypoints"
+                        "$prefix §e/sthw ➔ Shows all waypoints\n" +
+                                "§e/sthw set name ➔ Sets waypoint at current location\n" +
+                                "§e/sthw set x y z name ➔ Sets waypoint at specified location\n" +
+                                "§e/sthw remove name ➔ Remove the specified waypoint\n" +
+                                "§e/sthw clear ➔ Removes all waypoints"
                     )
                 }
             }

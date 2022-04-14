@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import org.lwjgl.input.Mouse
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.gui.elements.CleanButton
@@ -105,7 +106,7 @@ object ChatTabs {
                         chat.refreshChat()
                     }.onFailure { e ->
                         e.printStackTrace()
-                        UChat.chat("§cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
+                        UChat.chat("$failPrefix §cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
                         chat.drawnChatLines.clear()
                         chat.resetScroll()
                         for (line in chat.chatLines.asReversed()) {
@@ -186,7 +187,7 @@ object ChatTabs {
             mc.ingameGUI.chatGUI.refreshChat()
         }.onFailure {
             it.printStackTrace()
-            UChat.chat("§cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
+            UChat.chat("$failPrefix §cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
         }
     }
 

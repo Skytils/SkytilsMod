@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.spidersden
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S2APacketParticles
@@ -73,6 +74,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+        val matrixStack = UMatrixStack()
 
         if (Skytils.config.relicWaypoints) {
             for (relic in relicLocations) {
@@ -84,7 +86,6 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                 GlStateManager.disableDepth()
                 GlStateManager.disableCull()
                 RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(114, 245, 82), 1f)
-                GlStateManager.disableTexture2D()
                 if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(
                     x,
                     y + 1,
@@ -93,9 +94,8 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                     1.0f,
                     event.partialTicks
                 )
-                RenderUtil.renderWaypointText("Relic", relic, event.partialTicks)
+                RenderUtil.renderWaypointText("Relic", relic, event.partialTicks, matrixStack)
                 GlStateManager.disableLighting()
-                GlStateManager.enableTexture2D()
                 GlStateManager.enableDepth()
                 GlStateManager.enableCull()
             }
@@ -109,7 +109,6 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                 GlStateManager.disableDepth()
                 GlStateManager.disableCull()
                 RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(152, 41, 222), 1f)
-                GlStateManager.disableTexture2D()
                 if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(
                     x,
                     y + 1,
@@ -118,9 +117,8 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                     1.0f,
                     event.partialTicks
                 )
-                RenderUtil.renderWaypointText("Rare Relic", relic, event.partialTicks)
+                RenderUtil.renderWaypointText("Rare Relic", relic, event.partialTicks, matrixStack)
                 GlStateManager.disableLighting()
-                GlStateManager.enableTexture2D()
                 GlStateManager.enableDepth()
                 GlStateManager.enableCull()
             }

@@ -26,6 +26,7 @@ import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.PacketEvent
@@ -78,9 +79,11 @@ object Ping {
                     if (invokedCommand) {
                         invokedCommand = false
                         UChat.chat(
-                            "§9§lSkytils ➜ §${
+                            "$prefix §${
                                 when {
-                                    diff < 100 -> "a"
+                                    diff < 50 -> "a"
+                                    diff < 100 -> "2"
+                                    diff < 149 -> "e"
                                     diff < 249 -> "6"
                                     else -> "c"
                                 }
@@ -120,8 +123,10 @@ object Ping {
                         0f,
                         0f,
                         when {
-                            pingCache < 100 -> CommonColors.GREEN
-                            pingCache < 250 -> CommonColors.ORANGE
+                            pingCache < 50 -> CommonColors.GREEN
+                            pingCache < 100 -> CommonColors.DARK_GREEN
+                            pingCache < 149 -> CommonColors.YELLOW
+                            pingCache < 249 -> CommonColors.ORANGE
                             else -> CommonColors.RED
                         },
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
@@ -136,7 +141,7 @@ object Ping {
                 "69.69ms",
                 0f,
                 0f,
-                CommonColors.GREEN,
+                CommonColors.DARK_GREEN,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
                 SmartFontRenderer.TextShadow.NONE
             )

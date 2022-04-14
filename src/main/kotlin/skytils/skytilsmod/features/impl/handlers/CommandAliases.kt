@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import java.io.File
@@ -52,7 +53,7 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
                 Skytils.sendMessageQueue.add(msg)
             } catch (ignored: IllegalFormatException) {
                 if (event.addToChat) mc.ingameGUI.chatGUI.addToSentMessages(event.message)
-                UChat.chat("§cYou did not specify the correct amount of arguments for this alias!")
+                UChat.chat("$failPrefix §cYou did not specify the correct amount of arguments for this alias!")
             }
         }
     }

@@ -31,7 +31,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
@@ -197,13 +199,13 @@ class BoulderSolver {
                                 }
                                 if (isRight) {
                                     roomVariant = i
-                                    UChat.chat("§aSkytils detected boulder variant ${roomVariant + 1}.")
+                                    UChat.chat("$successPrefix §aSkytils detected boulder variant ${roomVariant + 1}.")
                                     break
                                 }
                                 i++
                             }
                             if (roomVariant == -2) {
-                                UChat.chat("§cSkytils couldn't detect the boulder variant.")
+                                UChat.chat("$failPrefix §cSkytils couldn't detect the boulder variant.")
                             }
                         }
                     }

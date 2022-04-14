@@ -25,7 +25,10 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.impl.RepartyCommand
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import skytils.skytilsmod.utils.Utils
@@ -43,7 +46,7 @@ class ChatListener {
             Skytils.config.apiKey = apiKey
             Skytils.hylinAPI.key = Skytils.config.apiKey
             Skytils.config.markDirty()
-            UChat.chat("§aSkytils updated your set Hypixel API key to §2${apiKey}")
+            UChat.chat("$successPrefix §aSkytils updated your set Hypixel API key to §2${apiKey}")
             return
         }
         if (Skytils.config.autoReparty) {
@@ -107,10 +110,10 @@ class ChatListener {
                 val leader = leader_pattern.matcher(unformatted)
                 val members = members_pattern.matcher(unformatted)
                 if (partyStart.matches() && partyStart.group(1).toInt() == 1) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You cannot reparty yourself."))
+                    UChat.chat("$failPrefix §cYou cannot reparty yourself.")
                     RepartyCommand.partyThread!!.interrupt()
                 } else if (leader.matches() && leader.group(1) != player.name) {
-                    player.addChatMessage(ChatComponentText(EnumChatFormatting.RED.toString() + "You are not party leader."))
+                    UChat.chat("$failPrefix §cYou are not party leader.")
                     RepartyCommand.partyThread!!.interrupt()
                 } else {
                     while (members.find()) {
@@ -189,7 +192,7 @@ class ChatListener {
             }
         }
         if (Skytils.config.firstLaunch && unformatted == "Welcome to Hypixel SkyBlock!") {
-            UChat.chat("§bThank you for downloading Skytils!")
+            UChat.chat("$prefix §bThank you for downloading Skytils!")
             ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
             Skytils.config.firstLaunch = false
             Skytils.config.markDirty()

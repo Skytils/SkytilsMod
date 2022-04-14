@@ -18,7 +18,8 @@
 
 package skytils.skytilsmod.features.impl.events
 
-import net.minecraft.client.renderer.GlStateManager
+import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.network.play.server.S29PacketSoundEffect
@@ -92,14 +93,16 @@ class MayorDiana {
                         else -> 5
                     }
                     val hits = gaiaConstructHits.getOrDefault(this, 0)
-                    GlStateManager.disableDepth()
+                    val matrixStack = UMatrixStack()
+                    UGraphics.disableDepth()
                     RenderUtil.drawLabel(
                         Vec3(posX, posY + 2, posZ),
                         "Hits: $hits / $neededHits",
                         if (hits < neededHits) Color.RED else Color.GREEN,
-                        (mc as AccessorMinecraft).timer.renderPartialTicks
+                        (mc as AccessorMinecraft).timer.renderPartialTicks,
+                        matrixStack
                     )
-                    GlStateManager.enableDepth()
+                    UGraphics.enableDepth()
                 }
             }
         }

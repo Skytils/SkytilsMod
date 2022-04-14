@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -39,10 +40,10 @@ import skytils.skytilsmod.utils.printDevMessage
 
 object BloodHelper {
     val watcherSkins = setOf(
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNlYzQwMDA4ZTFjMzFjMTk4NGY0ZDY1MGFiYjM0MTBmMjAzNzExOWZkNjI0YWZjOTUzNTYzYjczNTE1YTA3NyJ9fX0K",
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNlYzQwMDA4ZTFjMzFjMTk4NGY0ZDY1MGFiYjM0MTBmMjAzNzExOWZkNjI0YWZjOTUzNTYzYjczNTE1YTA3NyJ9fX0K=",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVjMWRjNDdhMDRjZTU3MDAxYThiNzI2ZjAxOGNkZWY0MGI3ZWE5ZDdiZDZkODM1Y2E0OTVhMGVmMTY5Zjg5MyJ9fX0K",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmY2ZTFlN2VkMzY1ODZjMmQ5ODA1NzAwMmJjMWFkYzk4MWUyODg5ZjdiZDdiNWIzODUyYmM1NWNjNzgwMjIwNCJ9fX0K",
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWZkNjFlODA1NWY2ZWU5N2FiNWI2MTk2YThkN2VjOTgwNzhhYzM3ZTAwMzc2MTU3YjZiNTIwZWFhYTJmOTNhZiJ9fX0="
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWZkNjFlODA1NWY2ZWU5N2FiNWI2MTk2YThkN2VjOTgwNzhhYzM3ZTAwMzc2MTU3YjZiNTIwZWFhYTJmOTNhZiJ9fX0K"
     )
     val watchers = mutableSetOf<EntityZombie>()
     val mobs = hashMapOf<EntityArmorStand, BloodMob>()
@@ -50,6 +51,7 @@ object BloodHelper {
     @SubscribeEvent
     fun render(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) return
+        val matrixStack = UMatrixStack()
         watchers.removeIf { it.isDead }
         mobs.also {
             it.filter { it.key.isDead && !it.value.e }
@@ -74,7 +76,8 @@ object BloodHelper {
                     mob.finalPos!!.xCoord,
                     mob.finalPos!!.yCoord + 2,
                     mob.finalPos!!.zCoord,
-                    event.partialTicks
+                    event.partialTicks,
+                    matrixStack
                 )
             }
     }

@@ -20,16 +20,22 @@ package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.command.SyntaxErrorException
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.utils.NumberUtil
 import skytils.skytilsmod.utils.SkillUtils
 import kotlin.math.ceil
 
 object CalcXPCommand : BaseCommand("skytilscalcxp") {
+    override fun getCommandUsage(player: EntityPlayerSP): String = "/skytilscalcxp (dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer) (start level) (end level)"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (args.size != 3) throw SyntaxErrorException("invalid arguments")
+        if (args.size != 3) {
+            UChat.chat("$prefix §b" + getCommandUsage(player))
+            return
+        }
         val type = args[0].lowercase()
         var starting = args[1].toDoubleOrNull() ?: 0.0
         var ending = args[2].toDoubleOrNull() ?: 0.0
@@ -38,7 +44,7 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
             type == "dungeons" -> SkillUtils.dungeoneeringXp
             type == "skill" -> SkillUtils.skillXp
             else -> {
-                UChat.chat("§9§lSkytils ➜ §cThat skill is unknown to me!")
+                UChat.chat("$failPrefix §cThat skill is unknown to me!")
                 return
             }
         }
@@ -54,6 +60,6 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
         for (i in realStart.inc()..realEnd.dec()) {
             xpMap?.get(i)?.let { sum += it }
         }
-        UChat.chat("§9§lSkytils ➜ §bYou need §6${NumberUtil.nf.format(sum)}§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
+        UChat.chat("$successPrefix §bYou need §6${NumberUtil.nf.format(sum)}§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
     }
 }

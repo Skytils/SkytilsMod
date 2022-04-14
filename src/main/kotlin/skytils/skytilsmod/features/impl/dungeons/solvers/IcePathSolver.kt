@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
@@ -122,7 +123,8 @@ class IcePathSolver {
                     pos2!!.addVector(0.5, 0.5, 0.5),
                     5,
                     Color(255, 0, 0),
-                    event.partialTicks
+                    event.partialTicks,
+                    UMatrixStack.Compat.get()
                 )
                 GlStateManager.enableCull()
             }

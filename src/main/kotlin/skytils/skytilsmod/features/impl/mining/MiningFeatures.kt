@@ -28,7 +28,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.event.ClickEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -37,7 +36,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -49,7 +47,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
+import skytils.skytilsmod.Skytils.Companion.prefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.GuiManager.Companion.createTitle
@@ -150,13 +151,13 @@ class MiningFeatures {
                         }
                     }
                     println("Puzzler Solution: $puzzlerSolution")
-                    UChat.chat("§aMine the block highlighted in §c§lRED§a!")
+                    UChat.chat("$successPrefix §aMine the block highlighted in §c§lRED§a!")
                 }
             }
         }
         if (Skytils.config.fetchurSolver && unformatted.startsWith("[NPC] Fetchur:")) {
             if (fetchurItems.size == 0) {
-                UChat.chat("§cSkytils did not load any solutions.")
+                UChat.chat("$failPrefix §cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -167,11 +168,11 @@ class MiningFeatures {
             }, null)
             TickTask(50) {
                 if (solution != null) {
-                    UChat.chat("§aFetchur needs: §2§l${solution}§a!")
+                    UChat.chat("$successPrefix §aFetchur needs: §2${solution}§a!")
                 } else {
                     if (unformatted.contains("its") || unformatted.contains("theyre")) {
                         println("Missing Fetchur item: $unformatted")
-                        UChat.chat("§cSkytils couldn't determine the Fetchur item. There were ${fetchurItems.size} solutions loaded.")
+                        UChat.chat("$failPrefix §cSkytils couldn't determine the Fetchur item. There were ${fetchurItems.size} solutions loaded.")
                     }
                 }
             }
@@ -219,38 +220,38 @@ class MiningFeatures {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
         ) {
-            MiningFeatures.CrystalHollowsMap.Locations.KingYolkar.loc.set()
+            CrystalHollowsMap.Locations.KingYolkar.loc.set()
         }
         if (formatted.startsWith("§r§cYou died")) {
             deadCount =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
             if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
-                mc.ingameGUI.chatGUI.printChatMessage(ChatComponentText("§3Skytils > §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").apply {
-                    chatStyle.chatClickEvent = ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/skytilshollowwaypoint set last_death ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}"
+                UChat.chat(
+                    UTextComponent("$prefix §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").setClick(
+                        MCClickEventAction.RUN_COMMAND,
+                        "/sthw set ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z} Last Death"
                     )
-                })
+                )
             }
         }
     }
 
     private fun waypointChatMessage(x: String, y: String, z: String) {
         val message = UMessage(
-            "§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n"
+            "$prefix §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
         for (loc in CrystalHollowsMap.Locations.values()) {
             if (loc.loc.exists()) continue
             message.append(
-                UTextComponent("${loc.displayName} ")
-                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set ${loc.id} $x $y $z")
+                UTextComponent("${loc.displayName.substring(0, 2)}[${loc.displayName}] ")
+                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/sthw set $x $y $z ${loc.id}")
                     .setHoverText("§eSet waypoint for ${loc.cleanName}")
             )
         }
         message.append(
             UTextComponent("§e[Custom]").setClick(
                 MCClickEventAction.SUGGEST_COMMAND,
-                "/skytilshollowwaypoint set name_here $x $y $z"
+                "/sthw set $x $y $z Name"
             ).setHoverText("§eSet waypoint for custom location")
         )
         message.chat()
@@ -296,6 +297,7 @@ class MiningFeatures {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+        val matrixStack = UMatrixStack()
 
         if (Skytils.config.puzzlerSolver && puzzlerSolution != null) {
             val x = puzzlerSolution!!.x - viewerX
@@ -308,7 +310,7 @@ class MiningFeatures {
         if (Skytils.config.raffleWaypoint && inRaffle && raffleBox != null) {
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
-            RenderUtil.renderWaypointText("Raffle Box", raffleBox!!, event.partialTicks)
+            RenderUtil.renderWaypointText("Raffle Box", raffleBox!!, event.partialTicks, matrixStack)
             GlStateManager.disableLighting()
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
@@ -316,11 +318,11 @@ class MiningFeatures {
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             GlStateManager.disableDepth()
             for (loc in CrystalHollowsMap.Locations.values()) {
-                loc.loc.drawWaypoint(loc.cleanName, event.partialTicks)
+                loc.loc.drawWaypoint(loc.cleanName, event.partialTicks, matrixStack)
             }
-            RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks)
+            RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks, matrixStack)
             for ((key, value) in waypoints)
-                RenderUtil.renderWaypointText(key, value, event.partialTicks)
+                RenderUtil.renderWaypointText(key, value, event.partialTicks, matrixStack)
             GlStateManager.enableDepth()
         }
     }
@@ -515,9 +517,9 @@ class MiningFeatures {
             return locX != null && locY != null && locZ != null
         }
 
-        fun drawWaypoint(text: String, partialTicks: Float) {
+        fun drawWaypoint(text: String, partialTicks: Float, matrixStack: UMatrixStack) {
             if (exists())
-                RenderUtil.renderWaypointText(text, locX!! + 200, locY!!, locZ!! + 200, partialTicks)
+                RenderUtil.renderWaypointText(text, locX!! + 200, locY!!, locZ!! + 200, partialTicks, matrixStack)
         }
 
         fun drawOnMap(size: Int, color: Int) {

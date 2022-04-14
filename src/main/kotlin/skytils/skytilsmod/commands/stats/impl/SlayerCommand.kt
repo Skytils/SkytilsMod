@@ -22,6 +22,8 @@ import com.google.gson.JsonObject
 import gg.essential.universal.wrappers.message.UMessage
 import skytils.hylin.extension.nonDashedString
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.commands.stats.StatCommand
 import skytils.skytilsmod.utils.*
 import java.util.*
@@ -34,7 +36,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
         val profileResponse: JsonObject =
             APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
         if (!profileResponse["success"].asBoolean) {
-            printMessage("§cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
+            printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
             return
         }
 
@@ -57,7 +59,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
                         SkillUtils.calcXpWithProgress(xp, SkillUtils.slayerXp[slayer]?.values ?: emptySet()).toInt()
                     }:§e ${NumberUtil.nf.format(xp)} XP"
                 }.joinToString(separator = "\n")
-                    .ifBlank { "§bMissing something? Do §f/skytils reload data§b and try again!" }
+                    .ifBlank { "$prefix §bMissing something? Do §f/skytils reload data§b and try again!" }
             ).chat()
     }
 }

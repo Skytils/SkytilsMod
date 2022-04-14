@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.farming
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -25,6 +26,8 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.failPrefix
+import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.core.DataFetcher
 import skytils.skytilsmod.utils.*
 import java.awt.Color
@@ -46,7 +49,7 @@ class TreasureHunter {
         }
         if (Skytils.config.treasureHunterSolver && formatted.startsWith("§e[NPC] Treasure Hunter§f: ")) {
             if (treasureHunterLocations.isEmpty()) {
-                UChat.chat("§cSkytils did not load any solutions.")
+                UChat.chat("$failPrefix §cSkytils did not load any solutions.")
                 DataFetcher.reloadData()
                 return
             }
@@ -56,7 +59,7 @@ class TreasureHunter {
                 }, null)
             if (solution != null) {
                 treasureLocation = solution
-                UChat.chat("§aSkytils will track your treasure located at: §b(${solution.x},${solution.y},${solution.z})")
+                UChat.chat("$successPrefix §aSkytils will track your treasure located at: §b(${solution.x},${solution.y},${solution.z})")
             }
         }
     }
@@ -65,6 +68,7 @@ class TreasureHunter {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+        val matrixStack = UMatrixStack()
 
         val pos = treasureLocation!!
         val x = pos.x - viewerX
@@ -74,11 +78,9 @@ class TreasureHunter {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
         RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(2, 250, 39), 1f)
-        GlStateManager.disableTexture2D()
         if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, Color(2, 250, 39).rgb, 1.0f, event.partialTicks)
-        RenderUtil.renderWaypointText("§6Treasure", pos.up(2), event.partialTicks)
+        RenderUtil.renderWaypointText("§6Treasure", pos.up(2), event.partialTicks, matrixStack)
         GlStateManager.disableLighting()
-        GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
     }

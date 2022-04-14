@@ -31,7 +31,6 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -57,7 +56,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
-            if ((Skytils.config.spiritLeapNames && SBInfo.lastOpenContainerName == "Spirit Leap") || (Skytils.config.reviveStoneNames && SBInfo.lastOpenContainerName == "Revive A Teammate")) {
+            if ((Skytils.config.spiritLeapNames && event.chestName == "Spirit Leap") || (Skytils.config.reviveStoneNames && event.chestName == "Revive A Teammate") || (Skytils.config.ghostTeleportMenuNames && event.chestName == "Teleport to Player")) {
                 val fr = ScreenRenderer.fontRenderer
                 var people = 0
                 GlStateManager.disableLighting()
