@@ -288,13 +288,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
     private fun addNewCategory(
         name: String = "",
-        enabled: Boolean = true
+        enabled: Boolean = true,
     ): Category {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 90.percent()
-            height = ChildBasedRangeConstraint()
+            height = ChildBasedRangeConstraint() + 2.pixels()
         }.effect(OutlineEffect(Color(255, 255, 255, 100), 1f))
 
         val enabledComponent = CheckboxComponent(enabled).childOf(container).constrain {
@@ -305,9 +305,9 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
                 // If this value change was triggered while updating the checkbox, don't update the child checkboxes.
                 // see `updateCheckbox()`
-                if(categoryObj.ignoreCheckboxValueChange) return@onValueChange
+                if (categoryObj.ignoreCheckboxValueChange) return@onValueChange
                 // When the category is checked or unchecked, all child waypoints will follow this change.
-                (this.parent as UIContainer).childContainers.forEach {
+                this.parent.childContainers.forEach {
                     it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
                 }
             }
@@ -330,7 +330,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
         val nameComponent = UITextInput("Category Name").childOf(container).constrain {
             x = CenterConstraint()
-            y = 0.pixels()
+            y = 5.pixels()
             width = 30.percent()
             height = 24.pixels()
         }.apply {
@@ -377,7 +377,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         pos: BlockPos = mc.thePlayer.position,
         enabled: Boolean = true,
         color: Color = Color.RED,
-        addedAt: Long = System.currentTimeMillis()
+        addedAt: Long = System.currentTimeMillis(),
     ) {
         addNewWaypoint(
             categoryContainers.entries.firstOrNull {
@@ -399,13 +399,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 90.percent()
-            height = ChildBasedMaxSizeConstraint()
+            height = ChildBasedMaxSizeConstraint() + 2.pixels()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f)).apply {
             animateBeforeHide {
                 setHeightAnimation(Animations.IN_SIN, 0.2f, 0.pixels)
             }
             animateAfterUnhide {
-                setHeightAnimation(Animations.IN_SIN, 0.2f, ChildBasedMaxSizeConstraint())
+                setHeightAnimation(Animations.IN_SIN, 0.2f, ChildBasedMaxSizeConstraint() + 2.pixels())
             }
         }
 
@@ -467,7 +467,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
             x = SiblingConstraint(25f)
-            y = 0.pixels()
+            y = 1.pixels()
             width = CoerceAtLeastConstraint(AspectConstraint(), 10.percentOfWindow)
         }.apply {
             setColor(color)
