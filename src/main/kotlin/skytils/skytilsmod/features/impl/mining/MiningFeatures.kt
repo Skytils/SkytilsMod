@@ -180,10 +180,42 @@ class MiningFeatures {
         if (Skytils.config.hollowChatCoords && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             val xyzMatcher = xyzPattern.matcher(unformatted)
             val xzMatcher = xzPattern.matcher(unformatted)
-            if (xyzMatcher.matches())
+            if (xyzMatcher.matches()) {
                 waypointChatMessage(xyzMatcher.group("x"), xyzMatcher.group("y"), xyzMatcher.group("z"))
-            else if (xzMatcher.matches())
+                return
+            } else if (xzMatcher.matches()) {
                 waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
+                return
+            }
+
+            /**
+             * Checks for the format used in DSM and SBE
+             * $DSMCHWP:Mines of Divan@-673,117,426 ✔
+             * $SBECHWP:Khazad-dûm@-292,63,281 ✔
+             * $asdf:Khazad-dûm@-292,63,281 ❌
+             * $SBECHWP:Khazad-dûm@asdf,asdf,asdf ❌
+             */
+            val cleaned = SBE_DSM_PATTERN.find(unformatted)
+            if (cleaned != null) {
+                val stringLocation = cleaned.groups["stringLocation"]!!.value
+                val x = cleaned.groups["x"]!!.value
+                val y = cleaned.groups["y"]!!.value
+                val z = cleaned.groups["z"]!!.value
+                CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }?.takeIf { !it.loc.exists() }?.let { loc ->
+                    /**
+                     * Sends the waypoints message except it suggests which one should be used based on
+                     * the name contained in the message and converts it to the internally used names for the waypoints.
+                     */
+                    UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
+                        .append(UTextComponent("§f${loc.displayName} ")
+                            .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set $x $y $z ${loc.id}")
+                            .setHoverText("§eSet waypoint for ${loc.displayName}"))
+                        .append(UTextComponent("§e[Custom]")
+                            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set $x $y $z name_here")
+                            .setHoverText("§eSet custom waypoint")
+                        ).chat()
+                }
+            }
         }
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
@@ -518,5 +550,6 @@ class MiningFeatures {
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
         var deadCount: Int = 0
+        val SBE_DSM_PATTERN: Regex = "\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)".toRegex()
     }
 }
