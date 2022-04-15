@@ -29,9 +29,7 @@ import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.Window
-import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
-import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.vigilance.gui.settings.CheckboxComponent
@@ -186,8 +184,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         }.forEach {
             runCatching {
                 arr.add(JsonObject().apply {
-                    if (it.category.name.getText().isNotBlank() && it.category.name.getText() != "Uncategorized")
-                        addProperty("category", it.category.name.getText())
+                    if (it.category.name.isNotBlank() && it.category.name != "Uncategorized")
+                        addProperty("category", it.category.name)
                     addProperty("name", it.name.getText())
                     addProperty("x", it.x.getText().toInt())
                     addProperty("y", it.y.getText().toInt())
@@ -217,7 +215,6 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         Waypoints.waypoints.filter {
             it.island == island
         }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-            println("adding waypoint ${it.category}/${it.name}")
             addNewWaypoint(it.category ?: "Uncategorized", it.name, it.pos, it.enabled)
         }
     }
@@ -230,8 +227,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 90.percent()
-            height = ChildBasedRangeConstraint()
-        }.effect(OutlineEffect(Color(255, 255, 255), 2f))
+            height = ChildBasedRangeConstraint() + 2.pixels()
+        }.effect(OutlineEffect(Color(255, 255, 255, 100), 1f))
 
         val selectedComponent = CheckboxComponent(enabled).childOf(container).constrain {
             x = 7.5.pixels()
@@ -249,21 +246,16 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             }
         }
 
-        val nameComponent = UITextInput("Category Name").childOf(container).constrain {
+        UIText(name).childOf(container).constrain {
             x = CenterConstraint()
             y = 0.pixels()
             width = 30.percent()
-        }.apply {
-            onLeftClick {
-                grabWindowFocus()
-            }
-            setText(name)
         }
 
         categoryContainers[container] = Category(
             container,
             selectedComponent,
-            nameComponent
+            name
         )
 
         return categoryContainers[container]!!
@@ -277,7 +269,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     ) {
         val category =
             categoryContainers.entries.firstOrNull {
-                it.value.name.getText() == categoryName
+                it.value.name == categoryName
             }?.value ?: addNewCategory(
                 categoryName
             )
@@ -286,15 +278,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 90.percent()
-            height = 20.pixels()
-        }.effect(OutlineEffect(Color(0, 243, 255), 1f)).apply {
-            animateBeforeHide {
-                setHeightAnimation(Animations.IN_SIN, 0.35f, 0.pixels)
-            }
-            animateAfterUnhide {
-                setHeightAnimation(Animations.IN_SIN, 0.35f, 20.pixels)
-            }
-        }
+            height = ChildBasedMaxSizeConstraint() + 2.pixels()
+        }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
         val selected = CheckboxComponent(selected).childOf(container).constrain {
             x = 7.5.pixels()
@@ -333,8 +318,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun updateCheckbox(category: Category) {
         category.ignoreCheckboxValueChange = true
-        category.enabled.setState(
-            category.children.all {
+        category.selected.setState(
+            category.container.childContainers.all {
                 entries[it]?.selected?.checked == true
             }
         )
@@ -349,9 +334,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private data class Category(
         val container: UIContainer,
-        val enabled: CheckboxComponent,
-        val name: UITextInput,
-        val children: MutableList<UIContainer> = mutableListOf(),
+        val selected: CheckboxComponent,
+        val name: String,
         var ignoreCheckboxValueChange: Boolean = false
     )
 
