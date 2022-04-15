@@ -23,6 +23,7 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.hylin.skyblock.dungeons.DungeonClass
@@ -43,6 +44,9 @@ import java.util.*
 class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
     private val playerPattern = Regex("(?:\\[.+?] )?(?<name>\\w+)")
+    private val doorOpenedPattern = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
+    private val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
+    private var doorOpener: String? = null
 
     companion object {
         val names = HashMap<String, Boolean>()
@@ -88,6 +92,8 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                         slot highlight 1174339584
                     } else if (classes.getOrDefault(dungeonClass, false)) {
                         slot highlight 1157693184
+                    } else if(name == doorOpener) {
+                        slot highlight 1174394112
                     }
                     GlStateManager.translate(0f, 0f, 299f)
                     Gui.drawRect(
@@ -117,6 +123,13 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                 GlStateManager.disableBlend()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onChatReceived(event: ClientChatReceivedEvent) {
+        if (!Skytils.config.highlightDoorOpener || !Utils.inDungeons || event.type == 2.toByte()) return
+        doorOpener = if (event.message.formattedText == bloodOpenedString) null
+        else (doorOpenedPattern.find(event.message.unformattedText)?.groups?.get("name")?.value ?: return)
     }
 
     @SubscribeEvent

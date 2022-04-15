@@ -180,6 +180,12 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var autoRepartyOnDungeonEnd = false
+      @Property(
+        type = PropertyType.SWITCH, name = "Highlight Door Opener",
+        description = "Highlight the player that most recently opened a Wither Door on the spirit leap menu.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var highlightDoorOpener = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Death Counter",
