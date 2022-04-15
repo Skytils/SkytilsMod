@@ -24,6 +24,8 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
+import gg.essential.universal.USound
+import gg.essential.vigilance.utils.onLeftClick
 import java.awt.Color
 
 class SimpleButton @JvmOverloads constructor(val t: String, val h: Boolean = false, val w: Boolean = false) :
@@ -72,6 +74,8 @@ class SimpleButton @JvmOverloads constructor(val t: String, val h: Boolean = fal
                 text.constrain {
                     color = Color(14737632).toConstraint()
                 }
+            }.onLeftClick {
+                USound.playButtonPress()
             }
     }
 }

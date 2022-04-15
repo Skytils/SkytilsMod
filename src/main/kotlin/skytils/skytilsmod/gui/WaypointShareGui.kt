@@ -18,27 +18,28 @@
 
 package skytils.skytilsmod.gui
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.RelativeConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
+import gg.essential.elementa.components.Window
+import gg.essential.elementa.components.input.UITextInput
+import gg.essential.elementa.constraints.*
+import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import net.minecraft.util.BlockPos
 import org.apache.commons.codec.binary.Base64
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.json
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -50,12 +51,16 @@ import java.awt.Color
 
 class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
+    companion object {
+        private val gson: Gson = GsonBuilder().create()
+    }
 
     private val scrollComponent: ScrollComponent
 
     private val islandDropdown: DropDown
 
     private val entries = HashMap<UIContainer, Entry>()
+    private val categoryContainers = HashMap<UIContainer, Category>()
 
     init {
         scrollComponent = ScrollComponent(
@@ -71,7 +76,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             SBInfo.mode == it.mode
         }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(window)
             .constrain {
-                x = basicXConstraint { it.parent.getRight() - it.getWidth() - 5f }
+                x = 5.pixels(true)
                 y = 5.percent()
             }.also {
                 it.onValueChange { s ->
@@ -137,8 +142,29 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         runCatching {
             val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
 
-            // TODO add some kind of exception handling for malformed data
-            val results = json.decodeFromString<List<Waypoint>>(decoded)
+            val arr = gson.fromJson(decoded, JsonArray::class.java)
+            val results = arr.mapNotNull { e ->
+                return@mapNotNull runCatching {
+                    e as JsonObject
+                    return@runCatching Waypoint(
+                        if (e.has("category")) e["category"].asString else null,
+                        e["name"].asString,
+                        BlockPos(
+                            e["x"].asInt,
+                            e["y"].asInt,
+                            e["z"].asInt
+                        ),
+                        SkyblockIsland.values().find {
+                            it.mode == e["island"].asString
+                        } ?: return@mapNotNull null,
+                        e["enabled"].asBoolean,
+                        e["color"]?.let { Color(it.asInt) } ?: Color.RED,
+                        System.currentTimeMillis()
+                    )
+                }.onFailure {
+                    it.printStackTrace()
+                }.getOrNull()
+            }
             Waypoints.waypoints.addAll(results)
             PersistentSave.markDirty<Waypoints>()
             loadWaypointsForSelection(islandDropdown.getValue())
@@ -153,66 +179,166 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun exportSelectedWaypoints() {
         val island = SkyblockIsland.values()[islandDropdown.getValue()]
-        // use the default json encoder because it won't pretty print
-        val exporting = entries.values.filter {
+
+        val arr = JsonArray()
+        entries.values.filter {
             it.selected.checked
-        }.map {
-            it.waypoint
+        }.forEach {
+            runCatching {
+                arr.add(JsonObject().apply {
+                    if (it.category.name.getText().isNotBlank() && it.category.name.getText() != "Uncategorized")
+                        addProperty("category", it.category.name.getText())
+                    addProperty("name", it.name.getText())
+                    addProperty("x", it.x.getText().toInt())
+                    addProperty("y", it.y.getText().toInt())
+                    addProperty("z", it.z.getText().toInt())
+                    addProperty("island", island.mode)
+                    addProperty("enabled", true)
+                    addProperty("color", Color.RED.rgb)
+                })
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
-        setClipboardString(Base64.encodeBase64String(Json.encodeToString(exporting).encodeToByteArray()))
+        setClipboardString(Base64.encodeBase64String(gson.toJson(arr).encodeToByteArray()))
         EssentialAPI.getNotifications()
             .push(
                 "Waypoints Exported",
-                "${exporting.size} ${island.formattedName} waypoints were copied to your clipboard!",
+                "${arr.size()} ${island.formattedName} waypoints were copied to your clipboard!",
                 2.5f
             )
     }
 
     private fun loadWaypointsForSelection(selection: Int) {
         entries.clear()
+        categoryContainers.clear()
         scrollComponent.clearChildren()
         val island = SkyblockIsland.values()[selection]
         Waypoints.waypoints.filter {
             it.island == island
         }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-            addNewWaypoint(it)
+            println("adding waypoint ${it.category}/${it.name}")
+            addNewWaypoint(it.category ?: "Uncategorized", it.name, it.pos, it.enabled)
         }
     }
 
-    private fun addNewWaypoint(waypoint: Waypoint) {
+    private fun addNewCategory(
+        name: String = "",
+        enabled: Boolean = true,
+    ): Category {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
-            width = 80.percent()
-            height = 9.5.percent()
-        }.effect(OutlineEffect(Color(0, 243, 255), 1f))
+            width = 90.percent()
+            height = ChildBasedRangeConstraint()
+        }.effect(OutlineEffect(Color(255, 255, 255), 2f))
 
-        val selected = CheckboxComponent(waypoint.enabled).childOf(container).constrain {
+        val selectedComponent = CheckboxComponent(enabled).childOf(container).constrain {
+            x = 7.5.pixels()
+            y = 0.pixels()
+        }.apply {
+            onValueChange { newValue: Any? ->
+                val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
+                // If this value change was triggered while updating the checkbox, don't update the child checkboxes.
+                // see `updateCheckbox()`
+                if (categoryObj.ignoreCheckboxValueChange) return@onValueChange
+                // When the category is checked or unchecked, all child waypoints will follow this change.
+                this.parent.childContainers.forEach {
+                    it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
+                }
+            }
+        }
+
+        val nameComponent = UITextInput("Category Name").childOf(container).constrain {
+            x = CenterConstraint()
+            y = 0.pixels()
+            width = 30.percent()
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(name)
+        }
+
+        categoryContainers[container] = Category(
+            container,
+            selectedComponent,
+            nameComponent
+        )
+
+        return categoryContainers[container]!!
+    }
+
+    private fun addNewWaypoint(
+        categoryName: String = "",
+        name: String = "",
+        pos: BlockPos = mc.thePlayer.position,
+        selected: Boolean = false,
+    ) {
+        val category =
+            categoryContainers.entries.firstOrNull {
+                it.value.name.getText() == categoryName
+            }?.value ?: addNewCategory(
+                categoryName
+            )
+
+        val container = UIContainer().childOf(category.container).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint(5f)
+            width = 90.percent()
+            height = 20.pixels()
+        }.effect(OutlineEffect(Color(0, 243, 255), 1f)).apply {
+            animateBeforeHide {
+                setHeightAnimation(Animations.IN_SIN, 0.35f, 0.pixels)
+            }
+            animateAfterUnhide {
+                setHeightAnimation(Animations.IN_SIN, 0.35f, 20.pixels)
+            }
+        }
+
+        val selected = CheckboxComponent(selected).childOf(container).constrain {
             x = 7.5.pixels()
             y = CenterConstraint()
+        }.apply {
+            onValueChange {
+                Window.enqueueRenderOperation {
+                    // Update the checkbox *after* the `checked` state is updated.
+                    updateCheckbox(category)
+                }
+            }
         }
 
-        val nameComponent = UIText(waypoint.name).childOf(container).constrain {
+        val nameComponent = UIText(name).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        val xComponent = UIText(waypoint.pos.x.toString()).childOf(container).constrain {
+        val xComponent = UIText(pos.x.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        val yComponent = UIText(waypoint.pos.y.toString()).childOf(container).constrain {
+        val yComponent = UIText(pos.y.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        val zComponent = UIText(waypoint.pos.z.toString()).childOf(container).constrain {
+        val zComponent = UIText(pos.z.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        entries[container] = Entry(selected, nameComponent, xComponent, yComponent, zComponent, waypoint)
+        entries[container] = Entry(category, selected, nameComponent, xComponent, yComponent, zComponent)
+    }
+
+    private fun updateCheckbox(category: Category) {
+        category.ignoreCheckboxValueChange = true
+        category.enabled.setState(
+            category.children.all {
+                entries[it]?.selected?.checked == true
+            }
+        )
+        category.ignoreCheckboxValueChange = false
     }
 
 
@@ -221,12 +347,20 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         Skytils.displayScreen = WaypointsGui()
     }
 
+    private data class Category(
+        val container: UIContainer,
+        val enabled: CheckboxComponent,
+        val name: UITextInput,
+        val children: MutableList<UIContainer> = mutableListOf(),
+        var ignoreCheckboxValueChange: Boolean = false
+    )
+
     private data class Entry(
+        val category: Category,
         val selected: CheckboxComponent,
         val name: UIText,
         val x: UIText,
         val y: UIText,
-        val z: UIText,
-        val waypoint: Waypoint
+        val z: UIText
     )
 }
