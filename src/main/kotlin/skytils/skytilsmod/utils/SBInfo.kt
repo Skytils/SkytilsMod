@@ -22,8 +22,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraft.scoreboard.Score
-import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -62,7 +60,7 @@ object SBInfo {
     private var lastLocRaw: Long = -1
     private var joinedWorld: Long = -1
     private var locraw: JsonObject? = null
-    private val junkRegex = Regex("[^A-Za-z0-9() -û]")
+    private val junkRegex = Regex("[^\u0020-\u0127û]")
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
@@ -133,18 +131,9 @@ object SBInfo {
             Skytils.sendMessageQueue.add("/locraw")
         }
         try {
-            val scoreboard = mc.thePlayer.worldScoreboard
-            val sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1) //§707/14/20
-            val scores: List<Score> = ArrayList(scoreboard.getSortedScores(sidebarObjective))
-            val lines: MutableList<String> = ArrayList()
-            for (i in scores.indices.reversed()) {
-                val score = scores[i]
-                val scorePlayerTeamOne = scoreboard.getPlayersTeam(score.playerName)
-                var line = ScorePlayerTeam.formatPlayerName(scorePlayerTeamOne, score.playerName)
-                line = line.stripControlCodes()
-                lines.add(line)
-            }
+            val lines = ScoreboardUtil.fetchScoreboardLines().map { it.stripControlCodes() }
             if (lines.size >= 5) {
+                //§707/14/20
                 date = lines[2].stripControlCodes().trim()
                 //§74:40am
                 val matcher = timePattern.find(lines[3])
@@ -157,20 +146,16 @@ object SBInfo {
                     } catch (e: ParseException) {
                     }
                 }
-                for (loc in lines) {
-                    if (loc.contains('⏣')) {
-                        location = loc.stripControlCodes().replace(junkRegex, "").trim()
-                        break
-                    }
+                lines.find { it.contains('⏣') }?.replace(junkRegex, "")?.trim()?.let {
+                    location = it
                 }
             }
             objective = null
-            var objTextLast = false
-            for (line in lines) {
-                if (objTextLast) {
-                    objective = line
+            for ((i, line) in lines.withIndex()) {
+                if (line == "Objective") {
+                    objective = lines.elementAt(i + 1)
+                    break
                 }
-                objTextLast = line == "Objective"
             }
         } catch (e: Exception) {
             e.printStackTrace()

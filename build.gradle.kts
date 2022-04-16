@@ -113,7 +113,7 @@ dependencies {
     }
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.0.8")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.6")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.8")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }

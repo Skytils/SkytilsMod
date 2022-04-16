@@ -193,7 +193,7 @@ class SlayerFeatures {
             if (Skytils.config.showRNGMeter) {
                 for ((index, line) in sidebarLines.withIndex()) {
                     if (line == "Slayer Quest") {
-                        val boss = sidebarLines.elementAtOrNull(index - 1) ?: continue
+                        val boss = sidebarLines.elementAtOrNull(index + 1) ?: continue
                         if (boss.startsWith("Revenant Horror")) {
                             BossStatus.setBossStatus(
                                 RNGMeter(
@@ -332,7 +332,7 @@ class SlayerFeatures {
                     unformatted.filter { it.isDigit() || it == '.' }.toFloat()
                 for ((index, line) in sidebarLines.withIndex()) {
                     if (line == "Slayer Quest") {
-                        val boss = sidebarLines.elementAtOrNull(index - 1) ?: continue
+                        val boss = sidebarLines.elementAtOrNull(index + 1) ?: continue
                         if (boss.startsWith("Revenant Horror")) {
                             Skytils.config.revRNG = rngMeter
                             break

@@ -27,7 +27,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 object ScoreboardUtil {
     @JvmStatic
     fun cleanSB(scoreboard: String): String {
-        return scoreboard.stripControlCodes().toCharArray().filter { it.code in 21..126 }.joinToString(separator = "")
+        return scoreboard.stripControlCodes().toCharArray().filter { it.code in 32..126 }.joinToString(separator = "")
     }
 
     var sidebarLines: List<String> = emptyList()
@@ -35,18 +35,12 @@ object ScoreboardUtil {
     fun fetchScoreboardLines(): List<String> {
         val scoreboard = mc.theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-        var scores = scoreboard.getSortedScores(objective)
-        val list = scores.filter { input: Score? ->
+        val scores = scoreboard.getSortedScores(objective).filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName
                 .startsWith("#")
-        }
-        scores = if (list.size > 15) {
-            list.drop(15)
-        } else {
-            list
-        }
+        }.take(15)
         return scores.map {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
-        }
+        }.asReversed()
     }
 }
