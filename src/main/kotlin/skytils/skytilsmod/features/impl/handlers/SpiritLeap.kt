@@ -88,7 +88,7 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
                     val scale = 0.9f
                     val scaleReset = 1 / scale
                     GlStateManager.pushMatrix()
-                    if(name == doorOpener) {
+                    if (name == doorOpener) {
                         slot highlight 1174394112
                     } else if (names.getOrDefault(name, false)) {
                         slot highlight 1174339584
