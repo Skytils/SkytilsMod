@@ -589,6 +589,13 @@ object Config : Vigilant(
     var spiritLeapNames = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Highlight Door Opener",
+        description = "Highlight the player that most recently opened a Wither Door on the spirit leap menu.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var highlightDoorOpener = false
+
+    @Property(
         type = PropertyType.BUTTON, name = "Spirit Leap Highlights",
         description = "Highlights names and classes on the Spirit Leap menu.",
         category = "Dungeons", subcategory = "Quality of Life",
@@ -2647,6 +2654,8 @@ object Config : Vigilant(
         addDependency("messageTitle300Score", "createTitleOn300Score")
 
         addDependency("bloodHelperColor", "bloodHelper")
+
+        addDependency("highlightDoorOpener", "spiritLeapNames")
 
         addDependency("showNextBlaze", "blazeSolver")
         addDependency("lowestBlazeColor", "blazeSolver")
