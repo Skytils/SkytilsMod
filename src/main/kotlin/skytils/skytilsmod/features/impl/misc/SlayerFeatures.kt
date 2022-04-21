@@ -33,6 +33,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntitySpider
@@ -439,6 +440,7 @@ class SlayerFeatures {
             TickTask(1) {
                 val e = event.entity as EntityArmorStand
                 if (slayerEntity != null) {
+                    // seraph stuff
                     if (e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)) {
                         val time = System.currentTimeMillis() - 50
                         printDevMessage(
@@ -464,6 +466,7 @@ class SlayerFeatures {
                             lastYangGlyphSwitch = -1L
                             lastYangGlyphSwitchTicks = -1
                         }
+                        return@TickTask
                     } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
                             .intersectsWith(slayerEntity!!.entityBoundingBox)
                     ) {
@@ -476,6 +479,7 @@ class SlayerFeatures {
                                 break
                             }
                         }
+                        return@TickTask
                     }
                 }
             }
@@ -932,7 +936,7 @@ class SlayerFeatures {
         private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
         private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
         private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
-        private val timerRegex = Regex("§c\\d+:\\d+§r")
+        private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
         var slayerEntity: Entity? = null
         var slayerNameEntity: EntityArmorStand? = null
         var slayerTimerEntity: EntityArmorStand? = null
@@ -951,79 +955,88 @@ class SlayerFeatures {
         var yangGlyphAdrenalineStressCount = -1L
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
-            if (entity is EntityZombie) {
-                TickTask(5) {
-                    val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
-                        entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                    ) { nearbyEntity: Entity? ->
-                        if (nearbyEntity is EntityArmorStand) {
-                            if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
-                                if (nearbyEntity.inventory.any { it != null }) {
-                                    // armor stand has equipment, abort!
-                                    return@getEntitiesInAABBexcluding false
+            when (entity) {
+                is EntityZombie -> {
+                    TickTask(5) {
+                        val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
+                            entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
+                        ) { nearbyEntity: Entity? ->
+                            if (nearbyEntity is EntityArmorStand) {
+                                if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
+                                    if (nearbyEntity.inventory.any { it != null }) {
+                                        // armor stand has equipment, abort!
+                                        return@getEntitiesInAABBexcluding false
+                                    }
+                                    // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
+                                    return@getEntitiesInAABBexcluding true
                                 }
-                                // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
-                                return@getEntitiesInAABBexcluding true
                             }
+                            false
                         }
-                        false
-                    }
-                    var isSlayer = 0
-                    val currentTier = getTier("Revenant Horror")
-                    for (nearby in nearbyArmorStands) {
-                        if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
-                        if (nearby.displayName.formattedText.startsWith("§c☠ §bRevenant Horror") ||
-                            nearby.displayName.formattedText.startsWith("§c☠ §fAtoned Horror")
-                        ) {
-                            if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths["Revenant"]?.get(
-                                    currentTier
-                                )?.asInt ?: 0)
-                                == entity.baseMaxHealth.toInt()
+                        var isSlayer = 0
+                        val currentTier = getTier("Revenant Horror")
+                        for (nearby in nearbyArmorStands) {
+                            if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
+                            if (nearby.displayName.formattedText.startsWith("§c☠ §bRevenant Horror") ||
+                                nearby.displayName.formattedText.startsWith("§c☠ §fAtoned Horror")
                             ) {
-                                slayerNameEntity = nearby as EntityArmorStand
-                                isSlayer++
+                                if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths["Revenant"]?.get(
+                                        currentTier
+                                    )?.asInt ?: 0)
+                                    == entity.baseMaxHealth.toInt()
+                                ) {
+                                    slayerNameEntity = nearby as EntityArmorStand
+                                    isSlayer++
+                                }
+                                continue
                             }
-                            continue
+                            if (nearby.displayName.formattedText == "§c02:59§r") {
+                                slayerTimerEntity = nearby as EntityArmorStand
+                                isSlayer++
+                                continue
+                            }
+                            if (!countTime && nearby.displayName.formattedText.matches(timerRegex)) {
+                                slayerTimerEntity = nearby as EntityArmorStand
+                                isSlayer++
+                                continue
+                            }
                         }
-                        if (nearby.displayName.formattedText == "§c02:59§r") {
-                            slayerTimerEntity = nearby as EntityArmorStand
-                            isSlayer++
-                            continue
+                        if (isSlayer == 2) {
+                            slayerEntity = entity
+                        } else {
+                            slayerTimerEntity = null
+                            slayerNameEntity = null
                         }
-                        if (!countTime && nearby.displayName.formattedText.matches(timerRegex)) {
-                            slayerTimerEntity = nearby as EntityArmorStand
-                            isSlayer++
-                            continue
-                        }
-                    }
-                    if (isSlayer == 2) {
-                        slayerEntity = entity
-                    } else {
-                        slayerTimerEntity = null
-                        slayerNameEntity = null
                     }
                 }
-            } else if (entity is EntitySpider) {
-                detectSlayerEntities(
-                    entity,
-                    "Tarantula Broodfather",
-                    if (countTime) "§c02:59§r" else null,
-                    "§5☠ §4Tarantula Broodfather"
-                )
-            } else if (entity is EntityWolf) {
-                detectSlayerEntities(
-                    entity,
-                    "Sven Packmaster",
-                    if (countTime) "§c03:59§r" else null,
-                    "§c☠ §fSven Packmaster"
-                )
-            } else if (entity is EntityEnderman) {
-                detectSlayerEntities(
-                    entity,
-                    "Voidgloom Seraph",
-                    if (countTime) "§c03:59§r" else null,
-                    "§c☠ §bVoidgloom Seraph"
-                )
+                is EntitySpider ->
+                    detectSlayerEntities(
+                        entity,
+                        "Tarantula Broodfather",
+                        if (countTime) "§c02:59§r" else null,
+                        "§5☠ §4Tarantula Broodfather"
+                    )
+                is EntityWolf ->
+                    detectSlayerEntities(
+                        entity,
+                        "Sven Packmaster",
+                        if (countTime) "§c03:59§r" else null,
+                        "§c☠ §fSven Packmaster"
+                    )
+                is EntityEnderman ->
+                    detectSlayerEntities(
+                        entity,
+                        "Voidgloom Seraph",
+                        if (countTime) "§c03:59§r" else null,
+                        "§c☠ §bVoidgloom Seraph"
+                    )
+                is EntityBlaze ->
+                    detectSlayerEntities(
+                        entity,
+                        "Inferno Demonlord",
+                        if (countTime) "§8§lASHEN§8 ♨8 §c04:19§r" else null,
+                        "§c☠ §bInferno Demonlord"
+                    )
             }
         }
 
@@ -1047,33 +1060,31 @@ class SlayerFeatures {
                 val potentialTimerEntities = arrayListOf<EntityArmorStand>()
                 val potentialNameEntities = arrayListOf<EntityArmorStand>()
                 for (nearby in nearbyArmorStands) {
-                    if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
-                    if (nearby.displayName.formattedText.startsWith(nameStart)
-                    ) {
-                        val currentTier = getTier(name)
-                        val expectedHealth =
-                            (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
-                                " "
-                            )]?.get(currentTier)?.asInt ?: 0)
-                        printDevMessage(
-                            "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth}",
-                            "slayer"
-                        )
-                        if (expectedHealth == floor(entity.baseMaxHealth).toInt()) {
-                            printDevMessage("hp matched", "slayer")
-                            potentialNameEntities.add(nearby as EntityArmorStand)
+                    when {
+                        nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
+                        nearby.displayName.formattedText.startsWith(nameStart) -> {
+                            val currentTier = getTier(name)
+                            val expectedHealth =
+                                (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
+                                    " "
+                                )]?.get(currentTier)?.asInt ?: 0)
+                            printDevMessage(
+                                "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
+                                "slayer"
+                            )
+                            if (expectedHealth == entity.baseMaxHealth.toInt()) {
+                                printDevMessage("hp matched", "slayer")
+                                potentialNameEntities.add(nearby as EntityArmorStand)
+                            }
                         }
-                        continue
-                    }
-                    if (nearby.displayName.formattedText == timer) {
-                        printDevMessage("timer matched", "slayer")
-                        potentialTimerEntities.add(nearby as EntityArmorStand)
-                        continue
-                    }
-                    if (timer == null && nearby.displayName.formattedText.matches(timerRegex)) {
-                        printDevMessage("timer regex matched", "slayer")
-                        potentialTimerEntities.add(nearby as EntityArmorStand)
-                        continue
+                        nearby.displayName.formattedText == timer -> {
+                            printDevMessage("timer matched", "slayer")
+                            potentialTimerEntities.add(nearby as EntityArmorStand)
+                        }
+                        timer == null && nearby.displayName.formattedText.matches(timerRegex) -> {
+                            printDevMessage("timer regex matched", "slayer")
+                            potentialTimerEntities.add(nearby as EntityArmorStand)
+                        }
                     }
                 }
                 if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
