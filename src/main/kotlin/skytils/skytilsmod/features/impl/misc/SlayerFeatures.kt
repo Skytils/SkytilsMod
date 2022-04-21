@@ -1034,7 +1034,7 @@ class SlayerFeatures {
                     detectSlayerEntities(
                         entity,
                         "Inferno Demonlord",
-                        if (countTime) "§8§lASHEN§8 ♨8 §c04:19§r" else null,
+                        null,
                         "§c☠ §bInferno Demonlord"
                     )
             }
