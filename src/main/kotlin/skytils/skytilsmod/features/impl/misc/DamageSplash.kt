@@ -62,7 +62,7 @@ class DamageSplash {
                 when {
                     name.startsWith("§0") -> "${this}☠"
                     name.startsWith("§f") && !name.contains("§e") -> "${this}❂"
-                    name.startsWith("§6") && !name.contains("§e") -> "${this}火"
+                    name.startsWith("§6") && !name.contains("§e") && !name.contains('ﬗ') -> "${this}火"
                     name.startsWith("§3") -> "${this}水"
                     else -> this
                 }
