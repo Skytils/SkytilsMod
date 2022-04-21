@@ -315,6 +315,15 @@ class SlayerFeatures {
                         yangGlyphAdrenalineStressCount = lastYangGlyphSwitch + 6000L
                     }
                 }
+            } else if (Skytils.config.totemPing != 0 && packet.entityId == totemEntity?.entityId) {
+                (packet.func_149376_c().find { it.dataValueId == 2 }?.`object` as String).let { name ->
+                    printDevMessage("totem name updating: $name", "totem")
+                    totemRegex.matchEntire(name)?.run {
+                        printDevMessage("time ${groups["time"]}", "totem")
+                        if (groups["time"]?.value?.toIntOrNull() == Skytils.config.totemPing)
+                            createTitle("Totem!", 20)
+                    }
+                }
             }
         }
 
@@ -361,6 +370,11 @@ class SlayerFeatures {
         if (yangGlyph != null && event.pos == yangGlyph && event.old.block is BlockBeacon && event.update.block is BlockAir) {
             yangGlyph = null
             yangGlyphEntity = null
+            return
+        }
+        if (totemEntity != null && event.old.block == Blocks.stained_hardened_clay && event.update.block is BlockAir) {
+            totemEntity = null
+            printDevMessage("removed totem entity", "totem")
             return
         }
         if (slayerEntity == null) return
@@ -480,6 +494,11 @@ class SlayerFeatures {
                             }
                         }
                         return@TickTask
+                    }
+                    // demonlord stuff
+                    if (Skytils.config.totemPing != 0 && e.customNameTag.matches(totemRegex)) {
+                        totemEntity = e
+                        printDevMessage("set totem", "totem")
                     }
                 }
             }
@@ -937,10 +956,12 @@ class SlayerFeatures {
         private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
         private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
         private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
+        private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
         var slayerEntity: Entity? = null
         var slayerNameEntity: EntityArmorStand? = null
         var slayerTimerEntity: EntityArmorStand? = null
         var yangGlyphEntity: EntityArmorStand? = null
+        var totemEntity: EntityArmorStand? = null
         var hasSlayerText = false
         private var lastTickHasSlayerText = false
         var expectedMaxHp: Int? = null
