@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.misc.damagesplash
 
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
+import skytils.skytilsmod.utils.graphics.colors.CustomColor
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -26,7 +27,7 @@ import skytils.skytilsmod.utils.graphics.colors.CommonColors
  * @author Wynntils
  */
 @Suppress("unused")
-enum class Damage(val symbol: String, val color: CommonColors) {
+enum class Damage(val symbol: String, val color: CustomColor) {
     CRITICAL("✧", CommonColors.CRITICAL),
     PET("♞", CommonColors.MAGENTA),
     WITHER("☠", CommonColors.BLACK),
@@ -35,6 +36,7 @@ enum class Damage(val symbol: String, val color: CommonColors) {
     TRUE("❂", CommonColors.WHITE),
     FIRE("火", CommonColors.ORANGE),
     DROWN("水", CommonColors.LIGHT_BLUE),
+    COMBO("ﬗ", CustomColor(242, 133, 0)),
     NORMAL("", CommonColors.LIGHT_GRAY);
 
     companion object {
