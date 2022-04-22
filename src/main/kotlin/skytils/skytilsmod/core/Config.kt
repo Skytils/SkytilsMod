@@ -2187,7 +2187,8 @@ object Config : Vigilant(
         PropertyType.NUMBER, name = "Totem Ping",
         description = "Alerts you of a specific time (seconds) on the Inferno Demonlord's Totem.",
         category = "Slayer", subcategory = "Inferno Demonlord",
-        searchTags = arrayOf("1.3.0-pre1")
+        searchTags = ["1.3.0-pre1"],
+        max = 8
     )
     var totemPing = 0
 
