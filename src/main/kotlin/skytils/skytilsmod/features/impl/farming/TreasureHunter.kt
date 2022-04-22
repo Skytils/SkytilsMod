@@ -77,7 +77,7 @@ class TreasureHunter {
         val distSq = x * x + y * y + z * z
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
-        RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(2, 250, 39), 1f)
+        RenderUtil.drawFilledBoundingBox(matrixStack, AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(2, 250, 39), 1f)
         if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, Color(2, 250, 39).rgb, 1.0f, event.partialTicks)
         RenderUtil.renderWaypointText("§6Treasure", pos.up(2), event.partialTicks, matrixStack)
         GlStateManager.disableLighting()

@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -123,6 +124,7 @@ class CreeperSolver {
             val blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND)
             GlStateManager.enableBlend()
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+            val matrixStack = UMatrixStack()
             for (i in solutionPairs.indices) {
                 val (one, two) = solutionPairs[i]
                 if (mc.theWorld.getBlockState(one).block == Blocks.prismarine && mc.theWorld.getBlockState(two).block == Blocks.prismarine) {
@@ -148,10 +150,10 @@ class CreeperSolver {
                     second.zCoord + 1
                 )
                 RenderUtil.drawFilledBoundingBox(
-                    aabb1.expand(0.01, 0.01, 0.01), color, 0.5f
+                    matrixStack, aabb1.expand(0.01, 0.01, 0.01), color, 0.5f
                 )
                 RenderUtil.drawFilledBoundingBox(
-                    aabb2.expand(0.01, 0.01, 0.01), color, 0.5f
+                    matrixStack, aabb2.expand(0.01, 0.01, 0.01), color, 0.5f
                 )
             }
             if (!blendEnabled) GlStateManager.disableBlend()

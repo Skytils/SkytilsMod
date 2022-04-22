@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.block.BlockPressurePlateWeighted
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -67,6 +68,7 @@ object ShootTheTargetSolver {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Skytils.config.shootTheTargetSolver || shot.isEmpty()) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+        val matrixStack = UMatrixStack()
 
         for (pos in shot) {
             val x = pos.x - viewerX
@@ -74,6 +76,7 @@ object ShootTheTargetSolver {
             val z = pos.z - viewerZ
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
+                matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
                 Color(255, 0, 0),
                 0.5f

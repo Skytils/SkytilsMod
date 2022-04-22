@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.essential.universal.UMatrixStack
 import net.minecraft.block.BlockButtonStone
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -89,12 +90,14 @@ object SimonSaysSolver {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
+            val matrixStack = UMatrixStack()
             val pos = clickInOrder[clickNeeded].west()
             val x = pos.x - viewerX
             val y = pos.y - viewerY
             val z = pos.z - viewerZ
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
+                matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
                 if (clickNeeded == clickInOrder.size - 1) Color(0, 255, 0) else Color(255, 0, 0),
                 0.5f

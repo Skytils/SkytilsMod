@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -417,6 +418,7 @@ object DungeonFeatures {
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
+            val matrixStack = UMatrixStack()
             if (Skytils.config.boxSpiritBow && equalsOneOf(
                     dungeonFloor,
                     "F4",
@@ -430,6 +432,7 @@ object DungeonFeatures {
                 val y = event.entity.posY - viewerY
                 val z = event.entity.posZ - viewerZ
                 RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
                     AxisAlignedBB(x, y, z, x + 0.75, y + 1.975, z + 0.75),
                     Color(255, 0, 255, 200),
                     1f

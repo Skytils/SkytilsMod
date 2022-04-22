@@ -85,7 +85,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                 val distSq = x * x + y * y + z * z
                 GlStateManager.disableDepth()
                 GlStateManager.disableCull()
-                RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(114, 245, 82), 1f)
+                RenderUtil.drawFilledBoundingBox(matrixStack, AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(114, 245, 82), 1f)
                 if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(
                     x,
                     y + 1,
@@ -108,7 +108,7 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                 val distSq = x * x + y * y + z * z
                 GlStateManager.disableDepth()
                 GlStateManager.disableCull()
-                RenderUtil.drawFilledBoundingBox(AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(152, 41, 222), 1f)
+                RenderUtil.drawFilledBoundingBox(matrixStack, AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(152, 41, 222), 1f)
                 if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(
                     x,
                     y + 1,

@@ -105,6 +105,7 @@ data class Waypoint(
     fun draw(partialTicks: Float, matrixStack: UMatrixStack) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
         RenderUtil.drawFilledBoundingBox(
+            matrixStack,
             pos.toBoundingBox().expandBlock().offset(-viewerX, -viewerY, -viewerZ),
             color.withAlpha(color.alpha.coerceAtMost(128)),
             1f
