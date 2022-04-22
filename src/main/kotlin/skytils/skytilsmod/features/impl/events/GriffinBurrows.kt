@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.events
 
 import com.google.common.collect.EvictingQueue
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -36,7 +37,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent
@@ -99,9 +99,10 @@ object GriffinBurrows {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.showGriffinBurrows) {
+            val matrixStack = UMatrixStack()
             for (pb in particleBurrows.values) {
                 if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
-                    pb.drawWaypoint(event.partialTicks)
+                    pb.drawWaypoint(event.partialTicks, matrixStack)
                 }
             }
         }
