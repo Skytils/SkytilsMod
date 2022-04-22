@@ -915,68 +915,11 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Griffin Burrows",
-        description = "Shows the location of burrows during the event.\n§cThis feature requires your API key to be set in general settings.",
+        description = "Uses particles to locate nearby burrows.",
         category = "Events", subcategory = "Mythological",
         searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow", "Waypoint", "ESP"]
     )
     var showGriffinBurrows = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Burrow Particle Add-on",
-        description = "Uses particles in addition to the API in order to locate burrows.\nThis feature will help find burrows when the API isn't working.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow", "Waypoint", "ESP"]
-    )
-    var particleBurrows = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Show Time Until Burrow Refresh",
-        description = "Displays the amount of time until the next refresh.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
-    )
-    var showGriffinCountdown = false
-
-
-    @Property(
-        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Castle",
-        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Castle warp.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
-    )
-    var burrowCastleFastTravel = false
-
-    @Property(
-        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Crypts",
-        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Crypts warp.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
-    )
-    var burrowCryptsFastTravel = false
-
-    @Property(
-        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Dark Auction",
-        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the DA warp.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
-    )
-    var burrowDarkAuctionFastTravel = false
-
-    @Property(
-        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Hub",
-        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Hub warp.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
-    )
-    var burrowHubFastTravel = false
-
-    @Property(
-        type = PropertyType.CHECKBOX, name = "Show Fast-Travel: Museum",
-        description = "Shows the closest travel scroll to the burrow.\nThis allows the mod to show the Museum warp.",
-        category = "Events", subcategory = "Mythological",
-        searchTags = ["Griffin", "Diana", "Myth", "Burrow", "Borrow"]
-    )
-    var burrowMuseumFastTravel = false
 
     @Property(
         type = PropertyType.COLOR, name = "Empty/Start Burrow Color",
@@ -2663,16 +2606,9 @@ object Config : Vigilant(
         addDependency("lividFinderType", "findCorrectLivid")
 
         listOf(
-            "showGriffinCountdown",
-            "particleBurrows",
             "emptyBurrowColor",
             "mobBurrowColor",
-            "treasureBurrowColor",
-            "burrowCastleFastTravel",
-            "burrowCryptsFastTravel",
-            "burrowDarkAuctionFastTravel",
-            "burrowHubFastTravel",
-            "burrowMuseumFastTravel"
+            "treasureBurrowColor"
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
 
         addDependency("activePetColor", "highlightActivePet")
