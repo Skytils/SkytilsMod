@@ -17,11 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.events
 
-import gg.essential.universal.UChat
-import gg.essential.universal.UResolution
-import gg.essential.universal.wrappers.message.UTextComponent
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.event.ClickEvent
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C07PacketPlayerDigging
@@ -38,142 +34,25 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import org.apache.commons.lang3.time.StopWatch
-import skytils.hylin.request.HypixelAPIException
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
-import skytils.skytilsmod.Skytils.Companion.prefix
-import skytils.skytilsmod.Skytils.Companion.successPrefix
-import skytils.skytilsmod.core.structure.FloatPair
-import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent
-import skytils.skytilsmod.events.impl.SendChatMessageEvent
-import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
-import skytils.skytilsmod.utils.graphics.ScreenRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer
-import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
-import java.util.concurrent.Future
-import kotlin.math.roundToInt
 
 object GriffinBurrows {
-    init {
-        GriffinGuiElement()
-    }
-
-    var lastManualRefresh = 0L
-
-    val burrows = hashMapOf<BlockPos, Burrow>()
-    val dugBurrows = hashSetOf<BlockPos>()
-    var lastDugBurrow: BlockPos? = null
     val particleBurrows = hashMapOf<BlockPos, ParticleBurrow>()
     var lastDugParticleBurrow: BlockPos? = null
-    val burrowRefreshTimer = StopWatch()
-    var shouldRefreshBurrows = false
 
     var hasSpadeInHotbar = false
-    var overridePerkCheck = false
-
-    fun refreshBurrows(): Future<*> {
-        return Skytils.threadPool.submit {
-            try {
-                if (!overridePerkCheck && MayorInfo.jerryMayor?.name != "Diana" && !MayorInfo.mayorPerks.contains("Mythological Ritual")) {
-                    UChat.chat(
-                        UTextComponent("§c§lHELLOOOOOO??? DIANA ISN'T MAYOR ARE YOU OK??? §6Am I wrong? Click me to disable this check.").setClick(
-                            ClickEvent.Action.RUN_COMMAND,
-                            "/skytilsoverridedianacheck"
-                        )
-                    )
-                    return@submit
-                }
-                val uuid = mc.thePlayer.gameProfile.id
-                val apiKey = Skytils.config.apiKey
-                if (apiKey.isBlank()) {
-                    UChat.chat("$failPrefix §c§lYour API key is required in order to use the burrow feature. §cPlease set it with /api new or /st setkey <key>")
-                    Skytils.config.showGriffinBurrows = false
-                    return@submit
-                }
-                val profileData =
-                    Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
-                if (profileData == null) {
-                    UChat.chat("$failPrefix §c§lUnable to find your Skyblock Profile!")
-                    return@submit
-                }
-                val receivedBurrows = profileData.griffin.burrows.associateTo(hashMapOf()) {
-                    val b = Burrow(it.x, it.y, it.z, it.type, it.tier, it.chain)
-                    b.blockPos to b
-                }
-                Utils.checkThreadAndQueue {
-                    dugBurrows.removeAll {
-                        !receivedBurrows.containsKey(it)
-                    }
-                    particleBurrows.keys.removeAll {
-                        receivedBurrows.containsKey(it)
-                    }
-                    val dupes = receivedBurrows.filterTo(hashMapOf()) { (bpos, _) ->
-                        dugBurrows.contains(bpos) || particleBurrows[bpos]?.dug == true
-                    }.also { receivedBurrows.entries.removeAll(it.entries) }
-                    burrows.clear()
-                    burrows.putAll(receivedBurrows)
-                    particleBurrows.clear()
-                    if (receivedBurrows.size == 0) {
-                        if (dupes.isEmpty()) UChat.chat("$failPrefix §cSkytils failed to load griffin burrows. Try manually digging a burrow and switching hubs.") else UChat.chat(
-                            "$failPrefix §cSkytils was unable to load fresh burrows. Please wait for the API refresh or switch hubs."
-                        )
-                    } else UChat.chat("$successPrefix §aSkytils loaded §2${receivedBurrows.size}§a burrows!")
-                }
-            } catch (apiException: HypixelAPIException) {
-                UChat.chat(
-                    "$failPrefix §cFailed to get burrows with reason: ${
-                        apiException.message?.replace(
-                            Skytils.config.apiKey,
-                            "*".repeat(Skytils.config.apiKey.length)
-                        )
-                    }"
-                )
-            } catch (e: Exception) {
-                UChat.chat(
-                    "$failPrefix §cSkytils ran into a fatal error whilst fetching burrows, please report this on our Discord. ${e::class.simpleName}: ${
-                        e.message?.replace(
-                            Skytils.config.apiKey,
-                            "*".repeat(Skytils.config.apiKey.length)
-                        )
-                    }"
-                )
-                e.printStackTrace()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onSendMessage(event: SendChatMessageEvent) {
-        if (!event.addToChat && event.message == "/skytilsoverridedianacheck") {
-            overridePerkCheck = true
-            event.isCanceled = true
-        }
-    }
 
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        val player = mc.thePlayer
         if (event.phase != TickEvent.Phase.START) return
-        hasSpadeInHotbar = player != null && Utils.inSkyblock && (0..7).any {
-            player.inventory.getStackInSlot(it).isSpade
-        }
-        if (!Utils.inSkyblock || player == null || !Skytils.config.showGriffinBurrows || SBInfo.mode != SkyblockIsland.Hub.mode) return
-        if (!burrowRefreshTimer.isStarted) burrowRefreshTimer.start()
-        if ((burrowRefreshTimer.time >= 60_000L || shouldRefreshBurrows)) {
-            burrowRefreshTimer.reset()
-            shouldRefreshBurrows = false
-            if (hasSpadeInHotbar) {
-                UChat.chat("$prefix §aSkytils is looking for burrows...")
-                refreshBurrows()
-            }
+        hasSpadeInHotbar = mc.thePlayer != null && Utils.inSkyblock && (0..7).any {
+            mc.thePlayer.inventory.getStackInSlot(it).isSpade
         }
     }
 
@@ -185,16 +64,9 @@ object GriffinBurrows {
                     unformatted.startsWith("You dug out a Griffin Burrow! (") ||
                     unformatted == "You finished the Griffin burrow chain! (4/4)")
         ) {
-            if (lastDugBurrow != null) {
-                dugBurrows.add(lastDugBurrow!!)
-                burrows.remove(lastDugBurrow!!)
-                lastDugBurrow = null
-            }
             if (lastDugParticleBurrow != null) {
                 val particleBurrow =
                     particleBurrows[lastDugParticleBurrow] ?: return
-                particleBurrow.dug = true
-                dugBurrows.add(particleBurrow.blockPos)
                 particleBurrows.remove(particleBurrow.blockPos)
                 lastDugParticleBurrow = null
             }
@@ -213,21 +85,15 @@ object GriffinBurrows {
                 else -> return
             }
         if (mc.thePlayer.heldItem?.isSpade != true || mc.theWorld.getBlockState(pos).block !== Blocks.grass) return
-        lastDugBurrow = burrows[pos]?.blockPos ?: lastDugBurrow
         lastDugParticleBurrow = particleBurrows[pos]?.blockPos ?: lastDugParticleBurrow
     }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Skytils.config.showGriffinBurrows) {
-            for (burrow in burrows.values) {
-                burrow.drawWaypoint(event.partialTicks)
-            }
-            if (Skytils.config.particleBurrows) {
-                for (pb in particleBurrows.values) {
-                    if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
-                        pb.drawWaypoint(event.partialTicks)
-                    }
+            for (pb in particleBurrows.values) {
+                if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
+                    pb.drawWaypoint(event.partialTicks)
                 }
             }
         }
@@ -235,90 +101,26 @@ object GriffinBurrows {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        burrows.clear()
         particleBurrows.clear()
-        shouldRefreshBurrows = true
-    }
-
-    class GriffinGuiElement : GuiElement("Griffin Timer", FloatPair(100, 10)) {
-        override fun render() {
-            if (SBInfo.mode != SkyblockIsland.Hub.mode) return
-            val player = mc.thePlayer
-            if (toggled && Utils.inSkyblock && player != null && hasSpadeInHotbar) {
-                val diff = ((60_000L - burrowRefreshTimer.time) / 1000L).toFloat().roundToInt().toLong()
-                val sr = UResolution
-                val leftAlign = actualX < sr.scaledWidth / 2f
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    "Time until refresh: " + diff + "s",
-                    if (leftAlign) 0f else actualWidth,
-                    0f,
-                    CommonColors.WHITE,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-            }
-        }
-
-        override fun demoRender() {
-            ScreenRenderer.fontRenderer.drawString(
-                "Time until refresh: 10s",
-                0f,
-                0f,
-                CommonColors.WHITE,
-                TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Time until refresh: 10s")
-        override val toggled: Boolean
-            get() = Skytils.config.showGriffinBurrows && Skytils.config.showGriffinCountdown
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
     }
 
     @SubscribeEvent
     fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock) return
-        if (Skytils.config.showGriffinBurrows && Skytils.config.particleBurrows && event.packet is S2APacketParticles) {
+        if (Skytils.config.showGriffinBurrows && hasSpadeInHotbar && event.packet is S2APacketParticles) {
             if (SBInfo.mode != SkyblockIsland.Hub.mode) return
             event.packet.apply {
+                val type = ParticleType.getParticleType(this) ?: return
                 val pos = BlockPos(x, y, z).down()
-                val footstepFilter =
-                    type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
-                val enchantFilter =
-                    type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
-                val startFilter =
-                    type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
-                val mobFilter =
-                    type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
-                val treasureFilter =
-                    type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
-                if (isLongDistance && (footstepFilter || enchantFilter || startFilter || mobFilter || treasureFilter)) {
-                    if (!burrows.containsKey(pos) && !dugBurrows.contains(pos)) {
-                        if (burrows.keys.any { it.distanceSq(x, y, z) < 4 }) return
-                        val burrow = particleBurrows.getOrPut(pos) {
-                            ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
-                        }
-
-                        if (!burrow.hasFootstep && footstepFilter) {
-                            burrow.hasFootstep = true
-                        } else if (!burrow.hasEnchant && enchantFilter) {
-                            burrow.hasEnchant = true
-                        } else if (burrow.type == -1 && type != EnumParticleTypes.FOOTSTEP && type != EnumParticleTypes.ENCHANTMENT_TABLE) {
-                            when {
-                                startFilter -> burrow.type = 0
-                                mobFilter -> burrow.type = 1
-                                treasureFilter -> burrow.type = 2
-                            }
-                        }
-                    }
+                val burrow = particleBurrows.getOrPut(pos) {
+                    ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+                }
+                when (type) {
+                    ParticleType.FOOTSTEP -> burrow.hasFootstep = true
+                    ParticleType.ENCHANT -> burrow.hasEnchant = true
+                    ParticleType.EMPTY -> burrow.type = 0
+                    ParticleType.MOB -> burrow.type = 1
+                    ParticleType.TREASURE -> burrow.type = 2
                 }
             }
         }
@@ -373,8 +175,6 @@ object GriffinBurrows {
         var hasEnchant: Boolean,
         override var type: Int
     ) : Diggable() {
-        var dug = false
-
         constructor(vec3: Vec3i, hasFootstep: Boolean, hasEnchant: Boolean, type: Int) : this(
             vec3.x,
             vec3.y,
@@ -405,73 +205,37 @@ object GriffinBurrows {
             }
     }
 
-    data class Burrow(
-        override val x: Int, override val y: Int, override val z: Int,
-        /**
-         * This variable seems to hold whether or not the burrow is the start/empty, a mob, or treasure
-         */
-        override var type: Int,
-        /**
-         * This variable holds the Griffin used, -1 means no Griffin, 0 means Common, etc.
-         */
-        val tier: Int,
-        /**
-         * This variable appears to hold what order the burrow is in the chain
-         */
-        private val chain: Int
-    ) : Diggable() {
-        override val waypointText: String
-            get() {
-                var type = "Burrow"
-                when (this.type) {
-                    0 -> type =
-                        if (chain == 0) "§aStart" else "§fEmpty"
-                    1 -> type = "§cMob"
-                    2, 3 -> type = "§6Treasure"
-                }
-                var closest: FastTravelLocations? = null
-                var distance = mc.thePlayer.position.distanceSq(blockPos)
-                for (warp in FastTravelLocations.values()) {
-                    if (!warp.toggled) continue
-                    val warpDistance = blockPos.distanceSq(warp.pos)
-                    if (warpDistance < distance) {
-                        distance = warpDistance
-                        closest = warp
-                    }
-                }
-                return "$type §bPosition: ${chain + 1}/4${
-                    if (closest != null) " ${closest.nameWithColor}" else ""
-                }"
-            }
-
-        override val color: Color
-            get() {
-                return when (this.type) {
-                    0 -> Skytils.config.emptyBurrowColor
-                    1 -> Skytils.config.mobBurrowColor
-                    2, 3 -> Skytils.config.treasureBurrowColor
-                    else -> Color.WHITE
-                }
-            }
-    }
-
-    enum class FastTravelLocations(val nameWithColor: String, val pos: BlockPos) {
-        CASTLE("§7CASTLE", BlockPos(-250, 130, 45)),
-        CRYPTS("§2CRYPTS", BlockPos(-162, 60, -100)),
-        DA("§5DA", BlockPos(91, 74, 173)),
-        HUB("§fHUB", BlockPos(-3, 70, -70)),
-        MUSEUM("§bMUSEUM", BlockPos(-76, 76, 80));
-
-        val toggled: Boolean
-            get() = when (this) {
-                CASTLE -> Skytils.config.burrowCastleFastTravel
-                CRYPTS -> Skytils.config.burrowCryptsFastTravel
-                DA -> Skytils.config.burrowDarkAuctionFastTravel
-                HUB -> Skytils.config.burrowHubFastTravel
-                MUSEUM -> Skytils.config.burrowMuseumFastTravel
-            }
-    }
-
     private val ItemStack?.isSpade
         get() = ItemUtil.getSkyBlockItemID(this) == "ANCESTRAL_SPADE"
+
+    private enum class ParticleType(val check: S2APacketParticles.() -> Boolean) {
+        EMPTY({
+            type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+        }),
+        MOB({
+            type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+
+        }),
+        TREASURE({
+            type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
+        }),
+        FOOTSTEP({
+            type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
+        }),
+        ENCHANT({
+            type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
+        });
+
+        companion object {
+            fun getParticleType(packet: S2APacketParticles): ParticleType? {
+                if (!packet.isLongDistance) return null
+                for (type in values()) {
+                    if (type.check(packet)) {
+                        return type
+                    }
+                }
+                return null
+            }
+        }
+    }
 }
