@@ -30,7 +30,6 @@ import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
@@ -237,15 +236,14 @@ class ItemFeatures {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            val chest = event.container
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText.trim()
             if (event.slot != null && event.slot.hasStack) {
-                val item: ItemStack = event.slot.stack ?: return
+                val item = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
-                    if (chestName.startsWith("Salvage") && extraAttr != null) {
-                        if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
+                    if (event.chestName.startsWith("Salvage") && extraAttr != null) {
+                        if (!extraAttr.hasKey("baseStatBoostPercentage") && getItemLore(item).asReversed()
+                                .getOrNull(2)
+                                ?.startsWith("§aPerfect ") == false && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
                             )
                         ) {
