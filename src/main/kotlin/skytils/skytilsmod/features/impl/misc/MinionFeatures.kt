@@ -63,10 +63,9 @@ class MinionFeatures {
             val inventory = chest.lowerChestInventory
             val slot = event.slot ?: return
             val item = slot.stack
-            val inventoryName = inventory.displayName.unformattedText
-            if (Skytils.config.onlyCollectEnchantedItems && inventoryName.contains("Minion") && item != null) {
+            if (Skytils.config.onlyCollectEnchantedItems && event.chestName.contains("Minion") && item != null) {
                 if (!item.isItemEnchanted && item.item != Items.skull) {
-                    if (inventoryName == "Minion Chest") {
+                    if (event.chestName == "Minion Chest") {
                         if (!blockUnenchanted) {
                             for (i in 0 until inventory.sizeInventory) {
                                 val stack = inventory.getStackInSlot(i) ?: continue
