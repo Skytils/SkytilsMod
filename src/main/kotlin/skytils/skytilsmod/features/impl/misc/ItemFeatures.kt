@@ -65,6 +65,7 @@ import skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getItemLore
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.RenderUtil.renderRarity
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -481,6 +482,7 @@ class ItemFeatures {
         var stackTip = ""
         val lore = getItemLore(item).takeIf { it.isNotEmpty() }
         getExtraAttributes(item)?.let { extraAttributes ->
+            val matrixStack = UMatrixStack()
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
                 stackTip = extraAttributes.getInteger("potion_level").toString()
             } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && item.item === Items.enchanted_book && extraAttributes.hasKey(
@@ -543,6 +545,38 @@ class ItemFeatures {
                     event.y,
                     1 - extraAttributes.getInteger("pickonimbus_durability") / 5000.0
                 )
+            }
+            if (Skytils.config.showAttributeShardAbbreviation && item.item == Items.prismarine_shard && extraAttributes.hasKey(
+                    "attributes"
+                ) && extraAttributes.getCompoundTag("attributes").keySet.size == 1
+            ) {
+                getItemLore(item).getOrNull(0)?.split(' ')?.dropLastWhile { it.romanToDecimal() == 0 }?.dropLast(1)
+                    ?.joinToString(separator = "") {
+                        if (it.startsWith('§'))
+                            it.substring(0, 2) + it[2].uppercase()
+                        else
+                            it[0].uppercase()
+                    }?.let { attribute ->
+                        UGraphics.disableLighting()
+                        UGraphics.disableDepth()
+                        UGraphics.disableBlend()
+                        matrixStack.push()
+                        matrixStack.translate(event.x.toFloat(), event.y.toFloat(), 1f)
+                        matrixStack.scale(0.8, 0.8, 1.0)
+                        matrixStack.runWithGlobalState {
+                            ScreenRenderer.fontRenderer.drawString(
+                                attribute,
+                                0f,
+                                0f,
+                                CommonColors.WHITE,
+                                TextAlignment.LEFT_RIGHT,
+                                TextShadow.NORMAL
+                            )
+                        }
+                        matrixStack.pop()
+                        UGraphics.enableLighting()
+                        UGraphics.enableDepth()
+                    }
             }
         }
         if (Skytils.config.showPetCandies && item.item === Items.skull) {
