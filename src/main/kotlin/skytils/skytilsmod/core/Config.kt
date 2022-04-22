@@ -1897,6 +1897,13 @@ object Config : Vigilant(
     var rareRelicFinder = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Better Stash",
+        description = "Shows an improved view of your stash.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var betterStash = false
+
+    @Property(
         type = PropertyType.BUTTON, name = "Reset Found Relic Waypoints",
         description = "Resets the state of all the relics at the Spider's Den.",
         category = "Miscellaneous", subcategory = "Quality of Life"

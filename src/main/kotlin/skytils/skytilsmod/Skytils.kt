@@ -276,6 +276,7 @@ class Skytils {
             TriviaSolver(),
             WaterBoardSolver(),
             Waypoints(),
+            BetterStash(),
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
