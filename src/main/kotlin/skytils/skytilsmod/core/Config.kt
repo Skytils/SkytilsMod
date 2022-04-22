@@ -2189,7 +2189,7 @@ object Config : Vigilant(
         max = 500
     )
     var lowSoulflowPing = 0
-    
+
     @Property(
         PropertyType.NUMBER, name = "Totem Ping",
         description = "Alerts you of a specific time (seconds) on the Inferno Demonlord's Totem.",
