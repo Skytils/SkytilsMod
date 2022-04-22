@@ -329,14 +329,10 @@ class MiscFeatures {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            val chest = event.container
-            val inventory = chest.lowerChestInventory
             val slot = event.slot ?: return
-            val item = slot.stack
-            val inventoryName = inventory.displayName.unformattedText
-            if (item == null) return
+            val item = slot.stack ?: return
             val extraAttributes = getExtraAttributes(item)
-            if (inventoryName == "Ophelia") {
+            if (event.chestName == "Ophelia") {
                 if (Skytils.config.dungeonPotLock > 0) {
                     if (slot.inventory === mc.thePlayer.inventory || slot.slotNumber == 49) return
                     if (item.item !== Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
