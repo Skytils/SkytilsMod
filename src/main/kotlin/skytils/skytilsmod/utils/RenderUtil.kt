@@ -19,6 +19,7 @@ package skytils.skytilsmod.utils
 
 import gg.essential.elementa.font.DefaultFonts
 import gg.essential.elementa.font.ElementaFonts
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
@@ -155,75 +156,74 @@ object RenderUtil {
         tessellator.draw()
     }
 
-    /**
-     * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
-     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
-     * @author Moulberry
-     * @author Mojang
-     */
-    fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GlStateManager.disableTexture2D()
-        val tessellator = Tessellator.getInstance()
-        val worldRenderer = tessellator.worldRenderer
-        GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
+    internal fun <T> Color.withParts(block: (Int, Int, Int, Int) -> T) = block(this.red, this.green, this.blue, this.alpha)
 
-        //vertical
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        tessellator.draw()
-        GlStateManager.color(
-            c.red / 255f * 0.8f,
-            c.green / 255f * 0.8f,
-            c.blue / 255f * 0.8f,
-            c.alpha / 255f * alphaMultiplier
-        )
+    fun drawFilledBoundingBox(matrixStack: UMatrixStack, aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
+        UGraphics.enableBlend()
+        UGraphics.disableLighting()
+        UGraphics.tryBlendFuncSeparate(770, 771, 1, 0)
+        val wr = UGraphics.getFromTessellator()
+        wr.beginWithDefaultShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_COLOR)
 
-        //x
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        GlStateManager.color(
-            c.red / 255f * 0.9f,
-            c.green / 255f * 0.9f,
-            c.blue / 255f * 0.9f,
-            c.alpha / 255f * alphaMultiplier
-        )
-        //z
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        GlStateManager.enableTexture2D()
-        GlStateManager.disableBlend()
+        // vertical
+        c.withAlpha(c.alpha * alphaMultiplier / 255f).withParts { r, g, b, a ->
+            // bottom
+            wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.maxZ).color(r, g, b, a).endVertex()
+            // top
+            wr.pos(matrixStack, aabb.minX, aabb.maxY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.maxY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.maxY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.maxY, aabb.minZ).color(r, g, b, a).endVertex()
+        }
+
+        // x axis
+        c.withParts { r, g, b, a ->
+            Color(
+                r * 0.8f / 255f,
+                g * 0.8f / 255f,
+                b * 0.8f / 255f,
+                a * alphaMultiplier / 255f
+            )
+        }.withParts { r, g, b, a ->
+            // west
+            wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.maxY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.maxY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
+            // east
+            wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.maxY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.maxY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.maxZ).color(r, g, b, a).endVertex()
+        }
+
+        // z axis
+        c.withParts { r, g, b, a ->
+            Color(
+                r * 0.9f / 255f,
+                g * 0.9f / 255f,
+                b * 0.9f / 255f,
+                a * alphaMultiplier / 255f
+            )
+        }.withParts { r, g, b, a ->
+            // north
+            wr.pos(matrixStack, aabb.minX, aabb.maxY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.maxY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
+            // south
+            wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.maxX, aabb.maxY, aabb.maxZ).color(r, g, b, a).endVertex()
+            wr.pos(matrixStack, aabb.minX, aabb.maxY, aabb.maxZ).color(r, g, b, a).endVertex()
+        }
+
+        wr.drawDirect()
+        UGraphics.disableBlend()
+        UGraphics.enableLighting()
     }
 
     /**
@@ -372,7 +372,8 @@ object RenderUtil {
         x: Double, y: Double, z: Double,
         str: String, color: Color,
         partialTicks: Float, matrixStack: UMatrixStack,
-        shadow: Boolean = true, scale: Float = 1f, background: Boolean = true) {
+        shadow: Boolean = true, scale: Float = 1f, background: Boolean = true
+    ) {
         val player = mc.thePlayer
         val x1 = x - player.lastTickPosX + (x - player.posX - (x - player.lastTickPosX)) * partialTicks
         val y1 = y - player.lastTickPosY + (y - player.posY - (y - player.lastTickPosY)) * partialTicks

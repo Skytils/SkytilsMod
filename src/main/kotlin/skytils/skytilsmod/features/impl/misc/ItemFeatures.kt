@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UGraphics
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.block.BlockDoor
 import net.minecraft.block.BlockLadder
@@ -624,12 +625,14 @@ class ItemFeatures {
             val state = mc.theWorld.getBlockState(block)
             if (isValidEtherwarpPos(obj)) {
                 val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+                val matrixStack = UMatrixStack()
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
                 GlStateManager.enableBlend()
                 GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
                 state.block.setBlockBoundsBasedOnState(mc.theWorld, block)
                 RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
                     state.block.getSelectedBoundingBox(mc.theWorld, block)
                         .expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
                         .offset(-viewerX, -viewerY, -viewerZ),
