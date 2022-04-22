@@ -479,6 +479,7 @@ class ItemFeatures {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val item = event.stack ?: return
         if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
+        val matrixStack = UMatrixStack()
         var stackTip = ""
         val lore = getItemLore(item).takeIf { it.isNotEmpty() }
         getExtraAttributes(item)?.let { extraAttributes ->
@@ -550,7 +551,7 @@ class ItemFeatures {
                     "attributes"
                 ) && extraAttributes.getCompoundTag("attributes").keySet.size == 1
             ) {
-                getItemLore(item).getOrNull(0)?.split(' ')?.dropLastWhile { it.romanToDecimal() == 0 }?.dropLast(1)
+                lore?.getOrNull(0)?.split(' ')?.dropLastWhile { it.romanToDecimal() == 0 }?.dropLast(1)
                     ?.joinToString(separator = "") {
                         if (it.startsWith('§'))
                             it.substring(0, 2) + it[2].uppercase()
