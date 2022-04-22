@@ -197,7 +197,7 @@ class ItemFeatures {
                         if (sbId != "ICE_SPRAY_WAND" && extraAttr != null && !extraAttr.hasKey(
                                 "dungeon_item_level"
                             ) && (extraAttr.hasKey("baseStatBoostPercentage") || getItemLore(stack).asReversed()
-                                .getOrNull(2)?.startsWith("§aPerfect ") == true)
+                                .getOrNull(1)?.startsWith("§aPerfect ") == true)
                         ) {
                             GlStateManager.translate(0f, 0f, 1f)
                             event.slot highlight Color(15, 233, 233)
@@ -241,9 +241,9 @@ class ItemFeatures {
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
                     if (event.chestName.startsWith("Salvage") && extraAttr != null) {
-                        if (!extraAttr.hasKey("baseStatBoostPercentage") && getItemLore(item).asReversed()
-                                .getOrNull(2)
-                                ?.startsWith("§aPerfect ") == false && !item.displayName.contains("Salvage") && !item.displayName.contains(
+                        if ((!extraAttr.hasKey("baseStatBoostPercentage") && getItemLore(item).asReversed()
+                                .getOrNull(1)
+                                ?.startsWith("§aPerfect ") == false) && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
                             )
                         ) {
