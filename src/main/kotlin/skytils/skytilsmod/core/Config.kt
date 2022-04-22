@@ -1323,7 +1323,7 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Show Attribute Shard Abbreviation",
         description = "Shows the abbreivated name of shards with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items",
-        searchTags = arrayOf("1.3.0-pre1")
+        searchTags = ["1.3.0-pre1"]
     )
     var showAttributeShardAbbreviation = false
 
