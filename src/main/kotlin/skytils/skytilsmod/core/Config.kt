@@ -1320,6 +1320,14 @@ object Config : Vigilant(
     var showEnchantedBookAbbreviation = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Attribute Shard Abbreviation",
+        description = "Shows the abbreivated name of shards with only 1 enchantment.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = arrayOf("1.3.0-pre1")
+    )
+    var showAttributeShardAbbreviation = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Enchanted Book Tier",
         description = "Shows the tier of books with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items"
