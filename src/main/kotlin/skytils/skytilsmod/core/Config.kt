@@ -2585,6 +2585,22 @@ object Config : Vigilant(
     )
     var compactHider = 0
 
+    @Property(
+        type = PropertyType.SELECTOR, name = "Pristine Hider",
+        description = "Removes Pristine messages from mining.",
+        category = "Spam", subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var pristineHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Wind Direction Hider",
+        description = "Removes Gone With the Wind direction change messages.",
+        category = "Spam", subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var windHider = 0
+
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
