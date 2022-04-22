@@ -193,7 +193,6 @@ tasks {
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-//        options.release.set(8)
     }
     withType<KotlinCompile> {
         kotlinOptions {
@@ -208,7 +207,7 @@ tasks {
                 "-Dkotlin.enableCacheBuilding=true",
                 "-Dkotlin.useParallelTasks=true",
                 "-Dkotlin.enableFastIncremental=true",
-                "-Xbackend-threads=0"
+                //"-Xbackend-threads=0"
             )
         )
     }
