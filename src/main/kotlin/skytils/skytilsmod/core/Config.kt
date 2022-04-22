@@ -1323,7 +1323,7 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Show Attribute Shard Abbreviation",
         description = "Shows the abbreivated name of shards with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items",
-        searchTags = arrayOf("1.3.0-pre1")
+        searchTags = ["1.3.0-pre1"]
     )
     var showAttributeShardAbbreviation = false
 
@@ -2591,6 +2591,22 @@ object Config : Vigilant(
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var compactHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Pristine Hider",
+        description = "Removes Pristine messages from mining.",
+        category = "Spam", subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var pristineHider = 0
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Wind Direction Hider",
+        description = "Removes Gone With the Wind direction change messages.",
+        category = "Spam", subcategory = "Miscellaneous",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var windHider = 0
 
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
