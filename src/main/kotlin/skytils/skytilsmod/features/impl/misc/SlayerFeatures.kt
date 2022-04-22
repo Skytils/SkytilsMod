@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.misc
 import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
@@ -413,6 +414,7 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
+        val matrixStack = UMatrixStack()
         if (Skytils.config.highlightYangGlyph && yangGlyph != null) {
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
@@ -421,6 +423,7 @@ class SlayerFeatures {
             val y = yangGlyph!!.y - viewerY
             val z = yangGlyph!!.z - viewerZ
             drawFilledBoundingBox(
+                matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
                 Skytils.config.yangGlyphColor,
                 1f
@@ -437,6 +440,7 @@ class SlayerFeatures {
                 val y = head.posY - viewerY
                 val z = head.posZ - viewerZ
                 drawFilledBoundingBox(
+                    matrixStack,
                     AxisAlignedBB(x - 0.25, y + 0.5, z - 0.25, x + 0.25, y + 1.5, z + 0.25),
                     Skytils.config.nukekebiHeadColor,
                     1f

@@ -173,6 +173,7 @@ object StupidTreasureChestOpeningThing {
         sendHelpPlease.entries.removeAll { (pos, chest) ->
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
+                matrixStack,
                 chest.box.offset(-viewerX, -viewerY, -viewerZ).expand(0.01, 0.01, 0.01),
                 Color(255, 0, 0, 69),
                 1f
@@ -186,6 +187,7 @@ object StupidTreasureChestOpeningThing {
             )
             if (chest.particleBox != null) {
                 RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
                     chest.particleBox!!.offset(-viewerX, -viewerY, -viewerZ),
                     Color(255, 0, 255, 69),
                     1f

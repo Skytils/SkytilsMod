@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
@@ -58,6 +59,7 @@ class BoulderSolver {
         if (boulderChest == null) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         if (roomVariant >= 0) {
+            val matrixStack = UMatrixStack()
             val steps = variantSteps[roomVariant]
             for (step in steps) {
                 if (grid[step.x][step.y] != BoulderState.EMPTY) {
@@ -77,6 +79,7 @@ class BoulderSolver {
                     val z = buttonPos.z - viewerZ
                     GlStateManager.disableCull()
                     RenderUtil.drawFilledBoundingBox(
+                        matrixStack,
                         AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
                         Color(255, 0, 0, 255),
                         0.7f
