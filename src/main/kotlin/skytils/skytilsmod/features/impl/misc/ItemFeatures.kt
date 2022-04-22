@@ -477,9 +477,10 @@ class ItemFeatures {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val item = event.stack ?: return
         if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
+        val matrixStack = UMatrixStack()
         var stackTip = ""
-        val extraAttributes = getExtraAttributes(item)
-        if (extraAttributes != null) {
+        val lore = getItemLore(item).takeIf { it.isNotEmpty() }
+        getExtraAttributes(item)?.let { extraAttributes ->
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
                 stackTip = extraAttributes.getInteger("potion_level").toString()
             } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && item.item === Items.enchanted_book && extraAttributes.hasKey(
@@ -544,15 +545,12 @@ class ItemFeatures {
                 )
             }
         }
-        val lore = getItemLore(item)
-        if (lore.isNotEmpty()) {
-            if (Skytils.config.showPetCandies && item.item === Items.skull) {
-                for (line in lore) {
-                    val candyLineMatcher = candyPattern.matcher(line)
-                    if (candyLineMatcher.matches()) {
-                        stackTip = candyLineMatcher.group(1).toString()
-                        break
-                    }
+        if (Skytils.config.showPetCandies && item.item === Items.skull) {
+            lore?.forEach { line ->
+                val candyLineMatcher = candyPattern.matcher(line)
+                if (candyLineMatcher.matches()) {
+                    stackTip = candyLineMatcher.group(1).toString()
+                    return@forEach
                 }
             }
         }
