@@ -26,20 +26,23 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.Utils
 
 class BetterStash {
     var shouldDelete = false
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (Skytils.config.betterStash) {
-            if (Regex("You have §a\\d+ §eitems? stashed away!!!").containsMatchIn(event.message.unformattedText)) {
+        if (Skytils.config.betterStash && Utils.inSkyblock) {
+            if (Regex("§eYou have §a\\d+ §eitems? stashed away!!!\\n.*").matches(event.message.unformattedText)) {
                 event.isCanceled = true
+                println(event.message.unformattedText)
                 Skytils.sendMessageQueue.add("/viewstash")
                 shouldDelete = true
-            } else if (shouldDelete && Regex("Item Stash Contents:\n.*").containsMatchIn(event.message.unformattedText)) {
+            } else if (shouldDelete && Regex("\\n§b§lItem Stash Contents:.*\\n.*\\n.*").matches(event.message.unformattedText)) {
                 shouldDelete = false
                 event.isCanceled = true
+                println(event.message.unformattedText)
                 val items =
                     Regex("Item Stash Contents:\n(.*)").find(event.message.unformattedText)!!.groupValues[1].split("->newLine<-")
                         .filter {
