@@ -19,15 +19,16 @@
 package skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
+import gg.essential.universal.utils.MCClickEventAction
+import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.setHoverText
 
 class BetterStash {
     private var shouldDelete = false
@@ -53,25 +54,21 @@ class BetterStash {
                     }
 
                 UChat.chat(
-                    UTextComponent("§e§lYou have §a${items.size}x §eitems in your stash!")
+                    "§eYou have §a${items.size}x §eitems in your stash!"
                 )
 
                 UMessage(
                     UTextComponent("§b§l[Items]").setClick(
-                        ClickEvent.Action.RUN_COMMAND, "/viewstash"
+                        MCClickEventAction.RUN_COMMAND, "/viewstash"
                     ).setHover(
-                        HoverEvent.Action.SHOW_TEXT, UTextComponent(items.joinToString("\n"))
+                        MCHoverEventAction.SHOW_TEXT, UTextComponent(items.joinToString("\n"))
                     ), "  ",
                     UTextComponent("§a§l[Claim]").setClick(
-                        ClickEvent.Action.RUN_COMMAND, "/pickupstash"
-                    ).setHover(
-                        HoverEvent.Action.SHOW_TEXT, UTextComponent("/pickupstash")
-                    ), "  ",
+                        MCClickEventAction.RUN_COMMAND, "/pickupstash"
+                    ).setHoverText("/pickupstash"), "  ",
                     UTextComponent("§c§l[Clear]").setClick(
-                        ClickEvent.Action.RUN_COMMAND, "/clearstash"
-                    ).setHover(
-                        HoverEvent.Action.SHOW_TEXT, UTextComponent("/clearstash")
-                    )
+                        MCClickEventAction.RUN_COMMAND, "/clearstash"
+                    ).setHoverText("/clearstash")
                 ).chat()
             }
         } else if (shouldDelete) shouldDelete = false

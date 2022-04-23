@@ -1897,13 +1897,6 @@ object Config : Vigilant(
     var rareRelicFinder = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Better Stash",
-        description = "Shows an improved view of your stash.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var betterStash = false
-
-    @Property(
         type = PropertyType.BUTTON, name = "Reset Found Relic Waypoints",
         description = "Resets the state of all the relics at the Spider's Den.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1912,6 +1905,13 @@ object Config : Vigilant(
     fun resetRelicWaypoints() {
         Tracker.getTrackerById("found_spiders_den_relics")!!.doReset()
     }
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Better Stash",
+        description = "Shows an improved view of your stash.\n&cWARNING: This feature runs /viewstash upon receiving a stash message.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var betterStash = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
