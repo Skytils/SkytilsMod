@@ -26,6 +26,7 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
 import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.getSkytilsResource
 import java.util.*
 import kotlin.random.Random
 
@@ -66,14 +67,14 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
 
 object SplashProgressTransformer {
     val gifs = mapOf(
-        0.0 to ResourceLocation("skytils", "sychicpet.gif"),
-        88.5 to ResourceLocation("skytils", "sychiccat.png"),
-        94.5 to ResourceLocation("skytils", "breefingdog.png"),
-        96.0 to ResourceLocation("skytils", "azoopet.gif"),
-        99.0 to ResourceLocation("skytils", "abdpfp.gif"),
-        99.7 to ResourceLocation("skytils", "bigrat.png"),
+        0.0 to getSkytilsResource("splashes/sychicpet.gif"),
+        88.5 to getSkytilsResource("splashes/sychiccat.png"),
+        94.5 to getSkytilsResource("splashes/breefingdog.png"),
+        96.0 to getSkytilsResource("splashes/azoopet.gif"),
+        99.0 to getSkytilsResource("splashes/abdpfp.gif"),
+        99.7 to getSkytilsResource("splashes/bigrat.png"),
         // this is around the chance of winning the jackpot on the lottery
-        100 - 100 * 1 / 302_575_350.0 to ResourceLocation("skytils", "jamcat.gif")
+        100 - 100 * 1 / 302_575_350.0 to getSkytilsResource("splashes/jamcat.gif")
     )
 
     @JvmStatic
@@ -81,22 +82,19 @@ object SplashProgressTransformer {
         val cal = GregorianCalendar.getInstance()
         val month = cal.get(GregorianCalendar.MONTH) + 1
         val date = cal.get(GregorianCalendar.DATE)
-        if (month == 2 && date == 6) return ResourceLocation(
-            "skytils",
-            "partysychic.gif"
+        if (month == 2 && date == 6) return getSkytilsResource(
+            "splashes/partysychic.gif"
         )
         if (SuperSecretSettings.noSychic) return resourceLocation
-        if (Utils.isBSMod) return ResourceLocation("skytils", "bigrat.png")
-        if (month == 12 || (month == 1 && date == 1)) return ResourceLocation(
-            "skytils",
-            "christmassychicpet.gif"
+        if (Utils.isBSMod) return getSkytilsResource("splashes/bigrat.png")
+        if (month == 12 || (month == 1 && date == 1)) return getSkytilsResource(
+            "splashes/christmassychicpet.gif"
         )
-        return if (SuperSecretSettings.breefingDog) ResourceLocation("skytils", "breefingdog.png")
+        return if (SuperSecretSettings.breefingDog) getSkytilsResource("splashes/breefingdog.png")
         else {
             val weight = Random.nextDouble() * 100
-            (gifs.entries.reversed().find { weight >= it.key }?.value ?: ResourceLocation(
-                "skytils",
-                "sychicpet.gif"
+            (gifs.entries.reversed().find { weight >= it.key }?.value ?: getSkytilsResource(
+                "splashes/sychicpet.gif"
             )).also {
                 println("Rolled a $weight, displaying ${it.resourcePath}")
             }
