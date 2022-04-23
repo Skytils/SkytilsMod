@@ -57,16 +57,16 @@ class BetterStash {
                 )
 
                 UMessage(
-                    UTextComponent("§b§l[Items]  ").setClick(
+                    UTextComponent("§b§l[Items]").setClick(
                         ClickEvent.Action.RUN_COMMAND, "/viewstash"
                     ).setHover(
                         HoverEvent.Action.SHOW_TEXT, UTextComponent(items.joinToString("\n"))
-                    ),
-                    UTextComponent("§a§l[Claim]  ").setClick(
+                    ), "  ",
+                    UTextComponent("§a§l[Claim]").setClick(
                         ClickEvent.Action.RUN_COMMAND, "/pickupstash"
                     ).setHover(
                         HoverEvent.Action.SHOW_TEXT, UTextComponent("/pickupstash")
-                    ),
+                    ), "  ",
                     UTextComponent("§c§l[Clear]").setClick(
                         ClickEvent.Action.RUN_COMMAND, "/clearstash"
                     ).setHover(
