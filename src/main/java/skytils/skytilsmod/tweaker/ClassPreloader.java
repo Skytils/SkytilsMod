@@ -86,7 +86,7 @@ public class ClassPreloader {
                     name,
                     bytes
             );
-            classLoader.loadClass(name);
+            //classLoader.loadClass(name);
             Launch.classLoader.addClassLoaderExclusion(name);
         } catch (Exception e) {
             if (isDev) e.printStackTrace();
