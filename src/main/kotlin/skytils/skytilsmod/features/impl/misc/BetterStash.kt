@@ -36,15 +36,13 @@ class BetterStash {
         if (Skytils.config.betterStash && Utils.inSkyblock) {
             if (Regex("§eYou have §a\\d+ §eitems? stashed away!!!\\n.*").matches(event.message.unformattedText)) {
                 event.isCanceled = true
-                println(event.message.unformattedText)
                 Skytils.sendMessageQueue.add("/viewstash")
                 shouldDelete = true
-            } else if (shouldDelete && Regex("\\n§b§lItem Stash Contents:.*\\n.*\\n.*").matches(event.message.unformattedText)) {
+            } else if (shouldDelete && Regex("\\n§b§lItem Stash Contents:[\\s\\S]*").matches(event.message.unformattedText)) {
                 shouldDelete = false
                 event.isCanceled = true
-                println(event.message.unformattedText)
                 val items =
-                    Regex("Item Stash Contents:\n(.*)").find(event.message.unformattedText)!!.groupValues[1].split("->newLine<-")
+                    Regex("Item Stash Contents:\n([\\s\\S]*)").find(event.message.unformattedText)!!.groupValues[1].split("\n")
                         .filter {
                             Regex("^§a\\d+(,\\d+)*x\\x20.*\$").matches(it)
                         }
