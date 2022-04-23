@@ -537,7 +537,7 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookTier) stackTip =
                         enchantments.getInteger(name.toString()).toString()
                 }
-            } else if (Skytils.config.showDungeonItemLevel && ItemUtil.getStarCount(extraAttributes) > 0) {
+            } else if (Skytils.config.showStarCount && ItemUtil.getStarCount(extraAttributes) > 0) {
                 stackTip = ItemUtil.getStarCount(extraAttributes).toString()
             }
             if (extraAttributes.hasKey("pickonimbus_durability")) {
