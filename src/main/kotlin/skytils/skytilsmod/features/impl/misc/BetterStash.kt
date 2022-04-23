@@ -49,21 +49,21 @@ class BetterStash {
                     ChatComponentText("§e§lYou have §a${items.size}x §eitems in your stash!")
                 )
                 Skytils.mc.thePlayer.addChatMessage(
-                    ChatComponentText("§b§l[Items]").setChatStyle(
+                    ChatComponentText("§b§l[Items]  ").setChatStyle(
                         ChatStyle().setChatHoverEvent(
                             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(items.joinToString("\n")))
                         ).setChatClickEvent(
                             ClickEvent(ClickEvent.Action.RUN_COMMAND, "/viewstash")
                         )
-                    ).appendSibling(ChatComponentText("  ")).appendSibling(
-                        ChatComponentText("§a§l[Claim]").setChatStyle(
+                    ).appendSibling(
+                        ChatComponentText("§a§l[Claim]  ").setChatStyle(
                             ChatStyle().setChatHoverEvent(
                                 HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("/pickupstash"))
                             ).setChatClickEvent(
                                 ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pickupstash")
                             )
                         )
-                    ).appendSibling(ChatComponentText("  ")).appendSibling(
+                    ).appendSibling(
                         ChatComponentText("§c§l[Clear]").setChatStyle(
                             ChatStyle().setChatHoverEvent(
                                 HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("/clearstash"))
