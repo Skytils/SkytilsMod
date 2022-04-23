@@ -93,7 +93,7 @@ object SplashProgressTransformer {
         return if (SuperSecretSettings.breefingDog) getSkytilsResource("splashes/breefingdog.png")
         else {
             val weight = Random.nextDouble() * 100
-            (gifs.entries.reversed().find { weight >= it.key }?.value ?: getSkytilsResource(
+            (gifs.entries.lastOrNull { weight >= it.key }?.value ?: getSkytilsResource(
                 "splashes/sychicpet.gif"
             )).also {
                 println("Rolled a $weight, displaying ${it.resourcePath}")
