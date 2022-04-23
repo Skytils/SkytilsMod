@@ -356,3 +356,5 @@ val Pet.isSpirit
 
 val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
     get() = Collections.newSetFromMap(this)
+
+fun getSkytilsResource(path: String) = ResourceLocation("skytils", path)
