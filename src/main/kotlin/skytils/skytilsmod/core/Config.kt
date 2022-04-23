@@ -1605,6 +1605,13 @@ object Config : Vigilant(
     var betterAuctionPriceInput = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Better Stash",
+        description = "Shows an improved view of your stash.\n&cWARNING: This feature runs /viewstash upon receiving a stash message.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var betterStash = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Container Sell Value",
         description = "Display the lowest BIN prices for the most valuable items in backpacks, ender chest pages, minions, and island chests.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1905,13 +1912,6 @@ object Config : Vigilant(
     fun resetRelicWaypoints() {
         Tracker.getTrackerById("found_spiders_den_relics")!!.doReset()
     }
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Better Stash",
-        description = "Shows an improved view of your stash.\n&cWARNING: This feature runs /viewstash upon receiving a stash message.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var betterStash = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
