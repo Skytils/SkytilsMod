@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.features.impl.events
 
+import com.google.common.collect.EvictingQueue
 import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -45,6 +46,7 @@ import java.awt.Color
 object GriffinBurrows {
     val particleBurrows = hashMapOf<BlockPos, ParticleBurrow>()
     var lastDugParticleBurrow: BlockPos? = null
+    val recentlyDugParticleBurrows: EvictingQueue<BlockPos> = EvictingQueue.create(5)
 
     var hasSpadeInHotbar = false
 
@@ -68,7 +70,9 @@ object GriffinBurrows {
             if (lastDugParticleBurrow != null) {
                 val particleBurrow =
                     particleBurrows[lastDugParticleBurrow] ?: return
+                recentlyDugParticleBurrows.add(lastDugParticleBurrow)
                 particleBurrows.remove(particleBurrow.blockPos)
+                printDevMessage("Removed $particleBurrow", "griffin")
                 lastDugParticleBurrow = null
             }
         }
@@ -86,7 +90,10 @@ object GriffinBurrows {
                 else -> return
             }
         if (mc.thePlayer.heldItem?.isSpade != true || mc.theWorld.getBlockState(pos).block !== Blocks.grass) return
-        lastDugParticleBurrow = particleBurrows[pos]?.blockPos ?: lastDugParticleBurrow
+        particleBurrows[pos]?.blockPos?.let {
+            printDevMessage("Clicked on $it", "griffin")
+            lastDugParticleBurrow = it
+        }
     }
 
     @SubscribeEvent
@@ -104,6 +111,7 @@ object GriffinBurrows {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         particleBurrows.clear()
+        recentlyDugParticleBurrows.clear()
     }
 
     @SubscribeEvent
@@ -114,6 +122,7 @@ object GriffinBurrows {
             event.packet.apply {
                 val type = ParticleType.getParticleType(this) ?: return
                 val pos = BlockPos(x, y, z).down()
+                if (recentlyDugParticleBurrows.contains(pos)) return
                 val burrow = particleBurrows.getOrPut(pos) {
                     ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
                 }
