@@ -1306,11 +1306,11 @@ object Config : Vigilant(
     var witherShieldCooldown = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Dungeon Item Level",
-        description = "Shows the amount of stars on dungeon items as the stack size.",
+        type = PropertyType.SWITCH, name = "Show Item Star Count",
+        description = "Shows the amount of stars on items as the stack size.",
         category = "Miscellaneous", subcategory = "Items"
     )
-    var showDungeonItemLevel = false
+    var showStarCount = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Enchanted Book Abbreviation",
