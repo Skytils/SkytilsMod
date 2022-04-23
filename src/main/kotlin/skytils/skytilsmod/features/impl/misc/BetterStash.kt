@@ -75,6 +75,6 @@ class BetterStash {
                     )
                 )
             }
-        }
+        } else if (shouldDelete) shouldDelete = false
     }
 }
