@@ -23,23 +23,20 @@ import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
+import skytils.skytilsmod.utils.ItemUtil
 
 object StarredItemStrategy : ItemProtectStrategy() {
     override fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
         if (extraAttr == null) return false
-        when (type) {
+        val isStarred = ItemUtil.getStarCount(extraAttr) > 0
+        return when (type) {
             ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
-                if (extraAttr.hasKey("dungeon_item_level")) {
-                    return true
-                }
+                isStarred
             }
             ProtectType.HOTBARDROPKEY -> {
-                if (!DungeonFeatures.hasClearedText && extraAttr.hasKey("dungeon_item_level")) {
-                    return true
-                }
+                !DungeonFeatures.hasClearedText && isStarred
             }
         }
-        return false
     }
 
     override val isToggled: Boolean

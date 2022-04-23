@@ -196,10 +196,11 @@ class ItemFeatures {
                         val stack = event.slot.stack
                         val extraAttr = getExtraAttributes(stack)
                         val sbId = getSkyBlockItemID(extraAttr)
-                        if (sbId != "ICE_SPRAY_WAND" && extraAttr != null && !extraAttr.hasKey(
-                                "dungeon_item_level"
-                            ) && (extraAttr.hasKey("baseStatBoostPercentage") || getItemLore(stack).asReversed()
-                                .getOrNull(1)?.startsWith("§aPerfect ") == true)
+                        if (sbId != "ICE_SPRAY_WAND" && extraAttr != null && ItemUtil.getStarCount(extraAttr) == 0
+                            && !extraAttr.hasKey("dungeon_item") && (extraAttr.hasKey("baseStatBoostPercentage") || getItemLore(
+                                stack
+                            ).getLastOrNull(1)
+                                ?.startsWith("§aPerfect ") == true)
                         ) {
                             GlStateManager.translate(0f, 0f, 1f)
                             event.slot highlight Color(15, 233, 233)
@@ -243,8 +244,7 @@ class ItemFeatures {
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
                     if (event.chestName.startsWith("Salvage") && extraAttr != null) {
-                        if ((!extraAttr.hasKey("baseStatBoostPercentage") && getItemLore(item).asReversed()
-                                .getOrNull(1)
+                        if ((!extraAttr.hasKey("baseStatBoostPercentage") && getItemLore(item).getLastOrNull(1)
                                 ?.startsWith("§aPerfect ") == false) && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
                             )
@@ -537,8 +537,8 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookTier) stackTip =
                         enchantments.getInteger(name.toString()).toString()
                 }
-            } else if (Skytils.config.showDungeonItemLevel && extraAttributes.hasKey("dungeon_item_level")) {
-                stackTip = extraAttributes.getInteger("dungeon_item_level").toString()
+            } else if (Skytils.config.showDungeonItemLevel && ItemUtil.getStarCount(extraAttributes) > 0) {
+                stackTip = ItemUtil.getStarCount(extraAttributes).toString()
             }
             if (extraAttributes.hasKey("pickonimbus_durability")) {
                 RenderUtil.drawDurabilityBar(
