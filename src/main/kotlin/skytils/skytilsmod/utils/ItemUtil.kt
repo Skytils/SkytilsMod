@@ -226,4 +226,7 @@ object ItemUtil {
         })
         return this
     }
+
+    fun getStarCount(extraAttributes: NBTTagCompound) =
+        extraAttributes.getInteger("upgrade_level") + extraAttributes.getInteger("dungeon_item_level")
 }
