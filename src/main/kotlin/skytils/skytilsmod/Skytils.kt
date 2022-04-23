@@ -212,6 +212,7 @@ class Skytils {
             AuctionData(),
             AuctionPriceOverlay(),
             ContainerSellValue,
+            BetterStash(),
             BlazeSolver(),
             BloodHelper,
             BossHPDisplays(),
@@ -276,7 +277,6 @@ class Skytils {
             TriviaSolver(),
             WaterBoardSolver(),
             Waypoints(),
-            BetterStash(),
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
