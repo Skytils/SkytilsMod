@@ -212,6 +212,7 @@ class Skytils {
             AuctionData(),
             AuctionPriceOverlay(),
             ContainerSellValue,
+            BetterStash(),
             BlazeSolver(),
             BloodHelper,
             BossHPDisplays(),
