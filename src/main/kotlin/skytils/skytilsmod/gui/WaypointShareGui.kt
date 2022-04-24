@@ -241,10 +241,11 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
                 // If this value change was triggered while updating the checkbox, don't update the child checkboxes.
                 // see `updateCheckbox()`
-                if (categoryObj.ignoreCheckboxValueChange) return@onValueChange
-                // When the category is checked or unchecked, all child waypoints will follow this change.
-                this.parent.childContainers.forEach {
-                    it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
+                if (!categoryObj.ignoreCheckboxValueChange) {
+                    // When the category is checked or unchecked, all child waypoints will follow this change.
+                    this.parent.childContainers.forEach {
+                        it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
+                    }
                 }
             }
         }
@@ -252,8 +253,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         UIText(name).childOf(container).constrain {
             x = CenterConstraint()
             y = CATEGORY_INNER_VERTICAL_PADDING.pixels()
-            width = 30.percent()
-            height = 24.pixels()
+            height = 12.pixels()
         }
 
         categoryContainers[container] = Category(
