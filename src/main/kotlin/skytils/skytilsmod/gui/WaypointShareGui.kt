@@ -37,6 +37,7 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
 import org.apache.commons.codec.binary.Base64
+import skytils.hylin.extension.getOptionalString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.Waypoint
@@ -51,6 +52,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     companion object {
         private val gson: Gson = GsonBuilder().create()
+
+        private const val CATEGORY_INNER_VERTICAL_PADDING = 7.5
     }
 
     private val scrollComponent: ScrollComponent
@@ -145,7 +148,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 return@mapNotNull runCatching {
                     e as JsonObject
                     return@runCatching Waypoint(
-                        if (e.has("category")) e["category"].asString else null,
+                        e.getOptionalString("category").ifEmpty { null },
                         e["name"].asString,
                         BlockPos(
                             e["x"].asInt,
@@ -227,12 +230,12 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 90.percent()
-            height = ChildBasedRangeConstraint() + 2.pixels()
+            height = ChildBasedRangeConstraint() + (CATEGORY_INNER_VERTICAL_PADDING * 2).pixels()
         }.effect(OutlineEffect(Color(255, 255, 255, 100), 1f))
 
         val selectedComponent = CheckboxComponent(enabled).childOf(container).constrain {
             x = 7.5.pixels()
-            y = 0.pixels()
+            y = CATEGORY_INNER_VERTICAL_PADDING.pixels()
         }.apply {
             onValueChange { newValue: Any? ->
                 val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
@@ -248,8 +251,9 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
         UIText(name).childOf(container).constrain {
             x = CenterConstraint()
-            y = 0.pixels()
+            y = CATEGORY_INNER_VERTICAL_PADDING.pixels()
             width = 30.percent()
+            height = 24.pixels()
         }
 
         categoryContainers[container] = Category(
@@ -298,19 +302,30 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             y = CenterConstraint()
         }
 
-        val xComponent = UIText(pos.x.toString()).childOf(container).constrain {
-            x = SiblingConstraint(5f)
+        // Position the x, y, and z labels so that they are centered at the middle of the ScrollComponent
+        val coordinates = UIContainer().childOf(container).constrain {
+            x = CenterConstraint()
             y = CenterConstraint()
+            width = ChildBasedSizeConstraint()
+            height = ChildBasedMaxSizeConstraint()
         }
 
-        val yComponent = UIText(pos.y.toString()).childOf(container).constrain {
-            x = SiblingConstraint(5f)
+        val xComponent = UIText(pos.x.toString()).childOf(coordinates).constrain {
+            x = 0.pixels()
             y = CenterConstraint()
+            color = ConstantColorConstraint(Color.LIGHT_GRAY)
         }
 
-        val zComponent = UIText(pos.z.toString()).childOf(container).constrain {
+        val yComponent = UIText(pos.y.toString()).childOf(coordinates).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
+            color = ConstantColorConstraint(Color.LIGHT_GRAY)
+        }
+
+        val zComponent = UIText(pos.z.toString()).childOf(coordinates).constrain {
+            x = SiblingConstraint(5f)
+            y = CenterConstraint()
+            color = ConstantColorConstraint(Color.LIGHT_GRAY)
         }
 
         entries[container] = Entry(category, selected, nameComponent, xComponent, yComponent, zComponent)
