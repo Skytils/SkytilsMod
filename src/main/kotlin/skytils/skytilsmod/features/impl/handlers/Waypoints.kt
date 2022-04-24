@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
@@ -25,9 +26,9 @@ import gg.essential.universal.UMatrixStack
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.extension.getOptionalString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.features.impl.mining.MiningFeatures.Companion.waypoints
 import skytils.skytilsmod.utils.*
 import java.awt.Color
 import java.io.File
@@ -40,69 +41,127 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Utils.inSkyblock) {
             val matrixStack = UMatrixStack()
-            waypoints.filter { it.enabled && it.island.mode == SBInfo.mode }.forEach {
-                it.draw(event.partialTicks, matrixStack)
+            categories.filter {
+                it.island.mode == SBInfo.mode
+            }.forEach { category ->
+                category.waypoints.filter { it.enabled }.forEach {
+                    it.draw(event.partialTicks, matrixStack)
+                }
             }
         }
     }
 
     override fun read(reader: InputStreamReader) {
-        waypoints.clear()
-        val arr = gson.fromJson(reader, JsonArray::class.java)
-        arr.mapNotNullTo(waypoints) { e ->
-            e as JsonObject
-            Waypoint(
-                e.getOptionalString("category").ifEmpty { null },
-                e["name"].asString,
-                BlockPos(
-                    e["x"].asInt,
-                    e["y"].asInt,
-                    e["z"].asInt
-                ),
-                SkyblockIsland.values().find {
-                    it.mode == e["island"].asString
-                } ?: return@mapNotNullTo null,
-                e["enabled"].asBoolean,
-                e["color"]?.let { Color(it.asInt, true) } ?: Color.RED,
-                e["addedAt"]?.asLong ?: System.currentTimeMillis()
-            )
-        }
+        importFromGenericJsonObject(gson.fromJson(reader, JsonElement::class.java))
     }
 
     override fun write(writer: OutputStreamWriter) {
-        val arr = JsonArray()
-        waypoints.forEach {
-            arr.add(JsonObject().apply {
-                if(it.category != null)
-                    addProperty("category", it.category)
-                addProperty("name", it.name)
-                addProperty("x", it.pos.x)
-                addProperty("y", it.pos.y)
-                addProperty("z", it.pos.z)
-                addProperty("island", it.island.mode)
-                addProperty("enabled", it.enabled)
-                addProperty("color", it.color.rgb)
-                addProperty("addedAt", it.addedAt)
-            })
+        val parentObj = JsonObject()
+        val categoriesList = JsonArray()
+
+        categories.forEach { category ->
+            val categoryObj = JsonObject()
+            categoryObj.addProperty("name", category.name ?: "")
+            categoryObj.addProperty("island", category.island.mode)
+            categoryObj.addProperty("isExpanded", category.isExpanded)
+            val waypointsList = JsonArray()
+            category.waypoints.forEach {
+                waypointsList.add(JsonObject().apply {
+                    addProperty("name", it.name)
+                    addProperty("x", it.pos.x)
+                    addProperty("y", it.pos.y)
+                    addProperty("z", it.pos.z)
+                    addProperty("enabled", it.enabled)
+                    addProperty("color", it.color.rgb)
+                    addProperty("addedAt", it.addedAt)
+                })
+            }
+            categoryObj.add("waypoints", waypointsList)
+            categoriesList.add(categoryObj)
         }
-        gson.toJson(arr, writer)
+
+        parentObj.add("categories", categoriesList)
+        gson.toJson(parentObj, writer)
     }
 
     override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonArray(), writer)
+        gson.toJson(JsonObject(), writer)
     }
 
     companion object {
         @JvmField
-        val waypoints = HashSet<Waypoint>()
+        val categories = HashSet<WaypointCategory>()
+
+        /**
+         * Imports waypoints from either a [JsonArray] (old format) or a [JsonObject] (new format)
+         * and adds them to the [categories] list.
+         *
+         * @param obj An instance of a [JsonArray] or a [JsonObject]
+         * @return The number of waypoints that were added
+         */
+        fun importFromGenericJsonObject(obj: JsonElement): Int {
+            var count = 0
+            if (obj.isJsonObject) {
+                obj as JsonObject
+                // Newer save format including waypoint categories
+                val categoriesList = obj["categories"].asJsonArray
+                for (category in categoriesList) {
+                    category as JsonObject
+                    categories.add(
+                        WaypointCategory(
+                            category["name"].asString,
+                            category["waypoints"].asJsonArray.map { e ->
+                                count++
+                                (e as JsonObject).asWaypoint()
+                            }.toHashSet(),
+                            category["isExpanded"]?.asBoolean ?: true,
+                            SkyblockIsland.values().find { it.mode == category["island"].asString } ?: continue
+                        )
+                    )
+                }
+            } else if (obj.isJsonArray) {
+                obj as JsonArray
+                // Older save format without waypoint categories
+                val groupedByIsland = obj.groupBy { it.asJsonObject["island"].asString }
+                for (group in groupedByIsland) {
+                    categories.add(
+                        WaypointCategory(
+                            null as String?,
+                            group.value.map { e ->
+                                count++
+                                (e as JsonObject).asWaypoint()
+                            }.toHashSet(),
+                            true,
+                            SkyblockIsland.values().find { it.mode == group.key } ?: continue
+                        )
+                    )
+                }
+            } else error("invalid JSON type")
+            return count
+        }
+
+        private fun JsonObject.asWaypoint(): Waypoint {
+            return Waypoint(
+                this["name"].asString,
+                BlockPos(this["x"].asInt, this["y"].asInt, this["z"].asInt),
+                this["enabled"].asBoolean,
+                this["color"]?.let { Color(it.asInt, true) } ?: Color.RED,
+                this["addedAt"]?.asLong ?: System.currentTimeMillis()
+            )
+        }
     }
 }
 
+data class WaypointCategory(
+    var name: String?,
+    val waypoints: HashSet<Waypoint>,
+    var isExpanded: Boolean = true,
+    var island: SkyblockIsland
+)
+
 data class Waypoint(
-    var category: String?,
     var name: String,
     var pos: BlockPos,
-    var island: SkyblockIsland,
     var enabled: Boolean,
     val color: Color,
     val addedAt: Long

@@ -18,10 +18,7 @@
 
 package skytils.skytilsmod.gui
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
+import com.google.gson.*
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
@@ -37,10 +34,8 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
 import org.apache.commons.codec.binary.Base64
-import skytils.hylin.extension.getOptionalString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -120,7 +115,10 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             exportSelectedWaypoints()
         }
 
-        HelpComponent(window, "This menu is used to share waypoints with other people. To import waypoints from another person, copy the *entire* string of text to your clipboard, and then click 'Import from Clipboard'. To send waypoints to someone else, make sure the ones you want to share are selected and then click 'Export Selected to Clipboard'. Make sure the very long string of text is not cut off by any character limits, or people will not be able to import your waypoints.")
+        HelpComponent(
+            window,
+            "This menu is used to share waypoints with other people. To import waypoints from another person, copy the *entire* string of text to your clipboard, and then click 'Import from Clipboard'. To send waypoints to someone else, make sure the ones you want to share are selected and then click 'Export Selected to Clipboard'. Make sure the very long string of text is not cut off by any character limits, or people will not be able to import your waypoints."
+        )
 
         SimpleButton("Select All").childOf(window).constrain {
             x = SiblingConstraint(5f)
@@ -146,34 +144,12 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         runCatching {
             val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
 
-            val arr = gson.fromJson(decoded, JsonArray::class.java)
-            val results = arr.mapNotNull { e ->
-                return@mapNotNull runCatching {
-                    e as JsonObject
-                    return@runCatching Waypoint(
-                        e.getOptionalString("category").ifEmpty { null },
-                        e["name"].asString,
-                        BlockPos(
-                            e["x"].asInt,
-                            e["y"].asInt,
-                            e["z"].asInt
-                        ),
-                        SkyblockIsland.values().find {
-                            it.mode == e["island"].asString
-                        } ?: return@mapNotNull null,
-                        e["enabled"].asBoolean,
-                        e["color"]?.let { Color(it.asInt) } ?: Color.RED,
-                        System.currentTimeMillis()
-                    )
-                }.onFailure {
-                    it.printStackTrace()
-                }.getOrNull()
-            }
-            Waypoints.waypoints.addAll(results)
+            val obj = gson.fromJson(decoded, JsonElement::class.java)
+            val count = Waypoints.importFromGenericJsonObject(obj)
             PersistentSave.markDirty<Waypoints>()
             loadWaypointsForSelection(islandDropdown.getValue())
             EssentialAPI.getNotifications()
-                .push("Waypoints Imported", "Successfully imported ${results.size} waypoints!", 2.5f)
+                .push("Waypoints Imported", "Successfully imported $count waypoints!", 2.5f)
         }.onFailure {
             it.printStackTrace()
             EssentialAPI.getNotifications()
@@ -184,14 +160,53 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     private fun exportSelectedWaypoints() {
         val island = SkyblockIsland.values()[islandDropdown.getValue()]
 
+        val obj = exportToNewFormat(island)
+        val count = obj["categories"].asJsonArray.sumOf { it.asJsonObject["waypoints"].asJsonArray.size() }
+        setClipboardString(Base64.encodeBase64String(gson.toJson(obj).encodeToByteArray()))
+        EssentialAPI.getNotifications()
+            .push(
+                "Waypoints Exported",
+                "$count ${island.formattedName} waypoints were copied to your clipboard!",
+                2.5f
+            )
+    }
+
+    private fun exportToNewFormat(island: SkyblockIsland): JsonObject {
+        val parentObj = JsonObject()
+        val categoriesList = JsonArray()
+
+        categoryContainers.forEach { (uiContainer, categoryObj) ->
+            categoriesList.add(JsonObject().apply {
+                addProperty("name", categoryObj.name)
+                addProperty("island", island.mode)
+                add("waypoints", JsonArray().apply {
+                    uiContainer.childContainers.mapNotNull {
+                        val e = entries[it] ?: return@mapNotNull null
+                        if (e.selected.checked)
+                            JsonObject().apply {
+                                addProperty("name", e.name.getText())
+                                addProperty("x", e.x.getText().toInt())
+                                addProperty("y", e.y.getText().toInt())
+                                addProperty("z", e.z.getText().toInt())
+                                addProperty("enabled", true)
+                                addProperty("color", Color.RED.rgb)
+                            }
+                        else null
+                    }.forEach { add(it) }
+                })
+            })
+        }
+        parentObj.add("categories", categoriesList)
+        return parentObj
+    }
+
+    private fun exportToOldFormat(island: SkyblockIsland): JsonArray {
         val arr = JsonArray()
         entries.values.filter {
             it.selected.checked
         }.forEach {
             runCatching {
                 arr.add(JsonObject().apply {
-                    if (it.category.name.isNotBlank() && it.category.name != "Uncategorized")
-                        addProperty("category", it.category.name)
                     addProperty("name", it.name.getText())
                     addProperty("x", it.x.getText().toInt())
                     addProperty("y", it.y.getText().toInt())
@@ -204,13 +219,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 it.printStackTrace()
             }
         }
-        setClipboardString(Base64.encodeBase64String(gson.toJson(arr).encodeToByteArray()))
-        EssentialAPI.getNotifications()
-            .push(
-                "Waypoints Exported",
-                "${arr.size()} ${island.formattedName} waypoints were copied to your clipboard!",
-                2.5f
-            )
+        return arr
     }
 
     private fun loadWaypointsForSelection(selection: Int) {
@@ -218,10 +227,13 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         categoryContainers.clear()
         scrollComponent.clearChildren()
         val island = SkyblockIsland.values()[selection]
-        Waypoints.waypoints.filter {
+        Waypoints.categories.filter {
             it.island == island
-        }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-            addNewWaypoint(it.category ?: "Uncategorized", it.name, it.pos, it.enabled)
+        }.forEach {
+            val category = addNewCategory(it.name ?: "Uncategorized")
+            it.waypoints.sortedBy { w -> "${w.name} ${w.pos} ${w.enabled}" }.forEach { waypoint ->
+                addNewWaypoint(category, waypoint.name, waypoint.pos, waypoint.enabled)
+            }
         }
     }
 
@@ -269,18 +281,11 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     }
 
     private fun addNewWaypoint(
-        categoryName: String = "",
+        category: Category,
         name: String = "",
         pos: BlockPos = mc.thePlayer.position,
         selected: Boolean = false,
     ) {
-        val category =
-            categoryContainers.entries.firstOrNull {
-                it.value.name == categoryName
-            }?.value ?: addNewCategory(
-                categoryName
-            )
-
         val container = UIContainer().childOf(category.container).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
