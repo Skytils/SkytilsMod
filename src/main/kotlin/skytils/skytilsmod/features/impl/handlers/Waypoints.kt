@@ -25,6 +25,7 @@ import gg.essential.universal.UMatrixStack
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.extension.getOptionalString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.*
@@ -50,9 +51,8 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         val arr = gson.fromJson(reader, JsonArray::class.java)
         arr.mapNotNullTo(waypoints) { e ->
             e as JsonObject
-            val category = if(e.has("category")) e["category"].asString else null
             Waypoint(
-                category,
+                e.getOptionalString("category").ifEmpty { null },
                 e["name"].asString,
                 BlockPos(
                     e["x"].asInt,

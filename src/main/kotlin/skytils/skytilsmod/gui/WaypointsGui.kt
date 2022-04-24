@@ -100,7 +100,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                             category as UIContainer
                             val uiContainers = category.childContainers.sortedBy { w ->
                                 val entry = entries[w] ?: error("no entry found for child")
-                                return@sortedBy sorter.sortingBy(entry.toWaypoint(SkyblockIsland.PrivateIsland))
+                                sorter.sortingBy(entry.toWaypoint(SkyblockIsland.PrivateIsland))
                             }
                             // Remove and re-add the waypoints in the correct order
                             category.children.removeAll(uiContainers)
@@ -115,6 +115,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             width = 20.percent()
             height = 23.pixels()
         }.apply {
+            val searchBar = this
             onLeftClick {
                 grabWindowFocus()
             }
@@ -123,7 +124,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 scrollComponent.allChildren.forEach { category ->
                     category.childContainers.forEach { w ->
                         val entry = entries[w] ?: error("no entry found for child")
-                        if (entry.name.getText().contains(this@apply.getText())) {
+                        if (entry.name.getText().contains(searchBar.getText())) {
                             w.unhide()
                         } else {
                             w.hide()
@@ -168,19 +169,20 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             height = 20.pixels()
         }.apply {
             onLeftClick {
-                scrollComponent.allChildren.forEach { c ->
-                    c as UIContainer
-                    val category = categoryContainers[c] ?: error("no category found for UIContainer")
-                    if (category.isCollapsed) return@forEach // Collapsed categories aren't visible
-                    c.childContainers.forEach { w ->
-                        val entry = entries[w] ?: error("no entry found for child")
-                        if (entry.name.getText().contains(searchBar.getText())) {
-                            c.removeChild(w)
-                            category.children.remove(w)
-                            entries.remove(w)
-                            if (category.children.isEmpty()) {
-                                scrollComponent.removeChild(c)
-                                categoryContainers.remove(c)
+                scrollComponent.allChildren.forEach { container ->
+                    container as UIContainer
+                    val category = categoryContainers[container] ?: error("no category found for UIContainer")
+                    if (!category.isCollapsed) { // Collapsed categories aren't visible
+                        container.childContainers.forEach { waypoint ->
+                            val entry = entries[waypoint] ?: error("no entry found for child")
+                            if (entry.name.getText().contains(searchBar.getText())) {
+                                container.removeChild(waypoint)
+                                category.children.remove(waypoint)
+                                entries.remove(waypoint)
+                                if (category.children.isEmpty()) {
+                                    scrollComponent.removeChild(container)
+                                    categoryContainers.remove(container)
+                                }
                             }
                         }
                     }
@@ -294,28 +296,29 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 90.percent()
-            height = ChildBasedRangeConstraint() + 2.pixels()
+            height = ChildBasedRangeConstraint() + (CATEGORY_INNER_PADDING * 2).pixels()
         }.effect(OutlineEffect(Color(255, 255, 255, 100), 1f))
 
         val enabledComponent = CheckboxComponent(enabled).childOf(container).constrain {
             x = 7.5.pixels()
-            y = 0.pixels()
+            y = CATEGORY_INNER_PADDING.pixels()
         }.apply {
             onValueChange { newValue: Any? ->
                 val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
                 // If this value change was triggered while updating the checkbox, don't update the child checkboxes.
                 // see `updateCheckbox()`
-                if (categoryObj.ignoreCheckboxValueChange) return@onValueChange
-                // When the category is checked or unchecked, all child waypoints will follow this change.
-                this.parent.childContainers.forEach {
-                    it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
+                if (!categoryObj.ignoreCheckboxValueChange) {
+                    // When the category is checked or unchecked, all child waypoints will follow this change.
+                    this.parent.childContainers.forEach {
+                        it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
+                    }
                 }
             }
         }
 
         SimpleButton("Remove").childOf(container).constrain {
             x = SiblingConstraint(5f)
-            y = 0.pixels()
+            y = CATEGORY_INNER_PADDING.pixels()
         }.onLeftClick {
             container.childContainers.forEach { entries.remove(it) } // remove all waypoints in this category from the list of entries
             container.children.clear() // clear the children of this category's UIContainer
@@ -325,12 +328,12 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
         val newWaypointButton = SimpleButton("New Waypoint").childOf(container).constrain {
             x = SiblingConstraint(5f)
-            y = 0.pixels()
+            y = CATEGORY_INNER_PADDING.pixels()
         }
 
         val nameComponent = UITextInput("Category Name").childOf(container).constrain {
             x = CenterConstraint()
-            y = 5.pixels()
+            y = (CATEGORY_INNER_PADDING + 5).pixels()
             width = 30.percent()
             height = 24.pixels()
         }.apply {
@@ -342,7 +345,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
         val expandComponent = SimpleButton("Collapse").childOf(container).constrain {
             x = 5.pixels(true)
-            y = 0.pixels()
+            y = CATEGORY_INNER_PADDING.pixels()
         }.apply {
             onLeftClick {
                 val categoryObj = categoryContainers[container] ?: error("no category found for name")
@@ -363,10 +366,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             newWaypointButton
         )
 
-        container.children.addObserver { _, _ ->
-            // When children are added or removed, the category's checkbox should be updated to reflect those changes.
-            updateCheckbox(categoryContainers[container] ?: return@addObserver)
-        }
+        // When children are added or removed, the category's checkbox should be updated to reflect those changes.
+        container.children.addObserver { _, _ -> updateCheckbox(categoryContainers[container]) }
 
         return categoryContainers[container]!!
     }
@@ -398,7 +399,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         val container = UIContainer().childOf(category.container).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
-            width = 90.percent()
+            width = 95.percent()
             height = ChildBasedMaxSizeConstraint() + 2.pixels()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f)).apply {
             animateBeforeHide {
@@ -432,42 +433,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             setText(name)
         }
 
-        val xComponent = UITextInput("X").childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CenterConstraint()
-            width = 5.percent()
-        }.apply {
-            onLeftClick {
-                grabWindowFocus()
-            }
-            setText(pos.x.toString())
-        }
-
-        val yComponent = UITextInput("Y").childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CenterConstraint()
-            width = 5.percent()
-        }.apply {
-            onLeftClick {
-                grabWindowFocus()
-            }
-            setText(pos.y.toString())
-        }
-
-        val zComponent = UITextInput("Z").childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CenterConstraint()
-            width = 5.percent()
-        }.apply {
-            onLeftClick {
-                grabWindowFocus()
-            }
-            setText(pos.z.toString())
-        }
+        val xComponent = container.createSmallTextBox("X", pos.x.toString())
+        val yComponent = container.createSmallTextBox("Y", pos.y.toString())
+        val zComponent = container.createSmallTextBox("Z", pos.z.toString())
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
             x = SiblingConstraint(25f)
-            y = 1.pixels()
+            y = CenterConstraint()
             width = CoerceAtLeastConstraint(AspectConstraint(), 10.percentOfWindow)
         }.apply {
             setColor(color)
@@ -523,12 +495,25 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             Entry(category, enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent, addedAt)
     }
 
+    private fun UIContainer.createSmallTextBox(placeholder: String, defaultText: String): UITextInput =
+        UITextInput(placeholder).childOf(this).constrain {
+            x = SiblingConstraint(5f)
+            y = CenterConstraint()
+            width = 5.percent()
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(defaultText)
+        }
+
     override fun onScreenClose() {
         super.onScreenClose()
         loadWaypointsForSelection(-1, isClosing = true)
     }
 
-    private fun updateCheckbox(category: Category) {
+    private fun updateCheckbox(category: Category?) {
+        category ?: return
         category.ignoreCheckboxValueChange = true
         category.enabled.setState(
             category.children.all {
@@ -560,7 +545,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         expandComponent.text.setText("Expand")
     }
 
-    internal data class Category(
+    private data class Category(
         val container: UIContainer,
         val enabled: CheckboxComponent,
         val name: UITextInput,
@@ -606,6 +591,10 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         companion object {
             var lastSelected = 0
         }
+    }
+
+    companion object {
+        const val CATEGORY_INNER_PADDING = 7.5
     }
 }
 
