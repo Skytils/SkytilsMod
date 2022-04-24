@@ -39,6 +39,7 @@ import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.features.impl.handlers.Waypoint
+import skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
@@ -101,7 +102,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                             category as UIContainer
                             val uiContainers = category.childContainers.sortedBy { w ->
                                 val entry = entries[w] ?: error("no entry found for child")
-                                sorter.sortingBy(entry.toWaypoint(SkyblockIsland.PrivateIsland))
+                                sorter.sortingBy(entry.toWaypoint())
                             }
                             // Remove and re-add the waypoints in the correct order
                             category.children.removeAll(uiContainers)
@@ -236,7 +237,10 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             addNewWaypoint(category)
         }
 
-        HelpComponent(window, "Waypoints are organized by category. To add a category, click the 'New Category' button. To create a new waypoint in a category, click the 'New Waypoint' button at the top of any category. Clicking the 'Remove' button at the top of a category will remove all waypoints in the category. Waypoints are separated by the island that they are displayed on, so if you don't see the waypoint that you're looking for, try changing the island in the dropdown menu in the top right corner. To share waypoints with someone else, click the 'Share' button in the bottom left corner.")
+        HelpComponent(
+            window,
+            "Waypoints are organized by category. To add a category, click the 'New Category' button. To create a new waypoint in a category, click the 'New Waypoint' button at the top of any category. Clicking the 'Remove' button at the top of a category will remove all waypoints in the category. Waypoints are separated by the island that they are displayed on, so if you don't see the waypoint that you're looking for, try changing the island in the dropdown menu in the top right corner. To share waypoints with someone else, click the 'Share' button in the bottom left corner."
+        )
 
         SimpleButton("Share").childOf(window).constrain {
             x = SiblingConstraint(5f)
@@ -257,17 +261,18 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 it.formattedName == islandDropdown.childrenOfType<UIText>()
                     .find { it.componentName == "currentSelectionText" }?.getText()
             } ?: error("previous selected island not found")
-            Waypoints.waypoints.removeAll {
+            Waypoints.categories.removeAll {
                 it.island == current
             }
-            for (entry in entries.values) {
-                runCatching {
-                    Waypoints.waypoints.add(
-                        entry.toWaypoint(current)
+            for (category in categoryContainers.values) {
+                Waypoints.categories.add(
+                    WaypointCategory(
+                        category.name.getText(),
+                        category.children.mapNotNull { entries[it]?.toWaypoint() }.toHashSet(),
+                        !category.isCollapsed,
+                        current
                     )
-                }.onFailure {
-                    it.printStackTrace()
-                }
+                )
             }
             PersistentSave.markDirty<Waypoints>()
         }
@@ -276,10 +281,24 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         scrollComponent.clearChildren()
         if (!isClosing) {
             val island = SkyblockIsland.values()[selection]
-            Waypoints.waypoints.filter {
+            Waypoints.categories.filter {
                 it.island == island
-            }.sortedBy { SortingOptions.values()[SortingOptions.lastSelected].sortingBy(it) }.forEach {
-                addNewWaypoint(it.category ?: "Uncategorized", it.name, it.pos, it.enabled, it.color, it.addedAt)
+            }.forEach {
+                val category = addNewCategory(it.name ?: "")
+                for (waypoint in it.waypoints.sortedBy { w ->
+                    SortingOptions.values()[SortingOptions.lastSelected].sortingBy(
+                        w
+                    )
+                }) {
+                    addNewWaypoint(
+                        category,
+                        waypoint.name,
+                        waypoint.pos,
+                        waypoint.enabled,
+                        waypoint.color,
+                        waypoint.addedAt
+                    )
+                }
             }
         }
     }
@@ -351,7 +370,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
         newWaypointButton.onLeftClick {
             expand(categoryContainers[container] ?: error("no category found for UIContainer"))
-            addNewWaypoint(categoryName = nameComponent.getText())
+            addNewWaypoint(category = categoryContainers[container]!!)
         }
 
         categoryContainers[container] = Category(
@@ -366,22 +385,6 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         container.children.addObserver { _, _ -> updateCheckbox(categoryContainers[container]) }
 
         return categoryContainers[container]!!
-    }
-
-    private fun addNewWaypoint(
-        categoryName: String = "Uncategorized",
-        name: String = "",
-        pos: BlockPos = mc.thePlayer.position,
-        enabled: Boolean = true,
-        color: Color = Color.RED,
-        addedAt: Long = System.currentTimeMillis(),
-    ) {
-        addNewWaypoint(
-            categoryContainers.entries.firstOrNull {
-                it.value.name.getText() == categoryName
-            }?.value ?: addNewCategory(categoryName),
-            name, pos, enabled, color, addedAt
-        )
     }
 
     private fun addNewWaypoint(
@@ -564,15 +567,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         var colorPickerUp: Boolean = false,
         var colorPickerDown: Boolean = false,
     ) {
-        fun toWaypoint(island: SkyblockIsland) = Waypoint(
-            category.name.getText(),
+        fun toWaypoint() = Waypoint(
             name.getText(),
             BlockPos(
                 x.getText().toInt(),
                 y.getText().toInt(),
                 z.getText().toInt()
             ),
-            island,
             enabled.checked,
             color.getColor(),
             addedAt
