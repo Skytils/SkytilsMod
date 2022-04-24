@@ -30,6 +30,7 @@ import gg.essential.universal.wrappers.UPlayer
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.client.audio.PositionedSoundRecord
 import net.minecraft.util.ResourceLocation
+import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SuperSecretSettings
 import java.awt.Color
@@ -82,25 +83,7 @@ class SuperSecretGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopen
             addNewSetting()
         }
 
-        val tooltipBlock = UIBlock().constrain {
-            x = 5.pixels(); y = basicYConstraint { it.parent.getTop() - it.getHeight() - 6 }; height =
-            ChildBasedSizeConstraint(4f); width = ChildBasedSizeConstraint(4f); color =
-            ConstantColorConstraint(Color(224, 224, 224, 100))
-        }.effect(OutlineEffect(Color(0, 243, 255), 1f)).also { it.hide() }
-            .addChild(UIWrappedText("How did you get here?").constrain {
-                x = 2.pixels(); y = 0.pixels()
-            })
-        UICircle(7f).childOf(window).constrain {
-            x = 9.pixels()
-            y = basicYConstraint { it.parent.getBottom() - it.getHeight() - 2 }
-        }.addChildren(
-            UIText("?", true).constrain { x = CenterConstraint(); y = CenterConstraint() },
-            tooltipBlock
-        ).onMouseEnter {
-            tooltipBlock.unhide()
-        }.onMouseLeave {
-            tooltipBlock.hide()
-        }
+        HelpComponent(window, "How did you get here?")
 
         for (setting in SuperSecretSettings.settings) {
             addNewSetting(setting)

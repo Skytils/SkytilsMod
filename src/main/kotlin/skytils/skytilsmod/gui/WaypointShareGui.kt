@@ -42,6 +42,7 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
+import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
@@ -119,8 +120,10 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             exportSelectedWaypoints()
         }
 
+        HelpComponent(window, "This menu is used to share waypoints with other people. To import waypoints from another person, copy the *entire* string of text to your clipboard, and then click 'Import from Clipboard'. To send waypoints to someone else, make sure the ones you want to share are selected and then click 'Export Selected to Clipboard'. Make sure the very long string of text is not cut off by any character limits, or people will not be able to import your waypoints.")
+
         SimpleButton("Select All").childOf(window).constrain {
-            x = 5.pixels()
+            x = SiblingConstraint(5f)
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
             if (entries.values.all {
