@@ -40,6 +40,7 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
+import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
@@ -226,13 +227,6 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             mc.displayGuiScreen(null)
         }
 
-        SimpleButton("New Waypoints").childOf(bottomButtons).constrain {
-            x = SiblingConstraint(5f)
-            y = 0.pixels()
-        }.onLeftClick {
-            addNewWaypoint()
-        }
-
         SimpleButton("New Category").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
@@ -242,8 +236,10 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             addNewWaypoint(category)
         }
 
+        HelpComponent(window, "Waypoints are organized by category. To add a category, click the 'New Category' button. To create a new waypoint in a category, click the 'New Waypoint' button at the top of any category. Clicking the 'Remove' button at the top of a category will remove all waypoints in the category. Waypoints are separated by the island that they are displayed on, so if you don't see the waypoint that you're looking for, try changing the island in the dropdown menu in the top right corner. To share waypoints with someone else, click the 'Share' button in the bottom left corner.")
+
         SimpleButton("Share").childOf(window).constrain {
-            x = 5.pixels()
+            x = SiblingConstraint(5f)
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
             mc.displayGuiScreen(null)
