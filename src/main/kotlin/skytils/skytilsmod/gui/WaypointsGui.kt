@@ -233,7 +233,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             y = 0.pixels()
         }.onLeftClick {
             // Add a new category and a new blank waypoint inside it.
-            val category = addNewCategory(name = "")
+            val category = addNewCategory(name = "", isExpanded = true)
             addNewWaypoint(category)
         }
 
@@ -284,7 +284,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             Waypoints.categories.filter {
                 it.island == island
             }.forEach {
-                val category = addNewCategory(it.name ?: "")
+                val category = addNewCategory(it.name ?: "", isExpanded = it.isExpanded)
                 for (waypoint in it.waypoints.sortedBy { w ->
                     SortingOptions.values()[SortingOptions.lastSelected].sortingBy(
                         w
@@ -306,6 +306,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
     private fun addNewCategory(
         name: String = "",
         enabled: Boolean = true,
+        isExpanded: Boolean
     ): Category {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
@@ -374,15 +375,17 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         }
 
         categoryContainers[container] = Category(
-            container,
-            enabledComponent,
-            nameComponent,
-            expandComponent,
-            newWaypointButton
+            container = container,
+            enabled = enabledComponent,
+            name = nameComponent,
+            expandComponent = expandComponent,
+            newWaypointButton = newWaypointButton,
+            isCollapsed = !isExpanded
         )
 
         // When children are added or removed, the category's checkbox should be updated to reflect those changes.
         container.children.addObserver { _, _ -> updateCheckbox(categoryContainers[container]) }
+        if (!isExpanded) collapse(categoryContainers[container]!!) // Update the "Collapse" button text if the category is collapsed to begin with
 
         return categoryContainers[container]!!
     }
@@ -492,6 +495,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         category.children.add(container)
         entries[container] =
             Entry(category, enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent, addedAt)
+
+        if (category.isCollapsed) container.hide(true)
     }
 
     private fun UIContainer.createSmallTextBox(placeholder: String, defaultText: String): UITextInput =
