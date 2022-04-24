@@ -30,6 +30,7 @@ import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.ChatAllowedCharacters
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.EnchantNames
+import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
@@ -74,25 +75,7 @@ class EnchantNamesGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reope
             addNewName()
         }
 
-        val tooltipBlock = UIBlock().constrain {
-            x = 5.pixels(); y = basicYConstraint { it.parent.getTop() - it.getHeight() - 6 }; height =
-            ChildBasedSizeConstraint(4f); width = ChildBasedSizeConstraint(4f); color =
-            ConstantColorConstraint(Color(224, 224, 224, 100))
-        }.effect(OutlineEffect(Color(0, 243, 255), 1f)).also { it.hide() }
-            .addChild(UIWrappedText("What are enchant names? Enchant names simply rename enchants to be anything you want!").constrain {
-                x = 2.pixels(); y = 0.pixels(); width = 90.percentOfWindow()
-            })
-        UICircle(7f).childOf(window).constrain {
-            x = 9.pixels()
-            y = basicYConstraint { it.parent.getBottom() - it.getHeight() - 2 }
-        }.addChildren(
-            UIText("?", true).constrain { x = CenterConstraint(); y = CenterConstraint() },
-            tooltipBlock
-        ).onMouseEnter {
-            tooltipBlock.unhide()
-        }.onMouseLeave {
-            tooltipBlock.hide()
-        }
+        HelpComponent(window, "What are enchant names? Enchant names simply rename enchants to be anything you want!")
 
         for (replacement in EnchantNames.replacements) {
             addNewName(replacement.key, replacement.value)

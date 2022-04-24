@@ -30,6 +30,7 @@ import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.CustomNotifications
+import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
@@ -82,25 +83,7 @@ class CustomNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2)
             addNewNotification()
         }
 
-        val tooltipBlock = UIBlock().constrain {
-            x = 5.pixels(); y = basicYConstraint { it.parent.getTop() - it.getHeight() - 6 }; height =
-            ChildBasedSizeConstraint(4f); width = ChildBasedSizeConstraint(4f); color =
-            ConstantColorConstraint(Color(224, 224, 224, 100))
-        }.effect(OutlineEffect(Color(0, 243, 255), 1f)).also { it.hide() }
-            .addChild(UIWrappedText("What are custom notifications? Custom Notifications allow you to configure popups for when certain chat messages are entered, using regex.").constrain {
-                x = 2.pixels(); y = 0.pixels(); width = 90.percentOfWindow()
-            })
-        UICircle(7f).childOf(window).constrain {
-            x = 9.pixels()
-            y = basicYConstraint { it.parent.getBottom() - it.getHeight() - 2 }
-        }.addChildren(
-            UIText("?", true).constrain { x = CenterConstraint(); y = CenterConstraint() },
-            tooltipBlock
-        ).onMouseEnter {
-            tooltipBlock.unhide()
-        }.onMouseLeave {
-            tooltipBlock.hide()
-        }
+        HelpComponent(window, "What are custom notifications? Custom Notifications allow you to configure popups for when certain chat messages are entered, using regex.")
 
         for (notif in CustomNotifications.notifications.sortedBy { it.text }) {
             addNewNotification(notif.regex.pattern, notif.text, notif.displayTicks)
