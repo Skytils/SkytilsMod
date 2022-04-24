@@ -194,14 +194,7 @@ class ItemFeatures {
                 if (Skytils.config.highlightSalvageableItems) {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
-                        val extraAttr = getExtraAttributes(stack)
-                        val sbId = getSkyBlockItemID(extraAttr)
-                        if (sbId != "ICE_SPRAY_WAND" && extraAttr != null && ItemUtil.getStarCount(extraAttr) == 0
-                            && !extraAttr.hasKey("dungeon_item") && (extraAttr.hasKey("baseStatBoostPercentage") || getItemLore(
-                                stack
-                            ).getLastOrNull(1)
-                                ?.startsWith("§aPerfect ") == true)
-                        ) {
+                        if (ItemUtil.isSalvageable(stack)) {
                             GlStateManager.translate(0f, 0f, 1f)
                             event.slot highlight Color(15, 233, 233)
                             GlStateManager.translate(0f, 0f, -1f)
