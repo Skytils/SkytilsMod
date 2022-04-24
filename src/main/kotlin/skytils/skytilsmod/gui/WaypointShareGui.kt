@@ -239,7 +239,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun addNewCategory(
         name: String = "",
-        enabled: Boolean = true,
+        enabled: Boolean = true
     ): Category {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
