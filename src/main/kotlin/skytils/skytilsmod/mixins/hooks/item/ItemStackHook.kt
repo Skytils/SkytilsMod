@@ -25,9 +25,11 @@ import skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.countMatches
+import skytils.skytilsmod.utils.ifNull
 
 const val starPattern = "§6✪"
-const val masterStarPattern = "§c✪"
+val masterStars = ('➊'..'➎').toList()
+val masterStarPattern = Regex("§c[${masterStars.joinToString("")}]")
 
 fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
     (stack as ItemStack).apply {
@@ -57,12 +59,14 @@ fun modifyDisplayName(s: String): String {
     if (!Utils.inSkyblock) return displayName
     try {
         if (Skytils.config.compactStars && displayName.contains("✪")) {
-            if (displayName.contains("§c✪")) {
+            masterStarPattern.find(displayName)?.let {
+                val star = it.value.last()
+                val count = masterStars.indexOf(star) + 1 + 5
                 displayName = "${
                     displayName.replace(starPattern, "")
                         .replace(masterStarPattern, "")
-                }§c${displayName.countMatches(masterStarPattern) + 5}✪"
-            } else {
+                }§c${count}✪"
+            }?.ifNull {
                 displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
             }
         }
