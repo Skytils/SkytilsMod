@@ -112,7 +112,7 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.8")
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.9")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.8")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
