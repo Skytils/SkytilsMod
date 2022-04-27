@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.misc
 import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import net.minecraft.block.*
@@ -133,65 +134,8 @@ class SlayerFeatures {
                     ?: ""
             expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
         }
-        if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
-        if (lastYangGlyphSwitchTicks > 120) lastYangGlyphSwitchTicks = -1
-        if (Skytils.config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && yangGlyphEntity == null && yangGlyph == null && slayerEntity != null) {
-            val suspect = mc.theWorld.getEntitiesWithinAABB(
-                EntityArmorStand::class.java,
-                slayerEntity!!.entityBoundingBox.expand(20.69, 20.69, 20.69)
-            ) { e ->
-                e as EntityArmorStand
-                e.ticksExisted <= 300 && lastYangGlyphSwitchTicks + 5 > e.ticksExisted && e.inventory[4]?.item == Item.getItemFromBlock(
-                    Blocks.beacon
-                )
-            }.minByOrNull {
-                (abs(lastYangGlyphSwitchTicks - it.ticksExisted) * 10) + slayerEntity!!.getDistanceSqToEntity(it)
-            }
-            if (suspect != null) {
-                printDevMessage(
-                    "Found suspect glyph, $lastYangGlyphSwitchTicks switched, ${suspect.ticksExisted} existed, ${
-                        slayerEntity!!.getDistanceSqToEntity(
-                            suspect
-                        )
-                    } distance", "slayer", "seraph", "seraphGlyph"
-                )
-                yangGlyphEntity = suspect
-            }
-        }
+        slayer?.tick(event)
         if (ticks % 4 == 0) {
-            if (Skytils.config.rev5TNTPing) {
-                if (hasSlayerText) {
-                    var under: BlockPos? = null
-                    if (mc.thePlayer.onGround) {
-                        under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                    } else {
-                        for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
-                            val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
-                            if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
-                                under = test
-                                break
-                            }
-                        }
-                    }
-                    if (under != null) {
-                        val blockUnder = mc.theWorld.getBlockState(under)
-                        val isDanger = when {
-                            blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
-                            blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
-                            blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
-                            blockUnder.block === Blocks.stained_hardened_clay -> {
-                                val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
-                                color == 0 || color == 8 || color == 14
-                            }
-                            blockUnder.block === Blocks.bedrock -> true
-                            else -> false
-                        }
-                        if (isDanger) {
-                            SoundQueue.addToQueue("random.orb", 1f)
-                        }
-                    }
-                }
-            }
             if (Skytils.config.showRNGMeter) {
                 for ((index, line) in sidebarLines.withIndex()) {
                     if (line == "Slayer Quest") {
@@ -300,15 +244,15 @@ class SlayerFeatures {
         if (!Utils.inSkyblock) return
         val packet = event.packet
         if (packet is S1CPacketEntityMetadata) {
-            if (packet.entityId == slayerEntity?.entityId && slayerEntity is EntityEnderman) {
-                (slayerEntity as EntityEnderman).apply {
-                    if (heldBlockState?.block == Blocks.beacon && ((packet.func_149376_c()
-                            .find { it.dataValueId == 16 } ?: return@apply).`object` as Short).toInt().and(65535)
+            (slayer as? SeraphSlayer)?.run {
+                if (packet.entityId == entity.entityId) {
+                    if (entity.heldBlockState?.block == Blocks.beacon && ((packet.func_149376_c()
+                            .find { it.dataValueId == 16 } ?: return).`object` as Short).toInt().and(65535)
                             .and(4095) == 0
                     ) {
                         lastYangGlyphSwitch = System.currentTimeMillis()
                         lastYangGlyphSwitchTicks = 0
-                        thrownBoundingBox = entityBoundingBox
+                        thrownBoundingBox = entity.entityBoundingBox
                         if (Skytils.config.yangGlyphPing && !Skytils.config.yangGlyphPingOnLand) createTitle(
                             "§cYang Glyph!",
                             30
@@ -316,7 +260,8 @@ class SlayerFeatures {
                         yangGlyphAdrenalineStressCount = lastYangGlyphSwitch + 6000L
                     }
                 }
-            } else if (Skytils.config.totemPing != 0 && packet.entityId == totemEntity?.entityId) {
+            }
+            if (Skytils.config.totemPing != 0 && packet.entityId == (slayer as? DemonlordSlayer)?.totemEntity?.entityId) {
                 (packet.func_149376_c().find { it.dataValueId == 2 }?.`object` as String).let { name ->
                     printDevMessage("totem name updating: $name", "totem")
                     totemRegex.matchEntire(name)?.run {
@@ -368,85 +313,49 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
-        if (yangGlyph != null && event.pos == yangGlyph && event.old.block is BlockBeacon && event.update.block is BlockAir) {
-            yangGlyph = null
-            yangGlyphEntity = null
-            return
-        }
-        if (totemEntity != null && event.old.block == Blocks.stained_hardened_clay && event.update.block is BlockAir) {
-            totemEntity = null
-            printDevMessage("removed totem entity", "totem")
-            return
-        }
-        if (slayerEntity == null) return
-        if (event.update.block is BlockBeacon) {
-            if (yangGlyphEntity != null) {
-                printDevMessage("Glyph Entity exists", "slayer", "seraph", "seraphGlyph")
-                if (event.update.block is BlockBeacon && yangGlyphEntity!!.position.distanceSq(event.pos) <= 3.5 * 3.5) {
-                    printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
-                    yangGlyph = event.pos
-                    yangGlyphEntity = null
-                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
-                        "§cYang Glyph!",
-                        30
-                    )
-                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
-                    lastYangGlyphSwitchTicks = -1
-                }
-            }
-            if (Skytils.config.experimentalYangGlyphDetection && yangGlyph == null && slayerEntity != null) {
-                if (lastYangGlyphSwitchTicks in 0..5 && slayerEntity!!.getDistanceSq(event.pos) <= 5 * 5) {
-                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
-                        "§cYang Glyph!",
-                        30
-                    )
-                    printDevMessage(
-                        "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
-                    )
-                    yangGlyph = event.pos
-                    lastYangGlyphSwitchTicks = -1
-                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
-                }
-            }
-        }
+        (slayer as? ThrowingSlayer)?.blockChange(event)
     }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
         val matrixStack = UMatrixStack()
-        if (Skytils.config.highlightYangGlyph && yangGlyph != null) {
-            GlStateManager.disableCull()
-            GlStateManager.disableDepth()
-            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-            val x = yangGlyph!!.x - viewerX
-            val y = yangGlyph!!.y - viewerY
-            val z = yangGlyph!!.z - viewerZ
-            drawFilledBoundingBox(
-                matrixStack,
-                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
-                Skytils.config.yangGlyphColor,
-                1f
-            )
-            GlStateManager.enableDepth()
-            GlStateManager.enableCull()
-        }
-        if (Skytils.config.highlightNukekebiHeads && nukekebiHeads.isNotEmpty()) {
-            for (head in nukekebiHeads.also { list -> list.removeAll { it.isDead } }) {
-                GlStateManager.disableCull()
-                GlStateManager.disableDepth()
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-                val x = head.posX - viewerX
-                val y = head.posY - viewerY
-                val z = head.posZ - viewerZ
-                drawFilledBoundingBox(
-                    matrixStack,
-                    AxisAlignedBB(x - 0.25, y + 0.5, z - 0.25, x + 0.25, y + 1.5, z + 0.25),
-                    Skytils.config.nukekebiHeadColor,
-                    1f
-                )
-                GlStateManager.enableDepth()
-                GlStateManager.enableCull()
+        (slayer as? SeraphSlayer)?.run {
+            if (Skytils.config.highlightYangGlyph) {
+                thrownLocation?.let { yangGlyph ->
+                    GlStateManager.disableCull() // is disabling cull even needed here?
+                    UGraphics.disableDepth()
+                    val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+                    val x = yangGlyph.x - viewerX
+                    val y = yangGlyph.y - viewerY
+                    val z = yangGlyph.z - viewerZ
+                    drawFilledBoundingBox(
+                        matrixStack,
+                        AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
+                        Skytils.config.yangGlyphColor,
+                        1f
+                    )
+                    UGraphics.enableDepth()
+                    GlStateManager.enableCull()
+                }
+            }
+            if (Skytils.config.highlightNukekebiHeads && nukekebiSkulls.isNotEmpty()) {
+                nukekebiSkulls.also { it.removeAll { it.isDead } }.forEach { head ->
+                    GlStateManager.disableCull() // same for this cull call?
+                    UGraphics.disableDepth()
+                    val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+                    val x = head.posX - viewerX
+                    val y = head.posY - viewerY
+                    val z = head.posZ - viewerZ
+                    drawFilledBoundingBox(
+                        matrixStack,
+                        AxisAlignedBB(x - 0.25, y + 0.5, z - 0.25, x + 0.25, y + 1.5, z + 0.25),
+                        Skytils.config.nukekebiHeadColor,
+                        1f
+                    )
+                    UGraphics.enableDepth()
+                    GlStateManager.enableCull()
+                }
             }
         }
     }
@@ -454,61 +363,9 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
         if (!Utils.inSkyblock) return
-        if (event.entity is EntityArmorStand && slayerEntity != null) {
-            TickTask(1) {
-                val e = event.entity as EntityArmorStand
-                if (slayerEntity != null) {
-                    // seraph stuff
-                    if (e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)) {
-                        val time = System.currentTimeMillis() - 50
-                        printDevMessage(
-                            "Found beacon armor stand, time diff ${time - lastYangGlyphSwitch}",
-                            "slayer",
-                            "seraph",
-                            "seraphGlyph"
-                        )
-                        if (lastYangGlyphSwitch != -1L && time - lastYangGlyphSwitch < 300 && e.entityBoundingBox.expand(
-                                4.5,
-                                4.0,
-                                4.5
-                            )
-                                .intersectsWith(thrownBoundingBox ?: e.entityBoundingBox)
-                        ) {
-                            printDevMessage(
-                                "Beacon armor stand is close to slayer entity",
-                                "slayer",
-                                "seraph",
-                                "seraphGlyph"
-                            )
-                            yangGlyphEntity = e
-                            lastYangGlyphSwitch = -1L
-                            lastYangGlyphSwitchTicks = -1
-                        }
-                        return@TickTask
-                    } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
-                            .intersectsWith(slayerEntity!!.entityBoundingBox)
-                    ) {
-                        printDevMessage("Found nearby armor stand", "slayer", "seraph", "seraphGlyph", "seraphFixation")
-                        for (item in e.inventory) {
-                            if (item?.item == Items.skull) {
-                                if (ItemUtil.getSkullTexture(item) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0=") {
-                                    nukekebiHeads.add(e)
-                                }
-                                break
-                            }
-                        }
-                        return@TickTask
-                    }
-                    // demonlord stuff
-                    if (Skytils.config.totemPing != 0 && e.customNameTag.matches(totemRegex)) {
-                        totemEntity = e
-                        printDevMessage("set totem", "totem")
-                    }
-                }
-            }
-        }
+        (slayer as? ThrowingSlayer)?.run { entityJoinWorld(event) }
         if (!hasSlayerText) return
-        if (slayerEntity != null) {
+        if (slayer != null) {
             printDevMessage("boss not null", "slayer", "seraph")
             return
         }
@@ -530,13 +387,13 @@ class SlayerFeatures {
             hitMap.compute(enderman) { _, int ->
                 return@compute (int ?: 0).inc()
             }
-            if (slayerEntity !is EntityEnderman) {
-                detectSlayerEntities(enderman, "Voidgloom Seraph", null, "§c☠ §bVoidgloom Seraph")
-            } else if (enderman != slayerEntity && hitMap[enderman]!! - (hitMap[slayerEntity as EntityEnderman]
-                    ?: 0) >= 10
+            if (slayer !is SeraphSlayer) {
+                processSlayerEntity(enderman)
+            } else if (enderman != slayer?.entity && (hitMap[enderman]
+                    ?: 0) - ((slayer?.entity as? EntityEnderman)?.let { hitMap[it] } ?: 0) >= 10
             ) {
-                printDevMessage("Processing new entity", "slayer", "seraph", "seraphHit")
-                detectSlayerEntities(enderman, "Voidgloom Seraph", null, "§c☠ §bVoidgloom Seraph")
+                printDevMessage("processing new entity")
+                processSlayerEntity(enderman)
             }
         }
     }
@@ -551,24 +408,17 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
-        slayerEntity = null
-        slayerNameEntity = null
-        slayerTimerEntity = null
+        slayer = null
         hitMap.clear()
-        yangGlyph = null
-        yangGlyphEntity = null
-        lastYangGlyphSwitch = -1
-        lastYangGlyphSwitchTicks = -1
-        yangGlyphAdrenalineStressCount = -1
     }
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Skytils.config.hideOthersBrokenHeartRadiation || !event.entity.isInvisible || event.entity !is EntityGuardian) return
-        if (slayerEntity != null && slayerEntity is EntityEnderman) {
-            if (slayerEntity!!.isRiding) {
+        (slayer as? SeraphSlayer)?.run {
+            if (entity.isRiding) {
                 printDevMessage("Slayer is Riding", "slayer", "seraph", "seraphRadiation")
-                if (event.entity.getDistanceSqToEntity(slayerEntity!!) > 2 * 2) {
+                if (event.entity.getDistanceSqToEntity(entity) > 2 * 2) {
                     printDevMessage("Guardian too far", "slayer", "seraph", "seraphRadiation")
                     event.isCanceled = true
                 }
@@ -584,8 +434,8 @@ class SlayerFeatures {
     fun onRenderHud(event: RenderHUDEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.pointYangGlyph) {
-            val pos = yangGlyph.toVec3()?.addVector(0.5, 0.5, 0.5)
-                ?: yangGlyphEntity?.run { if (this.isEntityAlive) this else null }?.positionVector ?: return
+            val pos = (slayer as? SeraphSlayer)?.thrownLocation.toVec3()?.addVector(0.5, 0.5, 0.5)
+                ?: (slayer as? SeraphSlayer)?.thrownEntity?.run { if (this.isEntityAlive) this else null }?.positionVector ?: return
             val x = UResolution.scaledWidth / 2.0
             val y = UResolution.scaledHeight / 2.0
             val angle: Double = -(MathHelper.atan2(
@@ -631,48 +481,43 @@ class SlayerFeatures {
                 val leftAlign = actualX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-                if (slayerTimerEntity != null) {
-                    if (slayerTimerEntity!!.isDead) {
-                        printDevMessage("timer died", "slayer", "seraph")
-                        slayerTimerEntity = null
-                    } else if (toggled) {
-                        ScreenRenderer.fontRenderer.drawString(
-                            slayerTimerEntity!!.displayName.formattedText,
-                            if (leftAlign) 0f else width.toFloat(),
-                            0f,
-                            CommonColors.WHITE,
-                            alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
+                slayer?.run {
+                    timerEntity?.run {
+                        if (isDead) {
+                            printDevMessage("timer died", "slayer", "seraph")
+                            timerEntity = null
+                        } else if (toggled) {
+                            ScreenRenderer.fontRenderer.drawString(
+                                displayName.formattedText,
+                                if (leftAlign) 0f else width.toFloat(),
+                                0f,
+                                CommonColors.WHITE,
+                                alignment,
+                                SmartFontRenderer.TextShadow.NORMAL
+                            )
+                        }
                     }
-                }
-                if (slayerNameEntity != null) {
-                    if (slayerNameEntity!!.isDead) {
-                        printDevMessage("name died", "slayer", "seraph")
-                        slayerNameEntity = null
-                    } else if (toggled) {
-                        ScreenRenderer.fontRenderer.drawString(
-                            slayerNameEntity!!.displayName.formattedText,
-                            if (leftAlign) 0f else width.toFloat(),
-                            10f,
-                            CommonColors.WHITE,
-                            alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
+                    nameEntity?.run {
+                        if (isDead) {
+                            printDevMessage("name died", "slayer", "seraph")
+                            nameEntity = null
+                        } else if (toggled) {
+                            ScreenRenderer.fontRenderer.drawString(
+                                displayName.formattedText,
+                                if (leftAlign) 0f else width.toFloat(),
+                                10f,
+                                CommonColors.WHITE,
+                                alignment,
+                                SmartFontRenderer.TextShadow.NORMAL
+                            )
+                        }
                     }
-                }
-                if (slayerEntity != null) {
-                    if (slayerEntity!!.isDead) {
+                    if (entity.isDead) {
                         printDevMessage("slayer died", "slayer", "seraph")
                         if (Skytils.config.slayerTimeToKill) {
                             UChat.chat("$prefix §bSlayer took §f${slayerEntity!!.ticksExisted / 20f}§bs to kill")
                         }
-                        slayerEntity = null
-                        nukekebiHeads.clear()
-                        lastYangGlyphSwitch = -1L
-                        lastYangGlyphSwitchTicks = -1
-                        yangGlyph = null
-                        yangGlyphEntity = null
+                        slayer = null
                     }
                 }
             }
@@ -716,88 +561,64 @@ class SlayerFeatures {
                 val leftAlign = actualX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-                if (slayerNameEntity != null) {
-                    if (slayerNameEntity!!.displayName.formattedText.dropLastWhile { it == 's' }
-                            .endsWith(" Hit")) {
+                (slayer as? SeraphSlayer)?.run {
+                    nameEntity?.run {
                         ScreenRenderer.fontRenderer.drawString(
-                            "§dShield Phase",
-                            if (leftAlign) 0f else width.toFloat(),
-                            0f,
-                            CommonColors.WHITE,
-                            alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
-                    } else {
-                        ScreenRenderer.fontRenderer.drawString(
-                            "§6Damage Phase",
-                            if (leftAlign) 0f else width.toFloat(),
+                            if (hitPhase)
+                                "§dShield Phase"
+                            else
+                                "§6Damage Phase",
+                            if (leftAlign) 0f else width,
                             0f,
                             CommonColors.WHITE,
                             alignment,
                             SmartFontRenderer.TextShadow.NORMAL
                         )
                     }
-                }
-                val heldBlock: IBlockState? = (slayerEntity as EntityEnderman).heldBlockState
-                if (heldBlock != null && heldBlock.block is BlockBeacon) {
+                    entity.heldBlockState?.takeIf { it.block is BlockBeacon }?.run {
+                        ScreenRenderer.fontRenderer.drawString(
+                            "§cHolding beacon!",
+                            if (leftAlign) 0f else width.toFloat(),
+                            10f,
+                            CommonColors.WHITE,
+                            alignment,
+                            SmartFontRenderer.TextShadow.NORMAL
+                        )
+                    } ?: if (lastYangGlyphSwitchTicks != -1) {
+                        ScreenRenderer.fontRenderer.drawString(
+                            "§cBeacon thrown! ${(System.currentTimeMillis() - yangGlyphAdrenalineStressCount) / 1000f}s",
+                            if (leftAlign) 0f else width.toFloat(),
+                            10f,
+                            CommonColors.WHITE,
+                            alignment,
+                            SmartFontRenderer.TextShadow.NORMAL
+                        )
+                    } else {
+                        ScreenRenderer.fontRenderer.drawString(
+                            "§bHolding nothing!",
+                            if (leftAlign) 0f else width.toFloat(),
+                            10f,
+                            CommonColors.WHITE,
+                            alignment,
+                            SmartFontRenderer.TextShadow.NORMAL
+                        )
+                    }
                     ScreenRenderer.fontRenderer.drawString(
-                        "§cHolding beacon!",
-                        if (leftAlign) 0f else width.toFloat(),
-                        10f,
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                } else if (lastYangGlyphSwitchTicks != -1) {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "§cBeacon thrown! ${(System.currentTimeMillis() - yangGlyphAdrenalineStressCount) / 1000f}s",
-                        if (leftAlign) 0f else width.toFloat(),
-                        10f,
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                } else {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "§bHolding nothing!",
-                        if (leftAlign) 0f else width.toFloat(),
-                        10f,
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                }
-                if (yangGlyph != null) {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "§cYang Glyph placed! ${(System.currentTimeMillis() - yangGlyphAdrenalineStressCount) / 1000f}s",
-                        if (leftAlign) 0f else width.toFloat(),
-                        20f,
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                } else {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "§bNo yang glyph",
+                        if (thrownLocation != null)
+                            "§cYang Glyph placed! ${(System.currentTimeMillis() - yangGlyphAdrenalineStressCount) / 1000f}s"
+                        else
+                            "§bNo yang glyph",
                         if (leftAlign) 0f else width.toFloat(),
                         20f,
                         CommonColors.WHITE,
                         alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
-                }
-                if (nukekebiHeads.size > 0) {
                     ScreenRenderer.fontRenderer.drawString(
-                        "§dNukekebi Heads: §c${nukekebiHeads.size}",
-                        if (leftAlign) 0f else width.toFloat(),
-                        30f,
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                } else {
-                    ScreenRenderer.fontRenderer.drawString(
-                        "§bNo Nukekebi Heads",
+                        if (nukekebiSkulls.size > 0)
+                            "§dNukekebi Heads: §c${nukekebiSkulls.size}"
+                        else
+                            "§bNo Nukekebi Heads",
                         if (leftAlign) 0f else width.toFloat(),
                         30f,
                         CommonColors.WHITE,
@@ -961,111 +782,57 @@ class SlayerFeatures {
         private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
         private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
         private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
-        var slayerEntity: Entity? = null
-        var slayerNameEntity: EntityArmorStand? = null
-        var slayerTimerEntity: EntityArmorStand? = null
-        var yangGlyphEntity: EntityArmorStand? = null
-        var totemEntity: EntityArmorStand? = null
+        var slayer: Slayer<*>? = null
+        val slayerEntity: Entity?
+            get() = slayer?.entity
         var hasSlayerText = false
         private var lastTickHasSlayerText = false
         var expectedMaxHp: Int? = null
         private val hitMap = HashMap<EntityEnderman, Int>()
-        var yangGlyph: BlockPos? = null
-        var lastYangGlyphSwitch: Long = -1L
-        var lastYangGlyphSwitchTicks = -1
-        var thrownBoundingBox: AxisAlignedBB? = null
-        private val nukekebiHeads = arrayListOf<EntityArmorStand>()
         var BossHealths = HashMap<String, JsonObject>()
         var maddoxCommand = ""
-        var yangGlyphAdrenalineStressCount = -1L
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
             when (entity) {
-                is EntityZombie -> {
-                    TickTask(5) {
-                        val nearbyArmorStands = entity.getEntityWorld().getEntitiesInAABBexcluding(
-                            entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                        ) { nearbyEntity: Entity? ->
-                            if (nearbyEntity is EntityArmorStand) {
-                                if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
-                                    if (nearbyEntity.inventory.any { it != null }) {
-                                        // armor stand has equipment, abort!
-                                        return@getEntitiesInAABBexcluding false
-                                    }
-                                    // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
-                                    return@getEntitiesInAABBexcluding true
-                                }
-                            }
-                            false
-                        }
-                        var isSlayer = 0
-                        val currentTier = getTier("Revenant Horror")
-                        for (nearby in nearbyArmorStands) {
-                            if (nearby.displayName.formattedText.startsWith("§8[§7Lv")) continue
-                            if (nearby.displayName.formattedText.startsWith("§c☠ §bRevenant Horror") ||
-                                nearby.displayName.formattedText.startsWith("§c☠ §fAtoned Horror")
-                            ) {
-                                if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths["Revenant"]?.get(
-                                        currentTier
-                                    )?.asInt ?: 0)
-                                    == entity.baseMaxHealth.toInt()
-                                ) {
-                                    slayerNameEntity = nearby as EntityArmorStand
-                                    isSlayer++
-                                }
-                                continue
-                            }
-                            if (nearby.displayName.formattedText == "§c02:59§r") {
-                                slayerTimerEntity = nearby as EntityArmorStand
-                                isSlayer++
-                                continue
-                            }
-                            if (!countTime && nearby.displayName.formattedText.matches(timerRegex)) {
-                                slayerTimerEntity = nearby as EntityArmorStand
-                                isSlayer++
-                                continue
-                            }
-                        }
-                        if (isSlayer == 2) {
-                            slayerEntity = entity
-                        } else {
-                            slayerTimerEntity = null
-                            slayerNameEntity = null
-                        }
-                    }
-                }
-                is EntitySpider ->
-                    detectSlayerEntities(
-                        entity,
-                        "Tarantula Broodfather",
-                        if (countTime) "§c02:59§r" else null,
-                        "§5☠ §4Tarantula Broodfather"
-                    )
-                is EntityWolf ->
-                    detectSlayerEntities(
-                        entity,
-                        "Sven Packmaster",
-                        if (countTime) "§c03:59§r" else null,
-                        "§c☠ §fSven Packmaster"
-                    )
-                is EntityEnderman ->
-                    detectSlayerEntities(
-                        entity,
-                        "Voidgloom Seraph",
-                        if (countTime) "§c03:59§r" else null,
-                        "§c☠ §bVoidgloom Seraph"
-                    )
-                is EntityBlaze ->
-                    detectSlayerEntities(
-                        entity,
-                        "Inferno Demonlord",
-                        null,
-                        "§c☠ §bInferno Demonlord"
-                    )
+                is EntityZombie -> slayer = RevenantSlayer(entity)
+                is EntitySpider -> slayer = Slayer(entity, "Tarantula Broodfather", "§5☠ §4Tarantula Broodfather")
+                is EntityWolf -> slayer = Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
+                is EntityEnderman -> slayer = SeraphSlayer(entity)
+                is EntityBlaze -> slayer = DemonlordSlayer(entity)
             }
         }
 
-        private fun detectSlayerEntities(entity: EntityLiving, name: String, timer: String?, nameStart: String) {
+        private fun getTier(name: String): String {
+            return sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
+                ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
+        }
+
+
+        init {
+            SlayerArmorDisplayElement()
+            SlayerDisplayElement()
+            SeraphDisplayElement()
+        }
+    }
+
+    /**
+     * Represents a slayer entity
+     *
+     * [nameEntity] and [timerEntity] must be mutable as the entity changes for Inferno Demonlord
+     */
+    open class Slayer<T : EntityLiving>(
+        val entity: T,
+        private val name: String,
+        private vararg val nameStart: String,
+    ) {
+        var nameEntity: EntityArmorStand? = null
+        var timerEntity: EntityArmorStand? = null
+
+        init {
+            detectSlayerEntities()
+        }
+
+        fun detectSlayerEntities() =
             TickTask(5) {
                 val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
                     entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
@@ -1087,7 +854,7 @@ class SlayerFeatures {
                 for (nearby in nearbyArmorStands) {
                     when {
                         nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
-                        nearby.displayName.formattedText.startsWith(nameStart) -> {
+                        nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
                             val currentTier = getTier(name)
                             val expectedHealth =
                                 (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
@@ -1102,34 +869,207 @@ class SlayerFeatures {
                                 potentialNameEntities.add(nearby as EntityArmorStand)
                             }
                         }
-                        nearby.displayName.formattedText == timer -> {
-                            printDevMessage("timer matched", "slayer")
-                            potentialTimerEntities.add(nearby as EntityArmorStand)
-                        }
-                        timer == null && nearby.displayName.formattedText.matches(timerRegex) -> {
+                        nearby.displayName.formattedText.matches(timerRegex) -> {
                             printDevMessage("timer regex matched", "slayer")
                             potentialTimerEntities.add(nearby as EntityArmorStand)
                         }
                     }
                 }
                 if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
-                    slayerEntity = entity
-                    slayerNameEntity = potentialNameEntities.first()
-                    slayerTimerEntity = potentialTimerEntities.first()
+                    nameEntity = potentialNameEntities.first()
+                    timerEntity = potentialTimerEntities.first()
+                }
+            }
+
+        open fun tick(event: ClientTickEvent) {}
+    }
+
+    class RevenantSlayer(entity: EntityZombie) :
+        Slayer<EntityZombie>(entity, "Revenant Horror", "§c☠ §bRevenant Horror", "§c☠ §fAtoned Horror") {
+        override fun tick(event: ClientTickEvent) {
+            if (ticks % 4 != 0) return
+            if (Skytils.config.rev5TNTPing) {
+                if (hasSlayerText) {
+                    var under: BlockPos? = null
+                    if (mc.thePlayer.onGround) {
+                        under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
+                    } else {
+                        for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
+                            val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
+                            if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
+                                under = test
+                                break
+                            }
+                        }
+                    }
+                    if (under != null) {
+                        val blockUnder = mc.theWorld.getBlockState(under)
+                        val isDanger = when {
+                            blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
+                            blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
+                            blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
+                            blockUnder.block === Blocks.stained_hardened_clay -> {
+                                val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
+                                color == 0 || color == 8 || color == 14
+                            }
+                            blockUnder.block === Blocks.bedrock -> true
+                            else -> false
+                        }
+                        if (isDanger) {
+                            SoundQueue.addToQueue("random.orb", 1f)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Represents a slayer which can throw a thing
+     *
+     * Sub-type of [Slayer]
+     */
+    abstract class ThrowingSlayer<T : EntityLiving>(entity: T, name: String, nameStart: String) : Slayer<T>(
+        entity, name, nameStart,
+    ) {
+        var thrownLocation: BlockPos? = null
+        var thrownEntity: EntityArmorStand? = null
+
+        open fun entityJoinWorld(event: EntityJoinWorldEvent) {}
+
+        abstract fun blockChange(event: BlockChangeEvent)
+    }
+
+    class SeraphSlayer(entity: EntityEnderman) :
+        ThrowingSlayer<EntityEnderman>(entity, "Voidgloom Seraph", "§c☠ §bVoidgloom Seraph") {
+        val nukekebiSkulls = mutableListOf<EntityArmorStand>()
+        var yangGlyphAdrenalineStressCount = -1L
+        var lastYangGlyphSwitch = -1L
+        var lastYangGlyphSwitchTicks = -1
+        var thrownBoundingBox: AxisAlignedBB? = null
+        val hitPhase: Boolean
+            get() = nameEntity?.customNameTag?.dropLastWhile { it == 's' }?.endsWith(" Hit") ?: false
+
+        override fun tick(event: ClientTickEvent) {
+            if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
+            if (lastYangGlyphSwitchTicks > 120) lastYangGlyphSwitchTicks = -1
+            if (Skytils.config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && thrownEntity == null && thrownLocation == null) {
+                mc.theWorld.getEntitiesWithinAABB(
+                    EntityArmorStand::class.java,
+                    entity.entityBoundingBox.expand(20.69, 20.69, 20.69)
+                ) { e ->
+                    e as EntityArmorStand
+                    e.ticksExisted <= 300 && lastYangGlyphSwitchTicks + 5 > e.ticksExisted &&
+                            e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)
+                }.minByOrNull {
+                    (abs(lastYangGlyphSwitchTicks - it.ticksExisted) * 10) + slayerEntity!!.getDistanceSqToEntity(
+                        it
+                    )
+                }?.let { suspect ->
+                    printDevMessage(
+                        "Found suspect glyph, ${lastYangGlyphSwitchTicks} switched, ${suspect.ticksExisted} existed, ${
+                            entity.getDistanceSqToEntity(
+                                suspect
+                            )
+                        } distance", "slayer", "seraph", "seraphGlyph"
+                    )
+                    thrownEntity = suspect
                 }
             }
         }
 
-        private fun getTier(name: String): String {
-            return sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
-                ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
+        override fun entityJoinWorld(event: EntityJoinWorldEvent) {
+            TickTask(1) {
+                (event.entity as? EntityArmorStand)?.let { e ->
+                    if (e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)) {
+                        val time = System.currentTimeMillis() - 50
+                        printDevMessage(
+                            "Found beacon armor stand, time diff ${time - lastYangGlyphSwitch}",
+                            "slayer",
+                            "seraph",
+                            "seraphGlyph"
+                        )
+                        if (lastYangGlyphSwitch != -1L && time - lastYangGlyphSwitch < 300 && e.entityBoundingBox.expand(
+                                4.5,
+                                4.0,
+                                4.5
+                            )
+                                .intersectsWith(thrownBoundingBox ?: e.entityBoundingBox)
+                        ) {
+                            printDevMessage(
+                                "Beacon armor stand is close to slayer entity",
+                                "slayer",
+                                "seraph",
+                                "seraphGlyph"
+                            )
+                            thrownEntity = e
+                            lastYangGlyphSwitch = -1L
+                            lastYangGlyphSwitchTicks = -1
+                        }
+                        return@TickTask
+                    } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
+                            .intersectsWith(entity.entityBoundingBox)
+                    ) {
+                        printDevMessage("Found nearby armor stand", "slayer", "seraph", "seraphGlyph", "seraphFixation")
+                        if (e.inventory.any {
+                                it?.takeIf { it.item == Items.skull }
+                                    ?.let { ItemUtil.getSkullTexture(it) } == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
+                            }) {
+                            nukekebiSkulls.add(e)
+                        }
+                        return@TickTask
+                    }
+                }
+            }
         }
 
+        override fun blockChange(event: BlockChangeEvent) {
+            if (event.pos == thrownLocation && event.old.block is BlockBeacon && event.update.block is BlockAir) {
+                thrownLocation = null
+                thrownEntity = null
+                return
+            }
+            thrownEntity?.let { entity ->
+                printDevMessage("Glyph Entity exists", "slayer", "seraph", "seraphGlyph")
+                if (event.update.block is BlockBeacon && entity.position.distanceSq(event.pos) <= 3.5 * 3.5) {
+                    printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
+                    thrownLocation = event.pos
+                    thrownEntity = null
+                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
+                        "§cYang Glyph!",
+                        30
+                    )
+                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
+                    lastYangGlyphSwitchTicks = -1
+                }
+            }
+            if (Skytils.config.experimentalYangGlyphDetection && thrownLocation == null) {
+                if (lastYangGlyphSwitchTicks in 0..5 && entity.getDistanceSq(event.pos) <= 5 * 5) {
+                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
+                        "§cYang Glyph!",
+                        30
+                    )
+                    printDevMessage(
+                        "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
+                    )
+                    thrownLocation = event.pos
+                    lastYangGlyphSwitchTicks = -1
+                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
+                }
+            }
+        }
+    }
 
-        init {
-            SlayerArmorDisplayElement()
-            SlayerDisplayElement()
-            SeraphDisplayElement()
+    class DemonlordSlayer(entity: EntityBlaze) :
+        ThrowingSlayer<EntityBlaze>(entity, "Inferno Demonlord", "§c☠ §bInferno Demonlord") {
+        var totemEntity: EntityArmorStand? = null
+
+        override fun blockChange(event: BlockChangeEvent) {
+            if (totemEntity != null && event.old.block == Blocks.stained_hardened_clay && event.update.block is BlockAir) {
+                totemEntity = null
+                printDevMessage("removed totem entity", "totem")
+                return
+            }
         }
     }
 }
