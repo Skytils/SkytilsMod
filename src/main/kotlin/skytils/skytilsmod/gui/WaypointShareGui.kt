@@ -41,6 +41,7 @@ import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
+import skytils.skytilsmod.utils.childContainers
 import skytils.skytilsmod.utils.setState
 import java.awt.Color
 
@@ -181,8 +182,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 addProperty("island", island.mode)
                 add("waypoints", JsonArray().apply {
                     uiContainer.childContainers.mapNotNull {
-                        val e = entries[it] ?: return@mapNotNull null
-                        if (e.selected.checked)
+                        val e = entries[it]
+                        if (e != null && e.selected.checked)
                             JsonObject().apply {
                                 addProperty("name", e.name.getText())
                                 addProperty("x", e.x.getText().toInt())
