@@ -26,9 +26,9 @@ import gg.essential.universal.UMatrixStack
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.hylin.extension.getString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.features.impl.mining.MiningFeatures.Companion.waypoints
 import skytils.skytilsmod.utils.*
 import java.awt.Color
 import java.io.File
@@ -115,24 +115,23 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                                 (e as JsonObject).asWaypoint()
                             }.toHashSet(),
                             category["isExpanded"]?.asBoolean ?: true,
-                            SkyblockIsland.values().find { it.mode == category["island"].asString } ?: continue
+                            SkyblockIsland.values().find { it.mode == category.getIsland() } ?: continue
                         )
                     )
                 }
             } else if (obj.isJsonArray) {
                 obj as JsonArray
                 // Older save format without waypoint categories
-                val groupedByIsland = obj.groupBy { it.asJsonObject["island"].asString }
-                for (group in groupedByIsland) {
+                for (group in obj.groupBy { it.asJsonObject.getIsland() }) {
                     categories.add(
                         WaypointCategory(
-                            null as String?,
-                            group.value.map { e ->
+                            name = null,
+                            waypoints = group.value.map { e ->
                                 count++
                                 (e as JsonObject).asWaypoint()
                             }.toHashSet(),
-                            true,
-                            SkyblockIsland.values().find { it.mode == group.key } ?: continue
+                            isExpanded = true,
+                            island = SkyblockIsland.values().find { it.mode == group.key } ?: continue
                         )
                     )
                 }
@@ -149,9 +148,14 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 this["addedAt"]?.asLong ?: System.currentTimeMillis()
             )
         }
+
+        private fun JsonObject.getIsland() = this.getString("island")
     }
 }
 
+/**
+ * Represents a collection of waypoints, including a name, island, and a list of [Waypoint] objects.
+ */
 data class WaypointCategory(
     var name: String?,
     val waypoints: HashSet<Waypoint>,

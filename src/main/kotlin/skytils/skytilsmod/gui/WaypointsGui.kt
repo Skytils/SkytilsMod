@@ -19,7 +19,6 @@
 package skytils.skytilsmod.gui
 
 import gg.essential.elementa.ElementaVersion
-import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
@@ -30,8 +29,9 @@ import gg.essential.elementa.constraints.*
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
-import gg.essential.universal.UKeyboard
-import gg.essential.vigilance.gui.settings.*
+import gg.essential.vigilance.gui.settings.CheckboxComponent
+import gg.essential.vigilance.gui.settings.ColorComponent
+import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Skytils
@@ -43,10 +43,7 @@ import skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.HelpComponent
 import skytils.skytilsmod.gui.components.SimpleButton
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
-import skytils.skytilsmod.utils.setState
-import skytils.skytilsmod.utils.toggle
+import skytils.skytilsmod.utils.*
 import java.awt.Color
 
 class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
@@ -101,7 +98,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                         scrollComponent.allChildren.forEach { category ->
                             category as UIContainer
                             val uiContainers = category.childContainers.sortedBy { w ->
-                                val entry = entries[w] ?: error("no entry found for child")
+                                val entry = entries[w] ?: throwNoEntryFoundError()
                                 sorter.sortingBy(entry.toWaypoint())
                             }
                             // Remove and re-add the waypoints in the correct order
@@ -125,7 +122,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 expandAll()
                 scrollComponent.allChildren.forEach { category ->
                     category.childContainers.forEach { w ->
-                        val entry = entries[w] ?: error("no entry found for child")
+                        val entry = entries[w] ?: throwNoEntryFoundError()
                         if (entry.name.getText().contains(searchBar.getText())) {
                             w.unhide()
                         } else {
@@ -146,7 +143,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 if (expandAll()) { // if not all of the categories are expanded, expand them. this will run on the next button press.
                     val valid = scrollComponent.allChildren.map { c ->
                         c.childContainers.mapNotNull { w ->
-                            val entry = entries[w] ?: error("no entry found for child")
+                            val entry = entries[w] ?: throwNoEntryFoundError()
                             if (entry.name.getText().contains(searchBar.getText())) return@mapNotNull entry
                             else return@mapNotNull null
                         }
@@ -173,10 +170,10 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             onLeftClick {
                 scrollComponent.allChildren.forEach { container ->
                     container as UIContainer
-                    val category = categoryContainers[container] ?: error("no category found for UIContainer")
+                    val category = categoryContainers[container] ?: throwCategoryNotFoundError()
                     if (!category.isCollapsed) { // Collapsed categories aren't visible
                         container.childContainers.forEach { waypoint ->
-                            val entry = entries[waypoint] ?: error("no entry found for child")
+                            val entry = entries[waypoint] ?: throwNoEntryFoundError()
                             if (entry.name.getText().contains(searchBar.getText())) {
                                 container.removeChild(waypoint)
                                 category.children.remove(waypoint)
@@ -291,17 +288,18 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                     )
                 }) {
                     addNewWaypoint(
-                        category,
-                        waypoint.name,
-                        waypoint.pos,
-                        waypoint.enabled,
-                        waypoint.color,
-                        waypoint.addedAt
+                        category, waypoint.name, waypoint.pos, waypoint.enabled, waypoint.color, waypoint.addedAt
                     )
                 }
             }
         }
     }
+
+    private fun siblingConstrainedButton(text: String, container: UIContainer) =
+        SimpleButton(text).childOf(container).constrain {
+            x = SiblingConstraint(5f)
+            y = CATEGORY_INNER_PADDING.pixels()
+        }
 
     private fun addNewCategory(
         name: String = "",
@@ -320,32 +318,24 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             y = CATEGORY_INNER_PADDING.pixels()
         }.apply {
             onValueChange { newValue: Any? ->
-                val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
-                // If this value change was triggered while updating the checkbox, don't update the child checkboxes.
-                // see `updateCheckbox()`
-                if (!categoryObj.ignoreCheckboxValueChange) {
-                    // When the category is checked or unchecked, all child waypoints will follow this change.
+                val categoryObj = categoryContainers[container] ?: throwCategoryNotFoundError()
+                // If this value change was triggered while updating the checkbox, don't update the child checkboxes. (see `updateCheckbox`)
+                if (!categoryObj.ignoreCheckboxValueChange)
                     this.parent.childContainers.forEach {
+                        // When the category is checked or unchecked, all child waypoints will follow this change.
                         it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
                     }
-                }
             }
         }
 
-        SimpleButton("Remove").childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CATEGORY_INNER_PADDING.pixels()
-        }.onLeftClick {
+        siblingConstrainedButton("Remove", container).onLeftClick {
             container.childContainers.forEach { entries.remove(it) } // remove all waypoints in this category from the list of entries
             container.children.clear() // clear the children of this category's UIContainer
             scrollComponent.removeChild(container) // remove this category's UIContainer from the ScrollComponent
             categoryContainers.remove(container) // remove this category from the list of categories
         }
 
-        val newWaypointButton = SimpleButton("New Waypoint").childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CATEGORY_INNER_PADDING.pixels()
-        }
+        val newWaypointButton = siblingConstrainedButton("New Waypoint", container)
 
         val nameComponent = UITextInput("Category Name").childOf(container).constrain {
             x = CenterConstraint()
@@ -359,18 +349,15 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             setText(name)
         }
 
-        val expandComponent = SimpleButton("Collapse").childOf(container).constrain {
-            x = 5.pixels(true)
-            y = CATEGORY_INNER_PADDING.pixels()
-        }.apply {
+        val expandComponent = siblingConstrainedButton("Collapse", container).apply {
             onLeftClick {
-                val categoryObj = categoryContainers[container] ?: error("no category found for name")
+                val categoryObj = categoryContainers[container] ?: throwCategoryNotFoundError()
                 if (categoryObj.isCollapsed) expand(categoryObj) else collapse(categoryObj)
             }
         }
 
         newWaypointButton.onLeftClick {
-            expand(categoryContainers[container] ?: error("no category found for UIContainer"))
+            expand(categoryContainers[container] ?: throwCategoryNotFoundError())
             addNewWaypoint(category = categoryContainers[container]!!)
         }
 
@@ -435,9 +422,9 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             setText(name)
         }
 
-        val xComponent = container.createSmallTextBox("X", pos.x.toString())
-        val yComponent = container.createSmallTextBox("Y", pos.y.toString())
-        val zComponent = container.createSmallTextBox("Z", pos.z.toString())
+        val xComponent = container.createSmallTextBox("X", pos.x.toString()).limitToNumericalCharacters()
+        val yComponent = container.createSmallTextBox("Y", pos.y.toString()).limitToNumericalCharacters()
+        val zComponent = container.createSmallTextBox("Z", pos.z.toString()).limitToNumericalCharacters()
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
             x = SiblingConstraint(25f)
@@ -465,32 +452,11 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             }
         }
 
-        nameComponent.apply {
-            onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) xComponent.grabWindowFocus()
-            }
-        }
-
-        xComponent.apply {
-            onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) yComponent.grabWindowFocus()
-                setText(getText().filter { c -> c.isDigit() || c == '-' })
-            }
-        }
-
-        yComponent.apply {
-            onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) zComponent.grabWindowFocus()
-                setText(getText().filter { c -> c.isDigit() || c == '-' })
-            }
-        }
-
-        zComponent.apply {
-            onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) nameComponent.grabWindowFocus()
-                setText(getText().filter { c -> c.isDigit() || c == '-' })
-            }
-        }
+        // When pressing the TAB key, cycle between the different input fields.
+        nameComponent.setTabTarget(xComponent)
+        xComponent.setTabTarget(yComponent)
+        yComponent.setTabTarget(zComponent)
+        zComponent.setTabTarget(nameComponent)
 
         category.children.add(container)
         entries[container] =
@@ -519,11 +485,9 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
     private fun updateCheckbox(category: Category?) {
         category ?: return
         category.ignoreCheckboxValueChange = true
-        category.enabled.setState(
-            category.children.all {
-                entries[it]?.enabled?.checked == true
-            }
-        )
+        category.enabled.setState(category.children.all {
+            entries[it]?.enabled?.checked == true
+        })
         category.ignoreCheckboxValueChange = false
     }
 
@@ -595,13 +559,10 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         }
     }
 
+    private fun throwCategoryNotFoundError(): Nothing = error("no  category found for UIContainer")
+    private fun throwNoEntryFoundError(): Nothing = error("no entry found for child")
+
     companion object {
         const val CATEGORY_INNER_PADDING = 7.5
     }
 }
-
-// Gets the children of a UIContainer excluding all Vigilance components.
-// Used to get a list of all waypoints in a category, because categories contain
-// controls as well as multiple `UIContainer`s for the category's waypoints.
-internal val UIComponent.childContainers
-    get() = this.childrenOfType<UIContainer>().filter { it !is SettingComponent }
