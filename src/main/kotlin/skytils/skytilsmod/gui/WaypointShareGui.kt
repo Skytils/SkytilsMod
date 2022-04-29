@@ -161,7 +161,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     private fun exportSelectedWaypoints() {
         val island = SkyblockIsland.values()[islandDropdown.getValue()]
 
-        val obj = exportToNewFormat(island)
+        val obj = exportAsJsonObject(island)
         val count = obj["categories"].asJsonArray.sumOf { it.asJsonObject["waypoints"].asJsonArray.size() }
         setClipboardString(Base64.encodeBase64String(gson.toJson(obj).encodeToByteArray()))
         EssentialAPI.getNotifications()
@@ -172,7 +172,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             )
     }
 
-    private fun exportToNewFormat(island: SkyblockIsland): JsonObject {
+    private fun exportAsJsonObject(island: SkyblockIsland): JsonObject {
         val parentObj = JsonObject()
         val categoriesList = JsonArray()
 
@@ -199,28 +199,6 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         }
         parentObj.add("categories", categoriesList)
         return parentObj
-    }
-
-    private fun exportToOldFormat(island: SkyblockIsland): JsonArray {
-        val arr = JsonArray()
-        entries.values.filter {
-            it.selected.checked
-        }.forEach {
-            runCatching {
-                arr.add(JsonObject().apply {
-                    addProperty("name", it.name.getText())
-                    addProperty("x", it.x.getText().toInt())
-                    addProperty("y", it.y.getText().toInt())
-                    addProperty("z", it.z.getText().toInt())
-                    addProperty("island", island.mode)
-                    addProperty("enabled", true)
-                    addProperty("color", Color.RED.rgb)
-                })
-            }.onFailure {
-                it.printStackTrace()
-            }
-        }
-        return arr
     }
 
     private fun loadWaypointsForSelection(selection: Int) {
