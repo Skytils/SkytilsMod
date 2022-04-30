@@ -29,7 +29,6 @@ import gg.essential.elementa.constraints.*
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
-import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
@@ -42,6 +41,7 @@ import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.HelpComponent
+import skytils.skytilsmod.gui.components.MultiCheckboxComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.*
 import java.awt.Color
@@ -91,19 +91,28 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 .constrain {
                     x = SiblingConstraint(10f, true)
                 }.apply {
-                    onValueChange {
+                    onValueChange { newValue ->
                         expandAll()
-                        SortingOptions.lastSelected = it
-                        val sorter = SortingOptions.values()[it]
+                        SortingOptions.lastSelected = newValue
+                        val sorter = SortingOptions.values()[newValue]
+                        val highestValues = mutableMapOf<UIContainer, Waypoint?>()
+                        // First, sort each category in place
                         scrollComponent.allChildren.forEach { category ->
                             category as UIContainer
-                            val uiContainers = category.childContainers.sortedBy { w ->
-                                val entry = entries[w] ?: throwNoEntryFoundError()
-                                sorter.sortingBy(entry.toWaypoint())
+                            val uiContainers = category.childContainers.sortedWith { a, b ->
+                                sorter.comparator.compare(entries[a]!!.toWaypoint(), entries[b]!!.toWaypoint())
                             }
-                            // Remove and re-add the waypoints in the correct order
+                            highestValues[category] = entries[uiContainers.firstOrNull()]?.toWaypoint()
+                            // Remove and re-add the waypoints in the correct order to their category
                             category.children.removeAll(uiContainers)
                             category.children.addAll(uiContainers)
+                        }
+                        // Then, sort the categories by their highest value according to the sorting function.
+                        scrollComponent.clearChildren()
+                        categoryContainers.values.sortedWith { a: Category, b: Category ->
+                            sorter.comparator.compare(highestValues[a.container], highestValues[b.container])
+                        }.forEach {
+                            scrollComponent.addChild(it.container)
                         }
                     }
                 }
@@ -148,13 +157,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                             else return@mapNotNull null
                         }
                     }.flatten()
-                    if (valid.any { it.enabled.checked }) {
+                    if (valid.any { it.enabled.checked!! }) {
                         valid.forEach {
-                            if (it.enabled.checked) it.enabled.toggle()
+                            if (it.enabled.checked!!) it.enabled.toggle()
                         }
                     } else {
                         valid.forEach {
-                            if (!it.enabled.checked) it.enabled.toggle()
+                            if (!it.enabled.checked!!) it.enabled.toggle()
                         }
                     }
                 }
@@ -171,7 +180,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 scrollComponent.allChildren.forEach { container ->
                     container as UIContainer
                     val category = categoryContainers[container] ?: throwCategoryNotFoundError()
-                    if (!category.isCollapsed) { // Collapsed categories aren't visible
+                    if (!category.isCollapsed) // Collapsed categories aren't visible
                         container.childContainers.forEach { waypoint ->
                             val entry = entries[waypoint] ?: throwNoEntryFoundError()
                             if (entry.name.getText().contains(searchBar.getText())) {
@@ -184,7 +193,6 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                                 }
                             }
                         }
-                    }
                 }
             }
         }
@@ -278,15 +286,18 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         scrollComponent.clearChildren()
         if (!isClosing) {
             val island = SkyblockIsland.values()[selection]
-            Waypoints.categories.filter {
+            val comparator = SortingOptions.values()[SortingOptions.lastSelected].comparator
+            // Sort the categories by their highest value, and then add the waypoints in each category sorted by their values
+            Waypoints.categories.sortedWith { a, b ->
+                comparator.compare(
+                    a.waypoints.sortedWith(comparator).firstOrNull(),
+                    b.waypoints.sortedWith(comparator).firstOrNull()
+                )
+            }.filter {
                 it.island == island
             }.forEach {
                 val category = addNewCategory(it.name ?: "", isExpanded = it.isExpanded)
-                for (waypoint in it.waypoints.sortedBy { w ->
-                    SortingOptions.values()[SortingOptions.lastSelected].sortingBy(
-                        w
-                    )
-                }) {
+                for (waypoint in it.waypoints.sortedWith(comparator)) {
                     addNewWaypoint(
                         category, waypoint.name, waypoint.pos, waypoint.enabled, waypoint.color, waypoint.addedAt
                     )
@@ -294,12 +305,6 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             }
         }
     }
-
-    private fun siblingConstrainedButton(text: String, container: UIContainer) =
-        SimpleButton(text).childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CATEGORY_INNER_PADDING.pixels()
-        }
 
     private fun addNewCategory(
         name: String = "",
@@ -313,32 +318,21 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             height = ChildBasedRangeConstraint() + (CATEGORY_INNER_PADDING * 2).pixels()
         }.effect(OutlineEffect(Color(255, 255, 255, 100), 1f))
 
-        val enabledComponent = CheckboxComponent(enabled).childOf(container).constrain {
+        val enabledComponent = MultiCheckboxComponent(enabled).childOf(container).constrain {
             x = 7.5.pixels()
             y = CATEGORY_INNER_PADDING.pixels()
         }.apply {
             onValueChange { newValue: Any? ->
                 val categoryObj = categoryContainers[container] ?: throwCategoryNotFoundError()
-                // If this value change was triggered while updating the checkbox, don't update the child checkboxes. (see `updateCheckbox`)
-                if (!categoryObj.ignoreCheckboxValueChange)
-                    this.parent.childContainers.forEach {
-                        // When the category is checked or unchecked, all child waypoints will follow this change.
-                        it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
-                    }
+                if (newValue != null) categoryObj.children.forEach {
+                    // When the category is checked or unchecked, all child waypoints will follow this change.
+                    entries[it]?.enabled?.setState(newValue as Boolean)
+                }
             }
         }
 
-        siblingConstrainedButton("Remove", container).onLeftClick {
-            container.childContainers.forEach { entries.remove(it) } // remove all waypoints in this category from the list of entries
-            container.children.clear() // clear the children of this category's UIContainer
-            scrollComponent.removeChild(container) // remove this category's UIContainer from the ScrollComponent
-            categoryContainers.remove(container) // remove this category from the list of categories
-        }
-
-        val newWaypointButton = siblingConstrainedButton("New Waypoint", container)
-
         val nameComponent = UITextInput("Category Name").childOf(container).constrain {
-            x = CenterConstraint()
+            x = SiblingConstraint(5f)
             y = (CATEGORY_INNER_PADDING + 5).pixels()
             width = 30.percent()
             height = 24.pixels()
@@ -349,11 +343,29 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             setText(name)
         }
 
-        val expandComponent = siblingConstrainedButton("Collapse", container).apply {
+        val expandComponent = SimpleButton("Collapse").childOf(container).constrain {
+            x = PixelConstraint(5f, alignOpposite = true)
+            y = CATEGORY_INNER_PADDING.pixels()
+        }.apply {
             onLeftClick {
                 val categoryObj = categoryContainers[container] ?: throwCategoryNotFoundError()
                 if (categoryObj.isCollapsed) expand(categoryObj) else collapse(categoryObj)
             }
+        }
+
+        SimpleButton("Remove").childOf(container).constrain {
+            x = SiblingConstraint(5f, alignOpposite = true)
+            y = CATEGORY_INNER_PADDING.pixels()
+        }.onLeftClick {
+            container.childContainers.forEach { entries.remove(it) } // remove all waypoints in this category from the list of entries
+            container.children.clear() // clear the children of this category's UIContainer
+            scrollComponent.removeChild(container) // remove this category's UIContainer from the ScrollComponent
+            categoryContainers.remove(container) // remove this category from the list of categories
+        }
+
+        val newWaypointButton = SimpleButton("New Waypoint").childOf(container).constrain {
+            x = SiblingConstraint(5f, alignOpposite = true)
+            y = CATEGORY_INNER_PADDING.pixels()
         }
 
         newWaypointButton.onLeftClick {
@@ -361,7 +373,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             addNewWaypoint(category = categoryContainers[container]!!)
         }
 
-        categoryContainers[container] = Category(
+        val category = Category(
             container = container,
             enabled = enabledComponent,
             name = nameComponent,
@@ -369,12 +381,17 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             newWaypointButton = newWaypointButton,
             isCollapsed = !isExpanded
         )
+        categoryContainers[container] = category
 
         // When children are added or removed, the category's checkbox should be updated to reflect those changes.
-        container.children.addObserver { _, _ -> updateCheckbox(categoryContainers[container]) }
+        container.children.addObserver { _, _ ->
+            Window.enqueueRenderOperation { // Update after the child is added so that its checked state can be used
+                if (!container.children.isEmpty() && !category.isCollapsed) updateCheckbox(categoryContainers[container])
+            }
+        }
         if (!isExpanded) collapse(categoryContainers[container]!!) // Update the "Collapse" button text if the category is collapsed to begin with
 
-        return categoryContainers[container]!!
+        return category
     }
 
     private fun addNewWaypoint(
@@ -389,17 +406,17 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             x = CenterConstraint()
             y = SiblingConstraint(5f)
             width = 95.percent()
-            height = ChildBasedMaxSizeConstraint() + 2.pixels()
+            height = ChildBasedMaxSizeConstraint() + 10.pixels()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f)).apply {
             animateBeforeHide {
                 setHeightAnimation(Animations.IN_SIN, 0.2f, 0.pixels)
             }
             animateAfterUnhide {
-                setHeightAnimation(Animations.IN_SIN, 0.2f, ChildBasedMaxSizeConstraint() + 2.pixels())
+                setHeightAnimation(Animations.IN_SIN, 0.2f, ChildBasedMaxSizeConstraint() + 10.pixels())
             }
         }
 
-        val enabled = CheckboxComponent(enabled).childOf(container).constrain {
+        val enabled = MultiCheckboxComponent(enabled).childOf(container).constrain {
             x = 7.5.pixels()
             y = CenterConstraint()
         }.apply {
@@ -484,11 +501,18 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
     private fun updateCheckbox(category: Category?) {
         category ?: return
-        category.ignoreCheckboxValueChange = true
-        category.enabled.setState(category.children.all {
+        val anyEnabled = category.children.any {
             entries[it]?.enabled?.checked == true
-        })
-        category.ignoreCheckboxValueChange = false
+        }
+        val allEnabled = anyEnabled && category.children.all {
+            entries[it]?.enabled?.checked == true
+        }
+        category.enabled.setState(
+            // If all checkboxes are checked, set the state to on.
+            // If some but not all of the checkboxes are checked, set the state to an indeterminate state.
+            // If none are checked, uncheck the checkbox.
+            if (allEnabled) true else if (anyEnabled) null else false
+        )
     }
 
     private fun expandAll(): Boolean {
@@ -515,7 +539,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
     private data class Category(
         val container: UIContainer,
-        val enabled: CheckboxComponent,
+        val enabled: MultiCheckboxComponent,
         val name: UITextInput,
         val expandComponent: SimpleButton,
         val newWaypointButton: SimpleButton,
@@ -526,15 +550,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
     private data class Entry(
         val category: Category,
-        val enabled: CheckboxComponent,
+        val enabled: MultiCheckboxComponent,
         val name: UITextInput,
         val x: UITextInput,
         val y: UITextInput,
         val z: UITextInput,
         val color: ColorComponent,
-        val addedAt: Long,
-        var colorPickerUp: Boolean = false,
-        var colorPickerDown: Boolean = false,
+        val addedAt: Long
     ) {
         fun toWaypoint() = Waypoint(
             name.getText(),
@@ -543,23 +565,36 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
                 y.getText().toInt(),
                 z.getText().toInt()
             ),
-            enabled.checked,
+            enabled.checked!!,
             color.getColor(),
             addedAt
         )
     }
 
-    enum class SortingOptions(val displayName: String, val sortingBy: (Waypoint) -> String) {
-        AZ("A-Z", { "${it.name} ${it.pos} ${it.enabled}" }),
-        CLOSEST("Closest", { "${mc.thePlayer?.getDistanceSq(it.pos)} ${AZ.sortingBy(it)}" }),
-        RECENT("Recent", { "${Long.MAX_VALUE - it.addedAt} ${AZ.sortingBy(it)}" });
+    enum class SortingOptions(val displayName: String, val comparator: Comparator<Waypoint>) {
+        AZ("A-Z", { a, b ->
+            a.name.compareTo(b.name)
+        }),
+        CLOSEST("Closest", { a, b ->
+            val distanceA = mc.thePlayer?.getDistanceSq(a.pos) ?: 0.0
+            val distanceB = mc.thePlayer?.getDistanceSq(b.pos) ?: 0.0
+            distanceA.compareTo(distanceB)
+        }),
+        FARTHEST("Farthest", { a, b ->
+            val distanceA = mc.thePlayer?.getDistanceSq(a.pos) ?: 0.0
+            val distanceB = mc.thePlayer?.getDistanceSq(b.pos) ?: 0.0
+            distanceB.compareTo(distanceA)
+        }),
+        RECENT("Recent", { a, b ->
+            a.addedAt.compareTo(b.addedAt)
+        });
 
         companion object {
             var lastSelected = 0
         }
     }
 
-    private fun throwCategoryNotFoundError(): Nothing = error("no  category found for UIContainer")
+    private fun throwCategoryNotFoundError(): Nothing = error("no category found for UIContainer")
     private fun throwNoEntryFoundError(): Nothing = error("no entry found for child")
 
     companion object {
