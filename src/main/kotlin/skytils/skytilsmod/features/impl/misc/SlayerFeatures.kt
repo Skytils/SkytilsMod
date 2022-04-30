@@ -23,6 +23,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import kotlinx.coroutines.*
 import net.minecraft.block.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.gui.GuiChat
@@ -88,6 +89,8 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
+import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.floor
 
@@ -366,7 +369,7 @@ class SlayerFeatures {
         (slayer as? ThrowingSlayer)?.run { entityJoinWorld(event) }
         if (!hasSlayerText) return
         if (slayer != null) {
-            printDevMessage("boss not null", "slayer", "seraph")
+            printDevMessage("boss not null", "slayerspam", "seraphspam")
             return
         }
         processSlayerEntity(event.entity)
@@ -768,7 +771,7 @@ class SlayerFeatures {
         }
     }
 
-    companion object {
+    companion object : CoroutineScope {
         private var ticks = 0
         private val ZOMBIE_MINIBOSSES = arrayOf(
             "§cRevenant Sycophant",
@@ -813,6 +816,8 @@ class SlayerFeatures {
             SlayerDisplayElement()
             SeraphDisplayElement()
         }
+
+        override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
     }
 
     /**
@@ -827,57 +832,80 @@ class SlayerFeatures {
     ) {
         var nameEntity: EntityArmorStand? = null
         var timerEntity: EntityArmorStand? = null
+        private val currentTier = getTier(name)
+        private val expectedHealth =
+            (if ("DOUBLE MOBS HP!!!" in MayorInfo.mayorPerks) 2 else 1) * (BossHealths[name.substringBefore(
+                " "
+            )]?.get(currentTier)?.asInt ?: 0)
 
         init {
-            detectSlayerEntities()
+            if (entity.baseMaxHealth != expectedHealth.toDouble()) {
+                printDevMessage("Entity doesn't match health", "slayer")
+                slayer = null
+            } else {
+                launch {
+                    val (n, t) = detectSlayerEntities().await()
+                    nameEntity = n
+                    timerEntity = t
+                }
+            }
         }
 
         fun detectSlayerEntities() =
-            TickTask(5) {
-                val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
-                    entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                ) { nearbyEntity: Entity? ->
-                    if (nearbyEntity is EntityArmorStand) {
-                        if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
-                            if (nearbyEntity.inventory.any { it != null }) {
-                                // armor stand has equipment, abort!
-                                return@getEntitiesInAABBexcluding false
+            CompletableDeferred<Pair<EntityArmorStand, EntityArmorStand>>().apply {
+                launch {
+                    TickTask(5) {
+                        val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
+                            entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
+                        ) { nearbyEntity: Entity? ->
+                            if (nearbyEntity is EntityArmorStand) {
+                                if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
+                                    if (nearbyEntity.inventory.any { it != null }) {
+                                        // armor stand has equipment, abort!
+                                        return@getEntitiesInAABBexcluding false
+                                    }
+                                    // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
+                                    return@getEntitiesInAABBexcluding true
+                                }
                             }
-                            // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
-                            return@getEntitiesInAABBexcluding true
+                            false
                         }
-                    }
-                    false
-                }
-                val potentialTimerEntities = arrayListOf<EntityArmorStand>()
-                val potentialNameEntities = arrayListOf<EntityArmorStand>()
-                for (nearby in nearbyArmorStands) {
-                    when {
-                        nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
-                        nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
-                            val currentTier = getTier(name)
-                            val expectedHealth =
-                                (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
-                                    " "
-                                )]?.get(currentTier)?.asInt ?: 0)
-                            printDevMessage(
-                                "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
-                                "slayer"
-                            )
-                            if (expectedHealth == entity.baseMaxHealth.toInt()) {
-                                printDevMessage("hp matched", "slayer")
-                                potentialNameEntities.add(nearby as EntityArmorStand)
+                        val potentialTimerEntities = arrayListOf<EntityArmorStand>()
+                        val potentialNameEntities = arrayListOf<EntityArmorStand>()
+                        for (nearby in nearbyArmorStands) {
+                            when {
+                                nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
+                                nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
+                                    val currentTier = getTier(name)
+                                    val expectedHealth =
+                                        (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
+                                            " "
+                                        )]?.get(currentTier)?.asInt ?: 0)
+                                    printDevMessage(
+                                        "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
+                                        "slayer"
+                                    )
+                                    if (expectedHealth == entity.baseMaxHealth.toInt()) {
+                                        printDevMessage("hp matched", "slayer")
+                                        potentialNameEntities.add(nearby as EntityArmorStand)
+                                    }
+                                }
+                                nearby.displayName.formattedText.matches(timerRegex) -> {
+                                    printDevMessage("timer regex matched", "slayer")
+                                    potentialTimerEntities.add(nearby as EntityArmorStand)
+                                }
                             }
                         }
-                        nearby.displayName.formattedText.matches(timerRegex) -> {
-                            printDevMessage("timer regex matched", "slayer")
-                            potentialTimerEntities.add(nearby as EntityArmorStand)
+                        if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
+                            return@TickTask potentialNameEntities.first() to potentialTimerEntities.first()
+                        } else {
+                            printDevMessage("not the right entity!", "slayer")
+                            slayer = null
+                            throw IllegalStateException("Wrong entity!")
                         }
+                    }.onComplete {
+                        complete(it)
                     }
-                }
-                if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
-                    nameEntity = potentialNameEntities.first()
-                    timerEntity = potentialTimerEntities.first()
                 }
             }
 
