@@ -29,7 +29,6 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
-import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import net.minecraft.util.BlockPos
@@ -38,11 +37,11 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.Waypoints
 import skytils.skytilsmod.gui.components.HelpComponent
+import skytils.skytilsmod.gui.components.MultiCheckboxComponent
 import skytils.skytilsmod.gui.components.SimpleButton
 import skytils.skytilsmod.utils.SBInfo
 import skytils.skytilsmod.utils.SkyblockIsland
 import skytils.skytilsmod.utils.childContainers
-import skytils.skytilsmod.utils.setState
 import java.awt.Color
 
 class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
@@ -126,7 +125,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
             if (entries.values.all {
-                    it.selected.checked
+                    it.selected.checked!!
                 }) {
                 entries.values.forEach {
                     it.selected.setState(false)
@@ -183,7 +182,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 add("waypoints", JsonArray().apply {
                     uiContainer.childContainers.mapNotNull {
                         val e = entries[it]
-                        if (e != null && e.selected.checked)
+                        if (e != null && e.selected.checked!!)
                             JsonObject().apply {
                                 addProperty("name", e.name.getText())
                                 addProperty("x", e.x.getText().toInt())
@@ -213,6 +212,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             it.waypoints.sortedBy { w -> "${w.name} ${w.pos} ${w.enabled}" }.forEach { waypoint ->
                 addNewWaypoint(category, waypoint.name, waypoint.pos, waypoint.enabled)
             }
+            updateCheckbox(category)
         }
     }
 
@@ -227,36 +227,30 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             height = ChildBasedRangeConstraint() + (CATEGORY_INNER_VERTICAL_PADDING * 2).pixels()
         }.effect(OutlineEffect(Color(255, 255, 255, 100), 1f))
 
-        val selectedComponent = CheckboxComponent(enabled).childOf(container).constrain {
+        val selectedComponent = MultiCheckboxComponent(enabled).childOf(container).constrain {
             x = 7.5.pixels()
             y = CATEGORY_INNER_VERTICAL_PADDING.pixels()
         }.apply {
             onValueChange { newValue: Any? ->
-                val categoryObj = categoryContainers[container] ?: error("no category found for UIContainer")
-                // If this value change was triggered while updating the checkbox, don't update the child checkboxes.
-                // see `updateCheckbox()`
-                if (!categoryObj.ignoreCheckboxValueChange) {
+                if (newValue != null) {
                     // When the category is checked or unchecked, all child waypoints will follow this change.
                     this.parent.childContainers.forEach {
-                        it.childrenOfType<CheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
+                        it.childrenOfType<MultiCheckboxComponent>().firstOrNull()?.setState(newValue as Boolean)
                     }
                 }
             }
         }
 
-        UIText(name).childOf(container).constrain {
+        UIText(name.ifEmpty { "Unnamed Category" }).childOf(container).constrain {
             x = CenterConstraint()
             y = CATEGORY_INNER_VERTICAL_PADDING.pixels()
             height = 12.pixels()
         }
 
-        categoryContainers[container] = Category(
-            container,
-            selectedComponent,
-            name
-        )
+        val categoryObj = Category(container, selectedComponent, name)
 
-        return categoryContainers[container]!!
+        categoryContainers[container] = categoryObj
+        return categoryObj
     }
 
     private fun addNewWaypoint(
@@ -272,7 +266,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             height = ChildBasedMaxSizeConstraint() + 2.pixels()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val selected = CheckboxComponent(selected).childOf(container).constrain {
+        val selected = MultiCheckboxComponent(selected).childOf(container).constrain {
             x = 7.5.pixels()
             y = CenterConstraint()
         }.apply {
@@ -319,15 +313,19 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     }
 
     private fun updateCheckbox(category: Category) {
-        category.ignoreCheckboxValueChange = true
+        val anySelected = category.container.childContainers.any {
+            entries[it]?.selected?.checked == true
+        }
+        val allSelected = anySelected && category.container.childContainers.all {
+            entries[it]?.selected?.checked == true
+        }
         category.selected.setState(
-            category.container.childContainers.all {
-                entries[it]?.selected?.checked == true
-            }
+            // If all checkboxes are checked, set the state to on.
+            // If some but not all of the checkboxes are checked, set the state to an indeterminate state.
+            // If none are checked, uncheck the checkbox.
+            if (allSelected) true else if (anySelected) null else false
         )
-        category.ignoreCheckboxValueChange = false
     }
-
 
     override fun onScreenClose() {
         super.onScreenClose()
@@ -336,14 +334,13 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private data class Category(
         val container: UIContainer,
-        val selected: CheckboxComponent,
+        val selected: MultiCheckboxComponent,
         val name: String,
-        var ignoreCheckboxValueChange: Boolean = false
     )
 
     private data class Entry(
         val category: Category,
-        val selected: CheckboxComponent,
+        val selected: MultiCheckboxComponent,
         val name: UIText,
         val x: UIText,
         val y: UIText,
