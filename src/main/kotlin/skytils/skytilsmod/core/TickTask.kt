@@ -24,6 +24,7 @@ import skytils.skytilsmod.utils.Utils
 
 class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
     private var callback: (T) -> Unit = {}
+    private var failure: (Throwable) -> Unit = {}
 
     init {
         Utils.checkThreadAndQueue {
@@ -33,10 +34,16 @@ class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
 
     internal fun complete() = try {
         callback(task())
-    } catch (_: Throwable) {}
+    } catch (t: Throwable) {
+        failure(t)
+    }
 
     fun onComplete(block: (T) -> Unit) = apply {
         callback = block
+    }
+
+    fun onFailure(block: (Throwable) -> Unit) = apply {
+        failure = block
     }
 }
 
