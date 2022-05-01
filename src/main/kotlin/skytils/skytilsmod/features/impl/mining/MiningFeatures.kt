@@ -201,20 +201,30 @@ class MiningFeatures {
                 val x = cleaned.groups["x"]!!.value
                 val y = cleaned.groups["y"]!!.value
                 val z = cleaned.groups["z"]!!.value
-                CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }?.takeIf { !it.loc.exists() }?.let { loc ->
-                    /**
-                     * Sends the waypoints message except it suggests which one should be used based on
-                     * the name contained in the message and converts it to the internally used names for the waypoints.
-                     */
-                    UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
-                        .append(UTextComponent("§f${loc.displayName} ")
-                            .setClick(MCClickEventAction.RUN_COMMAND, "/skytilshollowwaypoint set $x $y $z ${loc.id}")
-                            .setHoverText("§eSet waypoint for ${loc.displayName}"))
-                        .append(UTextComponent("§e[Custom]")
-                            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/skytilshollowwaypoint set $x $y $z name_here")
-                            .setHoverText("§eSet custom waypoint")
-                        ).chat()
-                }
+                CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }
+                    ?.takeIf { !it.loc.exists() }?.let { loc ->
+                        /**
+                         * Sends the waypoints message except it suggests which one should be used based on
+                         * the name contained in the message and converts it to the internally used names for the waypoints.
+                         */
+                        UMessage("§3Skytils > §eFound coordinates in a chat message, click a button to set a waypoint.\n")
+                            .append(
+                                UTextComponent("§f${loc.displayName} ")
+                                    .setClick(
+                                        MCClickEventAction.RUN_COMMAND,
+                                        "/skytilshollowwaypoint set $x $y $z ${loc.id}"
+                                    )
+                                    .setHoverText("§eSet waypoint for ${loc.displayName}")
+                            )
+                            .append(
+                                UTextComponent("§e[Custom]")
+                                    .setClick(
+                                        MCClickEventAction.SUGGEST_COMMAND,
+                                        "/skytilshollowwaypoint set $x $y $z name_here"
+                                    )
+                                    .setHoverText("§eSet custom waypoint")
+                            ).chat()
+                    }
             }
         }
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
@@ -304,7 +314,12 @@ class MiningFeatures {
             val y = puzzlerSolution!!.y - viewerY
             val z = puzzlerSolution!!.z - viewerZ
             GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(matrixStack, AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1), Color(255, 0, 0, 200), 1f)
+            RenderUtil.drawFilledBoundingBox(
+                matrixStack,
+                AxisAlignedBB(x, y, z, x + 1, y + 1.01, z + 1),
+                Color(255, 0, 0, 200),
+                1f
+            )
             GlStateManager.enableCull()
         }
         if (Skytils.config.raffleWaypoint && inRaffle && raffleBox != null) {
@@ -550,7 +565,8 @@ class MiningFeatures {
         private var inRaffle = false
         var lastTPLoc: BlockPos? = null
         var waypoints = HashMap<String, BlockPos>()
-        var deadCount: Int = 0
-        val SBE_DSM_PATTERN: Regex = "\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)".toRegex()
+        var deadCount = 0
+        val SBE_DSM_PATTERN =
+            Regex("\\\$(SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)")
     }
 }

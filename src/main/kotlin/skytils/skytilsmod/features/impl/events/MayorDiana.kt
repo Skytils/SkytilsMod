@@ -47,7 +47,6 @@ class MayorDiana {
     fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.trackGaiaHits && event.packet is S29PacketSoundEffect) {
-            if (event.packet.volume == 0f) return
             if (event.packet.volume == 0.8f && event.packet.soundName == "random.anvil_land") {
                 val pos = BlockPos(event.packet.x, event.packet.y, event.packet.z)
                 val golem = (mc.theWorld.loadedEntityList.filter {

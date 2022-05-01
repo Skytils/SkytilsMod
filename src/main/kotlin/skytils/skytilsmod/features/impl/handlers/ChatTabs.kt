@@ -140,44 +140,47 @@ object ChatTabs {
                 hoveredChatLine =
                     if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
             }
-            is GuiScreenEvent.MouseInputEvent.Pre -> {
-                if (Mouse.getEventButtonState()) {
-                    if (GuiScreen.isCtrlKeyDown() && DevTools.getToggle("chat")) {
-                        val button = Mouse.getEventButton()
-                        if (button != 0 && button != 1) return
-                        val chatLine = hoveredChatLine ?: return
-                        if (button == 0) {
-                            val component = (chatLine as ExtensionChatLine).fullComponent ?: chatLine.chatComponent
-                            GuiScreen.setClipboardString(component.formattedText)
-                            printDevMessage("Copied formatted message to clipboard!", "chat")
-                        } else {
-                            val component =
-                                chat.chatLines.find {
-                                    it.chatComponent.unformattedText == ((chatLine as ExtensionChatLine).fullComponent
-                                        ?: chatLine.chatComponent).unformattedText
-                                }?.chatComponent
-                                    ?: ((chatLine as ExtensionChatLine).fullComponent
-                                        ?: chatLine.chatComponent)
+        }
+    }
 
-                            printDevMessage("Copied serialized message to clipboard!", "chat")
-                            GuiScreen.setClipboardString(
-                                IChatComponent.Serializer.componentToJson(
-                                    component
-                                )
-                            )
-                        }
-                    } else if (Skytils.config.copyChat) {
-                        val button = Mouse.getEventButton()
-                        if (button != 0) return
-                        val chatLine = hoveredChatLine ?: return
-                        val component = if (GuiScreen.isCtrlKeyDown()) (chatLine as ExtensionChatLine).fullComponent
-                            ?: chatLine.chatComponent else if (GuiScreen.isShiftKeyDown()) chatLine.chatComponent else return
-                        GuiScreen.setClipboardString(component.unformattedText.stripControlCodes())
-                        EssentialAPI.getNotifications()
-                            .push("Copied chat", component.unformattedText.stripControlCodes(), 1f)
-                    }
-                }
+    @SubscribeEvent
+    fun onAttemptCopy(event: GuiScreenEvent.MouseInputEvent.Pre) {
+        if (!Utils.isOnHypixel || event.gui !is GuiChat || !Mouse.getEventButtonState()) return
+        val chat = mc.ingameGUI.chatGUI
+        chat as AccessorGuiNewChat
+        if (GuiScreen.isCtrlKeyDown() && DevTools.getToggle("chat")) {
+            val button = Mouse.getEventButton()
+            if (button != 0 && button != 1) return
+            val chatLine = hoveredChatLine ?: return
+            if (button == 0) {
+                val component = (chatLine as ExtensionChatLine).fullComponent ?: chatLine.chatComponent
+                GuiScreen.setClipboardString(component.formattedText)
+                printDevMessage("Copied formatted message to clipboard!", "chat")
+            } else {
+                val component =
+                    chat.chatLines.find {
+                        it.chatComponent.unformattedText == ((chatLine as ExtensionChatLine).fullComponent
+                            ?: chatLine.chatComponent).unformattedText
+                    }?.chatComponent
+                        ?: ((chatLine as ExtensionChatLine).fullComponent
+                            ?: chatLine.chatComponent)
+
+                printDevMessage("Copied serialized message to clipboard!", "chat")
+                GuiScreen.setClipboardString(
+                    IChatComponent.Serializer.componentToJson(
+                        component
+                    )
+                )
             }
+        } else if (Skytils.config.copyChat) {
+            val button = Mouse.getEventButton()
+            if (button != 0) return
+            val chatLine = hoveredChatLine ?: return
+            val component = if (GuiScreen.isCtrlKeyDown()) (chatLine as ExtensionChatLine).fullComponent
+                ?: chatLine.chatComponent else if (GuiScreen.isShiftKeyDown()) chatLine.chatComponent else return
+            GuiScreen.setClipboardString(component.unformattedText.stripControlCodes())
+            EssentialAPI.getNotifications()
+                .push("Copied chat", component.unformattedText.stripControlCodes(), 1f)
         }
     }
 
