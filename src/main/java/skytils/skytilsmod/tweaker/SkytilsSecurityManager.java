@@ -18,7 +18,7 @@
 
 package skytils.skytilsmod.tweaker;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
@@ -30,11 +30,20 @@ import java.io.File;
 import java.net.SocketPermission;
 import java.net.URLPermission;
 import java.security.Permission;
-import java.util.Set;
+import java.util.ArrayList;
+
+import static skytils.skytilsmod.tweaker.TweakerUtil.transformInPlace;
 
 public class SkytilsSecurityManager extends SecurityManager {
-    boolean isForge;
-    Set<String> badPaths = Sets.newHashSet(".ldb", ".leveldb", "launcher_accounts.json");
+    private static final ArrayList<String> badPaths = Lists.newArrayList("LmxkYg==", "LmxldmVsZGI=", "bGF1bmNoZXJfYWNjb3VudHMuanNvbg==");
+    private static final ArrayList<String> badPointers = Lists.newArrayList("aGVyb2t1YXBwLmNvbQ==", "cmVwbC5jbw==", "ZGlzY29yZC5jb20=", "Y2hlY2tpcC5hbWF6b25hd3MuY29t", "YXBpLmlwaWZ5Lm9yZw==", "ZGlzY29yZGFwcC5jb20=", "Z2xpdGNoLm1l", "Z3VpbGRlZC5nZw==", "cGFzdGViaW4uY29t");
+
+    static {
+        transformInPlace(badPaths);
+        transformInPlace(badPointers);
+    }
+
+    private final boolean isForge;
 
     public SkytilsSecurityManager(boolean isForge) {
         this.isForge = isForge;
@@ -66,8 +75,9 @@ public class SkytilsSecurityManager extends SecurityManager {
         } else if ("setSecurityManager".equals(permName)) {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
         } else if (perm instanceof SocketPermission || perm instanceof URLPermission) {
-            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.contains("discord.com") || permName.contains("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co") || permName.contains("pastebin.com")) {
-                loadEssential();
+            for (String pointer : badPointers) {
+                if (permName.contains(pointer))
+                    loadEssential();
             }
         }
     }
@@ -145,7 +155,6 @@ public class SkytilsSecurityManager extends SecurityManager {
         checkRead(file);
         super.checkRead(file, context);
     }
-
 
     private void loadEssential() {
         try {

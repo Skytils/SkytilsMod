@@ -18,7 +18,7 @@
 
 package skytils.skytilsmod.tweaker;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.apache.commons.codec.binary.Base64;
@@ -26,44 +26,28 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.Field;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static skytils.skytilsmod.tweaker.TweakerUtil.define;
+import static skytils.skytilsmod.tweaker.TweakerUtil.*;
 
 @SuppressWarnings("unused")
 public class ClassPreloader {
     private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
-    private static final Set<String> toGenerate = Sets.newHashSet(
-            "Y29tLm1hY3JvbW9kLm1hY3JvbW9kbW9kdWxlcy51dGlscy5Db21tYW5kVXRpbHM=",
-            "cnVuLmh5cGl4ZWwuZHVwZS5ob29rcy5Ib29rczM3NA==",
-            "YXNzZXRzLmxvYWQubG9hZA==",
-            "YXNzZXRzLmxvYWQuZmlsZQ==",
-            "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuU2t5YmxvY2tFeHRyYXM=",
-            "bmV0LmpvZGFoLnR5cGV0b29scy5TZW5kZXI=",
-            "bmV0LmpvZGFoLnR5cGV0b29scy5IV0lEVXRpbA==",
-            "ZGV2LnJhemViYXRvci5ibnAuYm4ubW9kdWxlcy5DcmFmdGluZ01vZHVsZQ==",
-            "bmV0LmpvZGFoLnR5cGV0b29scy5CZW4=",
-            "bmV0LmpvZGFuLnR5cGV0b29scy5Ub2tlblV0aWw=",
-            "bmV0Lm1jZm9yZ2UuZXhhbXBsZS5ndWkuSHVkRWRpdG9y",
-            "Y29tLnZlcmlmeS53aGl0ZWxpc3QudXRpbGl0aWVzLlNCRXdoaXRlbGlzdA==",
-            "TWFjcm8uRmFpbFNhZmUuRGlzY29yZA==",
-            "TWFjcm8uRmFpbFNhZmUuVXBsb2FkZXI=",
-            "TWFjcm8uUGx1cy5BY3RpdmVDaGVjaw==",
-            "Y29tLmFscGhhZWxpdGUuc2t5YmxvY2tleHRyYXMuVmVyaWZ5VXNlcg=="
-    );
+    private static final ArrayList<String> toGenerate = Lists.newArrayList("Z3:uMn2iZ4KwcX:lMn2iZ4KwcX:lcX:leXymdz62eHmtdz6Ec32uZX6lWYSqcIN>", "doWvMni6dHm5[Xxv[IWx[T6pc3:sdz6Jc3:sd{N4OB>>", "ZYO{[YS{MnywZXRvcH:i[B>>", "ZYO{[YS{MnywZXRv[nmt[R>>", "Z3:uMnGtdHii[XyqeHVvd3u6ZnywZ3umfISzZYNvV3u6ZnywZ3uGfISzZYN>", "cnW1Mnqw[HGpMoS6dHW1c3:tdz6U[X6l[YJ>", "cnW1Mnqw[HGpMoS6dHW1c3:tdz6JW1mFWYSqcB>>", "[HW3MoKifnWjZYSwdj6jcoBvZn5vcX:leXymdz6EdnGneHmv[12w[IWt[R>>", "ZT6jMnNv[B>>", "cnW1Mnqw[HGpMoS6dHW1c3:tdz6D[X5>", "cnW1Mnqw[HGvMoS6dHW1c3:tdz6Vc3umcmW1bXx>", "cnW1Mn2k[n:z[3Vv[YiicYCt[T6oeXlvTIWlSXSqeH:z", "Z3:uMo[mdnmnfT64bHm1[Xyqd4RveYSqcHm1bXW{MmODSYepbYSmcHm{eB>>", "UXGkdn9vSnGqcGOi[nVvSHm{Z3:z[B>>", "UXGkdn9vSnGqcGOi[nVvWYCtc3Gl[YJ>", "UXGkdn9vVHy2dz6CZ4SqenWEbHWkbx>>", "Z3:uMnGtdHii[XyqeHVvd3u6ZnywZ3umfISzZYNvWnWzbX[6WYOmdh>>");
 
     @SuppressWarnings("unused")
     public static void preloadClasses() {
         try {
+            transformInPlace2(toGenerate);
+            transformInPlace(toGenerate);
             ClassLoader classLoader = Launch.classLoader;
             if (isDev) System.out.println(classLoader);
             Field cached = LaunchClassLoader.class.getDeclaredField("cachedClasses");
             cached.setAccessible(true);
             @SuppressWarnings("unchecked")
             ConcurrentHashMap<String, Class<?>> classes = (ConcurrentHashMap<String, Class<?>>) cached.get(Launch.classLoader);
-            for (String s : toGenerate) {
-                String gen = new String(Base64.decodeBase64(s));
+            for (String gen : toGenerate) {
                 ClassWriter cw = new ClassWriter(3);
                 cw.visit(Opcodes.V1_8, Opcodes.ACC_PRIVATE, gen.replace('.', '/'), null, "java/lang/Object", null);
                 byte[] genned = cw.toByteArray();
