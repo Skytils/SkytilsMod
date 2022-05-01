@@ -796,12 +796,17 @@ class SlayerFeatures {
         var maddoxCommand = ""
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
-            when (entity) {
-                is EntityZombie -> slayer = RevenantSlayer(entity)
-                is EntitySpider -> slayer = Slayer(entity, "Tarantula Broodfather", "§5☠ §4Tarantula Broodfather")
-                is EntityWolf -> slayer = Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
-                is EntityEnderman -> slayer = SeraphSlayer(entity)
-                is EntityBlaze -> slayer = DemonlordSlayer(entity)
+            slayer = try {
+                when (entity) {
+                    is EntityZombie -> RevenantSlayer(entity)
+                    is EntitySpider -> Slayer(entity, "Tarantula Broodfather", "§5☠ §4Tarantula Broodfather")
+                    is EntityWolf -> Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
+                    is EntityEnderman -> SeraphSlayer(entity)
+                    is EntityBlaze -> DemonlordSlayer(entity)
+                    else -> null
+                }
+            } catch (e: IllegalStateException) {
+                null
             }
         }
 
