@@ -135,7 +135,7 @@ object ChatTabs {
                 ChatTab.buttons.entries.forEach { (c, b) ->
                     b.enabled = c != selectedTab
                     b.yPosition =
-                        UResolution.scaledHeight - chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * 9 - 50 - 9
+                        (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2).toInt()
                 }
                 hoveredChatLine =
                     if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
