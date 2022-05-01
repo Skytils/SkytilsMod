@@ -1914,6 +1914,13 @@ object Config : Vigilant(
     }
 
     @Property(
+        type = PropertyType.SWITCH, name = "Big Tentacle Nametags",
+        description = "Increases the size of the tentacle nametags in the Kuudra fight.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var bigTentacleTag = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
         description = "Shows the players within the range of the Dolphin pet.",
         category = "Pets", subcategory = "Displays"
