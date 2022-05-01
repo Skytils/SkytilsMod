@@ -30,6 +30,6 @@ fun onSendChatMessage(message: String, addToChat: Boolean, ci: CallbackInfo) {
 }
 
 fun onComponentClick(component: IChatComponent, cir: CallbackInfoReturnable<Boolean>) {
-    if (Utils.isOnHypixel && Skytils.config.chatTabs && Skytils.config.copyChat && GuiScreen.isCtrlKeyDown()) cir.returnValue =
+    if (Utils.isOnHypixel && Skytils.config.copyChat && GuiScreen.isCtrlKeyDown()) cir.returnValue =
         false
 }
