@@ -87,6 +87,7 @@ object ChatTabs {
                 ChatTab.PARTY -> "/pc "
                 ChatTab.GUILD -> "/gc "
                 ChatTab.PRIVATE -> "/r "
+                ChatTab.COOP -> "/cc "
             }
         }
     }
@@ -128,6 +129,7 @@ object ChatTabs {
                                 ChatTab.ALL -> "/chat a"
                                 ChatTab.PARTY -> "/chat p"
                                 ChatTab.GUILD -> "/chat g"
+                                ChatTab.COOP -> "/chat coop"
                                 else -> ""
                             }
                         )
@@ -221,6 +223,9 @@ object ChatTabs {
         }),
         PRIVATE("PM", { _, formatted ->
             formatted.startsWith("§dTo ") || formatted.startsWith("§dFrom ")
+        }),
+        COOP("CC", { _, formatted ->
+            formatted.startsWith("§r§bCo-op > ")
         });
 
         val button = CleanButton(-69420, 2 + 22 * ordinal, 0, 20, 20, text)
