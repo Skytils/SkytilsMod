@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.misc
 
 import com.google.gson.JsonObject
+import gg.essential.elementa.utils.Vector2f
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
@@ -45,6 +46,7 @@ import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
+import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
@@ -436,7 +438,8 @@ class SlayerFeatures {
         if (!Utils.inSkyblock) return
         if (Skytils.config.pointYangGlyph) {
             val pos = (slayer as? SeraphSlayer)?.thrownLocation.toVec3()?.addVector(0.5, 0.5, 0.5)
-                ?: (slayer as? SeraphSlayer)?.thrownEntity?.run { if (this.isEntityAlive) this else null }?.positionVector ?: return
+                ?: (slayer as? SeraphSlayer)?.thrownEntity?.run { if (this.isEntityAlive) this else null }?.positionVector
+                ?: return
             val x = UResolution.scaledWidth / 2.0
             val y = UResolution.scaledHeight / 2.0
             val angle: Double = -(MathHelper.atan2(
@@ -673,6 +676,50 @@ class SlayerFeatures {
         }
     }
 
+    object TotemDisplayElement : GuiElement("Totem Display", FloatPair(20, 50)) {
+        override fun render() {
+            (slayer as? DemonlordSlayer)?.totemEntity?.run {
+                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val alignment =
+                    if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+                ScreenRenderer.fontRenderer.drawString(
+                    displayName.formattedText,
+                    if (leftAlign) 0f else width,
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val alignment =
+                if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§6§l5s §c§l5 hits",
+                if (leftAlign) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§6§l5s §c§l5 hits")
+
+        override val toggled: Boolean
+            get() = Skytils.config.showTotemDisplay
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
     class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", FloatPair(150, 20)) {
         private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
@@ -844,15 +891,10 @@ class SlayerFeatures {
             )]?.get(currentTier)?.asInt ?: 0)
 
         init {
-            if (entity.baseMaxHealth != expectedHealth.toDouble()) {
-                printDevMessage("Entity doesn't match health", "slayer")
-                slayer = null
-            } else {
-                launch {
-                    val (n, t) = detectSlayerEntities().await()
-                    nameEntity = n
-                    timerEntity = t
-                }
+            launch {
+                val (n, t) = detectSlayerEntities().await()
+                nameEntity = n
+                timerEntity = t
             }
         }
 
@@ -881,11 +923,6 @@ class SlayerFeatures {
                             when {
                                 nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
                                 nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
-                                    val currentTier = getTier(name)
-                                    val expectedHealth =
-                                        (if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * (BossHealths[name.substringBefore(
-                                            " "
-                                        )]?.get(currentTier)?.asInt ?: 0)
                                     printDevMessage(
                                         "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
                                         "slayer"
@@ -1096,12 +1133,41 @@ class SlayerFeatures {
     class DemonlordSlayer(entity: EntityBlaze) :
         ThrowingSlayer<EntityBlaze>(entity, "Inferno Demonlord", "§c☠ §bInferno Demonlord") {
         var totemEntity: EntityArmorStand? = null
+        var totemPos: BlockPos? = null
+
+        companion object {
+            private val thrownTexture =
+                "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
+        }
+
+        override fun entityJoinWorld(event: EntityJoinWorldEvent) {
+            (event.entity as? EntityArmorStand)?.let { e ->
+                TickTask(1) {
+                    if (e.inventory[4]?.takeIf { it.item is ItemSkull }
+                            ?.let { ItemUtil.getSkullTexture(it) == thrownTexture } == true) {
+                        printDevMessage(
+                            "Found skull armor stand",
+                            "slayer",
+                        )
+                        thrownEntity = e
+                        return@TickTask
+                    } else if (e.name.matches(totemRegex) && e.getDistanceSq(totemPos) < 9) {
+                        totemEntity = e
+                    }
+                }
+            }
+        }
 
         override fun blockChange(event: BlockChangeEvent) {
             if (totemEntity != null && event.old.block == Blocks.stained_hardened_clay && event.update.block is BlockAir) {
                 totemEntity = null
                 printDevMessage("removed totem entity", "totem")
                 return
+            } else if ((thrownEntity?.position?.distanceSq(event.pos) ?: 0.0) < 9.0
+                && event.old.block is BlockAir && event.update.block == Blocks.stained_hardened_clay
+            ) {
+                thrownEntity = null
+                totemPos = event.pos
             }
         }
     }
