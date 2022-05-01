@@ -18,8 +18,8 @@
 
 package skytils.skytilsmod.features.impl.misc
 
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -32,6 +32,7 @@ object KuudraFeatures {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun beforeNametag(event: RenderLivingEvent.Specials.Pre<EntityArmorStand>) {
         if (Skytils.config.bigTentacleTag && "Tentacle" in event.entity.name) {
+            UGraphics.GL.pushMatrix()
             tentacleNametagStack.push()
             tentacleNametagStack.scale(10f, 10f, 0f)
             tentacleNametagStack.applyToGlobalState()
@@ -42,7 +43,7 @@ object KuudraFeatures {
     fun afterName(event: RenderLivingEvent.Specials.Post<EntityArmorStand>) {
         if (Skytils.config.bigTentacleTag && "Tentacle" in event.entity.name) {
             tentacleNametagStack.pop()
-            tentacleNametagStack.applyToGlobalState()
+            UGraphics.GL.popMatrix()
         }
     }
 
