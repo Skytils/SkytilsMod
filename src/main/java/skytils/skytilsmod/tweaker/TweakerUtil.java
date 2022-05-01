@@ -19,12 +19,14 @@
 package skytils.skytilsmod.tweaker;
 
 import net.minecraft.launchwrapper.Launch;
+import org.apache.commons.codec.binary.Base64;
 import sun.security.util.SecurityConstants;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 
 class TweakerUtil {
     static void runStage(String className, String methodName, Object... params) throws ReflectiveOperationException {
@@ -74,6 +76,18 @@ class TweakerUtil {
             field.set(null, s);
         } catch (Throwable e) {
             e.printStackTrace();
+        }
+    }
+
+    static void transformInPlace(ArrayList<String> list) {
+        for (int i = 0; i < list.size(); i++) {
+            list.set(i, new String(Base64.decodeBase64(list.get(i))));
+        }
+    }
+
+    static void transformInPlace2(ArrayList<String> list) {
+        for (int i = 0; i < list.size(); i++) {
+            list.set(i, list.get(i).chars().map(c -> c - 1).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString());
         }
     }
 }
