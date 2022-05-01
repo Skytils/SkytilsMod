@@ -31,7 +31,9 @@ class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
         }
     }
 
-    internal fun complete() = callback(task())
+    internal fun complete() = try {
+        callback(task())
+    } catch (_: Throwable) {}
 
     fun onComplete(block: (T) -> Unit) = apply {
         callback = block
