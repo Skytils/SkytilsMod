@@ -383,19 +383,17 @@ class SlayerFeatures {
 
     @SubscribeEvent
     fun onAttack(event: AttackEntityEvent) {
-        if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityEnderman || !Skytils.config.useSlayerHitMethod) return
-        val enderman = event.target as EntityEnderman
+        if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityLiving || !Skytils.config.useSlayerHitMethod) return
+        val enderman = event.target as EntityLiving
         if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
-            printDevMessage("A valid enderman was attacked", "slayer", "seraph", "seraphHit")
+            printDevMessage("A valid entity was attacked", "slayer", "seraph", "seraphHit")
             hitMap.compute(enderman) { _, int ->
                 return@compute (int ?: 0).inc()
             }
-            if (slayer !is SeraphSlayer) {
-                processSlayerEntity(enderman)
-            } else if (enderman != slayer?.entity && (hitMap[enderman]
+            if (enderman != slayer?.entity && (hitMap[enderman]
                     ?: 0) - ((slayer?.entity as? EntityEnderman)?.let { hitMap[it] } ?: 0) >= 10
             ) {
-                printDevMessage("processing new entity")
+                printDevMessage("processing new entity", "slayer")
                 processSlayerEntity(enderman)
             }
         }
@@ -791,7 +789,7 @@ class SlayerFeatures {
         var hasSlayerText = false
         private var lastTickHasSlayerText = false
         var expectedMaxHp: Int? = null
-        private val hitMap = HashMap<EntityEnderman, Int>()
+        private val hitMap = HashMap<EntityLiving, Int>()
         var BossHealths = HashMap<String, JsonObject>()
         var maddoxCommand = ""
 
@@ -837,6 +835,8 @@ class SlayerFeatures {
     ) {
         var nameEntity: EntityArmorStand? = null
         var timerEntity: EntityArmorStand? = null
+        val entityClass
+            get() = entity.javaClass
         private val currentTier = getTier(name)
         private val expectedHealth =
             (if ("DOUBLE MOBS HP!!!" in MayorInfo.mayorPerks) 2 else 1) * (BossHealths[name.substringBefore(
@@ -856,7 +856,7 @@ class SlayerFeatures {
             }
         }
 
-        fun detectSlayerEntities() =
+        private fun detectSlayerEntities() =
             CompletableDeferred<Pair<EntityArmorStand, EntityArmorStand>>().apply {
                 launch {
                     TickTask(5) {
