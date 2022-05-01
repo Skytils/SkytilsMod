@@ -2213,6 +2213,13 @@ object Config : Vigilant(
     var lowSoulflowPing = 0
 
     @Property(
+        PropertyType.SWITCH, name = "Show Totem Display",
+        description = "Shows the current totem's timer and hits.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var showTotemDisplay = false
+
+    @Property(
         PropertyType.NUMBER, name = "Totem Ping",
         description = "Alerts you of a specific time (seconds) on the Inferno Demonlord's Totem.",
         category = "Slayer", subcategory = "Inferno Demonlord",
