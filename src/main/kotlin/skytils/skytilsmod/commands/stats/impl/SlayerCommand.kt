@@ -18,10 +18,12 @@
 
 package skytils.skytilsmod.commands.stats.impl
 
-import com.google.gson.JsonObject
 import gg.essential.universal.wrappers.message.UMessage
+import io.ktor.client.call.*
+import io.ktor.client.request.*
 import skytils.hylin.extension.nonDashedString
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.commands.stats.StatCommand
@@ -30,24 +32,26 @@ import java.util.*
 
 
 object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
-    override fun displayStats(username: String, uuid: UUID) {
+    override suspend fun displayStats(username: String, uuid: UUID) {
         val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
 
-        val profileResponse: JsonObject =
-            APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
-        if (!profileResponse["success"].asBoolean) {
-            printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse["cause"].asString}")
+        val profileResponse =
+            client.get("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
+                .body<ProfileResponse>()
+        if (profileResponse.success) {
+            printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse.cause}")
             return
         }
 
-        val userData =
-            profileResponse["profile"].asJsonObject["members"].asJsonObject[uuid.nonDashedString()].asJsonObject
-        val slayersObject = userData["slayer_bosses"].asJsonObject
+        val slayersObject = profileResponse.profile.members[uuid.nonDashedString()]?.slayerBosses?.ifNull {
+            printMessage("$failPrefix §cUnable to retrieve slayer information")
+            return@ifNull
+        }
 
 
         val xpMap = SkillUtils.slayerXp.keys.associateWith {
             runCatching {
-                slayersObject[it].asJsonObject["xp"].asDouble
+                slayersObject?.get(it)?.xp ?: 0.0
             }.getOrDefault(0.0)
         }
         UMessage("§a➜ Slayer Statistics Viewer\n")
@@ -56,7 +60,8 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
             .append(
                 xpMap.map { (slayer, xp) ->
                     "§b${slayer.toTitleCase()} Slayer ${
-                        SkillUtils.calcXpWithProgress(xp, SkillUtils.slayerXp[slayer]?.values ?: emptySet()).toInt()
+                        SkillUtils.calcXpWithProgress(xp, SkillUtils.slayerXp[slayer]?.values ?: emptySet())
+                            .toInt()
                     }:§e ${NumberUtil.nf.format(xp)} XP"
                 }.joinToString(separator = "\n")
                     .ifBlank { "$prefix §bMissing something? Do §f/skytils reload data§b and try again!" }

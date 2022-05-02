@@ -25,7 +25,10 @@ import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
-import gg.essential.elementa.dsl.*
+import gg.essential.elementa.dsl.basicHeightConstraint
+import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.markdown.MarkdownComponent
 import net.minecraft.client.gui.GuiMainMenu
 import skytils.skytilsmod.Skytils
@@ -36,7 +39,7 @@ class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     init {
         val updateObj = UpdateChecker.updateGetter.updateObj
-        UIText("Skytils ${updateObj?.get("tag_name")?.asString} is available!")
+        UIText("Skytils ${updateObj!!.tagName} is available!")
             .constrain {
                 x = CenterConstraint()
                 y = RelativeConstraint(0.1f)
@@ -47,7 +50,7 @@ class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 y = SiblingConstraint()
             } childOf window
         val authorText =
-            UIText("Uploaded by: ${UpdateChecker.updateAsset?.getAsJsonObject("uploader")?.get("login")?.asString}")
+            UIText("Uploaded by: ${UpdateChecker.updateAsset.uploader.username}")
                 .constrain {
                     x = CenterConstraint()
                     y = SiblingConstraint()
@@ -59,12 +62,12 @@ class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 height = basicHeightConstraint { window.getHeight() - 90 - authorText.getBottom() }
                 width = RelativeConstraint(0.7f)
             } childOf window
-        UpdateChecker.updateGetter.updateObj?.get("body")?.asString?.let { MarkdownComponent(it.replace("*", "")) }
-            ?.constrain {
+        MarkdownComponent(UpdateChecker.updateGetter.updateObj!!.body.replace("*", ""))
+            .constrain {
                 height = RelativeConstraint()
                 width = RelativeConstraint()
             }
-            ?.childOf(changelogWrapper)
+            .childOf(changelogWrapper)
         SimpleButton("Update")
             .constrain {
                 x = CenterConstraint()

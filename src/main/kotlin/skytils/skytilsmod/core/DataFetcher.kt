@@ -17,24 +17,29 @@
  */
 package skytils.skytilsmod.core
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import gg.essential.universal.UChat
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import net.minecraft.util.BlockPos
 import skytils.skytilsmod.Reference.dataUrl
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.Skytils.Companion.domain
 import skytils.skytilsmod.Skytils.Companion.failPrefix
-import skytils.skytilsmod.Skytils.Companion.gson
+import skytils.skytilsmod.Skytils.Companion.json
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.handlers.Mayor
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
-import skytils.skytilsmod.features.impl.handlers.MayorPerk
 import skytils.skytilsmod.features.impl.handlers.SpamHider
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.misc.ItemFeatures
@@ -48,157 +53,108 @@ object DataFetcher {
     private fun loadData(): Deferred<*> {
         return Skytils.IO.async {
             try {
-                APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
+                client.get("${dataUrl}constants/domain.txt").bodyAsText().apply {
                     if (isNotBlank()) {
                         domain = trim()
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
+                client.get("${dataUrl}constants/enchants.json").body<JsonObject>().apply {
                     Utils.checkThreadAndQueue {
                         EnchantUtil.enchants.clear()
-                        val normal = this.getAsJsonObject("NORMAL")
-                        val ultimate = this.getAsJsonObject("ULTIMATE")
-                        val stacking = this.getAsJsonObject("STACKING")
-
-                        normal.entrySet().mapTo(EnchantUtil.enchants) {
-                            gson.fromJson(it.value, Enchant::class.java)
-                        }
-                        ultimate.entrySet().mapTo(EnchantUtil.enchants) {
-                            gson.fromJson(it.value, Enchant::class.java)
-                        }
-                        stacking.entrySet().mapTo(EnchantUtil.enchants) {
-                            gson.fromJson(it.value, Enchant::class.java)
-                        }
+                        EnchantUtil.enchants.addAll(
+                            json.decodeFromJsonElement<List<NormalEnchant>>(get("NORMAL")!!)
+                        )
+                        EnchantUtil.enchants.addAll(
+                            json.decodeFromJsonElement<List<NormalEnchant>>(get("ULTIMATE")!!)
+                        )
+                        EnchantUtil.enchants.addAll(
+                            json.decodeFromJsonElement<List<StackingEnchant>>(get("STACKING")!!)
+                        )
                     }
                 }
-
-                APIUtil.getJSONResponse("${dataUrl}solvers/fetchur.json").apply {
+                client.get("${dataUrl}solvers/fetchur.json").body<Map<String, String>>().apply {
                     Utils.checkThreadAndQueue {
                         MiningFeatures.fetchurItems.clear()
-                        entrySet().associateTo(MiningFeatures.fetchurItems) { it.key to it.value.asString }
+                        MiningFeatures.fetchurItems.putAll(this)
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}solvers/hungryhiker.json").apply {
+                client.get("${dataUrl}solvers/hungryhiker.json").body<Map<String, String>>().apply {
                     Utils.checkThreadAndQueue {
                         FarmingFeatures.hungerHikerItems.clear()
-                        entrySet().associateTo(FarmingFeatures.hungerHikerItems) { it.key to it.value.asString }
+                        FarmingFeatures.hungerHikerItems.putAll(this)
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}constants/levelingxp.json").apply {
+                client.get("${dataUrl}constants/levelingxp.json").body<LevelingXPData>().apply {
                     Utils.checkThreadAndQueue {
                         SkillUtils.maxSkillLevels.clear()
-                        get("default_skill_caps").asJsonObject.entrySet()
-                            .associateTo(SkillUtils.maxSkillLevels) { it.key to it.value.asInt }
+                        SkillUtils.maxSkillLevels.putAll(defaultCaps)
                         SkillUtils.skillXp.clear()
-                        get("leveling_xp").asJsonObject.entrySet()
-                            .associateTo(SkillUtils.skillXp) { it.key.toInt() to it.value.asLong }
+                        SkillUtils.skillXp.putAll(levelingXP)
                         SkillUtils.dungeoneeringXp.clear()
-                        get("dungeoneering_xp").asJsonObject.entrySet()
-                            .associateTo(SkillUtils.dungeoneeringXp) { it.key.toInt() to it.value.asLong }
+                        SkillUtils.dungeoneeringXp.putAll(dungeonXp)
                         SkillUtils.slayerXp.clear()
-                        get("slayer_xp").asJsonObject.entrySet().associateTo(SkillUtils.slayerXp) { (key, element) ->
-                            key to element.asJsonObject.entrySet()
-                                .associateTo(LinkedHashMap()) { it.key.toInt() to it.value.asLong }
-                        }
+                        SkillUtils.slayerXp.putAll(slayerXp)
                         SkillUtils.runeXp.clear()
-                        get("runecrafting_xp").asJsonObject.entrySet()
-                            .associateTo(SkillUtils.runeXp) { it.key.toInt() to it.value.asLong }
+                        SkillUtils.runeXp.putAll(runeXp)
                         SkillUtils.hotmXp.clear()
-                        get("hotm_xp").asJsonObject.entrySet()
-                            .associateTo(SkillUtils.hotmXp) { it.key.toInt() to it.value.asLong }
+                        SkillUtils.runeXp.putAll(hotmXp)
                     }
                 }
-                APIUtil.getArrayResponse("${dataUrl}constants/mayors.json").apply {
+                client.get("${dataUrl}constants/mayors.json").body<List<Mayor>>().apply {
                     Utils.checkThreadAndQueue {
                         MayorInfo.mayorData.clear()
-                        mapTo(MayorInfo.mayorData) {
-                            it as JsonObject
-                            Mayor(
-                                it["name"].asString,
-                                it["role"].asString,
-                                it["perks"].asJsonArray.map { p ->
-                                    val obj = p.asJsonObject
-                                    MayorPerk(obj["name"].asString, obj["description"].asString)
-                                },
-                                it["special"].asBoolean
-                            )
-                        }
+                        MayorInfo.mayorData.addAll(this)
                     }
                 }
-                APIUtil.getArrayResponse("${dataUrl}solvers/threeweirdos.json").apply {
-                    Utils.checkThreadAndQueue {
-                        ThreeWeirdosSolver.solutions.clear()
-                        mapTo(ThreeWeirdosSolver.solutions) { it.asString }
-                    }
+                client.get("${dataUrl}solvers/threeweirdos.json").body<List<String>>().apply {
+                    ThreeWeirdosSolver.solutions.clear()
+                    ThreeWeirdosSolver.solutions.addAll(this)
                 }
-                APIUtil.getJSONResponse("${dataUrl}solvers/treasurehunter.json").apply {
+                client.get("${dataUrl}solvers/treasurehunter.json").body<Map<String, String>>().apply {
                     Utils.checkThreadAndQueue {
                         TreasureHunter.treasureHunterLocations.clear()
-                        entrySet().associateTo(TreasureHunter.treasureHunterLocations) { (key, value) ->
-                            key to value.asString.split(",").map { it.toDouble() }
+                        entries.associateTo(TreasureHunter.treasureHunterLocations) { (key, value) ->
+                            key to value.split(",").map { it.toDouble() }
                                 .run { BlockPos(this[0], this[1], this[2]) }
                         }
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}solvers/oruotrivia.json").apply {
+                client.get("${dataUrl}solvers/oruotrivia.json").body<Map<String, List<String>>>().apply {
                     Utils.checkThreadAndQueue {
                         TriviaSolver.triviaSolutions.clear()
-                        entrySet().associateTo(TriviaSolver.triviaSolutions) { (key, value) ->
-                            key to value.asJsonArray.map { it.asString }.toTypedArray()
-                        }
+                        TriviaSolver.triviaSolutions.putAll(this)
                     }
                 }
-                APIUtil.getArrayResponse("${dataUrl}constants/relics.json").apply {
+                client.get("${dataUrl}constants/relics.json").body<List<Triple<Int, Int, Int>>>().apply {
                     Utils.checkThreadAndQueue {
                         RelicWaypoints.relicLocations.clear()
-                        mapTo(RelicWaypoints.relicLocations) {
-                            it as JsonArray
-                            BlockPos(it[0].asInt, it[1].asInt, it[2].asInt)
+                        mapTo(RelicWaypoints.relicLocations) { (x, y, z) ->
+                            BlockPos(x, y, z)
                         }
                     }
                 }
-                APIUtil.getJSONResponse("https://${domain}/api/auctions/npcprices").apply {
+                client.get("https://${domain}/api/auctions/npcprices").body<Map<String, Double>>().apply {
                     Utils.checkThreadAndQueue {
                         ItemFeatures.sellPrices.clear()
-                        entrySet().associateTo(ItemFeatures.sellPrices) {
-                            it.key to it.value.asDouble
-                        }
+                        ItemFeatures.sellPrices.putAll(this)
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}constants/slayerhealth.json").apply {
+                client.get("${dataUrl}constants/slayerhealth.json").body<Map<String, HashMap<String, Int>>>().apply {
                     Utils.checkThreadAndQueue {
                         SlayerFeatures.BossHealths.clear()
-                        entrySet().associateTo(SlayerFeatures.BossHealths) { it.key to it.value.asJsonObject }
+                        SlayerFeatures.BossHealths.putAll(this)
                     }
                 }
-                APIUtil.getArrayResponse("${dataUrl}SpamFilters.json").apply {
+                client.get("${dataUrl}SpamFilters.json").body<List<SpamHider.Filter>>().apply {
                     Utils.checkThreadAndQueue {
-                        val filters = SpamHider.repoFilters.toHashSet()
                         SpamHider.repoFilters.clear()
-                        mapTo(SpamHider.repoFilters) {
-                            it as JsonObject
-                            SpamHider.Filter(
-                                it["name"].asString,
-                                filters.find { f -> f.name == it["name"].asString }?.state ?: 0,
-                                true,
-                                it["pattern"].asString.toRegex(),
-                                when (it["type"].asString) {
-                                    "STARTSWITH" -> SpamHider.FilterType.STARTSWITH
-                                    "CONTAINS" -> SpamHider.FilterType.CONTAINS
-                                    "REGEX" -> SpamHider.FilterType.REGEX
-                                    else -> SpamHider.FilterType.CONTAINS
-                                },
-                                it["formatted"].asBoolean
-                            )
-                        }
+                        SpamHider.repoFilters.addAll(this)
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}constants/summons.json").apply {
+                client.get("${dataUrl}constants/summons.json").body<Map<String, String>>().apply {
                     Utils.checkThreadAndQueue {
                         SummonSkins.skinMap.clear()
-                        entrySet().associateTo(SummonSkins.skinMap) {
-                            it.key to it.value.asString
-                        }
+                        SummonSkins.skinMap.putAll(this)
                         SummonSkins.loadSkins()
                     }
                 }
@@ -222,3 +178,19 @@ object DataFetcher {
         }
     }
 }
+
+@Serializable
+private data class LevelingXPData(
+    @SerialName("default_skill_caps")
+    val defaultCaps: LinkedHashMap<String, Int>,
+    @SerialName("leveling_xp")
+    val levelingXP: LinkedHashMap<Int, Long>,
+    @SerialName("dungeoneering_xp")
+    val dungeonXp: LinkedHashMap<Int, Long>,
+    @SerialName("slayer_xp")
+    val slayerXp: LinkedHashMap<String, LinkedHashMap<Int, Long>>,
+    @SerialName("runecrafting_xp")
+    val runeXp: LinkedHashMap<Int, Long>,
+    @SerialName("hotm_xp")
+    val hotmXp: LinkedHashMap<Int, Long>
+)

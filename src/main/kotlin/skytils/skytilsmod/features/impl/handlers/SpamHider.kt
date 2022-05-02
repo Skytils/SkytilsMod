@@ -22,6 +22,10 @@ import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import gg.essential.vigilance.data.PropertyItem
 import gg.essential.vigilance.data.PropertyType
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.init.Blocks
@@ -40,6 +44,7 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import skytils.skytilsmod.events.impl.SetActionBarEvent
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
+import skytils.skytilsmod.utils.RegexAsString
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -49,10 +54,11 @@ import skytils.skytilsmod.utils.startsWithAny
 import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.HashSet
 import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
@@ -101,10 +107,14 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         gson.toJson(obj, writer)
     }
 
-    data class Filter(
+    @Serializable
+    data class Filter @OptIn(ExperimentalSerializationApi::class) constructor(
         var name: String,
-        var state: Int,
+        @EncodeDefault
+        var state: Int = repoFilters.find { f -> f.name == name }?.state ?: 0,
         var skyblockOnly: Boolean,
+        @Serializable(with = RegexAsString::class)
+        @SerialName("pattern")
         var regex: Regex,
         var type: FilterType,
         var formatted: Boolean
