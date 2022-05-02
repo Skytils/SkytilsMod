@@ -18,6 +18,8 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
@@ -36,7 +38,6 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.util.concurrent.Future
 
 object IceFillSolver {
     private var ticks = 0
@@ -45,7 +46,7 @@ object IceFillSolver {
     private var three: IceFillPuzzle? = null
     private var five: IceFillPuzzle? = null
     private var seven: IceFillPuzzle? = null
-    private var job: Future<*>? = null
+    private var job: Job? = null
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -53,9 +54,9 @@ object IceFillSolver {
         if (!Skytils.config.iceFillSolver) return
         val world: World = mc.theWorld
         if (ticks % 20 == 0) {
-            if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isDone == true)) {
+            if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
                 if (chestPos == null || roomFacing == null) {
-                    job = Skytils.threadPool.submit {
+                    job = Skytils.launch {
                         findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                             val playerX = mc.thePlayer.posX.toInt()
                             val playerZ = mc.thePlayer.posZ.toInt()
@@ -96,7 +97,7 @@ object IceFillSolver {
                     }
                 }
                 if (chestPos != null) {
-                    job = Skytils.threadPool.submit {
+                    job = Skytils.launch {
                         three =
                             (three ?: IceFillPuzzle(world, 70))
                         five = (five ?: IceFillPuzzle(world, 71))

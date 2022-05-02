@@ -18,6 +18,8 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLever
 import net.minecraft.init.Blocks
@@ -38,7 +40,6 @@ import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
 import java.util.*
-import java.util.concurrent.Future
 
 /**
  * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
@@ -54,8 +55,8 @@ class WaterBoardSolver {
         val player = mc.thePlayer ?: return
         val world = mc.theWorld ?: return
         if (ticks % 20 == 0) {
-            if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isDone == true)) {
-                job = Skytils.threadPool.submit {
+            if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
+                job = Skytils.launch {
                     prevInWaterRoom = inWaterRoom
                     inWaterRoom = false
                     if (Utils.getBlocksWithinRangeAtSameY(player.position, 13, 54).any {
@@ -92,7 +93,7 @@ class WaterBoardSolver {
                                 }
                             }
                         }
-                        if (chestPos == null) return@submit
+                        if (chestPos == null) return@launch
                         for (blockPos in Utils.getBlocksWithinRangeAtSameY(player.position, 25, 82)) {
                             if (world.getBlockState(blockPos).block === Blocks.piston_head) {
                                 inWaterRoom = true
@@ -328,6 +329,6 @@ class WaterBoardSolver {
         private var inWaterRoom = false
         private var variant = -1
         private var ticks = 0
-        private var job: Future<*>? = null
+        private var job: Job? = null
     }
 }
