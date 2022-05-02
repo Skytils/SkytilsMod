@@ -1914,6 +1914,13 @@ object Config : Vigilant(
     var bigTentacleTag = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Stop Hook Sinking in Lava",
+        description = "Stops your fishing hook from sinking in lava.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var lavaBobber = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
         description = "Shows the players within the range of the Dolphin pet.",
         category = "Pets", subcategory = "Displays"
