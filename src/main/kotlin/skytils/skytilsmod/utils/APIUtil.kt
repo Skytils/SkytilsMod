@@ -38,7 +38,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
 
-
+@Deprecated("Use ktor client instead")
 object APIUtil {
     private val parser = JsonParser()
 
