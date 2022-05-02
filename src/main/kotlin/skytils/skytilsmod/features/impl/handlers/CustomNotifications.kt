@@ -20,6 +20,7 @@ package skytils.skytilsmod.features.impl.handlers
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import kotlinx.coroutines.launch
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -36,7 +37,7 @@ class CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotificat
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onMessage(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type != 0.toByte() || notifications.isEmpty()) return
-        Skytils.threadPool.submit {
+        Skytils.launch {
             val formatted = event.message.formattedText
             for ((regex, text, displayTicks) in notifications) {
                 val match = regex.find(formatted) ?: continue

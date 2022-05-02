@@ -18,6 +18,7 @@
 
 package skytils.skytilsmod.utils
 
+import kotlinx.coroutines.launch
 import net.minecraft.client.ClientBrandRetriever
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -47,7 +48,7 @@ object ModChecker {
     }
 
     private fun showMessage() {
-        Skytils.threadPool.submit {
+        Skytils.launch {
             runCatching {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             }

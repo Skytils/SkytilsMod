@@ -18,6 +18,7 @@
 package skytils.skytilsmod.commands.stats
 
 import gg.essential.universal.wrappers.message.UMessage
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
@@ -48,22 +49,22 @@ abstract class StatCommand(
             printMessage("$failPrefix §cYou must have an API key set to use this command!")
             return
         }
-        Skytils.threadPool.submit {
+        Skytils.IO.launch {
             val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
             printMessage("§aGetting data for ${username}...")
             val uuid = try {
                 (if (args.isEmpty()) mc.thePlayer.uniqueID else Skytils.hylinAPI.getUUIDSync(username))
             } catch (e: AshconException) {
                 printMessage("$failPrefix §cFailed to get UUID, reason: ${e.message}")
-                return@submit
-            } ?: return@submit
+                return@launch
+            } ?: return@launch
             if (needProfile) {
                 val profile = try {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                 } catch (e: HypixelAPIException) {
                     printMessage("$failPrefix §cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
-                    return@submit
-                } ?: return@submit
+                    return@launch
+                } ?: return@launch
                 displayStats(username, uuid, profile)
             } else displayStats(username, uuid)
         }

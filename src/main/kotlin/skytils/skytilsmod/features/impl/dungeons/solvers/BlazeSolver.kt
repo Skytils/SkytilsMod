@@ -19,6 +19,7 @@ package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import kotlinx.coroutines.launch
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.init.Blocks
@@ -49,7 +50,7 @@ class BlazeSolver {
         if (ticks % 20 == 0) {
             ticks = 0
             if (blazeMode == 0 && orderedBlazes.size > 0) {
-                Skytils.threadPool.submit {
+                Skytils.launch {
                     val blazes = world.getEntities(
                         EntityBlaze::class.java
                     ) { blaze: EntityBlaze? -> player.getDistanceSqToEntity(blaze) < 100 * 100 }

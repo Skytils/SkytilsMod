@@ -19,6 +19,8 @@ package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityChest
@@ -39,7 +41,6 @@ import skytils.skytilsmod.listeners.DungeonListener
 import skytils.skytilsmod.utils.RenderUtil
 import skytils.skytilsmod.utils.Utils
 import java.awt.Color
-import java.util.concurrent.Future
 import kotlin.math.floor
 
 class BoulderSolver {
@@ -114,13 +115,13 @@ class BoulderSolver {
         var variantSteps = ArrayList<ArrayList<BoulderPush>>()
         var expectedBoulders = ArrayList<ArrayList<BoulderState>>()
         private var ticks = 0
-        private var job: Future<*>? = null
+        private var job: Job? = null
         fun update() {
             if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
             val player = mc.thePlayer
             val world: World? = mc.theWorld
-            if ((job == null || job?.isCancelled == true || job?.isDone == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
-                job = Skytils.threadPool.submit {
+            if ((job == null || job?.isCancelled == true || job?.isCompleted == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
+                job = Skytils.launch {
                     var foundBirch = false
                     var foundBarrier = false
                     for (potentialBarrier in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 68)) {
@@ -141,7 +142,7 @@ class BoulderSolver {
                             }
                         }
                     }
-                    if (!foundBirch || !foundBarrier) return@submit
+                    if (!foundBirch || !foundBarrier) return@launch
                     if (boulderChest == null || boulderFacing == null) {
                         findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                             val playerX = mc.thePlayer.posX.toInt()

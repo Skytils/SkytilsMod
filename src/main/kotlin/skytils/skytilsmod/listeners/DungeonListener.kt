@@ -22,6 +22,7 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
+import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -244,7 +245,7 @@ object DungeonListener {
 
     fun checkSpiritPet() {
         if (Skytils.hylinAPI.key.isNotEmpty()) {
-            Skytils.threadPool.submit {
+            Skytils.IO.launch {
                 runCatching {
                     for (teammate in team.values) {
                         val name = teammate.playerName

@@ -66,7 +66,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     UChat.chat("$failPrefix §cPlease provide your Hypixel API key!")
                     return
                 }
-                Skytils.threadPool.submit {
+                Skytils.IO.launch {
                     val apiKey = args[1]
                     if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=$apiKey").get("success")
                             .asBoolean
@@ -272,7 +272,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         ProfileGui(mc.thePlayer.uniqueID, UPlayer.getPlayer()?.displayNameString ?: "")
                 } else {
                     // TODO Add some kind of message indicating progress
-                    Skytils.launch {
+                    Skytils.IO.launch {
                         Skytils.hylinAPI.getUUID(args[1]).whenComplete { uuid ->
                             Skytils.displayScreen = ProfileGui(uuid, args[1])
                         }.catch { error ->

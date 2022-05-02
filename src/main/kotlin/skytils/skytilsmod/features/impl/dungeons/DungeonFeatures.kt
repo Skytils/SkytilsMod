@@ -21,6 +21,9 @@ import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
@@ -75,7 +78,6 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
-import java.util.concurrent.Future
 import java.util.regex.Pattern
 
 object DungeonFeatures {
@@ -95,7 +97,7 @@ object DungeonFeatures {
     private var foundLivid = false
     var livid: Entity? = null
     private var lividTag: Entity? = null
-    private var lividJob: Future<*>? = null
+    private var lividJob: Job? = null
     private var alertedSpiritPet = false
     private const val SPIRIT_PET_TEXTURE =
         "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
@@ -225,14 +227,13 @@ object DungeonFeatures {
                             }
                         }
                         0 -> {
-                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && (lividJob == null || lividJob?.isCancelled == true || lividJob?.isDone == true)) {
-                                lividJob = Skytils.threadPool.submit {
+                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && (lividJob == null || lividJob?.isCancelled == true || lividJob?.isCompleted == true)) {
+                                lividJob = Skytils.launch {
                                     while (mc.thePlayer.isPotionActive(Potion.blindness)) {
-                                        Thread.sleep(10)
+                                        delay(1)
                                     }
                                     val state = mc.theWorld.getBlockState(BlockPos(6, 109, 43))
                                     val color = state.getValue(BlockStainedGlass.COLOR)
-                                    color as AccessorEnumDyeColor
                                     val a = when (color) {
                                         EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
                                         EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
@@ -247,7 +248,7 @@ object DungeonFeatures {
                                         EnumDyeColor.YELLOW -> EnumChatFormatting.YELLOW
                                         else -> null
                                     }
-                                    val otherColor = color.chatColor
+                                    val otherColor = (color as AccessorEnumDyeColor).chatColor
                                     for (entity in mc.theWorld.loadedEntityList) {
                                         if (entity !is EntityArmorStand) continue
                                         val fallBackColor = entity.name.startsWith("$otherColor﴾ $otherColor§lLivid")
