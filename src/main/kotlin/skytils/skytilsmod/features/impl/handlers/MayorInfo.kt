@@ -18,7 +18,11 @@
 package skytils.skytilsmod.features.impl.handlers
 
 import com.mojang.authlib.exceptions.AuthenticationException
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -28,11 +32,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.SoundQueue
 import skytils.skytilsmod.core.TickTask
 import skytils.skytilsmod.events.impl.GuiContainerEvent
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.TabListUtils
+import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.stripControlCodes
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
@@ -207,21 +215,16 @@ object MayorInfo {
 
     fun fetchMayorData() {
         Skytils.IO.launch {
-            val res = APIUtil.getJSONResponse(baseURL)
-            if (res.has("name") && res.has("perks")) {
-                if (res["name"].asString == currentMayor || currentMayor == null || mayorPerks.size == 0) isLocal =
-                    false
-                if (!isLocal) {
-                    TickTask(1) {
-                        currentMayor = res["name"].asString
-                        lastFetchedMayorData = System.currentTimeMillis()
-                        if (currentMayor != "Jerry") jerryMayor = null
-                        mayorPerks.clear()
-                        val perks = res["perks"].asJsonArray
-                        for (i in 0 until perks.size()) {
-                            mayorPerks.add(perks[i].asJsonObject.get("name").asString)
-                        }
-                    }
+            val res = client.get(baseURL).body<Mayor>()
+            if (res.name == currentMayor || currentMayor == null || mayorPerks.size == 0) isLocal =
+                false
+            if (!isLocal) {
+                TickTask(1) {
+                    currentMayor = res.name
+                    lastFetchedMayorData = System.currentTimeMillis()
+                    if (currentMayor != "Jerry") jerryMayor = null
+                    mayorPerks.clear()
+                    mayorPerks.addAll(res.perks.map { it.name })
                 }
             }
         }
@@ -232,7 +235,7 @@ object MayorInfo {
         if (lastSentData - System.currentTimeMillis() < 300000) lastSentData = System.currentTimeMillis()
         Skytils.IO.launch {
             try {
-                val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
+                val serverId = UUID.randomUUID().toString().replace("-", "")
                 val url =
                     "$baseURL/new?username=${mc.session.username}&serverId=${serverId}&mayor=${mayor}${
                         perks.joinToString(separator = "") {
@@ -247,7 +250,7 @@ object MayorInfo {
                 val commentForDecompilers =
                     "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
                 mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
-                println(APIUtil.getJSONResponse(url))
+                println(client.get(url).bodyAsText())
             } catch (e: AuthenticationException) {
                 e.printStackTrace()
             } catch (e: IOException) {
@@ -258,12 +261,10 @@ object MayorInfo {
 
     fun fetchJerryData() {
         Skytils.IO.launch {
-            val res = APIUtil.getJSONResponse("$baseURL/jerry")
-            if (res.has("nextSwitch") && res.has("mayor") && res.has("perks")) {
-                TickTask(1) {
-                    newJerryPerks = res["nextSwitch"].asLong
-                    jerryMayor = mayorData.find { it.name == res["mayor"].asJsonObject["name"].asString }
-                }
+            val res = client.get("$baseURL/jerry").body<JerrySession>()
+            TickTask(1) {
+                newJerryPerks = res.nextSwitch
+                jerryMayor = res.mayor
             }
         }
     }
@@ -274,11 +275,11 @@ object MayorInfo {
             try {
                 val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
                 val url =
-                    StringBuilder("$baseURL/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}")
+                    "$baseURL/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}"
                 val commentForDecompilers =
                     "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
                 mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
-                println(APIUtil.getJSONResponse(url.toString()))
+                println(client.get(url).bodyAsText())
             } catch (e: AuthenticationException) {
                 e.printStackTrace()
             } catch (e: IOException) {
@@ -288,5 +289,15 @@ object MayorInfo {
     }
 }
 
+@Serializable
 class Mayor(val name: String, val role: String, val perks: List<MayorPerk>, val special: Boolean)
+
+@Serializable
 class MayorPerk(val name: String, val description: String)
+
+@Serializable
+data class JerrySession(
+    val nextSwitch: Long,
+    val mayor: Mayor,
+    val perks: List<MayorPerk>
+)

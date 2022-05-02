@@ -18,9 +18,14 @@
 
 package skytils.skytilsmod.features.impl.misc
 
-import skytils.skytilsmod.utils.APIUtil.getImage
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.launch
+import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.utils.graphics.DynamicResource
-import java.net.URL
+import javax.imageio.ImageIO
 
 object SummonSkins {
     // maps name to url
@@ -33,10 +38,11 @@ object SummonSkins {
         loadSkins()
     }
 
-    fun loadSkins() {
+    fun loadSkins() = Skytils.IO.launch {
         skintextureMap.clear()
         skinMap.forEach {
-            skintextureMap[it.key] = DynamicResource(it.key, URL(it.value).getImage())
+            skintextureMap[it.key] =
+                DynamicResource(it.key, ImageIO.read(client.get(it.value).bodyAsChannel().toInputStream()))
         }
     }
 }

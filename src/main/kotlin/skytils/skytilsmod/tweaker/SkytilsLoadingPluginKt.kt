@@ -19,14 +19,18 @@
 package skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.runBlocking
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
-import org.apache.hc.client5.http.classic.methods.HttpGet
-import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.spongepowered.asm.launch.MixinBootstrap
 import org.spongepowered.asm.mixin.MixinEnvironment
-import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.startsWithAny
 import java.awt.Desktop
@@ -71,6 +75,8 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
             // Asbyth's forge fork uses version 0
             if (!(forgeVersion >= 2318 || forgeVersion == 0)) {
                 val forgeUrl =
+                    "https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar"
+                val forgeUri =
                     URL("https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar").toURI()
                 val forgeButton = createButton("Get Forge") {
                     if (SkytilsInstallerFrame.getOperatingSystem() == SkytilsInstallerFrame.OperatingSystem.WINDOWS) {
@@ -80,24 +86,22 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
                             val runtime = Utils.getJavaRuntime()
 
-                            val client = APIUtil.builder.build()
-                            client.execute(HttpGet(forgeUrl)) {
-                                if (it.code == 200) {
-                                    it.entity.writeTo(forgeFile.outputStream())
-                                    EntityUtils.consume(it.entity)
-                                    client.close()
+                            runBlocking {
+                                val res = client.get(forgeUrl)
+                                if (res.status == HttpStatusCode.OK) {
+                                    res.bodyAsChannel().copyAndClose(forgeFile.writeChannel())
                                     Runtime.getRuntime()
                                         .exec("\"$runtime\" -jar \"${forgeFile.canonicalPath}\"")
                                     exit()
                                 } else {
-                                    Desktop.getDesktop().browse(forgeUrl)
+                                    Desktop.getDesktop().browse(forgeUri)
                                 }
                             }
                         }.onFailure {
                             it.printStackTrace()
-                            Desktop.getDesktop().browse(forgeUrl)
+                            Desktop.getDesktop().browse(forgeUri)
                         }
-                    } else Desktop.getDesktop().browse(forgeUrl)
+                    } else Desktop.getDesktop().browse(forgeUri)
                 }
                 showMessage(
                     """

@@ -18,6 +18,10 @@
 
 package skytils.skytilsmod.features.impl.trackers.impl
 
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -28,19 +32,23 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.utils.*
+import skytils.skytilsmod.utils.DevTools
+import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight
+import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.printDevMessage
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import kotlin.concurrent.fixedRateTimer
 
 object DupeTracker : Tracker("duped_items") {
-    val dupedUUIDs = hashSetOf<String>()
-    val dirtyUUIDs = hashSetOf<String>()
-    val dupeChecking = hashMapOf<String, Int>()
+    val dupedUUIDs = hashSetOf<IdentifiableItem>()
+    val dirtyUUIDs = hashSetOf<IdentifiableItem>()
+    val dupeChecking = hashMapOf<IdentifiableItem, Int>()
     var inAuctionBrowser = false
 
 
@@ -88,10 +96,12 @@ object DupeTracker : Tracker("duped_items") {
                     val slotId = packet.func_149173_d()
                     if (slotId < 54 && item?.stackSize == 1) {
                         val uuid = item.getUUID() ?: return
-                        val prev = dupeChecking.putIfAbsent(uuid, slotId) ?: return
+                        val itemId = ItemUtil.getSkyBlockItemID(item) ?: return
+                        val idItem = IdentifiableItem(itemId, uuid)
+                        val prev = dupeChecking.putIfAbsent(idItem, slotId) ?: return
                         if (prev != slotId) {
-                            printDevMessage("Dupe set ${item.displayName}, $uuid $slotId", "dupecheck")
-                            dupedUUIDs.add(uuid)
+                            printDevMessage("Dupe set ${item.displayName}, $idItem $slotId", "dupecheck")
+                            dupedUUIDs.add(idItem)
                             dirty = true
                         }
                     }
@@ -104,10 +114,12 @@ object DupeTracker : Tracker("duped_items") {
                     for ((i, stack) in packet.itemStacks.withIndex()) {
                         if (i < 54 && stack?.stackSize == 1) {
                             val uuid = stack.getUUID() ?: continue
-                            val prev = dupeChecking.putIfAbsent(uuid, i) ?: continue
+                            val itemId = ItemUtil.getSkyBlockItemID(stack) ?: continue
+                            val idItem = IdentifiableItem(itemId, uuid)
+                            val prev = dupeChecking.putIfAbsent(idItem, i) ?: continue
                             if (prev != i) {
-                                printDevMessage("Dupe window ${stack.displayName}, $uuid $i", "dupecheck")
-                                dupedUUIDs.add(uuid)
+                                printDevMessage("Dupe window ${stack.displayName}, $idItem $i", "dupecheck")
+                                dupedUUIDs.add(idItem)
                                 dirty = true
                             }
                         }
@@ -120,8 +132,11 @@ object DupeTracker : Tracker("duped_items") {
     @SubscribeEvent
     fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock || !Skytils.config.dupeTracker) return
-        val uuid = event.slot.stack.getUUID() ?: return
-        if (dupedUUIDs.contains(uuid) || dirtyUUIDs.contains(uuid)) {
+        val stack = event.slot.stack
+        val uuid = stack.getUUID() ?: return
+        val itemId = ItemUtil.getSkyBlockItemID(stack) ?: return
+        val idItem = IdentifiableItem(itemId, uuid)
+        if (dupedUUIDs.contains(idItem) || dirtyUUIDs.contains(idItem)) {
             GlStateManager.pushMatrix()
             GlStateManager.translate(0f, 0f, 299f)
             event.slot highlight Skytils.config.dupeTrackerOverlayColor
@@ -136,15 +151,16 @@ object DupeTracker : Tracker("duped_items") {
         val extraAttrib = ItemUtil.getExtraAttributes(event.itemStack) ?: return
         if (Skytils.config.dupeTracker) {
             val uuid = extraAttrib.getString("uuid")
-            if (dupedUUIDs.contains(uuid)) {
+            val itemId = ItemUtil.getSkyBlockItemID(extraAttrib) ?: return
+            val idItem = IdentifiableItem(itemId, uuid)
+            if (dupedUUIDs.contains(idItem)) {
                 event.toolTip.add("§c§lDUPED ITEM")
             }
-            if (dirtyUUIDs.contains(uuid)) {
+            if (dirtyUUIDs.contains(idItem)) {
                 event.toolTip.add("§c§lDIRTY ITEM")
             }
         }
-        val origin = extraAttrib.getString("originTag")
-        when (origin) {
+        when (val origin = extraAttrib.getString("originTag")) {
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
             else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: $origin")
@@ -157,7 +173,7 @@ object DupeTracker : Tracker("duped_items") {
     }
 
     override fun read(reader: InputStreamReader) {
-        dupedUUIDs.addAll(gson.fromJson<List<String>>(reader, List::class.java))
+        dupedUUIDs.addAll(gson.fromJson<List<IdentifiableItem>>(reader, List::class.java))
     }
 
     override fun write(writer: OutputStreamWriter) {
@@ -173,19 +189,29 @@ object DupeTracker : Tracker("duped_items") {
     init {
         fixedRateTimer(name = "Skytils-FetchDupeData", period = 7 * 60 * 1000L) {
             if (Utils.skyblock && Skytils.config.dupeTracker) {
-                APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dupeditems").apply {
-                    Utils.checkThreadAndQueue {
-                        dupedUUIDs.addAll(map { it.asString })
-                    }
-                }
-                if (Skytils.config.markDirtyItems) {
-                    APIUtil.getArrayResponse("https://${Skytils.domain}/api/auctions/dirtyitems").apply {
-                        Utils.checkThreadAndQueue {
-                            dirtyUUIDs.addAll(map { it.asString })
+                Skytils.IO.launch {
+                    client.get("https://${Skytils.domain}/api/auctions/dupeditems").body<List<IdentifiableItem>>()
+                        .apply {
+                            Utils.checkThreadAndQueue {
+                                dupedUUIDs.addAll(this)
+                            }
                         }
+                    if (Skytils.config.markDirtyItems) {
+                        client.get("https://${Skytils.domain}/api/auctions/dirtyitems").body<List<IdentifiableItem>>()
+                            .apply {
+                                Utils.checkThreadAndQueue {
+                                    dirtyUUIDs.addAll(this)
+                                }
+                            }
                     }
                 }
             }
         }
     }
 }
+
+@Serializable
+data class IdentifiableItem(
+    val itemId: String,
+    val uuid: String
+)

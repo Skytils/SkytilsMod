@@ -61,7 +61,7 @@ class TriviaSolver {
                     (if (DungeonTimer.dungeonStartTime > 0L) DungeonTimer.dungeonStartTime else System.currentTimeMillis()) / 1000.0
                 val diff = floor(currentTime - 1560276000)
                 val year = (diff / 446400 + 1).toInt()
-                triviaAnswers = arrayOf("Year $year")
+                triviaAnswers = listOf("Year $year")
             } else {
                 triviaSolutions.entries.find {
                     unformatted.contains(it.key)
@@ -147,8 +147,8 @@ class TriviaSolver {
     }
 
     companion object {
-        var triviaSolutions = HashMap<String, Array<String>>()
-        var triviaAnswers: Array<String>? = null
+        var triviaSolutions = HashMap<String, List<String>>()
+        var triviaAnswers: List<String>? = null
         var triviaAnswer: String? = null
 
     }

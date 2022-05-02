@@ -17,31 +17,36 @@
  */
 package skytils.skytilsmod.core
 
-import com.google.gson.JsonObject
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.gui.GuiMainMenu
 import net.minecraft.util.Util
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
-import org.apache.hc.client5.http.classic.methods.HttpGet
-import org.apache.hc.core5.http.io.entity.EntityUtils
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.gui.RequestUpdateGui
 import skytils.skytilsmod.gui.UpdateGui
-import skytils.skytilsmod.utils.APIUtil
+import skytils.skytilsmod.utils.GithubRelease
 import skytils.skytilsmod.utils.Utils
 import java.awt.Desktop
 import java.io.File
-import java.net.URL
-import kotlin.concurrent.thread
 
 object UpdateChecker {
     val updateGetter = UpdateGetter()
     val updateAsset
-        get() = updateGetter.updateObj!!["assets"].asJsonArray[0].asJsonObject
+        get() = updateGetter.updateObj!!.assets.first { it.name.endsWith(".jar") }
     val updateDownloadURL: String
-        get() = updateAsset["browser_download_url"].asString
+        get() = updateAsset.downloadUrl
 
     fun getJarNameFromUrl(url: String): String {
         return url.split(Regex("/")).last()
@@ -100,35 +105,34 @@ object UpdateChecker {
     }
 
     fun downloadDeleteTask() {
-        Thread {
+        Skytils.IO.launch {
             println("Checking for Skytils install task...")
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             // TODO Make this dynamic and fetch latest one or something
             val url =
                 "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.1.1.jar"
             val taskFile = File(taskDir, getJarNameFromUrl(url))
-            if (taskDir.mkdirs() || taskFile.createNewFile()) {
+            if (taskDir.mkdirs() || withContext(Dispatchers.IO) {
+                    taskFile.createNewFile()
+                }) {
                 println("Downloading Skytils delete task.")
-                val client = APIUtil.builder.build()
-
-                val req = HttpGet(URL(url).toURI())
-                val res = client.execute(req)
-                if (res.code != 200) {
+                val req = client.get(url)
+                if (req.status != HttpStatusCode.OK) {
                     println("Downloading delete task failed!")
                 } else {
                     println("Writing Skytils delete task.")
-                    res.entity.writeTo(taskFile.outputStream())
-                    EntityUtils.consume(res.entity)
-                    client.close()
+                    req.bodyAsChannel().copyAndClose(taskFile.writeChannel())
                     println("Delete task successfully downloaded!")
                 }
             }
-        }.start()
+        }
     }
 
     init {
         try {
-            thread(block = updateGetter::run).join()
+            Skytils.IO.launch {
+                updateGetter.run()
+            }
         } catch (ex: InterruptedException) {
             ex.printStackTrace()
         }
@@ -142,22 +146,22 @@ object UpdateChecker {
         Skytils.displayScreen = RequestUpdateGui()
     }
 
-    class UpdateGetter : Runnable {
+    class UpdateGetter {
         @Volatile
-        var updateObj: JsonObject? = null
+        var updateObj: GithubRelease? = null
 
-        override fun run() {
+        suspend fun run() {
             println("Checking for updates...")
             val latestRelease = when (Skytils.config.updateChannel) {
-                2 -> APIUtil.getJSONResponse(
+                2 -> client.get(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases/latest"
-                )
-                1 -> APIUtil.getArrayResponse(
+                ).body()
+                1 -> client.get(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases"
-                )[0].asJsonObject
+                ).body<List<GithubRelease>>()[0]
                 else -> return println("Channel set as none")
             }
-            val latestTag = latestRelease["tag_name"].asString
+            val latestTag = latestRelease.tagName
             val currentTag = Skytils.VERSION.substringBefore("-dev")
 
             val currentVersion = SkytilsVersion(currentTag)
