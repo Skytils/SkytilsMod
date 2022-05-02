@@ -23,9 +23,9 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
-import skytils.skytilsmod.utils.GlState.Companion.stack
 import skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
 import java.util.*
+import kotlin.math.max
 
 object ItemUtil {
     private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
@@ -229,15 +229,13 @@ object ItemUtil {
     }
 
     fun getStarCount(extraAttributes: NBTTagCompound) =
-        extraAttributes.getInteger("upgrade_level") + extraAttributes.getInteger("dungeon_item_level")
+        max(extraAttributes.getInteger("upgrade_level"), extraAttributes.getInteger("dungeon_item_level"))
 
     fun isSalvageable(stack: ItemStack): Boolean {
         val extraAttr = getExtraAttributes(stack)
         val sbId = getSkyBlockItemID(extraAttr)
-        return sbId != "ICE_SPRAY_WAND" && extraAttr != null && getStarCount(extraAttr) == 0
-                && !extraAttr.hasKey("dungeon_item") && (extraAttr.hasKey("baseStatBoostPercentage") || getItemLore(
-            stack
-        ).getLastOrNull(1)
-            ?.startsWith("§aPerfect ") == true)
+        return sbId != "ICE_SPRAY_WAND" && extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && getStarCount(
+            extraAttr
+        ) == 0
     }
 }

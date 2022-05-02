@@ -237,8 +237,7 @@ class ItemFeatures {
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
                     if (event.chestName.startsWith("Salvage") && extraAttr != null) {
-                        if ((!extraAttr.hasKey("baseStatBoostPercentage") && getItemLore(item).getLastOrNull(1)
-                                ?.startsWith("§aPerfect ") == false) && !item.displayName.contains("Salvage") && !item.displayName.contains(
+                        if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
                             )
                         ) {
