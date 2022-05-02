@@ -17,8 +17,6 @@
  */
 package skytils.skytilsmod.features.impl.misc
 
-import com.google.gson.JsonObject
-import gg.essential.elementa.utils.Vector2f
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
@@ -26,7 +24,6 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import kotlinx.coroutines.*
 import net.minecraft.block.*
-import net.minecraft.block.state.IBlockState
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -37,11 +34,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityBlaze
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntityGuardian
-import net.minecraft.entity.monster.EntitySpider
-import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.monster.*
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -92,7 +85,6 @@ import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.awt.Color
 import java.util.concurrent.Executors
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.floor
 
@@ -137,7 +129,7 @@ class SlayerFeatures {
                 sidebarLines.find { it.startsWith("Voidgloom Seraph") }
                     ?.substringAfter("Voidgloom Seraph")?.drop(1)
                     ?: ""
-            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier)?.asInt
+            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier) ?: 0
         }
         slayer?.tick(event)
         if (ticks % 4 == 0) {
@@ -837,7 +829,7 @@ class SlayerFeatures {
         private var lastTickHasSlayerText = false
         var expectedMaxHp: Int? = null
         private val hitMap = HashMap<EntityLiving, Int>()
-        var BossHealths = HashMap<String, JsonObject>()
+        var BossHealths = HashMap<String, HashMap<String, Int>>()
         var maddoxCommand = ""
 
         fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
@@ -888,7 +880,7 @@ class SlayerFeatures {
         private val expectedHealth =
             (if ("DOUBLE MOBS HP!!!" in MayorInfo.mayorPerks) 2 else 1) * (BossHealths[name.substringBefore(
                 " "
-            )]?.get(currentTier)?.asInt ?: 0)
+            )]?.get(currentTier) ?: 0)
 
         init {
             launch {

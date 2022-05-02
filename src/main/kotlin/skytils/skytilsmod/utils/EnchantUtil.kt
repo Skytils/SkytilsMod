@@ -18,9 +18,7 @@
 
 package skytils.skytilsmod.utils
 
-import com.google.gson.*
-import net.minecraft.nbt.NBTTagCompound
-import java.lang.reflect.Type
+import kotlinx.serialization.Serializable
 
 object EnchantUtil {
     val enchants = arrayListOf<Enchant>()
@@ -31,44 +29,18 @@ interface Enchant {
     val nbtName: String
     val goodLevel: Int
     val maxLevel: Int
-
-    class Serializer : JsonDeserializer<Enchant> {
-
-        @Throws(JsonParseException::class)
-        override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Enchant {
-            json as JsonObject
-
-            if (json.has("stackLevel")) {
-                return StackingEnchant(
-                    json["loreName"].asString,
-                    json["nbtName"].asString,
-                    json["goodLevel"].asInt,
-                    json["maxLevel"].asInt,
-                    json["nbtNum"].asString,
-                    json["statLabel"].asString,
-                    json["stackLevel"].asJsonArray.map { it.asInt }
-                )
-            } else {
-                return NormalEnchant(
-                    json["loreName"].asString,
-                    json["nbtName"].asString,
-                    json["goodLevel"].asInt,
-                    json["maxLevel"].asInt,
-                    json["nbtName"].asString.startsWith("ultimate_")
-                )
-            }
-        }
-    }
 }
 
+@Serializable
 data class NormalEnchant(
     override val loreName: String,
     override val nbtName: String,
     override val goodLevel: Int,
     override val maxLevel: Int,
-    val isUltimate: Boolean
+    val isUltimate: Boolean = nbtName.startsWith("ultimate_")
 ) : Enchant
 
+@Serializable
 data class StackingEnchant(
     override val loreName: String,
     override val nbtName: String,

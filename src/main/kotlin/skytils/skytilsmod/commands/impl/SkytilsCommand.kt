@@ -18,19 +18,19 @@
 package skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
+import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.UPlayer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import gg.essential.universal.wrappers.message.UMessage
+import gg.essential.universal.wrappers.message.UTextComponent
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.ChatStyle
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.Skytils.Companion.prefix
@@ -52,7 +52,7 @@ import skytils.skytilsmod.utils.*
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
-import kotlin.concurrent.thread
+import kotlin.collections.set
 
 object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
@@ -68,8 +68,8 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 }
                 Skytils.IO.launch {
                     val apiKey = args[1]
-                    if (APIUtil.getJSONResponse("https://api.hypixel.net/key?key=$apiKey").get("success")
-                            .asBoolean
+                    if (client.get("https://api.hypixel.net/key?key=$apiKey")
+                            .body<HypixelResponse>().success
                     ) {
                         Skytils.config.apiKey = apiKey
                         Skytils.hylinAPI.key = Skytils.config.apiKey
@@ -116,8 +116,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 } else {
                     when (args[1].lowercase()) {
                         "data" -> {
-                            DataFetcher.reloadData()
-                            UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
+                            DataFetcher.reloadData().invokeOnCompletion {
+                                UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
+                            }
                         }
                         "mayor" -> {
                             MayorInfo.fetchMayorData()
@@ -220,41 +221,28 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "enchant" -> Skytils.displayScreen = EnchantNamesGui()
             "update" -> {
                 try {
-                    thread(block = UpdateChecker.updateGetter::run).join()
-                    if (UpdateChecker.updateGetter.updateObj == null) {
-                        return UChat.chat("$prefix §cNo new update found.")
+                    Skytils.IO.launch {
+                        async { UpdateChecker.updateGetter.run() }.invokeOnCompletion {
+                            if (UpdateChecker.updateGetter.updateObj == null) {
+                                return@invokeOnCompletion UChat.chat("$prefix §cNo new update found.")
+                            }
+                            val message = UMessage(
+                                "$prefix §7Update for version ${
+                                    UpdateChecker.updateGetter.updateObj!!.tagName
+                                } is available! ",
+                                UTextComponent("§a[Update Now] ").setClick(
+                                    MCClickEventAction.RUN_COMMAND,
+                                    "/skytils updateNow"
+                                ).setHoverText("§eUpdates and restarts your game"),
+                                UTextComponent("§b[Update Later] ").setClick(
+                                    MCClickEventAction.RUN_COMMAND,
+                                    "/skytils updateLater"
+                                ).setHoverText("§eUpdates after you close your game")
+                            )
+                            message.chat()
+                        }
                     }
-                    val message = ChatComponentText(
-                        "$prefix §7Update for version ${
-                            UpdateChecker.updateGetter.updateObj?.get("tag_name")?.asString
-                        } is available! "
-                    )
-                    message.appendSibling(
-                        ChatComponentText("§a[Update Now] ").setChatStyle(
-                            ChatStyle().setChatClickEvent(
-                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytils updateNow")
-                            ).setChatHoverEvent(
-                                HoverEvent(
-                                    HoverEvent.Action.SHOW_TEXT,
-                                    ChatComponentText("§eUpdates and restarts your game")
-                                )
-                            )
-                        )
-                    )
-                    message.appendSibling(
-                        ChatComponentText("§b[Update Later] ").setChatStyle(
-                            ChatStyle().setChatClickEvent(
-                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytils updateLater")
-                            ).setChatHoverEvent(
-                                HoverEvent(
-                                    HoverEvent.Action.SHOW_TEXT,
-                                    ChatComponentText("§eUpdates after you close your game")
-                                )
-                            )
-                        )
-                    )
-                    return player.addChatMessage(message)
-                } catch (ex: InterruptedException) {
+                } catch (ex: Exception) {
                     ex.printStackTrace()
                 }
             }
