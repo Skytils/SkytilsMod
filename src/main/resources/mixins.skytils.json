@@ -30,6 +30,7 @@
     "entity.MixinBossStatus",
     "entity.MixinEntityBlaze",
     "entity.MixinEntityDragon",
+    "entity.MixinEntityFishHook",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayerSP",
     "forge.MixinJarDiscoverer",
