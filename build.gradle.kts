@@ -23,6 +23,7 @@ import java.security.MessageDigest
 
 plugins {
     kotlin("jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
@@ -111,6 +112,12 @@ dependencies {
         exclude(module = "kotlin-stdlib")
         exclude(module = "kotlinx-coroutines-core")
     }
+
+    shadowMe(platform("io.ktor:ktor-bom:2.0.1"))
+    shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
+    shadowMe("io.ktor:ktor-client-core-jvm")
+    shadowMe("io.ktor:ktor-client-cio-jvm")
+    shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.0.8")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.8")
