@@ -25,6 +25,7 @@ import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
 import java.util.*
+import kotlin.math.max
 
 object ItemUtil {
     private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
@@ -228,5 +229,5 @@ object ItemUtil {
     }
 
     fun getStarCount(extraAttributes: NBTTagCompound) =
-        extraAttributes.getInteger("upgrade_level") + extraAttributes.getInteger("dungeon_item_level")
+        max(extraAttributes.getInteger("upgrade_level"), extraAttributes.getInteger("dungeon_item_level"))
 }
