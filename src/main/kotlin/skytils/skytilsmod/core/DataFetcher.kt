@@ -21,8 +21,9 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import net.minecraft.util.BlockPos
-import skytils.skytilsmod.Reference
+import skytils.skytilsmod.Reference.dataUrl
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.domain
 import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
@@ -45,7 +46,6 @@ import kotlin.concurrent.fixedRateTimer
 object DataFetcher {
     private fun loadData(): Future<*> {
         return Skytils.threadPool.submit {
-            val dataUrl = Reference.dataUrl
             try {
                 APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
                     if (isNotBlank()) {
@@ -156,7 +156,7 @@ object DataFetcher {
                         }
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").apply {
+                APIUtil.getJSONResponse("${domain}/api/auctions/npcprices").apply {
                     Utils.checkThreadAndQueue {
                         ItemFeatures.sellPrices.clear()
                         entrySet().associateTo(ItemFeatures.sellPrices) {
