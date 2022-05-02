@@ -22,10 +22,18 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cache.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.network.tls.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.serialization.json.Json
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
@@ -92,6 +100,7 @@ import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import sun.misc.Unsafe
 import java.io.File
+import java.security.KeyStore
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
@@ -173,6 +182,40 @@ class Skytils {
             Unsafe::class.java.getDeclaredField("theUnsafe").apply {
                 isAccessible = true
             }.get(null) as Unsafe
+        }
+
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                })
+            }
+            install(HttpCache)
+            install(HttpRequestRetry) {
+                retryOnServerErrors(maxRetries = 5)
+                exponentialDelay()
+            }
+            install(UserAgent) {
+                agent = "Skytils/$VERSION"
+            }
+
+            engine {
+                endpoint {
+                    connectTimeout = 10000
+                    keepAliveTime = 5000
+                    requestTimeout = 10000
+                    socketTimeout = 10000
+                }
+                https {
+                    addKeyStore(KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+                        load(javaClass.getResourceAsStream("skytilsletsencrypt.jks"), "skytilsontop".toCharArray());
+                    }, "skytilsontop".toCharArray())
+                }
+            }
+            defaultRequest {
+            }
         }
 
         val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
