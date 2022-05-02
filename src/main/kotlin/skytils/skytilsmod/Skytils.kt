@@ -122,9 +122,9 @@ class Skytils {
         const val VERSION = "1.2.6"
 
         @JvmField
+        @Deprecated("Use kotlinx serialization instead")
         val gson: Gson = GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeAdapter(Enchant::class.java, Enchant.Serializer())
             .create()
 
         @JvmStatic
@@ -184,13 +184,15 @@ class Skytils {
             }.get(null) as Unsafe
         }
 
+        val json = Json {
+            prettyPrint = true
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
+
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                })
+                json(json)
             }
             install(HttpCache)
             install(HttpRequestRetry) {

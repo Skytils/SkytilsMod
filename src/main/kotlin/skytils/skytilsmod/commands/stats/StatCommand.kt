@@ -62,7 +62,14 @@ abstract class StatCommand(
                 val profile = try {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
                 } catch (e: HypixelAPIException) {
-                    printMessage("$failPrefix §cUnable to retrieve profile information: ${e.message?.replace(Skytils.config.apiKey, "*".repeat(Skytils.config.apiKey.length))}")
+                    printMessage(
+                        "$failPrefix §cUnable to retrieve profile information: ${
+                            e.message?.replace(
+                                Skytils.config.apiKey,
+                                "*".repeat(Skytils.config.apiKey.length)
+                            )
+                        }"
+                    )
                     return@launch
                 } ?: return@launch
                 displayStats(username, uuid, profile)
@@ -82,7 +89,7 @@ abstract class StatCommand(
         error("function displayStats for command ${this.commandName} is not initalized!")
     }
 
-    protected open fun displayStats(username: String, uuid: UUID) {
+    protected open suspend fun displayStats(username: String, uuid: UUID) {
         error("function displayStats for command ${this.commandName} is not initalized!")
     }
 }

@@ -177,9 +177,11 @@ tasks {
         configurations = listOf(shadowMe, shadowMeMod)
 
         relocate("org.apache.hc", "skytils.apacheorg.hc")
-        relocate("org.apache.commons.codec", "skytils.apacheorg.codec")
+        relocate("org.apache.commons.codec", "skytils.apache-codec")
         relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
         relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
+        relocate("io.ktor", "skytils.ktor")
+        relocate("kotlinx.serialization", "skytils.ktx-serialization")
 
         exclude(
             "**/LICENSE.md",

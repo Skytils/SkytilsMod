@@ -17,14 +17,21 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.jsonPrimitive
 import net.minecraft.item.ItemStack
-import skytils.hylin.skyblock.bazaar.BazaarProduct
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.gson
+import skytils.skytilsmod.Skytils.Companion.client
+import skytils.skytilsmod.Skytils.Companion.json
 import skytils.skytilsmod.core.Config
-import skytils.skytilsmod.utils.APIUtil
 import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.PetInfo
+import skytils.skytilsmod.utils.toStringIfTrue
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.javaField
 
@@ -39,30 +46,33 @@ class AuctionData {
             var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
             when (id) {
                 "PET" -> if (extraAttr.hasKey("petInfo")) {
-                    val petInfo = gson.fromJson(extraAttr.getString("petInfo"), JsonObject::class.java)
-                    if (petInfo.has("type") && petInfo.has("tier")) {
-                        id = "PET-" + petInfo["type"].asString + "-" + petInfo["tier"].asString
-                    }
+                    val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
+                    id = "PET-${petInfo.type}-${petInfo.tier}"
                 }
                 "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
                     val enchants = extraAttr.getCompoundTag("enchantments")
                     val enchant = enchants.keySet.firstOrNull()
                     if (enchant != null) {
-                        id = "ENCHANTED_BOOK-" + enchant.uppercase() + "-" + enchants.getInteger(enchant)
+                        id = "ENCHANTED_BOOK-${enchant.uppercase()}-${enchants.getInteger(enchant)}"
                     }
                 }
                 "POTION" -> if (extraAttr.hasKey("potion") && extraAttr.hasKey("potion_level")) {
-                    id = "POTION-" + extraAttr.getString("potion")
-                        .uppercase() + "-" + extraAttr.getInteger("potion_level") + (if (extraAttr.hasKey("enhanced")) "-ENHANCED" else "") + (if (extraAttr.hasKey(
-                            "extended"
+                    id = "POTION-${
+                        extraAttr.getString("potion")
+                            .uppercase()
+                    }-${extraAttr.getInteger("potion_level")}${"-ENHANCED".toStringIfTrue(extraAttr.hasKey("enhanced"))}${
+                        "-EXTENDED".toStringIfTrue(
+                            extraAttr.hasKey(
+                                "extended"
+                            )
                         )
-                    ) "-EXTENDED" else "") + if (extraAttr.hasKey("splash")) "-SPLASH" else ""
+                    }${"-SPLASH".toStringIfTrue(extraAttr.hasKey("splash"))}"
                 }
                 "RUNE" -> if (extraAttr.hasKey("runes")) {
                     val runes = extraAttr.getCompoundTag("runes")
                     val rune = runes.keySet.firstOrNull()
                     if (rune != null) {
-                        id = "RUNE-" + rune.uppercase() + "-" + runes.getInteger(rune)
+                        id = "RUNE-${rune.uppercase()}-${runes.getInteger(rune)}"
                     }
                 }
             }
@@ -76,9 +86,10 @@ class AuctionData {
         }
         fixedRateTimer(name = "Skytils-FetchAuctionData", period = 60 * 1000L) {
             if (Skytils.config.fetchLowestBINPrices) {
-                val data = APIUtil.getJSONResponse(dataURL)
-                for ((key, value) in data.entrySet()) {
-                    lowestBINs[key] = value.asDouble
+                Skytils.IO.launch {
+                    client.get(dataURL).body<JsonObject>().forEach { itemId, price ->
+                        lowestBINs[itemId] = price.jsonPrimitive.double
+                    }
                 }
             }
         }
