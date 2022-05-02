@@ -18,6 +18,7 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
@@ -54,7 +55,7 @@ class IcePathSolver {
                 if (silverfish.size > 0) {
                     Companion.silverfish = silverfish[0]
                     if (silverfishChestPos == null || roomFacing == null) {
-                        Skytils.threadPool.submit {
+                        Skytils.launch {
                             findChest@ for (te in mc.theWorld.loadedTileEntityList) {
                                 val playerX = mc.thePlayer.posX.toInt()
                                 val playerZ = mc.thePlayer.posZ.toInt()

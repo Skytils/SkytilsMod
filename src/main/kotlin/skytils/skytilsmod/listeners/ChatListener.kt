@@ -18,8 +18,8 @@
 package skytils.skytilsmod.listeners
 
 import gg.essential.universal.UChat
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -55,11 +55,11 @@ class ChatListener {
                 if (matcher.find()) {
                     lastPartyDisbander = matcher.group(1)
                     println("Party disbanded by $lastPartyDisbander")
-                    Skytils.threadPool.submit {
-                        if (Skytils.config.autoRepartyTimeout == 0) return@submit
+                    Skytils.launch {
+                        if (Skytils.config.autoRepartyTimeout == 0) return@launch
                         try {
                             println("waiting for timeout")
-                            Thread.sleep(Skytils.config.autoRepartyTimeout * 1000L)
+                            delay(Skytils.config.autoRepartyTimeout * 1000L)
                             lastPartyDisbander = ""
                             println("cleared last party disbander")
                         } catch (_: Exception) {
