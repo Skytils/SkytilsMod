@@ -17,7 +17,15 @@
  */
 package skytils.skytilsmod.utils
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C01PacketChatMessage
@@ -29,7 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import skytils.skytilsmod.Skytils
-import skytils.skytilsmod.Skytils.Companion.gson
+import skytils.skytilsmod.Skytils.Companion.json
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -59,7 +67,7 @@ object SBInfo {
     private var lastManualLocRaw: Long = -1
     private var lastLocRaw: Long = -1
     private var joinedWorld: Long = -1
-    private var locraw: JsonObject? = null
+    private var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
     @SubscribeEvent
@@ -96,17 +104,13 @@ object SBInfo {
             val unformatted = event.packet.chatComponent.unformattedText
             if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
                 try {
-                    val obj = gson.fromJson(unformatted, JsonObject::class.java)
-                    if (obj.has("server")) {
-                        if (System.currentTimeMillis() - lastManualLocRaw > 5000) {
-                            Utils.cancelChatPacket(event)
-                        }
-                        if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
-                            locraw = obj
-                            mode = locraw!!["mode"].asString
-                        }
+                    val obj = json.decodeFromString<LocrawObject>(unformatted)
+                    if (System.currentTimeMillis() - lastManualLocRaw > 5000) {
+                        Utils.cancelChatPacket(event)
                     }
-                } catch (e: Exception) {
+                    locraw = obj
+                    mode = obj.mode
+                } catch (e: SerializationException) {
                     e.printStackTrace()
                 }
             }
@@ -178,5 +182,24 @@ enum class SkyblockIsland(val formattedName: String, val mode: String) {
     DungeonHub("Dungeon Hub", "dungeon_hub"),
     Hub("Hub", "hub"),
     DarkAuction("Dark Auction", "dark_auction"),
-    JerryWorkshop("Jerry's Workshop", "winter")
+    JerryWorkshop("Jerry's Workshop", "winter");
+
+    object ModeSerializer : KSerializer<SkyblockIsland> {
+        override val descriptor: SerialDescriptor =
+            PrimitiveSerialDescriptor("SkyblockIsland", PrimitiveKind.STRING)
+
+        override fun deserialize(decoder: Decoder): SkyblockIsland =
+            decoder.decodeString().let { s -> values().first { it.mode == s } }
+
+        override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
+    }
 }
+
+
+@Serializable
+data class LocrawObject(
+    val server: String,
+    val gametype: String = "unknown",
+    val mode: String = "unknown",
+    val map: String = "unknown"
+)

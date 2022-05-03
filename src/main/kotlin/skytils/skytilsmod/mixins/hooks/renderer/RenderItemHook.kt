@@ -80,8 +80,8 @@ fun renderItemPre(stack: ItemStack, model: IBakedModel, ci: CallbackInfo) {
 fun modifyGlintRendering(stack: ItemStack, model: IBakedModel, ci: CallbackInfo) {
     if (Utils.inSkyblock) {
         val itemId = getSkyBlockItemID(stack)
-        if (GlintCustomizer.glintColors.containsKey(itemId)) {
-            val color = GlintCustomizer.glintColors[itemId]!!.toInt()
+        GlintCustomizer.glintItems[itemId]?.color?.let {
+            val color = it.toInt()
             GlStateManager.depthMask(false)
             GlStateManager.depthFunc(514)
             GlStateManager.disableLighting()

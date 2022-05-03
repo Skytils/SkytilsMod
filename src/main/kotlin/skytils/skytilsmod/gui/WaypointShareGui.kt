@@ -18,10 +18,6 @@
 
 package skytils.skytilsmod.gui
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
@@ -37,9 +33,12 @@ import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
-import net.minecraft.util.BlockPos
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.apache.commons.codec.binary.Base64
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.json
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.handlers.Waypoint
 import skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -51,9 +50,6 @@ import java.awt.Color
 
 class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
-    companion object {
-        private val gson: Gson = GsonBuilder().create()
-    }
 
     private val scrollComponent: ScrollComponent
 
@@ -141,28 +137,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         runCatching {
             val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
 
-            val arr = gson.fromJson(decoded, JsonArray::class.java)
-            val results = arr.mapNotNull { e ->
-                return@mapNotNull runCatching {
-                    e as JsonObject
-                    return@runCatching Waypoint(
-                        e["name"].asString,
-                        BlockPos(
-                            e["x"].asInt,
-                            e["y"].asInt,
-                            e["z"].asInt
-                        ),
-                        SkyblockIsland.values().find {
-                            it.mode == e["island"].asString
-                        } ?: return@mapNotNull null,
-                        e["enabled"].asBoolean,
-                        e["color"]?.let { Color(it.asInt) } ?: Color.RED,
-                        System.currentTimeMillis()
-                    )
-                }.onFailure {
-                    it.printStackTrace()
-                }.getOrNull()
-            }
+            // TODO add some kind of exception handling for malformed data
+            val results = json.decodeFromString<List<Waypoint>>(decoded)
             Waypoints.waypoints.addAll(results)
             PersistentSave.markDirty<Waypoints>()
             loadWaypointsForSelection(islandDropdown.getValue())
@@ -177,30 +153,17 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun exportSelectedWaypoints() {
         val island = SkyblockIsland.values()[islandDropdown.getValue()]
-
-        val arr = JsonArray()
-        entries.values.filter {
+        // use the default json encoder because it won't pretty print
+        val exporting = entries.values.filter {
             it.selected.checked
-        }.forEach {
-            runCatching {
-                arr.add(JsonObject().apply {
-                    addProperty("name", it.name.getText())
-                    addProperty("x", it.x.getText().toInt())
-                    addProperty("y", it.y.getText().toInt())
-                    addProperty("z", it.z.getText().toInt())
-                    addProperty("island", island.mode)
-                    addProperty("enabled", true)
-                    addProperty("color", Color.RED.rgb)
-                })
-            }.onFailure {
-                it.printStackTrace()
-            }
+        }.map {
+            it.waypoint
         }
-        setClipboardString(Base64.encodeBase64String(gson.toJson(arr).encodeToByteArray()))
+        setClipboardString(Base64.encodeBase64String(Json.encodeToString(exporting).encodeToByteArray()))
         EssentialAPI.getNotifications()
             .push(
                 "Waypoints Exported",
-                "${arr.size()} ${island.formattedName} waypoints were copied to your clipboard!",
+                "${exporting.size} ${island.formattedName} waypoints were copied to your clipboard!",
                 2.5f
             )
     }
@@ -212,11 +175,11 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         Waypoints.waypoints.filter {
             it.island == island
         }.sortedBy { "${it.name} ${it.pos} ${it.enabled}" }.forEach {
-            addNewWaypoint(it.name, it.pos, it.enabled)
+            addNewWaypoint(it)
         }
     }
 
-    private fun addNewWaypoint(name: String = "", pos: BlockPos = mc.thePlayer.position, selected: Boolean = false) {
+    private fun addNewWaypoint(waypoint: Waypoint) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -224,32 +187,32 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val selected = CheckboxComponent(selected).childOf(container).constrain {
+        val selected = CheckboxComponent(waypoint.enabled).childOf(container).constrain {
             x = 7.5.pixels()
             y = CenterConstraint()
         }
 
-        val nameComponent = UIText(name).childOf(container).constrain {
+        val nameComponent = UIText(waypoint.name).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        val xComponent = UIText(pos.x.toString()).childOf(container).constrain {
+        val xComponent = UIText(waypoint.pos.x.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        val yComponent = UIText(pos.y.toString()).childOf(container).constrain {
+        val yComponent = UIText(waypoint.pos.y.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        val zComponent = UIText(pos.z.toString()).childOf(container).constrain {
+        val zComponent = UIText(waypoint.pos.z.toString()).childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
         }
 
-        entries[container] = Entry(selected, nameComponent, xComponent, yComponent, zComponent)
+        entries[container] = Entry(selected, nameComponent, xComponent, yComponent, zComponent, waypoint)
     }
 
 
@@ -263,6 +226,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         val name: UIText,
         val x: UIText,
         val y: UIText,
-        val z: UIText
+        val z: UIText,
+        val waypoint: Waypoint
     )
 }

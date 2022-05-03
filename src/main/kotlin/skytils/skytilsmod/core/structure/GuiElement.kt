@@ -21,9 +21,7 @@ import gg.essential.universal.UResolution
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 
-abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
-    var pos: FloatPair
-
+abstract class GuiElement(var name: String, var scale: Float, var pos: FloatPair) {
     @JvmOverloads
     constructor(name: String, fp: FloatPair = FloatPair(0, 0)) : this(name, 1.0f, fp)
 
@@ -63,7 +61,7 @@ abstract class GuiElement(var name: String, var scale: Float, fp: FloatPair) {
     }
 
     init {
-        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, fp)
+        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, pos)
         scale = GuiManager.GUISCALES.getOrDefault(name, scale)
     }
 }

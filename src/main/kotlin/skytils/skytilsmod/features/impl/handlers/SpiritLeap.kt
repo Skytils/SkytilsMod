@@ -18,7 +18,9 @@
 
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
@@ -37,8 +39,8 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.stripControlCodes
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import java.util.*
 
 class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
@@ -137,43 +139,31 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         nameSlotCache.clear()
     }
 
-    override fun read(reader: InputStreamReader) {
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        for (entry in obj["classes"].asJsonObject.entrySet()) {
-            classes[DungeonClass.getClassFromName(entry.key)] =
-                entry.value.asJsonObject["enabled"].asBoolean
-        }
-        for (entry in obj["users"].asJsonObject.entrySet()) {
-            names[entry.key] =
-                entry.value.asJsonObject["enabled"].asBoolean
+    @Serializable
+    private data class SaveData(val users: Map<String, SaveComponent>, val classes: Map<DungeonClass, SaveComponent>)
+
+    @Serializable
+    private data class SaveComponent(val enabled: Boolean)
+
+    override fun read(reader: Reader) {
+        val data = json.decodeFromString<SaveData>(reader.readText())
+        names.putAll(data.users.entries.associate { it.key to it.value.enabled })
+        data.classes.forEach { (clazz, state) ->
+            classes[clazz] = state.enabled
         }
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        val classes = JsonObject()
-        for (dClass in Companion.classes) {
-            val classObj = JsonObject()
-            classObj.addProperty("enabled", dClass.value)
-            classes.add(dClass.key.name, classObj)
-        }
-
-        val users = JsonObject()
-        for (name in names) {
-            val userObj = JsonObject()
-            userObj.addProperty("enabled", name.value)
-            users.add(name.key, userObj)
-        }
-
-        obj.add("classes", classes)
-        obj.add("users", users)
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(
+            json.encodeToString(
+                SaveData(
+                    names.entries.associate { it.key to SaveComponent(it.value) },
+                    classes.entries.associate { it.key to SaveComponent(it.value) })
+            )
+        )
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        val e = JsonObject()
-        e.add("classes", JsonObject())
-        e.add("users", JsonObject())
-        gson.toJson(e, writer)
+    override fun setDefault(writer: Writer) {
+        write(writer)
     }
 }

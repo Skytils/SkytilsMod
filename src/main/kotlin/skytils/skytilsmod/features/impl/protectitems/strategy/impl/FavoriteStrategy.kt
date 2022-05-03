@@ -18,6 +18,8 @@
 
 package skytils.skytilsmod.features.impl.protectitems.strategy.impl
 
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import skytils.skytilsmod.Skytils
@@ -25,8 +27,8 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 object FavoriteStrategy : ItemProtectStrategy() {
     val favoriteItems = hashSetOf<String>()
@@ -40,17 +42,16 @@ object FavoriteStrategy : ItemProtectStrategy() {
     override val isToggled: Boolean = true
 
     object FavoriteStrategySave : PersistentSave(File(Skytils.modDir, "favoriteitems.json")) {
-        override fun read(reader: InputStreamReader) {
-            favoriteItems.addAll(gson.fromJson<HashSet<String>>(reader, HashSet::class.java)!!)
+        override fun read(reader: Reader) {
+            favoriteItems.addAll(json.decodeFromString(reader.readText()))
         }
 
-        override fun write(writer: OutputStreamWriter) {
-            gson.toJson(favoriteItems, writer)
+        override fun write(writer: Writer) {
+            writer.write(json.encodeToString(favoriteItems))
         }
 
-        override fun setDefault(writer: OutputStreamWriter) {
+        override fun setDefault(writer: Writer) {
             writer.write("[]")
         }
-
     }
 }

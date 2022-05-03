@@ -37,8 +37,8 @@ fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
         val extraAttr = getExtraAttributes(this)
         if (extraAttr != null) {
             val itemId = getSkyBlockItemID(extraAttr)
-            if (GlintCustomizer.overrides.containsKey(itemId)) {
-                cir.returnValue = GlintCustomizer.overrides[itemId]
+            GlintCustomizer.glintItems[itemId]?.override?.let {
+                cir.returnValue = it
                 return
             }
             if (Skytils.config.enchantGlintFix) {
@@ -48,7 +48,7 @@ fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
                 }
             }
         }
-        if (tagCompound != null && tagCompound.hasKey("SkytilsForceGlint")) {
+        if (tagCompound?.hasKey("SkytilsForceGlint") == true) {
             cir.returnValue = tagCompound.getBoolean("SkytilsForceGlint")
         }
     }

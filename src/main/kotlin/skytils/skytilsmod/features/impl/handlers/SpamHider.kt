@@ -17,15 +17,11 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import gg.essential.vigilance.data.PropertyItem
 import gg.essential.vigilance.data.PropertyType
-import kotlinx.serialization.EncodeDefault
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.init.Blocks
@@ -55,56 +51,51 @@ import skytils.skytilsmod.utils.stripControlCodes
 import skytils.skytilsmod.utils.toasts.*
 import skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
-    override fun read(reader: InputStreamReader) {
+    @Serializable
+    private data class SpamHiderSave(
+        val default: Map<String, RepoFilterSave>,
+        val filter: Map<String, Filter>
+    )
+
+    @Serializable
+    private data class RepoFilterSave(
+        val state: Int,
+        val name: String
+    )
+
+    override fun read(reader: Reader) {
         filters.clear()
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        if (!obj["default"].isJsonNull) {
-            obj["default"].asJsonObject.entrySet().forEach { element ->
-                repoFilters.find { it.name == element.key }?.state = element.value.asJsonObject["state"].asInt
-            }
+        val obj = json.decodeFromString<SpamHiderSave>(reader.readText())
+        obj.default.forEach { k, v ->
+            repoFilters.find { it.name == k }?.state = v.state
         }
-        if (!obj["filter"].isJsonNull) {
-            val adapter = gson.getAdapter(Filter::class.java)
-            obj["filter"].asJsonObject.entrySet().forEach { element ->
-                filters.add(adapter.fromJsonTree(element.value))
-            }
-        }
+        filters.addAll(obj.filter.values)
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        val defaultObj = JsonObject()
-        repoFilters.forEach {
-            @Suppress("SENSELESS_COMPARISON")
-            if (it == null) return@forEach
-            val json = JsonObject()
-            json.addProperty("name", it.name)
-            json.addProperty("state", it.state)
-            defaultObj.add(it.name, json)
-        }
-        obj.add("default", defaultObj)
-        val filterObj = JsonObject()
-        val adapter = gson.getAdapter(Filter::class.java)
-        filters.forEach {
-            filterObj.add(it.name, adapter.toJsonTree(it))
-        }
-        obj.add("filter", filterObj)
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(SpamHiderSave(
+            default = repoFilters.associate { it.name to RepoFilterSave(it.state, it.name) },
+            filter = filters.associate { it.name to it }
+        )))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        obj.add("default", JsonObject())
-        obj.add("filter", JsonObject())
-        gson.toJson(obj, writer)
+    override fun setDefault(writer: Writer) {
+        writer.write(
+            json.encodeToString(
+                SpamHiderSave(
+                    default = emptyMap(),
+                    filter = emptyMap()
+                )
+            )
+        )
     }
 
     @Serializable

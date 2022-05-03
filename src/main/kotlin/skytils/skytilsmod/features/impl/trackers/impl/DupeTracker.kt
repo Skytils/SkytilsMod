@@ -22,6 +22,8 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -41,8 +43,8 @@ import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.printDevMessage
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import kotlin.concurrent.fixedRateTimer
 
 object DupeTracker : Tracker("duped_items") {
@@ -172,15 +174,15 @@ object DupeTracker : Tracker("duped_items") {
         dirtyUUIDs.clear()
     }
 
-    override fun read(reader: InputStreamReader) {
-        dupedUUIDs.addAll(gson.fromJson<List<IdentifiableItem>>(reader, List::class.java))
+    override fun read(reader: Reader) {
+        dupedUUIDs.addAll(json.decodeFromString<List<IdentifiableItem>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        gson.toJson(dupedUUIDs, Set::class.java, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(dupedUUIDs))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
+    override fun setDefault(writer: Writer) {
         writer.write("[]")
     }
 

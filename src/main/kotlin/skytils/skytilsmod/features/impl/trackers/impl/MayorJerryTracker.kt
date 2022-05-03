@@ -18,8 +18,10 @@
 
 package skytils.skytilsmod.features.impl.trackers.impl
 
-import com.google.gson.JsonObject
 import gg.essential.universal.UResolution
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,8 +34,8 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import skytils.skytilsmod.utils.stripControlCodes
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 object MayorJerryTracker : Tracker("mayorjerry") {
 
@@ -125,33 +127,35 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         JerryBoxDrops.values().onEach { it.droppedAmount = 0L }
     }
 
-    override fun read(reader: InputStreamReader) {
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        for (entry in obj.get("jerry").asJsonObject.entrySet()) {
-            (HiddenJerry.getFromType(entry.key) ?: continue).discoveredTimes = entry.value.asLong
+    // TODO: 5/3/2022  Redo this entire thing
+    @Serializable
+    private data class TrackerSave(
+        val jerry: Map<HiddenJerry, Long>,
+        val drops: Map<JerryBoxDrops, Long>
+    )
+
+    override fun read(reader: Reader) {
+        val save = json.decodeFromString<TrackerSave>(reader.readText())
+        HiddenJerry.values().forEach {
+            it.discoveredTimes = save.jerry[it] ?: 0L
         }
-        for (entry in obj.get("drops").asJsonObject.entrySet()) {
-            (JerryBoxDrops.getFromName(entry.key) ?: continue).droppedAmount = entry.value.asLong
+        JerryBoxDrops.values().forEach {
+            it.droppedAmount = save.drops[it] ?: 0L
         }
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-
-        val jerryObj = JsonObject()
-        for (jerry in HiddenJerry.values()) {
-            jerryObj.addProperty(jerry.type, jerry.discoveredTimes)
-        }
-        obj.add("jerry", jerryObj)
-        val boxLoot = JsonObject()
-        for (loot in JerryBoxDrops.values()) {
-            boxLoot.addProperty(loot.dropName, loot.droppedAmount)
-        }
-        obj.add("drops", boxLoot)
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(
+            json.encodeToString(
+                TrackerSave(
+                    HiddenJerry.values().associateWith(HiddenJerry::discoveredTimes),
+                    JerryBoxDrops.values().associateWith(JerryBoxDrops::droppedAmount)
+                )
+            )
+        )
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
+    override fun setDefault(writer: Writer) {
         write(writer)
     }
 
