@@ -21,11 +21,10 @@ package skytils.skytilsmod.utils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
+import net.minecraft.util.BlockPos
+import java.awt.Color
 
 private typealias NonDashedUUID = String
 private typealias MobName = String
@@ -95,4 +94,51 @@ object RegexAsString : KSerializer<Regex> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Regex", PrimitiveKind.STRING)
     override fun deserialize(decoder: Decoder): Regex = Regex(decoder.decodeString())
     override fun serialize(encoder: Encoder, value: Regex) = encoder.encodeString(value.pattern)
+}
+
+object BlockPosCSV : KSerializer<BlockPos> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BlockPos", PrimitiveKind.STRING)
+    override fun deserialize(decoder: Decoder): BlockPos = decoder.decodeString().split(',').let {
+        BlockPos(it[0].toInt(), it[1].toInt(), it[2].toInt())
+    }
+
+    override fun serialize(encoder: Encoder, value: BlockPos) = encoder.encodeString("${value.x},${value.y},${value.z}")
+}
+
+object IntColorSerializer : KSerializer<Color> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.INT)
+    override fun deserialize(decoder: Decoder): Color = Color(decoder.decodeInt(), true)
+    override fun serialize(encoder: Encoder, value: Color) = encoder.encodeInt(value.rgb)
+}
+
+object BlockPosObjectSerializer : KSerializer<BlockPos> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("BlockPos") {
+        element<Int>("x")
+        element<Int>("y")
+        element<Int>("z")
+    }
+
+    override fun serialize(encoder: Encoder, value: BlockPos) =
+        encoder.encodeStructure(descriptor) {
+            encodeIntElement(descriptor, 0, value.x)
+            encodeIntElement(descriptor, 1, value.y)
+            encodeIntElement(descriptor, 2, value.z)
+        }
+
+    override fun deserialize(decoder: Decoder): BlockPos =
+        decoder.decodeStructure(descriptor) {
+            var x = -1
+            var y = -1
+            var z = -1
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    0 -> x = decodeIntElement(descriptor, 0)
+                    1 -> y = decodeIntElement(descriptor, 1)
+                    2 -> z = decodeIntElement(descriptor, 2)
+                    CompositeDecoder.DECODE_DONE -> break
+                    else -> error("Unexpected index: $index")
+                }
+            }
+            BlockPos(x, y, z)
+        }
 }

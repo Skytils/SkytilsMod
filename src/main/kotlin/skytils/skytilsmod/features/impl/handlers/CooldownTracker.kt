@@ -18,7 +18,8 @@
 
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,10 +36,9 @@ import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import kotlin.math.floor
-import kotlin.time.ExperimentalTime
 
 class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.json")) {
 
@@ -68,7 +68,6 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
 
     class CooldownDisplayElement : GuiElement("Item Cooldown Display", FloatPair(10, 10)) {
 
-        @OptIn(ExperimentalTime::class)
         override fun render() {
             if (Utils.inSkyblock && toggled) {
                 cooldowns.entries.removeAll {
@@ -112,30 +111,23 @@ class CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.jso
         }
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         itemCooldowns.clear()
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        for ((key, value) in obj.entrySet()) {
-            itemCooldowns[key] = value.asDouble
-        }
+        itemCooldowns.putAll(json.decodeFromString<Map<String, Double>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        for ((key, value) in itemCooldowns) {
-            obj.addProperty(key, value)
-        }
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(itemCooldowns))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
 
     companion object {
         var cooldownReduction = 0.0
-        val itemCooldowns = mutableMapOf<String, Double>()
-        val cooldowns = mutableMapOf<String, Long>()
+        val itemCooldowns = hashMapOf<String, Double>()
+        val cooldowns = hashMapOf<String, Long>()
 
         fun updateCooldownReduction() {
             val mages = DungeonListener.team.values.filter { it.dungeonClass == DungeonClass.MAGE }

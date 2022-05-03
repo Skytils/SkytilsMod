@@ -48,9 +48,8 @@ fun replaceArmorGlint(
         if (Utils.inSkyblock) {
             val itemstack = entitylivingbaseIn.getCurrentArmor(armorSlot - 1)
             val itemId = getSkyBlockItemID(itemstack)
-            if (GlintCustomizer.glintColors.containsKey(itemId)) {
+            GlintCustomizer.glintItems[itemId]?.color?.let { color ->
                 ci.cancel()
-                val color = GlintCustomizer.glintColors[itemId]
                 val f = entitylivingbaseIn.ticksExisted.toFloat() + partialTicks
                 rendererLivingEntity.bindTexture(ENCHANTED_ITEM_GLINT_RES)
                 GlStateManager.enableBlend()
@@ -64,7 +63,7 @@ fun replaceArmorGlint(
                     GlStateManager.blendFunc(768, 1)
                     val f2 = 0.76f
                     //GlStateManager.color(0.5F * f2, 0.25F * f2, 0.8F * f2, 1.0F);
-                    color!!.applyColor()
+                    color.applyColor()
                     GlStateManager.matrixMode(5890)
                     GlStateManager.loadIdentity()
                     val f3 = 0.33333334f

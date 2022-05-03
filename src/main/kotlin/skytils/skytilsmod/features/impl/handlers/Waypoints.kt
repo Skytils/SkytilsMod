@@ -17,11 +17,10 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
+import kotlinx.serialization.*
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,8 +29,8 @@ import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.*
 import java.awt.Color
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
 
@@ -45,47 +44,18 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         }
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         waypoints.clear()
-        val arr = gson.fromJson(reader, JsonArray::class.java)
-        arr.mapNotNullTo(waypoints) { e ->
-            e as JsonObject
-            Waypoint(
-                e["name"].asString,
-                BlockPos(
-                    e["x"].asInt,
-                    e["y"].asInt,
-                    e["z"].asInt
-                ),
-                SkyblockIsland.values().find {
-                    it.mode == e["island"].asString
-                } ?: return@mapNotNullTo null,
-                e["enabled"].asBoolean,
-                e["color"]?.let { Color(it.asInt, true) } ?: Color.RED,
-                e["addedAt"]?.asLong ?: System.currentTimeMillis()
-            )
-        }
+        // TODO: check to see if it will throw an exception if any waypoint is blazing fortress
+        waypoints.addAll(json.decodeFromString<List<Waypoint>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val arr = JsonArray()
-        waypoints.forEach {
-            arr.add(JsonObject().apply {
-                addProperty("name", it.name)
-                addProperty("x", it.pos.x)
-                addProperty("y", it.pos.y)
-                addProperty("z", it.pos.z)
-                addProperty("island", it.island.mode)
-                addProperty("enabled", it.enabled)
-                addProperty("color", it.color.rgb)
-                addProperty("addedAt", it.addedAt)
-            })
-        }
-        gson.toJson(arr, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(waypoints))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonArray(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
     }
 
     companion object {
@@ -94,13 +64,20 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     }
 }
 
-data class Waypoint(
+@Serializable
+data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
     var name: String,
+    @Serializable(with = BlockPosObjectSerializer::class)
     var pos: BlockPos,
+    @Serializable(with = SkyblockIsland.ModeSerializer::class)
     var island: SkyblockIsland,
-    var enabled: Boolean,
-    val color: Color,
-    val addedAt: Long
+    @EncodeDefault
+    var enabled: Boolean = true,
+    @Serializable(with = IntColorSerializer::class)
+    @EncodeDefault
+    var color: Color = Color.RED,
+    @EncodeDefault
+    val addedAt: Long = System.currentTimeMillis()
 ) {
     fun draw(partialTicks: Float, matrixStack: UMatrixStack) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)

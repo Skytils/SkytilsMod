@@ -17,61 +17,43 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import java.io.*
+import java.io.File
+import java.io.Reader
+import java.io.Writer
 
 class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")) {
 
-    override fun read(reader: InputStreamReader) {
-        overrides.clear()
-        glintColors.clear()
-        for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
-            val entry = value.asJsonObject
-            if (entry.has("override")) {
-                overrides[key] = entry["override"].asBoolean
-            }
-            if (entry.has("color")) {
-                val color = Utils.customColorFromString(entry["color"].asString)
-                glintColors[key] = color
-            }
-        }
+    override fun read(reader: Reader) {
+        glintItems.clear()
+        glintItems.putAll(json.decodeFromString<Map<String, CustomGlint>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        for ((key, value) in overrides) {
-            val child = JsonObject()
-            child.add("override", JsonPrimitive(value))
-            obj.add(key, child)
+    override fun write(writer: Writer) {
+        glintItems.entries.removeAll { (_, glint) ->
+            glint.override == null && glint.color == null
         }
-        for ((key, value) in glintColors) {
-            val stringValue = value.toString()
-            if (obj.has(key)) {
-                obj[key].asJsonObject.addProperty("color", stringValue)
-                continue
-            }
-            val child = JsonObject()
-            child.add("color", JsonPrimitive(stringValue))
-            obj.add(key, child)
-        }
-        gson.toJson(obj, writer)
+        writer.write(json.encodeToString(glintItems))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
+
+    @Serializable
+    data class CustomGlint(
+        var override: Boolean?,
+        @Serializable(with = CustomColor.Serializer::class)
+        var color: CustomColor?
+    )
 
     companion object {
-
         @JvmField
-        val overrides = HashMap<String, Boolean>()
-
-        @JvmField
-        val glintColors = HashMap<String, CustomColor>()
+        val glintItems = HashMap<String, CustomGlint>()
     }
 }
