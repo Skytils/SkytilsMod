@@ -288,8 +288,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             // Sort the categories by their highest value, and then add the waypoints in each category sorted by their values
             Waypoints.categories.sortedWith { a, b ->
                 comparator.compare(
-                    a.waypoints.sortedWith(comparator).firstOrNull(),
-                    b.waypoints.sortedWith(comparator).firstOrNull()
+                    a.waypoints.maxWithOrNull(comparator) ?: return@sortedWith 0,
+                    b.waypoints.maxWithOrNull(comparator) ?: return@sortedWith 0
                 )
             }.filter {
                 it.island == island
@@ -482,10 +482,18 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             // Remove this waypoint from its old category and make it a child of the Window so it can be freely moved around
             // prevent the container's width from changing when it is removed from the container
             val absoluteWidth = container.getWidth()
+            val absoluteHeight = container.getHeight()
             container.setWidth(absoluteWidth.pixels())
             currentCategory.container.removeChild(container)
             currentCategory.children.remove(container)
             window.addChild(container)
+            val offsetX = getLeft() - container.getRight() + event.relativeX
+            val offsetY = getTop() - container.getBottom() + event.relativeY
+            Window.enqueueRenderOperation {
+                // This prevents an edge case where the waypoint would appear almost off the screen
+                container.setX(basicXConstraint { event.absoluteX - absoluteWidth - offsetX })
+                container.setY(basicYConstraint { event.absoluteY - absoluteHeight - offsetY })
+            }
         }.onMouseDrag { mouseX, mouseY, _ ->
             val entry = entries[container] ?: throwNoEntryFoundError()
             if (!entry.isDragging) return@onMouseDrag
@@ -498,8 +506,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
             entry.lastDragPos = absX to absY
 
-            val newX = container.getLeft() + dx
-            val newY = container.getTop() + dy
+            val newX = entry.container.getLeft() + dx
+            val newY = entry.container.getTop() + dy
             container.setX(newX.pixels)
             container.setY(newY.pixels)
 
@@ -652,7 +660,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         val z: UITextInput,
         val color: ColorComponent,
         val addedAt: Long,
-        var isDragging: Boolean = true,
+        var isDragging: Boolean = false,
         var lastDragPos: Pair<Float, Float>? = null,
         var previousCategory: Category? = null
     ) {
@@ -707,15 +715,15 @@ private class MoveComponent : UIContainer() {
     init {
 
         constrain {
-            width = 10.pixels()
-            height = 12.pixels()
+            width = 12.pixels()
+            height = 10.pixels()
         }
 
         for (i in 0..2)
             UIBlock().constrain {
-                y = (3.5 * i).pixels()
-                x = 0.pixels()
-                width = 100.percent()
+                y = (1.0 + 3.5 * i).pixels()
+                x = 1.pixels()
+                width = 10.pixels()
                 height = 1.pixels()
             } childOf this
     }
