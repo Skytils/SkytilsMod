@@ -20,15 +20,13 @@ package skytils.skytilsmod.gui
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.ScrollComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.components.Window
+import gg.essential.elementa.components.*
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.vigilance.gui.VigilancePalette
 import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
@@ -394,6 +392,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         return category
     }
 
+    private var lastHoveredCategory: Category? = null
+
     private fun addNewWaypoint(
         category: Category,
         name: String = "",
@@ -469,6 +469,89 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             }
         }
 
+        MoveComponent().childOf(container).constrain {
+            x = 5.pixels(alignOpposite = true)
+            y = CenterConstraint()
+        }.onMouseClick { event ->
+            val entry = entries[container] ?: throwNoEntryFoundError()
+            val currentCategory = categoryContainers[container.parent] ?: return@onMouseClick
+            entry.isDragging = true
+            entry.lastDragPos = event.absoluteX to event.absoluteY
+            entry.previousCategory = currentCategory
+
+            // Remove this waypoint from its old category and make it a child of the Window so it can be freely moved around
+            // prevent the container's width from changing when it is removed from the container
+            val absoluteWidth = container.getWidth()
+            container.setWidth(absoluteWidth.pixels())
+            currentCategory.container.removeChild(container)
+            currentCategory.children.remove(container)
+            window.addChild(container)
+        }.onMouseDrag { mouseX, mouseY, _ ->
+            val entry = entries[container] ?: throwNoEntryFoundError()
+            if (!entry.isDragging) return@onMouseDrag
+            val (startX, startY) = entry.lastDragPos ?: return@onMouseDrag
+
+            val absX = mouseX + getLeft()
+            val absY = mouseY + getTop()
+            val dx = absX - startX
+            val dy = absY - startY
+
+            entry.lastDragPos = absX to absY
+
+            val newX = container.getLeft() + dx
+            val newY = container.getTop() + dy
+            container.setX(newX.pixels)
+            container.setY(newY.pixels)
+
+            // If the mouse is hovered over a new category, create a placeholder that would be replaced
+            // with the waypoint if the mouse were to be released.
+            val hovered = categoryContainers.entries.firstOrNull { it.key.isHovered() }?.value ?: return@onMouseDrag
+            lastHoveredCategory = hovered
+
+            for (categoryObj in categoryContainers.values) {
+                if (categoryObj.dragGuideElement != null && hovered != categoryObj) {
+                    // Remove drag placeholder objects that don't belong to the currently hovered category.
+                    categoryObj.container.removeChild(categoryObj.dragGuideElement!!)
+                    categoryObj.dragGuideElement = null
+                }
+            }
+
+            if (hovered.dragGuideElement == null) {
+                hovered.dragGuideElement = UIBlock(VigilancePalette.getSuccess()).constrain {
+                    x = 0.pixels()
+                    y = SiblingConstraint(5f)
+                    width = 100.percent()
+                    height = 4.pixels()
+                }.childOf(hovered.container)
+            }
+        }.onMouseRelease {
+            val entry = entries[container] ?: throwNoEntryFoundError()
+            if (!entry.isDragging || entry.previousCategory == null || lastHoveredCategory == null) return@onMouseRelease
+            entry.isDragging = false
+            entry.lastDragPos = null
+
+            val newCategory = lastHoveredCategory!!
+            // Remove the container as a child of the Window because it will be added to a UIContainer below:
+            Window.enqueueRenderOperation { // This all must be run during the next frame so that we don't modify children while iterating over them.
+                window.removeChild(container)
+                if (newCategory.dragGuideElement != null) {
+                    // Remove the dragging guide because the drag has ended
+                    newCategory.container.removeChild(newCategory.dragGuideElement!!)
+                    newCategory.dragGuideElement = null
+                }
+                // Add the waypoint to the category that it was dragged to
+                newCategory.container.addChild(container)
+                newCategory.children.add(container)
+                // Set it back to its original constraints so it fits back into the category
+                container.constrain {
+                    x = CenterConstraint()
+                    y = SiblingConstraint(5f)
+                    width = 95.percent()
+                }
+                entry.previousCategory = null
+            }
+        }
+
         // When pressing the TAB key, cycle between the different input fields.
         nameComponent.setTabTarget(xComponent)
         xComponent.setTabTarget(yComponent)
@@ -477,7 +560,17 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
         category.children.add(container)
         entries[container] =
-            Entry(category, enabled, nameComponent, xComponent, yComponent, zComponent, colorComponent, addedAt)
+            Entry(
+                category,
+                container,
+                enabled,
+                nameComponent,
+                xComponent,
+                yComponent,
+                zComponent,
+                colorComponent,
+                addedAt
+            )
 
         if (category.isCollapsed) container.hide(true)
     }
@@ -545,18 +638,23 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
         val newWaypointButton: SimpleButton,
         val children: MutableList<UIContainer> = mutableListOf(),
         var isCollapsed: Boolean = false,
-        var ignoreCheckboxValueChange: Boolean = false
+        var ignoreCheckboxValueChange: Boolean = false,
+        var dragGuideElement: UIBlock? = null
     )
 
     private data class Entry(
         val category: Category,
+        val container: UIContainer,
         val enabled: MultiCheckboxComponent,
         val name: UITextInput,
         val x: UITextInput,
         val y: UITextInput,
         val z: UITextInput,
         val color: ColorComponent,
-        val addedAt: Long
+        val addedAt: Long,
+        var isDragging: Boolean = true,
+        var lastDragPos: Pair<Float, Float>? = null,
+        var previousCategory: Category? = null
     ) {
         fun toWaypoint() = Waypoint(
             name.getText(),
@@ -599,5 +697,26 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
 
     companion object {
         const val CATEGORY_INNER_PADDING = 7.5
+    }
+}
+
+/**
+ * A component with three lines that signifies a button which allows the user to move the waypoint to another category.
+ */
+private class MoveComponent : UIContainer() {
+    init {
+
+        constrain {
+            width = 10.pixels()
+            height = 12.pixels()
+        }
+
+        for (i in 0..2)
+            UIBlock().constrain {
+                y = (3.5 * i).pixels()
+                x = 0.pixels()
+                width = 100.percent()
+                height = 1.pixels()
+            } childOf this
     }
 }
