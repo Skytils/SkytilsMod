@@ -25,6 +25,8 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.settings.GameSettings
@@ -60,7 +62,6 @@ import java.awt.Color
 import java.io.File
 import java.io.IOException
 import java.util.*
-import java.util.concurrent.Future
 import kotlin.math.floor
 
 
@@ -228,8 +229,8 @@ fun AxisAlignedBB.isPosInside(pos: BlockPos): Boolean {
     return pos.x > this.minX && pos.x < this.maxX && pos.y > this.minY && pos.y < this.maxY && pos.z > this.minZ && pos.z < this.maxZ
 }
 
-fun Vigilant.openGUI(): Future<*> = Skytils.threadPool.submit {
-    Skytils.displayScreen = this.gui()
+fun Vigilant.openGUI(): Job = Skytils.launch {
+    Skytils.displayScreen = this@openGUI.gui()
 }
 
 val EntityLivingBase.baseMaxHealth: Double

@@ -22,23 +22,40 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.skytilsmod.utils.Utils
 
-class TickTask(var ticks: Int = 0, val task: () -> Unit) {
+class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
+    private var callback: (T) -> Unit = {}
+    private var failure: (Throwable) -> Unit = {}
+
     init {
         Utils.checkThreadAndQueue {
             TickTaskManager.tasks.add(this)
         }
     }
+
+    internal fun complete() = try {
+        callback(task())
+    } catch (t: Throwable) {
+        failure(t)
+    }
+
+    fun onComplete(block: (T) -> Unit) = apply {
+        callback = block
+    }
+
+    fun onFailure(block: (Throwable) -> Unit) = apply {
+        failure = block
+    }
 }
 
 object TickTaskManager {
-    val tasks = ArrayList<TickTask>(20)
+    val tasks = ArrayList<TickTask<*>>(20)
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
         tasks.removeAll {
             if (it.ticks-- <= 0) {
-                it.task()
+                it.complete()
                 return@removeAll true
             } else return@removeAll false
         }

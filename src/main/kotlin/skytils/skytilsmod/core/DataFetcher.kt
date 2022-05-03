@@ -20,9 +20,12 @@ package skytils.skytilsmod.core
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import gg.essential.universal.UChat
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import net.minecraft.util.BlockPos
-import skytils.skytilsmod.Reference
+import skytils.skytilsmod.Reference.dataUrl
 import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.Skytils.Companion.domain
 import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.gson
 import skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
@@ -39,17 +42,15 @@ import skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import skytils.skytilsmod.features.impl.misc.SummonSkins
 import skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import skytils.skytilsmod.utils.*
-import java.util.concurrent.Future
 import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
-    private fun loadData(): Future<*> {
-        return Skytils.threadPool.submit {
-            val dataUrl = Reference.dataUrl
+    private fun loadData(): Deferred<*> {
+        return Skytils.IO.async {
             try {
                 APIUtil.getResponse("${dataUrl}constants/domain.txt").apply {
                     if (isNotBlank()) {
-                        Skytils.domain = trim()
+                        domain = trim()
                     }
                 }
                 APIUtil.getJSONResponse("${dataUrl}constants/enchants.json").apply {
@@ -156,7 +157,7 @@ object DataFetcher {
                         }
                     }
                 }
-                APIUtil.getJSONResponse("${dataUrl}constants/sellprices.json").apply {
+                APIUtil.getJSONResponse("${domain}/api/auctions/npcprices").apply {
                     Utils.checkThreadAndQueue {
                         ItemFeatures.sellPrices.clear()
                         entrySet().associateTo(ItemFeatures.sellPrices) {
@@ -209,7 +210,7 @@ object DataFetcher {
     }
 
     @JvmStatic
-    fun reloadData(): Future<*> {
+    fun reloadData(): Deferred<*> {
         return loadData()
     }
 

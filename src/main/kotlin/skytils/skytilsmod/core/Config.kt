@@ -1292,7 +1292,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Prevent Placing Weapons",
-        description = "Stops the game from trying to place the Flower of Truth, Spirit Sceptre, and Weird Tuba items.",
+        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, and Weird Tuba items.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var preventPlacingWeapons = false
@@ -1914,6 +1914,20 @@ object Config : Vigilant(
     }
 
     @Property(
+        type = PropertyType.SWITCH, name = "Big Tentacle Nametags",
+        description = "Increases the size of the tentacle nametags in the Kuudra fight.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var bigTentacleTag = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Stop Hook Sinking in Lava",
+        description = "Stops your fishing hook from sinking in lava.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var lavaBobber = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
         description = "Shows the players within the range of the Dolphin pet.",
         category = "Pets", subcategory = "Displays"
@@ -2204,6 +2218,13 @@ object Config : Vigilant(
         max = 500
     )
     var lowSoulflowPing = 0
+
+    @Property(
+        PropertyType.SWITCH, name = "Show Totem Display",
+        description = "Shows the current totem's timer and hits.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var showTotemDisplay = false
 
     @Property(
         PropertyType.NUMBER, name = "Totem Ping",

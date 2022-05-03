@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import net.minecraft.client.Minecraft
@@ -156,6 +157,10 @@ class Skytils {
         @JvmField
         val dispatcher = threadPool.asCoroutineDispatcher()
 
+        val IO = object : CoroutineScope {
+            override val coroutineContext = Dispatchers.IO + SupervisorJob()
+        }
+
         override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob()
 
         val hylinAPI = createHylinAPI("", false)
@@ -241,6 +246,7 @@ class Skytils {
             IcePathSolver(),
             ItemFeatures(),
             KeyShortcuts(),
+            KuudraFeatures,
             LockOrb(),
             MasterMode7Features,
             MayorDiana(),

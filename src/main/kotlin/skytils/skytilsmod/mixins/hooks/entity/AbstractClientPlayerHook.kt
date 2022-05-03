@@ -18,6 +18,7 @@
 package skytils.skytilsmod.mixins.hooks.entity
 
 import gg.essential.universal.UChat
+import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.Entity
@@ -31,8 +32,6 @@ import skytils.skytilsmod.features.impl.misc.SummonSkins.skintextureMap
 import skytils.skytilsmod.utils.SuperSecretSettings
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.printDevMessage
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
 
 class AbstractClientPlayerHook(player: Any) {
 
@@ -58,11 +57,13 @@ class AbstractClientPlayerHook(player: Any) {
         return@lazy false
     }
 
-    val summonType: Future<String?> by lazy {
-        if (!isSummonMob) return@lazy CompletableFuture.completedFuture(null)
-        if (mc.theWorld == null) return@lazy CompletableFuture.completedFuture(null)
-        if (that.isInvisible) return@lazy CompletableFuture.completedFuture("shadow_assassin")
-        Skytils.threadPool.submit(::findTypeEntity)
+    val summonType: Deferred<String?> by lazy {
+        if (!isSummonMob) return@lazy CompletableDeferred(null)
+        if (mc.theWorld == null) return@lazy  CompletableDeferred(null)
+        if (that.isInvisible) return@lazy  CompletableDeferred("shadow_assassin")
+        Skytils.async {
+            findTypeEntity()
+        }
     }
 
     private fun findTypeEntity(): String? {
@@ -91,20 +92,21 @@ class AbstractClientPlayerHook(player: Any) {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun replaceSkin(cir: CallbackInfoReturnable<ResourceLocation>) {
         if (isSummonMob) {
             if (Skytils.config.fixSummonSkin) {
                 if (correctSkin == null) {
-                    if (!summonType.isDone) return
-                    if (summonType.get() == "lost_adventurer" || summonType.get() == null) {
+                    if (!summonType.isCompleted) return
+                    if (summonType.getCompleted() == "lost_adventurer" || summonType.getCompleted() == null) {
                         return
                     }
                     // TODO Add support for resource packs
-                    printDevMessage("summon type ${summonType.get()}", "summonskins")
-                    correctSkin = skintextureMap[summonType.get()]?.resource
+                    printDevMessage("summon type ${summonType.getCompleted()}", "summonskins")
+                    correctSkin = skintextureMap[summonType.getCompleted()]?.resource
                         ?: (if (Skytils.config.usePlayerSkin || SuperSecretSettings.noSychic) mc.thePlayer.locationSkin else sychicSkin).also {
                             UChat.chat(
-                                "$failPrefix §cPlease tell a Skytils dev to add a skin for ${summonType.get()}"
+                                "$failPrefix §cPlease tell a Skytils dev to add a skin for ${summonType.getCompleted()}"
                             )
                         }
 
