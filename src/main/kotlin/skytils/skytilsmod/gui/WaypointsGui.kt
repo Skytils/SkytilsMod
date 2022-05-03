@@ -666,11 +666,9 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
     ) {
         fun toWaypoint() = Waypoint(
             name.getText(),
-            BlockPos(
-                x.getText().toInt(),
-                y.getText().toInt(),
-                z.getText().toInt()
-            ),
+            x.getText().toInt(),
+            y.getText().toInt(),
+            z.getText().toInt(),
             enabled.checked!!,
             color.getColor(),
             addedAt
