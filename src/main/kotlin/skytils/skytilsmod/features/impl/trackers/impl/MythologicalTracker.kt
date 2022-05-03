@@ -18,9 +18,11 @@
 
 package skytils.skytilsmod.features.impl.trackers.impl
 
-import com.google.gson.JsonObject
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
@@ -41,20 +43,18 @@ import skytils.skytilsmod.utils.NumberUtil.nf
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
 import skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import skytils.skytilsmod.utils.graphics.colors.CommonColors
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.pow
 
 class MythologicalTracker : Tracker("mythological") {
 
-    private val rareDugDrop: Pattern = Pattern.compile("^RARE DROP! You dug out a (.+)!$")
-    private val mythCreatureDug =
-        Pattern.compile("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
+    private val rareDugDrop = Regex("^RARE DROP! You dug out a (.+)!$")
+    private val mythCreatureDug = Regex("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
 
     private var lastMinosChamp = 0L
 
@@ -160,9 +160,8 @@ class MythologicalTracker : Tracker("mythological") {
                 if (event.packet.type == 2.toByte() || !Skytils.config.trackMythEvent) return
                 val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
                 if (unformatted.startsWith("RARE DROP! You dug out a ")) {
-                    val matcher = rareDugDrop.matcher(unformatted)
-                    if (matcher.matches()) {
-                        (BurrowDrop.getFromName(matcher.group(1)) ?: return).droppedTimes++
+                    rareDugDrop.find(unformatted)?.let {
+                        (BurrowDrop.getFromName(it.groups[1]?.value ?: return) ?: return).droppedTimes++
                         markDirty<MythologicalTracker>()
                     }
                 } else if (unformatted.startsWith("Wow! You dug out ") && unformatted.endsWith(
@@ -171,9 +170,8 @@ class MythologicalTracker : Tracker("mythological") {
                 ) {
                     BurrowDrop.COINS.droppedTimes += unformatted.replace(Regex("[^\\d]"), "").toLong()
                 } else if (unformatted.contains("! You dug out ")) {
-                    val matcher = mythCreatureDug.matcher(unformatted)
-                    if (matcher.matches()) {
-                        val mob = BurrowMob.getFromName(matcher.group(1)) ?: return
+                    mythCreatureDug.find(unformatted)?.let {
+                        val mob = BurrowMob.getFromName(it.groups[1]?.value ?: return) ?: return
                         //for some reason, minos inquisitors say minos champion in the chat
                         if (mob == BurrowMob.CHAMP) {
                             Utils.cancelChatPacket(event)
@@ -262,37 +260,35 @@ class MythologicalTracker : Tracker("mythological") {
         BurrowMob.values().forEach { it.dugTimes = 0L }
     }
 
-    override fun read(reader: InputStreamReader) {
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        burrowsDug = obj.get("dug").asLong
-        for (entry in obj.get("items").asJsonObject.entrySet()) {
-            (BurrowDrop.getFromId(entry.key) ?: continue).droppedTimes = entry.value.asLong
-        }
-        for (entry in obj.get("mobs").asJsonObject.entrySet()) {
-            (BurrowMob.getFromId(entry.key) ?: continue).dugTimes = entry.value.asLong
-        }
+    // TODO: 5/3/2022 fix this
+    @kotlinx.serialization.Serializable
+    data class TrackerSave(
+        val burrowsDug: Long,
+        @SerialName("items")
+        val drops: Map<BurrowDrop, Long>,
+        val mobs: Map<BurrowMob, Long>
+    )
+
+    override fun read(reader: Reader) {
+        val save = json.decodeFromString<TrackerSave>(reader.readText())
+        burrowsDug = save.burrowsDug
+        BurrowDrop.values().forEach { it.droppedTimes = save.drops[it] ?: 0L }
+        BurrowMob.values().forEach { it.dugTimes = save.mobs[it] ?: 0L }
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-
-        obj.addProperty("dug", burrowsDug)
-
-        val itemObj = JsonObject()
-        for (item in BurrowDrop.values()) {
-            itemObj.addProperty(item.itemId, item.droppedTimes)
-        }
-        obj.add("items", itemObj)
-
-        val mobObj = JsonObject()
-        for (mob in BurrowMob.values()) {
-            mobObj.addProperty(mob.modId, mob.dugTimes)
-        }
-        obj.add("mobs", mobObj)
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(
+            json.encodeToString(
+                TrackerSave(
+                    burrowsDug,
+                    BurrowDrop.values().associateWith(BurrowDrop::droppedTimes),
+                    BurrowMob.values().associateWith(BurrowMob::dugTimes)
+                )
+            )
+        )
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
+    override fun setDefault(writer: Writer) {
         write(writer)
     }
 

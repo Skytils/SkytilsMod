@@ -22,7 +22,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import skytils.skytilsmod.Skytils.Companion.failPrefix
-import skytils.skytilsmod.Skytils.Companion.prefix
 import skytils.skytilsmod.Skytils.Companion.successPrefix
 import skytils.skytilsmod.commands.BaseCommand
 import skytils.skytilsmod.core.PersistentSave
@@ -45,25 +44,27 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
             "override" -> {
                 when {
                     originalMessage.contains("on") -> {
-                        GlintCustomizer.overrides[itemId] = true
+                        GlintCustomizer.glintItems[itemId]?.override = true
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aForced an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("off") -> {
-                        GlintCustomizer.overrides[itemId] = false
+                        GlintCustomizer.glintItems[itemId]?.override = false
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aForce disabled an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("clearall") -> {
-                        GlintCustomizer.overrides.clear()
+                        GlintCustomizer.glintItems.values.forEach {
+                            it.override = null
+                        }
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aRemoved all your glint overrides.")
                         return
                     }
                     originalMessage.contains("clear") -> {
-                        GlintCustomizer.overrides.remove(itemId)
+                        GlintCustomizer.glintItems[itemId]?.override = null
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aCleared glint overrides for your item.")
                         return
@@ -78,7 +79,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("set") -> {
                         if (args.size != 3) throw WrongUsageException("You must specify a valid hex color!")
                         try {
-                            GlintCustomizer.glintColors[itemId] = Utils.customColorFromString(args[2])
+                            GlintCustomizer.glintItems[itemId]?.color = Utils.customColorFromString(args[2])
                             PersistentSave.markDirty<GlintCustomizer>()
                             UChat.chat("$successPrefix §aForced an enchant glint color for your item.")
                         } catch (e: NumberFormatException) {
@@ -87,13 +88,15 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         return
                     }
                     originalMessage.contains("clearall") -> {
-                        GlintCustomizer.glintColors.clear()
+                        GlintCustomizer.glintItems.values.forEach {
+                            it.color = null
+                        }
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aRemoved all your custom glint colors.")
                         return
                     }
                     originalMessage.contains("clear") -> {
-                        GlintCustomizer.glintColors.remove(itemId)
+                        GlintCustomizer.glintItems[itemId]?.color = null
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aCleared the custom glint color for your item.")
                         return

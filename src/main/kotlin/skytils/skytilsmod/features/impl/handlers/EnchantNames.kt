@@ -18,15 +18,17 @@
 
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.DevTools
-import java.io.*
-
+import java.io.File
+import java.io.Reader
+import java.io.Writer
 
 class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     companion object {
@@ -76,23 +78,18 @@ class EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
         return this
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         replacements.clear()
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        for ((key, value) in obj.entrySet()) {
-            replacements[key] = value.asString
-        }
+        replacements.putAll(
+            json.decodeFromString(reader.readText())
+        )
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        for ((key, value) in replacements) {
-            obj.addProperty(key, value)
-        }
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(replacements))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
 }

@@ -17,9 +17,9 @@
  */
 package skytils.skytilsmod.features.impl.spidersden
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonPrimitive
 import gg.essential.universal.UMatrixStack
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S2APacketParticles
@@ -32,13 +32,10 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.events.impl.PacketEvent.SendEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.utils.RenderUtil
-import skytils.skytilsmod.utils.SBInfo
-import skytils.skytilsmod.utils.SkyblockIsland
-import skytils.skytilsmod.utils.Utils
+import skytils.skytilsmod.utils.*
 import java.awt.Color
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 class RelicWaypoints : Tracker("found_spiders_den_relics") {
     @SubscribeEvent
@@ -85,7 +82,12 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                 val distSq = x * x + y * y + z * z
                 GlStateManager.disableDepth()
                 GlStateManager.disableCull()
-                RenderUtil.drawFilledBoundingBox(matrixStack, AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(114, 245, 82), 1f)
+                RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
+                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                    Color(114, 245, 82),
+                    1f
+                )
                 if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(
                     x,
                     y + 1,
@@ -108,7 +110,12 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
                 val distSq = x * x + y * y + z * z
                 GlStateManager.disableDepth()
                 GlStateManager.disableCull()
-                RenderUtil.drawFilledBoundingBox(matrixStack, AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), Color(152, 41, 222), 1f)
+                RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
+                    AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
+                    Color(152, 41, 222),
+                    1f
+                )
                 if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(
                     x,
                     y + 1,
@@ -129,24 +136,17 @@ class RelicWaypoints : Tracker("found_spiders_den_relics") {
         foundRelics.clear()
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         foundRelics.clear()
-        for (serializedPosition in gson.fromJson(reader, JsonArray::class.java).asJsonArray.map { it.asString }) {
-            val parts = serializedPosition.split(",".toRegex()).toTypedArray()
-            foundRelics.add(BlockPos(parts[0].toInt(), parts[1].toInt(), parts[2].toInt()))
-        }
+        foundRelics.addAll(json.decodeFromString(ListSerializer(BlockPosCSV), reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val arr = JsonArray()
-        for (found in foundRelics) {
-            arr.add(JsonPrimitive(found.x.toString() + "," + found.y + "," + found.z))
-        }
-        gson.toJson(arr, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(SetSerializer(BlockPosCSV), foundRelics))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonArray(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
     }
 
     companion object {
