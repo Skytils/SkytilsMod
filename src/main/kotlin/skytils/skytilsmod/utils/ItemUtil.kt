@@ -234,8 +234,8 @@ object ItemUtil {
     fun isSalvageable(stack: ItemStack): Boolean {
         val extraAttr = getExtraAttributes(stack)
         val sbId = getSkyBlockItemID(extraAttr)
-        return sbId != "ICE_SPRAY_WAND" && extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && getStarCount(
+        return extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && getStarCount(
             extraAttr
-        ) == 0
+        ) == 0 && sbId != "ICE_SPRAY_WAND"
     }
 }
