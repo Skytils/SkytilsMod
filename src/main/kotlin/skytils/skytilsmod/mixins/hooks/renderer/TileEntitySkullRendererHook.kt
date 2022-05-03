@@ -27,9 +27,9 @@ import net.minecraft.util.ResourceLocation
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.features.impl.handlers.GlintCustomizer
-import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import skytils.skytilsmod.utils.RenderUtil.getPartialTicks
+import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
 
 val instance: TileEntitySkullRenderer = TileEntitySkullRenderer.instance
@@ -49,10 +49,7 @@ fun addGlintToSkull(
 ) {
     if (Utils.lastRenderedSkullStack != null && Utils.lastRenderedSkullEntity != null) {
         val itemId = getSkyBlockItemID(Utils.lastRenderedSkullStack)
-        if (GlintCustomizer.glintColors.containsKey(itemId)) {
-            val color = GlintCustomizer.glintColors[itemId]
-            renderGlint(Utils.lastRenderedSkullEntity, model, rotation, color)
-        } else renderGlint(Utils.lastRenderedSkullEntity, model, rotation, null)
+        renderGlint(Utils.lastRenderedSkullEntity, model, rotation, GlintCustomizer.glintItems[itemId]?.color)
         Utils.lastRenderedSkullStack = null
         Utils.lastRenderedSkullEntity = null
     }

@@ -17,38 +17,33 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
-import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.graphics.colors.CustomColor
-import java.io.*
+import java.io.File
+import java.io.Reader
+import java.io.Writer
 
 class ArmorColor : PersistentSave(File(Skytils.modDir, "armorcolors.json")) {
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         armorColors.clear()
-        val dataObject = gson.fromJson(reader, JsonObject::class.java)
-        for ((key, value) in dataObject.entrySet()) {
-            val color = Utils.customColorFromString(value.asString)
-            armorColors[key] = color
-        }
+        armorColors.putAll(json.decodeFromString<Map<String, @Contextual CustomColor>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        for ((key, value) in armorColors) {
-            obj.addProperty(key, value.toString())
-        }
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(armorColors))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
 
     companion object {
         @JvmField
-        val armorColors = HashMap<String, CustomColor>()
+        val armorColors = HashMap<String, @Contextual CustomColor>()
     }
 }

@@ -18,13 +18,13 @@
 
 package skytils.skytilsmod.core
 
-import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 import net.minecraft.client.Minecraft
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.utils.ensureFile
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KClass
 
@@ -32,25 +32,25 @@ abstract class PersistentSave(protected val saveFile: File, private val interval
 
     var dirty = false
 
-    protected val gson: Gson = Skytils.gson
+    protected val json: Json = Skytils.json
     protected val mc: Minecraft = Skytils.mc
 
-    abstract fun read(reader: InputStreamReader)
+    abstract fun read(reader: Reader)
 
-    abstract fun write(writer: OutputStreamWriter)
+    abstract fun write(writer: Writer)
 
-    abstract fun setDefault(writer: OutputStreamWriter)
+    abstract fun setDefault(writer: Writer)
 
     private fun readSave() {
         try {
-            this.saveFile.ensureFile()
-            this.saveFile.reader().use {
+            saveFile.ensureFile()
+            saveFile.bufferedReader().use {
                 read(it)
             }
         } catch (e: Exception) {
             e.printStackTrace()
             try {
-                this.saveFile.writer().use {
+                saveFile.bufferedWriter().use {
                     setDefault(it)
                 }
             } catch (ex: Exception) {
@@ -61,8 +61,8 @@ abstract class PersistentSave(protected val saveFile: File, private val interval
 
     private fun writeSave() {
         try {
-            this.saveFile.ensureFile()
-            this.saveFile.writer().use { writer ->
+            saveFile.ensureFile()
+            saveFile.writer().use { writer ->
                 write(writer)
             }
             dirty = false

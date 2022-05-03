@@ -17,8 +17,9 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonObject
 import gg.essential.universal.UChat
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
@@ -26,8 +27,8 @@ import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.events.impl.SendChatMessageEvent
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import java.util.*
 
 class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
@@ -58,24 +59,17 @@ class CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json"
         }
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         aliases.clear()
-        val obj = gson.fromJson(reader, JsonObject::class.java)
-        for ((key, value) in obj.entrySet()) {
-            aliases[key] = value.asString
-        }
+        aliases.putAll(json.decodeFromString<Map<String, String>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonObject()
-        for ((key, value) in aliases) {
-            obj.addProperty(key, value)
-        }
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(aliases))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
 
     companion object {

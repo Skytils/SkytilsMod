@@ -17,10 +17,14 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import gg.essential.universal.UKeyboard
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -31,8 +35,8 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.PersistentSave
 import skytils.skytilsmod.utils.Utils
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     @SubscribeEvent
@@ -58,37 +62,27 @@ class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
         }
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         shortcuts.clear()
-        when (val data = gson.fromJson(reader, JsonElement::class.java)) {
-            is JsonObject -> {
-                data.entrySet().mapTo(shortcuts) { (cmd, keyCode) ->
-                    KeybindShortcut(cmd, keyCode.asInt, 0)
-                }
-            }
+        when (val data = json.decodeFromString<JsonElement>(reader.readText())) {
             is JsonArray -> {
-                data.mapTo(shortcuts) {
-                    it as JsonObject
-                    KeybindShortcut(it["message"].asString, it["keyCode"].asInt, it["modifiers"].asInt)
+                shortcuts.addAll(json.decodeFromJsonElement<List<KeybindShortcut>>(data))
+            }
+            is JsonObject -> {
+                json.decodeFromJsonElement<Map<String, Int>>(data).mapTo(shortcuts) { (cmd, keyCode) ->
+                    KeybindShortcut(cmd, keyCode)
                 }
             }
+            else -> error("Invalid shortcuts file")
         }
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val arr = JsonArray()
-        for (s in shortcuts) {
-            val obj = JsonObject()
-            obj.addProperty("message", s.message)
-            obj.addProperty("keyCode", s.keyCode)
-            obj.addProperty("modifiers", s.modifiers)
-            arr.add(obj)
-        }
-        gson.toJson(arr, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(shortcuts))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonArray(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
     }
 
     companion object {
@@ -96,7 +90,8 @@ class KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     }
 
 
-    data class KeybindShortcut(val message: String, val keyCode: Int, val modifiers: Int) {
+    @Serializable
+    data class KeybindShortcut(val message: String, val keyCode: Int, val modifiers: Int = 0) {
         constructor(message: String, keyCode: Int, modifiers: List<Modifiers>) : this(
             message,
             keyCode,

@@ -18,8 +18,8 @@
 
 package skytils.skytilsmod.features.impl.misc
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonPrimitive
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -36,7 +36,9 @@ import skytils.skytilsmod.utils.ItemRarity
 import skytils.skytilsmod.utils.ItemUtil
 import skytils.skytilsmod.utils.RenderUtil.highlight
 import skytils.skytilsmod.utils.Utils
-import java.io.*
+import java.io.File
+import java.io.Reader
+import java.io.Writer
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -154,24 +156,17 @@ class FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
         }"
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         favorited.clear()
-        val data = gson.fromJson(reader, JsonArray::class.java)
-        for (value in data) {
-            favorited.add(value.asString)
-        }
+        favorited.addAll(json.decodeFromString(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val arr = JsonArray()
-        for (value in favorited) {
-            arr.add(JsonPrimitive(value))
-        }
-        gson.toJson(arr, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(favorited))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonArray(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
     }
 
     companion object {

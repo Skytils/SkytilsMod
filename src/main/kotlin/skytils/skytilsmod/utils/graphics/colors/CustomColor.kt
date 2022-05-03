@@ -17,9 +17,16 @@
  */
 package skytils.skytilsmod.utils.graphics.colors
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import net.minecraft.client.renderer.GlStateManager
 import org.apache.commons.codec.digest.DigestUtils
 import skytils.skytilsmod.utils.MathUtil
+import skytils.skytilsmod.utils.Utils
 
 /** CustomColor
  * will represent color or complex colors
@@ -254,5 +261,11 @@ open class CustomColor {
                 a
             )
         }
+    }
+
+    object Serializer : KSerializer<CustomColor> {
+        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CustomColor", PrimitiveKind.STRING)
+        override fun deserialize(decoder: Decoder): CustomColor = Utils.customColorFromString(decoder.decodeString())
+        override fun serialize(encoder: Encoder, value: CustomColor) = encoder.encodeString(value.toString())
     }
 }

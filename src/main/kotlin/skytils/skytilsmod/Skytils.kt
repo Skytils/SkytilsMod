@@ -18,8 +18,6 @@
 
 package skytils.skytilsmod
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import io.ktor.client.*
@@ -34,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
@@ -98,6 +97,7 @@ import skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavail
 import skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
+import skytils.skytilsmod.utils.graphics.colors.CustomColor
 import sun.misc.Unsafe
 import java.io.File
 import java.security.KeyStore
@@ -120,12 +120,6 @@ class Skytils {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
         const val VERSION = "1.2.3"
-
-        @JvmField
-        @Deprecated("Use kotlinx serialization instead")
-        val gson: Gson = GsonBuilder()
-            .setPrettyPrinting()
-            .create()
 
         @JvmStatic
         val mc: Minecraft by lazy {
@@ -188,6 +182,11 @@ class Skytils {
             prettyPrint = true
             isLenient = true
             ignoreUnknownKeys = true
+            serializersModule = SerializersModule {
+                include(serializersModule)
+                contextual(CustomColor::class, CustomColor.Serializer)
+                contextual(Regex::class, RegexAsString)
+            }
         }
 
         val client = HttpClient(CIO) {

@@ -17,20 +17,23 @@
  */
 package skytils.skytilsmod.features.impl.handlers
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.core.GuiManager
 import skytils.skytilsmod.core.PersistentSave
+import skytils.skytilsmod.utils.RegexAsString
 import skytils.skytilsmod.utils.Utils
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 class CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifications.json")) {
 
@@ -48,40 +51,37 @@ class CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotificat
         }
     }
 
-    override fun read(reader: InputStreamReader) {
+    override fun read(reader: Reader) {
         notifications.clear()
-        val obj = gson.fromJson(reader, JsonElement::class.java)
-        if (obj is JsonObject) {
-            for ((key, value) in obj.entrySet()) {
-                notifications.add(Notification(key.toRegex(), value.asString, 20))
-            }
-        } else if (obj is JsonArray) {
+        val obj = json.decodeFromString<JsonElement>(reader.readText())
+        if (obj is JsonArray) {
             obj.mapTo(notifications) {
-                it as JsonObject
-                Notification(it["regex"].asString.toRegex(), it["text"].asString, it["ticks"].asInt)
+                json.decodeFromJsonElement(it)
+            }
+        } else if (obj is JsonObject) {
+            for ((key, value) in obj) {
+                notifications.add(Notification(key.toRegex(), value.jsonPrimitive.content, 20))
             }
         }
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val obj = JsonArray()
-        for (notif in notifications) {
-            obj.add(JsonObject().apply {
-                addProperty("regex", notif.regex.pattern)
-                addProperty("text", notif.text)
-                addProperty("ticks", notif.displayTicks)
-            })
-        }
-        gson.toJson(obj, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(notifications))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonArray(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
     }
 
     companion object {
         val notifications = hashSetOf<Notification>()
     }
 
-    data class Notification(val regex: Regex, val text: String, val displayTicks: Int)
+    @Serializable
+    data class Notification(
+        @Serializable(with = RegexAsString::class)
+        val regex: Regex,
+        val text: String,
+        @SerialName("ticks") val displayTicks: Int
+    )
 }

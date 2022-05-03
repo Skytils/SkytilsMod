@@ -18,7 +18,8 @@
 
 package skytils.skytilsmod.features.impl.misc
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -29,8 +30,8 @@ import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.PacketEvent
 import skytils.skytilsmod.utils.*
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 import java.util.*
 
 object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
@@ -88,22 +89,16 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
         }
     }
 
-    override fun read(reader: InputStreamReader) {
-        gson.fromJson(reader, JsonObject::class.java).entrySet().forEach { price ->
-            prices[UUID.fromString(price.key)] = price.value.asDouble
-        }
+    override fun read(reader: Reader) {
+        prices.clear()
+        prices.putAll(json.decodeFromString<Map<UUID, Double>>(reader.readText()))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val res = JsonObject()
-        prices.forEach { (uuid, price) ->
-            res.addProperty(uuid.toString(), price)
-        }
-        gson.toJson(res, writer)
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(prices))
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
-
 }

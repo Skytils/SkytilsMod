@@ -17,7 +17,9 @@
  */
 package skytils.skytilsmod.core
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -37,8 +39,8 @@ import skytils.skytilsmod.utils.GlState
 import skytils.skytilsmod.utils.Utils
 import skytils.skytilsmod.utils.toasts.GuiToast
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
 
 class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     private var counter = 0
@@ -208,32 +210,29 @@ class GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         }
     }
 
-    override fun read(reader: InputStreamReader) {
-        for ((key, value) in gson.fromJson(reader, JsonObject::class.java).entrySet()) {
-            GUIPOSITIONS[key] = FloatPair(
-                value.asJsonObject["x"].asFloat,
-                value.asJsonObject["y"].asFloat
+    override fun read(reader: Reader) {
+        json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale) ->
+            GUIPOSITIONS[name] = FloatPair(x, y)
+            GUISCALES[name] = scale
+        }
+    }
+
+    override fun write(writer: Writer) {
+        writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {
+            it.key to GuiElementLocation(
+                it.value.getX(),
+                it.value.getY(),
+                GUISCALES[it.key] ?: 1f
             )
-            GUISCALES[key] = value.asJsonObject["scale"].asFloat
-        }
+        }))
     }
 
-    override fun write(writer: OutputStreamWriter) {
-        val data = JsonObject()
-        for ((key, value) in names) {
-            GUIPOSITIONS[key] = value.pos
-            GUISCALES[key] = value.scale
-            val obj = JsonObject()
-            obj.addProperty("x", value.pos.getX())
-            obj.addProperty("y", value.pos.getY())
-            obj.addProperty("scale", value.scale)
-            data.add(key, obj)
-        }
-        gson.toJson(data, writer)
+    override fun setDefault(writer: Writer) {
+        writer.write("{}")
     }
 
-    override fun setDefault(writer: OutputStreamWriter) {
-        gson.toJson(JsonObject(), writer)
-    }
-
+    // this class sucks lol (why is there a thing called floatpair)
+    // was going to make guielement serializable but it's too much effort
+    @Serializable
+    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float)
 }
