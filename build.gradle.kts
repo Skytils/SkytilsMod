@@ -97,7 +97,6 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
     shadowMeMod("com.github.Skytils:Hylin:04665adf92") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
@@ -176,8 +175,6 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe, shadowMeMod)
 
-        relocate("org.apache.hc", "skytils.apacheorg.hc")
-        relocate("org.apache.commons.codec", "skytils.apache-codec")
         relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
         relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
         relocate("io.ktor", "skytils.ktor")
