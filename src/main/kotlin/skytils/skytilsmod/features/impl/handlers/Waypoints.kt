@@ -92,6 +92,9 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         @JvmField
         val categories = HashSet<WaypointCategory>()
 
+        private val sbeWaypointFormat =
+            Regex("(?:\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
+
         /**
          * Imports waypoints from either a [JsonArray] (old format) or a [JsonObject] (new format)
          * and adds them to the [categories] list.
@@ -135,7 +138,32 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                         )
                     )
                 }
-            } else error("invalid JSON type")
+            } else if (obj.isJsonPrimitive) {
+                // This string might be in the SBE format, let's convert it so people don't complain
+                val str = obj.asString
+                if (str.contains("@")) {
+                    val waypoints = sbeWaypointFormat.findAll(str.trim()).map {
+                        Waypoint(
+                            it.groups["name"]!!.value, BlockPos(
+                                it.groups["x"]!!.value.toInt(),
+                                it.groups["y"]!!.value.toInt(),
+                                it.groups["z"]!!.value.toInt()
+                            ), true, Color.RED, System.currentTimeMillis()
+                        )
+                    }
+                    if (!waypoints.iterator().hasNext()) {
+                        error("invalid JSON type")
+                    }
+                    categories.add(
+                        WaypointCategory(
+                            name = null,
+                            waypoints = waypoints.toHashSet(),
+                            isExpanded = true,
+                            island = SkyblockIsland.values().find { it.mode == SBInfo.mode }
+                                ?: SkyblockIsland.CrystalHollows
+                        ))
+                } else error("invalid JSON type")
+            }
             return count
         }
 
