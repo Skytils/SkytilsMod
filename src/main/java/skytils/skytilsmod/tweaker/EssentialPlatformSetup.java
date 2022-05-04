@@ -32,17 +32,23 @@ import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.Collections;
 import java.util.Locale;
@@ -95,30 +101,62 @@ public class EssentialPlatformSetup {
         }
     }
 
+    public static SSLContext getSSLContext() throws GeneralSecurityException, IOException {
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        ks.load(Files.newInputStream(Paths.get(System.getProperty("java.home") + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts")), "changeit".toCharArray());
+
+        KeyStore me = KeyStore.getInstance(KeyStore.getDefaultType());
+        me.load(EssentialPlatformSetup.class.getResourceAsStream("/skytilsletsencrypt.jks"), "skytilsontop".toCharArray());
+
+        KeyStore besties = KeyStore.getInstance(KeyStore.getDefaultType());
+        besties.load(null, null);
+
+        for (String alias : Collections.list(ks.aliases())) {
+            besties.setCertificateEntry(alias, ks.getCertificate(alias));
+        }
+        for (String alias : Collections.list(me.aliases())) {
+            besties.setCertificateEntry(alias, me.getCertificate(alias));
+        }
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(besties);
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(besties, null);
+        ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+        return ctx;
+    }
+
     @SuppressWarnings("unused")
     public static void setup() {
         try {
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            ks.load(new FileInputStream(System.getProperty("java.home") + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts"), "changeit".toCharArray());
-
-            KeyStore me = KeyStore.getInstance(KeyStore.getDefaultType());
-            me.load(EssentialPlatformSetup.class.getResourceAsStream("skytilsletsencrypt.jks"), "skytilsontop".toCharArray());
-
-            KeyStore besties = KeyStore.getInstance(KeyStore.getDefaultType());
-            besties.load(null, null);
-
-            for (String alias : Collections.list(ks.aliases())) {
-                besties.setCertificateEntry(alias, ks.getCertificate(alias));
-            }
-            for (String alias : Collections.list(me.aliases())) {
-                besties.setCertificateEntry(alias, me.getCertificate(alias));
-            }
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(besties);
-            SSLContext ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, tmf.getTrustManagers(), null);
+            SSLContext ctx = getSSLContext();
+            SSLContext.setDefault(ctx);
             HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
+            String ver = System.getProperty("java.runtime.version", "unknown");
+            String javaLoc = System.getProperty("java.home");
+            if (ver.contains("1.8.0_51") || javaLoc.contains("jre-legacy")) {
+                Path keyStoreLoc = Paths.get("./config/skytils/updates/files/skytilsletsencrypt.jks");
+                File keyStoreFile = keyStoreLoc.toFile();
+                if (!keyStoreFile.exists()) {
+                    System.out.println("Skytils is attempting to run keytool.");
+                    Files.createDirectories(keyStoreLoc.getParent());
+                    try (InputStream in = EssentialPlatformSetup.class.getResourceAsStream("/skytilsletsencrypt.jks"); OutputStream os = Files.newOutputStream(keyStoreLoc)) {
+                        IOUtils.copy(in, os);
+                    }
+                    String os = System.getProperty("os.name", "unknown");
+                    String keyStorePath = javaLoc + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts";
+                    String keyToolPath = javaLoc + File.separator + "bin" + File.separator + (os.toLowerCase(Locale.ENGLISH).startsWith("windows") ? "keytool.exe" : "keytool");
+                    File log = new File("./config/skytils/updates/files/sslfix-" + System.currentTimeMillis() + ".log");
+                    new ProcessBuilder()
+                            .command(keyToolPath, "-importkeystore", "-srckeystore", keyStoreFile.getAbsolutePath(), "-destkeystore", keyStorePath, "-srcstorepass", "skytilsontop", "-deststorepass", "changeit", "-noprompt")
+                            .redirectOutput(log)
+                            .redirectError(log)
+                            .start().waitFor();
+                    System.out.println("A reboot of Minecraft is required for the code to work, force closing the game");
+                    SkytilsLoadingPlugin.exit();
+                }
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -150,7 +188,7 @@ public class EssentialPlatformSetup {
             //noinspection ConstantConditions
             if (Launch.classLoader.getClassBytes("net.minecraft.world.World") != null || essentialLoc.isDirectory() || Skytils.VERSION.endsWith("-dev"))
                 return;
-            String essentialVersion = DigestUtils.sha256Hex(new FileInputStream(essentialLoc)).toUpperCase(Locale.ENGLISH);
+            String essentialVersion = DigestUtils.sha256Hex(Files.newInputStream(essentialLoc.toPath())).toUpperCase(Locale.ENGLISH);
             if (isDev) System.out.println(essentialVersion);
 
             JsonObject essentialDownloads = new JsonParser().parse(requestEssentialResource(Reference.dataUrl + new String(Base64.decodeBase64("Y29uc3RhbnRzL2hhc2hlcy5qc29u==")))).getAsJsonObject();
