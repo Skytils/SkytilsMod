@@ -50,12 +50,12 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
 
     override fun read(reader: Reader) {
         runCatching {
-            categories.addAll(json.decodeFromString<List<WaypointCategory>>(reader.readText()))
+            categories.addAll(json.decodeFromString<CategoryList>(reader.readText()).categories)
         }.onFailure { e ->
             println("Error loading waypoints from PersistentSave:")
             e.printStackTrace()
             // Error loading the new Waypoint format. Try loading the old format.
-            val waypointsList = json.decodeFromString<List<Waypoint>>(reader.readText()).toHashSet()
+            val waypointsList = json.decodeFromString<HashSet<Waypoint>>(reader.readText())
             waypointsList.groupBy {
                 @Suppress("DEPRECATION")
                 it.island!!
@@ -73,11 +73,11 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     }
 
     override fun write(writer: Writer) {
-        writer.write(json.encodeToString(CategoryList(categories.toList())))
+        writer.write(json.encodeToString(CategoryList(categories)))
     }
 
     override fun setDefault(writer: Writer) {
-        writer.write(json.encodeToString(CategoryList(emptyList())))
+        writer.write(json.encodeToString(CategoryList(emptySet())))
     }
 
     companion object {
@@ -91,7 +91,7 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
  */
 @Serializable
 data class CategoryList(
-    val categories: List<WaypointCategory>
+    val categories: Set<WaypointCategory>
 )
 
 /**
@@ -100,9 +100,9 @@ data class CategoryList(
 @Serializable
 data class WaypointCategory(
     var name: String?,
-    val waypoints: HashSet<Waypoint>,
+    val waypoints: Set<Waypoint>,
     var isExpanded: Boolean = true,
-    @Serializable(with = SkyblockIslandModeSerializer::class)
+    @Serializable(with = SkyblockIsland.ModeSerializer::class)
     var island: SkyblockIsland
 )
 
@@ -121,7 +121,7 @@ data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
     @EncodeDefault
     val addedAt: Long = System.currentTimeMillis(),
     @Deprecated("Should only exist in older data formats which do not have waypoint categories.")
-    @Serializable(with = SkyblockIslandModeSerializer::class)
+    @Serializable(with = SkyblockIsland.ModeSerializer::class)
     var island: SkyblockIsland? = null
 ) {
 
