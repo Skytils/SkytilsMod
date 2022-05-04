@@ -121,9 +121,7 @@ public class EssentialPlatformSetup {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(besties);
         SSLContext ctx = SSLContext.getInstance("TLS");
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(besties, null);
-        ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+        ctx.init(null, tmf.getTrustManagers(), null);
         return ctx;
     }
 
