@@ -49,7 +49,7 @@ data class ProfileMember(
 
 @Serializable
 data class SlayerBoss(
-    val xp: Double
+    val xp: Long
 )
 
 @Serializable

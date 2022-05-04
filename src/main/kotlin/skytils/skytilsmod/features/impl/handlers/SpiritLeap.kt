@@ -139,12 +139,6 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         nameSlotCache.clear()
     }
 
-    @Serializable
-    private data class SaveData(val users: Map<String, SaveComponent>, val classes: Map<DungeonClass, SaveComponent>)
-
-    @Serializable
-    private data class SaveComponent(val enabled: Boolean)
-
     override fun read(reader: Reader) {
         val data = json.decodeFromString<SaveData>(reader.readText())
         names.putAll(data.users.entries.associate { it.key to it.value.enabled })
@@ -167,3 +161,9 @@ class SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         write(writer)
     }
 }
+
+@Serializable
+private data class SaveData(val users: Map<String, SaveComponent>, val classes: Map<DungeonClass, SaveComponent>)
+
+@Serializable
+private data class SaveComponent(val enabled: Boolean)
