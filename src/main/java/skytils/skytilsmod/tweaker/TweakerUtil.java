@@ -28,7 +28,9 @@ import java.security.PrivilegedAction;
 
 class TweakerUtil {
     static void runStage(String className, String methodName, Object... params) throws ReflectiveOperationException {
-        getClassForLaunch(className, true).getDeclaredMethod(methodName).invoke(null, params);
+        Method m = getClassForLaunch(className, true).getDeclaredMethod(methodName);
+        m.setAccessible(true);
+        m.invoke(null, params);
     }
 
     static Class<?> getClassForLaunch(String name, boolean initialize) throws ClassNotFoundException {
