@@ -478,6 +478,22 @@ class ItemFeatures {
         getExtraAttributes(item)?.let { extraAttributes ->
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
                 stackTip = extraAttributes.getInteger("potion_level").toString()
+            } else if(Skytils.config.showShardLevel && item.item == Items.prismarine_shard && extraAttributes.hasKey("attributes")) {
+                /*If they ever add the ability to combine attributes on shards, this will need to be updated to:
+                val attributes = extraAttributes.getCompoundTag("attributes")
+                val attributeList = attributes.keySet
+                var highestLevel = 0
+                for(attribute in attributeList) {
+                    val currentAttribute = attributes.getInteger(attribute)
+                    if(currentAttribute > highestLevel) {
+                        highestLevel = currentAttribute
+                    }
+                }
+                stackTip = highestLevel.toString()
+                */
+                
+                val attributes = extraAttributes.getCompoundTag("attributes")
+                stackTip = attributes.getInteger(attributes.keySet.first()).toString()
             } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && item.item === Items.enchanted_book && extraAttributes.hasKey(
                     "enchantments"
                 )
