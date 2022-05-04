@@ -157,7 +157,7 @@ object DataFetcher {
                         }
                     }
                 }
-                APIUtil.getJSONResponse("${domain}/api/auctions/npcprices").apply {
+                APIUtil.getJSONResponse("https://${domain}/api/auctions/npcprices").apply {
                     Utils.checkThreadAndQueue {
                         ItemFeatures.sellPrices.clear()
                         entrySet().associateTo(ItemFeatures.sellPrices) {
