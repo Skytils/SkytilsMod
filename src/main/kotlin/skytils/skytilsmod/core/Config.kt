@@ -1384,12 +1384,12 @@ object Config : Vigilant(
     var showPotionTier = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Shard Level",
-        description = "Shows the level of Shards as the stack size.",
+        type = PropertyType.SWITCH, name = "Show Attribute Shard Level",
+        description = "Shows the level of Attribute Shards as the stack size.",
         category = "Miscellaneous", subcategory = "Items",
         searchTags = ["1.3.0-pre1"]
     )
-    var showShardLevel= false
+    var showAttributeShardLevel = false
     
     @Property(
         type = PropertyType.SWITCH, name = "Show Pet Candies",

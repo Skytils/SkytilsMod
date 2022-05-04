@@ -477,32 +477,24 @@ class ItemFeatures {
         val lore = getItemLore(item).takeIf { it.isNotEmpty() }
         getExtraAttributes(item)?.let { extraAttributes ->
             val matrixStack = UMatrixStack()
+            val itemId = getSkyBlockItemID(extraAttributes)
             if (Skytils.config.showPotionTier && extraAttributes.hasKey("potion_level")) {
                 stackTip = extraAttributes.getInteger("potion_level").toString()
-            } else if(Skytils.config.showShardLevel && item.item == Items.prismarine_shard && extraAttributes.hasKey("attributes")) {
-                /*If they ever add the ability to combine attributes on shards, this will need to be updated to:
-                val attributes = extraAttributes.getCompoundTag("attributes")
-                val attributeList = attributes.keySet
-                var highestLevel = 0
-                for(attribute in attributeList) {
-                    val currentAttribute = attributes.getInteger(attribute)
-                    if(currentAttribute > highestLevel) {
-                        highestLevel = currentAttribute
-                    }
+            } else if (Skytils.config.showAttributeShardLevel && itemId == "ATTRIBUTE_SHARD") {
+                extraAttributes.getCompoundTag("attributes").takeUnless {
+                    it.hasNoTags()
+                }?.let {
+                    /*
+                    If they ever add the ability to combine attributes on shards, this will need to be updated to:
+                    stackTip = it.keySet.maxOf { s -> it.getInteger(s) }.toString()
+                    */
+                    stackTip = it.getInteger(it.keySet.first()).toString()
                 }
-                stackTip = highestLevel.toString()
-                */
-                
-                val attributes = extraAttributes.getCompoundTag("attributes")
-                stackTip = attributes.getInteger(attributes.keySet.first()).toString()
-            } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && item.item === Items.enchanted_book && extraAttributes.hasKey(
-                    "enchantments"
-                )
-            ) {
-                val enchantments = extraAttributes.getCompoundTag("enchantments")
-                val enchantmentNames = enchantments.keySet
-                if (enchantments.keySet.size == 1) {
-                    val name = enchantmentNames.first()
+            } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && itemId == "ENCHANTED_BOOK") {
+                extraAttributes.getCompoundTag("enchantments").takeIf {
+                    it.keySet.size == 1
+                }?.let { enchantments ->
+                    val name = enchantments.keySet.first()
                     if (Skytils.config.showEnchantedBookAbbreviation) {
                         val enchant = EnchantUtil.enchants.find { it.nbtName == name }
                         val prefix: String = if (enchant != null) {
@@ -544,7 +536,7 @@ class ItemFeatures {
                         GlStateManager.enableDepth()
                     }
                     if (Skytils.config.showEnchantedBookTier) stackTip =
-                        enchantments.getInteger(name.toString()).toString()
+                        enchantments.getInteger(name).toString()
                 }
             } else if (Skytils.config.showStarCount && ItemUtil.getStarCount(extraAttributes) > 0) {
                 stackTip = ItemUtil.getStarCount(extraAttributes).toString()
@@ -556,9 +548,9 @@ class ItemFeatures {
                     1 - extraAttributes.getInteger("pickonimbus_durability") / 5000.0
                 )
             }
-            if (Skytils.config.showAttributeShardAbbreviation && item.item == Items.prismarine_shard && extraAttributes.hasKey(
+            if (Skytils.config.showAttributeShardAbbreviation && itemId == "ATTRIBUTE_SHARD" && extraAttributes.getCompoundTag(
                     "attributes"
-                ) && extraAttributes.getCompoundTag("attributes").keySet.size == 1
+                ).keySet.size == 1
             ) {
                 lore?.getOrNull(0)?.split(' ')?.dropLastWhile { it.romanToDecimal() == 0 }?.dropLast(1)
                     ?.joinToString(separator = "") {
