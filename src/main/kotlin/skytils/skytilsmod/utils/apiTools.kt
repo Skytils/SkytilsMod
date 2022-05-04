@@ -142,21 +142,3 @@ object BlockPosObjectSerializer : KSerializer<BlockPos> {
             BlockPos(x, y, z)
         }
 }
-
-/**
- * Serializes/deserializes a [SkyblockIsland] based on its [SkyblockIsland.mode] to retain compatibility
- * with older saves that used the mode instead of a stringified enum constant name.
- */
-object SkyblockIslandModeSerializer : KSerializer<SkyblockIsland> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("SkyblockIsland", PrimitiveKind.STRING)
-
-    override fun deserialize(decoder: Decoder): SkyblockIsland = decoder.decodeString().let { str ->
-        val sbIsland = SkyblockIsland.values().find { it.mode == str }
-        // Migrate old saves from the Blazing Fortress to the Crimson Isle
-        if (sbIsland == null && str == "combat_2") return SkyblockIsland.CrimsonIsle
-        else return sbIsland ?: error("Unexpected SkyblockIsland: $str")
-    }
-
-    override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
-
-}
