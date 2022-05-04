@@ -150,6 +150,5 @@ class TriviaSolver {
         var triviaSolutions = HashMap<String, List<String>>()
         var triviaAnswers: List<String>? = null
         var triviaAnswer: String? = null
-
     }
 }

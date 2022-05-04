@@ -117,7 +117,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     when (args[1].lowercase()) {
                         "data" -> {
                             DataFetcher.reloadData().invokeOnCompletion {
-                                UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
+                                it ?: UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
                             }
                         }
                         "mayor" -> {
