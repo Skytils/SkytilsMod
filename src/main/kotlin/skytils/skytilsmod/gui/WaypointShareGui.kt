@@ -145,7 +145,12 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         runCatching {
             val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
 
-            import(decoded)
+            runCatching {
+                import(decoded)
+            }.onFailure {
+                // When importing from the SBE format, the clipboard contents are not base64-encoded
+                importSBEFormat(getClipboardString())
+            }
 
             PersistentSave.markDirty<Waypoints>()
             loadWaypointsForSelection(islandDropdown.getValue())
@@ -169,7 +174,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         importOldFormat(str)
     }
 
-    private fun importOldFormat(str: String) = runCatching {
+    private fun importOldFormat(str: String) {
         val waypoints = Skytils.json.decodeFromString<List<Waypoint>>(str)
         waypoints.groupBy {
             @Suppress("DEPRECATION")
@@ -191,20 +196,17 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 "Successfully imported ${waypoints.size} waypoints!",
                 2.5f
             )
-    }.onFailure {
-        it.printStackTrace()
-        importSBEFormat(str)
     }
 
     private val sbeWaypointFormat =
-        Regex("(?:/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
+        Regex("(?:\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
 
     private fun importSBEFormat(str: String) {
         val island = SkyblockIsland.values().find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
-        val waypoints = sbeWaypointFormat.findAll(str.trim()).map {
+        val waypoints = sbeWaypointFormat.findAll(str.trim().replace("\n", "")).map {
             Waypoint(
                 it.groups["name"]!!.value,
-                it.groups["x"]!!.value.toInt(),
+                -it.groups["x"]!!.value.toInt(), // For some dumb reason SBE inverts the x coordinate
                 it.groups["y"]!!.value.toInt(),
                 it.groups["z"]!!.value.toInt(),
                 true,
@@ -212,17 +214,22 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 System.currentTimeMillis(),
                 island
             )
-        }
-        if (!waypoints.iterator().hasNext()) {
-            error("invalid JSON type")
+        }.toSet()
+        if (waypoints.isEmpty()) {
+            error("Valid format not detected.")
         }
         Waypoints.categories.add(
             WaypointCategory(
                 name = null,
-                waypoints = waypoints.toHashSet(),
+                waypoints = waypoints,
                 isExpanded = true,
                 island = island
             )
+        )
+        EssentialAPI.getNotifications().push(
+            "Waypoints Imported",
+            "Successfully imported ${waypoints.size} waypoints!",
+            2.5f
         )
     }
 
@@ -240,7 +247,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 isExpanded = true,
                 island = island
             )
-        }
+        }.toSet()
         val str = Skytils.json.encodeToString(CategoryList(categories))
 
         val count = categories.sumOf { it.waypoints.size }
