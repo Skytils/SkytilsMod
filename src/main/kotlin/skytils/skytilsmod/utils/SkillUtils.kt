@@ -262,8 +262,8 @@ object SkillUtils {
         1886700
     )
 
-    fun calcXpWithProgress(experience: Double, values: Collection<Long>): Double {
-        var xp = experience
+    fun calcXpWithProgress(experience: Number, values: Collection<Long>): Double {
+        var xp = experience.toDouble()
         var level = 0.0
 
         for (toRemove in values) {

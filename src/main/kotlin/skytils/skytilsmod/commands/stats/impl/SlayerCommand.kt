@@ -38,7 +38,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
         val profileResponse =
             client.get("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
                 .body<ProfileResponse>()
-        if (profileResponse.success) {
+        if (!profileResponse.success) {
             printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse.cause}")
             return
         }
@@ -51,8 +51,8 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
 
         val xpMap = SkillUtils.slayerXp.keys.associateWith {
             runCatching {
-                slayersObject?.get(it)?.xp ?: 0.0
-            }.getOrDefault(0.0)
+                slayersObject?.get(it)?.xp ?: 0
+            }.getOrDefault(0)
         }
         UMessage("§a➜ Slayer Statistics Viewer\n")
             .append("§2§l ❣ §7§oYou are looking at data for ${username}\n\n")

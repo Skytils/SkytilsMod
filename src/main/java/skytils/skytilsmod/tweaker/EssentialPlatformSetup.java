@@ -32,7 +32,6 @@ import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
