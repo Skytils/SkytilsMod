@@ -117,13 +117,24 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     when (args[1].lowercase()) {
                         "data" -> {
                             DataFetcher.reloadData().invokeOnCompletion {
-                                it ?: UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
+                                it?.run {
+                                    UChat.chat("$failPrefix §cFailed to reload repository data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
+                                }?.ifNull {
+                                    UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
+                                }
                             }
                         }
                         "mayor" -> {
-                            MayorInfo.fetchMayorData()
-                            MayorInfo.fetchJerryData()
-                            UChat.chat("$prefix §bMayor data has been §freloaded§b successfully.")
+                            Skytils.IO.async {
+                                MayorInfo.fetchMayorData()
+                                MayorInfo.fetchJerryData()
+                            }.invokeOnCompletion {
+                                it?.run {
+                                    UChat.chat("$failPrefix §cFailed to reload mayor data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
+                                }?.ifNull {
+                                    UChat.chat("$prefix §bMayor data has been §freloaded§b successfully.")
+                                }
+                            }
                         }
                         "slayer" -> {
                             for (entity in mc.theWorld.getEntitiesWithinAABBExcludingEntity(
