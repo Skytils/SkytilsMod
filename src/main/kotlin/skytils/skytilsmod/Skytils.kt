@@ -209,13 +209,6 @@ class Skytils {
                     requestTimeout = 10000
                     socketTimeout = 10000
                 }
-                https {
-                    addKeyStore(KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-                        load(javaClass.getResourceAsStream("skytilsletsencrypt.jks"), "skytilsontop".toCharArray());
-                    }, "skytilsontop".toCharArray())
-                }
-            }
-            defaultRequest {
             }
         }
 
