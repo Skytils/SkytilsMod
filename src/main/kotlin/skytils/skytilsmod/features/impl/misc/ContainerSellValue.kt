@@ -32,7 +32,10 @@ import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.structure.FloatPair
 import skytils.skytilsmod.core.structure.GuiElement
+import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.features.impl.handlers.AuctionData
+import skytils.skytilsmod.mixins.hooks.item.masterStarPattern
+import skytils.skytilsmod.mixins.hooks.item.masterStars
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.Utils.inDungeons
 import skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -125,7 +128,10 @@ object ContainerSellValue {
             ItemFeatures.sellPrices[identifier] ?: 0.0
         )
 
-        if(itemStack.stackSize > 1 || !Skytils.config.includeModifiersInSellValue) return basePrice * itemStack.stackSize
+        if (itemStack.stackSize > 1 || !Skytils.config.includeModifiersInSellValue) return basePrice * itemStack.stackSize
+
+        // Never add modifiers to randomized dungeon items
+        if (ItemUtil.isSalvageable(itemStack) || ItemUtil.getSkyBlockItemID(itemStack) == "ICE_SPRAY_WAND") return basePrice
 
         val extraAttrs = ItemUtil.getExtraAttributes(itemStack) ?: return basePrice
         val recombValue =
@@ -136,14 +142,17 @@ object ContainerSellValue {
             AuctionData.lowestBINs[if (it >= 10) "FUMING_POTATO_BOOK" else "HOT_POTATO_BOOK"] ?: 0.0
         } else 0.0
 
-        val enchantments = if(!identifier.startsWith("ENCHANTED_BOOK-"))
+        val enchantments = if (!identifier.startsWith("ENCHANTED_BOOK-"))
             extraAttrs.getCompoundTag("enchantments") else null
         val enchantValue = enchantments?.keySet?.sumOf {
             AuctionData.lowestBINs["ENCHANTED_BOOK-${it.uppercase()}-${enchantments.getInteger(it)}"] ?: 0.0
         } ?: 0.0
 
-        val masterStars = itemStack.displayName?.count { it == '⍟' } ?: 0
-        val masterStarValue = if(masterStars > 0) (1..masterStars).sumOf { i ->
+        val masterStarCount =
+            if (itemStack.displayName?.contains("✪") == true) masterStarPattern.find(itemStack.displayName)?.let {
+                masterStars.indexOf(it.value.last()) + 1
+            } ?: 0 else 0
+        val masterStarValue = if (masterStarCount > 0) (1..masterStarCount).sumOf { i ->
             AuctionData.lowestBINs[listOf("FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH")[i - 1] + "_MASTER_STAR"] ?: 0.0
         } else 0.0
 
@@ -168,13 +177,13 @@ object ContainerSellValue {
 
     private var ticks = 0
 
-    private fun shouldRenderGuiComponent() : Boolean {
+    private fun shouldRenderGuiComponent(): Boolean {
         val gui = mc.currentScreen
         val container = if (mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return false
         val chestName = container.lowerChestInventory.name
 
         // Ensure that the gui element should be shown for the player's open container
-        return Skytils.config.containerSellValue && gui is GuiChest && isChestNameValid(chestName)
+        return Skytils.config.containerSellValue && gui is GuiChest && isChestNameValid(chestName) && totalContainerValue > 0.0 && textLines.isNotEmpty()
     }
 
     /**
@@ -182,7 +191,7 @@ object ContainerSellValue {
      */
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     fun onGuiScreenDrawPre(event: GuiScreenEvent.DrawScreenEvent.Pre) {
-        if(event.isCanceled && NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) {
+        if (event.isCanceled && NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) {
             // NEU cancels this event when it renders the storage overlay,
             // which means that the BackgroundDrawnEvent isn't called.
             renderGuiComponent()
@@ -198,7 +207,7 @@ object ContainerSellValue {
      */
     @SubscribeEvent
     fun onPostBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        if(!NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) renderGuiComponent()
+        if (!NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) renderGuiComponent()
     }
 
     /**
@@ -225,15 +234,24 @@ object ContainerSellValue {
     }
 
     /**
+     * Clear the cached display items so that they don't briefly appear when opening another GUI before being updated.
+     */
+    @SubscribeEvent
+    fun onGuiClose(event: GuiContainerEvent.CloseWindowEvent) {
+        totalContainerValue = 0.0
+        textLines.clear()
+    }
+
+    /**
      * Update the list of items in the GUI to be displayed after the container background is drawn.
      */
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if(!Skytils.config.containerSellValue) return
+        if (event.phase != TickEvent.Phase.START || !Skytils.config.containerSellValue) return
 
-        // Limit this method to only run four times per second
-        ticks ++
-        if(ticks % 5 != 0) return
+        // Limit this method to only run a few times per second
+        ticks++
+        if (ticks % 4 != 0) return
         ticks = 0
 
         val gui = mc.currentScreen
@@ -261,22 +279,21 @@ object ContainerSellValue {
 
         totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
 
-
         // Sort the items from most to least valuable and convert them into a readable format
         textLines.clear()
         if (distinctItems.isEmpty() || totalContainerValue == 0.0) return
         textLines.addAll(
             distinctItems.entries.asSequence()
-            .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
-            .filter { it.value.shouldDisplay() }
-            .map { (itemName, displayItem) ->
-                "$itemName§r${
-                    (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
-                }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
-            }
-            .toList()
-            .also { lines = it.size }
-            .take(Skytils.config.containerSellValueMaxItems)
+                .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
+                .filter { it.value.shouldDisplay() }
+                .map { (itemName, displayItem) ->
+                    "$itemName§r${
+                        (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
+                    }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
+                }
+                .toList()
+                .also { lines = it.size }
+                .take(Skytils.config.containerSellValueMaxItems)
         )
     }
 

@@ -230,4 +230,12 @@ object ItemUtil {
 
     fun getStarCount(extraAttributes: NBTTagCompound) =
         max(extraAttributes.getInteger("upgrade_level"), extraAttributes.getInteger("dungeon_item_level"))
+
+    fun isSalvageable(stack: ItemStack): Boolean {
+        val extraAttr = getExtraAttributes(stack)
+        val sbId = getSkyBlockItemID(extraAttr)
+        return extraAttr != null && extraAttr.hasKey("baseStatBoostPercentage") && getStarCount(
+            extraAttr
+        ) == 0 && sbId != "ICE_SPRAY_WAND"
+    }
 }
