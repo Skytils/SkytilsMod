@@ -59,18 +59,6 @@ import kotlin.math.sin
 
 class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
-    @Serializable
-    private data class SpamHiderSave(
-        val default: Map<String, RepoFilterSave>,
-        val filter: Map<String, Filter>
-    )
-
-    @Serializable
-    private data class RepoFilterSave(
-        val state: Int,
-        val name: String
-    )
-
     override fun read(reader: Reader) {
         filters.clear()
         val obj = json.decodeFromString<SpamHiderSave>(reader.readText())
@@ -840,3 +828,16 @@ class SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 }
+
+
+@Serializable
+private data class SpamHiderSave(
+    val default: Map<String, RepoFilterSave>,
+    val filter: Map<String, SpamHider.Filter>
+)
+
+@Serializable
+private data class RepoFilterSave(
+    val state: Int,
+    val name: String
+)

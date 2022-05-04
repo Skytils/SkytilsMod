@@ -38,8 +38,8 @@ import skytils.skytilsmod.gui.components.SimpleButton
 class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     init {
-        val updateObj = UpdateChecker.updateGetter.updateObj
-        UIText("Skytils ${updateObj!!.tagName} is available!")
+        val updateObj = UpdateChecker.updateGetter.updateObj ?: error("Update object is null")
+        UIText("Skytils ${updateObj.tagName} is available!")
             .constrain {
                 x = CenterConstraint()
                 y = RelativeConstraint(0.1f)
@@ -62,7 +62,7 @@ class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
                 height = basicHeightConstraint { window.getHeight() - 90 - authorText.getBottom() }
                 width = RelativeConstraint(0.7f)
             } childOf window
-        MarkdownComponent(UpdateChecker.updateGetter.updateObj!!.body.replace("*", ""))
+        MarkdownComponent(updateObj.body.replace("*", ""))
             .constrain {
                 height = RelativeConstraint()
                 width = RelativeConstraint()

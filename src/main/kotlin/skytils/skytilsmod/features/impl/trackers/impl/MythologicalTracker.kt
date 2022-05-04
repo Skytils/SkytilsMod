@@ -160,7 +160,7 @@ class MythologicalTracker : Tracker("mythological") {
                 if (event.packet.type == 2.toByte() || !Skytils.config.trackMythEvent) return
                 val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
                 if (unformatted.startsWith("RARE DROP! You dug out a ")) {
-                    rareDugDrop.find(unformatted)?.let {
+                    rareDugDrop.matchEntire(unformatted)?.let {
                         (BurrowDrop.getFromName(it.groups[1]?.value ?: return) ?: return).droppedTimes++
                         markDirty<MythologicalTracker>()
                     }
@@ -170,7 +170,7 @@ class MythologicalTracker : Tracker("mythological") {
                 ) {
                     BurrowDrop.COINS.droppedTimes += unformatted.replace(Regex("[^\\d]"), "").toLong()
                 } else if (unformatted.contains("! You dug out ")) {
-                    mythCreatureDug.find(unformatted)?.let {
+                    mythCreatureDug.matchEntire(unformatted)?.let {
                         val mob = BurrowMob.getFromName(it.groups[1]?.value ?: return) ?: return
                         //for some reason, minos inquisitors say minos champion in the chat
                         if (mob == BurrowMob.CHAMP) {

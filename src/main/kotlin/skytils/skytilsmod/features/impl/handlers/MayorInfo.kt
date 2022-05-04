@@ -216,8 +216,8 @@ object MayorInfo {
     fun fetchMayorData() {
         Skytils.IO.launch {
             val res = client.get(baseURL).body<Mayor>()
-            if (res.name == currentMayor || currentMayor == null || mayorPerks.size == 0) isLocal =
-                false
+            if (res.name == currentMayor || currentMayor == null || mayorPerks.size == 0)
+                isLocal = false
             if (!isLocal) {
                 TickTask(1) {
                     currentMayor = res.name
