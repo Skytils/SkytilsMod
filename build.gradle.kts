@@ -179,6 +179,7 @@ tasks {
         relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
         relocate("io.ktor", "skytils.ktor")
         relocate("kotlinx.serialization", "skytils.ktx-serialization")
+        relocate("kotlinx.coroutines", "skytils.ktx-coroutines")
 
         exclude(
             "**/LICENSE.md",
