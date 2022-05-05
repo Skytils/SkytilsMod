@@ -1335,8 +1335,8 @@ object Config : Vigilant(
     var showEnchantedBookTier = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Book Helper",
-        description = "Shows if you're combining incompatible books",
+        type = PropertyType.SWITCH, name = "Combine Helper",
+        description = "Shows if you're combining incompatible books or attribute shards",
         category = "Miscellaneous", subcategory = "Items"
     )
     var bookHelper = false
@@ -1390,7 +1390,7 @@ object Config : Vigilant(
         searchTags = ["1.3.0-pre1"]
     )
     var showAttributeShardLevel = false
-    
+
     @Property(
         type = PropertyType.SWITCH, name = "Show Pet Candies",
         description = "Shows the number of candies used as the stack size",

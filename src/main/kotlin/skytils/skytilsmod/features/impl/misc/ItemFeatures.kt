@@ -609,21 +609,25 @@ class ItemFeatures {
     fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Skytils.config.bookHelper || !Utils.inSkyblock) return
         if (event.container !is ContainerChest || SBInfo.lastOpenContainerName != "Anvil") return
-        val book1 = event.container.getSlot(29).stack ?: return
-        val book2 = event.container.getSlot(33).stack ?: return
-        if (book1.item != Items.enchanted_book || book2.item != Items.enchanted_book) return
-        val nbt1 = getExtraAttributes(book1) ?: return
-        val nbt2 = getExtraAttributes(book2) ?: return
-        val enchantNBT = listOf(nbt1, nbt2).map { nbt ->
-            nbt.getCompoundTag("enchantments")
+        val item1 = event.container.getSlot(29).stack ?: return
+        val item2 = event.container.getSlot(33).stack ?: return
+        val nbt1 = getExtraAttributes(item1) ?: return
+        val nbt2 = getExtraAttributes(item2) ?: return
+        val tagName = when (getSkyBlockItemID(nbt1) to getSkyBlockItemID(nbt2)) {
+            "ENCHANTED_BOOK" to "ENCHANTED_BOOK" -> "enchantments"
+            "ATTRIBUTE_SHARD" to "ATTRIBUTE_SHARD" -> "attributes"
+            else -> return
         }
-        val enchantList = enchantNBT.mapNotNull { nbt ->
+        val typeList = listOf(nbt1, nbt2).map { nbt ->
+            nbt.getCompoundTag(tagName)
+        }
+        val tierList = typeList.mapNotNull { nbt ->
             nbt.keySet.takeIf { it.size == 1 }?.first()
         }
-        if (enchantList.size != 2) return
-        val errorString = if (enchantList[0] != enchantList[1]) {
-            "Enchant Types don't match!"
-        } else if (enchantNBT[0].getInteger(enchantList[0]) != enchantNBT[1].getInteger(enchantList[1])) {
+        if (tierList.size != 2) return
+        val errorString = if (tierList[0] != tierList[1]) {
+            "Types don't match!"
+        } else if (typeList[0].getInteger(tierList[0]) != typeList[1].getInteger(tierList[1])) {
             "Tiers don't match!"
         } else return
         val gui = event.gui as AccessorGuiContainer
