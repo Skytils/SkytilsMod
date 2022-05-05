@@ -182,14 +182,15 @@ enum class SkyblockIsland(val formattedName: String, val mode: String) {
     DungeonHub("Dungeon Hub", "dungeon_hub"),
     Hub("Hub", "hub"),
     DarkAuction("Dark Auction", "dark_auction"),
-    JerryWorkshop("Jerry's Workshop", "winter");
+    JerryWorkshop("Jerry's Workshop", "winter"),
+    Unknown("(Unknown)", "");
 
     object ModeSerializer : KSerializer<SkyblockIsland> {
         override val descriptor: SerialDescriptor =
             PrimitiveSerialDescriptor("SkyblockIsland", PrimitiveKind.STRING)
 
         override fun deserialize(decoder: Decoder): SkyblockIsland =
-            decoder.decodeString().let { s -> values().first { it.mode == s } }
+            decoder.decodeString().let { s -> values().firstOrNull { it.mode == s } ?: Unknown }
 
         override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
     }
