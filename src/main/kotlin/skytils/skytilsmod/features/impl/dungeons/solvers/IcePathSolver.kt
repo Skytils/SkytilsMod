@@ -193,7 +193,7 @@ class IcePathSolver {
      */
     private fun solve(iceCave: Array<IntArray>, startX: Int, startY: Int, endX: Int, endY: Int): ArrayList<Point?> {
         val startPoint = Point(startX, startY)
-        val queue = LinkedList<Point>()
+        val queue = ArrayDeque<Point>()
         val iceCaveColors = Array(
             iceCave.size
         ) { arrayOfNulls<Point>(iceCave[0].size) }
