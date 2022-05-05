@@ -116,7 +116,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MODID = "skytils"
         const val MOD_NAME = "Skytils"
-        const val VERSION = "1.2.6"
+        const val VERSION = "1.3.0-pre1"
 
         @JvmStatic
         val mc: Minecraft by lazy {
