@@ -17,26 +17,47 @@
  */
 package skytils.skytilsmod.mixins.hooks.renderer
 
+import net.minecraft.block.BlockCarpet
+import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.resources.model.IBakedModel
+import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.BlockPos
 import net.minecraft.world.IBlockAccess
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
+import skytils.skytilsmod.Skytils
+import skytils.skytilsmod.utils.SBInfo
+import skytils.skytilsmod.utils.SkyblockIsland
+import skytils.skytilsmod.utils.Utils
 
 fun modifyGetModelFromBlockState(
-    blockRendererDispatcher: Any,
+    blockRendererDispatcher: BlockRendererDispatcher,
     state: IBlockState?,
     worldIn: IBlockAccess,
     pos: BlockPos?,
     cir: CallbackInfoReturnable<IBakedModel>
 ) {
-    (blockRendererDispatcher as BlockRendererDispatcher).apply {
-        val event = RenderBlockInWorldEvent(state, worldIn, pos)
-        event.postAndCatch()
-        if (event.state !== state) {
-            cir.returnValue = blockModelShapes.getModelForState(event.state)
+    if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.DwarvenMines.mode || state == null || pos == null) return
+    var returnState = state
+    if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
+            state.getValue(
+                BlockCarpet.COLOR
+            ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
+        )
+    ) {
+        returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
+    } else if (Skytils.config.darkModeMist && pos.y <= 76) {
+        if (state.block === Blocks.stained_glass &&
+            state.getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE
+        ) {
+            returnState = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
+        } else if (state.block === Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
+            returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
         }
+    }
+    if (returnState !== state) {
+        cir.returnValue = blockRendererDispatcher.blockModelShapes.getModelForState(returnState)
     }
 }

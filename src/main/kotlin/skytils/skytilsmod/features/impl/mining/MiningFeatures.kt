@@ -23,7 +23,6 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
-import net.minecraft.block.BlockCarpet
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -31,7 +30,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.AxisAlignedBB
@@ -60,7 +58,6 @@ import skytils.skytilsmod.core.structure.GuiElement
 import skytils.skytilsmod.events.impl.BossBarEvent
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.PacketEvent
-import skytils.skytilsmod.events.impl.RenderBlockInWorldEvent
 import skytils.skytilsmod.features.impl.handlers.MayorInfo
 import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
@@ -394,20 +391,6 @@ class MiningFeatures {
         inRaffle = false
         CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
         waypoints.clear()
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onGetBlockModel(event: RenderBlockInWorldEvent) {
-        if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.DwarvenMines.mode || event.state == null) return
-        val state = event.state!!
-        if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
-                state.getValue(
-                    BlockCarpet.COLOR
-                ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
-            )
-        ) {
-            event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
-        }
     }
 
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
