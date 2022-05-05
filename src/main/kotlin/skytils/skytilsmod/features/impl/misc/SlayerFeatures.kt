@@ -267,6 +267,17 @@ class SlayerFeatures {
                             createTitle("Totem!", 20)
                     }
                 }
+            } else if (packet.entityId == (slayer as? DemonlordSlayer)?.entity?.entityId &&
+                ((packet.func_149376_c().find { it.dataValueId == 0 }?.`object` as Byte).toInt() and 0x20) == 0 &&
+                slayer?.entity?.isInvisible == true
+            ) {
+                slayer?.run {
+                    launch {
+                        val (n, t) = detectSlayerEntities().await()
+                        nameEntity = n
+                        timerEntity = t
+                    }
+                }
             }
         }
 
@@ -890,7 +901,7 @@ class SlayerFeatures {
             }
         }
 
-        private fun detectSlayerEntities() =
+        fun detectSlayerEntities() =
             CompletableDeferred<Pair<EntityArmorStand, EntityArmorStand>>().apply {
                 launch {
                     TickTask(5) {
