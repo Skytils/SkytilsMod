@@ -134,7 +134,7 @@ class Skytils {
         var ticks = 0
 
         @JvmField
-        val sendMessageQueue = LinkedList<String>()
+        val sendMessageQueue = ArrayDeque<String>()
 
         @JvmField
         var usingLabymod = false

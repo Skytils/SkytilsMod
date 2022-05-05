@@ -221,7 +221,7 @@ object AlignmentTaskSolver {
         start: Point,
         end: Point
     ): ArrayList<Point> {
-        val queue = LinkedList<Point>()
+        val queue = ArrayDeque<Point>()
         val gridCopy = Array(
             grid.size
         ) { arrayOfNulls<Point>(grid[0].size) }

@@ -29,7 +29,7 @@ class GlState {
 
     companion object {
         val newBlend: Boolean
-        val stack = LinkedList<GlState>()
+        val stack = ArrayDeque<GlState>()
 
         init {
             val context = GLContext.getCapabilities()

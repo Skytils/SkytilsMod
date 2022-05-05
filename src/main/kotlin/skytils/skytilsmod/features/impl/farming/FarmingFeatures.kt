@@ -21,7 +21,6 @@ import gg.essential.universal.UChat
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.event.world.WorldEvent
