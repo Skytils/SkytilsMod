@@ -167,7 +167,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun import(str: String) = runCatching {
         val categories = Skytils.json.decodeFromString<CategoryList>(str).categories
-        Waypoints.categories.addAll(Waypoints.categories)
+        Waypoints.categories.addAll(categories)
         EssentialAPI.getNotifications().push(
             "Waypoints Imported",
             "Successfully imported ${categories.sumOf { it.waypoints.size }} waypoints!",
@@ -203,7 +203,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     }
 
     private val sbeWaypointFormat =
-        Regex("(?:\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
+        Regex("(?:\\.?\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
 
     private fun importSBEFormat(str: String) {
         val island = SkyblockIsland.values().find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
@@ -253,6 +253,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             )
         }.toSet()
         val str = Skytils.json.encodeToString(CategoryList(categories))
+            .lines().joinToString("", transform = String::trim)
 
         val count = categories.sumOf { it.waypoints.size }
         setClipboardString(Base64.encodeBase64String(str.encodeToByteArray()))
