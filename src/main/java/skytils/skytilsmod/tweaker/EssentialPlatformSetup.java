@@ -31,9 +31,6 @@ import skytils.skytilsmod.Reference;
 import skytils.skytilsmod.Skytils;
 import sun.management.VMManagement;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,9 +44,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.util.Collections;
 import java.util.Locale;
 
 public class EssentialPlatformSetup {
@@ -100,36 +94,9 @@ public class EssentialPlatformSetup {
         }
     }
 
-    public static SSLContext getSSLContext() throws GeneralSecurityException, IOException {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        ks.load(Files.newInputStream(Paths.get(System.getProperty("java.home") + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts")), "changeit".toCharArray());
-
-        KeyStore me = KeyStore.getInstance(KeyStore.getDefaultType());
-        me.load(EssentialPlatformSetup.class.getResourceAsStream("/skytilsletsencrypt.jks"), "skytilsontop".toCharArray());
-
-        KeyStore besties = KeyStore.getInstance(KeyStore.getDefaultType());
-        besties.load(null, null);
-
-        for (String alias : Collections.list(ks.aliases())) {
-            besties.setCertificateEntry(alias, ks.getCertificate(alias));
-        }
-        for (String alias : Collections.list(me.aliases())) {
-            besties.setCertificateEntry(alias, me.getCertificate(alias));
-        }
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(besties);
-        SSLContext ctx = SSLContext.getInstance("TLS");
-        ctx.init(null, tmf.getTrustManagers(), null);
-        return ctx;
-    }
-
     @SuppressWarnings("unused")
     public static void setup() {
         try {
-            SSLContext ctx = getSSLContext();
-            SSLContext.setDefault(ctx);
-            HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
             String ver = System.getProperty("java.runtime.version", "unknown");
             String javaLoc = System.getProperty("java.home");
             if (ver.contains("1.8.0_51") || javaLoc.contains("jre-legacy")) {
