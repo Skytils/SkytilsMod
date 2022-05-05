@@ -34,6 +34,6 @@ import skytils.skytilsmod.mixins.hooks.renderer.BlockRendererDispatcherHookKt;
 public abstract class MixinBlockRendererDispatcher implements IResourceManagerReloadListener {
     @Inject(method = "getModelFromBlockState", at = @At("RETURN"), cancellable = true)
     private void modifyGetModelFromBlockState(IBlockState state, IBlockAccess worldIn, BlockPos pos, CallbackInfoReturnable<IBakedModel> cir) {
-        BlockRendererDispatcherHookKt.modifyGetModelFromBlockState(this, state, worldIn, pos, cir);
+        BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockRendererDispatcher) (Object) this, state, worldIn, pos, cir);
     }
 }

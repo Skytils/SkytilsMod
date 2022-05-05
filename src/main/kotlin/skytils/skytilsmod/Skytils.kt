@@ -74,7 +74,6 @@ import skytils.skytilsmod.features.impl.events.TechnoMayor
 import skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import skytils.skytilsmod.features.impl.farming.TreasureHunter
 import skytils.skytilsmod.features.impl.handlers.*
-import skytils.skytilsmod.features.impl.mining.DarkModeMist
 import skytils.skytilsmod.features.impl.mining.MiningFeatures
 import skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
 import skytils.skytilsmod.features.impl.misc.*
@@ -266,7 +265,6 @@ class Skytils {
             CooldownTracker(),
             CustomNotifications(),
             DamageSplash(),
-            DarkModeMist(),
             DungeonFeatures,
             DungeonMap(),
             DungeonTimer(),
