@@ -19,7 +19,6 @@
 package skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.essential.universal.UMatrixStack
-import net.minecraft.block.BlockPressurePlateWeighted
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
@@ -54,14 +53,14 @@ object ShootTheTargetSolver {
             if (old.block == Blocks.emerald_block && state.block == Blocks.stained_hardened_clay) {
                 shot.add(pos)
             }
-        } else if (pos == plate && state.block is BlockPressurePlateWeighted) {
+        }/* else if (pos == plate && state.block is BlockPressurePlateWeighted) {
             if (state.getValue(BlockPressurePlateWeighted.POWER) == 0 || old !is BlockPressurePlateWeighted || old.getValue(
                     BlockPressurePlateWeighted.POWER
                 ) == 0
             ) {
                 shot.clear()
             }
-        }
+        }*/
     }
 
     @SubscribeEvent
