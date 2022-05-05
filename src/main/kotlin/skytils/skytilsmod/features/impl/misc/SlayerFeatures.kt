@@ -389,17 +389,17 @@ class SlayerFeatures {
     @SubscribeEvent
     fun onAttack(event: AttackEntityEvent) {
         if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityLiving || !Skytils.config.useSlayerHitMethod) return
-        val enderman = event.target as EntityLiving
-        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(enderman.baseMaxHealth).toInt() == expectedMaxHp) {
+        val entity = event.target as EntityLiving
+        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(entity.baseMaxHealth).toInt() == expectedMaxHp) {
             printDevMessage("A valid entity was attacked", "slayer", "seraph", "seraphHit")
-            hitMap.compute(enderman) { _, int ->
+            hitMap.compute(entity) { _, int ->
                 return@compute (int ?: 0).inc()
             }
-            if (enderman != slayer?.entity && (hitMap[enderman]
+            if (entity != slayer?.entity && (hitMap[entity]
                     ?: 0) - ((slayer?.entity as? EntityEnderman)?.let { hitMap[it] } ?: 0) >= 10
             ) {
                 printDevMessage("processing new entity", "slayer")
-                processSlayerEntity(enderman)
+                processSlayerEntity(entity)
             }
         }
     }
@@ -511,7 +511,7 @@ class SlayerFeatures {
                         } else if (toggled) {
                             ScreenRenderer.fontRenderer.drawString(
                                 displayName.formattedText,
-                                if (leftAlign) 0f else width.toFloat(),
+                                if (leftAlign) 0f else width,
                                 10f,
                                 CommonColors.WHITE,
                                 alignment,
@@ -868,6 +868,7 @@ class SlayerFeatures {
             SlayerArmorDisplayElement()
             SlayerDisplayElement()
             SeraphDisplayElement()
+            TotemDisplayElement
         }
 
         override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
@@ -1040,7 +1041,7 @@ class SlayerFeatures {
                     )
                 }?.let { suspect ->
                     printDevMessage(
-                        "Found suspect glyph, ${lastYangGlyphSwitchTicks} switched, ${suspect.ticksExisted} existed, ${
+                        "Found suspect glyph, $lastYangGlyphSwitchTicks switched, ${suspect.ticksExisted} existed, ${
                             entity.getDistanceSqToEntity(
                                 suspect
                             )
