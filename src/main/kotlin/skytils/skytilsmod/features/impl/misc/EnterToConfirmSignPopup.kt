@@ -31,14 +31,6 @@ import skytils.skytilsmod.utils.Utils
  */
 class EnterToConfirmSignPopup {
 
-    val prompts = listOf(
-        "Enter query",
-        "auction bid",
-        "Enter amount",
-        "Enter price",
-        "Your auction",
-    )
-
     /**
      * EventListener for this feature.
      */
@@ -49,9 +41,7 @@ class EnterToConfirmSignPopup {
         val gui = event.gui as? GuiEditSign ?: return
         if (Keyboard.getEventKey() != Keyboard.KEY_RETURN) return
         val tile = (gui as AccessorGuiEditSign).tileSign
-        if (!tile.signText.asSequence().map { it.unformattedText }.zipWithNext().any { (first, second) ->
-                first == "^^^^^^^^^^^^^^^" && prompts.any { second == it }
-            }) return
+        if (tile.signText[1].unformattedText != "^^^^^^^^^^^^^^^") return
         gui.mc.displayGuiScreen(null)
     }
 
