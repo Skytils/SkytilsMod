@@ -72,9 +72,16 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             height = 50.pixels()
         }
 
-        islandDropdown = DropDown(SkyblockIsland.values().indexOfFirst {
-            SBInfo.mode == it.mode
-        }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(topButtons)
+        val isOnUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
+        val hasAnyUnknownWaypoint = Waypoints.categories.any { it.island == SkyblockIsland.Unknown }
+        val options = SkyblockIsland.values()
+            .mapNotNull { if (it == SkyblockIsland.Unknown && !isOnUnknownIsland && !hasAnyUnknownWaypoint) null else it.formattedName }
+        islandDropdown = DropDown(
+            SkyblockIsland.values().indexOfFirst {
+                SBInfo.mode == it.mode
+            }.run { if (this == -1) SkyblockIsland.values().indexOf(SkyblockIsland.Unknown) else this },
+            options
+        ).childOf(topButtons)
             .constrain {
                 x = 5.pixels(true)
             }.also {

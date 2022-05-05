@@ -70,9 +70,13 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
             height = 70.percent() + 2.pixels()
         }
 
+        val hasUnknown = Waypoints.categories.any { it.island == SkyblockIsland.Unknown }
         islandDropdown = DropDown(SkyblockIsland.values().indexOfFirst {
             SBInfo.mode == it.mode
-        }.run { if (this == -1) 0 else this }, SkyblockIsland.values().map { it.formattedName }).childOf(window)
+        }.run { if (this == -1) 0 else this },
+            SkyblockIsland.values()
+                .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.formattedName }
+        ).childOf(window)
             .constrain {
                 x = 5.pixels(true)
                 y = 5.percent()
