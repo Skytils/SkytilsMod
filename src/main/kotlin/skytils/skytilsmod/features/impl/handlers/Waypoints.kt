@@ -38,8 +38,9 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (Utils.inSkyblock) {
             val matrixStack = UMatrixStack()
+            val isUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
             categories.filter {
-                it.island.mode == SBInfo.mode
+                it.island.mode == SBInfo.mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
             }.forEach { category ->
                 category.waypoints.filter { it.enabled }.forEach {
                     it.draw(event.partialTicks, matrixStack)
@@ -49,13 +50,14 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     }
 
     override fun read(reader: Reader) {
+        val str = reader.readText()
         runCatching {
-            categories.addAll(json.decodeFromString<CategoryList>(reader.readText()).categories)
+            categories.addAll(json.decodeFromString<CategoryList>(str).categories)
         }.onFailure { e ->
             println("Error loading waypoints from PersistentSave:")
             e.printStackTrace()
             // Error loading the new Waypoint format. Try loading the old format.
-            val waypointsList = json.decodeFromString<HashSet<Waypoint>>(reader.readText())
+            val waypointsList = json.decodeFromString<HashSet<Waypoint>>(str)
             waypointsList.groupBy {
                 @Suppress("DEPRECATION")
                 it.island!!
@@ -69,6 +71,8 @@ class Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     )
                 )
             }
+            // If the old format is used, it should be instantly converted to prevent future errors
+            markDirty<Waypoints>()
         }
     }
 
