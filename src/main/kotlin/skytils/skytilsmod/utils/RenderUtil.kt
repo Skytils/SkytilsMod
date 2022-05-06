@@ -156,7 +156,8 @@ object RenderUtil {
         tessellator.draw()
     }
 
-    internal fun <T> Color.withParts(block: (Int, Int, Int, Int) -> T) = block(this.red, this.green, this.blue, this.alpha)
+    internal fun <T> Color.withParts(block: (Int, Int, Int, Int) -> T) =
+        block(this.red, this.green, this.blue, this.alpha)
 
     fun drawFilledBoundingBox(matrixStack: UMatrixStack, aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         UGraphics.enableBlend()
@@ -348,24 +349,41 @@ object RenderUtil {
 
     fun renderWaypointText(
         str: String,
-        X: Double,
-        Y: Double,
-        Z: Double,
+        x: Double,
+        y: Double,
+        z: Double,
         partialTicks: Float,
         matrixStack: UMatrixStack
     ) {
         GlStateManager.alphaFunc(516, 0.1f)
         val player = mc.thePlayer
-        val x =
-            X - player.lastTickPosX + (X - player.posX - (X - player.lastTickPosX)) * partialTicks
-        val y =
-            Y - player.lastTickPosY + (Y - player.posY - (Y - player.lastTickPosY)) * partialTicks
-        val z =
-            Z - player.lastTickPosZ + (Z - player.posZ - (Z - player.lastTickPosZ)) * partialTicks
-        val distSq = x * x + y * y + z * z
+        val distX = x - player.posX
+        val distY = y - player.posY
+        val distZ = z - player.posZ
+        val distSq = distX * distX + distY * distY + distZ * distZ
         val dist = sqrt(distSq)
-        drawNametag(X, Y, Z, str, Color.WHITE, partialTicks, matrixStack)
-        drawNametag(X, Y - 0.25, Z, "${ChatColor.YELLOW}${dist.roundToInt()}m", Color.WHITE, partialTicks, matrixStack)
+        val renderX: Double
+        val renderY: Double
+        val renderZ: Double
+        if (distSq > 144) {
+            renderX = distX * 12 / dist
+            renderY = distY * 12 / dist
+            renderZ = distZ * 12 / dist
+        } else {
+            renderX = distX
+            renderY = distY
+            renderZ = distZ
+        }
+        drawNametag(renderX, renderY, renderZ, str, Color.WHITE, partialTicks, matrixStack)
+        drawNametag(
+            renderX,
+            renderY - 0.25,
+            renderZ,
+            "${ChatColor.YELLOW}${dist.roundToInt()}m",
+            Color.WHITE,
+            partialTicks,
+            matrixStack
+        )
     }
 
     private fun drawNametag(
