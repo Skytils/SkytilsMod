@@ -18,7 +18,6 @@
 package skytils.skytilsmod.features.impl.misc.damagesplash
 
 import gg.essential.universal.UChat
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.entity.RenderManager
@@ -62,7 +61,7 @@ class DamageSplashEntity(
             remove()
             return
         }
-        val maxLiving = 150
+        val maxLiving = Skytils.config.splashLivingTime
         if (livingTicks > maxLiving) {
             remove()
             return
