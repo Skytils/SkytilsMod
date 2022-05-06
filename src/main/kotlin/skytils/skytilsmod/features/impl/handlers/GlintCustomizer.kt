@@ -55,5 +55,9 @@ class GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.js
     companion object {
         @JvmField
         val glintItems = HashMap<String, CustomGlint>()
+
+        fun getGlintItem(uuid: String) = glintItems.getOrPut(uuid) {
+            CustomGlint(null, null)
+        }
     }
 }
