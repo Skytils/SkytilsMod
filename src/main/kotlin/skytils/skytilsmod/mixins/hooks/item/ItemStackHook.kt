@@ -17,6 +17,7 @@
  */
 package skytils.skytilsmod.mixins.hooks.item
 
+import gg.essential.universal.UChat
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import skytils.skytilsmod.Skytils
@@ -58,7 +59,10 @@ fun modifyDisplayName(s: String): String {
     var displayName = s
     if (!Utils.inSkyblock) return displayName
     try {
-        if (Skytils.config.compactStars && displayName.contains("✪")) {
+        if(Skytils.config.oldStars && Skytils.config.compactStars) {
+            Skytils.config.compactStars = false
+            UChat.chat("§cSkytils: §7Compact stars has been disabled because Old Stars is enabled.")
+        } else if (Skytils.config.compactStars && displayName.contains("✪")) {
             masterStarPattern.find(displayName)?.let {
                 val star = it.value.last()
                 val count = masterStars.indexOf(star) + 1 + 5
@@ -68,6 +72,12 @@ fun modifyDisplayName(s: String): String {
                 }§c${count}✪"
             }?.ifNull {
                 displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
+            }
+        } else if(Skytils.config.oldStars && displayName.contains("✪")) {
+            masterStarPattern.find(displayName)?.let {
+                val star = it.value.last()
+                val count = masterStars.indexOf(star) + 1
+                displayName = displayName.replace(masterStarPattern, "").replace(starPattern.repeat(count), "§c✪".repeat(count))
             }
         }
     } catch (ignored: Exception) {
