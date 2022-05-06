@@ -1238,24 +1238,19 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Necromancy Soul Helper",
-        description = "Displays if a soul got obtained for a master floor.",
+        description = "Displays if a Soul has been obtained on a Master Floor..",
         category = "Miscellaneous", subcategory = "Items"
     )
     var necromancySoulHelper = false
 
-    @Property(
-        type = PropertyType.SWITCH, name = "Compact Item Stars",
-        description = "Shortens item names with stars in them.",
-        category = "Miscellaneous", subcategory = "Items"
+   @Property(
+    type = PropertyType.SWITCH, name = "Item Stars",
+    description = "Changes the way Item Stars are displayed on Items.",
+    category = "Miscellaneous", subcategory = "Items",
+    options = ["None", "Old", "Compact"],
+    searchTags = ["1.3.0-pre2"]
     )
-    var compactStars = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Old Item Stars",
-        description = "Displays the old item stars.",
-        category = "Miscellaneous", subcategory = "Items"
-    )
-    var oldStars = false
+    var starDisplayType = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
@@ -1641,6 +1636,22 @@ object Config : Vigilant(
     var containerSellValue = false
 
     @Property(
+    type = PropertyType.SELECTOR, name = "Total Magmafish Amount",
+    description = "Displays the total amount of Magma Fish in your inventory(Including Trophies).",
+    category = "Miscellaneous", subcategory = "Quality of Life",
+    options = [""]
+    )
+    var containerSellValue = false
+
+    @Property(
+    type = PropertyType.SELECTOR, name = "Total Magmafish Amount Display Type",
+    description = "Changes the way the Total Amount is displayed.",
+    category = "Miscellaneous", subcategory = "Quality of Life",
+    options = ["Compact", "Advanced"]
+    )
+    var containerSellValue = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Include Item Modifiers",
         description = "Includes potato books, recombobulators, enchantments, and master stars in the item price calculations.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1656,13 +1667,6 @@ object Config : Vigilant(
     var containerSellValueMaxItems = 20
 
     @Property(
-        type = PropertyType.SWITCH, name = "Custom Damage Splash",
-        description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var customDamageSplash = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
         description = "§b[WIP] §rAdds commas to Skyblock Damage Splashes.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1670,12 +1674,11 @@ object Config : Vigilant(
     var commaDamage = false
 
     @Property(
-        type = PropertyType.SLIDER, name = "Damage Splash Time",
-        description = "§b[WIP] §rChanges the time damage splashes are displayed for.",
-        category = "Miscellaneous", subcategory = "Quality of Life",
-        min = 10, max = 150, increment = 1
+    type = PropertyType.SWITCH, name = "Custom Damage Splash",
+    description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
+    category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var splashLivingTime = 150
+    var customDamageSplash = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Night Vision",
@@ -2708,8 +2711,6 @@ object Config : Vigilant(
             "mobBurrowColor",
             "treasureBurrowColor"
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
-
-        addDependency("splashLivingTime", "customDamageSplash")
 
         addDependency("activePetColor", "highlightActivePet")
         addDependency("favoritePetColor", "highlightFavoritePets")

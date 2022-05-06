@@ -61,7 +61,7 @@ class DamageSplashEntity(
             remove()
             return
         }
-        val maxLiving = Skytils.config.splashLivingTime
+        val maxLiving = 150
         if (livingTicks > maxLiving) {
             remove()
             return

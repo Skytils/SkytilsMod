@@ -163,7 +163,7 @@ object DupeTracker : Tracker("duped_items") {
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
             "" -> return
-            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: " + if(origin.isNotEmpty()) { origin.split('_').joinToString(" ").toTitleCase()} else "Unknown")
+            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: " + origin.ifEmpty { "Unknown" }.split('_').joinToString(" ").toTitleCase())
         }
     }
 
