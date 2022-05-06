@@ -62,13 +62,13 @@ object DataFetcher {
                     Utils.checkThreadAndQueue {
                         EnchantUtil.enchants.clear()
                         EnchantUtil.enchants.addAll(
-                            json.decodeFromJsonElement<List<NormalEnchant>>(get("NORMAL")!!)
+                            json.decodeFromJsonElement<Map<String, NormalEnchant>>(get("NORMAL")!!).values
                         )
                         EnchantUtil.enchants.addAll(
-                            json.decodeFromJsonElement<List<NormalEnchant>>(get("ULTIMATE")!!)
+                            json.decodeFromJsonElement<Map<String, NormalEnchant>>(get("ULTIMATE")!!).values
                         )
                         EnchantUtil.enchants.addAll(
-                            json.decodeFromJsonElement<List<StackingEnchant>>(get("STACKING")!!)
+                            json.decodeFromJsonElement<Map<String, StackingEnchant>>(get("STACKING")!!).values
                         )
                     }
                 }
