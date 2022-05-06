@@ -1237,11 +1237,25 @@ object Config : Vigilant(
     var blockZapperFatigueTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Necromancy Soul Helper",
+        description = "Displays if a soul got obtained for a master floor.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var necromancySoulHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Compact Item Stars",
         description = "Shortens item names with stars in them.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var compactStars = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Old Item Stars",
+        description = "Displays the old item stars.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var oldStars = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
@@ -1642,6 +1656,13 @@ object Config : Vigilant(
     var containerSellValueMaxItems = 20
 
     @Property(
+        type = PropertyType.SWITCH, name = "Custom Damage Splash",
+        description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var customDamageSplash = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Comma Damage",
         description = "§b[WIP] §rAdds commas to Skyblock Damage Splashes.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1649,11 +1670,12 @@ object Config : Vigilant(
     var commaDamage = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Custom Damage Splash",
-        description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        type = PropertyType.SLIDER, name = "Damage Splash Time",
+        description = "§b[WIP] §rChanges the time damage splashes are displayed for.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 10, max = 150, increment = 1
     )
-    var customDamageSplash = false
+    var splashLivingTime = 150
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Night Vision",
@@ -2686,6 +2708,9 @@ object Config : Vigilant(
             "mobBurrowColor",
             "treasureBurrowColor"
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
+
+        addDependency("splashLivingTime", "customDamageSplash")
+        addDependency("commaDamage", "customDamageSplash")
 
         addDependency("activePetColor", "highlightActivePet")
         addDependency("favoritePetColor", "highlightFavoritePets")
