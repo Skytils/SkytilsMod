@@ -21,6 +21,7 @@ package skytils.skytilsmod.utils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.IntArraySerializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import net.minecraft.util.BlockPos
@@ -109,6 +110,17 @@ object IntColorSerializer : KSerializer<Color> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.INT)
     override fun deserialize(decoder: Decoder): Color = Color(decoder.decodeInt(), true)
     override fun serialize(encoder: Encoder, value: Color) = encoder.encodeInt(value.rgb)
+}
+
+object BlockPosArraySerializer : KSerializer<BlockPos> {
+    private val delegateSerializer = IntArraySerializer()
+    override val descriptor: SerialDescriptor = delegateSerializer.descriptor
+    override fun deserialize(decoder: Decoder): BlockPos = decoder.decodeSerializableValue(delegateSerializer).let {
+        BlockPos(it[0], it[1], it[2])
+    }
+
+    override fun serialize(encoder: Encoder, value: BlockPos) =
+        encoder.encodeSerializableValue(delegateSerializer, intArrayOf(value.x, value.y, value.z))
 }
 
 object BlockPosObjectSerializer : KSerializer<BlockPos> {
