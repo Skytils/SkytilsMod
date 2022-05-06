@@ -49,6 +49,13 @@ class AuctionData {
                     val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
                     id = "PET-${petInfo.type}-${petInfo.tier}"
                 }
+                "ATTRIBUTE_SHARD" -> if (extraAttr.hasKey("attributes")) {
+                    val attributes = extraAttr.getCompoundTag("attributes")
+                    val attribute = attributes.keySet.firstOrNull()
+                    if (attribute != null) {
+                        id = "ATTRIBUTE_SHARD-${attribute.uppercase()}-${attributes.getInteger(attribute)}"
+                    }
+                }
                 "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
                     val enchants = extraAttr.getCompoundTag("enchantments")
                     val enchant = enchants.keySet.firstOrNull()
