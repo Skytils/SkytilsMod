@@ -2710,7 +2710,6 @@ object Config : Vigilant(
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
 
         addDependency("splashLivingTime", "customDamageSplash")
-        addDependency("commaDamage", "customDamageSplash")
 
         addDependency("activePetColor", "highlightActivePet")
         addDependency("favoritePetColor", "highlightFavoritePets")
