@@ -70,7 +70,7 @@ fun modifyDisplayName(s: String): String {
                 }?.ifNull {
                     displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
                 }
-            } else if(Skytils.config.starDisplayType == 1)) {
+            } else if(Skytils.config.starDisplayType == 1) {
                 masterStarPattern.find(displayName)?.let {
                     val star = it.value.last()
                     val count = masterStars.indexOf(star) + 1
