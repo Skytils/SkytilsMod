@@ -1339,7 +1339,7 @@ object Config : Vigilant(
         description = "Shows if you're combining incompatible books or attribute shards",
         category = "Miscellaneous", subcategory = "Items"
     )
-    var bookHelper = false
+    var combineHelper = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Etherwarp Teleport Position",

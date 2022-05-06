@@ -607,8 +607,8 @@ class ItemFeatures {
 
     @SubscribeEvent
     fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!Skytils.config.bookHelper || !Utils.inSkyblock) return
-        if (event.container !is ContainerChest || SBInfo.lastOpenContainerName != "Anvil") return
+        if (!Skytils.config.combineHelper || !Utils.inSkyblock) return
+        if (event.container !is ContainerChest || !Utils.equalsOneOf(event.chestName, "Anvil", "Attribute Fusion")) return
         val item1 = event.container.getSlot(29).stack ?: return
         val item2 = event.container.getSlot(33).stack ?: return
         val nbt1 = getExtraAttributes(item1) ?: return
