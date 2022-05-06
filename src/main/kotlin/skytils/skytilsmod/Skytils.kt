@@ -26,10 +26,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import net.minecraft.client.Minecraft
@@ -158,10 +155,10 @@ class Skytils {
         val dispatcher = threadPool.asCoroutineDispatcher()
 
         val IO = object : CoroutineScope {
-            override val coroutineContext = Dispatchers.IO + SupervisorJob()
+            override val coroutineContext = Dispatchers.IO + SupervisorJob() + CoroutineName("Skytils IO")
         }
 
-        override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob()
+        override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
 
         val hylinAPI = createHylinAPI("", false)
 
