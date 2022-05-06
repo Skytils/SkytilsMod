@@ -1244,11 +1244,11 @@ object Config : Vigilant(
     var necromancySoulHelper = false
 
    @Property(
-    type = PropertyType.SWITCH, name = "Item Stars",
-    description = "Changes the way Item Stars are displayed on Items.",
-    category = "Miscellaneous", subcategory = "Items",
-    options = ["None", "Old", "Compact"],
-    searchTags = ["1.3.0-pre2"]
+        type = PropertyType.SWITCH, name = "Item Stars",
+        description = "Changes the way Item Stars are displayed on Items.",
+        category = "Miscellaneous", subcategory = "Items",
+        options = ["Normal", "Old", "Compact"],
+        searchTags = ["1.3.0-pre2"]
     )
     var starDisplayType = 0
 
@@ -1636,20 +1636,19 @@ object Config : Vigilant(
     var containerSellValue = false
 
     @Property(
-    type = PropertyType.SELECTOR, name = "Total Magmafish Amount",
-    description = "Displays the total amount of Magma Fish in your inventory(Including Trophies).",
-    category = "Miscellaneous", subcategory = "Quality of Life",
-    options = [""]
+        type = PropertyType.SWITCH, name = "Total Magmafish Amount",
+        description = "Displays the total amount of Magma Fish in your inventory(Including Trophies).",
+        category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var containerSellValue = false
+    var totalMagmafish = false
 
     @Property(
-    type = PropertyType.SELECTOR, name = "Total Magmafish Amount Display Type",
-    description = "Changes the way the Total Amount is displayed.",
-    category = "Miscellaneous", subcategory = "Quality of Life",
-    options = ["Compact", "Advanced"]
+        type = PropertyType.SELECTOR, name = "Total Magmafish Amount Display Type",
+        description = "Changes the way the Total Amount is displayed.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        options = ["Compact", "Advanced"]
     )
-    var containerSellValue = false
+    var magmafishDisplayType = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Include Item Modifiers",
@@ -1674,9 +1673,9 @@ object Config : Vigilant(
     var commaDamage = false
 
     @Property(
-    type = PropertyType.SWITCH, name = "Custom Damage Splash",
-    description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
-    category = "Miscellaneous", subcategory = "Quality of Life"
+        type = PropertyType.SWITCH, name = "Custom Damage Splash",
+        description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var customDamageSplash = false
 
