@@ -25,6 +25,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import net.minecraft.util.BlockPos
@@ -125,11 +126,11 @@ object DataFetcher {
                         TriviaSolver.triviaSolutions.putAll(this)
                     }
                 }
-                client.get("${dataUrl}constants/relics.json").body<List<Triple<Int, Int, Int>>>().apply {
+                client.get("${dataUrl}constants/relics.json").body<List<JsonElement>>().apply {
                     Utils.checkThreadAndQueue {
                         RelicWaypoints.relicLocations.clear()
-                        mapTo(RelicWaypoints.relicLocations) { (x, y, z) ->
-                            BlockPos(x, y, z)
+                        mapTo(RelicWaypoints.relicLocations) {
+                            json.decodeFromJsonElement(BlockPosArraySerializer, it)
                         }
                     }
                 }
