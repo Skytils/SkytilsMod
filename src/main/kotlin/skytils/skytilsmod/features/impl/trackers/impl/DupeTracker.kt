@@ -38,11 +38,8 @@ import skytils.skytilsmod.Skytils.Companion.client
 import skytils.skytilsmod.events.impl.GuiContainerEvent
 import skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import skytils.skytilsmod.features.impl.trackers.Tracker
-import skytils.skytilsmod.utils.DevTools
-import skytils.skytilsmod.utils.ItemUtil
+import skytils.skytilsmod.utils.*
 import skytils.skytilsmod.utils.RenderUtil.highlight
-import skytils.skytilsmod.utils.Utils
-import skytils.skytilsmod.utils.printDevMessage
 import java.io.Reader
 import java.io.Writer
 import kotlin.concurrent.fixedRateTimer
@@ -166,7 +163,7 @@ object DupeTracker : Tracker("duped_items") {
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
             "" -> return
-            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: $origin")
+            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: " + origin.ifEmpty { "Unknown" }.split('_').joinToString(" ").toTitleCase())
         }
     }
 
