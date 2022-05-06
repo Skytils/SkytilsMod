@@ -44,13 +44,13 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
             "override" -> {
                 when {
                     originalMessage.contains("on") -> {
-                        GlintCustomizer.glintItems[itemId]?.override = true
+                        GlintCustomizer.getGlintItem(itemId).override = true
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aForced an enchant glint for your item.")
                         return
                     }
                     originalMessage.contains("off") -> {
-                        GlintCustomizer.glintItems[itemId]?.override = false
+                        GlintCustomizer.getGlintItem(itemId).override = false
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aForce disabled an enchant glint for your item.")
                         return
@@ -64,7 +64,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         return
                     }
                     originalMessage.contains("clear") -> {
-                        GlintCustomizer.glintItems[itemId]?.override = null
+                        GlintCustomizer.getGlintItem(itemId).override = null
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aCleared glint overrides for your item.")
                         return
@@ -79,7 +79,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                     originalMessage.contains("set") -> {
                         if (args.size != 3) throw WrongUsageException("You must specify a valid hex color!")
                         try {
-                            GlintCustomizer.glintItems[itemId]?.color = Utils.customColorFromString(args[2])
+                            GlintCustomizer.getGlintItem(itemId).color = Utils.customColorFromString(args[2])
                             PersistentSave.markDirty<GlintCustomizer>()
                             UChat.chat("$successPrefix §aForced an enchant glint color for your item.")
                         } catch (e: NumberFormatException) {
@@ -96,7 +96,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         return
                     }
                     originalMessage.contains("clear") -> {
-                        GlintCustomizer.glintItems[itemId]?.color = null
+                        GlintCustomizer.getGlintItem(itemId).color = null
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aCleared the custom glint color for your item.")
                         return
