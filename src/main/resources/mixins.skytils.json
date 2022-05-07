@@ -1,8 +1,8 @@
 {
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.8",
-  "plugin": "skytils.skytilsmod.mixins.SkytilsMixinPlugin",
-  "package": "skytils.skytilsmod.mixins.transformers",
+  "plugin": "gg.skytils.skytilsmod.mixins.SkytilsMixinPlugin",
+  "package": "gg.skytils.skytilsmod.mixins.transformers",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "MixinMinecraft",
@@ -80,7 +80,7 @@
     "sba.MixinContainerPreviewManager",
     "sk1eroam.MixinAnimationHandler",
     "util.MixinChatStyle",
-    "util.MixinIChatComponent$Serializer",
+    "util.MixinIChatComponentSerializer",
     "util.MixinUtil",
     "world.MixinChunk",
     "world.MixinWorld"
