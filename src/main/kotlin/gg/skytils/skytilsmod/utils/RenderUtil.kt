@@ -165,9 +165,10 @@ object RenderUtil {
         UGraphics.tryBlendFuncSeparate(770, 771, 1, 0)
         val wr = UGraphics.getFromTessellator()
         wr.beginWithDefaultShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_COLOR)
+        val adjustedAlpha = (c.alpha * alphaMultiplier).toInt().coerceAtMost(255)
 
         // vertical
-        c.withAlpha(c.alpha * alphaMultiplier / 255f).withParts { r, g, b, a ->
+        c.withAlpha(adjustedAlpha).withParts { r, g, b, a ->
             // bottom
             wr.pos(matrixStack, aabb.minX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
             wr.pos(matrixStack, aabb.maxX, aabb.minY, aabb.minZ).color(r, g, b, a).endVertex()
@@ -183,10 +184,10 @@ object RenderUtil {
         // x axis
         c.withParts { r, g, b, a ->
             Color(
-                r * 0.8f / 255f,
-                g * 0.8f / 255f,
-                b * 0.8f / 255f,
-                a * alphaMultiplier / 255f
+                (r * 0.8f).toInt(),
+                (g * 0.8f).toInt(),
+                (b * 0.8f).toInt(),
+                adjustedAlpha
             )
         }.withParts { r, g, b, a ->
             // west
@@ -204,10 +205,10 @@ object RenderUtil {
         // z axis
         c.withParts { r, g, b, a ->
             Color(
-                r * 0.9f / 255f,
-                g * 0.9f / 255f,
-                b * 0.9f / 255f,
-                a * alphaMultiplier / 255f
+                (r * 0.9f).toInt(),
+                (g * 0.9f).toInt(),
+                (b * 0.9f).toInt(),
+                adjustedAlpha
             )
         }.withParts { r, g, b, a ->
             // north
