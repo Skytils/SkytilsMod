@@ -143,10 +143,16 @@ object ChatTabs {
                     b.yPosition =
                         (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2).toInt()
                 }
-                hoveredChatLine =
-                    if (chat.chatOpen && Skytils.config.copyChat) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
             }
         }
+    }
+
+    @SubscribeEvent
+    fun preDrawScreen(event: GuiScreenEvent.DrawScreenEvent.Pre) {
+        val chat = mc.ingameGUI.chatGUI
+        chat as AccessorGuiNewChat
+        hoveredChatLine =
+            if (Skytils.config.copyChat && chat.chatOpen) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
     }
 
     @SubscribeEvent
