@@ -33,7 +33,7 @@ plugins {
 }
 
 version = "1.3.0-pre1"
-group = "skytils.skytilsmod"
+group = "gg.skytils"
 
 repositories {
     mavenLocal()
@@ -47,7 +47,7 @@ loom {
     silentMojangMappingsLicense()
     launchConfigs {
         getByName("client") {
-            property("fml.coreMods.load", "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
+            property("fml.coreMods.load", "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
             property("elementa.dev", "true")
             property("elementa.debug", "true")
             property("elementa.invalid_usage", "warn")
@@ -58,7 +58,7 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
-            arg("--tweakClass", "skytils.skytilsmod.tweaker.SkytilsTweaker")
+            arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             arg("--mixin", "mixins.skytils.json")
         }
     }
@@ -145,13 +145,13 @@ tasks {
             attributes(
                 mapOf(
                     "Main-Class" to "SkytilsInstallerFrame",
-                    "FMLCorePlugin" to "skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
+                    "FMLCorePlugin" to "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
-                    "TweakClass" to "skytils.skytilsmod.tweaker.SkytilsTweaker",
+                    "TweakClass" to "gg.skytils.skytilsmod.tweaker.SkytilsTweaker",
                     "TweakOrder" to "0"
                 )
             )
@@ -175,11 +175,11 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowMe, shadowMeMod)
 
-        relocate("dev.falsehonesty.asmhelper", "skytils.asmhelper")
-        relocate("com.llamalad7.mixinextras", "skytils.mixinextras")
-        relocate("io.ktor", "skytils.ktor")
-        relocate("kotlinx.serialization", "skytils.ktx-serialization")
-        relocate("kotlinx.coroutines", "skytils.ktx-coroutines")
+        relocate("dev.falsehonesty.asmhelper", "gg.skytils.asmhelper")
+        relocate("com.llamalad7.mixinextras", "gg.skytils.mixinextras")
+        relocate("io.ktor", "gg.skytils.ktor")
+        relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
+        relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
 
         exclude(
             "**/LICENSE.md",
@@ -194,7 +194,8 @@ tasks {
             "META-INF/maven/**",
             "META-INF/versions/**",
             "META-INF/com.android.tools/**",
-            "fabric.mod.json"
+            "fabric.mod.json",
+            "**/loader-dev.jar"
         )
         mergeServiceFiles()
     }
