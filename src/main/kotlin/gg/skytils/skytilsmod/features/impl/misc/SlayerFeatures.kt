@@ -262,7 +262,7 @@ class SlayerFeatures {
                 }
             }
             if (Skytils.config.totemPing != 0 && packet.entityId == (slayer as? DemonlordSlayer)?.totemEntity?.entityId) {
-                (packet.func_149376_c().find { it.dataValueId == 2 }?.`object` as String).let { name ->
+                ((packet.func_149376_c().find { it.dataValueId == 2 } ?: return).`object` as String).let { name ->
                     printDevMessage("totem name updating: $name", "totem")
                     totemRegex.matchEntire(name)?.run {
                         printDevMessage("time ${groups["time"]}", "totem")
@@ -271,7 +271,8 @@ class SlayerFeatures {
                     }
                 }
             } else if (packet.entityId == (slayer as? DemonlordSlayer)?.entity?.entityId &&
-                ((packet.func_149376_c().find { it.dataValueId == 0 }?.`object` as Byte).toInt() and 0x20) == 0 &&
+                (((packet.func_149376_c().find { it.dataValueId == 0 }
+                    ?: return).`object` as Byte).toInt() and 0x20) == 0 &&
                 slayer?.entity?.isInvisible == true
             ) {
                 slayer?.run {
