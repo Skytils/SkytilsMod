@@ -187,6 +187,7 @@ class Skytils {
                 include(serializersModule)
                 contextual(CustomColor::class, CustomColor.Serializer)
                 contextual(Regex::class, RegexAsString)
+                contextual(UUID::class, UUIDAsString)
             }
         }
 

@@ -26,6 +26,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import net.minecraft.util.BlockPos
 import java.awt.Color
+import java.util.*
 
 private typealias NonDashedUUID = String
 private typealias MobName = String
@@ -153,4 +154,11 @@ object BlockPosObjectSerializer : KSerializer<BlockPos> {
             }
             BlockPos(x, y, z)
         }
+}
+
+
+object UUIDAsString : KSerializer<UUID> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
+    override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+    override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
 }

@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.network.play.server.S02PacketChat
@@ -35,7 +36,7 @@ import java.io.Writer
 import java.util.*
 
 object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
-    val prices = mutableMapOf<UUID, Double>()
+    val prices = mutableMapOf<@Contextual UUID, Double>()
     private val coinRegex = Regex("(?:§6)?([\\d,]+) coins", RegexOption.IGNORE_CASE)
     private var lastBought: Triple<String, UUID, Double>? = null
     private val junkRegex = Regex("[,.]")

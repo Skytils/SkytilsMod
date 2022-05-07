@@ -97,7 +97,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         var name: String,
         @EncodeDefault
         var state: Int = repoFilters.find { f -> f.name == name }?.state ?: 0,
-        var skyblockOnly: Boolean,
+        var skyblockOnly: Boolean = true,
         @Serializable(with = RegexAsString::class)
         @SerialName("pattern")
         var regex: Regex,
