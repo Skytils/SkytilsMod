@@ -1238,13 +1238,14 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Necromancy Soul Helper",
-        description = "Displays if a Soul has been obtained on a Master Floor..",
-        category = "Miscellaneous", subcategory = "Items"
+        description = "Displays if a Soul has been obtained on a Master Floor.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["1.3.0-pre2"]
     )
     var necromancySoulHelper = false
 
    @Property(
-        type = PropertyType.SWITCH, name = "Item Stars",
+        type = PropertyType.SELECTOR, name = "Item Stars",
         description = "Changes the way Item Stars are displayed on Items.",
         category = "Miscellaneous", subcategory = "Items",
         options = ["Normal", "Old", "Compact"],
@@ -1636,9 +1637,18 @@ object Config : Vigilant(
     var containerSellValue = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Minion Profit and Experience Calculator",
+        description = "Displays how much Experience and Coins a Minion will give you.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["1.3.0-pre2"]
+    )
+    var minionProfitCalc = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Total Magmafish Amount",
         description = "Displays the total amount of Magma Fish in your inventory(Including Trophies).",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["1.3.0-pre2"]
     )
     var totalMagmafish = false
 
@@ -1646,9 +1656,18 @@ object Config : Vigilant(
         type = PropertyType.SELECTOR, name = "Total Magmafish Amount Display Type",
         description = "Changes the way the Total Amount is displayed.",
         category = "Miscellaneous", subcategory = "Quality of Life",
-        options = ["Compact", "Advanced"]
+        options = ["Compact", "Advanced"],
+        searchTags = ["1.3.0-pre2"]
     )
     var magmafishDisplayType = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Trophy Worth In Lore",
+        description = "Displays the amount of Magmafish the Trophy is worth in its lore.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["1.3.0-pre2"]
+    )
+    var showTrophyWorth = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Include Item Modifiers",
