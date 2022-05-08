@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.DynamicResource
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -39,10 +40,15 @@ object SummonSkins {
     }
 
     fun loadSkins() = Skytils.IO.launch {
-        skintextureMap.clear()
-        skinMap.forEach {
-            skintextureMap[it.key] =
-                DynamicResource(it.key, ImageIO.read(client.get(it.value).bodyAsChannel().toInputStream()))
+        skinMap.entries.associate {
+            it.key to ImageIO.read(client.get(it.value).bodyAsChannel().toInputStream())
+        }.also {
+            Utils.checkThreadAndQueue {
+                skintextureMap.clear()
+                skintextureMap.putAll(it.mapValues {
+                    DynamicResource(it.key, it.value)
+                })
+            }
         }
     }
 }
