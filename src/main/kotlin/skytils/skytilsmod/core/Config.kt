@@ -1620,7 +1620,7 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var betterStash = false
-    
+
     @Property(
         type = PropertyType.SWITCH, name = "Container Sell Value",
         description = "Display the lowest BIN prices for the most valuable items in backpacks, ender chest pages, minions, and island chests.",
