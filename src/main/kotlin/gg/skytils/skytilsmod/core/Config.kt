@@ -1236,12 +1236,14 @@ object Config : Vigilant(
     )
     var blockZapperFatigueTimer = false
 
-    @Property(
-        type = PropertyType.SWITCH, name = "Compact Item Stars",
-        description = "Shortens item names with stars in them.",
-        category = "Miscellaneous", subcategory = "Items"
+       @Property(
+        type = PropertyType.SELECTOR, name = "Item Stars",
+        description = "Changes the way Item Stars are displayed on Items.",
+        category = "Miscellaneous", subcategory = "Items",
+        options = ["Normal", "Old", "Compact"],
+        searchTags = ["1.3.0-pre3"]
     )
-    var compactStars = false
+    var starDisplayType = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
