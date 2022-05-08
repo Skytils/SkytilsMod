@@ -281,7 +281,6 @@ class Skytils {
             IcePathSolver(),
             ItemFeatures(),
             KeyShortcuts,
-            KuudraFeatures,
             LockOrb(),
             MasterMode7Features,
             MayorDiana(),

@@ -17,34 +17,3 @@
  */
 
 package gg.skytils.skytilsmod.features.impl.misc
-
-import gg.essential.universal.UGraphics
-import gg.essential.universal.UMatrixStack
-import gg.skytils.skytilsmod.Skytils
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
-object KuudraFeatures {
-    private val tentacleNametagStack = UMatrixStack()
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun beforeNametag(event: RenderLivingEvent.Specials.Pre<EntityArmorStand>) {
-        if (Skytils.config.bigTentacleTag && "Tentacle" in event.entity.name) {
-            UGraphics.GL.pushMatrix()
-            tentacleNametagStack.push()
-            tentacleNametagStack.scale(10f, 10f, 0f)
-            tentacleNametagStack.applyToGlobalState()
-        }
-    }
-
-    @SubscribeEvent
-    fun afterName(event: RenderLivingEvent.Specials.Post<EntityArmorStand>) {
-        if (Skytils.config.bigTentacleTag && "Tentacle" in event.entity.name) {
-            tentacleNametagStack.pop()
-            UGraphics.GL.popMatrix()
-        }
-    }
-
-}
