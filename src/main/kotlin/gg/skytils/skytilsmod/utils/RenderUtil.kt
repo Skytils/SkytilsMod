@@ -356,35 +356,41 @@ object RenderUtil {
         partialTicks: Float,
         matrixStack: UMatrixStack
     ) {
+        matrixStack.push()
         GlStateManager.alphaFunc(516, 0.1f)
-        val player = mc.thePlayer
-        val distX = x - player.posX
-        val distY = y - player.posY
-        val distZ = z - player.posZ
-        val distSq = distX * distX + distY * distY + distZ * distZ
-        val dist = sqrt(distSq)
+        val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
+        val distX = x - viewerX
+        val distY = y - viewerY
+        val distZ = z - viewerZ
+        val dist = sqrt(distX * distX + distY * distY + distZ * distZ)
         val renderX: Double
         val renderY: Double
         val renderZ: Double
-        if (distSq > 144) {
-            renderX = distX * 12 / dist
-            renderY = distY * 12 / dist
-            renderZ = distZ * 12 / dist
+        if (dist > 12) {
+            renderX = distX * 12 / dist + viewerX
+            renderY = distY * 12 / dist + viewerY
+            renderZ = distZ * 12 / dist + viewerZ
         } else {
-            renderX = distX
-            renderY = distY
-            renderZ = distZ
+            renderX = x
+            renderY = y
+            renderZ = z
         }
         drawNametag(renderX, renderY, renderZ, str, Color.WHITE, partialTicks, matrixStack)
+        matrixStack.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        matrixStack.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        matrixStack.translate(0.0, -0.25, 0.0)
+        matrixStack.rotate(-mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        matrixStack.rotate(mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         drawNametag(
             renderX,
-            renderY - 0.25,
+            renderY,
             renderZ,
             "${ChatColor.YELLOW}${dist.roundToInt()}m",
             Color.WHITE,
             partialTicks,
             matrixStack
         )
+        matrixStack.pop()
     }
 
     private fun drawNametag(
