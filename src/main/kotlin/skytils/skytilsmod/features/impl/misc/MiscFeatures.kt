@@ -334,7 +334,7 @@ class MiscFeatures {
             val extraAttributes = getExtraAttributes(item)
             if (event.chestName == "Ophelia") {
                 if (Skytils.config.dungeonPotLock > 0) {
-                    if (slot.inventory === mc.thePlayer.inventory || slot.slotNumber == 49) return
+                    if (slot.inventory === mc.thePlayer.inventory || Utils.equalsOneOf(slot.slotNumber, 49, 53)) return
                     if (item.item !== Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
                         event.isCanceled = true
                         return

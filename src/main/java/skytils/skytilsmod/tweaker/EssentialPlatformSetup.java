@@ -47,7 +47,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 public class EssentialPlatformSetup {
-    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/TakoTheDev/SkytilsMod-Data@main/"};
+    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"};
     private static final boolean isDev = System.getProperty("skytils.testEssentialSetup") != null;
 
     private static boolean trySetDataUrl(String url) {
