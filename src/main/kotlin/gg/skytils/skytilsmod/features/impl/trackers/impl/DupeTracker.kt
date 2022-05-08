@@ -41,6 +41,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import gg.skytils.skytilsmod.utils.*
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
