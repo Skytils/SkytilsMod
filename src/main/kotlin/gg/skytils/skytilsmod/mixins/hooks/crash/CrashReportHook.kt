@@ -51,16 +51,18 @@ class CrashReportHook(private val crash: CrashReport) {
             val registry =
                 InjectionInfo::class.java.getFieldHelper("registry")?.get(null) as? Map<*, *> ?: return
             val prefixField = ReflectionHelper.getFieldFor(
-                "org.spongepowered.asm.mixin.injection.struct.InjectionInfo.InjectorEntry",
+                "org.spongepowered.asm.mixin.injection.struct.InjectionInfo\$InjectorEntry",
                 "prefix"
             ) ?: return
             val prefixes = registry.values.map {
                 "${prefixField.get(it)}$"
             }
             crash.crashCause.stackTrace.filter {
-                it.methodName.countMatches("$") == 2 && it.methodName.startsWithAny(prefixes)
+                it.methodName.countMatches("$") >= 2 && it.methodName.startsWithAny(prefixes)
             }.mapNotNullTo(hashSetOf()) {
-                val method = ReflectionHelper.getMethodFor(it.className, it.methodName) ?: return@mapNotNullTo null
+                val method = ReflectionHelper.getClassHelper(it.className)?.declaredMethods?.find { m ->
+                    m.name == it.methodName
+                } ?: return@mapNotNullTo null
                 if (!method.isAnnotationPresent(MixinMerged::class.java)) return@mapNotNullTo null
                 val annotation = method.getDeclaredAnnotation(MixinMerged::class.java) ?: return@mapNotNullTo null
                 return@mapNotNullTo it to annotation.mixin
