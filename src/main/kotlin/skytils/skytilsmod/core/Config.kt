@@ -1241,7 +1241,7 @@ object Config : Vigilant(
         description = "Changes the way Item Stars are displayed on Items.",
         category = "Miscellaneous", subcategory = "Items",
         options = ["Normal", "Old", "Compact"],
-        searchTags = ["1.3.0-pre2"]
+        searchTags = ["1.3.0-pre3"]
     )
     var starDisplayType = 0
 
