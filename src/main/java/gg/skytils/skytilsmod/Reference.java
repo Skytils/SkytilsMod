@@ -22,5 +22,5 @@ public class Reference {
     public static String dataUrl = "https://data.skytils.gg/";
     public static final String MODID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "1.3.0-pre1";
+    public static final String VERSION = "1.3.0-pre2";
 }
