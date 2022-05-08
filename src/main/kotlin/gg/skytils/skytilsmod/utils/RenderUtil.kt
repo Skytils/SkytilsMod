@@ -363,28 +363,19 @@ object RenderUtil {
         val distY = y - viewerY
         val distZ = z - viewerZ
         val dist = sqrt(distX * distX + distY * distY + distZ * distZ)
-        val renderX: Double
-        val renderY: Double
-        val renderZ: Double
         if (dist > 12) {
-            renderX = distX * 12 / dist + viewerX
-            renderY = distY * 12 / dist + viewerY
-            renderZ = distZ * 12 / dist + viewerZ
-        } else {
-            renderX = x
-            renderY = y
-            renderZ = z
+            matrixStack.scale(12f, 12f, 12f)
         }
-        drawNametag(renderX, renderY, renderZ, str, Color.WHITE, partialTicks, matrixStack)
+        drawNametag(x, y, z, str, Color.WHITE, partialTicks, matrixStack)
         matrixStack.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         matrixStack.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         matrixStack.translate(0.0, -0.25, 0.0)
         matrixStack.rotate(-mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         matrixStack.rotate(mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         drawNametag(
-            renderX,
-            renderY,
-            renderZ,
+            x,
+            y,
+            z,
             "${ChatColor.YELLOW}${dist.roundToInt()}m",
             Color.WHITE,
             partialTicks,
