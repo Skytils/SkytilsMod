@@ -808,9 +808,13 @@ class ScreenRenderer {
     }
 
     companion object {
-        @JvmField
-        var fontRenderer: SmartFontRenderer = SmartFontRenderer()
-        var mc: Minecraft = Minecraft.getMinecraft()
+        val fontRenderer: SmartFontRenderer by lazy {
+            if (!Minecraft.getMinecraft().isCallingFromMinecraftThread) error("ScreenRenderer cannot continue loading because it is not on the main thread")
+            SmartFontRenderer()
+        }
+        val mc: Minecraft by lazy {
+            Minecraft.getMinecraft()
+        }
         private var screen: UResolution? = null
         var isRendering = false
         var scale = 1.0f
