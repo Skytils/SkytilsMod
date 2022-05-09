@@ -77,7 +77,7 @@ fun modifyDisplayName(s: String): String {
                     displayName = displayName.replace(masterStarPattern, "").replace(starPattern.repeat(count), "§c✪".repeat(count))
                 }
             }
-        }    
+        }
     } catch (ignored: Exception) {
     }
     return displayName
