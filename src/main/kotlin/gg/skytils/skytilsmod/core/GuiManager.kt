@@ -81,7 +81,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun searchElements(query: String): List<GuiElement> {
         val results: MutableList<GuiElement> = ArrayList()
         for ((key, value) in names) {
-            if (key == query) results.add(value)
+            if (key.contains(query)) results.add(value)
         }
         return results
     }
@@ -207,8 +207,11 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
     override fun read(reader: Reader) {
         json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale) ->
-            GUIPOSITIONS[name] = FloatPair(x, y)
+            val pos = FloatPair(x, y)
+            GUIPOSITIONS[name] = pos
             GUISCALES[name] = scale
+            getByName(name)?.pos = pos
+            getByName(name)?.scale = scale
         }
     }
 

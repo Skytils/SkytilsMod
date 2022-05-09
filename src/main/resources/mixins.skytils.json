@@ -33,7 +33,6 @@
     "entity.MixinEntityFishHook",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayerSP",
-    "forge.MixinJarDiscoverer",
     "gui.MixinChatLine",
     "gui.MixinGuiContainer",
     "gui.MixinGuiIngame",
