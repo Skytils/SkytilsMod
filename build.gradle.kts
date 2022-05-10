@@ -60,6 +60,7 @@ loom {
             property("legacy.debugClassLoadingFiner", "true")
             arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             arg("--mixin", "mixins.skytils.json")
+            arg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
     }
     runConfigs {
