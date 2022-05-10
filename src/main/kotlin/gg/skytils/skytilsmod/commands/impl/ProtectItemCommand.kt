@@ -18,7 +18,7 @@
 package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
-import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
+import gg.skytils.skytilsmod.Skytils.Companion.*
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.protectitems.strategy.impl.FavoriteStrategy
@@ -35,7 +35,7 @@ object ProtectItemCommand : BaseCommand("protectitem") {
         if (subcommand == "clearall") {
             FavoriteStrategy.favoriteItems.clear()
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-            UChat.chat("$successPrefix §aCleared all your protected items!")
+            UChat.chat("$failPrefix §cCleared all your protected items!")
             return
         }
         if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
@@ -46,7 +46,7 @@ object ProtectItemCommand : BaseCommand("protectitem") {
         val uuid = extraAttributes.getString("uuid")
         if (FavoriteStrategy.favoriteItems.remove(uuid)) {
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-            UChat.chat("$successPrefix §aI will no longer protect your ${item.displayName}§a!")
+            UChat.chat("$failPrefix §cI will no longer protect your ${item.displayName}§a!")
         } else {
             FavoriteStrategy.favoriteItems.add(uuid)
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
