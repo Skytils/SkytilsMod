@@ -57,7 +57,9 @@ abstract class GuiElement(var name: String, var scale: Float, var pos: FloatPair
 
     companion object {
         val sr = UResolution
-        val fr = ScreenRenderer.fontRenderer
+        val fr by lazy {
+            ScreenRenderer.fontRenderer
+        }
     }
 
     init {

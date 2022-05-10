@@ -32,7 +32,7 @@ plugins {
     signing
 }
 
-version = "1.3.0-pre2"
+version = "1.3.0-pre3"
 group = "gg.skytils"
 
 repositories {
@@ -60,6 +60,7 @@ loom {
             property("legacy.debugClassLoadingFiner", "true")
             arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             arg("--mixin", "mixins.skytils.json")
+            arg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
     }
     runConfigs {
