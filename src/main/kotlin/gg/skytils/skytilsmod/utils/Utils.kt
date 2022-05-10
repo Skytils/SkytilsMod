@@ -361,3 +361,7 @@ val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
 fun getSkytilsResource(path: String) = ResourceLocation("skytils", path)
 
 fun <E> List<E>.getLastOrNull(index: Int) = getOrNull(lastIndex - index)
+
+fun isBreefing(): Boolean {
+    return mc.thePlayer.name == "Breefing"
+}

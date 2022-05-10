@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.isBreefing
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,6 +49,11 @@ class ChatListener {
             Skytils.config.markDirty()
             UChat.chat("$successPrefix §aSkytils updated your set Hypixel API key to §2${apiKey}")
             return
+        }
+        if(formatted.contains("jawbus", ignoreCase = true) && isBreefing()) {
+            formatted.replace("jawbus", "Jaws", ignoreCase = true)
+            event.isCanceled = true
+            UChat.chat(formatted)
         }
         if (Skytils.config.autoReparty) {
             if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
