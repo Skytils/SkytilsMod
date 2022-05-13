@@ -1891,6 +1891,14 @@ object Config : Vigilant(
     var showLowestBINPrice = false
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Show When a Tooltip's Countdown Ends",
+        description = "Shows when a countdown within an item's tooltip will end, relative to your timezone.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        options = ["Off", "24-Hour Format", "12-Hour Format"]
+    )
+    var showWhenCountdownEnds = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Stop Clicking Non-Salvageable Items",
         description = "Stops you from clicking Non-Salvageable items while in the Salvage menu",
         category = "Miscellaneous", subcategory = "Quality of Life"

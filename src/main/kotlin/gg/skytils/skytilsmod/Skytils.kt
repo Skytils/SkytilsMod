@@ -266,6 +266,7 @@ class Skytils {
             CommandAliases,
             ContainerSellValue,
             CooldownTracker,
+            CountdownCalculator,
             CustomNotifications,
             DamageSplash(),
             DungeonFeatures,
