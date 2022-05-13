@@ -37,7 +37,7 @@ to the user's current system time in Unix epoch form, then converting that value
 object CountdownCalculator {
 
     val regex =
-        "(?:(?<days>\\d+)d)? ?(?:(?<hours>\\d+)h)? ?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?".toRegex()
+        ".*§.(?:(?<days>\\d+)d)? ?(?:(?<hours>\\d+)h)? ?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\b.*".toRegex()
     val formatter12h = DateTimeFormatter.ofPattern("EEEE, MMM d h:mm:ss a z")!!
     val formatter24h = DateTimeFormatter.ofPattern("EEEE, MMM d HH:mm:ss z")!!
 
@@ -54,7 +54,7 @@ object CountdownCalculator {
         Countdown("Until interest:", "Interest at"),
         Countdown("Ends in:", "Ends at"),
         Countdown("Remaining:", "Ends at"),
-        Countdown("Duration:", "Completes at"),
+        Countdown("Duration:", "Finishes at"),
         Countdown("Time left:", "Ends at"),
         Countdown("Event lasts for", "Ends at", isRelative = true),
         Countdown("(§e", "Starts at"), // Calendar details
@@ -71,13 +71,12 @@ object CountdownCalculator {
             else -> return
         }
         if (event.itemStack != null && mc.thePlayer?.openContainer != null) {
-
             var i = -1
             var lastTimer: ZonedDateTime? = null
             while (++i < event.toolTip.size) {
                 val tooltipLine = event.toolTip[i]
                 val countdownKind = countdownTypes.find { it.match in tooltipLine } ?: continue
-                val match = regex.find(tooltipLine) ?: continue
+                val match = regex.matchEntire(tooltipLine) ?: continue
 
                 val days = match.groups["days"]?.value?.toInt() ?: 0
                 val hours = match.groups["hours"]?.value?.toInt() ?: 0
