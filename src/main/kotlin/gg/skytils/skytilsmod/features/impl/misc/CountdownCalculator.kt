@@ -83,6 +83,7 @@ object CountdownCalculator {
                 val minutes = match.groups["minutes"]?.value?.toInt() ?: 0
                 val seconds = match.groups["seconds"]?.value?.toInt() ?: 0
                 val totalSeconds = days * 86400L + hours * 3600L + minutes * 60L + seconds
+                if (totalSeconds == 0L) continue
                 val countdownTarget = if (countdownKind.isRelative) {
                     if (lastTimer == null) {
                         event.toolTip.add(
