@@ -37,7 +37,7 @@ to the user's current system time in Unix epoch form, then converting that value
 object CountdownCalculator {
 
     val regex =
-        ".*§.(?:(?<days>\\d+)d)? ?(?:(?<hours>\\d+)h)? ?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\b.*".toRegex()
+        "(?:(?<days>\\d+)d)? ?(?:(?<hours>\\d+)h)? ?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\b".toRegex()
     val formatter12h = DateTimeFormatter.ofPattern("EEEE, MMM d h:mm:ss a z")!!
     val formatter24h = DateTimeFormatter.ofPattern("EEEE, MMM d HH:mm:ss z")!!
 
@@ -76,7 +76,7 @@ object CountdownCalculator {
             while (++i < event.toolTip.size) {
                 val tooltipLine = event.toolTip[i]
                 val countdownKind = countdownTypes.find { it.match in tooltipLine } ?: continue
-                val match = regex.matchEntire(tooltipLine) ?: continue
+                val match = regex.findAll(tooltipLine).maxByOrNull { it.value.length } ?: continue
 
                 val days = match.groups["days"]?.value?.toInt() ?: 0
                 val hours = match.groups["hours"]?.value?.toInt() ?: 0
