@@ -72,7 +72,6 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Loader
@@ -482,16 +481,7 @@ class MiscFeatures {
             WorldAgeDisplay()
         }
     }
-    @SubscribeEvent
-    fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase>) {
-        if (!Utils.inSkyblock) return
-        if (event.entity is EntityArmorStand) {
-            val entity = event.entity as EntityArmorStand
-            if (!entity.hasCustomName() || !entity.customNameTag.contains("Jawbus") || !isBreefing()) return
-            var name = entity.customNameTag
-            name = name.replace("Jawbus","Jaws")
-        }
-    }
+
     class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", FloatPair(150, 20)) {
         override fun render() {
             val player = mc.thePlayer
