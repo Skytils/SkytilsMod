@@ -361,3 +361,5 @@ val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
 fun getSkytilsResource(path: String) = ResourceLocation("skytils", path)
 
 fun <E> List<E>.getLastOrNull(index: Int) = getOrNull(lastIndex - index)
+
+fun <T> Iterator<T>.nextOrNull(): T? = if (hasNext()) next() else null

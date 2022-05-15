@@ -276,6 +276,7 @@ class Skytils {
             EnterToConfirmSignPopup(),
             FarmingFeatures(),
             FavoritePets,
+            Funny,
             GlintCustomizer,
             GriffinBurrows,
             IceFillSolver,
