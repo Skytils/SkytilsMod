@@ -275,6 +275,7 @@ class Skytils {
             EnchantNames,
             FarmingFeatures(),
             FavoritePets,
+            Funny,
             GlintCustomizer,
             GriffinBurrows,
             IceFillSolver,
