@@ -27,6 +27,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
+    id("io.github.juuxel.loom-quiltflower") version "1.7.2"
     java
     idea
     signing
@@ -41,6 +42,10 @@ repositories {
     maven("https://repo.sk1er.club/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-releases/")
     maven("https://jitpack.io")
+}
+
+quiltflower {
+    quiltflowerVersion.set("1.8.1")
 }
 
 loom {
