@@ -166,7 +166,6 @@ object DupeTracker : Tracker("duped_items") {
         when (val origin = extraAttrib.getString("originTag")) {
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
-            "" -> return
             else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: " + origin.ifBlank { "Unknown" }.split('_').joinToString(" ").toTitleCase())
         }
     }
