@@ -1236,15 +1236,6 @@ object Config : Vigilant(
     )
     var blockZapperFatigueTimer = false
 
-       @Property(
-        type = PropertyType.SELECTOR, name = "Item Stars",
-        description = "Changes the way Item Stars are displayed on Items.",
-        category = "Miscellaneous", subcategory = "Items",
-        options = ["Normal", "Old", "Compact"],
-        searchTags = ["1.3.0-pre4"]
-    )
-    var starDisplayType = 0
-
     @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
         description = "Removes the block animation on swords.",
@@ -1282,6 +1273,15 @@ object Config : Vigilant(
         searchTags = ["Wither Impact", "Hyperion", "Wither Shield"]
     )
     var itemCooldownDisplay = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Item Stars Display",
+        description = "Changes the way Item Stars are displayed on Items.",
+        category = "Miscellaneous", subcategory = "Items",
+        options = ["Normal", "Old", "Compact"],
+        searchTags = ["1.3.0-pre4"]
+    )
+    var starDisplayType = 0
 
     @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Larger Heads",

@@ -58,7 +58,7 @@ fun modifyDisplayName(s: String): String {
     var displayName = s
     if (!Utils.inSkyblock) return displayName
     try {
-        if(displayName.contains("✪")) {
+        if (displayName.contains("✪")) {
             if (Skytils.config.starDisplayType == 2) {
                 masterStarPattern.find(displayName)?.let {
                     val star = it.value.last()
@@ -70,7 +70,7 @@ fun modifyDisplayName(s: String): String {
                 }?.ifNull {
                     displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
                 }
-            } else if(Skytils.config.starDisplayType == 1) {
+            } else if (Skytils.config.starDisplayType == 1) {
                 masterStarPattern.find(displayName)?.let {
                     val star = it.value.last()
                     val count = masterStars.indexOf(star) + 1
