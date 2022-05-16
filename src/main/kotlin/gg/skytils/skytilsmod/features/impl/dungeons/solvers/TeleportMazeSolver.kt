@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DevTools
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -134,7 +135,7 @@ class TeleportMazeSolver {
                 matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
                 Skytils.config.teleportMazeSolverColor,
-                1f
+                Funny.alphaMult
             )
             GlStateManager.enableCull()
         }

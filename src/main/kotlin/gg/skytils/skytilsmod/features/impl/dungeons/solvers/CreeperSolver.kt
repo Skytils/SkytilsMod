@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.block.Block
@@ -44,7 +45,7 @@ import java.awt.Color
 
 class CreeperSolver {
     private val colors = CommonColors.set.copySet()
-    private var solutionPairs: MutableList<Pair<BlockPos, BlockPos>> = ArrayList()
+    private val solutionPairs = arrayListOf<Pair<BlockPos, BlockPos>>()
     private var ticks = 0
     private var creeper: EntityCreeper? = null
 
@@ -102,6 +103,11 @@ class CreeperSolver {
                                                 it.second
                                             ) || Utils.equalsOneOf(endBlock, it.first, it.second)
                                         }) solutionPairs.add(blockPos to endBlock)
+                                }
+                            }
+                            if (SuperSecretSettings.bennettArthur) {
+                                solutionPairs.mapIndexed { i, pair ->
+                                    pair.first to solutionPairs[(i + 1) % solutionPairs.size].second
                                 }
                             }
                         }

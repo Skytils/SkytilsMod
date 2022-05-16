@@ -41,6 +41,7 @@ import java.awt.Color
 import java.awt.Point
 import java.util.*
 import kotlin.math.floor
+import kotlin.random.Random
 
 object AlignmentTaskSolver {
     // the blocks are on the west side, frames block pos is 1 block higher
@@ -134,7 +135,10 @@ object AlignmentTaskSolver {
             val frame =
                 (mc.theWorld.loadedEntityList.find { it is EntityItemFrame && it.hangingPosition == space.framePos }
                     ?: continue) as EntityItemFrame
-            var neededClicks = directionSet.getOrElse(space.coords) { 0 } - frame.rotation
+            var neededClicks =
+                if (!SuperSecretSettings.bennettArthur) directionSet.getOrElse(space.coords) { 0 } - frame.rotation else Random.nextInt(
+                    8
+                )
             if (neededClicks == 0) continue
             if (neededClicks < 0) neededClicks += 8
             RenderUtil.drawLabel(

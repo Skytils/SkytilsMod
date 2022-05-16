@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -123,7 +124,7 @@ class IcePathSolver {
                     pos!!.addVector(0.5, 0.5, 0.5),
                     pos2!!.addVector(0.5, 0.5, 0.5),
                     5,
-                    Color(255, 0, 0),
+                    Color(1f, 0f, 0f, Funny.alphaMult),
                     event.partialTicks,
                     UMatrixStack.Compat.get()
                 )

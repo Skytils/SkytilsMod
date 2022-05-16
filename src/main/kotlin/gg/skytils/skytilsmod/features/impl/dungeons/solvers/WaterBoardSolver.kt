@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -40,6 +41,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.util.*
+import kotlin.random.Random
 
 /**
  * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
@@ -138,6 +140,9 @@ class WaterBoardSolver {
                                         variant = 2
                                     } else if (foundGold && foundQuartz) {
                                         variant = 3
+                                    }
+                                    if (SuperSecretSettings.bennettArthur) {
+                                        variant = Random.nextInt(4)
                                     }
                                     when (variant) {
                                         0 -> {

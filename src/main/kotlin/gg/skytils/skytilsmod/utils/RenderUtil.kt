@@ -304,12 +304,20 @@ object RenderUtil {
         GlStateManager.popMatrix()
     }
 
-    fun draw3DLine(pos1: Vec3, pos2: Vec3, width: Int, color: Color, partialTicks: Float, matrixStack: UMatrixStack) {
+    fun draw3DLine(
+        pos1: Vec3,
+        pos2: Vec3,
+        width: Int,
+        color: Color,
+        partialTicks: Float,
+        matrixStack: UMatrixStack,
+        alphaMultiplier: Float = 1f
+    ) {
         val render = mc.renderViewEntity
         val worldRenderer = UGraphics.getFromTessellator()
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val realX = interpolate(render.posX, render.lastTickPosX, partialTicks)
+        val realY = interpolate(render.posY, render.lastTickPosY, partialTicks)
+        val realZ = interpolate(render.posZ, render.lastTickPosZ, partialTicks)
         matrixStack.push()
         matrixStack.translate(-realX, -realY, -realZ)
         UGraphics.enableBlend()
@@ -317,7 +325,12 @@ object RenderUtil {
         UGraphics.disableLighting()
         UGraphics.tryBlendFuncSeparate(770, 771, 1, 0)
         GL11.glLineWidth(width.toFloat())
-        UGraphics.color4f(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+        UGraphics.color4f(
+            color.red / 255f,
+            color.green / 255f,
+            color.blue / 255f,
+            (color.alpha * alphaMultiplier / 255f).coerceAtMost(1f)
+        )
         worldRenderer.beginWithActiveShader(UGraphics.DrawMode.LINE_STRIP, DefaultVertexFormats.POSITION)
         worldRenderer.pos(matrixStack, pos1.xCoord, pos1.yCoord, pos1.zCoord).endVertex()
         worldRenderer.pos(matrixStack, pos2.xCoord, pos2.yCoord, pos2.zCoord).endVertex()
@@ -787,5 +800,12 @@ object RenderUtil {
 
 fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
 fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+fun Color.multAlpha(mult: Float) = Color(
+    red,
+    green,
+    blue,
+    (alpha * mult).toInt().coerceIn(0, 255)
+)
 
 fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)

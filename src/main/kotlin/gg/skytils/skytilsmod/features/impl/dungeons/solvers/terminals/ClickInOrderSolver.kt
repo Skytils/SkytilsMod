@@ -20,8 +20,10 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.multAlpha
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
@@ -68,15 +70,15 @@ object ClickInOrderSolver {
         GlStateManager.color(1f, 1f, 1f, 1f)
         if (firstSlot != null) {
             val slot = invSlots[firstSlot]
-            if (slot != null) slot highlight Skytils.config.clickInOrderFirst
+            if (slot != null) slot highlight Skytils.config.clickInOrderFirst.multAlpha(Funny.alphaMult)
         }
         if (secondSlot != null) {
             val slot = invSlots[secondSlot]
-            if (slot != null) slot highlight Skytils.config.clickInOrderSecond
+            if (slot != null) slot highlight Skytils.config.clickInOrderSecond.multAlpha(Funny.alphaMult)
         }
         if (thirdSlot != null) {
             val slot = invSlots[thirdSlot]
-            if (slot != null) slot highlight Skytils.config.clickInOrderThird
+            if (slot != null) slot highlight Skytils.config.clickInOrderThird.multAlpha(Funny.alphaMult)
         }
         if (lightingState) GlStateManager.enableLighting()
     }

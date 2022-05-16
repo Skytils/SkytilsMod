@@ -23,6 +23,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.DataFetcher
+import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.entity.item.EntityArmorStand
@@ -38,34 +40,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
-/**
- * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license and modified by the Skytils team
- * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
- * @author bowser0000
- */
 class ThreeWeirdosSolver {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons) return
-        val unformatted = event.message.unformattedText.stripControlCodes()
-        if (unformatted.contains("PUZZLE SOLVED!")) {
-            if (unformatted.contains("wasn't fooled by ")) {
+        if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Three Weirdos")) return
+        val formatted = event.message.formattedText
+        if (formatted.startsWith("§a§lPUZZLE SOLVED!")) {
+            if (formatted.contains("wasn't fooled by ")) {
                 riddleNPC = null
                 riddleChest = null
             }
         }
-        if (unformatted.contains("[NPC]")) {
+        if (formatted.startsWith("§e[NPC] ")) {
             if (solutions.size == 0) {
                 UChat.chat("$failPrefix §cSkytils failed to load solutions for Three Weirdos.")
                 DataFetcher.reloadData()
             }
-            for (solution in solutions) {
-                if (unformatted.contains(solution)) {
-                    val npcName = unformatted.substring(unformatted.indexOf("]") + 2, unformatted.indexOf(":"))
-                    riddleNPC = npcName
-                    UChat.chat("$prefix §a§l${npcName.stripControlCodes()} §2has the blessing.")
-                    break
-                }
+
+            if (solutions.any {
+                    SuperSecretSettings.bennettArthur || formatted.contains(it)
+                }) {
+                val npcName = formatted.substringAfter("§c").substringBefore("§f")
+                riddleNPC = npcName
+                UChat.chat("$prefix §a§l${npcName.stripControlCodes()} §2has the blessing.")
             }
         }
     }
@@ -153,7 +150,7 @@ class ThreeWeirdosSolver {
     }
 
     companion object {
-        var solutions = hashSetOf<String>()
+        val solutions = hashSetOf<String>()
 
         var riddleNPC: String? = null
 

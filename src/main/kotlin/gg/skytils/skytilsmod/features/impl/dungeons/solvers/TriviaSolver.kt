@@ -23,6 +23,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.features.impl.misc.Funny
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -72,7 +74,7 @@ class TriviaSolver {
 
             if (triviaAnswers != null && formatted.trim().startsWithAny("§r§6 ⓐ", "§r§6 ⓑ", "§r§6 ⓒ")) {
                 triviaAnswers!!.find {
-                    formatted.endsWith("§a$it§r")
+                    formatted.endsWith("§a$it§r") && (!SuperSecretSettings.bennettArthur || Funny.ticks % 2 == 0)
                 }.also {
                     if (it == null) {
                         event.message = ChatComponentText(formatted.replace("§a", "§c"))
