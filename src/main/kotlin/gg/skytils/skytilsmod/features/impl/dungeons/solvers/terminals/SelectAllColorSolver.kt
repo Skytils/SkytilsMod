@@ -20,12 +20,14 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 
 object SelectAllColorSolver {
 
@@ -49,7 +51,9 @@ object SelectAllColorSolver {
                     val item = slot.stack ?: continue
                     if (item.isItemEnchanted) continue
                     if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
-                    if (item.unlocalizedName.contains(colorNeeded!!)) {
+                    if (SuperSecretSettings.bennettArthur) {
+                        if (Random.nextInt(3) == 0) shouldClick.add(slot.slotNumber)
+                    } else if (item.unlocalizedName.contains(colorNeeded!!)) {
                         shouldClick.add(slot.slotNumber)
                     }
                 }

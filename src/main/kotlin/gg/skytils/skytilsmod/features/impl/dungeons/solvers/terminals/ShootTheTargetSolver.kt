@@ -22,6 +22,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.renderer.GlStateManager
@@ -77,8 +78,8 @@ object ShootTheTargetSolver {
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
-                Color(255, 0, 0),
-                0.5f
+                Color.RED,
+                0.5f * Funny.alphaMult
             )
             GlStateManager.enableCull()
         }

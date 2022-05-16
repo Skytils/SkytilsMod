@@ -27,10 +27,27 @@ import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.graphics.DynamicResource
 import gg.skytils.skytilsmod.utils.nextOrNull
 import kotlinx.coroutines.launch
+import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import javax.imageio.ImageIO
 
 object Funny {
+    var ticks = 0
+    var alphaMult = 0f
+
+    @SubscribeEvent
+    fun onWorldRender(event: RenderWorldLastEvent) {
+        if (SuperSecretSettings.bennettArthur) {
+            if (++ticks >= 360) ticks = 0
+            alphaMult = MathHelper.sin(ticks * 0.0174533f)
+        } else {
+            ticks = 0
+            alphaMult = 1f
+        }
+    }
+
     init {
         GuiManager.registerElement(JamCatElement)
     }

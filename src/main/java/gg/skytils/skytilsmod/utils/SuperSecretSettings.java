@@ -36,6 +36,7 @@ public class SuperSecretSettings {
 
     // Secrets
     public static boolean azooPuzzoo = false;
+    public static boolean bennettArthur = false;
     public static boolean breefingDog = false;
     public static boolean jamCat = false;
     public static boolean noSychic = false;
@@ -98,6 +99,7 @@ public class SuperSecretSettings {
 
     public static void setSecrets() {
         azooPuzzoo = settings.contains("azoopuzzoo");
+        bennettArthur = settings.contains("bennettarthur");
         breefingDog = settings.contains("breefingdog");
         jamCat = settings.contains("jamcat");
         noSychic = settings.contains("nosychic");

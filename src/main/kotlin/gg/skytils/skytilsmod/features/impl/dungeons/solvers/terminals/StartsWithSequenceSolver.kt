@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
@@ -27,6 +28,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+import kotlin.random.Random
 
 object StartsWithSequenceSolver {
 
@@ -51,7 +53,9 @@ object StartsWithSequenceSolver {
                     val item = slot.stack ?: continue
                     if (item.isItemEnchanted) continue
                     if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
-                    if (item.displayName.stripControlCodes().startsWith(sequenceNeeded!!)) {
+                    if (SuperSecretSettings.bennettArthur) {
+                        if (Random.nextInt(3) == 0) SelectAllColorSolver.shouldClick.add(slot.slotNumber)
+                    } else if (item.displayName.stripControlCodes().startsWith(sequenceNeeded!!)) {
                         shouldClick.add(slot.slotNumber)
                     }
                 }
