@@ -60,7 +60,7 @@ data class GIFResource(
 
     fun draw() {
         if (frames.isEmpty()) return
-        if (frameCounter % frameDelay == 0) {
+        if (frameCounter++ % frameDelay == 0) {
             currentFrame = frames[frameCounter / frameDelay]
             if (frameCounter >= maxCounter) frameCounter = 0
         }
