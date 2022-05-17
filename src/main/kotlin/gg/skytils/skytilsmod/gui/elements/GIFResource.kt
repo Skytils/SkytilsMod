@@ -61,8 +61,8 @@ data class GIFResource(
     fun draw() {
         if (frames.isEmpty()) return
         if (frameCounter++ % frameDelay == 0) {
-            currentFrame = frames[frameCounter / frameDelay]
             if (frameCounter >= maxCounter) frameCounter = 0
+            currentFrame = frames[frameCounter / frameDelay]
         }
         RenderUtil.renderTexture(
             currentFrame.resource,
