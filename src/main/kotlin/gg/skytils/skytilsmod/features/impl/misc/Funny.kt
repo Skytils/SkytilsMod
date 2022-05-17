@@ -19,11 +19,13 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
+import gg.skytils.skytilsmod.utils.getSkytilsResource
 import gg.skytils.skytilsmod.utils.graphics.DynamicResource
 import gg.skytils.skytilsmod.utils.nextOrNull
 import kotlinx.coroutines.launch
@@ -53,7 +55,6 @@ object Funny {
     }
 
     object JamCatElement : GuiElement("Jamcat", fp = FloatPair(0, 0)) {
-
         init {
             if (toggled) {
                 Skytils.IO.launch {
@@ -63,7 +64,9 @@ object Funny {
         }
 
         private val frames: List<ResourceLocation> by lazy {
-            ImageIO.createImageInputStream(javaClass.getResourceAsStream("assets/skytils/splashes/jamcat.gif"))
+            ImageIO.createImageInputStream(
+                mc.resourceManager.getResource(getSkytilsResource("splashes/jamcat.gif")).inputStream
+            )
                 .use { stream ->
                     ImageIO.getImageReaders(stream).nextOrNull()?.apply {
                         input = stream

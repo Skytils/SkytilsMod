@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.core
 
+import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -126,6 +127,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
                 GlStateManager.popMatrix()
             } catch (ex: Exception) {
                 ex.printStackTrace()
+                UChat.chat("${Skytils.failPrefix} §cSkytils ${Skytils.VERSION} caught and logged an ${ex::class.simpleName ?: "error"} while rendering ${element.name}. Please report this on the Discord server at discord.gg/skytils.")
             }
             mc.mcProfiler.endSection()
         }
