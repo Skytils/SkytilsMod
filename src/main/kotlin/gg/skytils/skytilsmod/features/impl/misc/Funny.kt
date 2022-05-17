@@ -18,22 +18,15 @@
 
 package gg.skytils.skytilsmod.features.impl.misc
 
-import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
+import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.getSkytilsResource
-import gg.skytils.skytilsmod.utils.graphics.DynamicResource
-import gg.skytils.skytilsmod.utils.nextOrNull
-import kotlinx.coroutines.launch
 import net.minecraft.util.MathHelper
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import javax.imageio.ImageIO
 
 object Funny {
     var ticks = 0
@@ -55,33 +48,13 @@ object Funny {
     }
 
     object JamCatElement : GuiElement("Jamcat", fp = FloatPair(0, 0)) {
-        init {
-            if (toggled) {
-                Skytils.IO.launch {
-                    frames
-                }
-            }
+        val gif by lazy {
+            GIFResource(getSkytilsResource("splashes/jamcat.gif"), frameDelay = 5)
         }
-
-        private val frames: List<ResourceLocation> by lazy {
-            ImageIO.createImageInputStream(
-                mc.resourceManager.getResource(getSkytilsResource("splashes/jamcat.gif")).inputStream
-            )
-                .use { stream ->
-                    ImageIO.getImageReaders(stream).nextOrNull()?.apply {
-                        input = stream
-                        return@lazy (0 until getNumImages(true)).map {
-                            DynamicResource("skytils_jamcat_frame", read(it)).resource
-                        }
-                    }
-                }
-            return@lazy emptyList()
-        }
-        private var currentFrame = 0
 
         override fun render() {
-            if (!toggled || frames.isEmpty()) return
-            renderTexture(frames[currentFrame++ % frames.size], 0, 0, 128, 128)
+            if (!toggled) return
+            gif.draw()
         }
 
         override fun demoRender() = render()
