@@ -162,6 +162,11 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
             val y = (floatMouseY - yOffset) / sr.scaledHeight.toFloat()
             dragging!!.setPos(x, y)
             addResizeCorners(dragging!!)
+        } else return
+
+        dragging?.let {
+            GuiManager.GUIPOSITIONS[it.name] = it.pos
+            GuiManager.GUISCALES[it.name] = it.scale
         }
     }
 
