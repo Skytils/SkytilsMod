@@ -36,7 +36,7 @@ object Funny {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (SuperSecretSettings.bennettArthur) {
             if (++ticks >= 360) ticks = 0
-            alphaMult = MathHelper.sin(ticks * 0.0174533f)
+            alphaMult = MathHelper.sin(ticks * 0.0174533f).coerceAtLeast(0f)
         } else {
             ticks = 0
             alphaMult = 1f
