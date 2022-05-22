@@ -124,8 +124,8 @@ dependencies {
     shadowMe("io.ktor:ktor-client-cio-jvm")
     shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
 
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.9")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.9")
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.10")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.10")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
