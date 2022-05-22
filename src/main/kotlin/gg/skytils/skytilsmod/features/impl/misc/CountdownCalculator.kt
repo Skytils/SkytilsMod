@@ -41,31 +41,28 @@ object CountdownCalculator {
     val formatter12h = DateTimeFormatter.ofPattern("EEEE, MMM d h:mm:ss a z")!!
     val formatter24h = DateTimeFormatter.ofPattern("EEEE, MMM d HH:mm:ss z")!!
 
-    data class Countdown(
+    @Suppress("unused")
+    private enum class CountdownTypes(
         val match: String,
         val label: String,
         val isRelative: Boolean = false,
-    )
-
-    val countdownTypes = listOf(
-        Countdown("Starting in:", "Starts at"),
-        Countdown("Starts in:", "Starts at"),
-        Countdown("Interest in:", "Interest at"),
-        Countdown("Until interest:", "Interest at"),
-        Countdown("Ends in:", "Ends at"),
-        Countdown("Remaining:", "Ends at"),
-        Countdown("Duration:", "Finishes at"),
-        Countdown("Time left:", "Ends at"),
-        Countdown("Event lasts for", "Ends at", isRelative = true),
-        Countdown("(§e", "Starts at"), // Calendar details
-    )
-
+    ) {
+        STARTING("Starting in:", "Starts at"),
+        STARTS("Starts in:", "Starts at"),
+        INTEREST("Interest in:", "Interest at"),
+        UNTILINTEREST("Until interest:", "Interest at"),
+        ENDS("Ends in:", "Ends at"),
+        REMAINING("Remaining:", "Ends at"),
+        DURATION("Duration:", "Finishes at"),
+        TIMELEFT("Time left:", "Ends at"),
+        EVENTTIMELEFT("Event lasts for", "Ends at", isRelative = true),
+        CALENDARDETAILS("(§e", "Starts at"); // Calendar details
+    }
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock) return
-        val useFormatter = when(Skytils.config.showWhenCountdownEnds) {
-            0 -> return
+        val useFormatter = when (Skytils.config.showWhenCountdownEnds) {
             1 -> formatter24h
             2 -> formatter12h
             else -> return
@@ -75,7 +72,7 @@ object CountdownCalculator {
             var lastTimer: ZonedDateTime? = null
             while (++i < event.toolTip.size) {
                 val tooltipLine = event.toolTip[i]
-                val countdownKind = countdownTypes.find { it.match in tooltipLine } ?: continue
+                val countdownKind = CountdownTypes.values().find { it.match in tooltipLine } ?: continue
                 val match = regex.findAll(tooltipLine).maxByOrNull { it.value.length } ?: continue
 
                 val days = match.groups["days"]?.value?.toInt() ?: 0
@@ -91,12 +88,8 @@ object CountdownCalculator {
                             "§r§cThe above countdown is relative, but I can't find another countdown. (Skytils)"
                         )
                         continue
-                    } else {
-                        lastTimer.plusSeconds(totalSeconds)
-                    }
-                } else {
-                    ZonedDateTime.now().plusSeconds(totalSeconds)
-                }
+                    } else lastTimer.plusSeconds(totalSeconds)
+                } else ZonedDateTime.now().plusSeconds(totalSeconds)
                 val countdownTargetFormatted = useFormatter.format(countdownTarget)
                 event.toolTip.add(
                     ++i,
