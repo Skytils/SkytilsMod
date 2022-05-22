@@ -218,6 +218,10 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     override fun write(writer: Writer) {
+        names.entries.forEach { (n, e) ->
+            GUIPOSITIONS[n] = e.pos
+            GUISCALES[n] = e.scale
+        }
         writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {
             it.key to GuiElementLocation(
                 it.value.getX(),
