@@ -301,6 +301,7 @@ class Skytils {
             RainTimer(),
             RandomStuff,
             RelicWaypoints,
+            ScamCheck,
             ScoreCalculation,
             SelectAllColorSolver,
             ShootTheTargetSolver,
@@ -348,8 +349,9 @@ class Skytils {
 
         cch.registerCommand(CataCommand)
         cch.registerCommand(CalcXPCommand)
-        cch.registerCommand(LimboCommand)
         cch.registerCommand(HollowWaypointCommand)
+        cch.registerCommand(LimboCommand)
+        cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
