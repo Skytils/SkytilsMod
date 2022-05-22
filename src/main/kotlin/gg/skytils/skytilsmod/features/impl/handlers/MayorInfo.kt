@@ -45,6 +45,7 @@ import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.round
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -149,7 +150,6 @@ object MayorInfo {
                 ?.contains("alpha") == true
         ) return
         if (event.container is ContainerChest) {
-            val chest = event.container
             val chestName = event.chestName
             if (chestName == "Calendar and Events" || ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith(
                     "Mayor "
@@ -200,9 +200,7 @@ object MayorInfo {
                 val timeLeft =
                     Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
                 val nextPerksNoRound = System.currentTimeMillis() + timeLeft.inWholeMilliseconds
-                val offset = (nextPerksNoRound % 300000)
-                val rounded = nextPerksNoRound - 300000
-                val nextPerks = (if (offset > 150000) rounded + 300000 else rounded) - 1
+                val nextPerks = round(nextPerksNoRound / 300000.0).toLong() * 300000L
                 if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 60000) {
                     println("Jerry has ${mayor.name}'s perks ($perks) and is ending in $newJerryPerks ($${endingIn.stripControlCodes()})")
                     sendJerryData(mayor, nextPerks)
