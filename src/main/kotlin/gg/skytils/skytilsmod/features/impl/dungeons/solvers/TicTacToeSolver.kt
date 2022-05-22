@@ -135,7 +135,7 @@ class TicTacToeSolver {
                             }
                             AlphaBetaAdvanced.run(this)
                             val move =
-                                if (SuperSecretSettings.bennettArthur) algorithmBestMove else availableMoves.randomOrNull()
+                                if (!SuperSecretSettings.bennettArthur) algorithmBestMove else availableMoves.randomOrNull()
                                     ?: -1
                             if (move != -1) {
                                 val column = move % Board.BOARD_WIDTH
