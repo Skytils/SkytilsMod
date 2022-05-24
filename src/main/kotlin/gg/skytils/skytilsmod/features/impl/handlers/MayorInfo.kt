@@ -110,35 +110,33 @@ object MayorInfo {
         ) return
         if (event.message.unformattedText == "§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]") {
             val hoverEvent = event.message.chatStyle.chatHoverEvent
-            if (hoverEvent != null && hoverEvent.action == HoverEvent.Action.SHOW_TEXT) {
-                val value = hoverEvent.value
-                println(value.formattedText)
-                val lines = value.formattedText.split("\n")
-                if (lines.size < 2) return
-                var color = ""
-                if (lines[0].stripControlCodes().startsWith("Mayor ")) {
-                    color = lines[0].substring(0, 2)
-                }
-                isLocal = true
-                currentMayor = lines[0].substringAfterLast(" ")
-                mayorPerks.clear()
-                fetchMayorData()
-                val perks = HashSet<String>()
-                for (i in 1 until lines.size) {
-                    val line = lines[i]
-                    if (line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
-                    if (color.isNotEmpty()) {
-                        if (line.startsWith("§r$color")) {
-                            perks.add(line.stripControlCodes())
-                        }
-                    } else if (!line.startsWith("§r§7") && !line.startsWith("§r§8")) {
+            if (hoverEvent?.action != HoverEvent.Action.SHOW_TEXT) return
+            println(hoverEvent.value.formattedText)
+            val lines = hoverEvent.value.formattedText.split("\n").takeIf {
+                it.size >= 2
+            } ?: return
+            val color = lines[0].takeIf {
+                it.stripControlCodes().startsWith("Mayor ")
+            }?.substring(0, 2)
+            isLocal = true
+            currentMayor = lines[0].substringAfterLast(" ")
+            mayorPerks.clear()
+            fetchMayorData()
+            val perks = hashSetOf<String>()
+            for (i in 1 until lines.size) {
+                val line = lines[i]
+                if (line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
+                if (color != null) {
+                    if (line.startsWith("§r$color")) {
                         perks.add(line.stripControlCodes())
                     }
+                } else if (!line.startsWith("§r§7") && !line.startsWith("§r§8")) {
+                    perks.add(line.stripControlCodes())
                 }
-                println("Got perks from chat: $perks")
-                mayorPerks.addAll(perks)
-                sendMayorData(currentMayor, mayorPerks)
             }
+            println("Got perks from chat: $perks")
+            mayorPerks.addAll(perks)
+            sendMayorData(currentMayor, mayorPerks)
         }
     }
 
@@ -157,9 +155,8 @@ object MayorInfo {
                     currentMayor!!
                 ))))
             ) {
-                val slot = event.slot
-                val item = slot.stack
-                if (item != null && item.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || (currentMayor == null && item.displayName.contains(
+                val item = event.slot.stack
+                if (item?.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || (currentMayor == null && item.displayName.contains(
                         "Mayor "
                     ) && !item.displayName.contains("Election")))
                 ) {
