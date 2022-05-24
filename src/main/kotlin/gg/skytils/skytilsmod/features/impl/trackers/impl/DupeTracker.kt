@@ -41,6 +41,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import gg.skytils.skytilsmod.utils.*
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
@@ -165,8 +166,7 @@ object DupeTracker : Tracker("duped_items") {
         when (val origin = extraAttrib.getString("originTag")) {
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
-            "" -> return
-            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: $origin")
+            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: " + origin.ifBlank { "Unknown" }.split('_').joinToString(" ").toTitleCase())
         }
     }
 
