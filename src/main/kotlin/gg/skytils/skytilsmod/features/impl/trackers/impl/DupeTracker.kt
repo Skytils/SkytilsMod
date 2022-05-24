@@ -23,11 +23,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
-import gg.skytils.skytilsmod.utils.DevTools
-import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.printDevMessage
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
@@ -41,7 +38,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import gg.skytils.skytilsmod.utils.*
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
@@ -164,9 +160,14 @@ object DupeTracker : Tracker("duped_items") {
             }
         }
         when (val origin = extraAttrib.getString("originTag")) {
+            "" -> return
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
-            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: " + origin.ifBlank { "Unknown" }.split('_').joinToString(" ").toTitleCase())
+            else -> if (Skytils.config.showOrigin) event.toolTip.add(
+                "§7§lOrigin: ${
+                    origin.splitToWords()
+                }"
+            )
         }
     }
 
