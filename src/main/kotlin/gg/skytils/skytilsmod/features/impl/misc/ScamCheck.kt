@@ -70,13 +70,12 @@ object ScamCheck {
     private fun checkScam(tradingWith: ItemStack) {
         val firstLore = ItemUtil.getItemLore(tradingWith).find { it.matches(tradingWithRegex) } ?: return
         val otherParty = firstLore.replace(tradingWithRegex, "$1")
-        val uuid = runCatching {
-            mc.theWorld?.playerEntities?.find {
-                it.uniqueID.version() == 4 && it.name == otherParty
-            }?.uniqueID ?: Skytils.hylinAPI.getUUIDSync(otherParty)
-        }.getOrNull()
-            ?: return UChat.chat("${Skytils.failPrefix} §cUnable to get the UUID for ${otherParty}! Could they be nicked?")
+        val worldUUID = mc.theWorld?.playerEntities?.find {
+            it.uniqueID.version() == 4 && it.name == otherParty
+        }?.uniqueID
         Skytils.IO.launch {
+            val uuid = worldUUID ?: runCatching { Skytils.hylinAPI.getUUIDSync(otherParty) }.getOrNull()
+            ?: return@launch UChat.chat("${Skytils.failPrefix} §cUnable to get the UUID for ${otherParty}! Could they be nicked?")
             val result = checkScammer(uuid, "tradewindow")
             if (result.isScammer) {
                 TickTask(1) {
@@ -109,7 +108,7 @@ data class ScamCheckResponse(
             UMessage("${Skytils.prefix} §c$username is a known scammer!\n",
                 "§bDatabases:\n",
                 reasons.entries.joinToString("\n") { (db, reason) ->
-                    "§b${db}: ${reason}"
+                    "§b${db}: $reason"
                 }
             ).chat()
         }
