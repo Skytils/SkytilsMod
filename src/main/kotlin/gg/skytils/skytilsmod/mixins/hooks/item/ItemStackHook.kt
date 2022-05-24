@@ -75,7 +75,7 @@ fun modifyDisplayName(s: String): String {
                     val star = it.value.last()
                     val count = masterStars.indexOf(star) + 1
                     displayName = displayName.replace(masterStarPattern, "")
-                        .replace(starPattern.repeat(count), "§c✪".repeat(count))
+                        .replaceFirst(starPattern.repeat(count), "§c✪".repeat(count))
                 }
             }
         }
