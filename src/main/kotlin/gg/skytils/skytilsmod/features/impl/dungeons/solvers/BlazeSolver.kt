@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.coroutines.launch
@@ -38,6 +39,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import kotlin.random.Random
 
 class BlazeSolver {
     private var ticks = 0
@@ -133,6 +135,7 @@ class BlazeSolver {
                     }
                 }
                 orderedBlazes.sortWith { blaze1, blaze2 ->
+                    if (SuperSecretSettings.bennettArthur) return@sortWith Random.nextInt(-1, 2)
                     val compare = blaze1.health.compareTo(blaze2.health)
                     if (compare == 0 && !impossible) {
                         impossible = true

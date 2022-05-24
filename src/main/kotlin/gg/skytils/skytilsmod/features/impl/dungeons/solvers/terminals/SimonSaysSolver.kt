@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.block.BlockButtonStone
@@ -72,14 +73,10 @@ object SimonSaysSolver {
                             }
                         }
                     }
-                } else if (pos == startBtn) {
-                    if (state.block === Blocks.stone_button) {
-                        if (state.getValue(BlockButtonStone.POWERED)) {
-                            //println("Simon says was started")
-                            clickInOrder.clear()
-                            clickNeeded = 0
-                        }
-                    }
+                } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
+                    //println("Simon says was started")
+                    clickInOrder.clear()
+                    clickNeeded = 0
                 }
             }
         }
@@ -99,8 +96,8 @@ object SimonSaysSolver {
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-                if (clickNeeded == clickInOrder.size - 1) Color(0, 255, 0) else Color(255, 0, 0),
-                0.5f
+                if (clickNeeded == clickInOrder.size - 1) Color.GREEN else Color.RED,
+                0.5f * Funny.alphaMult
             )
             GlStateManager.enableCull()
         }

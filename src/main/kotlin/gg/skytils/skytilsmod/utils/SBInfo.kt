@@ -183,6 +183,7 @@ enum class SkyblockIsland(val formattedName: String, val mode: String) {
     Hub("Hub", "hub"),
     DarkAuction("Dark Auction", "dark_auction"),
     JerryWorkshop("Jerry's Workshop", "winter"),
+    Instanced("Instanced", "instanced"),
     Unknown("(Unknown)", "");
 
     object ModeSerializer : KSerializer<SkyblockIsland> {

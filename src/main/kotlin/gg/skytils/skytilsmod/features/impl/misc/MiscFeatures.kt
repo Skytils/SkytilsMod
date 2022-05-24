@@ -385,7 +385,7 @@ class MiscFeatures {
                 ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
             ) return
             if (ItemUtil.getItemLore(item).asReversed().any {
-                    it.contains("Right-click", true)
+                    it.contains("-click", true)
                 }) return
             event.isCanceled = true
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 0, mc.thePlayer)

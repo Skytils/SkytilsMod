@@ -54,7 +54,7 @@ class TicTacToeSolver {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (ticks % 20 == 0) {
             ticks = 0
-            if (DungeonListener.missingPuzzles.contains("Tic Tac Toe") || SuperSecretSettings.azooPuzzoo) {
+            if (SuperSecretSettings.azooPuzzoo || DungeonListener.missingPuzzles.contains("Tic Tac Toe")) {
                 val frames = mc.theWorld.loadedEntityList.filter {
                     if (it !is EntityItemFrame) return@filter false
                     val realPos = it.position.down()
@@ -134,7 +134,9 @@ class TicTacToeSolver {
                                 }
                             }
                             AlphaBetaAdvanced.run(this)
-                            val move = algorithmBestMove
+                            val move =
+                                if (!SuperSecretSettings.bennettArthur) algorithmBestMove else availableMoves.randomOrNull()
+                                    ?: -1
                             if (move != -1) {
                                 val column = move % Board.BOARD_WIDTH
                                 val row = move / Board.BOARD_WIDTH

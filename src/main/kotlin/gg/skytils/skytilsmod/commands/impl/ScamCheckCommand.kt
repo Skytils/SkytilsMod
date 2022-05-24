@@ -16,11 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod;
+package gg.skytils.skytilsmod.commands.impl
 
-public class Reference {
-    public static String dataUrl = "https://data.skytils.gg/";
-    public static final String MODID = "skytils";
-    public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "1.3.0-pre3";
+import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.skytils.skytilsmod.features.impl.misc.ScamCheck
+import java.util.*
+
+object ScamCheckCommand : StatCommand("skytilsscamcheck", needApiKey = false, needProfile = false, listOf("stsc")) {
+    override suspend fun displayStats(username: String, uuid: UUID) {
+        val check = ScamCheck.checkScammer(uuid, "command").printResult(username)
+    }
 }

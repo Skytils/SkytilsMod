@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import kotlin.math.floor
+import kotlin.random.Random
 
 class BoulderSolver {
     @SubscribeEvent
@@ -203,6 +205,8 @@ class BoulderSolver {
                                 }
                                 if (isRight) {
                                     roomVariant = i
+                                    if (SuperSecretSettings.bennettArthur) roomVariant =
+                                        Random.nextInt(0, expectedBoulders.size)
                                     UChat.chat("$successPrefix §aSkytils detected boulder variant ${roomVariant + 1}.")
                                     break
                                 }

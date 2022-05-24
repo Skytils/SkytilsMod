@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -30,6 +31,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 
 object ChangeAllToSameColorSolver {
     val ordering =
@@ -60,6 +62,8 @@ object ChangeAllToSameColorSolver {
                     4 -> color = CommonColors.RED
                 }
             }
+
+            if (SuperSecretSettings.bennettArthur) betterOpt = Random.nextInt(-4, 5)
 
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()

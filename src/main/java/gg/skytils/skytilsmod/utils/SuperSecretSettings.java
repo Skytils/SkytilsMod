@@ -23,9 +23,8 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -36,7 +35,9 @@ public class SuperSecretSettings {
 
     // Secrets
     public static boolean azooPuzzoo = false;
+    public static boolean bennettArthur = false;
     public static boolean breefingDog = false;
+    public static boolean jamCat = false;
     public static boolean noSychic = false;
     public static boolean smolPeople = false;
 
@@ -73,7 +74,7 @@ public class SuperSecretSettings {
     public static void load() {
         settings.clear();
         try {
-            List<String> lines = IOUtils.readLines(new FileInputStream(saveLoc), Charsets.UTF_8);
+            List<String> lines = IOUtils.readLines(Files.newInputStream(saveLoc.toPath()), Charsets.UTF_8);
             for (String line : lines) {
                 if (!line.isEmpty()) {
                     settings.add(line);
@@ -89,7 +90,7 @@ public class SuperSecretSettings {
         if (!dirty) return;
         dirty = false;
         try {
-            IOUtils.writeLines(settings, "\n", new FileOutputStream(saveLoc), Charsets.UTF_8);
+            IOUtils.writeLines(settings, "\n", Files.newOutputStream(saveLoc.toPath()), Charsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -97,7 +98,9 @@ public class SuperSecretSettings {
 
     public static void setSecrets() {
         azooPuzzoo = settings.contains("azoopuzzoo");
+        bennettArthur = settings.contains("bennettarthur");
         breefingDog = settings.contains("breefingdog");
+        jamCat = settings.contains("jamcat");
         noSychic = settings.contains("nosychic");
         smolPeople = settings.contains("smolpeople");
     }
