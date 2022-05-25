@@ -72,6 +72,7 @@ loom {
             isIdeConfigGenerated = true
             vmArg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
+        remove(getByName("server"))
     }
     forge {
         pack200Provider.set(Pack200Adapter())
