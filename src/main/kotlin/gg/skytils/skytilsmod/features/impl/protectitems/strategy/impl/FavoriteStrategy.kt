@@ -43,7 +43,7 @@ object FavoriteStrategy : ItemProtectStrategy() {
 
     object FavoriteStrategySave : PersistentSave(File(Skytils.modDir, "favoriteitems.json")) {
         override fun read(reader: Reader) {
-            favoriteItems.addAll(json.decodeFromString(reader.readText()))
+            favoriteItems.addAll(json.decodeFromString<Set<String>>(reader.readText()))
         }
 
         override fun write(writer: Writer) {
