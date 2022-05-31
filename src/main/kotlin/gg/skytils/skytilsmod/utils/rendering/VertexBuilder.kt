@@ -50,16 +50,15 @@ internal class MeshImpl<S : VertexScope>(
     override val drawMode: DrawMode,
     override val format: VertexFormats<S>
 ) : Mesh<S> {
-    internal val vaos: MutableList<VertexArray> = ArrayList()
+    lateinit var vao: VertexArray
 
     override fun render(matrixStack: UMatrixStack) {
+        if (!::vao.isInitialized) return
         matrixStack.applyToGlobalState()
-        vaos.forEach {
-            it.render(drawMode.glID)
-        }
+        vao.render(drawMode.glID)
     }
 
-    fun build(block: S.() -> Unit) = apply { vaos.add(format.scopeInstance().apply(block).upload(this)) }
+    fun build(block: S.() -> Unit) = apply { vao = format.scopeInstance().apply(block).upload(this) }
 }
 
 enum class DrawMode(internal val glID: Int) {
