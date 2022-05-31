@@ -27,7 +27,8 @@ import java.time.format.DateTimeFormatter
 
 /*********************
 CountdownCalculator
-A Kotlin object by Erymanthus / RayDeeUx (original code base, math, timestamp wrangling) + nea89 (regex wrangling, full code rewrite, cleanup)
+A Kotlin object by Erymanthus / RayDeeUx (original code base, math, timestamp wrangling)
++ nea89 (regex wrangling, full code rewrite, cleanup)
 [written for the Kotlin-based Minecraft Forge 1.8.9 mod Skytils by Sychic and My-Name-Is-Jeff / Lily]
 
 Intended to detect countdowns within item tooltips and adding the value of such countdowns in units of seconds
@@ -53,7 +54,7 @@ object CountdownCalculator {
     DESCRIPTIVECOUNTDOWNTYPE(match, label),
 
     example:
-    TIMEUNTILTECHNOBLADEDIES("Time until Technoblade dies", "Against all odds, he will die at"),
+    TIMEUNTILNEXTTECHNOUPLOAD("Time until the next Technoblade upload", "Against all odds, he will upload a new video at"),
 
     if there are any formatting codes in the item lore line within the prefix of the countdown in question,
     you must include them in your `substringFromItemLore` (or `match`) value. there will be some section signs within the
