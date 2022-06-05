@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
@@ -79,7 +80,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 
 class MiscFeatures {
@@ -149,7 +150,7 @@ class MiscFeatures {
                 }
             }
             if (unformatted == "Your zapper is temporarily fatigued!") {
-                val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
+                val duration = (blockZapperCooldownExpiration - System.currentTimeMillis()).milliseconds
                 printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
                 if (duration.isPositive()) {
                     UChat.chat("$prefix §eThis will expire in${
@@ -287,6 +288,14 @@ class MiscFeatures {
         if (!Utils.inSkyblock) return
         if (event.type == RenderGameOverlayEvent.ElementType.AIR && Skytils.config.hideAirDisplay && !Utils.inDungeons) {
             event.isCanceled = true
+        }
+
+        if (mc.thePlayer == null || Skytils.config.lowHealthVignetteThreshold == 0.0f) return
+        val healthPercentage = (mc.thePlayer.health + mc.thePlayer.absorptionAmount) / mc.thePlayer.maxHealth
+        if (healthPercentage < Skytils.config.lowHealthVignetteThreshold && event.type == RenderGameOverlayEvent.ElementType.ALL) {
+            val color =
+                Skytils.config.lowHealthVignetteColor.withAlpha((Skytils.config.lowHealthVignetteColor.alpha * (1.0 - healthPercentage)).toInt())
+            RenderUtil.drawVignette(color)
         }
     }
 
