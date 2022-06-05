@@ -80,7 +80,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class MiscFeatures {
@@ -150,7 +150,7 @@ class MiscFeatures {
                 }
             }
             if (unformatted == "Your zapper is temporarily fatigued!") {
-                val duration = (blockZapperCooldownExpiration - System.currentTimeMillis()).milliseconds
+                val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
                 printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
                 if (duration.isPositive()) {
                     UChat.chat("$prefix §eThis will expire in${
