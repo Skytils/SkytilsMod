@@ -388,7 +388,6 @@ object RenderUtil {
             renderY = y
             renderZ = z
         }
-        GlStateManager.enableTexture2D()
         drawNametag(renderX, renderY, renderZ, str, Color.WHITE, partialTicks, matrixStack)
         matrixStack.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         matrixStack.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
@@ -438,6 +437,7 @@ object RenderUtil {
             worldRenderer.pos(matrixStack, width + 1.0, -1.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
             worldRenderer.drawDirect()
         }
+        GlStateManager.enableTexture2D()
         DefaultFonts.VANILLA_FONT_RENDERER.drawString(
             matrixStack,
             str,
