@@ -388,6 +388,7 @@ object RenderUtil {
             renderY = y
             renderZ = z
         }
+        GlStateManager.enableTexture2D()
         drawNametag(renderX, renderY, renderZ, str, Color.WHITE, partialTicks, matrixStack)
         matrixStack.rotate(-mc.renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         matrixStack.rotate(mc.renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
