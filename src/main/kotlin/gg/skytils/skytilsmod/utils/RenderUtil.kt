@@ -437,6 +437,7 @@ object RenderUtil {
             worldRenderer.pos(matrixStack, width + 1.0, -1.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
             worldRenderer.drawDirect()
         }
+        GlStateManager.enableTexture2D()
         DefaultFonts.VANILLA_FONT_RENDERER.drawString(
             matrixStack,
             str,
