@@ -22,8 +22,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.6.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.7.0"
+    kotlin("plugin.serialization") version "1.6.21"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
@@ -119,7 +119,7 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.0.1"))
+    shadowMe(platform("io.ktor:ktor-bom:2.0.2"))
     shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
@@ -213,7 +213,13 @@ tasks {
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs =
-                listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8", "-Xbackend-threads=0")
+                listOf(
+                    /*"-opt-in=kotlin.RequiresOptIn", */
+                    "-Xjvm-default=all",
+                    "-Xrelease=8",
+                    "-Xbackend-threads=0",
+                    /*"-Xuse-k2"*/
+                )
             languageVersion = "1.6"
         }
         kotlinDaemonJvmArguments.set(
