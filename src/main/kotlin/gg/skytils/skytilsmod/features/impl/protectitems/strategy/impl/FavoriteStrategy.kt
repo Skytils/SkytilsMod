@@ -47,7 +47,7 @@ object FavoriteStrategy : ItemProtectStrategy() {
         }
 
         override fun write(writer: Writer) {
-            writer.write(json.encodeToString(favoriteItems))
+            writer.write(json.encodeToString<Set<String>>(favoriteItems))
         }
 
         override fun setDefault(writer: Writer) {
