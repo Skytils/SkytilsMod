@@ -295,7 +295,7 @@ class Skytils {
             PetFeatures(),
             Ping,
             PricePaid,
-            ProtectItems(),
+            ProtectItems,
             RainTimer(),
             RandomStuff,
             RelicWaypoints,
