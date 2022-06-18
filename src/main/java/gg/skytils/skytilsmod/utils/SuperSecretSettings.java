@@ -40,6 +40,7 @@ public class SuperSecretSettings {
     public static boolean jamCat = false;
     public static boolean noSychic = false;
     public static boolean smolPeople = false;
+    public static boolean tryItAndSee = false;
 
     static {
         if (!saveLoc.exists()) {
@@ -103,5 +104,6 @@ public class SuperSecretSettings {
         jamCat = settings.contains("jamcat");
         noSychic = settings.contains("nosychic");
         smolPeople = settings.contains("smolpeople");
+        tryItAndSee = settings.contains("tryItAndSee");
     }
 }
