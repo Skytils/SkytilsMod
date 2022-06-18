@@ -1467,6 +1467,20 @@ object Config : Vigilant(
     var alwaysShowItemHighlight = false
 
     @Property(
+        type = PropertyType.PERCENT_SLIDER, name = "Low Health Vignette Threshold",
+        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0% to disable.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var lowHealthVignetteThreshold = 0.0f
+
+    @Property(
+        type = PropertyType.COLOR, name = "Low Health Vignette Color",
+        description = "The color of the vignette that is shown when your health is below the threshold.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var lowHealthVignetteColor: Color = Color.RED
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Tooltips while on Storage",
         description = "Hides the tooltips of backpacks and ender chest while on the Storage GUI",
         category = "Miscellaneous", subcategory = "Other"
