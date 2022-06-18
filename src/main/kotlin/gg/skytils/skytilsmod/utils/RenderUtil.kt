@@ -373,7 +373,7 @@ object RenderUtil {
         GlStateManager.alphaFunc(516, 0.1f)
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val distX = x - viewerX
-        val distY = y - viewerY
+        val distY = y - viewerY - mc.renderViewEntity.eyeHeight
         val distZ = z - viewerZ
         val dist = sqrt(distX * distX + distY * distY + distZ * distZ)
         val renderX: Double
@@ -381,7 +381,7 @@ object RenderUtil {
         val renderZ: Double
         if (dist > 12) {
             renderX = distX * 12 / dist + viewerX
-            renderY = distY * 12 / dist + viewerY
+            renderY = distY * 12 / dist + viewerY + mc.renderViewEntity.eyeHeight
             renderZ = distZ * 12 / dist + viewerZ
         } else {
             renderX = x
@@ -437,6 +437,7 @@ object RenderUtil {
             worldRenderer.pos(matrixStack, width + 1.0, -1.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
             worldRenderer.drawDirect()
         }
+        GlStateManager.enableTexture2D()
         DefaultFonts.VANILLA_FONT_RENDERER.drawString(
             matrixStack,
             str,

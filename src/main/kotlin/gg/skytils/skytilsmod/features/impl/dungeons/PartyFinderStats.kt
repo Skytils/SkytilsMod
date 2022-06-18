@@ -112,13 +112,13 @@ object PartyFinderStats {
                         component.append(
                             UTextComponent(
                                 "§7[Lvl ${activePet.level}] ${rarity}${
-                                    activePet.type.split('_').joinToString(" ") { it.toTitleCase() }
+                                    activePet.type.splitToWords()
                                 }"
                             )
                                 .setHoverText(
                                     "§b" + (activePet.heldItem?.lowercase()
                                         ?.replace("pet_item_", "")
-                                        ?.split('_')?.joinToString(" ") { it.toTitleCase() } ?: "§cNo Pet Item")
+                                        ?.splitToWords() ?: "§cNo Pet Item")
                                 )
                         )
                     } ?: component.append("§cNo Pet Equipped!")

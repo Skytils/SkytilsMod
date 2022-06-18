@@ -1237,13 +1237,6 @@ object Config : Vigilant(
     var blockZapperFatigueTimer = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Compact Item Stars",
-        description = "Shortens item names with stars in them.",
-        category = "Miscellaneous", subcategory = "Items"
-    )
-    var compactStars = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
         description = "Removes the block animation on swords.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1280,6 +1273,15 @@ object Config : Vigilant(
         searchTags = ["Wither Impact", "Hyperion", "Wither Shield"]
     )
     var itemCooldownDisplay = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Item Stars Display",
+        description = "Changes the way Item Stars are displayed on Items.",
+        category = "Miscellaneous", subcategory = "Items",
+        options = ["Normal", "Old", "Compact"],
+        searchTags = ["1.3.0-pre4"]
+    )
+    var starDisplayType = 0
 
     @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Larger Heads",
@@ -1903,6 +1905,14 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var showLowestBINPrice = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Show When a Tooltip's Countdown Ends",
+        description = "Shows when a countdown within an item's tooltip will end, relative to your timezone.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        options = ["Off", "24-Hour Format", "12-Hour Format"]
+    )
+    var showWhenCountdownEnds = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Stop Clicking Non-Salvageable Items",
