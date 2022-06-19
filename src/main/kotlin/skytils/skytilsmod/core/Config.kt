@@ -1833,6 +1833,14 @@ object Config : Vigilant(
     var protectStarredItems = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Protect Items Bypass Key",
+        description = "Press ALT to bypass item protection",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock"]
+    )
+    var protectItemBypass = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Spider's Den Rain Timer",
         description = "Shows the duration of rain in the Spider's Den.",
         category = "Miscellaneous", subcategory = "Quality of Life"

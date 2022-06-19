@@ -18,12 +18,14 @@
 package skytils.skytilsmod.features.impl.protectitems
 
 import gg.essential.universal.UChat
+import gg.essential.universal.UKeyboard
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import skytils.skytilsmod.Skytils
 import skytils.skytilsmod.Skytils.Companion.failPrefix
 import skytils.skytilsmod.Skytils.Companion.mc
 import skytils.skytilsmod.core.SoundQueue
@@ -132,10 +134,14 @@ class ProtectItems {
         }
     }
 
+    private fun isBypassActive(): Boolean {
+        return Skytils.config.protectItemBypass && UKeyboard.isAltKeyDown()
+    }
+
     private fun notifyStopped(event: Event?, action: String) {
         SoundQueue.addToQueue("note.bass", 0.5f, 1f)
         UChat.chat("$failPrefix §cStopped you from $action that item!")
-        event?.isCanceled = true
+        event?.isCanceled = !isBypassActive()
     }
 
 }
