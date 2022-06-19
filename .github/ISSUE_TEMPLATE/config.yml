@@ -1,0 +1,10 @@
+#
+# Issue Template Chooser Configuration
+#
+
+blank_issues_enabled: false
+
+contact_links:
+  - name: Discord
+    url: https://discord.gg/skytils
+    about: Github Issues are intended for contributors only. Please go to the Discord for support.

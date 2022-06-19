@@ -1,0 +1,22 @@
+name: Faceless Issues
+
+# Controls when the workflow will run
+on:
+  issues:
+    types:
+      - opened
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  check:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: My-Name-Is-Jeff/faceless-issues@v1.0.1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          close: true
+          closeComment: "This issue has been automatically closed. For support, please use our [Discord](https://discord.gg/skytils) server."
+          label: "faceless"
