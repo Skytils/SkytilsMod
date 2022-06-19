@@ -590,6 +590,17 @@ class ItemFeatures {
                 }
             }
         }
+        if (Skytils.config.showCollectionStackSize) {
+            val collectionDisplayName = getDisplayName(item)
+            val collectionMatcher = collectionPattern.matcher(collectionDisplayName)
+            if (collectionMatcher.matches()) {
+                lore?.forEach { line -> //prevent false positives
+                    if (line.contains("Collection")) {
+                        stackTip = collectionMatcher.group(2).toString().romanToDecimal().toString()
+                    }
+                }
+            }
+        }
         if (stackTip.isNotEmpty()) {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
