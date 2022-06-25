@@ -103,7 +103,7 @@ object MasterMode7Features {
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag)) {
                 printDevMessage("${drag.name} spawning", "witherkingdrags")
-                if (Skytils.config.witherKingDragonSpawnAlert) UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§lis spawning! §f(${x}, ${y}, ${z})")
+                if (Skytils.config.witherKingDragonSpawnAlert) UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§ldragon is spawning! §f(${x}, ${y}, ${z})")
             }
         }
     }
