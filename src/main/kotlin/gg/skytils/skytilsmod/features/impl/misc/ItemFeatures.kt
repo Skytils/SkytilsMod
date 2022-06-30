@@ -599,6 +599,8 @@ class ItemFeatures {
                 lore?.forEach { line ->
                     if (line.contains("Collection")) {
                         //the for loop is necessary to prevent false positives of stackTips rendering on minions
+                lore?.forEach { line -> //prevent false positives
+                    if (line.contains("Collection")) {
                         stackTip = collectionMatcher.group(2).toString().romanToDecimal().toString()
                     }
                 }
