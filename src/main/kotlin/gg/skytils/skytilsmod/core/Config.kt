@@ -1946,6 +1946,28 @@ object Config : Vigilant(
     var lavaBobber = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Collection Tier",
+        description = "Shows the tier of your item collections as the stack size.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showCollectionStackSize = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Cake Year",
+        description = "Shows the year of New Year's Cakes as the stack size.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showCakeStackSize = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Show Spooky Pie Stack Size",
+        description = "Shows the year of a Spooky Pie as the stack size.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        options = ["Off", "Show Skyblock Year", "Show nth Spooky Festival"]
+    )
+    var showSpookyPieStackSize = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dolphin Pet Display",
         description = "Shows the players within the range of the Dolphin pet.",
         category = "Pets", subcategory = "Displays"

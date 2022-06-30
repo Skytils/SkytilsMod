@@ -80,6 +80,8 @@ class ItemFeatures {
 
     companion object {
         private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+        private val collectionPattern = Pattern.compile(".*(?<collection1>[A-Z][a-z]+) (?<tier>[X,I,V]+)")
+        private val nthPattern = Pattern.compile(".*(?<year>[1-9]+)(st|nd|rd|th)")
         val sellPrices = HashMap<String, Double>()
         val bitCosts = HashMap<String, Int>()
         val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
@@ -587,6 +589,42 @@ class ItemFeatures {
                 if (candyLineMatcher.matches()) {
                     stackTip = candyLineMatcher.group(1).toString()
                     return@forEach
+                }
+            }
+        }
+        if (Skytils.config.showCollectionStackSize) {
+            val collectionDisplayName = getDisplayName(item)
+            val collectionMatcher = collectionPattern.matcher(collectionDisplayName)
+            if (collectionMatcher.matches()) {
+                lore?.forEach { line ->
+                    if (line.contains("Collection")) {
+                        //the for loop is necessary to prevent false positives of stackTips rendering on minions
+                        stackTip = collectionMatcher.group(2).toString().romanToDecimal().toString()
+                    }
+                }
+            }
+        }
+        if (Skytils.config.showCakeStackSize) {
+            val cakeDisplayName = getDisplayName(item)
+            if (cakeDisplayName.endsWith("New Year Cake")) {
+                lore?.forEach { line ->
+                    val nthMatcher = nthPattern.matcher(line)
+                    if (nthMatcher.matches()) {
+                        stackTip = nthMatcher.group(1).toString()
+                    }
+                }
+            }
+        }
+        if (Skytils.config.showSpookyPieStackSize == 1 || Skytils.config.showSpookyPieStackSize == 2) {
+            val pieDisplayName = getDisplayName(item)
+            if (pieDisplayName.endsWith("Spooky Pie")) {
+                val extraAttributes = getExtraAttributes(item) ?: return
+                lore?.forEach { line ->
+                    if (Skytils.config.showSpookyPieStackSize == 2) {
+                        stackTip = (Integer.parseInt(extraAttributes.getString("event").replace("spooky_festival_", "")) + 1).toString()
+                    } else if (Skytils.config.showSpookyPieStackSize == 1) {
+                        stackTip = (extraAttributes.getInteger("new_years_cake") + 1).toString()
+                    }
                 }
             }
         }

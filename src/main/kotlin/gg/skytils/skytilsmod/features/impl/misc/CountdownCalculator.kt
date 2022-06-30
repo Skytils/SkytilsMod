@@ -25,22 +25,47 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-/*********************
-CountdownCalculator
-A Kotlin class by Erymanthus / RayDeeUx (code base, math, timestamp wrangling) + nea89 (regex wrangling + cleanup)
-[designed for the Skytils mod by Sychic and My-Name-Is-Jeff / Lily]
+/**
+ * CountdownCalculator
+ * A Kotlin object by Erymanthus / RayDeeUx (original code base, math, timestamp wrangling)
+ * + nea89 (regex wrangling, full code rewrite, cleanup)
+ * [written for the Kotlin-based Minecraft Forge 1.8.9 mod Skytils by Sychic and My-Name-Is-Jeff / Lily]
 
-Intended to detect countdowns within item tooltips and adding the value of such countdowns
-to the user's current system time in Unix epoch form, then converting that value to a human readable timestamp.
- *********************/
+ * Intended to detect countdowns within item tooltips and adding the value of such countdowns in units of seconds
+ * to the user's current system time in Unix epoch form, then converting that value to a human readable timestamp.
+ * @author nea89
+ * @author Erymanthus(#5074) | [u/]RayDeeUx
+ */
 
 object CountdownCalculator {
 
     val regex =
         "(?:(?<days>\\d+)d)? ?(?:(?<hours>\\d+)h)? ?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\b".toRegex()
     val formatter12h = DateTimeFormatter.ofPattern("EEEE, MMM d h:mm:ss a z")!!
-    val formatter24h = DateTimeFormatter.ofPattern("EEEE, MMM d HH:mm:ss z")!!
+    val formatter24h = DateTimeFormatter.ofPattern("EEEE, MMM d HH:mm:ss z")!! //we love our non 12 hour timestamp format users <3
 
+    /********************
+    note to future contributors:
+    to add a new timestamp, type make sure you have /sba dev enabled first and inspect the item lore
+    with a countdown before adding it to the list of substrings seen here.
+    
+    the format is as follows:
+    DESCRIPTIVECOUNTDOWNTYPE(substringFromItemLore, desiredPrefixOfYourChoice),
+    
+    or, alternaitvely, as per the variable names in the enum class:
+    DESCRIPTIVECOUNTDOWNTYPE(match, label),
+
+    example:
+    TIMEUNTILNEXTTECHNOUPLOAD("Time until the next Technoblade upload", "Against all odds, he will upload a new video at"),
+
+    if there are any formatting codes in the item lore line within the prefix of the countdown in question,
+    you must include them in your `substringFromItemLore` (or `match`) value. there will be some section signs within the
+    line of your item lore's line for you to copy if necessary.
+
+    conversely, there is no need to include any formatting codes (or colons) for your `desiredPrefixOfYourChoice` (or `label`) value.
+    this kotlin object will automatically handle that for you in-game. make sure your `desiredPrefixOfYourChoice` (or `label`)
+    value is descriptive, but not too lengthy.
+    ********************/
     @Suppress("unused")
     private enum class CountdownTypes(
         val match: String,
@@ -56,6 +81,8 @@ object CountdownCalculator {
         DURATION("Duration:", "Finishes at"),
         TIMELEFT("Time left:", "Ends at"),
         EVENTTIMELEFT("Event lasts for", "Ends at", isRelative = true),
+        HOLLOWSPASSVARIANTONE("another§6 ", "Your pass expires at"), //why variant one? see below
+        HOLLOWSPASSVARIANTTWO("another §6", "Your pass expires at"), //variant two because hypixel admins have a VERY inconsistent record of placing color codes and I (erymanthus) am NOT taking any risks of this feature breaking over some inconsistency. i mean have you seen how shit goes down when mod devs don't account for variances
         CALENDARDETAILS("(§e", "Starts at"); // Calendar details
     }
 
@@ -74,7 +101,6 @@ object CountdownCalculator {
                 val tooltipLine = event.toolTip[i]
                 val countdownKind = CountdownTypes.values().find { it.match in tooltipLine } ?: continue
                 val match = regex.findAll(tooltipLine).maxByOrNull { it.value.length } ?: continue
-
                 val days = match.groups["days"]?.value?.toInt() ?: 0
                 val hours = match.groups["hours"]?.value?.toInt() ?: 0
                 val minutes = match.groups["minutes"]?.value?.toInt() ?: 0
@@ -85,7 +111,7 @@ object CountdownCalculator {
                     if (lastTimer == null) {
                         event.toolTip.add(
                             ++i,
-                            "§r§cThe above countdown is relative, but I can't find another countdown. (Skytils)"
+                            "§r§cThe above countdown is relative, but Skytils couldn't find another countdown."
                         )
                         continue
                     } else lastTimer.plusSeconds(totalSeconds)
@@ -93,7 +119,7 @@ object CountdownCalculator {
                 val countdownTargetFormatted = useFormatter.format(countdownTarget)
                 event.toolTip.add(
                     ++i,
-                    "§r§b${countdownKind.label}: $countdownTargetFormatted"
+                    "§r§b${countdownKind.label} $countdownTargetFormatted"
                 )
                 lastTimer = countdownTarget
             }
