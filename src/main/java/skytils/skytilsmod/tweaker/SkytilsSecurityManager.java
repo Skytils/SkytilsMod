@@ -66,7 +66,7 @@ public class SkytilsSecurityManager extends SecurityManager {
         } else if ("setSecurityManager".equals(permName)) {
             throw new SecurityException("Cannot replace the FML (Skytils) security manager");
         } else if (perm instanceof SocketPermission || perm instanceof URLPermission) {
-            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.contains("discord.com") || permName.contains("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co") || permName.contains("pastebin.com")) {
+            if (permName.contains("checkip.amazonaws.com") || permName.contains("guilded.gg") || permName.contains("api.ipify.org") || permName.contains("discord.com") || permName.contains("discordapp.com") || permName.contains("glitch.me") || permName.contains("herokuapp.com") || permName.contains("repl.co") || permName.contains("pastebin.com") || permName.contains("breadcat.cc")) {
                 loadEssential();
             }
         }
