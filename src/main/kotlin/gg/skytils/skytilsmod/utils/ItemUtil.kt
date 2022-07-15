@@ -29,7 +29,6 @@ import kotlin.math.max
 
 object ItemUtil {
     private val PET_PATTERN = "§7\\[Lvl \\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
-    private val PET_PATTERN_FOR_SYNTHESIS = "§7\\[\\d+] (?<color>§[0-9a-fk-or]).+".toRegex()
     const val NBT_INTEGER = 3
     private const val NBT_STRING = 8
     private const val NBT_LIST = 9
@@ -169,12 +168,8 @@ object ItemUtil {
             }
         }
         val petRarityMatcher = PET_PATTERN.find(name)
-        val petRarityMatcherTwo = PET_PATTERN_FOR_SYNTHESIS.find(name)
         if (petRarityMatcher != null) {
             val color = petRarityMatcher.groupValues.getOrNull(1) ?: return ItemRarity.NONE
-            return ItemRarity.byBaseColor(color) ?: ItemRarity.NONE
-        } else if (petRarityMatcherTwo != null) {
-            val color = petRarityMatcherTwo.groupValues.getOrNull(1) ?: return ItemRarity.NONE
             return ItemRarity.byBaseColor(color) ?: ItemRarity.NONE
         }
 
