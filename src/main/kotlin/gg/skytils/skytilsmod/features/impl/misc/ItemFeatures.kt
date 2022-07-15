@@ -604,19 +604,23 @@ class ItemFeatures {
         }
         if (Skytils.config.showCakeStackSize) {
             val cakeDisplayName = getDisplayName(item)
-            if (cakeDisplayName.contains("New Year Cake")) {
+            if (cakeDisplayName.contains("cNew Year Cake (Year ") && cakeDisplayName.contains(")")) {
                 val extraAttributes = getExtraAttributes(item) ?: return
                 stackTip = (extraAttributes.getInteger("new_years_cake")).toString()
             }
         }
         if (Skytils.config.showSpookyPieStackSize == 1 || Skytils.config.showSpookyPieStackSize == 2) {
             val pieDisplayName = getDisplayName(item)
-            if (pieDisplayName.endsWith("Spooky Pie")) {
+            if (pieDisplayName.contains("Spooky Pie")) {
                 val extraAttributes = getExtraAttributes(item) ?: return
-                if (Skytils.config.showSpookyPieStackSize == 2) {
-                    stackTip = (Integer.parseInt(extraAttributes.getString("event").replace("spooky_festival_", "")) + 1).toString()
-                } else if (Skytils.config.showSpookyPieStackSize == 1) {
-                    stackTip = (extraAttributes.getInteger("new_years_cake") + 1).toString()
+                lore?.forEach { line ->
+                    if (line.contains("Obtained during the")) {
+                        if (Skytils.config.showSpookyPieStackSize == 2) {
+                            stackTip = (Integer.parseInt(extraAttributes.getString("event").replace("spooky_festival_", "")) + 1).toString()
+                        } else if (Skytils.config.showSpookyPieStackSize == 1) {
+                            stackTip = (extraAttributes.getInteger("new_years_cake") + 1).toString()
+                        }
+                    }
                 }
             }
         }
