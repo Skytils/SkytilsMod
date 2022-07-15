@@ -81,7 +81,6 @@ class ItemFeatures {
     companion object {
         private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
         private val collectionPattern = Pattern.compile(".*(?<collection1>[A-Z][a-z]+) (?<tier>[X,I,V]+)")
-        private val nthPattern = Pattern.compile(".*(?<year>[1-9]+)(st|nd|rd|th)")
         val sellPrices = HashMap<String, Double>()
         val bitCosts = HashMap<String, Int>()
         val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
@@ -598,9 +597,6 @@ class ItemFeatures {
             if (collectionMatcher.matches()) {
                 lore?.forEach { line ->
                     if (line.contains("Collection")) {
-                        //the for loop is necessary to prevent false positives of stackTips rendering on minions
-                lore?.forEach { line -> //prevent false positives
-                    if (line.contains("Collection")) {
                         stackTip = collectionMatcher.group(2).toString().romanToDecimal().toString()
                     }
                 }
@@ -608,8 +604,9 @@ class ItemFeatures {
         }
         if (Skytils.config.showCakeStackSize) {
             val cakeDisplayName = getDisplayName(item)
-            if (cakeDisplayName.endsWith("New Year Cake")) {
-                stackTip = (getExtraAttributes(item).getInteger("new_years_cake")).toString()
+            if (cakeDisplayName.contains("New Year Cake")) {
+                val extraAttributes = getExtraAttributes(item) ?: return
+                stackTip = (extraAttributes.getInteger("new_years_cake")).toString()
             }
         }
         if (Skytils.config.showSpookyPieStackSize == 1 || Skytils.config.showSpookyPieStackSize == 2) {

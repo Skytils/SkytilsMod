@@ -1460,13 +1460,6 @@ object Config : Vigilant(
     var showMinionTier = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Collection Tier",
-        description = "Shows the tier of your item collections as the stack size.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var showCollectionStackSize = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Always Show Item Name Highlight",
         description = "Always shows the item name highlight.",
         category = "Miscellaneous", subcategory = "Quality of Life"
