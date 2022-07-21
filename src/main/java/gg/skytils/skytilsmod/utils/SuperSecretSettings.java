@@ -50,6 +50,8 @@ public class SuperSecretSettings {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            load();
         }
         Runtime.getRuntime().addShutdownHook(new Thread(SuperSecretSettings::save, "Skytils-SuperSecretSave"));
     }

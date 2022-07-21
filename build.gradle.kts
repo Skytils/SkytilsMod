@@ -64,7 +64,7 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
-            arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
+            arg("--tweakClass", "gg.essential.loader.stage0.EssentialSetupTweaker")
             arg("--mixin", "mixins.skytils.json")
         }
     }
@@ -160,7 +160,7 @@ tasks {
                     "MixinConfigs" to "mixins.skytils.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
-                    "TweakClass" to "gg.skytils.skytilsmod.tweaker.SkytilsTweaker",
+                    "TweakClass" to "gg.essential.loader.stage0.EssentialSetupTweaker",
                     "TweakOrder" to "0"
                 )
             )
