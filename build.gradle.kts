@@ -42,6 +42,7 @@ repositories {
     maven("https://repo.sk1er.club/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-releases/")
     maven("https://jitpack.io")
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
 quiltflower {
@@ -70,7 +71,6 @@ loom {
     runConfigs {
         getByName("client") {
             isIdeConfigGenerated = true
-            vmArg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
         remove(getByName("server"))
     }
@@ -129,6 +129,8 @@ dependencies {
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.10")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
+
+    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 }
 
 sourceSets {
@@ -202,7 +204,6 @@ tasks {
             "META-INF/versions/**",
             "META-INF/com.android.tools/**",
             "fabric.mod.json",
-            "**/loader-dev.jar"
         )
         mergeServiceFiles()
     }
