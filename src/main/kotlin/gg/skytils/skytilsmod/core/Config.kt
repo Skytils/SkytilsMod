@@ -1337,6 +1337,14 @@ object Config : Vigilant(
     var showEnchantedBookTier = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Head Floor Number",
+        description = "Shows the corresponding floor number for Diamond/Gold Catacombs Heads.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["Dungeons"]
+    )
+    var showHeadFloorNumber = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Combine Helper",
         description = "Shows if you're combining incompatible books or attribute shards",
         category = "Miscellaneous", subcategory = "Items"

@@ -80,6 +80,7 @@ class ItemFeatures {
 
     companion object {
         private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+        private val headPattern = Pattern.compile("(DIAMOND|GOLD)_([a-zA-Z]{5,9}|)_HEAD")
         val sellPrices = HashMap<String, Double>()
         val bitCosts = HashMap<String, Int>()
         val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
@@ -89,6 +90,15 @@ class ItemFeatures {
         var lowSoulFlowPinged = false
         var lastShieldUse = -1L
         var lastShieldClick = 0L
+        val floorNumberMap = hashMapOf(
+            "BONZO" to "1",
+            "SCARF" to "2",
+            "PROFESSOR" to "3",
+            "THORN" to "4",
+            "LIVID" to "5",
+            "SADAN" to "6",
+            "NECRON" to "7"
+        )
 
         init {
             SelectedArrowDisplay()
@@ -489,6 +499,11 @@ class ItemFeatures {
                     stackTip = it.keySet.maxOf { s -> it.getInteger(s) }.toString()
                     */
                     stackTip = it.getInteger(it.keySet.first()).toString()
+                }
+            } else if (Skytils.config.showHeadFloorNumber) {
+                val matcher = headPattern.matcher(itemId)
+                if (matcher.matches()) {
+                    stackTip = floorNumberMap[matcher.group(2)].toString()
                 }
             } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && itemId == "ENCHANTED_BOOK") {
                 extraAttributes.getCompoundTag("enchantments").takeIf {
