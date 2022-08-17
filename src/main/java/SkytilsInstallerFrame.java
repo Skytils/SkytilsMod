@@ -84,7 +84,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
             testPanel.add(chooser, BorderLayout.EAST);
 
             // Footer
-            footer = new FooterPanel(w / 2, h / 11, 16, 16, new Color(0x8193ff));
+            footer = new FooterPanel(w / 2 + (getOperatingSystem( ) == OperatingSystem.LINUX ?  60  : 0) , h / 11, 16, 16, new Color(0x8193ff));
             footer.openFolder.addActionListener(this);
             footer.install.addActionListener(this);
             footer.install.setEnabled(true);
@@ -189,11 +189,22 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        String forgeUrl = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html";
         if (e.getSource() == descriptionPanel.forge) {
             try {
-                Desktop.getDesktop().browse(new URI("http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
-            } catch (IOException | URISyntaxException ex) {
+                Desktop.getDesktop().browse(new URI(forgeUrl));
+            } catch (IOException  | URISyntaxException ex) {
                 showErrorPopup(ex);
+            } catch(/** Throws on linux */ UnsupportedOperationException ex) {
+                ex.printStackTrace();
+                JTextArea textArea = new JTextArea("Failed to open url open it manually instead\n" + forgeUrl);
+                textArea.setEditable(false);
+                Font currentFont = textArea.getFont();
+                Font newFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
+                textArea.setFont(newFont);
+                JScrollPane errorScrollPane = new JScrollPane(textArea);
+                errorScrollPane.setPreferredSize(new Dimension(600, 400));
+                JOptionPane.showMessageDialog(null, errorScrollPane, "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

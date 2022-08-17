@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
@@ -290,6 +291,17 @@ class MiscFeatures {
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onRenderHud(event: RenderHUDEvent) {
+        if (!Utils.inSkyblock || mc.thePlayer == null || Skytils.config.lowHealthVignetteThreshold == 0.0f) return
+        val healthPercentage = (mc.thePlayer.health + mc.thePlayer.absorptionAmount) / mc.thePlayer.baseMaxHealth
+        if (healthPercentage < Skytils.config.lowHealthVignetteThreshold) {
+            val color =
+                Skytils.config.lowHealthVignetteColor.withAlpha((Skytils.config.lowHealthVignetteColor.alpha * (1.0 - healthPercentage)).toInt())
+            RenderUtil.drawVignette(color)
+        }
+    }
+
     @SubscribeEvent
     fun onRenderBlockOverlay(event: RenderBlockOverlayEvent) {
         if (Utils.inSkyblock && Skytils.config.noFire && event.overlayType == RenderBlockOverlayEvent.OverlayType.FIRE) {
@@ -334,7 +346,7 @@ class MiscFeatures {
             val extraAttributes = getExtraAttributes(item)
             if (event.chestName == "Ophelia") {
                 if (Skytils.config.dungeonPotLock > 0) {
-                    if (slot.inventory === mc.thePlayer.inventory || slot.slotNumber == 49) return
+                    if (slot.inventory === mc.thePlayer.inventory || Utils.equalsOneOf(slot.slotNumber, 49, 53)) return
                     if (item.item !== Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
                         event.isCanceled = true
                         return

@@ -23,20 +23,30 @@ import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
+import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.getSkytilsResource
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.MathHelper
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.PlayerInteractEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object Funny {
     var ticks = 0
     var alphaMult = 0f
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onItemUse(event: PlayerInteractEvent) {
+        if (!Utils.inSkyblock || !SuperSecretSettings.tryItAndSee || event.entityPlayer?.heldItem == null) return
+        (event.entityPlayer as? EntityPlayerSP)?.dropOneItem(true)
+    }
+
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (SuperSecretSettings.bennettArthur) {
             if (++ticks >= 360) ticks = 0
-            alphaMult = MathHelper.sin(ticks * 0.0174533f)
+            alphaMult = MathHelper.sin(ticks * 0.0174533f).coerceAtLeast(0f)
         } else {
             ticks = 0
             alphaMult = 1f

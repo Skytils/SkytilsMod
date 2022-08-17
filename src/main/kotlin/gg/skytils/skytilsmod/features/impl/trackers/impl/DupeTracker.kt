@@ -23,11 +23,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
-import gg.skytils.skytilsmod.utils.DevTools
-import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.printDevMessage
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
@@ -163,10 +160,14 @@ object DupeTracker : Tracker("duped_items") {
             }
         }
         when (val origin = extraAttrib.getString("originTag")) {
+            "" -> return
             "ITEM_STASH" -> event.toolTip.add("§c§lStashed item: possibly duped")
             "ITEM_COMMAND", "ITEM_MENU" -> event.toolTip.add("§c§lSpawned by admin lol")
-            "" -> return
-            else -> if (Skytils.config.showOrigin) event.toolTip.add("§7§lOrigin: $origin")
+            else -> if (Skytils.config.showOrigin) event.toolTip.add(
+                "§7§lOrigin: ${
+                    origin.splitToWords()
+                }"
+            )
         }
     }
 

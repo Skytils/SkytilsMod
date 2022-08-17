@@ -22,8 +22,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.6.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.7.0"
+    kotlin("plugin.serialization") version "1.6.21"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
@@ -65,13 +65,14 @@ loom {
             property("legacy.debugClassLoadingFiner", "true")
             arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             arg("--mixin", "mixins.skytils.json")
-            arg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
     }
     runConfigs {
         getByName("client") {
             isIdeConfigGenerated = true
+            vmArg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
+        remove(getByName("server"))
     }
     forge {
         pack200Provider.set(Pack200Adapter())
@@ -118,14 +119,14 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.0.1"))
+    shadowMe(platform("io.ktor:ktor-bom:2.0.2"))
     shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
     shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
 
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.9")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.9")
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.10")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.10")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
@@ -212,7 +213,13 @@ tasks {
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs =
-                listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xrelease=8", "-Xbackend-threads=0")
+                listOf(
+                    /*"-opt-in=kotlin.RequiresOptIn", */
+                    "-Xjvm-default=all",
+                    "-Xrelease=8",
+                    "-Xbackend-threads=0",
+                    /*"-Xuse-k2"*/
+                )
             languageVersion = "1.6"
         }
         kotlinDaemonJvmArguments.set(
@@ -244,7 +251,6 @@ tasks {
 
 kotlin {
     jvmToolchain {
-        check(this is JavaToolchainSpec)
         languageVersion.set(JavaLanguageVersion.of(8))
     }
 }

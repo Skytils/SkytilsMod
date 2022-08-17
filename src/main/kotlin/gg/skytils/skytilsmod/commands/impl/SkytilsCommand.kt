@@ -85,7 +85,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 ChatComponentText(
                     "$prefix §bToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()
                             [(ZonedDateTime.now(ZoneId.of("America/New_York"))
-                        .dayOfMonth - 1) % MiningFeatures.fetchurItems.size]
+                        .dayOfMonth) % MiningFeatures.fetchurItems.size]
                 )
             )
             "griffin" -> if (args.size == 1) {

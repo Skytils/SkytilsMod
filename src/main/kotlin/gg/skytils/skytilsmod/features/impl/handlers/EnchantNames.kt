@@ -79,7 +79,7 @@ object EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) 
     override fun read(reader: Reader) {
         replacements.clear()
         replacements.putAll(
-            json.decodeFromString(reader.readText())
+            json.decodeFromString<Map<String, String>>(reader.readText())
         )
     }
 

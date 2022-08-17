@@ -23,7 +23,6 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedHashSet;
@@ -41,6 +40,7 @@ public class SuperSecretSettings {
     public static boolean jamCat = false;
     public static boolean noSychic = false;
     public static boolean smolPeople = false;
+    public static boolean tryItAndSee = false;
 
     static {
         if (!saveLoc.exists()) {
@@ -75,7 +75,7 @@ public class SuperSecretSettings {
     public static void load() {
         settings.clear();
         try {
-            List<String> lines = IOUtils.readLines(new FileInputStream(saveLoc), Charsets.UTF_8);
+            List<String> lines = IOUtils.readLines(Files.newInputStream(saveLoc.toPath()), Charsets.UTF_8);
             for (String line : lines) {
                 if (!line.isEmpty()) {
                     settings.add(line);
@@ -104,5 +104,6 @@ public class SuperSecretSettings {
         jamCat = settings.contains("jamcat");
         noSychic = settings.contains("nosychic");
         smolPeople = settings.contains("smolpeople");
+        tryItAndSee = settings.contains("tryItAndSee");
     }
 }

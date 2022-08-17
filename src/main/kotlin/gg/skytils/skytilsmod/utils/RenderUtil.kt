@@ -373,7 +373,7 @@ object RenderUtil {
         GlStateManager.alphaFunc(516, 0.1f)
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val distX = x - viewerX
-        val distY = y - viewerY
+        val distY = y - viewerY - mc.renderViewEntity.eyeHeight
         val distZ = z - viewerZ
         val dist = sqrt(distX * distX + distY * distY + distZ * distZ)
         val renderX: Double
@@ -381,7 +381,7 @@ object RenderUtil {
         val renderZ: Double
         if (dist > 12) {
             renderX = distX * 12 / dist + viewerX
-            renderY = distY * 12 / dist + viewerY
+            renderY = distY * 12 / dist + viewerY + mc.renderViewEntity.eyeHeight
             renderZ = distZ * 12 / dist + viewerZ
         } else {
             renderX = x
@@ -437,6 +437,7 @@ object RenderUtil {
             worldRenderer.pos(matrixStack, width + 1.0, -1.0, 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
             worldRenderer.drawDirect()
         }
+        GlStateManager.enableTexture2D()
         DefaultFonts.VANILLA_FONT_RENDERER.drawString(
             matrixStack,
             str,
@@ -756,6 +757,43 @@ object RenderUtil {
             .color(red, green, blue, alpha).endVertex()
         renderer.pos(x.toDouble() + width.toDouble(), y.toDouble(), 0.0).color(red, green, blue, alpha).endVertex()
         tesselator.draw()
+    }
+
+    // see GuiIngame
+    private val vignetteTexPath = ResourceLocation("textures/misc/vignette.png")
+
+    /**
+     * @author Mojang (modified)
+     * @see net.minecraft.client.gui.GuiIngame.renderVignette
+     */
+    fun drawVignette(color: Color) {
+        mc.entityRenderer.setupOverlayRendering()
+        UGraphics.enableBlend()
+        UGraphics.disableDepth()
+
+        UGraphics.depthMask(false)
+        UGraphics.tryBlendFuncSeparate(0, 769, 1, 0)
+
+        // Changing the alpha doesn't affect the vignette, so we have to use the alpha to change the color values
+        UGraphics.color4f(
+            (1f - (color.red / 255f)) * (color.alpha / 255f),
+            (1f - (color.green / 255f)) * (color.alpha / 255f),
+            (1f - (color.blue / 255f)) * (color.alpha / 255f),
+            1f
+        )
+
+        val sr = UResolution
+
+        UGraphics.bindTexture(0, vignetteTexPath)
+        val tessellator = UGraphics.getTessellator()
+        val wr = UGraphics.getFromTessellator()
+        val matrixStack = UMatrixStack()
+        wr.beginWithDefaultShader(UGraphics.DrawMode.QUADS, DefaultVertexFormats.POSITION_TEX)
+        wr.pos(matrixStack, 0.0, sr.scaledHeight.toDouble(), -90.0).tex(0.0, 1.0).endVertex()
+        wr.pos(matrixStack, sr.scaledWidth.toDouble(), sr.scaledHeight.toDouble(), -90.0).tex(1.0, 1.0).endVertex()
+        wr.pos(matrixStack, sr.scaledWidth.toDouble(), 0.0, -90.0).tex(1.0, 0.0).endVertex()
+        wr.pos(matrixStack, 0.0, 0.0, -90.0).tex(0.0, 0.0).endVertex()
+        tessellator.draw()
     }
 
     /*

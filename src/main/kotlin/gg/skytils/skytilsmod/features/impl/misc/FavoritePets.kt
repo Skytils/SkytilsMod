@@ -159,7 +159,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
 
     override fun read(reader: Reader) {
         favorited.clear()
-        favorited.addAll(json.decodeFromString(reader.readText()))
+        favorited.addAll(json.decodeFromString<Set<String>>(reader.readText()))
     }
 
     override fun write(writer: Writer) {

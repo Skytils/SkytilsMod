@@ -33,7 +33,12 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ProtectItems {
+object ProtectItems {
+    
+    init {
+        ItemProtectStrategy.isAnyToggled()
+    }
+
     @SubscribeEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         if (!Utils.inSkyblock) return

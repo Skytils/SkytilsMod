@@ -266,6 +266,7 @@ class Skytils {
             CommandAliases,
             ContainerSellValue,
             CooldownTracker,
+            CountdownCalculator,
             CustomNotifications,
             DamageSplash(),
             DungeonFeatures,
@@ -296,10 +297,11 @@ class Skytils {
             PetFeatures(),
             Ping,
             PricePaid,
-            ProtectItems(),
+            ProtectItems,
             RainTimer(),
             RandomStuff,
             RelicWaypoints,
+            ScamCheck,
             ScoreCalculation,
             SelectAllColorSolver,
             ShootTheTargetSolver,
@@ -347,8 +349,9 @@ class Skytils {
 
         cch.registerCommand(CataCommand)
         cch.registerCommand(CalcXPCommand)
-        cch.registerCommand(LimboCommand)
         cch.registerCommand(HollowWaypointCommand)
+        cch.registerCommand(LimboCommand)
+        cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
