@@ -2352,6 +2352,14 @@ object Config : Vigilant(
     var hopeHider = 0
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Bat Swarm Hider",
+        description = "Removes Bat Swarm messages from your chat.",
+        category = "Spam", subcategory = "Abilities",
+        options = ["Normal", "Hidden", "Separate GUI"]
+    )
+    var batSwarmHider = 0
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Mining ability hider",
         description = "Removes Mining ability messages from your chat.",
         category = "Spam", subcategory = "Abilities",

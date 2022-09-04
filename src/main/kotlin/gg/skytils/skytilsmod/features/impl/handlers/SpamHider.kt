@@ -313,6 +313,13 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
+                // (Vampire) Witch Mask
+                unformatted.contains("Your Bat Swarm hit ") -> {
+                    when (Skytils.config.batSwarmHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.batSwarmHider == 2)
+                    }
+                }
+
                 // Mining Abilities
                 (
                         (formatted.startsWith("§r§a§r§6") && formatted.endsWith("§r§ais now available!§r"))
