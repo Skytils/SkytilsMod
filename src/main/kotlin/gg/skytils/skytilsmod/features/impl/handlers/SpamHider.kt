@@ -168,9 +168,9 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     @SubscribeEvent
     fun onActionBarDisplay(event: SetActionBarEvent) {
         if (!Utils.inSkyblock) return
-        val manaUsageMatcher = Regexs.MANAUSED.pattern.matcher(event.message)
-        if (Skytils.config.manaUseHider != 0 && manaUsageMatcher.find()) {
-            val manaUsage = manaUsageMatcher.group(1) ?: return
+        val manaUsageMatcher = Regexs.MANAUSED.pattern.find(event.message)
+        if (Skytils.config.manaUseHider != 0 && manaUsageMatcher != null) {
+            val manaUsage = manaUsageMatcher.groups[1]?.value ?: return
             val spaced = " ".repeat(manaUsage.length)
 
             event.message = event.message.replace(manaUsage, spaced)
@@ -184,18 +184,18 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
-    private enum class Regexs(var pattern: Pattern) {
-        BLESSINGBUFF(Pattern.compile("(?<buff1>\\d[\\d,.%]+?) (?<symbol1>\\S{1,2})")),
-        BLESSINGGRANT(Pattern.compile("Grant.{1,2} you .* and .*\\.")),
-        BLESSINGNAME(Pattern.compile("Blessing of (?<blessing>\\w+)")),
-        BUILDINGTOOLS(Pattern.compile("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
-        MANAUSED(Pattern.compile("(§b-\\d+ Mana \\(§6.+§b\\))")),
+    private enum class Regexs(var pattern: Regex) {
+        BLESSINGBUFF(Regex("(?<buff1>\\+[\\d,.%& \\+x]+) (?<symbol1>\\S{1,2})")),
+        BLESSINGGRANT(Regex("Grant.{1,2} you (.*) and (.*)\\.")),
+        BLESSINGNAME(Regex("Blessing of (?<blessing>\\w+)")),
+        BUILDINGTOOLS(Regex("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
+        MANAUSED(Regex("(§b-\\d+ Mana \\(§6.+§b\\))")),
         SPOOKED(
-            Pattern.compile(
+            Regex(
                 "(§r§cYou died and lost [\\d,.]+ coins!§r)|(§r§dJust kidding! .+ §r§7spooked you!§r)|(§r§aAll your coins are fine, this was just a big mean spook :\\)§r)|(§r§c§lDO YOU REALLY WANT TO DELETE YOUR CURRENT PROFILE\\?§r)|(§r§cIt will delete in 10 seconds\\.\\.\\.§r)|(§r§c(?:[1-5]|\\.\\.\\.)§r)|(§r§7You just got spooked! .+ §r§7is the culprit!§r)|(§r§7False! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§cYou had a blacklisted .+ §r§cin your inventory, we had to delete it! Sorry!§r)|(§r§aJK! Your items are fine\\. This was just a big spook :\\)§r)|(§r§[9-b]§l▬+§r)|(§r§eFriend request from §r§d\\[PIG§r§b\\+\\+\\+§r§d\\] Technoblade§r)|(§r§a§l\\[ACCEPT\\] §r§8- §r§c§l\\[DENY\\] §r§8- §r§7§l\\[IGNORE\\]§r)|(§r§7Nope! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§aOnly kidding! We won't give you op ;\\)§r)|(§r§eYou are now op!§r)|(§r§aYour profile is fine! This was just an evil spook :\\)§r)|(§r§aYou're fine! Nothing changed with your guild status! :\\)§r)|(§r§cYou were kicked from your guild with reason '.+'§r)|(§r§aSorry, its just a spook bro\\. :\\)§r)"
             )
         ),
-        POWDERCHEST(Pattern.compile("§r§aYou received §r§b\\+(?<amount>\\d+) §r§a(?<type>Gemstone|Mithril) Powder§r"))
+        POWDERCHEST(Regex("§r§aYou received §r§b\\+(?<amount>\\d+) §r§a(?<type>Gemstone|Mithril) Powder§r"))
         ;
     }
 
@@ -330,27 +330,27 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     when (Skytils.config.blessingHider) {
                         1 -> cancelChatPacket(event, false)
                         2 -> {
-                            val blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.matcher(unformatted)
-                            if (blessingTypeMatcher.find()) {
-                                lastBlessingType = blessingTypeMatcher.group("blessing").lowercase()
+                            val blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.find(unformatted)
+                            if (blessingTypeMatcher != null) {
+                                lastBlessingType = blessingTypeMatcher.groups.get("blessing")?.value?.lowercase() ?: ""
                                 cancelChatPacket(event, false)
                             }
                         }
                     }
                 }
+
                 Utils.inDungeons && unformatted.contains("Grant") -> {
-                    if (Regexs.BLESSINGGRANT.pattern.matcher(unformatted).find()) {
+                    Regexs.BLESSINGGRANT.pattern.find(unformatted)?.let { match ->
                         when (Skytils.config.blessingHider) {
                             1 -> cancelChatPacket(event, false)
                             2 -> {
-                                val blessingBuffMatcher = Regexs.BLESSINGBUFF.pattern.matcher(unformatted)
-                                val buffs: MutableList<BlessingBuff> = ArrayList()
-                                while (blessingBuffMatcher.find()) {
-                                    val symbol =
-                                        if (blessingBuffMatcher.group("symbol1") == "he") "\u2764" else blessingBuffMatcher.group(
-                                            "symbol1"
-                                        )
-                                    buffs.add(BlessingBuff(blessingBuffMatcher.group("buff1"), symbol))
+                                val buffs = match.groupValues.mapNotNull { blessingGroup ->
+                                    Regexs.BLESSINGBUFF.pattern.matchEntire(blessingGroup)
+                                }.map { blessingBuffMatch ->
+                                    BlessingBuff(
+                                        blessingBuffMatch.groups.get("buff1")?.value ?: return@let,
+                                        blessingBuffMatch.groups.get("symbol1")?.value ?: return@let
+                                    )
                                 }
                                 if (lastBlessingType != "") GuiManager.toastGui.add(
                                     BlessingToast(
@@ -363,6 +363,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         }
                     }
                 }
+
                 Utils.inDungeons && unformatted.contains("Blessing of ") -> {
                     when (Skytils.config.blessingHider) {
                         1, 2 -> cancelChatPacket(event, false)
@@ -565,9 +566,8 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     "place"
                 ) || formatted.contains("zap"))
                         ) -> {
-                    if (formatted.startsWith("§9§lSkytils §8» §eThis will expire in") || Regexs.BUILDINGTOOLS.pattern.matcher(
-                            formatted
-                        ).matches()
+                    if (formatted.startsWith("§9§lSkytils §8» §eThis will expire in") ||
+                        Regexs.BUILDINGTOOLS.pattern.matches(formatted)
                     ) {
                         val chatGui = mc.ingameGUI.chatGUI
                         val lines =
@@ -655,18 +655,18 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
                 // Spooky Staff
-                Skytils.config.spookyMessageHider != 0 && System.currentTimeMillis() - lastSpooked <= 10000 && Regexs.SPOOKED.pattern.matcher(
-                    formatted
-                ).matches() -> {
+                Skytils.config.spookyMessageHider != 0 && System.currentTimeMillis() - lastSpooked <= 10000 &&
+                        Regexs.SPOOKED.pattern.matches(formatted) -> {
                     cancelChatPacket(event, Skytils.config.spookyMessageHider == 2)
                 }
+
                 Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(
                     " Powder§r"
                 ) -> {
-                    val matcher = Regexs.POWDERCHEST.pattern.matcher(formatted)
-                    if (matcher.find()) {
-                        val amount = matcher.group("amount").toInt()
-                        val type = matcher.group("type")
+                    val matcher = Regexs.POWDERCHEST.pattern.find(formatted)
+                    if (matcher != null) {
+                        val amount = matcher.groups["amount"]?.value?.toInt() ?: 0
+                        val type = matcher.groups["type"]?.value ?: "Error"
                         powderQueueTicks = 10
                         powderQueue.compute(type) { _, v ->
                             (v ?: 0) + amount
