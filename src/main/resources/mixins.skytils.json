@@ -83,5 +83,8 @@
     "world.MixinChunk",
     "world.MixinWorld"
   ],
-  "verbose": true
+  "verbose": true,
+  "client": [
+    "gui.MixinGuiEditSign"
+  ]
 }

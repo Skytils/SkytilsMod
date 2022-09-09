@@ -1843,6 +1843,13 @@ object Config : Vigilant(
     var powerOrbDuration = 10
 
     @Property(
+        type = PropertyType.SWITCH, name = "Press Enter to confirm Sign Popups",
+        description = "Allows pressing enter to confirm a sign popup, such as the bazaar or auction house prices.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var pressEnterToConfirmSignQuestion = false
+
+    @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
         description = "Prevents you from dropping, salvaging, or selling items worth more than this value. Based on Lowest BIN price.",
         category = "Miscellaneous", subcategory = "Quality of Life",
