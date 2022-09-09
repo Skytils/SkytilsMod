@@ -22,12 +22,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.7.0"
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
-    id("io.github.juuxel.loom-quiltflower") version "1.7.2"
+    id("io.github.juuxel.loom-quiltflower") version "1.7.3"
     java
     idea
     signing
@@ -97,7 +97,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:2581") {
+    implementation("gg.essential:essential-1.8.9-forge:4804+g97db1f45b") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
@@ -119,14 +119,14 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.0.2"))
+    shadowMe(platform("io.ktor:ktor-bom:2.1.1"))
     shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
     shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
 
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.10")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.10")
+    shadowMe("com.github.LlamaLad7:MixinExtras:0.0.12")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.12")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
