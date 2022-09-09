@@ -121,11 +121,18 @@ object ContainerSellValue {
                 || chestName == "Personal Vault"
     }
 
-    private fun getItemValue(itemStack: ItemStack): Double {
+    private val npcSellingBooks = mapOf(
+        "ENCHANTED_BOOK-TELEKINESIS-1" to 100.0,
+        "ENCHANTED_BOOK-TRUE_PROTECTION-1" to 900000.0
+    )
+
+    fun getItemValue(itemStack: ItemStack): Double {
         val identifier = AuctionData.getIdentifier(itemStack) ?: return 0.0
-        val basePrice = maxOf(
-            AuctionData.lowestBINs[identifier] ?: 0.0,
-            ItemFeatures.sellPrices[identifier] ?: 0.0
+        val basePrice = minOf(
+            maxOf(
+                AuctionData.lowestBINs[identifier] ?: 0.0,
+                ItemFeatures.sellPrices[identifier] ?: 0.0
+            ), npcSellingBooks[identifier] ?: Double.MAX_VALUE
         )
 
         if (itemStack.stackSize > 1 || !Skytils.config.includeModifiersInSellValue) return basePrice * itemStack.stackSize
@@ -145,7 +152,8 @@ object ContainerSellValue {
         val enchantments = if (!identifier.startsWith("ENCHANTED_BOOK-"))
             extraAttrs.getCompoundTag("enchantments") else null
         val enchantValue = enchantments?.keySet?.sumOf {
-            AuctionData.lowestBINs["ENCHANTED_BOOK-${it.uppercase()}-${enchantments.getInteger(it)}"] ?: 0.0
+            val id = "ENCHANTED_BOOK-${it.uppercase()}-${enchantments.getInteger(it)}"
+            (AuctionData.lowestBINs[id] ?: 0.0).coerceAtMost(npcSellingBooks[id] ?: Double.MAX_VALUE)
         } ?: 0.0
 
         val masterStarCount =
@@ -156,7 +164,16 @@ object ContainerSellValue {
             AuctionData.lowestBINs[listOf("FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH")[i - 1] + "_MASTER_STAR"] ?: 0.0
         } else 0.0
 
-        return basePrice + enchantValue + recombValue + hpbValue + masterStarValue
+        val artOfWarValue =
+            extraAttrs.getInteger("art_of_war_count") * (AuctionData.lowestBINs["THE_ART_OF_WAR"] ?: 0.0)
+
+        val farmingForDummiesValue =
+            extraAttrs.getInteger("farming_for_dummies_count") * (AuctionData.lowestBINs["FARMING_FOR_DUMMIES"] ?: 0.0)
+
+        val artOfPeaceValue =
+            AuctionData.lowestBINs["THE_ART_OF_PEACE"].takeIf { extraAttrs.getBoolean("artOfPeaceApplied") } ?: 0.0
+
+        return basePrice + enchantValue + recombValue + hpbValue + masterStarValue + artOfWarValue + farmingForDummiesValue + artOfPeaceValue
     }
 
     private val ItemStack.prettyDisplayName: String

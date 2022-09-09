@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
+import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
 import gg.skytils.skytilsmod.gui.elements.CleanButton
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
 import gg.skytils.skytilsmod.utils.ItemUtil
@@ -178,22 +179,13 @@ class AuctionPriceOverlay {
                         SmartFontRenderer.TextShadow.NONE
                     )
                 }
-                val enchantValue = getValueOfEnchantments(lastAuctionedStack)
-                if (enchantValue > 0) fr.drawString(
-                    "Estimated Enchantment Value: §b" + NumberUtil.nf.format(
-                        enchantValue
+                val estimatedValue = ContainerSellValue.getItemValue(lastAuctionedStack!!)
+                if (estimatedValue > 0) fr.drawString(
+                    "Estimated Value: §b" + NumberUtil.nf.format(
+                        estimatedValue
                     ),
                     width / 2f + 200,
                     height / 2f - 50,
-                    CommonColors.ORANGE,
-                    SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                    SmartFontRenderer.TextShadow.NONE
-                )
-                val hpbValue = getHotPotatoBookValue(lastAuctionedStack)
-                if (hpbValue > 0) fr.drawString(
-                    "HPB Value: §b" + NumberUtil.nf.format(hpbValue),
-                    width / 2f + 200,
-                    height / 2f - 25,
                     CommonColors.ORANGE,
                     SmartFontRenderer.TextAlignment.LEFT_RIGHT,
                     SmartFontRenderer.TextShadow.NONE
@@ -399,39 +391,6 @@ class AuctionPriceOverlay {
         private fun isProperCompactNumber(value: String): Boolean {
             val count = value.replace("\\s+".toRegex(), "").replace("[.0-9]+".toRegex(), "")
             return count.length < 2
-        }
-
-        private fun getValueOfEnchantments(item: ItemStack?): Double {
-            val extraAttr = ItemUtil.getExtraAttributes(item)
-            if (extraAttr == null || !extraAttr.hasKey("enchantments")) return 0.0
-            val enchantments = extraAttr.getCompoundTag("enchantments")
-            var total = 0.0
-            for (enchantName in enchantments.keySet) {
-                val id =
-                    "ENCHANTED_BOOK-${enchantName.uppercase()}-${enchantments.getInteger(enchantName)}"
-                val price = AuctionData.lowestBINs[id] ?: continue
-                var npcPrice = Double.MAX_VALUE
-                when (id) {
-                    "ENCHANTED_BOOK-TELEKINESIS-1" -> npcPrice = 100.0
-                    "ENCHANTED_BOOK-TRUE_PROTECTION-1" -> npcPrice = 900000.0
-                }
-                total += npcPrice.coerceAtMost(price)
-            }
-            return total
-        }
-
-        private fun getHotPotatoBookValue(item: ItemStack?): Double {
-            val extraAttr = ItemUtil.getExtraAttributes(item)
-            if (extraAttr == null || !extraAttr.hasKey("hot_potato_count")) return 0.0
-            val potatoCount = extraAttr.getInteger("hot_potato_count")
-            val hpbs = potatoCount.coerceAtMost(10)
-            val fpbs = potatoCount - hpbs
-            val hpbPrice = AuctionData.lowestBINs["HOT_POTATO_BOOK"]
-            val fpbPrice = AuctionData.lowestBINs["FUMING_POTATO_BOOK"]
-            var total = 0.0
-            if (hpbPrice != null) total += hpbs * hpbPrice
-            if (fpbPrice != null) total += fpbs * fpbPrice
-            return total
         }
     }
 }
