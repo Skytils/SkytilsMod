@@ -1308,13 +1308,6 @@ object Config : Vigilant(
     var witherShieldCooldown = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Item Star Count",
-        description = "Shows the amount of stars on items as the stack size.",
-        category = "Miscellaneous", subcategory = "Items"
-    )
-    var showStarCount = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Show Enchanted Book Abbreviation",
         description = "Shows the abbreviated name of books with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1328,6 +1321,14 @@ object Config : Vigilant(
         searchTags = ["1.3.0-pre1"]
     )
     var showAttributeShardAbbreviation = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Attribute Shard Level",
+        description = "Shows the level of Attribute Shards as the stack size.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["1.3.0-pre1"]
+    )
+    var showAttributeShardLevel = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Enchanted Book Tier",
@@ -1365,6 +1366,14 @@ object Config : Vigilant(
     var showGemstones = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Head Floor Number",
+        description = "Shows the corresponding floor number for Diamond/Gold Catacombs Heads.",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["Dungeons"]
+    )
+    var showHeadFloorNumber = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Item Origin",
         description = "Shows the origin on items.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1386,19 +1395,18 @@ object Config : Vigilant(
     var showPotionTier = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Attribute Shard Level",
-        description = "Shows the level of Attribute Shards as the stack size.",
-        category = "Miscellaneous", subcategory = "Items",
-        searchTags = ["1.3.0-pre1"]
-    )
-    var showAttributeShardLevel = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Show Pet Candies",
         description = "Shows the number of candies used as the stack size",
         category = "Miscellaneous", subcategory = "Items"
     )
     var showPetCandies = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Item Star Count",
+        description = "Shows the amount of stars on items as the stack size.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showStarCount = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Stacking Enchant Progress Display",

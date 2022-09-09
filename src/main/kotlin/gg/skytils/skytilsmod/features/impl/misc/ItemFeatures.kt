@@ -80,6 +80,8 @@ class ItemFeatures {
 
     companion object {
         private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+        private val headPattern =
+            Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
         val sellPrices = HashMap<String, Double>()
         val bitCosts = HashMap<String, Int>()
         val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
@@ -538,6 +540,11 @@ class ItemFeatures {
                     if (Skytils.config.showEnchantedBookTier) stackTip =
                         enchantments.getInteger(name).toString()
                 }
+            } else if (Skytils.config.showHeadFloorNumber && item.item === Items.skull && headPattern.matches(
+                    itemId ?: ""
+                )
+            ) {
+                stackTip = headPattern.matchEntire(itemId!!)?.groups?.indexOfLast { it != null }.toString()
             } else if (Skytils.config.showStarCount && ItemUtil.getStarCount(extraAttributes) > 0) {
                 stackTip = ItemUtil.getStarCount(extraAttributes).toString()
             }
