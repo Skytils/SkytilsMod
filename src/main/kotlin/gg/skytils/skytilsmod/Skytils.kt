@@ -334,6 +334,8 @@ class Skytils {
         PersistentSave.loadData()
 
         ModChecker.checkModdedForge()
+
+        ScreenRenderer.init()
     }
 
     @Mod.EventHandler

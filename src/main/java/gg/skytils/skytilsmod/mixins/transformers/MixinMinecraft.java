@@ -68,9 +68,4 @@ public abstract class MixinMinecraft {
             }
         }
     }
-
-    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/IReloadableResourceManager;registerReloadListener(Lnet/minecraft/client/resources/IResourceManagerReloadListener;)V", shift = At.Shift.AFTER, ordinal = 4))
-    private void initializeSmartFontRenderer(CallbackInfo ci) {
-        ScreenRenderer.init();
-    }
 }
