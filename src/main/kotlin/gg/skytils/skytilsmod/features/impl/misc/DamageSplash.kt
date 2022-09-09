@@ -30,7 +30,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -46,38 +45,36 @@ class DamageSplash {
 
     @SubscribeEvent
     fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!Utils.inSkyblock || !Skytils.config.customDamageSplash) return
+        if (!Utils.inSkyblock || Skytils.config.customDamageSplash == 0) return
         val entity = e.entity
         if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
         val strippedName = entity.customNameTag.stripControlCodes()
-        val damageMatcher = damagePattern.matcher(strippedName)
-        if (damageMatcher.matches()) {
-            e.isCanceled = true
-            entity.worldObj.removeEntity(e.entity)
-            if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
-            val name = entity.customNameTag
-            val damage = damageMatcher.group(1).run {
-                when {
-                    name.startsWith("§0") -> "${this}☠"
-                    name.startsWith("§f") && !name.contains("§e") -> "${this}❂"
-                    name.startsWith("§6") && !(name.contains("§e") || name.contains('ﬗ')) -> "${this}火"
-                    name.startsWith("§3") -> "${this}水"
-                    else -> this
-                }
+        val damageMatcher = damagePattern.matchEntire(strippedName) ?: return
+        e.isCanceled = true
+        entity.worldObj.removeEntity(e.entity)
+        if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
+        val name = entity.customNameTag
+        val damage = damageMatcher.groups[1]!!.value.run {
+            when {
+                name.startsWith("§0") -> "${this}☠"
+                name.startsWith("§f") && !name.contains("§e") -> "${this}❂"
+                name.startsWith("§6") && !(name.contains("§e") || name.contains('ﬗ')) -> "${this}火"
+                name.startsWith("§3") -> "${this}水"
+                else -> this
             }
-            spawnEntity(
-                DamageSplashEntity(
-                    entity,
-                    damage,
-                    Location(entity.posX, entity.posY + 1.5, entity.posZ)
-                )
-            )
         }
+        spawnEntity(
+            DamageSplashEntity(
+                entity,
+                damage,
+                Location(entity.posX, entity.posY + 1.5, entity.posZ)
+            )
+        )
     }
 
     companion object {
-        private val damagePattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+        private val damagePattern = Regex("✧?(\\d{1,3}(?:,\\d{3})*[⚔+✧❤♞☄✷ﬗ]*)")
     }
 }

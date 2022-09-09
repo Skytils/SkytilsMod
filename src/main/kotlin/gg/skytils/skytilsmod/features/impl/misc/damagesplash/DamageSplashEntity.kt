@@ -32,7 +32,6 @@ import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.entity.RenderManager
 import net.minecraft.entity.item.EntityArmorStand
 import java.util.*
-import java.util.regex.Pattern
 
 /**
  * Taken from Wynntils under GNU Affero General Public License v3.0
@@ -101,14 +100,14 @@ class DamageSplashEntity(
     companion object {
         private val renderer = ScreenRenderer()
         private val added = WeakHashMap<String, UUID>()
-        private val SYMBOL_PATTERN = Pattern.compile("(\\d+)(.*)")
+        private val SYMBOL_PATTERN = Regex("(\\d{1,3}(?:,\\d{3})*)(.*)")
     }
 
     init {
-        val symbolMatcher = SYMBOL_PATTERN.matcher(damage)
-        if (symbolMatcher.matches()) {
-            var symbol = symbolMatcher.group(2)
-            damage = symbolMatcher.group(1)
+        val symbolMatcher = SYMBOL_PATTERN.matchEntire(damage)
+        if (symbolMatcher != null) {
+            var symbol = symbolMatcher.groups[2]!!.value
+            damage = symbolMatcher.groups[1]!!.value.replace(",", "")
             if (symbol.contains("❤")) {
                 love = true
                 symbol = symbol.replace("❤", "")
@@ -124,7 +123,7 @@ class DamageSplashEntity(
             color = Damage.fromSymbol(symbol)?.color
         }
         displayText =
-            "${if (Skytils.config.commaDamage) NumberUtil.nf.format(damage.toLong()) else format(damage.toLong())}${
+            "${if (Skytils.config.customDamageSplash == 1) NumberUtil.nf.format(damage.toLong()) else format(damage.toLong())}${
                 exportStringIfTrue(
                     love,
                     "❤"

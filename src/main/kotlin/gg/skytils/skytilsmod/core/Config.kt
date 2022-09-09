@@ -1658,18 +1658,12 @@ object Config : Vigilant(
     var containerSellValueMaxItems = 20
 
     @Property(
-        type = PropertyType.SWITCH, name = "Comma Damage",
-        description = "§b[WIP] §rAdds commas to Skyblock Damage Splashes.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var commaDamage = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Custom Damage Splash",
+        type = PropertyType.SELECTOR, name = "Custom Damage Splash Style",
         description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        options = ["Off", "Comma", "Truncate"]
     )
-    var customDamageSplash = false
+    var customDamageSplash = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Night Vision",

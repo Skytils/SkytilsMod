@@ -21,10 +21,8 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.features.impl.dungeons.WitherKingDragons
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.potion.Potion
 import net.minecraft.util.EnumParticleTypes
@@ -45,37 +43,6 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
     fun onNewDisplayName(s: String) {
         if (!Utils.inSkyblock) return
-        if (Skytils.config.commaDamage && entity is EntityArmorStand && entity.ticksExisted < 300 && s.isNotEmpty()) {
-            val matched = dmgPattern.matchEntire(s.stripControlCodes())
-            if (matched != null) {
-                val dmg = matched.groups["num"]?.value?.toIntOrNull()
-                if ((dmg ?: 0) >= 1000) {
-                    overrideDisplayName = buildString {
-                        var idx = 0
-                        val reverse = s.reversed()
-                        for ((i, c) in reverse.withIndex()) {
-                            append(c)
-                            if (c.isDigit()) {
-                                val next = reverse.getOrNull(i + 1)
-                                if (next != '§') {
-                                    idx++
-                                }
-                                if (idx != 0 && idx % 3 == 0) {
-                                    val remaining = reverse.substring(i + 1)
-                                    if (remaining.withIndex().any { (i1, c1) ->
-                                            c1.isDigit() && remaining.getOrNull(i1 + 1) != '§'
-                                        }) {
-                                        append(',')
-                                        idx = 0
-                                    }
-                                }
-                            }
-                        }
-                    }.reversed()
-                    return
-                }
-            }
-        }
         if (overrideDisplayName != null)
             overrideDisplayName = s
     }
