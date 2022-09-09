@@ -22,16 +22,12 @@ import kotlin.KotlinVersion;
 import kotlin.text.StringsKt;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
+
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.exit;
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
 
 @IFMLLoadingPlugin.Name("Skytils On Top")
 @IFMLLoadingPlugin.SortingIndex(69)
@@ -142,21 +138,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         kotlinPlugin = new SkytilsLoadingPluginKt();
     }
 
-    /**
-     * Bypasses forges security manager to exit the jvm
-     */
-    public static void exit() {
-        try {
-            Class<?> clazz = Class.forName("java.lang.Shutdown");
-            Method m_exit = clazz.getDeclaredMethod("exit", int.class);
-            m_exit.setAccessible(true);
-            m_exit.invoke(null, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
     private boolean checkForClass(String className) {
         try {
             Class.forName(className, false, getClass().getClassLoader());
@@ -164,64 +145,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         } catch (ClassNotFoundException ignored) {
             return false;
         }
-    }
-
-    private void showMessage(String errorMessage) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // This makes the JOptionPane show on taskbar and stay on top
-        JFrame frame = new JFrame();
-        frame.setUndecorated(true);
-        frame.setAlwaysOnTop(true);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
-        Icon icon = null;
-        try {
-            URL url = SkytilsLoadingPlugin.class.getResource("/assets/skytils/sychicpet.gif");
-            if (url != null) {
-                icon = new ImageIcon(Toolkit.getDefaultToolkit().createImage(url).getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        JButton discordLink = new JButton("Join the Discord");
-        discordLink.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event) {
-                try {
-                    Desktop.getDesktop().browse(new URI("https://discord.gg/skytils"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        JButton close = new JButton("Close");
-        close.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                exit();
-            }
-        });
-
-        Object[] options = new Object[]{discordLink, close};
-        JOptionPane.showOptionDialog(
-                frame,
-                errorMessage,
-                "Skytils Error",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                icon,
-                options,
-                options[0]
-        );
-        exit();
     }
 
     @Override

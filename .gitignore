@@ -118,6 +118,3 @@ run/
 !gradle-wrapper.jar
 
 .vscode/
-
-!loader.jar
-!loader-dev.jar

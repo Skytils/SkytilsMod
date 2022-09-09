@@ -21,6 +21,8 @@ package gg.skytils.skytilsmod.tweaker
 import SkytilsInstallerFrame
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
+import gg.skytils.skytilsmod.tweaker.TweakerUtil.exit
+import gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage
 import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
@@ -36,12 +38,9 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.spongepowered.asm.launch.MixinBootstrap
 import org.spongepowered.asm.mixin.MixinEnvironment
 import java.awt.Desktop
-import java.awt.Image
-import java.awt.Toolkit
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
-import java.net.URI
 import java.net.URL
 import javax.swing.*
 
@@ -62,14 +61,14 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 try {
                     Class.forName("com.mumfrey.liteloader.launch.LiteLoaderTweaker")
                     showMessage(SkytilsLoadingPlugin.liteloaderUserMessage)
-                    SkytilsLoadingPlugin.exit()
+                    exit()
                 } catch (ignored: ClassNotFoundException) {
                     showMessage(
                         SkytilsLoadingPlugin.badMixinVersionMessage + "<br>The culprit seems to be " + File(
                             MixinEnvironment::class.java.protectionDomain.codeSource.location.toURI()
                         ).name + "</p></html>"
                     )
-                    SkytilsLoadingPlugin.exit()
+                    exit()
                 }
             }
 
@@ -131,7 +130,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                 #ask for support in the Discord.
                 """.trimMargin("#"), sk1erClubButton
                 )
-                SkytilsLoadingPlugin.exit()
+                exit()
             }
         }
     }
@@ -154,55 +153,6 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
 
     override fun getAccessTransformerClass(): String? {
         return null
-    }
-
-    private fun showMessage(errorMessage: String, vararg options: Any) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        // This makes the JOptionPane show on taskbar and stay on top
-        val frame = JFrame()
-        frame.isUndecorated = true
-        frame.isAlwaysOnTop = true
-        frame.setLocationRelativeTo(null)
-        frame.isVisible = true
-        var icon: Icon? = null
-        try {
-            val url =
-                SkytilsLoadingPlugin::class.java.getResource("/assets/skytils/sychicpet.gif")
-            if (url != null) {
-                icon = ImageIcon(
-                    Toolkit.getDefaultToolkit().createImage(url).getScaledInstance(50, 50, Image.SCALE_DEFAULT)
-                )
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        val discordLink = createButton("Join the Discord") {
-            Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
-        }
-        val close = createButton("Close") {
-            exit()
-        }
-        val totalOptions = arrayOf(discordLink, close, *options)
-        JOptionPane.showOptionDialog(
-            frame,
-            errorMessage,
-            "Skytils Error",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.ERROR_MESSAGE,
-            icon,
-            totalOptions,
-            totalOptions[0]
-        )
-        exit()
-    }
-
-    private fun exit() {
-        SkytilsLoadingPlugin.exit()
     }
 }
 

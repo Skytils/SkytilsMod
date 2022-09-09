@@ -70,7 +70,6 @@ loom {
     runConfigs {
         getByName("client") {
             isIdeConfigGenerated = true
-            vmArg("-javaagent:\"../src/main/resources/assets/skytils/loader/loader-dev.jar\"")
         }
         remove(getByName("server"))
     }
@@ -201,8 +200,7 @@ tasks {
             "META-INF/maven/**",
             "META-INF/versions/**",
             "META-INF/com.android.tools/**",
-            "fabric.mod.json",
-            "**/loader-dev.jar"
+            "fabric.mod.json"
         )
         mergeServiceFiles()
     }

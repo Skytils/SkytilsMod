@@ -19,79 +19,38 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
-import net.minecraft.launchwrapper.ITweaker;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Objects;
+
+import static gg.skytils.skytilsmod.tweaker.SkytilsSecurityManager.overrideSecurityManager;
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.runStage;
 
 @SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
-    private final ITweaker delegateTweaker;
 
-    public SkytilsTweaker() {
-        try {
-            ClassLoader cl = getClass().getClassLoader();
-            LaunchClassLoader lcl = Launch.classLoader;
-            URL loaderLoc = cl.getResource("assets/skytils/loader/loader-dev.jar");
-            boolean isDev;
-            if (loaderLoc != null) {
-                System.out.println("Skytils is running in a development environment.");
-                isDev = true;
-            } else {
-                // shadow explodes jar files
-                Path systemLoc = Paths.get("./assets/skytils/loader/loader.jar");
-                Files.createDirectories(systemLoc.getParent());
-                try (InputStream is = cl.getResourceAsStream("assets/skytils/loader/loader.notjar")) {
-                    Objects.requireNonNull(is, "Resource stream is null");
-                    Files.copy(is, systemLoc, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                loaderLoc = systemLoc.toUri().toURL();
-                isDev = false;
-            }
-            Objects.requireNonNull(loaderLoc, "Loader was not found");
-
-            addURL(lcl.getClass().getClassLoader(), loaderLoc);
-            lcl.addClassLoaderExclusion("gg.skytils.skytilsmod.loader.");
-            lcl.addTransformerExclusion("gg.skytils.skytilsmod.loader.");
-            lcl.addURL(loaderLoc);
-            delegateTweaker = (ITweaker)
-                    Class.forName("gg.skytils.skytilsmod.loader.SkytilsLoader", true, lcl)
-                            .getDeclaredConstructor(boolean.class)
-                            .newInstance(isDev);
-        } catch (Throwable e) {
-            throw new IllegalStateException("Failed to initialize loader", e);
+    public SkytilsTweaker() throws Throwable {
+        runStage("gg.skytils.skytilsmod.utils.SuperSecretSettings", "load");
+        boolean isFML = System.getSecurityManager().getClass().equals(FMLSecurityManager.class);
+        if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
+            System.out.println("Skytils is setting the security manager to prevent 'ghost windows'... Set the flag skytils.noSecurityManager to prevent this behavior.");
+            overrideSecurityManager(isFML);
+            runStage("gg.skytils.skytilsmod.tweaker.SkytilsSecurityManager", "overrideSecurityManager", isFML);
+            System.out.println("Current security manager: " + System.getSecurityManager());
         }
+        runStage("gg.skytils.skytilsmod.tweaker.EssentialPlatformSetup", "setup");
     }
 
-    private void addURL(ClassLoader cl, URL url) throws ReflectiveOperationException {
-        Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-        m.setAccessible(true);
-        m.invoke(cl, url);
-    }
 
     @Override
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-        delegateTweaker.acceptOptions(args, gameDir, assetsDir, profile);
         super.acceptOptions(args, gameDir, assetsDir, profile);
     }
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        delegateTweaker.injectIntoClassLoader(classLoader);
         super.injectIntoClassLoader(classLoader);
     }
 

@@ -25,14 +25,10 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 
 class SkytilsMixinPlugin : IMixinConfigPlugin {
-    private val delegate: IMixinConfigPlugin =
-        Class.forName("gg.skytils.skytilsmod.loader.SkytilsLoaderMixinPlugin").newInstance() as IMixinConfigPlugin
-
     val mixinPackage = "gg.skytils.skytilsmod.mixins.transformers"
     var deobfEnvironment = false
 
     override fun onLoad(mixinPackage: String) {
-        delegate.onLoad(mixinPackage)
         deobfEnvironment = Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
         if (deobfEnvironment) {
             println("We are in a deobfuscated environment, loading compatibility mixins.")
@@ -40,9 +36,7 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         MixinExtrasBootstrap.init()
     }
 
-    override fun getRefMapperConfig(): String? {
-        return delegate.refMapperConfig
-    }
+    override fun getRefMapperConfig(): String? = null
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
         if (!mixinClassName.startsWith(mixinPackage)) {
@@ -53,16 +47,13 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
             println("Mixin $mixinClassName is for a deobfuscated environment, disabling.")
             return false
         }
-        return delegate.shouldApplyMixin(targetClassName, mixinClassName)
+        return true
     }
 
     override fun acceptTargets(myTargets: MutableSet<String>, otherTargets: Set<String>) {
-        delegate.acceptTargets(myTargets, otherTargets)
     }
 
-    override fun getMixins(): List<String>? {
-        return delegate.mixins
-    }
+    override fun getMixins(): List<String>? = null
 
     override fun preApply(
         targetClassName: String,
@@ -70,7 +61,6 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         mixinClassName: String,
         mixinInfo: IMixinInfo
     ) {
-        delegate.preApply(targetClassName, targetClass, mixinClassName, mixinInfo)
     }
 
     override fun postApply(
@@ -79,6 +69,5 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         mixinClassName: String,
         mixinInfo: IMixinInfo?
     ) {
-        delegate.postApply(targetClassName, targetClass, mixinClassName, mixinInfo)
     }
 }
