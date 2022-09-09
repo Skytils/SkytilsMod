@@ -33,7 +33,7 @@ object RandomStuff {
     @SubscribeEvent
     fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (!Skytils.config.randomStuff || !Utils.inSkyblock) return
-        if (event.packet is S0EPacketSpawnObject && event.packet.type == 70 && ((DungeonTimer.phase1ClearTime != -1L && DungeonTimer.phase4ClearTime == -1L) || SBInfo.mode == "instanced")) {
+        if (event.packet is S0EPacketSpawnObject && event.packet.type == 70 && ((DungeonTimer.phase1ClearTime != -1L && DungeonTimer.bossClearTime == -1L) || SBInfo.mode == "instanced")) {
             event.isCanceled = true
         }
     }
@@ -42,7 +42,7 @@ object RandomStuff {
     fun onCheckRenderEvent(event: CheckRenderEntityEvent<*>) {
         if (!Skytils.config.randomStuff || !Utils.inSkyblock) return
         event.apply {
-            if (entity.isInvisible && DungeonTimer.phase1ClearTime != -1L && DungeonTimer.phase4ClearTime == -1L && entity is EntityArmorStand) {
+            if (entity.isInvisible && DungeonTimer.phase1ClearTime != -1L && DungeonTimer.bossClearTime == -1L && entity is EntityArmorStand) {
                 val nn = entity.inventory.filterNotNull()
                 if (nn.size != 1) return
                 if (nn.first().item !is ItemBlock) return
