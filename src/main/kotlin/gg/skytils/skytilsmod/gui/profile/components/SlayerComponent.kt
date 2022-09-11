@@ -32,7 +32,7 @@ import gg.essential.vigilance.gui.VigilancePalette
 import gg.skytils.skytilsmod.utils.NumberUtil
 import skytils.hylin.skyblock.Member
 
-class SlayerComponent(profileState: State<Member?>) : UIComponent() {
+class SlayerComponent(profileState: State<Member?>) : UIContainer() {
 
     val slayers = profileState.map { it?.slayers }
     val rev = slayers.map { it?.revenant }

@@ -40,7 +40,7 @@ open class XPComponent(
     percent: Float = 0f,
     overflow: Long = 0,
     var colorConstraint: ColorConstraint = Color(0x4166f5).constraint
-) : UIComponent() {
+) : UIContainer() {
     // to get around leaking `this` into ctor
     private fun that() = this
 

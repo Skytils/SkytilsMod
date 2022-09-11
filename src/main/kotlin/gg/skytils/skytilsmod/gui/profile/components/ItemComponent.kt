@@ -34,6 +34,7 @@ class ItemComponent(val state: State<ItemStack>) : UIComponent() {
     constructor(item: Item, metadata: Int = 0) : this(ItemStack(item, 1, metadata))
 
     override fun draw(matrixStack: UMatrixStack) {
+        beforeDraw(matrixStack)
         super.draw(matrixStack)
         matrixStack.push()
         matrixStack.translate(getLeft(), getTop(), 100f)
