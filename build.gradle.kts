@@ -28,12 +28,13 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("io.github.juuxel.loom-quiltflower") version "1.7.3"
+    id("net.kyori.blossom") version "1.3.1"
     java
     idea
     signing
 }
 
-version = "1.3.0-pre3"
+version = "1.3.0-pre4"
 group = "gg.skytils"
 
 repositories {
@@ -128,6 +129,10 @@ dependencies {
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.12")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
+}
+
+blossom {
+    replaceToken("@@SKYTILS_VERSION@@", version, "src/main/java/gg/skytils/skytilsmod/Reference.java")
 }
 
 sourceSets {
