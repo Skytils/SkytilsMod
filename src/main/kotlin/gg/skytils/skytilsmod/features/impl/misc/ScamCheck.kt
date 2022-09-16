@@ -44,24 +44,31 @@ object ScamCheck {
     private val tradingRegex = Regex("You {18}(?<otherParty>\\w{1,16})")
     private val tradingWithRegex = Regex("§7Trading with.*? (?<otherParty>\\w{1,16})§f§7\\.")
     private var tradingWindowId = -1
+    private var scamChecked = false
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || !Skytils.config.scamCheck) return
         when (val packet = event.packet) {
             is S2DPacketOpenWindow -> {
-                if (tradingRegex.matches(packet.windowTitle.unformattedText))
+                if (tradingRegex.matches(packet.windowTitle.unformattedText)) {
                     tradingWindowId = packet.windowId
-            }
-            is S2FPacketSetSlot -> {
-                if (packet.func_149175_c() == tradingWindowId && packet.func_149173_d() == 41 && packet.func_149174_e() != null) {
-                    checkScam(packet.func_149174_e())
+                    scamChecked = false
                 }
             }
+
+            is S2FPacketSetSlot -> {
+                if (!scamChecked && packet.func_149175_c() == tradingWindowId && packet.func_149173_d() == 41 && packet.func_149174_e() != null) {
+                    checkScam(packet.func_149174_e())
+                    scamChecked = true
+                }
+            }
+
             is S30PacketWindowItems -> {
-                if (packet.func_148911_c() == tradingWindowId && packet.itemStacks.size == 45) {
+                if (!scamChecked && packet.func_148911_c() == tradingWindowId && packet.itemStacks.size == 45) {
                     val tradingWith = packet.itemStacks[41] ?: return
                     checkScam(tradingWith)
+                    scamChecked = true
                 }
             }
         }

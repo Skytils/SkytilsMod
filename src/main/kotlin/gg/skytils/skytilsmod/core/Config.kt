@@ -1581,6 +1581,13 @@ object Config : Vigilant(
     var randomStuff = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Scam Check",
+        description = "Check if the other party is a known scammer when trading.\nThis relies on a database and may not contain all scammers.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var scamCheck = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Bestiary Level",
         description = "Shows the bestiary level as the stack size.",
         category = "Miscellaneous", subcategory = "Other"
