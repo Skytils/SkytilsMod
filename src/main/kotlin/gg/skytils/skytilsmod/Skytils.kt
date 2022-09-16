@@ -197,7 +197,7 @@ class Skytils {
             }
             install(HttpCache)
             install(HttpRequestRetry) {
-                retryOnServerErrors(maxRetries = 5)
+                retryOnServerErrors(maxRetries = 3)
                 exponentialDelay()
             }
             install(UserAgent) {

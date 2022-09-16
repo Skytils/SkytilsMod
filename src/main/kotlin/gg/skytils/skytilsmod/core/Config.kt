@@ -1545,18 +1545,12 @@ object Config : Vigilant(
     var golemSpawnTimer = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Legion Player Display",
-        description = "Shows the amount of players within range of the Legion enchantment.",
-        category = "Miscellaneous", subcategory = "Other"
+        type = PropertyType.SWITCH, name = "Players in Range Display",
+        description = "Shows the amount of players within a 30 block radius.",
+        category = "Miscellaneous", subcategory = "Other",
+        searchTags = ["Dolphin", "Legion", "Bobbin' Time"]
     )
-    var legionPlayerDisplay = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Cap Legion Display",
-        description = "Caps the legion display to the effective maximum(20)",
-        category = "Miscellaneous", subcategory = "Other"
-    )
-    var legionCap = true
+    var playersInRangeDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Placed Summoning Eye Display",
@@ -1959,20 +1953,6 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var lavaBobber = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Dolphin Pet Display",
-        description = "Shows the players within the range of the Dolphin pet.",
-        category = "Pets", subcategory = "Displays"
-    )
-    var dolphinPetDisplay = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Cap Dolphin Pet Display",
-        description = "Caps the dolphin pet display to the effective maximum (5)",
-        category = "Pets", subcategory = "Displays"
-    )
-    var dolphinCap = true
 
     @Property(
         type = PropertyType.SELECTOR, name = "Autopet Message Hider",

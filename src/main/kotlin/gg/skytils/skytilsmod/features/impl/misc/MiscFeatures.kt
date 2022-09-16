@@ -41,7 +41,6 @@ import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
-import gg.skytils.skytilsmod.utils.Utils.isInTablist
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -57,7 +56,6 @@ import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
@@ -324,6 +322,7 @@ class MiscFeatures {
                         event.isCanceled = true
                         return
                     }
+
                     "mob.villager.haggle" -> if (packet.volume == 0.5f) {
                         event.isCanceled = true
                         return
@@ -408,21 +407,9 @@ class MiscFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
 
-        if (Skytils.config.legionPlayerDisplay) {
-            hasLegion = mc.thePlayer.inventory.armorInventory.any {
-                getExtraAttributes(it).run {
-                    this != null && this.hasKey("enchantments") && this.getCompoundTag("enchantments")
-                        .hasKey("ultimate_legion")
-                }
-            }
-            if (hasLegion) {
-                legionPlayers = mc.theWorld.getPlayers<EntityPlayer>(
-                    EntityOtherPlayerMP::class.java
-                ) { p: EntityPlayer? ->
-                    p != null && p !== mc.thePlayer && p.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30 && p.uniqueID.version() != 2 && isInTablist(
-                        p
-                    )
-                }.size
+        if (Skytils.config.playersInRangeDisplay) {
+            mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
+                it.uniqueID.version() == 4 && it.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30
             }
         }
         if (Skytils.config.summoningEyeDisplay && SBInfo.mode == SkyblockIsland.TheEnd.mode) {
@@ -482,13 +469,12 @@ class MiscFeatures {
     companion object {
 
         private var golemSpawnTime: Long = 0
-        var legionPlayers = 0
-        var hasLegion = false
+        var inRangePlayerCount = 0
         var placedEyes = 0
 
         init {
             GolemSpawnTimerElement()
-            LegionPlayerDisplay()
+            PlayersInRangeDisplay()
             PlacedSummoningEyeDisplay()
             WorldAgeDisplay()
         }
@@ -538,12 +524,12 @@ class MiscFeatures {
         }
     }
 
-    class LegionPlayerDisplay : GuiElement("Legion Player Display", FloatPair(50, 50)) {
+    class PlayersInRangeDisplay : GuiElement("Players In Range Display", FloatPair(50, 50)) {
         override fun render() {
-            if (hasLegion && toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
+            if (toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
                 ScreenRenderer.fontRenderer.drawString(
-                    if (Skytils.config.legionCap && legionPlayers > 20) "20" else legionPlayers.toString(),
+                    inRangePlayerCount.toString(),
                     20f,
                     5f,
                     CommonColors.ORANGE,
@@ -554,13 +540,11 @@ class MiscFeatures {
         }
 
         override fun demoRender() {
-            val x = 0f
-            val y = 0f
-            renderItem(ItemStack(Items.enchanted_book), x.toInt(), y.toInt())
+            renderItem(ItemStack(Items.enchanted_book), 0, 0)
             ScreenRenderer.fontRenderer.drawString(
                 "69",
-                x + 20,
-                y + 5,
+                20f,
+                5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
                 TextShadow.NORMAL
@@ -573,7 +557,7 @@ class MiscFeatures {
             get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("69")
 
         override val toggled: Boolean
-            get() = Skytils.config.legionPlayerDisplay
+            get() = Skytils.config.playersInRangeDisplay
 
         init {
             Skytils.guiManager.registerElement(this)

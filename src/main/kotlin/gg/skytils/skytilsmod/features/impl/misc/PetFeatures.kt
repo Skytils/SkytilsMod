@@ -23,8 +23,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.core.structure.FloatPair
-import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.SendEvent
@@ -32,29 +30,19 @@ import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.ItemUtil.getItemLore
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
-import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.Utils.isInTablist
-import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
-import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.setHoverText
 import gg.skytils.skytilsmod.utils.stripControlCodes
-import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
 
 class PetFeatures {
@@ -152,21 +140,6 @@ class PetFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
-
-        if (Skytils.config.dolphinPetDisplay && lastPet == "Dolphin") {
-            dolphinPlayers = mc.theWorld.getPlayers<EntityPlayer>(
-                EntityOtherPlayerMP::class.java
-            ) { p: EntityPlayer? ->
-                p != null && p !== mc.thePlayer && p.getDistanceSqToEntity(mc.thePlayer) <= 10 * 10 && p.uniqueID.version() != 2 && isInTablist(
-                    p
-                )
-            }.size
-        }
-    }
-
     companion object {
         private var lastPetConfirmation: Long = 0
         private var lastPetLockNotif: Long = 0
@@ -174,58 +147,5 @@ class PetFeatures {
         private val SUMMON_PATTERN = Pattern.compile("§r§aYou summoned your §r(?<pet>.+)§r§a!§r")
         private val AUTOPET_PATTERN =
             Pattern.compile("§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?<pet>.+)§e! §a§lVIEW RULE§r")
-        var dolphinPlayers = 0
-
-        init {
-            DolphinPetDisplay()
-        }
-    }
-
-    class DolphinPetDisplay : GuiElement("Dolphin Pet Display", FloatPair(50, 20)) {
-        override fun render() {
-            val player = mc.thePlayer
-            if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
-                if (lastPet != "Dolphin") return
-                renderTexture(ICON, 0, 0)
-                ScreenRenderer.fontRenderer.drawString(
-                    if (Skytils.config.dolphinCap && dolphinPlayers > 5) "5" else dolphinPlayers.toString(),
-                    20f,
-                    5f,
-                    CommonColors.ORANGE,
-                    TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
-                )
-            }
-        }
-
-        override fun demoRender() {
-            val x = 0f
-            val y = 0f
-            renderTexture(ICON, x.toInt(), y.toInt())
-            ScreenRenderer.fontRenderer.drawString(
-                "5",
-                x + 20,
-                y + 5,
-                CommonColors.ORANGE,
-                TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = 16
-        override val width: Int
-            get() = 20 + ScreenRenderer.fontRenderer.getStringWidth("5")
-
-        override val toggled: Boolean
-            get() = Skytils.config.dolphinPetDisplay
-
-        companion object {
-            private val ICON = ResourceLocation("skytils", "icons/dolphin.png")
-        }
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
     }
 }
