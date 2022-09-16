@@ -227,6 +227,35 @@ class ItemFeatures {
                     }
                 }
             }
+            if (Skytils.config.combineHelper && Utils.equalsOneOf(
+                    event.chestName,
+                    "Anvil",
+                    "Attribute Fusion"
+                )
+            ) {
+                val item = event.container.getSlot(29).stack ?: return
+                if (event.container.getSlot(33).hasStack) return
+                val candidate = event.slot.stack ?: return
+                val nbt1 = getExtraAttributes(item) ?: return
+                val nbt2 = getExtraAttributes(candidate) ?: return
+                val tagName = when (getSkyBlockItemID(nbt1) to getSkyBlockItemID(nbt2)) {
+                    "ENCHANTED_BOOK" to "ENCHANTED_BOOK" -> "enchantments"
+                    "ATTRIBUTE_SHARD" to "ATTRIBUTE_SHARD" -> "attributes"
+                    else -> return
+                }
+                val typeList = listOf(nbt1, nbt2).map { nbt ->
+                    nbt.getCompoundTag(tagName)
+                }
+                val tierList = typeList.mapNotNull { nbt ->
+                    nbt.keySet.takeIf { it.size == 1 }?.first()
+                }
+                if (tierList.size != 2 || tierList[0] != tierList[1] || typeList[0].getInteger(tierList[0]) != typeList[1].getInteger(
+                        tierList[1]
+                    )
+                ) return
+
+                event.slot highlight Color(17, 252, 243)
+            }
         }
     }
 
