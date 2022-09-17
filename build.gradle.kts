@@ -214,11 +214,11 @@ tasks {
                 listOf(
                     /*"-opt-in=kotlin.RequiresOptIn", */
                     "-Xjvm-default=all",
-                    "-Xrelease=8",
+                    //"-Xjdk-release=1.8",
                     "-Xbackend-threads=0",
                     /*"-Xuse-k2"*/
                 )
-            languageVersion = "1.6"
+            languageVersion = "1.7"
         }
         kotlinDaemonJvmArguments.set(
             listOf(

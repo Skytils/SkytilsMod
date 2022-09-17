@@ -136,8 +136,10 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                     val newScale = scaleX.coerceAtLeast(scaleY / 2).coerceAtLeast(0.01f)
                     locationButton.element.scale *= newScale
                 }
+
                 Corner.TOP_LEFT -> {
                 }
+
                 Corner.TOP_RIGHT -> {
                     val scaledX = locationButton.x
                     val scaledY = locationButton.y2
@@ -151,8 +153,11 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                     locationButton.element.scale *= newScale
                     locationButton.element.pos.setY((scaledY - newHeight) / sr.scaledHeight)
                 }
+
                 Corner.BOTTOM_LEFT -> {
                 }
+
+                null -> {}
             }
 
             locationButton.drawButton(mc, mouseX, mouseY)
@@ -194,14 +199,17 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                         button.x = boxXOne
                         button.y = boxYOne
                     }
+
                     Corner.TOP_RIGHT -> {
                         button.x = boxXTwo
                         button.y = boxYOne
                     }
+
                     Corner.BOTTOM_LEFT -> {
                         button.x = boxXOne
                         button.y = boxYTwo
                     }
+
                     Corner.BOTTOM_RIGHT -> {
                         button.x = boxXTwo
                         button.y = boxYTwo

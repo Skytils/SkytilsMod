@@ -389,7 +389,7 @@ class Skytils {
         EntityManager.tickEntities()
 
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
-        TabListUtils.tabEntries = TabListUtils.fetchTabEntires().map { it to it?.text }
+        TabListUtils.tabEntries = TabListUtils.fetchTabEntries().map { it to it.text }
         if (displayScreen != null) {
             if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer) {
                 mc.displayGuiScreen(displayScreen)
