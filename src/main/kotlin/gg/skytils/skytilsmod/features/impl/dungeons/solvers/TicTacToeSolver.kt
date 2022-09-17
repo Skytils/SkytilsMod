@@ -93,7 +93,11 @@ class TicTacToeSolver {
                             board = Board()
                         }
                         with(board!!) {
-                            place(column, row, owner)
+                            try {
+                                place(column, row, owner)
+                            } catch (e: IllegalStateException) {
+                                e.printStackTrace()
+                            }
                             mappedPositions[row * Board.BOARD_WIDTH + column] = frame
                         }
                     }
