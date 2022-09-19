@@ -25,7 +25,9 @@ import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
@@ -35,5 +37,10 @@ public class MixinItemRenderer {
     @Redirect(method = "renderItemInFirstPerson", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
     private int getItemInUseCountForFirstPerson(AbstractClientPlayer abstractClientPlayer) {
         return ItemRendererHookKt.getItemInUseCountForFirstPerson(abstractClientPlayer, itemToRender);
+    }
+
+    @Inject(method = "transformFirstPersonItem", at = @At(value = "TAIL"))
+    private void modifySize(float equipProgress, float swingProgress, CallbackInfo ci) {
+        ItemRendererHookKt.modifySize();
     }
 }

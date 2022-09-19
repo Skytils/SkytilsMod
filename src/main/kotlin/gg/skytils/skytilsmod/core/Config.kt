@@ -525,6 +525,13 @@ object Config : Vigilant(
     var showDungeonFloorAsStackSize = false
 
     @Property(
+        type = PropertyType.PERCENT_SLIDER, name = "Held Item Scale",
+        description = "Changes the size of your held item.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var itemScale = 1f
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Giant HP",
         description = "Shows the HP of Giants in your HUD.",
         category = "Dungeons", subcategory = "Quality of Life"

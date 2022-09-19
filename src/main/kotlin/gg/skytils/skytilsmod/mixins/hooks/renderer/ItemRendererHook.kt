@@ -18,7 +18,9 @@
 
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
+import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.item.ItemStack
@@ -27,4 +29,15 @@ import net.minecraft.item.ItemSword
 fun getItemInUseCountForFirstPerson(player: AbstractClientPlayer, item: ItemStack): Int {
     if (Skytils.config.disableBlockAnimation && Utils.inSkyblock && item.item is ItemSword && player.itemInUseDuration <= 7) return 0
     return player.itemInUseCount
+}
+
+fun modifySize() {
+    val scale = Skytils.config.itemScale * if (SuperSecretSettings.twilightGiant) 5f else 1f
+    val matrixStack = UMatrixStack()
+    matrixStack.scale(scale, scale, scale)
+    if (scale < 1) {
+        val offset = 1 - scale
+        matrixStack.translate(-offset, offset, 0f)
+    }
+    matrixStack.applyToGlobalState()
 }

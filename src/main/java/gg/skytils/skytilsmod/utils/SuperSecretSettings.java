@@ -41,6 +41,7 @@ public class SuperSecretSettings {
     public static boolean noSychic = false;
     public static boolean smolPeople = false;
     public static boolean tryItAndSee = false;
+    public static boolean twilightGiant = false;
 
     static {
         if (!saveLoc.exists()) {
@@ -105,5 +106,6 @@ public class SuperSecretSettings {
         noSychic = settings.contains("nosychic");
         smolPeople = settings.contains("smolpeople");
         tryItAndSee = settings.contains("tryItAndSee");
+        twilightGiant = settings.contains("twilightGiant");
     }
 }
