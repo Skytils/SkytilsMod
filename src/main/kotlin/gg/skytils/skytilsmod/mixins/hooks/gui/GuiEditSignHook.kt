@@ -27,6 +27,7 @@ val prompts = listOf(
     "Enter price",
     "Your auction",
     "Enter the amount",
+    "Auction", // Auction time
 ).map { "^^^^^^^^^^^^^^^" to it }
 
 fun isConfirmableSign(gui: AccessorGuiEditSign) =
