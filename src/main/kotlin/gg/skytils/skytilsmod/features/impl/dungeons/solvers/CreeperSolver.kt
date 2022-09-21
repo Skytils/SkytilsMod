@@ -72,7 +72,7 @@ class CreeperSolver {
                     // Find creepers nearby
                     val creeperScan = AxisAlignedBB(x - 14, y - 8, z - 13, x + 14, y + 8, z + 13) // 28x16x26 cube
                     this.creeper = world.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan).find {
-                        !it.isInvisible && it.maxHealth == 20f && it.health == 20f && it.name == "Creeper"
+                        !it.isInvisible && it.maxHealth == 20f && it.health == 20f
                     }
                 } else {
                     val creeper = this.creeper!!
