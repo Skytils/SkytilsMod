@@ -195,12 +195,12 @@ object ContainerSellValue {
     private var ticks = 0
 
     private fun shouldRenderGuiComponent(): Boolean {
-        val gui = mc.currentScreen
-        val container = if (mc.currentScreen is GuiChest) mc.thePlayer.openContainer as ContainerChest else return false
+        val gui = mc.currentScreen as? GuiChest ?: return false
+        val container = gui.inventorySlots as? ContainerChest ?: return false
         val chestName = container.lowerChestInventory.name
 
         // Ensure that the gui element should be shown for the player's open container
-        return Skytils.config.containerSellValue && gui is GuiChest && isChestNameValid(chestName) && totalContainerValue > 0.0 && textLines.isNotEmpty()
+        return Skytils.config.containerSellValue && isChestNameValid(chestName) && totalContainerValue > 0.0 && textLines.isNotEmpty()
     }
 
     /**
