@@ -106,7 +106,7 @@ object MythologicalTracker : Tracker("mythological") {
     @Suppress("UNUSED")
     enum class BurrowMob(
         val mobName: String,
-        val modId: String,
+        val mobId: String,
         val plural: Boolean = false,
         var dugTimes: Long = 0L,
     ) {
@@ -120,7 +120,7 @@ object MythologicalTracker : Tracker("mythological") {
 
         companion object {
             fun getFromId(id: String?): BurrowMob? {
-                return values().find { it.modId == id }
+                return values().find { it.mobId == id }
             }
 
             fun getFromName(name: String?): BurrowMob? {
@@ -204,6 +204,7 @@ object MythologicalTracker : Tracker("mythological") {
                     }
                 }
             }
+
             is S2FPacketSetSlot -> {
                 val item = event.packet.func_149174_e() ?: return
                 if (event.packet.func_149175_c() != 0 || mc.thePlayer == null || mc.thePlayer.ticksExisted <= 1 || mc.thePlayer?.openContainer != mc.thePlayer?.inventoryContainer) return
@@ -269,17 +270,18 @@ object MythologicalTracker : Tracker("mythological") {
     // TODO: 5/3/2022 fix this
     @kotlinx.serialization.Serializable
     data class TrackerSave(
+        @SerialName("dug")
         val burrowsDug: Long,
         @SerialName("items")
-        val drops: Map<BurrowDrop, Long>,
-        val mobs: Map<BurrowMob, Long>
+        val drops: Map<String, Long>,
+        val mobs: Map<String, Long>
     )
 
     override fun read(reader: Reader) {
         val save = json.decodeFromString<TrackerSave>(reader.readText())
         burrowsDug = save.burrowsDug
-        BurrowDrop.values().forEach { it.droppedTimes = save.drops[it] ?: 0L }
-        BurrowMob.values().forEach { it.dugTimes = save.mobs[it] ?: 0L }
+        BurrowDrop.values().forEach { it.droppedTimes = save.drops[it.itemId] ?: 0L }
+        BurrowMob.values().forEach { it.dugTimes = save.mobs[it.mobId] ?: 0L }
     }
 
     override fun write(writer: Writer) {
@@ -287,8 +289,8 @@ object MythologicalTracker : Tracker("mythological") {
             json.encodeToString(
                 TrackerSave(
                     burrowsDug,
-                    BurrowDrop.values().associateWith(BurrowDrop::droppedTimes),
-                    BurrowMob.values().associateWith(BurrowMob::dugTimes)
+                    BurrowDrop.values().associate { it.itemId to it.droppedTimes },
+                    BurrowMob.values().associate { it.mobId to it.dugTimes }
                 )
             )
         )
