@@ -22,7 +22,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
+import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.inventory.GuiChest
@@ -33,7 +33,12 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MinionFeatures {
+object MinionFeatures {
+
+    private var blockUnenchanted = false
+
+    private val minionRegex = Regex("(?<type>[A-Z_]+)_GENERATOR_(?<tier>\\d+)")
+
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         if (event.gui is GuiChest) {
@@ -114,9 +119,9 @@ class MinionFeatures {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val item = event.stack ?: return
         if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
-        val extraAttributes = getExtraAttributes(item)
-        if (Skytils.config.showMinionTier && extraAttributes != null && extraAttributes.hasKey("generator_tier")) {
-            val s = extraAttributes.getInteger("generator_tier").toString()
+        val sbId = getSkyBlockItemID(item) ?: return
+        if (Skytils.config.showMinionTier) {
+            val s = minionRegex.find(sbId)?.groups?.get("tier")?.value ?: return
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
@@ -129,10 +134,5 @@ class MinionFeatures {
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
         }
-    }
-
-    companion object {
-
-        private var blockUnenchanted = false
     }
 }

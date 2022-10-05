@@ -288,7 +288,7 @@ class Skytils {
             MayorJerry(),
             MayorJerryTracker,
             MiningFeatures(),
-            MinionFeatures(),
+            MinionFeatures,
             MiscFeatures(),
             MythologicalTracker,
             PartyFinderStats,
