@@ -80,7 +80,7 @@ class AuctionPriceOverlay {
                     "Create BIN Auction"
                 )
             ) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 29, 2, 0, mc.thePlayer)
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 29, 69, 3, mc.thePlayer)
                 event.isCanceled = true
             } else if (Utils.equalsOneOf(
                     SBInfo.lastOpenContainerName,
@@ -88,7 +88,7 @@ class AuctionPriceOverlay {
                     "Confirm BIN Auction"
                 )
             ) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 11, 2, 0, mc.thePlayer)
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 11, 69, 3, mc.thePlayer)
                 event.isCanceled = true
             }
         }
