@@ -94,6 +94,7 @@ class MiningFeatures {
         if (!Utils.inSkyblock) return
         if (Skytils.config.crystalHollowDeathWaypoint && event.packet is S08PacketPlayerPosLook && mc.thePlayer != null) {
             lastTPLoc = mc.thePlayer.position
+            lastTPTime = System.currentTimeMillis()
         }
     }
 
@@ -376,7 +377,7 @@ class MiningFeatures {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
-            && deadCount == 0 && mc.thePlayer != null
+            && deadCount == 0 && mc.thePlayer != null && lastTPTime + 1000 < System.currentTimeMillis()
         ) {
             CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.loc?.set()
         } else if (deadCount > 0)
@@ -547,6 +548,7 @@ class MiningFeatures {
         private var raffleBox: BlockPos? = null
         private var inRaffle = false
         var lastTPLoc: BlockPos? = null
+        var lastTPTime: Long = 0
         var waypoints = HashMap<String, BlockPos>()
         var deadCount = 0
         val SBE_DSM_PATTERN =
