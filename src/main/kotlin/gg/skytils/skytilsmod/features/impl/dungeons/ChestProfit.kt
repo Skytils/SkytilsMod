@@ -46,68 +46,73 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ChestProfit {
     @SubscribeEvent
     fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!Utils.inDungeons || DungeonTimer.scoreShownAt == -1L) return
         if (!Skytils.config.dungeonChestProfit) return
-        if (event.container is ContainerChest) {
-            val inv = event.container.lowerChestInventory
-            if (event.chestName.endsWith(" Chest")) {
-                val chestType = DungeonChest.getFromName(event.chestName) ?: return
-                val openChest = inv.getStackInSlot(31) ?: return
-                if (openChest.displayName == "§aOpen Reward Chest") {
-                    for (unclean in ItemUtil.getItemLore(openChest)) {
-                        val line = unclean.stripControlCodes()
-                        if (line.contains("FREE")) {
-                            chestType.price = 0.0
-                            break
-                        } else if (line.contains(" Coins")) {
-                            chestType.price =
-                                line.substring(0, line.indexOf(" ")).replace(",".toRegex(), "").toDouble()
-                            break
-                        }
-                    }
-                    chestType.value = 0.0
-                    chestType.items.clear()
-                    for (i in 9..17) {
-                        val lootSlot = inv.getStackInSlot(i)
-                        val identifier = AuctionData.getIdentifier(lootSlot)
-                        if (identifier != null) {
-                            var value = AuctionData.lowestBINs[identifier]
-                            if (value == null) value = 0.0
-                            chestType.value += value
-                            chestType.items.add(DungeonChestLootItem(lootSlot, value))
-                        }
+        if ((!Utils.inDungeons || DungeonTimer.scoreShownAt == -1L) && SBInfo.mode != SkyblockIsland.DungeonHub.mode) return
+        if (event.container !is ContainerChest) return
+        val inv = event.container.lowerChestInventory
+        if (event.chestName.endsWith(" Chest")) {
+            val chestType = DungeonChest.getFromName(event.chestName) ?: return
+            val openChest = inv.getStackInSlot(31) ?: return
+            if (openChest.displayName == "§aOpen Reward Chest") {
+                for (unclean in ItemUtil.getItemLore(openChest)) {
+                    val line = unclean.stripControlCodes()
+                    if (line.contains("FREE")) {
+                        chestType.price = 0.0
+                        break
+                    } else if (line.contains(" Coins")) {
+                        chestType.price =
+                            line.substring(0, line.indexOf(" ")).replace(",".toRegex(), "").toDouble()
+                        break
                     }
                 }
-                if (chestType.items.size > 0) {
-                    val sr = UResolution
-                    val leftAlign = element.actualX < sr.scaledWidth / 2f
-                    val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                    GlStateManager.color(1f, 1f, 1f, 1f)
-                    GlStateManager.disableLighting()
-                    var drawnLines = 1
-                    val profit = chestType.profit
+                chestType.value = 0.0
+                chestType.items.clear()
+                for (i in 9..17) {
+                    val lootSlot = inv.getStackInSlot(i)
+                    val identifier = AuctionData.getIdentifier(lootSlot)
+                    if (identifier != null) {
+                        val value = AuctionData.lowestBINs[identifier] ?: 0.0
+                        chestType.value += value
+                        chestType.items.add(DungeonChestLootItem(lootSlot, value))
+                    } else {
+                        val groups = essenceRegex.matchEntire(lootSlot.displayName)?.groups ?: continue
+                        val type = groups["type"]?.value?.uppercase() ?: continue
+                        val count = groups["count"]?.value?.toInt() ?: continue
+                        val value = (AuctionData.lowestBINs["ESSENCE_$type"] ?: 0.0) * count
+                        chestType.value += value
+                        chestType.items.add(DungeonChestLootItem(lootSlot, value))
+                    }
+                }
+            }
+            if (chestType.items.size > 0) {
+                val sr = UResolution
+                val leftAlign = element.actualX < sr.scaledWidth / 2f
+                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                GlStateManager.color(1f, 1f, 1f, 1f)
+                GlStateManager.disableLighting()
+                var drawnLines = 1
+                val profit = chestType.profit
+                ScreenRenderer.fontRenderer.drawString(
+                    chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
+                        profit
+                    ),
+                    if (leftAlign) element.actualX else element.actualX + element.width,
+                    element.actualY,
+                    chestType.displayColor,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+                for (item in chestType.items) {
+                    val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
                     ScreenRenderer.fontRenderer.drawString(
-                        chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
-                            profit
-                        ),
+                        line,
                         if (leftAlign) element.actualX else element.actualX + element.width,
-                        element.actualY,
-                        chestType.displayColor,
+                        element.actualY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
+                        CommonColors.WHITE,
                         alignment,
                         SmartFontRenderer.TextShadow.NORMAL
                     )
-                    for (item in chestType.items) {
-                        val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
-                        ScreenRenderer.fontRenderer.drawString(
-                            line,
-                            if (leftAlign) element.actualX else element.actualX + element.width,
-                            element.actualY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
-                            CommonColors.WHITE,
-                            alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
-                        )
-                        drawnLines++
-                    }
+                    drawnLines++
                 }
             }
         }
@@ -115,9 +120,7 @@ class ChestProfit {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        for (chest in DungeonChest.values()) {
-            chest.reset()
-        }
+        DungeonChest.values().forEach(DungeonChest::reset)
         rerollBypass = false
     }
 
@@ -176,7 +179,7 @@ class ChestProfit {
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
         override fun render() {
-            if (toggled && Utils.inDungeons) {
+            if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
@@ -214,5 +217,6 @@ class ChestProfit {
     companion object {
         private val element = DungeonChestProfitElement()
         private var rerollBypass = false
+        private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
     }
 }
