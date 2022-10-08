@@ -22,8 +22,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
@@ -118,7 +118,7 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.1.1"))
+    shadowMe(platform("io.ktor:ktor-bom:2.1.2"))
     shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
@@ -248,9 +248,7 @@ tasks {
 }
 
 kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
+    jvmToolchain(8)
 }
 
 signing {
