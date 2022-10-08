@@ -245,11 +245,8 @@ class MiscFeatures {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (Skytils.config.highlightDisabledPotionEffects && event.slot.hasStack && SBInfo.lastOpenContainerName?.startsWith(
-                "Toggle Potion Effects"
-            ) == true
-        ) {
-            val item = event.slot.stack
+        val item = event.slot.stack ?: return
+        if (Skytils.config.highlightDisabledPotionEffects && event.chestName.startsWith("Toggle Potion Effects")) {
             if (item.item == Items.potionitem) {
                 if (ItemUtil.getItemLore(item).any {
                         it == "§7Currently: §cDISABLED"
@@ -257,6 +254,12 @@ class MiscFeatures {
                     event.slot highlight Color(255, 0, 0, 80)
                 }
             }
+        }
+        // (Your|Co-op Bazaar Orders)
+        if (Skytils.config.highlightFilledBazaarOrders && event.chestName.endsWith(" Bazaar Orders")) {
+            val filled =
+                ItemUtil.getItemLore(item).find { it.startsWith("§7Filled: §") }?.endsWith(" §a§l100%!") ?: false
+            if (filled) event.slot highlight Color(255, 0, 0, 80)
         }
     }
 

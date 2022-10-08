@@ -1251,6 +1251,15 @@ object Config : Vigilant(
     var disableBlockAnimation = false
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Scale",
+        description = "Change the size of dropped items.",
+        category = "Miscellaneous", subcategory = "Items",
+        maxF = 5f,
+        decimalPlaces = 2
+    )
+    var itemDropScale = 1f
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Implosion Particles",
         description = "Removes the explosion created by the Implosion ability.",
         category = "Miscellaneous", subcategory = "Items"
@@ -1265,13 +1274,11 @@ object Config : Vigilant(
     var hideMidasStaffGoldBlocks = false
 
     @Property(
-        type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Scale",
-        description = "Change the size of dropped items.",
-        category = "Miscellaneous", subcategory = "Items",
-        maxF = 5f,
-        decimalPlaces = 2
+        type = PropertyType.SWITCH, name = "Highlight Filled Bazaar Orders",
+        description = "Highlights 100% filled orders in the bazaar.",
+        category = "Miscellaneous", subcategory = "Items"
     )
-    var itemDropScale = 1f
+    var highlightFilledBazaarOrders = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Item Cooldown Display",
