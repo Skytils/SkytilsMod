@@ -103,7 +103,7 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:04665adf92") {
+    shadowMeMod("com.github.Skytils:Hylin:1db16cb567") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")

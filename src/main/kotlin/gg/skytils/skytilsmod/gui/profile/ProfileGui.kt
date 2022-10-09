@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
-import skytils.hylin.extension.getLatestSkyblockProfile
 import skytils.hylin.extension.nonDashedString
 import skytils.hylin.player.Player
 import skytils.hylin.skyblock.Member
@@ -66,7 +65,7 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
                     hylinAPI.getSkyblockProfiles(uuid).whenComplete { list ->
                         list.forEach { println(it.cuteName) }
                         profiles.set(list)
-                        selection.set(list.indexOf(list.getLatestSkyblockProfile(uuid)))
+                        selection.set(list.indexOfFirst { it.selected })
                     }
                 }
                 launch {
@@ -99,7 +98,7 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
             launch {
                 hylinAPI.getSkyblockProfiles(uuidState.get()).whenComplete { profileList ->
                     profiles.set(profileList)
-                    selection.set(profileList.indexOf(profileList.getLatestSkyblockProfile(uuidState.get())))
+                    selection.set(profileList.indexOfFirst { it.selected })
                 }
             }
             launch {
