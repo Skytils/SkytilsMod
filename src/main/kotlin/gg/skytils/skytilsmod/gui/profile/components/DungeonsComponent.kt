@@ -38,7 +38,7 @@ import skytils.hylin.skyblock.dungeons.DungeonClass
 import java.awt.Color
 
 class DungeonsComponent(private val playerState: State<Player?>, private val profileState: State<Member?>) :
-    UIComponent() {
+    UIContainer() {
 
     val classes by UIContainer().constrain {
         width = 100.percent

@@ -32,7 +32,7 @@ import gg.skytils.skytilsmod.gui.profile.states.alwaysMap
 import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.item.Inventory
 
-class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
+class WardrobeComponent(val profileState: State<Member?>) : UIContainer() {
 
     private val armor =
         ArmorComponent(profileState.map { p ->
@@ -98,7 +98,7 @@ class WardrobeComponent(val profileState: State<Member?>) : UIComponent() {
 
     }
 
-    class ArmorComponent(invState: State<Inventory>, val vertical: Boolean) : UIComponent() {
+    class ArmorComponent(invState: State<Inventory>, val vertical: Boolean) : UIContainer() {
         private var invState: State<Inventory> = invState.also {
             it.onSetValue(::parseSlots)
         }

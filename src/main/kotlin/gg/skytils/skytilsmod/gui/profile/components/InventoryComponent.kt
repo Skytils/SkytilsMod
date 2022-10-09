@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.Window
@@ -28,7 +29,7 @@ import gg.essential.elementa.state.State
 import gg.essential.vigilance.gui.VigilancePalette
 import skytils.hylin.skyblock.item.Inventory
 
-class InventoryComponent(val inv: State<Inventory?>) : UIComponent() {
+class InventoryComponent(val inv: State<Inventory?>) : UIContainer() {
     init {
         inv.onSetValue(::parseInv)
         UIRoundedRectangle(5f).constrain {

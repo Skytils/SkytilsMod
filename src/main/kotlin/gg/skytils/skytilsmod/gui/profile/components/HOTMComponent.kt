@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
@@ -30,7 +31,7 @@ import skytils.hylin.skyblock.Member
 import skytils.hylin.skyblock.mining.HOTM
 import kotlin.math.ceil
 
-class HOTMComponent(val profileState: State<Member?>) : UIComponent() {
+class HOTMComponent(val profileState: State<Member?>) : UIContainer() {
 
     init {
         profileState.onSetValue {
