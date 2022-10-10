@@ -203,6 +203,13 @@ object Config : Vigilant(
     var dungeonChestProfit = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Dungeon Chest Profit Includes Essence",
+        description = "Include essence when calculating Dungeon Chest Profit.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var dungeonChestProfitIncludesEssence = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Map",
         description = "Displays the vanilla map on your screen using vanilla rendering code.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -2676,6 +2683,7 @@ object Config : Vigilant(
             }
         }
 
+        addDependency("dungeonChestProfitIncludesEssence", "dungeonChestProfit")
         addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")

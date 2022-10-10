@@ -74,7 +74,7 @@ class ChestProfit {
                         val value = AuctionData.lowestBINs[identifier] ?: 0.0
                         chestType.value += value
                         chestType.items.add(DungeonChestLootItem(lootSlot, value))
-                    } else {
+                    } else if (Skytils.config.dungeonChestProfitIncludesEssence) {
                         val groups = essenceRegex.matchEntire(lootSlot.displayName)?.groups ?: continue
                         val type = groups["type"]?.value?.uppercase() ?: continue
                         val count = groups["count"]?.value?.toInt() ?: continue
