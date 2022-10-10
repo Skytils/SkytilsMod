@@ -259,7 +259,7 @@ class MiscFeatures {
         if (Skytils.config.highlightFilledBazaarOrders && event.chestName.endsWith(" Bazaar Orders")) {
             val filled =
                 ItemUtil.getItemLore(item).find { it.startsWith("§7Filled: §") }?.endsWith(" §a§l100%!") ?: false
-            if (filled) event.slot highlight Color(255, 0, 0, 80)
+            if (filled) event.slot highlight Color(0, 255, 0, 80)
         }
     }
 
@@ -411,7 +411,7 @@ class MiscFeatures {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
 
         if (Skytils.config.playersInRangeDisplay) {
-            mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
+            inRangePlayerCount = mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
                 it.uniqueID.version() == 4 && it.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30
             }
         }
