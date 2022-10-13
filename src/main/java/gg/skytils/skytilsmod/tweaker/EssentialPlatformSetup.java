@@ -93,7 +93,7 @@ public class EssentialPlatformSetup {
         LogManager.getLogger().info("Data URL: " + Reference.dataUrl);
 
         try {
-            if (Integer.parseInt(makeRequest(Reference.dataUrl + "api/version")) > Reference.apiVersion) {
+            if (Integer.parseInt(makeRequest(Reference.dataUrl + "api/version").trim()) > Reference.apiVersion) {
                 showMessage("<html><p>" +
                         "Your version of Skytils requires a<br>" +
                         "mandatory update before you can play!<br>" +
