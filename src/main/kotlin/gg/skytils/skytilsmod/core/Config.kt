@@ -525,6 +525,13 @@ object Config : Vigilant(
     var showBatHitboxes = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Color Brewing Stands",
+        description = "Color brewing stands if they are done or not.",
+        category = "Miscellaneous", subcategory = "Brewing"
+    )
+    var colorBrewingStands = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Dungeon Floor as Stack Size",
         description = "Shows the dungeon floor as the stack size.",
         category = "Miscellaneous", subcategory = "Items"

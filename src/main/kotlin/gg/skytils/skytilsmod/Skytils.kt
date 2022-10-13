@@ -256,6 +256,7 @@ class Skytils {
             BetterStash(),
             BlazeSolver(),
             BloodHelper,
+            BrewingFeatures,
             BossHPDisplays(),
             BoulderSolver(),
             ChatTabs,

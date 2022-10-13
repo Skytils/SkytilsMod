@@ -60,6 +60,7 @@ object PartyFinderStats {
                     Skytils.hylinAPI.getLatestSkyblockProfileForMember(uuid).whenComplete { profile ->
                         profile?.run { playerStats(username, uuid, this) }
                     }.catch { e ->
+                        e.printStackTrace()
                         UChat.chat(
                             "$failPrefix §cUnable to retrieve profile information: ${
                                 e.message?.replace(
@@ -70,6 +71,7 @@ object PartyFinderStats {
                         )
                     }
                 }.catch { e ->
+                    e.printStackTrace()
                     UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
                 }
             }
@@ -142,6 +144,7 @@ object PartyFinderStats {
                                 extraAttribs.any {
                                     it.getTagList("ability_scroll", Constants.NBT.TAG_STRING).tagCount() == 3
                                 } -> add("§dWither Impact")
+
                                 itemIds.contains("MIDAS_STAFF") -> add("§6Midas Staff")
                                 itemIds.contains("YETI_SWORD") -> add("§fYeti Sword")
                                 itemIds.contains("BAT_WAND") -> add("§9Spirit Sceptre")
@@ -259,6 +262,7 @@ object PartyFinderStats {
                 e.printStackTrace()
             }
         }.catch { e ->
+            e.printStackTrace()
             UChat.chat(
                 "$failPrefix §cFailed to get dungeon stats: ${
                     e.message?.replace(
