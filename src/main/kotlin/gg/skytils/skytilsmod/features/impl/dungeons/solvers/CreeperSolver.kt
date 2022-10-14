@@ -70,11 +70,9 @@ class CreeperSolver {
                     }
                     val pairs = candidates.elementPairs()
 
-                    for (pair in pairs) {
-                        checkLineBox(creeper, pair.first.middleVec(), pair.second.middleVec(), Holder(null)).let {
-                            solutionPairs.add(pair)
-                        }
-                    }
+                    solutionPairs.addAll(pairs.filter { (a, b) ->
+                        checkLineBox(creeper, a.middleVec(), b.middleVec(), Holder(null))
+                    })
 
                     if (SuperSecretSettings.bennettArthur) {
                         solutionPairs.mapIndexed { i, pair ->
