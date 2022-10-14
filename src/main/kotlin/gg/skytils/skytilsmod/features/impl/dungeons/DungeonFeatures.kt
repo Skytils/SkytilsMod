@@ -135,12 +135,14 @@ object DungeonFeatures {
                             printDevMessage("light $lastLitUpTime", "spiritbear")
                         }
                     }
+
                     is S02PacketChat -> {
                         if (lastLitUpTime != -1L && packet.chatComponent.formattedText == "§r§a§lA §r§5§lSpirit Bear §r§a§lhas appeared!§r") {
                             printDevMessage("chat ${System.currentTimeMillis() - lastLitUpTime}", "spiritbear")
                             lastLitUpTime = -1L
                         }
                     }
+
                     is S0CPacketSpawnPlayer -> {
                         if (lastLitUpTime != -1L && packet.player.version() == 2) {
                             printDevMessage("spawn ${System.currentTimeMillis() - lastLitUpTime}", "spiritbear")
@@ -226,6 +228,7 @@ object DungeonFeatures {
                                 foundLivid = true
                             }
                         }
+
                         0 -> {
                             if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && (lividJob == null || lividJob?.isCancelled == true || lividJob?.isCompleted == true)) {
                                 lividJob = Skytils.launch {
@@ -305,16 +308,25 @@ object DungeonFeatures {
                         BossStatus.hasColorModifier = event.hasColorModifier
                         event.isCanceled = true
                     }
+
                     1 -> {
                         BossStatus.healthScale = displayData.health / displayData.maxHealth
                         BossStatus.statusBarTime = 100
-                        val health = if (dungeonFloor == "M7") 800_000_000 else 300_000
+                        val isMaster = dungeonFloor == "M7"
+                        val health = when (unformatted) {
+                            "Maxor" -> if (isMaster) 800_000_000 else 100_000_000
+                            "Storm" -> if (isMaster) 1_000_000_000 else 400_000_000
+                            "Goldor" -> if (isMaster) 1_200_000_000 else 750_000_000
+                            "Necron" -> if (isMaster) 1_400_000_000 else 1_000_000_000
+                            else -> 69
+                        }
                         BossStatus.bossName = displayData.displayName.formattedText + "§r§8 - §r§a" + NumberUtil.format(
                             (BossStatus.healthScale * health).toLong()
                         ) + "§r§8/§r§a${NumberUtil.format(health)}§r§c❤"
                         BossStatus.hasColorModifier = event.hasColorModifier
                         event.isCanceled = true
                     }
+
                     0 -> {
                     }
                 }
@@ -587,6 +599,7 @@ object DungeonFeatures {
                         }
                     }
                 }
+
                 chestName == "Start Dungeon?" -> {
                     if (!startWithoutFullParty && Skytils.config.noChildLeftBehind && event.slot?.stack?.displayName == "§aStart Dungeon?") {
                         val teamCount =
