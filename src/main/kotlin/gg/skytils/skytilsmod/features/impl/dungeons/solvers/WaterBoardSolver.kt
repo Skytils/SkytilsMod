@@ -49,7 +49,16 @@ import kotlin.random.Random
  * @author bowser0000
  * @link https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  */
-class WaterBoardSolver {
+object WaterBoardSolver {
+    private val solutions = hashMapOf<WoolColor, Set<LeverBlock>>()
+    private var chestPos: BlockPos? = null
+    private var roomFacing: EnumFacing? = null
+    private var prevInWaterRoom = false
+    private var inWaterRoom = false
+    private var variant = -1
+    private var ticks = 0
+    private var job: Job? = null
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons) return
@@ -118,15 +127,19 @@ class WaterBoardSolver {
                                             block === Blocks.gold_block -> {
                                                 foundGold = true
                                             }
+
                                             block === Blocks.hardened_clay -> {
                                                 foundClay = true
                                             }
+
                                             block === Blocks.emerald_block -> {
                                                 foundEmerald = true
                                             }
+
                                             block === Blocks.quartz_block -> {
                                                 foundQuartz = true
                                             }
+
                                             block === Blocks.diamond_block -> {
                                                 foundDiamond = true
                                             }
@@ -163,6 +176,7 @@ class WaterBoardSolver {
                                             solutions[WoolColor.GREEN] = setOf(LeverBlock.EMERALD)
                                             solutions[WoolColor.RED] = setOf()
                                         }
+
                                         1 -> {
                                             solutions[WoolColor.PURPLE] = setOf(LeverBlock.COAL)
                                             solutions[WoolColor.ORANGE] = setOf(
@@ -181,6 +195,7 @@ class WaterBoardSolver {
                                             solutions[WoolColor.RED] =
                                                 setOf(LeverBlock.QUARTZ, LeverBlock.COAL, LeverBlock.EMERALD)
                                         }
+
                                         2 -> {
                                             solutions[WoolColor.PURPLE] =
                                                 setOf(LeverBlock.QUARTZ, LeverBlock.GOLD, LeverBlock.DIAMOND)
@@ -191,6 +206,7 @@ class WaterBoardSolver {
                                             solutions[WoolColor.RED] =
                                                 setOf(LeverBlock.GOLD, LeverBlock.EMERALD)
                                         }
+
                                         3 -> {
                                             solutions[WoolColor.PURPLE] = setOf(
                                                 LeverBlock.QUARTZ,
@@ -216,6 +232,7 @@ class WaterBoardSolver {
                                                 LeverBlock.CLAY
                                             )
                                         }
+
                                         else -> {
                                         }
                                     }
@@ -323,17 +340,5 @@ class WaterBoardSolver {
                     roomFacing!!.opposite, 2 + shiftBy
                 ).offset(leverSide)
             }
-    }
-
-    companion object {
-
-        private val solutions = HashMap<WoolColor, Set<LeverBlock>>()
-        private var chestPos: BlockPos? = null
-        private var roomFacing: EnumFacing? = null
-        private var prevInWaterRoom = false
-        private var inWaterRoom = false
-        private var variant = -1
-        private var ticks = 0
-        private var job: Job? = null
     }
 }

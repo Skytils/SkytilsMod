@@ -39,7 +39,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-class MayorJerry {
+object MayorJerry {
+
+    private val jerryType = Regex("(\\w+)(?=\\s+Jerry)")
+    var lastJerry = -1L
+
+    init {
+        JerryPerkGuiElement()
+        JerryTimerGuiElement()
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
@@ -67,16 +75,6 @@ class MayorJerry {
                     createTitle("§" + color.uppercase() + " JERRY!", 60)
                 }
             }
-        }
-    }
-
-    companion object {
-        private val jerryType = Regex("(\\w+)(?=\\s+Jerry)")
-        var lastJerry = -1L
-
-        init {
-            JerryPerkGuiElement()
-            JerryTimerGuiElement()
         }
     }
 

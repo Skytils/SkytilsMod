@@ -28,7 +28,14 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
  * Adopted from PikaFan's Rain Timer Website, licensed under GPL v3
  * @link https://github.com/PikaFan123/rain-timer
  */
-class RainTimer {
+object RainTimer {
+    var nextRain = 1596552707000
+
+    init {
+        RainTimerGuiElement()
+        while (nextRain < System.currentTimeMillis()) nextRain += 4850000
+    }
+
     class RainTimerGuiElement : GuiElement(name = "Rain Timer", fp = FloatPair(10, 10)) {
         override fun render() {
             if (Utils.inSkyblock && toggled) {
@@ -79,14 +86,5 @@ class RainTimer {
             Skytils.guiManager.registerElement(this)
         }
 
-    }
-
-    companion object {
-        var nextRain = 1596552707000
-
-        init {
-            RainTimerGuiElement()
-            while (nextRain < System.currentTimeMillis()) nextRain += 4850000
-        }
     }
 }

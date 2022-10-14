@@ -40,7 +40,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
-class ThreeWeirdosSolver {
+object ThreeWeirdosSolver {
+    val solutions = hashSetOf<String>()
+
+    var riddleNPC: String? = null
+
+    @JvmField
+    var riddleChest: BlockPos? = null
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Three Weirdos")) return
@@ -147,14 +154,5 @@ class ThreeWeirdosSolver {
     fun onWorldChange(event: WorldEvent.Load) {
         riddleNPC = null
         riddleChest = null
-    }
-
-    companion object {
-        val solutions = hashSetOf<String>()
-
-        var riddleNPC: String? = null
-
-        @JvmField
-        var riddleChest: BlockPos? = null
     }
 }

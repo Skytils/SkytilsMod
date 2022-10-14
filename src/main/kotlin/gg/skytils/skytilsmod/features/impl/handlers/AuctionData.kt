@@ -35,56 +35,59 @@ import net.minecraft.item.ItemStack
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.javaField
 
-class AuctionData {
+object AuctionData {
 
-    companion object {
-        val dataURL
-            get() = "https://${Skytils.domain}/api/auctions/lowestbins"
-        val lowestBINs = HashMap<String, Double>()
-        fun getIdentifier(item: ItemStack?): String? {
-            val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
-            var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
-            when (id) {
-                "PET" -> if (extraAttr.hasKey("petInfo")) {
-                    val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
-                    id = "PET-${petInfo.type}-${petInfo.tier}"
-                }
-                "ATTRIBUTE_SHARD" -> if (extraAttr.hasKey("attributes")) {
-                    val attributes = extraAttr.getCompoundTag("attributes")
-                    val attribute = attributes.keySet.firstOrNull()
-                    if (attribute != null) {
-                        id = "ATTRIBUTE_SHARD-${attribute.uppercase()}-${attributes.getInteger(attribute)}"
-                    }
-                }
-                "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
-                    val enchants = extraAttr.getCompoundTag("enchantments")
-                    val enchant = enchants.keySet.firstOrNull()
-                    if (enchant != null) {
-                        id = "ENCHANTED_BOOK-${enchant.uppercase()}-${enchants.getInteger(enchant)}"
-                    }
-                }
-                "POTION" -> if (extraAttr.hasKey("potion") && extraAttr.hasKey("potion_level")) {
-                    id = "POTION-${
-                        extraAttr.getString("potion")
-                            .uppercase()
-                    }-${extraAttr.getInteger("potion_level")}${"-ENHANCED".toStringIfTrue(extraAttr.hasKey("enhanced"))}${
-                        "-EXTENDED".toStringIfTrue(
-                            extraAttr.hasKey(
-                                "extended"
-                            )
-                        )
-                    }${"-SPLASH".toStringIfTrue(extraAttr.hasKey("splash"))}"
-                }
-                "RUNE" -> if (extraAttr.hasKey("runes")) {
-                    val runes = extraAttr.getCompoundTag("runes")
-                    val rune = runes.keySet.firstOrNull()
-                    if (rune != null) {
-                        id = "RUNE-${rune.uppercase()}-${runes.getInteger(rune)}"
-                    }
+    private val dataURL
+        get() = "https://${Skytils.domain}/api/auctions/lowestbins"
+    val lowestBINs = HashMap<String, Double>()
+
+    fun getIdentifier(item: ItemStack?): String? {
+        val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
+        var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
+        when (id) {
+            "PET" -> if (extraAttr.hasKey("petInfo")) {
+                val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
+                id = "PET-${petInfo.type}-${petInfo.tier}"
+            }
+
+            "ATTRIBUTE_SHARD" -> if (extraAttr.hasKey("attributes")) {
+                val attributes = extraAttr.getCompoundTag("attributes")
+                val attribute = attributes.keySet.firstOrNull()
+                if (attribute != null) {
+                    id = "ATTRIBUTE_SHARD-${attribute.uppercase()}-${attributes.getInteger(attribute)}"
                 }
             }
-            return id
+
+            "ENCHANTED_BOOK" -> if (extraAttr.hasKey("enchantments")) {
+                val enchants = extraAttr.getCompoundTag("enchantments")
+                val enchant = enchants.keySet.firstOrNull()
+                if (enchant != null) {
+                    id = "ENCHANTED_BOOK-${enchant.uppercase()}-${enchants.getInteger(enchant)}"
+                }
+            }
+
+            "POTION" -> if (extraAttr.hasKey("potion") && extraAttr.hasKey("potion_level")) {
+                id = "POTION-${
+                    extraAttr.getString("potion")
+                        .uppercase()
+                }-${extraAttr.getInteger("potion_level")}${"-ENHANCED".toStringIfTrue(extraAttr.hasKey("enhanced"))}${
+                    "-EXTENDED".toStringIfTrue(
+                        extraAttr.hasKey(
+                            "extended"
+                        )
+                    )
+                }${"-SPLASH".toStringIfTrue(extraAttr.hasKey("splash"))}"
+            }
+
+            "RUNE" -> if (extraAttr.hasKey("runes")) {
+                val runes = extraAttr.getCompoundTag("runes")
+                val rune = runes.keySet.firstOrNull()
+                if (rune != null) {
+                    id = "RUNE-${rune.uppercase()}-${runes.getInteger(rune)}"
+                }
+            }
         }
+        return id
     }
 
     init {

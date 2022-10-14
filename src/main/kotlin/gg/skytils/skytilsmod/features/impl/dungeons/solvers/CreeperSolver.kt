@@ -39,7 +39,7 @@ import java.awt.Color
 import javax.xml.ws.Holder
 
 
-class CreeperSolver {
+object CreeperSolver {
     private val colors = CommonColors.set.copySet()
     private val solutionPairs = arrayListOf<Pair<BlockPos, BlockPos>>()
     private var ticks = 0

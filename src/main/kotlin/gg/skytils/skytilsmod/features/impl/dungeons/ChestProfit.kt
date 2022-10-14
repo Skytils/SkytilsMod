@@ -43,7 +43,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * Licensed under GNU GPL v3, with permission given from author
  * @author Quantizr
  */
-class ChestProfit {
+object ChestProfit {
+    private val element = DungeonChestProfitElement()
+    private var rerollBypass = false
+    private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
+
     @SubscribeEvent
     fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Skytils.config.dungeonChestProfit) return
@@ -212,11 +216,5 @@ class ChestProfit {
         init {
             Skytils.guiManager.registerElement(this)
         }
-    }
-
-    companion object {
-        private val element = DungeonChestProfitElement()
-        private var rerollBypass = false
-        private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
     }
 }

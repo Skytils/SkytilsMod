@@ -45,7 +45,16 @@ import java.awt.Color
 import kotlin.math.floor
 import kotlin.random.Random
 
-class BoulderSolver {
+object BoulderSolver {
+    var boulderChest: BlockPos? = null
+    var boulderFacing: EnumFacing? = null
+    var grid = Array(7) { arrayOfNulls<BoulderState>(6) }
+    var roomVariant = -1
+    var variantSteps = ArrayList<ArrayList<BoulderPush>>()
+    var expectedBoulders = ArrayList<ArrayList<BoulderState>>()
+    private var ticks = 0
+    private var job: Job? = null
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
@@ -108,125 +117,115 @@ class BoulderSolver {
     }
 
     class BoulderPush(var x: Int, var y: Int, var direction: Direction)
-    companion object {
 
-        var boulderChest: BlockPos? = null
-        var boulderFacing: EnumFacing? = null
-        var grid = Array(7) { arrayOfNulls<BoulderState>(6) }
-        var roomVariant = -1
-        var variantSteps = ArrayList<ArrayList<BoulderPush>>()
-        var expectedBoulders = ArrayList<ArrayList<BoulderState>>()
-        private var ticks = 0
-        private var job: Job? = null
-        fun update() {
-            if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
-            val player = mc.thePlayer
-            val world: World? = mc.theWorld
-            if ((job == null || job?.isCancelled == true || job?.isCompleted == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
-                job = Skytils.launch {
-                    var foundBirch = false
-                    var foundBarrier = false
-                    for (potentialBarrier in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 68)) {
-                        if (foundBarrier && foundBirch) break
-                        if (!foundBarrier) {
-                            if (world.getBlockState(potentialBarrier).block === Blocks.barrier) {
-                                foundBarrier = true
-                            }
+    fun update() {
+        if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
+        val player = mc.thePlayer
+        val world: World? = mc.theWorld
+        if ((job == null || job?.isCancelled == true || job?.isCompleted == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
+            job = Skytils.launch {
+                var foundBirch = false
+                var foundBarrier = false
+                for (potentialBarrier in Utils.getBlocksWithinRangeAtSameY(player.position, 13, 68)) {
+                    if (foundBarrier && foundBirch) break
+                    if (!foundBarrier) {
+                        if (world.getBlockState(potentialBarrier).block === Blocks.barrier) {
+                            foundBarrier = true
                         }
-                        if (!foundBirch) {
-                            val potentialBirch = potentialBarrier.down(2)
-                            if (world.getBlockState(potentialBirch).block === Blocks.planks && Blocks.planks.getDamageValue(
-                                    world,
-                                    potentialBirch
-                                ) == 2
+                    }
+                    if (!foundBirch) {
+                        val potentialBirch = potentialBarrier.down(2)
+                        if (world.getBlockState(potentialBirch).block === Blocks.planks && Blocks.planks.getDamageValue(
+                                world,
+                                potentialBirch
+                            ) == 2
+                        ) {
+                            foundBirch = true
+                        }
+                    }
+                }
+                if (!foundBirch || !foundBarrier) return@launch
+                if (boulderChest == null || boulderFacing == null) {
+                    findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                        val playerX = mc.thePlayer.posX.toInt()
+                        val playerZ = mc.thePlayer.posZ.toInt()
+                        val xRange = playerX - 25..playerX + 25
+                        val zRange = playerZ - 25..playerZ + 25
+                        if (te.pos.y == 66 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                        ) {
+                            val potentialChestPos = te.pos
+                            if (world.getBlockState(potentialChestPos.down()).block == Blocks.stonebrick && world.getBlockState(
+                                    potentialChestPos.up(3)
+                                ).block == Blocks.barrier
                             ) {
-                                foundBirch = true
+                                boulderChest = potentialChestPos
+                                println("Boulder chest is at $boulderChest")
+                                for (direction in EnumFacing.HORIZONTALS) {
+                                    if (world.getBlockState(potentialChestPos.offset(direction)).block == Blocks.stained_hardened_clay) {
+                                        boulderFacing = direction
+                                        println("Boulder room is facing $direction")
+                                        break@findChest
+                                    }
+                                }
                             }
                         }
                     }
-                    if (!foundBirch || !foundBarrier) return@launch
-                    if (boulderChest == null || boulderFacing == null) {
-                        findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                            val playerX = mc.thePlayer.posX.toInt()
-                            val playerZ = mc.thePlayer.posZ.toInt()
-                            val xRange = playerX - 25..playerX + 25
-                            val zRange = playerZ - 25..playerZ + 25
-                            if (te.pos.y == 66 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
-                            ) {
-                                val potentialChestPos = te.pos
-                                if (world.getBlockState(potentialChestPos.down()).block == Blocks.stonebrick && world.getBlockState(
-                                        potentialChestPos.up(3)
-                                    ).block == Blocks.barrier
-                                ) {
-                                    boulderChest = potentialChestPos
-                                    println("Boulder chest is at $boulderChest")
-                                    for (direction in EnumFacing.HORIZONTALS) {
-                                        if (world.getBlockState(potentialChestPos.offset(direction)).block == Blocks.stained_hardened_clay) {
-                                            boulderFacing = direction
-                                            println("Boulder room is facing $direction")
-                                            break@findChest
-                                        }
-                                    }
-                                }
-                            }
+                } else {
+                    val downRow = boulderFacing!!.opposite
+                    val rightColumn = boulderFacing!!.rotateY()
+                    val farLeftPos = boulderChest!!.offset(downRow, 5).offset(rightColumn.opposite, 9)
+                    var row = 0
+                    while (row < 6) {
+                        var column = 0
+                        while (column < 7) {
+                            val current = farLeftPos.offset(rightColumn, 3 * column).offset(downRow, 3 * row)
+                            val state = world.getBlockState(current)
+                            grid[column][row] =
+                                if (state.block === Blocks.air) BoulderState.EMPTY else BoulderState.FILLED
+                            column++
                         }
-                    } else {
-                        val downRow = boulderFacing!!.opposite
-                        val rightColumn = boulderFacing!!.rotateY()
-                        val farLeftPos = boulderChest!!.offset(downRow, 5).offset(rightColumn.opposite, 9)
-                        var row = 0
-                        while (row < 6) {
-                            var column = 0
-                            while (column < 7) {
-                                val current = farLeftPos.offset(rightColumn, 3 * column).offset(downRow, 3 * row)
-                                val state = world.getBlockState(current)
-                                grid[column][row] =
-                                    if (state.block === Blocks.air) BoulderState.EMPTY else BoulderState.FILLED
-                                column++
-                            }
-                            row++
-                        }
-                        if (roomVariant == -1) {
-                            roomVariant = -2
-                            var i = 0
-                            while (i < expectedBoulders.size) {
-                                val expected = expectedBoulders[i]
-                                var isRight = true
-                                var j = 0
-                                while (j < expected.size) {
-                                    val column = j % 7
-                                    val r = floor((j / 7f).toDouble()).toInt()
-                                    val state = expected[j]
-                                    if (grid[column][r] != state && state != BoulderState.PLACEHOLDER) {
-                                        isRight = false
-                                        break
-                                    }
-                                    j++
-                                }
-                                if (isRight) {
-                                    roomVariant = i
-                                    if (SuperSecretSettings.bennettArthur) roomVariant =
-                                        Random.nextInt(0, expectedBoulders.size)
-                                    UChat.chat("$successPrefix §aSkytils detected boulder variant ${roomVariant + 1}.")
+                        row++
+                    }
+                    if (roomVariant == -1) {
+                        roomVariant = -2
+                        var i = 0
+                        while (i < expectedBoulders.size) {
+                            val expected = expectedBoulders[i]
+                            var isRight = true
+                            var j = 0
+                            while (j < expected.size) {
+                                val column = j % 7
+                                val r = floor((j / 7f).toDouble()).toInt()
+                                val state = expected[j]
+                                if (grid[column][r] != state && state != BoulderState.PLACEHOLDER) {
+                                    isRight = false
                                     break
                                 }
-                                i++
+                                j++
                             }
-                            if (roomVariant == -2) {
-                                UChat.chat("$failPrefix §cSkytils couldn't detect the boulder variant.")
+                            if (isRight) {
+                                roomVariant = i
+                                if (SuperSecretSettings.bennettArthur) roomVariant =
+                                    Random.nextInt(0, expectedBoulders.size)
+                                UChat.chat("$successPrefix §aSkytils detected boulder variant ${roomVariant + 1}.")
+                                break
                             }
+                            i++
+                        }
+                        if (roomVariant == -2) {
+                            UChat.chat("$failPrefix §cSkytils couldn't detect the boulder variant.")
                         }
                     }
                 }
             }
         }
+    }
 
-        fun reset() {
-            boulderChest = null
-            boulderFacing = null
-            grid = Array(7) { arrayOfNulls(6) }
-            roomVariant = -1
-        }
+    fun reset() {
+        boulderChest = null
+        boulderFacing = null
+        grid = Array(7) { arrayOfNulls(6) }
+        roomVariant = -1
     }
 
     init {

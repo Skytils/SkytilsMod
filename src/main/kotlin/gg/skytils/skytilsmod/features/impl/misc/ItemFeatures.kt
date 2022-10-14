@@ -76,67 +76,65 @@ import java.awt.Color
 import java.util.regex.Pattern
 import kotlin.math.pow
 
-class ItemFeatures {
+object ItemFeatures {
 
-    companion object {
-        private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
-        private val headPattern =
-            Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
-        val sellPrices = HashMap<String, Double>()
-        val bitCosts = HashMap<String, Int>()
-        val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
-        var selectedArrow = ""
-        var soulflowAmount = ""
-        var stackingEnchantDisplayText = ""
-        var lowSoulFlowPinged = false
-        var lastShieldUse = -1L
-        var lastShieldClick = 0L
+    private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+    private val headPattern =
+        Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
+    val sellPrices = HashMap<String, Double>()
+    val bitCosts = HashMap<String, Int>()
+    val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
+    var selectedArrow = ""
+    var soulflowAmount = ""
+    var stackingEnchantDisplayText = ""
+    var lowSoulFlowPinged = false
+    var lastShieldUse = -1L
+    var lastShieldClick = 0L
 
-        init {
-            SelectedArrowDisplay()
-            StackingEnchantDisplay()
-            SoulflowGuiElement()
-            WitherShieldDisplay()
-        }
-
-        val interactables = setOf(
-            Blocks.acacia_door,
-            Blocks.anvil,
-            Blocks.beacon,
-            Blocks.bed,
-            Blocks.birch_door,
-            Blocks.brewing_stand,
-            Blocks.command_block,
-            Blocks.crafting_table,
-            Blocks.chest,
-            Blocks.dark_oak_door,
-            Blocks.daylight_detector,
-            Blocks.daylight_detector_inverted,
-            Blocks.dispenser,
-            Blocks.dropper,
-            Blocks.enchanting_table,
-            Blocks.ender_chest,
-            Blocks.furnace,
-            Blocks.hopper,
-            Blocks.jungle_door,
-            Blocks.lever,
-            Blocks.noteblock,
-            Blocks.powered_comparator,
-            Blocks.unpowered_comparator,
-            Blocks.powered_repeater,
-            Blocks.unpowered_repeater,
-            Blocks.standing_sign,
-            Blocks.wall_sign,
-            Blocks.trapdoor,
-            Blocks.trapped_chest,
-            Blocks.wooden_button,
-            Blocks.stone_button,
-            Blocks.oak_door,
-            Blocks.skull
-        )
-
-        var ticks = 0
+    init {
+        SelectedArrowDisplay()
+        StackingEnchantDisplay()
+        SoulflowGuiElement()
+        WitherShieldDisplay()
     }
+
+    val interactables = setOf(
+        Blocks.acacia_door,
+        Blocks.anvil,
+        Blocks.beacon,
+        Blocks.bed,
+        Blocks.birch_door,
+        Blocks.brewing_stand,
+        Blocks.command_block,
+        Blocks.crafting_table,
+        Blocks.chest,
+        Blocks.dark_oak_door,
+        Blocks.daylight_detector,
+        Blocks.daylight_detector_inverted,
+        Blocks.dispenser,
+        Blocks.dropper,
+        Blocks.enchanting_table,
+        Blocks.ender_chest,
+        Blocks.furnace,
+        Blocks.hopper,
+        Blocks.jungle_door,
+        Blocks.lever,
+        Blocks.noteblock,
+        Blocks.powered_comparator,
+        Blocks.unpowered_comparator,
+        Blocks.powered_repeater,
+        Blocks.unpowered_repeater,
+        Blocks.standing_sign,
+        Blocks.wall_sign,
+        Blocks.trapdoor,
+        Blocks.trapped_chest,
+        Blocks.wooden_button,
+        Blocks.stone_button,
+        Blocks.oak_door,
+        Blocks.skull
+    )
+
+    var ticks = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.experimental.and
 
-class TicTacToeSolver {
+object TicTacToeSolver {
 
     private var topLeft: BlockPos? = null
     private var roomFacing: EnumFacing? = null

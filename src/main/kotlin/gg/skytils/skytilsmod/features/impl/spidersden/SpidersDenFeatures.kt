@@ -36,7 +36,13 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SpidersDenFeatures {
+object SpidersDenFeatures {
+    private var shouldShowArachneSpawn = false
+
+    init {
+        ArachneHPElement()
+    }
+
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
@@ -69,15 +75,6 @@ class SpidersDenFeatures {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         shouldShowArachneSpawn = false
-    }
-
-    companion object {
-
-        private var shouldShowArachneSpawn = false
-
-        init {
-            ArachneHPElement()
-        }
     }
 
     class ArachneHPElement : GuiElement("Show Arachne HP", FloatPair(200, 30)) {

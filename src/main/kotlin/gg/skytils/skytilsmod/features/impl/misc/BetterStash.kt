@@ -30,7 +30,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BetterStash {
+object BetterStash {
     private var shouldDelete = false
 
     private val stashRegex = Regex("§eYou have §a\\d+ §eitems? stashed away!!!\\n.*")

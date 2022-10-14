@@ -43,7 +43,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
-class TriviaSolver {
+object TriviaSolver {
+    val triviaSolutions = hashMapOf<String, List<String>>()
+    var triviaAnswers: List<String>? = null
+    var triviaAnswer: String? = null
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (event.type == 2.toByte()) return
@@ -146,11 +150,5 @@ class TriviaSolver {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         triviaAnswer = null
-    }
-
-    companion object {
-        var triviaSolutions = HashMap<String, List<String>>()
-        var triviaAnswers: List<String>? = null
-        var triviaAnswer: String? = null
     }
 }

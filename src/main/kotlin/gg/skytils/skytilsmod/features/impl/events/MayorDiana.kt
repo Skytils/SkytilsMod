@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 
-class MayorDiana {
+object MayorDiana {
 
     private val gaiaConstructHits = HashMap<EntityIronGolem, Int>()
 

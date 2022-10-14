@@ -65,17 +65,35 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.util.regex.Pattern
 
-class MiningFeatures {
+object MiningFeatures {
+
+    var fetchurItems = linkedMapOf<String, String>()
+
+    private val eventPattern =
+        Regex("(?:PASSIVE )?EVENT (?<event>.+) (?:ACTIVE IN (?<location>.+)|RUNNING) (FOR|for) (?<min>\\d+):(?<sec>\\d+)")
+    private var lastJukebox: BlockPos? = null
+    private var puzzlerSolution: BlockPos? = null
+    private var raffleBox: BlockPos? = null
+    private var inRaffle = false
+    var lastTPLoc: BlockPos? = null
+    var waypoints = hashMapOf<String, BlockPos>()
+    var deadCount = 0
+    private val SBE_DSM_PATTERN =
+        Regex("\\\$(?:SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@-(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)")
+    private val xyzPattern =
+        Regex(".*?(?<user>[a-zA-Z0-9_]{3,16}):.*?(?<x>[0-9]{1,3}),? (?:y: )?(?<y>[0-9]{1,3}),? (?:z: )?(?<z>[0-9]{1,3}).*?")
+    private val xzPattern =
+        Regex(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}),? (?<z>[0-9]{1,3}).*")
+
     @SubscribeEvent
     fun onBossBar(event: BossBarEvent.Set) {
         if (!Utils.inSkyblock) return
         val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
         if (Skytils.config.raffleWarning) {
             if (unformatted.contains("EVENT")) {
-                val matcher = EVENT_PATTERN.matcher(unformatted)
-                if (matcher.find()) {
-                    val ev = matcher.group("event")
-                    val seconds = matcher.group("min").toInt() * 60 + matcher.group("sec").toInt()
+                eventPattern.find(unformatted)?.groups?.let {
+                    val ev = it["event"]!!.value
+                    val seconds = it["min"]!!.value.toInt() * 60 + it["sec"]!!.value.toInt()
                     if (ev == "RAFFLE") {
                         if (seconds <= 15 && GuiManager.title != "§cRaffle ending in §a" + seconds + "s") {
                             createTitle("§cRaffle ending in §a" + seconds + "s", 20)
@@ -96,11 +114,6 @@ class MiningFeatures {
             lastTPLoc = mc.thePlayer.position
         }
     }
-
-    private val xyzPattern: Pattern =
-        Pattern.compile(".*?(?<user>[a-zA-Z0-9_]{3,16}):.*?(?<x>[0-9]{1,3}),? (?:y: )?(?<y>[0-9]{1,3}),? (?:z: )?(?<z>[0-9]{1,3}).*?")
-    private val xzPattern: Pattern =
-        Pattern.compile(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}),? (?<z>[0-9]{1,3}).*")
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
@@ -175,13 +188,12 @@ class MiningFeatures {
             }
         }
         if (Skytils.config.hollowChatCoords && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
-            val xyzMatcher = xyzPattern.matcher(unformatted)
-            val xzMatcher = xzPattern.matcher(unformatted)
-            if (xyzMatcher.matches()) {
-                waypointChatMessage(xyzMatcher.group("x"), xyzMatcher.group("y"), xyzMatcher.group("z"))
+            xyzPattern.find(unformatted)?.groups?.let {
+                waypointChatMessage(it["x"]!!.value, it["y"]!!.value, it["z"]!!.value)
                 return
-            } else if (xzMatcher.matches()) {
-                waypointChatMessage(xzMatcher.group("x"), "100", xzMatcher.group("z"))
+            }
+            xzPattern.find(unformatted)?.groups?.let {
+                waypointChatMessage(it["x"]!!.value, "100", it["z"]!!.value)
                 return
             }
 
@@ -535,21 +547,5 @@ class MiningFeatures {
                 locZ?.plus(200)
             )
         }
-    }
-
-    companion object {
-        var fetchurItems = LinkedHashMap<String, String>()
-
-        private val EVENT_PATTERN =
-            Pattern.compile("(?:PASSIVE )?EVENT (?<event>.+) (?:ACTIVE IN (?<location>.+)|RUNNING) (FOR|for) (?<min>\\d+):(?<sec>\\d+)")
-        private var lastJukebox: BlockPos? = null
-        private var puzzlerSolution: BlockPos? = null
-        private var raffleBox: BlockPos? = null
-        private var inRaffle = false
-        var lastTPLoc: BlockPos? = null
-        var waypoints = HashMap<String, BlockPos>()
-        var deadCount = 0
-        val SBE_DSM_PATTERN =
-            Regex("\\\$(?:SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@-(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)")
     }
 }

@@ -89,7 +89,60 @@ import kotlin.math.abs
 import kotlin.math.floor
 
 
-class SlayerFeatures {
+object SlayerFeatures : CoroutineScope {
+    override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
+
+    private var ticks = 0
+    private val ZOMBIE_MINIBOSSES = arrayOf(
+        "§cRevenant Sycophant",
+        "§cRevenant Champion",
+        "§4Deformed Revenant",
+        "§cAtoned Champion",
+        "§4Atoned Revenant"
+    )
+    private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
+    private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
+    private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
+    private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
+    private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
+    var slayer: Slayer<*>? = null
+    val slayerEntity: Entity?
+        get() = slayer?.entity
+    var hasSlayerText = false
+    private var lastTickHasSlayerText = false
+    var expectedMaxHp: Int? = null
+    private val hitMap = HashMap<EntityLiving, Int>()
+    var BossHealths = HashMap<String, HashMap<String, Int>>()
+    var maddoxCommand = ""
+
+    fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
+        slayer = try {
+            when (entity) {
+                is EntityZombie -> RevenantSlayer(entity)
+                is EntitySpider -> Slayer(entity, "Tarantula Broodfather", "§5☠ §4Tarantula Broodfather")
+                is EntityWolf -> Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
+                is EntityEnderman -> SeraphSlayer(entity)
+                is EntityBlaze -> DemonlordSlayer(entity)
+                else -> null
+            }
+        } catch (e: IllegalStateException) {
+            null
+        }
+    }
+
+    private fun getTier(name: String): String {
+        return sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
+            ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
+    }
+
+
+    init {
+        SlayerArmorDisplayElement()
+        SlayerDisplayElement()
+        SeraphDisplayElement()
+        TotemDisplayElement
+    }
+
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
@@ -823,61 +876,6 @@ class SlayerFeatures {
         }
     }
 
-    companion object : CoroutineScope {
-        private var ticks = 0
-        private val ZOMBIE_MINIBOSSES = arrayOf(
-            "§cRevenant Sycophant",
-            "§cRevenant Champion",
-            "§4Deformed Revenant",
-            "§cAtoned Champion",
-            "§4Atoned Revenant"
-        )
-        private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
-        private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
-        private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
-        private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
-        private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
-        var slayer: Slayer<*>? = null
-        val slayerEntity: Entity?
-            get() = slayer?.entity
-        var hasSlayerText = false
-        private var lastTickHasSlayerText = false
-        var expectedMaxHp: Int? = null
-        private val hitMap = HashMap<EntityLiving, Int>()
-        var BossHealths = HashMap<String, HashMap<String, Int>>()
-        var maddoxCommand = ""
-
-        fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
-            slayer = try {
-                when (entity) {
-                    is EntityZombie -> RevenantSlayer(entity)
-                    is EntitySpider -> Slayer(entity, "Tarantula Broodfather", "§5☠ §4Tarantula Broodfather")
-                    is EntityWolf -> Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
-                    is EntityEnderman -> SeraphSlayer(entity)
-                    is EntityBlaze -> DemonlordSlayer(entity)
-                    else -> null
-                }
-            } catch (e: IllegalStateException) {
-                null
-            }
-        }
-
-        private fun getTier(name: String): String {
-            return sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
-                ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
-        }
-
-
-        init {
-            SlayerArmorDisplayElement()
-            SlayerDisplayElement()
-            SeraphDisplayElement()
-            TotemDisplayElement
-        }
-
-        override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
-    }
-
     /**
      * Represents a slayer entity
      *
@@ -940,6 +938,7 @@ class SlayerFeatures {
                                         potentialNameEntities.add(nearby as EntityArmorStand)
                                     }
                                 }
+
                                 nearby.displayName.formattedText.matches(timerRegex) -> {
                                     printDevMessage("timer regex matched", "slayer")
                                     potentialTimerEntities.add(nearby as EntityArmorStand)
@@ -990,6 +989,7 @@ class SlayerFeatures {
                                 val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
                                 color == 0 || color == 8 || color == 14
                             }
+
                             blockUnder.block === Blocks.bedrock -> true
                             else -> false
                         }

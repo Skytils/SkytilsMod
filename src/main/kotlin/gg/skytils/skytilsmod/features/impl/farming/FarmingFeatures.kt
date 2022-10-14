@@ -39,7 +39,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 
-class FarmingFeatures {
+object FarmingFeatures {
+    val hungerHikerItems = LinkedHashMap<String, String>()
+    var trapperStart = -1.0
+    var animalFound = false
+    var acceptTrapperCommand = ""
+
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
@@ -140,12 +145,5 @@ class FarmingFeatures {
                 acceptTrapperCommand = ""
             }
         }
-    }
-
-    companion object {
-        var hungerHikerItems = LinkedHashMap<String, String>()
-        var trapperStart = -1.0
-        var animalFound = false
-        var acceptTrapperCommand = ""
     }
 }

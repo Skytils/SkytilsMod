@@ -27,7 +27,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.pow
 
-class LockOrb {
+object LockOrb {
     @SubscribeEvent
     fun onPacket(event: PacketEvent.SendEvent) {
         if (!Utils.inSkyblock || !Skytils.config.powerOrbLock) return

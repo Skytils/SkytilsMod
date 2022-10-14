@@ -41,7 +41,13 @@ import java.awt.Color
 import java.awt.Point
 import java.util.*
 
-class IcePathSolver {
+object IcePathSolver {
+    private val steps: MutableList<Point?> = ArrayList()
+    private var silverfishChestPos: BlockPos? = null
+    private var roomFacing: EnumFacing? = null
+    private var grid: Array<IntArray>? = null
+    private var silverfish: EntitySilverfish? = null
+    private var silverfishPos: Point? = null
     private var ticks = 0
 
     @SubscribeEvent
@@ -54,7 +60,7 @@ class IcePathSolver {
                     EntitySilverfish::class.java
                 ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceSqToEntity(s) < 20 * 20 }
                 if (silverfish.size > 0) {
-                    Companion.silverfish = silverfish[0]
+                    this.silverfish = silverfish[0]
                     if (silverfishChestPos == null || roomFacing == null) {
                         Skytils.launch {
                             findChest@ for (te in mc.theWorld.loadedTileEntityList) {
@@ -256,15 +262,5 @@ class IcePathSolver {
             // we've already seen this point
             null
         } else Point(x + i * diffX, y + i * diffY)
-    }
-
-    companion object {
-
-        private val steps: MutableList<Point?> = ArrayList()
-        private var silverfishChestPos: BlockPos? = null
-        private var roomFacing: EnumFacing? = null
-        private var grid: Array<IntArray>? = null
-        private var silverfish: EntitySilverfish? = null
-        private var silverfishPos: Point? = null
     }
 }

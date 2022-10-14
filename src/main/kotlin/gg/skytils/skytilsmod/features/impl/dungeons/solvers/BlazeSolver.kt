@@ -41,7 +41,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import kotlin.random.Random
 
-class BlazeSolver {
+object BlazeSolver {
+    var orderedBlazes = arrayListOf<ShootableBlaze>()
+    var blazeMode = 0
+    var blazeChest: BlockPos? = null
+    var impossible = false
     private var ticks = 0
 
     @SubscribeEvent
@@ -189,13 +193,4 @@ class BlazeSolver {
     }
 
     data class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
-    companion object {
-        @JvmField
-        var orderedBlazes = ArrayList<ShootableBlaze>()
-
-        @JvmField
-        var blazeMode = 0
-        var blazeChest: BlockPos? = null
-        var impossible = false
-    }
 }

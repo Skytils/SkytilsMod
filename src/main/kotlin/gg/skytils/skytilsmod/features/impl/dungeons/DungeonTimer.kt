@@ -35,7 +35,28 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-class DungeonTimer {
+object DungeonTimer {
+    var dungeonStartTime = -1L
+    var bloodOpenTime = -1L
+    var bloodClearTime = -1L
+    var portalEnterTime = -1L
+    var bossEntryTime = -1L
+    var bossClearTime = -1L
+    var phase1ClearTime = -1L
+    var phase2ClearTime = -1L
+    var phase3ClearTime = -1L
+    var phase4ClearTime = -1L
+    var terraClearTime = -1L
+    var giantsClearTime = -1L
+    var witherDoors = 0
+    var scoreShownAt = -1L
+
+    init {
+        DungeonTimerElement()
+        NecronPhaseTimerElement()
+        SadanPhaseTimerElement()
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || event.type.toInt() == 2) return
@@ -45,14 +66,17 @@ class DungeonTimer {
             scoreShownAt == -1L && message.contains("§r§fTeam Score: §r") -> {
                 scoreShownAt = System.currentTimeMillis()
             }
+
             (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
             }
+
             message.endsWith(" §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!§r") || unformatted == "A Wither Key was picked up!" || message.endsWith(
                 "§r§ehas obtained §r§8Wither Key§r§e!§r"
             ) -> {
                 witherDoors++
             }
+
             bloodOpenTime == -1L && (unformatted == "The BLOOD DOOR has been opened!" || message.startsWith(
                 "§r§c[BOSS] The Watcher§r§f"
             )) -> {
@@ -61,12 +85,14 @@ class DungeonTimer {
                     "§4Blood §btook ${diff(bloodOpenTime, dungeonStartTime)} seconds to open."
                 )
             }
+
             message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r" -> {
                 bloodClearTime = System.currentTimeMillis()
                 if (Skytils.config.dungeonTimer) UChat.chat(
                     "§cWatcher §btook ${diff(bloodClearTime, bloodOpenTime)} seconds to clear."
                 )
             }
+
             bloodClearTime != -1L && bossEntryTime == -1L && unformatted.startsWith("[BOSS] ") && unformatted.contains(":") -> {
                 val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
                 if (bossName != "The Watcher" && DungeonFeatures.dungeonFloor != null && Utils.checkBossName(
@@ -80,6 +106,7 @@ class DungeonTimer {
                     )
                 }
             }
+
             bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r") -> {
                 bossClearTime = System.currentTimeMillis()
                 TickTask(5) {
@@ -121,6 +148,7 @@ class DungeonTimer {
                     }
                 }
             }
+
             Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && message.startsWith("§r§4[BOSS] ") -> {
                 when {
                     message.endsWith("§r§cPathetic Maxor, just like expected.§r") && phase1ClearTime == -1L -> {
@@ -129,18 +157,21 @@ class DungeonTimer {
                             "§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds."
                         )
                     }
+
                     message.endsWith("§r§cAt least my son died by your hands.§r") && phase2ClearTime == -1L -> {
                         phase2ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
                             "§cStorm §btook ${diff(phase2ClearTime, phase1ClearTime)} seconds."
                         )
                     }
+
                     message.endsWith("§r§c....§r") && phase3ClearTime == -1L -> {
                         phase3ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
                             "§6Goldor §btook ${diff(phase3ClearTime, phase2ClearTime)} seconds."
                         )
                     }
+
                     message.endsWith("§r§cAll this, for nothing...§r") -> {
                         phase4ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
@@ -149,6 +180,7 @@ class DungeonTimer {
                     }
                 }
             }
+
             Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
                 when {
                     (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
@@ -157,6 +189,7 @@ class DungeonTimer {
                             "§dTerracotta §btook ${diff(terraClearTime, bossEntryTime)} seconds."
                         )
                     }
+
                     (message.endsWith("§r§f: You did it. I understand now, you have earned my respect.§r") && giantsClearTime == -1L) -> {
                         giantsClearTime = System.currentTimeMillis()
                         if (Skytils.config.sadanPhaseTimer) UChat.chat(
@@ -184,29 +217,6 @@ class DungeonTimer {
         giantsClearTime = -1
         witherDoors = 0
         scoreShownAt = -1
-    }
-
-    companion object {
-        var dungeonStartTime = -1L
-        var bloodOpenTime = -1L
-        var bloodClearTime = -1L
-        var portalEnterTime = -1L
-        var bossEntryTime = -1L
-        var bossClearTime = -1L
-        var phase1ClearTime = -1L
-        var phase2ClearTime = -1L
-        var phase3ClearTime = -1L
-        var phase4ClearTime = -1L
-        var terraClearTime = -1L
-        var giantsClearTime = -1L
-        var witherDoors = 0
-        var scoreShownAt = -1L
-
-        init {
-            DungeonTimerElement()
-            NecronPhaseTimerElement()
-            SadanPhaseTimerElement()
-        }
     }
 
     class DungeonTimerElement : GuiElement("Dungeon Timer", FloatPair(200, 80)) {

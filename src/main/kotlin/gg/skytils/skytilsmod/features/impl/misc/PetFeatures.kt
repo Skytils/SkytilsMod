@@ -43,10 +43,16 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
-class PetFeatures {
+object PetFeatures {
     val petItems = HashMap<String, Boolean>()
+    private val SUMMON_PATTERN = Regex("§r§aYou summoned your §r(?<pet>.+)§r§a!§r")
+    private val AUTOPET_PATTERN =
+        Regex("§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?<pet>.+)§e! §a§lVIEW RULE§r")
+    private var lastPetConfirmation: Long = 0
+    private var lastPetLockNotif: Long = 0
+    var lastPet: String? = null
+
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
@@ -70,15 +76,15 @@ class PetFeatures {
         if (message.startsWith("§r§aYou despawned your §r§")) {
             lastPet = null
         } else if (message.startsWith("§r§aYou summoned your §r")) {
-            val petMatcher = SUMMON_PATTERN.matcher(message)
-            if (petMatcher.find()) {
-                lastPet = petMatcher.group("pet").stripControlCodes()
-            } else UChat.chat("$failPrefix §cSkytils failed to capture equipped pet.")
+            SUMMON_PATTERN.find(message)?.groups?.get("pet")?.value?.stripControlCodes().let {
+                if (it == null) UChat.chat("$failPrefix §cSkytils failed to capture equipped pet.")
+                else lastPet = it
+            }
         } else if (message.startsWith("§cAutopet §eequipped your §7[Lvl ")) {
-            val autopetMatcher = AUTOPET_PATTERN.matcher(message)
-            if (autopetMatcher.find()) {
-                lastPet = autopetMatcher.group("pet").stripControlCodes()
-            } else UChat.chat("$failPrefix §cSkytils failed to capture equipped pet.")
+            AUTOPET_PATTERN.find(message)?.groups?.get("pet")?.value?.stripControlCodes().let {
+                if (it == null) UChat.chat("$failPrefix §cSkytils failed to capture equipped pet.")
+                else lastPet = it
+            }
         }
     }
 
@@ -138,14 +144,5 @@ class PetFeatures {
             UChat.chat("$prefix §aYou may now apply pet items for 5 seconds.")
             event.isCanceled = true
         }
-    }
-
-    companion object {
-        private var lastPetConfirmation: Long = 0
-        private var lastPetLockNotif: Long = 0
-        var lastPet: String? = null
-        private val SUMMON_PATTERN = Pattern.compile("§r§aYou summoned your §r(?<pet>.+)§r§a!§r")
-        private val AUTOPET_PATTERN =
-            Pattern.compile("§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?<pet>.+)§e! §a§lVIEW RULE§r")
     }
 }

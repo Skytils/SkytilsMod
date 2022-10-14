@@ -34,7 +34,8 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class DungeonMap {
+object DungeonMap {
+    var mapData: MapData? = null
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
@@ -76,9 +77,5 @@ class DungeonMap {
 
     init {
         TrashDungeonMap()
-    }
-
-    companion object {
-        var mapData: MapData? = null
     }
 }

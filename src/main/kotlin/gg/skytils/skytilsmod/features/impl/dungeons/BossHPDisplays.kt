@@ -41,7 +41,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.regex.Pattern
 
-class BossHPDisplays {
+object BossHPDisplays {
+    private var canGiantsSpawn = false
+
+    init {
+        GiantHPElement()
+        GuardianRespawnTimer()
+    }
+
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inDungeons || event.type.toInt() == 2) return
@@ -96,16 +103,6 @@ class BossHPDisplays {
                     GlStateManager.enableCull()
                 }
             }
-        }
-    }
-
-    companion object {
-
-        private var canGiantsSpawn = false
-
-        init {
-            GiantHPElement()
-            GuardianRespawnTimer()
         }
     }
 

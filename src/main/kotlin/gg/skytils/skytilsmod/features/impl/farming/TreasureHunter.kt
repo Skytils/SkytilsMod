@@ -33,8 +33,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 
-class TreasureHunter {
+object TreasureHunter {
 
+    val treasureHunterLocations = LinkedHashMap<String, BlockPos>()
     private var treasureLocation: BlockPos? = null
 
     @SubscribeEvent
@@ -89,9 +90,4 @@ class TreasureHunter {
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
     }
-
-    companion object {
-        val treasureHunterLocations = LinkedHashMap<String, BlockPos>()
-    }
-
 }

@@ -37,7 +37,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.concurrent.CopyOnWriteArrayList
 
-class TechnoMayor {
+object TechnoMayor {
+    private val orbLocations = CopyOnWriteArrayList<Vec3>()
+
     @SubscribeEvent
     fun onRenderSpecialLivingPre(event: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
         if (!Utils.inSkyblock) return
@@ -111,9 +113,5 @@ class TechnoMayor {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         orbLocations.clear()
-    }
-
-    companion object {
-        private val orbLocations = CopyOnWriteArrayList<Vec3>()
     }
 }

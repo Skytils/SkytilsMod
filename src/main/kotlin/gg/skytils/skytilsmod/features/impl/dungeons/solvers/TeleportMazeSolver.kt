@@ -42,13 +42,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.abs
 
-class TeleportMazeSolver {
+object TeleportMazeSolver {
 
-    companion object {
-        private val steppedPads = HashSet<BlockPos>()
-        val poss = HashSet<BlockPos>()
-        val valid = HashSet<BlockPos>()
-    }
+    private val steppedPads = HashSet<BlockPos>()
+    val poss = HashSet<BlockPos>()
+    val valid = HashSet<BlockPos>()
 
     @SubscribeEvent
     fun onSendMsg(event: SendChatMessageEvent) {

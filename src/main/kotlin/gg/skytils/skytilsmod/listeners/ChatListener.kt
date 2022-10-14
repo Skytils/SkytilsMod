@@ -35,7 +35,15 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class ChatListener {
+object ChatListener {
+    private var lastPartyDisbander = ""
+    private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
+    private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
+    private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
+    private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
+    private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
+    private var awaitingDelimiter = false
+
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
@@ -96,6 +104,7 @@ class ChatListener {
                         event.isCanceled = true
                         return
                     }
+
                     1 -> {
                         println("Done querying party")
                         RepartyCommand.gettingParty = false
@@ -138,6 +147,7 @@ class ChatListener {
                         event.isCanceled = true
                         return
                     }
+
                     1 -> {
                         println("Done disbanding")
                         RepartyCommand.disbanding = false
@@ -206,15 +216,5 @@ class ChatListener {
         if (lines.size > index) {
             lines.removeAt(index)
         }
-    }
-
-    companion object {
-        private var lastPartyDisbander = ""
-        private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
-        private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
-        private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
-        private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
-        private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
-        private var awaitingDelimiter = false
     }
 }

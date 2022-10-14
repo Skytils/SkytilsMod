@@ -52,7 +52,12 @@ import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 import java.awt.Color
 
-class AuctionPriceOverlay {
+object AuctionPriceOverlay {
+    private var lastAuctionedStack: ItemStack? = null
+    private var lastEnteredInput = ""
+    private var undercut = false
+    private val tooltipLocationButton = GuiButton(999, 2, 2, 20, 20, "bruh")
+
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
@@ -333,64 +338,58 @@ class AuctionPriceOverlay {
 
     }
 
-    companion object {
-        private var lastAuctionedStack: ItemStack? = null
-        private var lastEnteredInput = ""
-        private var undercut = false
-        private val tooltipLocationButton = GuiButton(999, 2, 2, 20, 20, "bruh")
-        private fun isUndercut(): Boolean {
-            if (!undercut || lastAuctionedStack == null) return false
-            val id = AuctionData.getIdentifier(lastAuctionedStack)
-            return id != null && AuctionData.lowestBINs.containsKey(id)
-        }
+    private fun isUndercut(): Boolean {
+        if (!undercut || lastAuctionedStack == null) return false
+        val id = AuctionData.getIdentifier(lastAuctionedStack)
+        return id != null && AuctionData.lowestBINs.containsKey(id)
+    }
 
-        /**
-         * This code was modified and taken under CC BY-SA 3.0 license
-         * @link https://stackoverflow.com/a/44630965
-         * @author Sachin Rao
-         */
-        private fun getActualValueFromCompactNumber(value: String): Double? {
-            val lastAlphabet = value.replace("[^a-zA-Z]*$".toRegex(), "")
-                .replace(".(?!$)".toRegex(), "")
-            var multiplier = 1L
-            when (lastAlphabet.lowercase()) {
-                "k" -> multiplier = 1000L
-                "m" -> multiplier = 1000000L
-                "b" -> multiplier = 1000000000L
-                "t" -> multiplier = 1000000000000L
-                else -> {
-                }
-            }
-            val values = value.split(lastAlphabet.toRegex()).toTypedArray()
-            return if (multiplier == 1L) {
-                null
-            } else {
-                val valueMultiplier: Double = try {
-                    values[0].toDouble()
-                } catch (ex: ArrayIndexOutOfBoundsException) {
-                    0.0
-                } catch (ex: NumberFormatException) {
-                    0.0
-                }
-                val valueAdder: Double = try {
-                    values[1].toDouble()
-                } catch (ex: ArrayIndexOutOfBoundsException) {
-                    0.0
-                } catch (ex: NumberFormatException) {
-                    0.0
-                }
-                valueMultiplier * multiplier + valueAdder
+    /**
+     * This code was modified and taken under CC BY-SA 3.0 license
+     * @link https://stackoverflow.com/a/44630965
+     * @author Sachin Rao
+     */
+    private fun getActualValueFromCompactNumber(value: String): Double? {
+        val lastAlphabet = value.replace("[^a-zA-Z]*$".toRegex(), "")
+            .replace(".(?!$)".toRegex(), "")
+        var multiplier = 1L
+        when (lastAlphabet.lowercase()) {
+            "k" -> multiplier = 1000L
+            "m" -> multiplier = 1000000L
+            "b" -> multiplier = 1000000000L
+            "t" -> multiplier = 1000000000000L
+            else -> {
             }
         }
-
-        /**
-         * This code was modified and taken under CC BY-SA 3.0 license
-         * @link https://stackoverflow.com/a/44630965
-         * @author Sachin Rao
-         */
-        private fun isProperCompactNumber(value: String): Boolean {
-            val count = value.replace("\\s+".toRegex(), "").replace("[.0-9]+".toRegex(), "")
-            return count.length < 2
+        val values = value.split(lastAlphabet.toRegex()).toTypedArray()
+        return if (multiplier == 1L) {
+            null
+        } else {
+            val valueMultiplier: Double = try {
+                values[0].toDouble()
+            } catch (ex: ArrayIndexOutOfBoundsException) {
+                0.0
+            } catch (ex: NumberFormatException) {
+                0.0
+            }
+            val valueAdder: Double = try {
+                values[1].toDouble()
+            } catch (ex: ArrayIndexOutOfBoundsException) {
+                0.0
+            } catch (ex: NumberFormatException) {
+                0.0
+            }
+            valueMultiplier * multiplier + valueAdder
         }
+    }
+
+    /**
+     * This code was modified and taken under CC BY-SA 3.0 license
+     * @link https://stackoverflow.com/a/44630965
+     * @author Sachin Rao
+     */
+    private fun isProperCompactNumber(value: String): Boolean {
+        val count = value.replace("\\s+".toRegex(), "").replace("[.0-9]+".toRegex(), "")
+        return count.length < 2
     }
 }

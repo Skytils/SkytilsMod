@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import skytils.hylin.skyblock.dungeons.DungeonClass
 
-class TankDisplayStuff {
+object TankDisplayStuff {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
