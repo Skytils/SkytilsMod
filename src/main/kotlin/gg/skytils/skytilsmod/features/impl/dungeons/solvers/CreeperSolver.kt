@@ -21,19 +21,14 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
-import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
-import net.minecraft.block.Block
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -41,6 +36,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import javax.xml.ws.Holder
 
 
 class CreeperSolver {
@@ -48,68 +44,44 @@ class CreeperSolver {
     private val solutionPairs = arrayListOf<Pair<BlockPos, BlockPos>>()
     private var ticks = 0
     private var creeper: EntityCreeper? = null
+    private val candidateBlocks = setOf(Blocks.prismarine, Blocks.sea_lantern)
 
-    /**
-     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
-     */
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        val mc = Minecraft.getMinecraft()
-        val world: World? = mc.theWorld
-        val player = mc.thePlayer
+        val world = mc.theWorld ?: return
+        val player = mc.thePlayer ?: return
         if (ticks % 20 == 0) {
-            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && world != null && player != null && DungeonListener.missingPuzzles.contains(
+            if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Creeper Beams"
                 )
             ) {
-                val x = player.posX
-                val y = player.posY
-                val z = player.posZ
                 if (this.creeper == null) {
-                    // Find creepers nearby
-                    val creeperScan = AxisAlignedBB(x - 14, y - 8, z - 13, x + 14, y + 8, z + 13) // 28x16x26 cube
-                    this.creeper = world.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan).find {
-                        !it.isInvisible && it.maxHealth == 20f && it.health == 20f && !it.hasCustomName()
+                    val creeperScan = player.entityBoundingBox.expand(14.0, 8.0, 13.0)
+                    this.creeper = world.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan) {
+                        it != null && !it.isInvisible && it.maxHealth == 20f && it.health == 20f && !it.hasCustomName()
+                    }.firstOrNull()
+                } else if (solutionPairs.isEmpty()) {
+                    val creeper = this.creeper!!.entityBoundingBox
+
+                    val roomBB = creeper.expand(14.0, 10.0, 13.0)
+                    val candidates = BlockPos.getAllInBox(BlockPos(roomBB.minVec), BlockPos(roomBB.maxVec)).filter {
+                        it.y > 68 && world.getBlockState(it).block in candidateBlocks
                     }
-                } else {
-                    val creeper = this.creeper!!
-                    // Start creeper line drawings
-                    if (solutionPairs.isEmpty()) {
-                        // Search for nearby sea lanterns and prismarine blocks
-                        val point1 = BlockPos(creeper.posX - 14, creeper.posY - 7, creeper.posZ - 13)
-                        val point2 = BlockPos(creeper.posX + 14, creeper.posY + 10, creeper.posZ + 13)
-                        for (blockPos in BlockPos.getAllInBox(point1, point2)) {
-                            val block: Block = world.getBlockState(blockPos).block
-                            if (block === Blocks.sea_lantern || block === Blocks.prismarine) {
-                                // Connect block to nearest block on opposite side
-                                val startBlock = Vec3(blockPos.x + 0.5, blockPos.y + 0.5, blockPos.z + 0.5)
-                                val oppositeBlock =
-                                    getFirstBlockPosAfterVectors(
-                                        startBlock,
-                                        Vec3(creeper.posX, creeper.posY + 1, creeper.posZ),
-                                        10,
-                                        20
-                                    )
-                                val endBlock =
-                                    getNearbyBlock(oppositeBlock, Blocks.sea_lantern, Blocks.prismarine)
-                                if (endBlock != null && startBlock.yCoord > 68 && endBlock.y > 68) { // Don't create line underground
-                                    if (solutionPairs.none {
-                                            Utils.equalsOneOf(
-                                                blockPos,
-                                                it.first,
-                                                it.second
-                                            ) || Utils.equalsOneOf(endBlock, it.first, it.second)
-                                        }) solutionPairs.add(blockPos to endBlock)
-                                }
-                            }
-                            if (SuperSecretSettings.bennettArthur) {
-                                solutionPairs.mapIndexed { i, pair ->
-                                    pair.first to solutionPairs[(i + 1) % solutionPairs.size].second
-                                }
-                            }
+                    val pairs = candidates.elementPairs()
+
+                    for (pair in pairs) {
+                        checkLineBox(creeper, pair.first.middleVec(), pair.second.middleVec(), Holder(null)).let {
+                            solutionPairs.add(pair)
+                        }
+                    }
+
+                    if (SuperSecretSettings.bennettArthur) {
+                        solutionPairs.mapIndexed { i, pair ->
+                            pair.first to solutionPairs[(i + 1) % solutionPairs.size].second
+                        }.let {
+                            solutionPairs.clear()
+                            solutionPairs.addAll(it)
                         }
                     }
                 }
@@ -174,51 +146,109 @@ class CreeperSolver {
     }
 
     /**
-     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
+     * @author qJake
+     * @link https://stackoverflow.com/a/3235902
+     * https://creativecommons.org/licenses/by-sa/2.5/
+     * Modified
      */
-    private fun getNearbyBlock(pos: BlockPos?, vararg blockTypes: Block): BlockPos? {
-        if (pos == null) return null
-        val pos1 = BlockPos(pos.x - 2, pos.y - 3, pos.z - 2)
-        val pos2 = BlockPos(pos.x + 2, pos.y + 3, pos.z + 2)
-        var closestBlock: BlockPos? = null
-        var closestBlockDistance = 99.0
-        val blocks = BlockPos.getAllInBox(pos1, pos2)
-        for (block in blocks) {
-            for (blockType in blockTypes) {
-                if (mc.theWorld.getBlockState(block).block === blockType && block.distanceSq(pos) < closestBlockDistance) {
-                    closestBlock = block
-                    closestBlockDistance = block.distanceSq(pos)
-                }
-            }
+    private fun checkLineBox(bb: AxisAlignedBB, point1: Vec3, point2: Vec3, hitVec: Holder<Vec3>): Boolean {
+        val minVec = bb.minVec
+        val maxVec = bb.maxVec
+        if (point2.x < minVec.x && point1.x < minVec.x) return false
+        if (point2.x > maxVec.x && point1.x > maxVec.x) return false
+        if (point2.y < minVec.y && point1.y < minVec.y) return false
+        if (point2.y > maxVec.y && point1.y > maxVec.y) return false
+        if (point2.z < minVec.z && point1.z < minVec.z) return false
+        if (point2.z > maxVec.z && point1.z > maxVec.z) return false
+        if (bb.isVecInside(point1)) {
+            hitVec.value = point1
+            return true
         }
-        return closestBlock
+        if ((getIntersection(
+                point1.x - minVec.x,
+                point2.x - minVec.x,
+                point1,
+                point2,
+                hitVec
+            ) && bb.isVecInYZ(hitVec.value))
+            || (getIntersection(
+                point1.y - minVec.y,
+                point2.y - minVec.y,
+                point1,
+                point2,
+                hitVec
+            ) && bb.isVecInXZ(hitVec.value))
+            || (getIntersection(
+                point1.z - minVec.z,
+                point2.z - minVec.z,
+                point1,
+                point2,
+                hitVec
+            ) && bb.isVecInXY(hitVec.value))
+            || (getIntersection(
+                point1.x - maxVec.x,
+                point2.x - maxVec.x,
+                point1,
+                point2,
+                hitVec
+            ) && bb.isVecInYZ(hitVec.value))
+            || (getIntersection(
+                point1.y - maxVec.y,
+                point2.y - maxVec.y,
+                point1,
+                point2,
+                hitVec
+            ) && bb.isVecInXZ(hitVec.value))
+            || (getIntersection(
+                point1.z - maxVec.z,
+                point2.z - maxVec.z,
+                point1,
+                point2,
+                hitVec
+            ) && bb.isVecInXY(hitVec.value))
+        ) return true
+
+        return false
     }
 
     /**
-     * Original code was taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     * @author bowser0000
+     * @author qJake
+     * @link https://stackoverflow.com/a/3235902
+     * https://creativecommons.org/licenses/by-sa/2.5/
+     * Modified
      */
-    private fun getFirstBlockPosAfterVectors(
-        pos1: Vec3,
-        pos2: Vec3,
-        strength: Int,
-        distance: Int
-    ): BlockPos? {
-        val x = pos2.xCoord - pos1.xCoord
-        val y = pos2.yCoord - pos1.yCoord
-        val z = pos2.zCoord - pos1.zCoord
-        for (i in strength until distance * strength) { // Start at least 1 strength away
-            val newX = pos1.xCoord + x / strength * i
-            val newY = pos1.yCoord + y / strength * i
-            val newZ = pos1.zCoord + z / strength * i
-            val newBlock = BlockPos(newX, newY, newZ)
-            if (mc.theWorld.getBlockState(newBlock).block !== Blocks.air) {
-                return newBlock
-            }
-        }
-        return null
+    private fun getIntersection(
+        dist1: Double,
+        dist2: Double,
+        point1: Vec3,
+        point2: Vec3,
+        hitVec: Holder<Vec3>
+    ): Boolean {
+        if ((dist1 * dist2) >= 0.0f) return false
+        if (dist1 == dist2) return false
+        hitVec.value = point1 + ((point2 - point1) * (-dist1 / (dist2 - dist1)))
+        return true
+    }
+
+    /**
+     * Checks if the specified vector is within the YZ dimensions of the bounding box.
+     */
+    private fun AxisAlignedBB.isVecInYZ(vec: Vec3): Boolean {
+        return vec.yCoord >= this.minY && vec.yCoord <= this.maxY && vec.zCoord >= this.minZ && vec.zCoord <= this.maxZ
+    }
+
+    /**
+     * Checks if the specified vector is within the XZ dimensions of the bounding box.
+     */
+    private fun AxisAlignedBB.isVecInXZ(vec: Vec3): Boolean {
+        return vec.xCoord >= this.minX && vec.xCoord <= this.maxX && vec.zCoord >= this.minZ && vec.zCoord <= this.maxZ
+
+    }
+
+    /**
+     * Checks if the specified vector is within the XY dimensions of the bounding box.
+     */
+    private fun AxisAlignedBB.isVecInXY(vec: Vec3): Boolean {
+        return vec.xCoord >= this.minX && vec.xCoord <= this.maxX && vec.yCoord >= this.minY && vec.yCoord <= this.maxY
     }
 }

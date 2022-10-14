@@ -220,9 +220,9 @@ object Utils {
         runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrNull() ?: "Key $keyCode"
 }
 
-val AxisAlignedBB.minVec: Vec3
+inline val AxisAlignedBB.minVec: Vec3
     get() = Vec3(minX, minY, minZ)
-val AxisAlignedBB.maxVec: Vec3
+inline val AxisAlignedBB.maxVec: Vec3
     get() = Vec3(maxX, maxY, maxZ)
 
 fun AxisAlignedBB.isPosInside(pos: BlockPos): Boolean {
@@ -302,6 +302,8 @@ fun CheckboxComponent.setState(checked: Boolean) {
 
 fun BlockPos?.toVec3() = if (this == null) null else Vec3(this)
 
+fun BlockPos.middleVec() = Vec3(x + 0.5, y + 0.5, z + 0.5)
+
 fun <T : Any> T?.ifNull(run: () -> Unit): T? {
     if (this == null) run()
     return this
@@ -316,22 +318,22 @@ val MethodInsnNode.descriptor: Descriptor
 
 fun <T : Any> Map<T, T>.getOrSelf(key: T): T = this.getOrDefault(key, key)
 
-val S2APacketParticles.x
+inline val S2APacketParticles.x
     get() = this.xCoordinate
 
-val S2APacketParticles.y
+inline val S2APacketParticles.y
     get() = this.yCoordinate
 
-val S2APacketParticles.z
+inline val S2APacketParticles.z
     get() = this.zCoordinate
 
-val S2APacketParticles.type: EnumParticleTypes
+inline val S2APacketParticles.type: EnumParticleTypes
     get() = this.particleType
 
-val S2APacketParticles.count
+inline val S2APacketParticles.count
     get() = this.particleCount
 
-val S2APacketParticles.speed
+inline val S2APacketParticles.speed
     get() = this.particleSpeed
 
 operator fun <K : Any, V : Any> Cache<K, V>.set(name: K, value: V) = put(name, value)
@@ -363,3 +365,29 @@ fun getSkytilsResource(path: String) = ResourceLocation("skytils", path)
 fun <E> List<E>.getLastOrNull(index: Int) = getOrNull(lastIndex - index)
 
 fun <T> Iterator<T>.nextOrNull(): T? = if (hasNext()) next() else null
+
+inline val Vec3.x
+    get() = this.xCoord
+
+inline val Vec3.y
+    get() = this.yCoord
+
+inline val Vec3.z
+    get() = this.zCoord
+
+operator fun Vec3.plus(other: Vec3): Vec3 = add(other)
+operator fun Vec3.minus(other: Vec3): Vec3 = subtract(other)
+
+operator fun Vec3.times(scaleValue: Double): Vec3 = Vec3(xCoord * scaleValue, yCoord * scaleValue, zCoord * scaleValue)
+
+/**
+ * @author Ilya
+ * @link https://stackoverflow.com/a/56043547
+ * Modified https://creativecommons.org/licenses/by-sa/4.0/
+ */
+fun <T> List<T>.elementPairs() = sequence {
+    val arr = this@elementPairs
+    for (i in 0 until arr.size - 1)
+        for (j in i + 1 until arr.size)
+            yield(arr[i] to arr[j])
+}
