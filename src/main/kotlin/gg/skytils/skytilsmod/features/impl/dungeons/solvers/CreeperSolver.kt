@@ -49,29 +49,28 @@ class CreeperSolver {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        val world = mc.theWorld ?: return
-        val player = mc.thePlayer ?: return
         if (ticks % 20 == 0) {
             if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Creeper Beams"
                 )
             ) {
                 if (this.creeper == null) {
-                    val creeperScan = player.entityBoundingBox.expand(14.0, 8.0, 13.0)
-                    this.creeper = world.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan) {
+                    val creeperScan = mc.thePlayer.entityBoundingBox.expand(14.0, 8.0, 13.0)
+                    this.creeper = mc.theWorld?.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan) {
                         it != null && !it.isInvisible && it.maxHealth == 20f && it.health == 20f && !it.hasCustomName()
-                    }.firstOrNull()
+                    }?.firstOrNull()
                 } else if (solutionPairs.isEmpty()) {
                     val creeper = this.creeper!!.entityBoundingBox
+                    val validBox = creeper.expand(0.5, 0.75, 0.5)
 
                     val roomBB = creeper.expand(14.0, 10.0, 13.0)
                     val candidates = BlockPos.getAllInBox(BlockPos(roomBB.minVec), BlockPos(roomBB.maxVec)).filter {
-                        it.y > 68 && world.getBlockState(it).block in candidateBlocks
+                        it.y > 68 && mc.theWorld?.getBlockState(it)?.block in candidateBlocks
                     }
                     val pairs = candidates.elementPairs()
 
                     solutionPairs.addAll(pairs.filter { (a, b) ->
-                        checkLineBox(creeper, a.middleVec(), b.middleVec(), Holder(null))
+                        checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(null))
                     })
 
                     if (SuperSecretSettings.bennettArthur) {
