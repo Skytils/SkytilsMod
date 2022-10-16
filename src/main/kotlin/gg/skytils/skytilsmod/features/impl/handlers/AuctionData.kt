@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.json
@@ -97,8 +98,13 @@ object AuctionData {
         fixedRateTimer(name = "Skytils-FetchAuctionData", period = 60 * 1000L) {
             if (Skytils.config.fetchLowestBINPrices) {
                 Skytils.IO.launch {
-                    client.get(dataURL).body<JsonObject>().forEach { itemId, price ->
-                        lowestBINs[itemId] = price.jsonPrimitive.double
+                    client.get(dataURL).let {
+                        if (it.headers["cf-cache-status"] == "STALE") {
+                            UChat.chat("${Skytils.failPrefix} Uh oh! Auction data is stale, prices may be inaccurate.")
+                        }
+                        it.body<JsonObject>().forEach { itemId, price ->
+                            lowestBINs[itemId] = price.jsonPrimitive.double
+                        }
                     }
                 }
             }
