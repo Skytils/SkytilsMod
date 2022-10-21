@@ -289,7 +289,7 @@ object MiningFeatures {
             if (Skytils.config.highlightCompletedCommissions && SBInfo.lastOpenContainerName.equals("Commissions")) {
                 if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
                     if (ItemUtil.getItemLore(item).any {
-                            it == "§7§eClick to claim rewards!"
+                            it == "§eClick to claim rewards!"
                         }) {
                         event.slot highlight Color(255, 0, 0)
                     }
