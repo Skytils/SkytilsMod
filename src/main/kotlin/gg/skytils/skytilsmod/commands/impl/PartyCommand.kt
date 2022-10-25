@@ -22,9 +22,6 @@ import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.commands.BaseCommand
 import net.minecraft.client.entity.EntityPlayerSP
 
-/**
- * @author Clicks
- */
 object PartyCommand : BaseCommand("p", listOf("party")) {
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
