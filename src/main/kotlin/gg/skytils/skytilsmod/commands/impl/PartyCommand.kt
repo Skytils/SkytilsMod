@@ -30,12 +30,12 @@ object PartyCommand : BaseCommand("p", listOf("party")) {
             return
         }
         if (!args.first().endsWith(",") && !((args.first() == "invite" || args.first() == "i") && (args[1].endsWith(",") || args.size > 2))) {
-            UChat.chat("/p ${args.joinToString(" ")}")
+            UChat.say("/p ${args.joinToString(" ")}")
             return
         } else {
             Thread {
                 args.filter { it != "invite" && it != "i" }.forEach {
-                    UChat.chat("/p ${it.replace(",", "").replace(" ", "")}")
+                    UChat.say("/p ${it.replace(",", "").replace(" ", "")}")
                     Thread.sleep(400)
                 }
             }.start()
