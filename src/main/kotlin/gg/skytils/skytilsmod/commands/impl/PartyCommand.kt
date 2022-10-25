@@ -29,13 +29,13 @@ object PartyCommand : BaseCommand("p", listOf("party")) {
             UChat.say("/p")
             return
         }
-        if (!args.first().endsWith(",")) {
-            UChat.say("/p ${args.joinToString(" ")}")
+        if (!args.first().endsWith(",") && !((args.first() == "invite" || args.first() == "i") && (args[1].endsWith(",") || args.size > 2))) {
+            UChat.chat("/p ${args.joinToString(" ")}")
             return
         } else {
             Thread {
-                args.forEach {
-                    UChat.say("/p ${it.replace(",", "").replace(" ", "")}")
+                args.filter { it != "invite" && it != "i" }.forEach {
+                    UChat.chat("/p ${it.replace(",", "").replace(" ", "")}")
                     Thread.sleep(400)
                 }
             }.start()
