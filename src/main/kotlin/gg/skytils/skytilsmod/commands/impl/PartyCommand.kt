@@ -19,7 +19,9 @@
 package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.commands.BaseCommand
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 
 object PartyCommand : BaseCommand("p", listOf("party")) {
@@ -29,16 +31,16 @@ object PartyCommand : BaseCommand("p", listOf("party")) {
             UChat.say("/p")
             return
         }
-        if (!args.first().endsWith(",") && !((args.first() == "invite" || args.first() == "i") && (args[1].endsWith(",") || args.size > 2))) {
+        if (!args.first().endsWith(",") && !((args.first() in listOf("invite", "i")) && (args[1].endsWith(",") || args.size > 2))) {
             UChat.say("/p ${args.joinToString(" ")}")
             return
         } else {
-            Thread {
+            Skytils.launch {
                 args.filter { it != "invite" && it != "i" }.forEach {
                     UChat.say("/p ${it.replace(",", "").replace(" ", "")}")
                     Thread.sleep(400)
                 }
-            }.start()
+            }
         }
     }
 }
