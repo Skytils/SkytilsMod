@@ -96,7 +96,7 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.1.3")
+    shadowMe("org.apache.httpcomponents.client5:httpclient5:5.2")
     shadowMeMod("com.github.Skytils:Hylin:04665adf92") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
