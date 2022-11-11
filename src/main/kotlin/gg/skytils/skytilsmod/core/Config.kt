@@ -829,7 +829,7 @@ object Config : Vigilant(
         description = "Replaces left clicks while on terminals with middle clicks.",
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
-    var middleClickTerminals = true
+    var middleClickTerminals = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Change All to Same Color Solver",
