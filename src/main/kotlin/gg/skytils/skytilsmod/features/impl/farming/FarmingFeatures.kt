@@ -45,6 +45,11 @@ object FarmingFeatures {
     var animalFound = false
     var acceptTrapperCommand = ""
 
+    private val targetHeightRegex =
+        Regex("^The target is around (?<blocks>\\d+) blocks (?<type>above|below), at a (?<angle>\\d+) degrees angle!$")
+    var targetMinY = 0
+    var targetMaxY = 0
+
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type == 2.toByte()) return
@@ -71,6 +76,37 @@ object FarmingFeatures {
                     trapperStart = -1.0
                 }
                 animalFound = true
+            }
+        }
+        if (Skytils.config.talbotsTheodoliteHelper) {
+            if (unformatted.startsWith("[NPC] Trevor The Trapper: You can find your")) {
+                targetMinY = -1
+                targetMaxY = -1
+            } else if (unformatted.startsWith("You are at the exact height!")) {
+                targetMinY = mc.thePlayer.posY.toInt();
+                targetMaxY = mc.thePlayer.posY.toInt();
+            } else {
+                val match = targetHeightRegex.find(unformatted);
+                if (match != null) {
+                    val blocks = match.groups["blocks"]!!.value.toInt()
+                    val below = match.groups["type"]!!.value == "below"
+                    val y = mc.thePlayer.posY.toInt() + blocks * if (below) -1 else 1
+                    val filler = if (blocks == 5) 2 else 0
+                    val minY = y - 2 - if (below) 0 else filler
+                    val maxY = y + 2 + if (below) filler else 0
+
+                    if (minY <= targetMaxY && maxY >= targetMinY) {
+                        targetMinY = minY.coerceAtLeast(targetMinY)
+                        targetMaxY = maxY.coerceAtMost(targetMaxY);
+                    } else {
+                        targetMinY = minY;
+                        targetMaxY = maxY;
+                    }
+
+                    UChat.chat("§r§aThe target is at §6Y §r§e$targetMinY${if (targetMinY != targetMaxY) "-$targetMaxY" else ""} §7($blocks blocks ${match.groups["type"]!!.value}, ${match.groups["angle"]!!.value} angle)")
+
+                    event.isCanceled = true
+                }
             }
         }
 

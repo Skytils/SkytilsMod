@@ -1048,6 +1048,13 @@ object Config : Vigilant(
     var trapperPing = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Talbot's Theodolite Helper",
+        description = "Shows Y coordinate bounds based on Talbot's Theodolite output",
+        category = "Farming", subcategory = "Quality of Life"
+    )
+    var talbotsTheodoliteHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.",
         category = "Mining", subcategory = "Quality of Life"
