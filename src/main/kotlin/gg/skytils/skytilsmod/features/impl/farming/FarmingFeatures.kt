@@ -65,7 +65,7 @@ object FarmingFeatures {
                 trapperStart = System.currentTimeMillis().toDouble()
                 animalFound = false
             } else if (unformatted.startsWith("Return to the Trapper soon to get a new animal to hunt!")) {
-                if (trapperStart > 0 && System.currentTimeMillis() - trapperStart > 60000) { //1 minute cooldown
+                if (trapperStart > 0 && System.currentTimeMillis() - trapperStart > 30000) { //30 seconds cooldown
                     Utils.playLoudSound("note.pling", 1.0)
                     UChat.chat("$prefix §bTrapper cooldown has already expired!")
                     trapperStart = -1.0
@@ -121,9 +121,9 @@ object FarmingFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
         if (trapperStart > 0 && mc.thePlayer != null) {
-            if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
+            if (System.currentTimeMillis() - trapperStart > 30000 && animalFound) { //30 seconds cooldown
                 trapperStart = -1.0
-                UChat.chat("§dSkytils: Trapper cooldown has now expired!")
+                UChat.chat("$prefix §bTrapper cooldown has now expired!")
                 for (i in 0..4) {
                     SoundQueue.addToQueue(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
                 }
