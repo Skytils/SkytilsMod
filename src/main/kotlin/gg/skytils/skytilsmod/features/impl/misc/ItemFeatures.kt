@@ -212,16 +212,7 @@ object ItemFeatures {
                                 "Stone Button", "Tripwire Hook", "Journal Entry",
                                 "Training Weights", "Mimic Fragment"
                             )
-                        ) event.slot highlight Color(255, 50, 150, 255) else {
-                            val itemId = AuctionData.getIdentifier(stack) ?: ""
-                            if ((itemId.startsWith("ENCHANTED_BOOK-") && itemId.containsAny(
-                                    "FEATHER_FALLING",
-                                    "BANK",
-                                    "NO_PAIN_NO_GAIN",
-                                    "INFINITE_QUIVER"
-                                )) || itemId == "ENCHANTED_BOOK"
-                            ) event.slot highlight Color(50, 50, 255)
-                        }
+                        ) event.slot highlight Color(255, 50, 150, 255)
                     }
                 }
             }
