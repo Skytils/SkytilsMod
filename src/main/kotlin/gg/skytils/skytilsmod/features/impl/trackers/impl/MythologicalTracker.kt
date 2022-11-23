@@ -58,9 +58,10 @@ object MythologicalTracker : Tracker("mythological") {
 
     private var lastMinosChamp = 0L
 
-    private val timestampFormat = DateTimeFormatter.ofPattern("M/d/yy h:mm a").withZone(
-        ZoneId.of("America/New_York")
-    )
+    private val timestampFormat = DateTimeFormatter
+        .ofPattern("M/d/yy h:mm a")
+        .withZone(ZoneId.of("America/New_York"))
+        .withLocale(Locale.US)
 
     private val seenUUIDs = WeakHashMap<String, Boolean>().asSet
 
