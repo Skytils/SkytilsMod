@@ -45,7 +45,7 @@ repositories {
 }
 
 quiltflower {
-    quiltflowerVersion.set("1.8.1")
+    quiltflowerVersion.set("1.9.0")
 }
 
 loom {
