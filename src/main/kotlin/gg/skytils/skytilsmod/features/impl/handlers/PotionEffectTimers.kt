@@ -29,7 +29,10 @@ import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.startsWithAny
+import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -40,6 +43,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTimers.json")) {
     val effectMenuTitle = Regex("^(?:\\((?<currPage>\\d+)\\/(?<lastPage>\\d+)\\) )?Active Effects\$")
@@ -78,9 +84,16 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
 
         potionEffectTimers.entries.removeAll { (name, effect) ->
             if (!effect.infinite && effect.duration == (notifications[name] ?: Long.MAX_VALUE)) {
-                GuiManager.createTitle("§c${effect.potionName.splitToWords()} is about to wear off!", 40)
+                GuiManager.createTitle("§c${effect.potionName} is about to wear off!", 40)
+                UChat.chat("${Skytils.prefix} §e${effect.potionName} has only ${effect.duration / 20.0} seconds left!")
             }
-            return@removeAll effect.tick()
+            val isEnding = effect.tick()
+            if (isEnding) {
+                GuiManager.createTitle("§c${effect.potionName} has worn off!", 40)
+                UChat.chat("${Skytils.prefix} §c${effect.potionName} has worn off!")
+            }
+
+            return@removeAll isEnding
         }
         markDirty<PotionEffectTimers>()
     }
