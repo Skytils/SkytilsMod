@@ -51,7 +51,7 @@ object TerminalFeatures {
                 ))
             ) {
                 event.isCanceled = true
-                mc.playerController.windowClick(event.container.windowId, event.slotId, 4, 1, mc.thePlayer)
+                mc.playerController.windowClick(event.container.windowId, event.slotId, 0, 4, mc.thePlayer)
             }
         }
     }
