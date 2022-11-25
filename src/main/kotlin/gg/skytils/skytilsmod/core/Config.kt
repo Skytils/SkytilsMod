@@ -154,11 +154,11 @@ object Config : Vigilant(
     var updateChannel = 2
 
     @Property(
-        type = PropertyType.SWITCH, name = "Red Screen Fix",
-        description = "Fixes an issue in The Catacombs Floors 2 and 3 where the screen turns red on fancy graphics.",
-        category = "Dungeons", subcategory = "Miscellaneous"
+        type = PropertyType.SWITCH, name = "Blood Room Portal Timer",
+        description = "Displays time to portal on your HUD.",
+        category = "Dungeons", subcategory = "HUD"
     )
-    var worldborderFix = true
+    var bloodPortalTimer = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
@@ -236,6 +236,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Miscellaneous"
     )
     var necronPhaseTimer = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Red Screen Fix",
+        description = "Fixes an issue in The Catacombs Floors 2 and 3 where the screen turns red on fancy graphics.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var worldborderFix = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Decimal Seconds on Timers",

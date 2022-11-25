@@ -33,6 +33,7 @@ import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -42,6 +43,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockStainedGlass
+import net.minecraft.block.material.Material
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -104,10 +106,12 @@ object DungeonFeatures {
     private val lastBlockPos = BlockPos(7, 77, 34)
     private var startWithoutFullParty = false
     private var blazes = 0
+    private var secondsToPortal = 0f
     var hasClearedText = false
 
     init {
         LividGuiElement()
+        PortalTimer()
         SpiritBearSpawnTimer()
     }
 
@@ -197,6 +201,8 @@ object DungeonFeatures {
                 GuiManager.createTitle("Spirit Pet", 20)
                 alertedSpiritPet = true
             }
+
+            secondsToPortal = (mc.thePlayer.maxInPortalTime / 20f) * (1 - mc.thePlayer.timeInPortal)
 
             if (Skytils.config.findCorrectLivid && !foundLivid) {
                 if (equalsOneOf(dungeonFloor, "F5", "M5")) {
@@ -654,6 +660,51 @@ object DungeonFeatures {
         startWithoutFullParty = false
         blazes = 0
         hasClearedText = false
+    }
+
+    class PortalTimer : GuiElement("Blood Room Portal Timer", FloatPair(0.05f, 0.4f)) {
+        override fun render() {
+            if (!toggled || !Utils.inDungeons || DungeonTimer.bloodClearTime == -1L || DungeonTimer.bossEntryTime != -1L || mc.thePlayer?.isInsideOfMaterial(
+                    Material.portal
+                ) == false
+            ) return
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "${secondsToPortal.roundToPrecision(2)}s",
+                if (leftAlign) 0f else width.toFloat(),
+                0f,
+                CommonColors.RED,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override fun demoRender() {
+            val leftAlign = actualX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Portal: 3.99s",
+                if (leftAlign) 0f else 0f + width,
+                0f,
+                CommonColors.RED,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Portal: 3.99s")
+
+        override val toggled: Boolean
+            get() = Skytils.config.bloodPortalTimer
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
