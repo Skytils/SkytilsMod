@@ -406,6 +406,10 @@ object MiscFeatures {
                     "Reforge Item"
                 ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
             ) return
+            if (SBInfo.lastOpenContainerName.startsWithAny(
+                    "Salvage Item"
+                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§cSalvage Item"
+            ) return
             if (ItemUtil.getItemLore(item).asReversed().any {
                     it.contains("-click", true)
                 }) return
