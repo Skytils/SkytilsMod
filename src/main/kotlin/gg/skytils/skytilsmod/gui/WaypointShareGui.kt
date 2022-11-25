@@ -45,7 +45,12 @@ import gg.skytils.skytilsmod.utils.childContainers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.apache.commons.codec.binary.Base64
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
+import org.apache.commons.compress.compressors.gzip.GzipParameters
 import java.awt.Color
+import java.io.ByteArrayOutputStream
+import java.util.zip.Deflater
 
 class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
@@ -147,7 +152,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun importFromClipboard() {
         runCatching {
-            val decoded = Base64.decodeBase64(getClipboardString()).toString(Charsets.UTF_8)
+            val decoded = Base64.decodeBase64(getClipboardString()).decodeToString()
 
             runCatching {
                 import(decoded)
@@ -166,7 +171,25 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     }
 
     private fun import(str: String) = runCatching {
-        val categories = Skytils.json.decodeFromString<CategoryList>(str).categories
+        val categories = hashSetOf<WaypointCategory>()
+        if (str.startsWith("<Skytils-Waypoint-Data>(V")) {
+            val version = str.substringBefore(')').substringAfter('V').toIntOrNull() ?: 0
+            val content = str.substringAfter(':')
+
+            val json = when (version) {
+                1 -> {
+                    GzipCompressorInputStream(content.byteInputStream()).use {
+                        it.readBytes().decodeToString()
+                    }
+                }
+
+                else -> throw IllegalArgumentException("Unknown version $version")
+            }
+            categories.addAll(Skytils.json.decodeFromString<CategoryList>(json).categories)
+
+        } else categories.addAll(Skytils.json.decodeFromString<CategoryList>(str).categories)
+
+
         Waypoints.categories.addAll(categories)
         EssentialAPI.getNotifications().push(
             "Waypoints Imported",
@@ -255,8 +278,19 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
         val str = Skytils.json.encodeToString(CategoryList(categories))
             .lines().joinToString("", transform = String::trim)
 
+        val data = Base64.encodeBase64String(ByteArrayOutputStream().use { bs ->
+            GzipCompressorOutputStream(bs, GzipParameters().apply {
+                compressionLevel = Deflater.BEST_COMPRESSION
+            }).use { gs ->
+                gs.write(str.encodeToByteArray())
+            }
+            bs.toByteArray()
+        })
+
+
+        setClipboardString("<Skytils-Waypoint-Data>(V1):${data}")
+
         val count = categories.sumOf { it.waypoints.size }
-        setClipboardString(Base64.encodeBase64String(str.encodeToByteArray()))
         EssentialAPI.getNotifications()
             .push(
                 "Waypoints Exported",
