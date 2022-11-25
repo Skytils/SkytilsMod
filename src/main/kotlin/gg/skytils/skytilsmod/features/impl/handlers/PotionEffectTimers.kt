@@ -87,7 +87,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
 
     @SubscribeEvent
     fun onCommandRun(event: SendChatMessageEvent) {
-        if (!event.addToChat && event.message == "/skytilsupdatepotioneffects") {
+        if (event.message == "/skytilsupdatepotioneffects") {
             event.isCanceled = true
             shouldReadEffects = true
             potionEffectTimers.clear()

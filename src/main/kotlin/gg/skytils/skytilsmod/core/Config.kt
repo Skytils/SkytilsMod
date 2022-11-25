@@ -1344,6 +1344,14 @@ object Config : Vigilant(
     var witherShieldCooldown = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Wither Shield has Wither Impact",
+        description = "Get better tbh imagine only 1 scroll",
+        category = "Miscellaneous", subcategory = "Items",
+        searchTags = ["Wither Impact", "Hyperion", "Wither Shield", "Scylla", "Astraea", "Valkyrie"]
+    )
+    var assumeWitherImpact = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Enchanted Book Abbreviation",
         description = "Shows the abbreviated name of books with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items"
@@ -2762,6 +2770,8 @@ object Config : Vigilant(
 
         addDependency("containerSellValueMaxItems", "containerSellValue")
         addDependency("includeModifiersInSellValue", "containerSellValue")
+
+        addDependency("assumeWitherImpact", "witherShieldCooldown")
 
         registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {

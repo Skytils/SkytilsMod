@@ -865,7 +865,8 @@ object ItemFeatures {
                 val alignment =
                     if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 if (lastShieldUse != -1L) {
-                    val diff = ((lastShieldUse + 5000 - System.currentTimeMillis()) / 1000f)
+                    val diff =
+                        ((lastShieldUse + (if (Skytils.config.assumeWitherImpact) 5000 else 10000) - System.currentTimeMillis()) / 1000f)
                     ScreenRenderer.fontRenderer.drawString(
                         "Shield: §c${"%.2f".format(diff)}s",
                         if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
