@@ -671,7 +671,7 @@ object DungeonFeatures {
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "${secondsToPortal.roundToPrecision(2)}s",
+                "§a${secondsToPortal.roundToPrecision(2)}s",
                 if (leftAlign) 0f else width.toFloat(),
                 0f,
                 CommonColors.RED,
@@ -684,7 +684,7 @@ object DungeonFeatures {
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "Portal: 3.99s",
+                "§aPortal: 3.99s",
                 if (leftAlign) 0f else 0f + width,
                 0f,
                 CommonColors.RED,

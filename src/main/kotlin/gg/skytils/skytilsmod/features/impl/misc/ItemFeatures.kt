@@ -138,6 +138,7 @@ object ItemFeatures {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
         if (ticks % 4 == 0) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
                 val held = mc.thePlayer.inventory.getCurrentItem()
