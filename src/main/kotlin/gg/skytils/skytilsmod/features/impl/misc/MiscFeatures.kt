@@ -19,7 +19,6 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
@@ -482,7 +481,7 @@ object MiscFeatures {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
-                val sr = UResolution
+
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val text =
                     "§cGolem spawn in: §a" + ((golemSpawnTime - System.currentTimeMillis()) / 1000.0).roundToPrecision(1) + "s"

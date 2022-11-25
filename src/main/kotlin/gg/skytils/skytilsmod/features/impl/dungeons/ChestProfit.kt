@@ -89,8 +89,8 @@ object ChestProfit {
                 }
             }
             if (chestType.items.size > 0) {
-                val sr = UResolution
-                val leftAlign = element.actualX < sr.scaledWidth / 2f
+
+                val leftAlign = element.actualX < UResolution.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()

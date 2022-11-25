@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UChat
-import gg.essential.universal.UResolution
 import gg.essential.vigilance.data.PropertyItem
 import gg.essential.vigilance.data.PropertyType
 import gg.skytils.skytilsmod.Skytils
@@ -54,7 +53,6 @@ import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.sin
 
 object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
@@ -234,11 +232,13 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                             1, 2 -> cancelChatPacket(event, Skytils.config.hideMortMessages == 2)
                         }
                     }
+
                     unformatted.startsWith("[BOSS]") && !unformatted.startsWith("[BOSS] The Watcher") -> {
                         when (Skytils.config.hideBossMessages) {
                             1, 2 -> cancelChatPacket(event, Skytils.config.hideBossMessages == 2)
                         }
                     }
+
                     Skytils.config.hideOruoMessages && unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && !unformatted.contains(
                         "You should have listened"
                     ) && !unformatted.contains("Yikes") && !unformatted.contains("chose the wrong answer") && !unformatted.contains(
@@ -386,6 +386,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         }
                     }
                 }
+
                 formatted.contains("§r§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it.") -> {
                     when (Skytils.config.witherKeyHider) {
                         1, 2, 3 -> cancelChatPacket(event, false)
@@ -406,6 +407,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         }
                     }
                 }
+
                 unformatted.contains("RIGHT CLICK on the BLOOD DOOR to open it.") -> {
                     when (Skytils.config.bloodKeyHider) {
                         1, 2, 3 -> cancelChatPacket(event, false)
@@ -635,6 +637,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         }
                     }
                 }
+
                 formatted.contains("§r§eunlocked §r§dWither Essence §r§8x") -> {
                     when (Skytils.config.witherEssenceHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.witherEssenceHider == 2)
@@ -724,7 +727,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         override fun render() {
             val now = System.currentTimeMillis()
             val timePassed = now - lastTimeRender
-            val sr = UResolution
+
             val animDiv = timePassed.toDouble() / 1000.0
             lastTimeRender = now
             var i = 0

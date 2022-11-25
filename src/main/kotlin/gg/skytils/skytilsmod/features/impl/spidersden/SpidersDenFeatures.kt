@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.features.impl.spidersden
 
 import gg.essential.universal.UMatrixStack
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.FloatPair
@@ -92,7 +91,7 @@ object SpidersDenFeatures {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             val text = "§8[§7Lv500§8] §cArachne §a17.6M§f/§a20M§c❤§r"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT

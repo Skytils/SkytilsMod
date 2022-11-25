@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UMatrixStack
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.FloatPair
@@ -143,7 +142,7 @@ object BossHPDisplays {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(

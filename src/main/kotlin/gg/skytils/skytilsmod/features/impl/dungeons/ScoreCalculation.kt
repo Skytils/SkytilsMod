@@ -19,7 +19,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
@@ -338,6 +337,7 @@ object ScoreCalculation {
                     val matcher = deathsTabPattern.find(name) ?: return@forEach
                     deaths.set(matcher.groups["deaths"]?.value?.toIntOrNull() ?: 0)
                 }
+
                 name.contains("Puzzles:") -> {
                     println(name)
                     val matcher = missingPuzzlePattern.find(name) ?: return@forEach
@@ -345,17 +345,20 @@ object ScoreCalculation {
                     printDevMessage("puzzles ${missingPuzzles.get()}", "scorecalcpuzzle")
                     updateText(totalScore.get())
                 }
+
                 name.contains("✔") -> {
                     if (solvedPuzzlePattern.containsMatchIn(name)) {
                         missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                     }
                 }
+
                 name.contains("✖") -> {
                     if (failedPuzzlePattern.containsMatchIn(name)) {
                         missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                         failedPuzzles.set(failedPuzzles.get() + 1)
                     }
                 }
+
                 name.contains("Secrets Found:") -> {
                     printDevMessage(name, "scorecalcsecrets")
                     if (name.contains("%")) {
@@ -371,10 +374,12 @@ object ScoreCalculation {
                         foundSecrets.set(matcher.groups["secrets"]?.value?.toIntOrNull() ?: 0)
                     }
                 }
+
                 name.contains("Crypts:") -> {
                     val matcher = cryptsPattern.find(name) ?: return@forEach
                     crypts.set(matcher.groups["crypts"]?.value?.toIntOrNull() ?: 0)
                 }
+
                 name.contains("Completed Rooms") -> {
                     val matcher = roomCompletedPattern.find(name) ?: return@forEach
                     completedRooms.set(matcher.groups["count"]?.value?.toIntOrNull() ?: return@forEach)
@@ -493,7 +498,7 @@ object ScoreCalculation {
     class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
-                val sr = UResolution
+
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 ScreenRenderer.fontRenderer.drawString(
                     "Crypts: ${crypts.get()}",
@@ -506,7 +511,7 @@ object ScoreCalculation {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             ScreenRenderer.fontRenderer.drawString(
                 "Crypts: 5",

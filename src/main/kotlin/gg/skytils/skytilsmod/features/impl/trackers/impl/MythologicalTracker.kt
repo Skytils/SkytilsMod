@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
 import gg.essential.universal.UChat
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.SoundQueue
@@ -304,7 +303,7 @@ object MythologicalTracker : Tracker("mythological") {
     object MythologicalTrackerElement : GuiElement("Mythological Tracker", FloatPair(150, 120)) {
         override fun render() {
             if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SkyblockIsland.Hub.mode) {
-                val sr = UResolution
+
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
@@ -345,7 +344,7 @@ object MythologicalTracker : Tracker("mythological") {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT

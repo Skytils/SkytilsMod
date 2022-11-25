@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -166,7 +165,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
     class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", FloatPair(150, 120)) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
-                val sr = UResolution
+
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
@@ -199,7 +198,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT

@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
-import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
@@ -665,7 +664,7 @@ object DungeonFeatures {
                 if (diff < 0) {
                     lastLitUpTime = -1
                 }
-                val sr = UResolution
+
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -680,7 +679,7 @@ object DungeonFeatures {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -712,7 +711,7 @@ object DungeonFeatures {
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
                 if (lividTag == null) return
-                val sr = UResolution
+
                 val leftAlign = actualX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -727,7 +726,7 @@ object DungeonFeatures {
         }
 
         override fun demoRender() {
-            val sr = UResolution
+
             val leftAlign = actualX < sr.scaledWidth / 2f
             val text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
