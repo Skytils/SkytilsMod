@@ -295,6 +295,7 @@ class Skytils {
             PartyFinderStats,
             PetFeatures,
             Ping,
+            PotionEffectTimers,
             PricePaid,
             ProtectItems,
             RainTimer,
