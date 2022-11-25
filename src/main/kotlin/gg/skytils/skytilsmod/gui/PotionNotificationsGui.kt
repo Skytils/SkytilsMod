@@ -97,7 +97,7 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2)
         }
     }
 
-    private fun addNewNotification(potionId: String = "", ticks: Long = 20 * 60L) {
+    private fun addNewNotification(potionName: String = "", ticks: Long = 20 * 60L) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -105,7 +105,7 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2)
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val potion = UITextInput("Potion Id").childOf(container).constrain {
+        val potion = UITextInput("Potion Name").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
             width = 70.percent()
@@ -113,7 +113,7 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2)
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(potionId)
+            setText(potionName)
         }
 
         val remainingTicks = UITextInput("Ticks").childOf(container).constrain {
@@ -153,15 +153,15 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2)
         super.onScreenClose()
         PotionEffectTimers.notifications.clear()
 
-        for ((_, potionId, remainingTicks) in components.values) {
-            if (potionId.getText().isBlank() || remainingTicks.getText()
+        for ((_, potion, remainingTicks) in components.values) {
+            if (potion.getText().isBlank() || remainingTicks.getText()
                     .isBlank()
             ) continue
             runCatching {
-                PotionEffectTimers.notifications[potionId.getText()] = remainingTicks.getText().toLong()
+                PotionEffectTimers.notifications[potion.getText()] = remainingTicks.getText().toLong()
             }.onFailure {
                 it.printStackTrace()
-                EssentialAPI.getNotifications().push("Invalid notification", potionId.getText(), 3f)
+                EssentialAPI.getNotifications().push("Invalid notification", potion.getText(), 3f)
             }
         }
 

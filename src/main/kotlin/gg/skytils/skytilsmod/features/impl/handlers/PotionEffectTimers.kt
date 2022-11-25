@@ -29,10 +29,7 @@ import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.splitToWords
-import gg.skytils.skytilsmod.utils.startsWithAny
+import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -79,10 +76,9 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || Utils.inDungeons || event.phase != TickEvent.Phase.START) return
 
-        potionEffectTimers.entries.removeAll { (id, effect) ->
-
-            if (!effect.infinite && effect.duration == (notifications[id] ?: Long.MAX_VALUE)) {
-                GuiManager.createTitle("§c${effect.potionId.splitToWords()} is about to wear off!", 20)
+        potionEffectTimers.entries.removeAll { (name, effect) ->
+            if (!effect.infinite && effect.duration == (notifications[name] ?: Long.MAX_VALUE)) {
+                GuiManager.createTitle("§c${effect.potionName.splitToWords()} is about to wear off!", 20)
             }
             return@removeAll effect.tick()
         }
@@ -106,9 +102,8 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
         if (event.slot.inventory == mc.thePlayer.inventory) return
         val item = event.slot.stack ?: return
         val extraAttr = ItemUtil.getExtraAttributes(item)
-        val sbId = ItemUtil.getSkyBlockItemID(extraAttr)
-        if (sbId == "POTION" && extraAttr != null) {
-            val potionId = extraAttr.getString("potion")
+        if (item.item == Items.potionitem && extraAttr != null) {
+            val potionName = item.displayName.stripControlCodes().substringBeforeLast(" ")
             val potionLevel = extraAttr.getInteger("potion_level")
             for (line in ItemUtil.getItemLore(item).asReversed()) {
                 val match = duration.matchEntire(line) ?: continue
@@ -117,7 +112,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
                 val minutes = match.groups["minutes"]?.value?.toIntOrNull() ?: 0
                 val seconds = match.groups["seconds"]?.value?.toIntOrNull() ?: 0
                 val durationTicks = if (isInfinite) Long.MAX_VALUE else (hours * 3600 + minutes * 60 + seconds) * 20L
-                potionEffectTimers[potionId] = PotionEffectTimer(potionId, potionLevel, durationTicks, isInfinite)
+                potionEffectTimers[potionName] = PotionEffectTimer(potionName, potionLevel, durationTicks, isInfinite)
                 break
             }
         }
@@ -167,7 +162,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
 
     @Serializable
     data class PotionEffectTimer(
-        val potionId: String,
+        val potionName: String,
         val potionLevel: Int,
         var duration: Long,
         val infinite: Boolean
