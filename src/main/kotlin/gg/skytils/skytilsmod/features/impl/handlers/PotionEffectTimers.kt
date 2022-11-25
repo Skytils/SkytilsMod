@@ -78,7 +78,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
 
         potionEffectTimers.entries.removeAll { (name, effect) ->
             if (!effect.infinite && effect.duration == (notifications[name] ?: Long.MAX_VALUE)) {
-                GuiManager.createTitle("§c${effect.potionName.splitToWords()} is about to wear off!", 20)
+                GuiManager.createTitle("§c${effect.potionName.splitToWords()} is about to wear off!", 40)
             }
             return@removeAll effect.tick()
         }

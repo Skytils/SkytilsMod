@@ -119,7 +119,7 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2)
         val remainingTicks = UITextInput("Ticks").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 5.percent()
+            width = 8.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
