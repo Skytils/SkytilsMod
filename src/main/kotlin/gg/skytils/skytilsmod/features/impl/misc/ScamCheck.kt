@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.MojangUtil
 import gg.skytils.skytilsmod.utils.Utils
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -81,7 +82,7 @@ object ScamCheck {
             it.uniqueID.version() == 4 && it.name == otherParty
         }?.uniqueID
         Skytils.IO.launch {
-            val uuid = worldUUID ?: runCatching { Skytils.hylinAPI.getUUIDSync(otherParty) }.getOrNull()
+            val uuid = worldUUID ?: runCatching { MojangUtil.getUUIDFromUsername(otherParty) }.getOrNull()
             ?: return@launch UChat.chat("${Skytils.failPrefix} §cUnable to get the UUID for ${otherParty}! Could they be nicked?")
             val result = checkScammer(uuid, "tradewindow")
             if (result.isScammer) {

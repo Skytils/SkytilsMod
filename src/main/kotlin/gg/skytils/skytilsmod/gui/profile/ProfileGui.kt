@@ -38,6 +38,7 @@ import gg.skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import gg.skytils.skytilsmod.gui.profile.components.*
 import gg.skytils.skytilsmod.gui.profile.states.alwaysMap
 import gg.skytils.skytilsmod.gui.profile.states.alwaysUpdateState
+import gg.skytils.skytilsmod.utils.MojangUtil
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
@@ -135,7 +136,7 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, dr
         state.onSetValue { name ->
             println(name)
             Skytils.launch {
-                hylinAPI.getUUID(name).whenComplete { uuidState.set(it) }
+                MojangUtil.getUUIDFromUsername(name)?.let { uuidState.set(it) }
             }
         }
     }

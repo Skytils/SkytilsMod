@@ -80,6 +80,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     }
                 }
             }
+
             "config" -> Skytils.config.openGUI()
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
@@ -88,6 +89,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         .dayOfMonth) % MiningFeatures.fetchurItems.size]
                 )
             )
+
             "griffin" -> if (args.size == 1) {
                 UChat.chat("$prefix §b/skytils griffin <refresh>")
             } else {
@@ -95,9 +97,11 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     "refresh" -> {
                         GriffinBurrows.particleBurrows.clear()
                     }
+
                     else -> UChat.chat("$prefix §b/skytils griffin <refresh>")
                 }
             }
+
             "resettracker" -> if (args.size == 1) {
                 throw WrongUsageException("You need to specify one of [${Tracker.TRACKERS.joinToString(", ") { it.id }}]!")
             } else {
@@ -109,6 +113,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     }]!"
                 )).doReset()
             }
+
             "reload" -> {
                 if (args.size == 1) {
                     UChat.chat("$prefix §b/skytils reload <data/mayor/slayer>")
@@ -124,6 +129,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                                 }
                             }
                         }
+
                         "mayor" -> {
                             Skytils.IO.async {
                                 MayorInfo.fetchMayorData()
@@ -136,6 +142,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                                 }
                             }
                         }
+
                         "slayer" -> {
                             for (entity in mc.theWorld.getEntitiesWithinAABBExcludingEntity(
                                 mc.thePlayer,
@@ -145,10 +152,12 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                                 SlayerFeatures.processSlayerEntity(entity)
                             }
                         }
+
                         else -> UChat.chat("$prefix §b/skytils reload <aliases/data/slayer>")
                     }
                 }
             }
+
             "help" -> if (args.size == 1) {
                 player.addChatMessage(
                     ChatComponentText(
@@ -191,15 +200,18 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 )
                 return
             }
+
             "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen = CommandAliasesGui()
             "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
                 LocationEditGui()
+
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()
             "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> ArmorColorCommand.processCommand(
                 player,
                 args.copyOfRange(1, args.size)
             )
+
             "swaphub" -> {
                 if (Utils.inSkyblock) {
                     Skytils.sendMessageQueue.add("/warpforge")
@@ -209,6 +221,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     }
                 }
             }
+
             "spiritleapnames" -> Skytils.displayScreen = SpiritLeapNamesGui()
             "dev" -> {
                 if (args.size == 1) {
@@ -229,6 +242,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     )
                 }
             }
+
             "enchant" -> Skytils.displayScreen = EnchantNamesGui()
             "update" -> {
                 try {
@@ -257,12 +271,14 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     ex.printStackTrace()
                 }
             }
+
             "updatenow" -> Skytils.displayScreen = UpdateGui(true)
             "updatelater" -> Skytils.displayScreen = UpdateGui(false)
             "ping" -> {
                 Ping.invokedCommand = true
                 Ping.sendPing()
             }
+
             "waypoint", "waypoints" -> Skytils.displayScreen = WaypointsGui()
             "notifications" -> Skytils.displayScreen = CustomNotificationsGui()
             "pv" -> {
@@ -272,21 +288,25 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 } else {
                     // TODO Add some kind of message indicating progress
                     Skytils.IO.launch {
-                        Skytils.hylinAPI.getUUID(args[1]).whenComplete { uuid ->
-                            Skytils.displayScreen = ProfileGui(uuid, args[1])
-                        }.catch { error ->
+                        runCatching {
+                            MojangUtil.getUUIDFromUsername(args[1])
+                        }.onFailure {
                             UChat.chat("$failPrefix §cError finding player!")
-                            error.printStackTrace()
+                            it.printStackTrace()
+                        }.getOrNull()?.let { uuid ->
+                            Skytils.displayScreen = ProfileGui(uuid, args[1])
                         }
                     }
                 }
             }
+
             "pricepaid" -> {
                 val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer?.heldItem) ?: return
                 PricePaid.prices[UUID.fromString(extraAttr.getString("uuid").ifEmpty { return })] =
                     args[1].toDoubleOrNull() ?: return
                 PersistentSave.markDirty<PricePaid>()
             }
+
             else -> UChat.chat("$failPrefix §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
         }
     }

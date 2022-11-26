@@ -56,23 +56,25 @@ object PartyFinderStats {
             val username = match.groups["name"]?.value ?: return
             if (username == mc.thePlayer.name) return
             Skytils.launch {
-                Skytils.hylinAPI.getUUID(username).whenComplete { uuid ->
-                    Skytils.hylinAPI.getLatestSkyblockProfileForMember(uuid).whenComplete { profile ->
-                        profile?.run { playerStats(username, uuid, this) }
-                    }.catch { e ->
-                        e.printStackTrace()
-                        UChat.chat(
-                            "$failPrefix §cUnable to retrieve profile information: ${
-                                e.message?.replace(
-                                    Skytils.config.apiKey,
-                                    "*".repeat(Skytils.config.apiKey.length)
-                                )
-                            }"
-                        )
-                    }
-                }.catch { e ->
+                val uuid = try {
+                    MojangUtil.getUUIDFromUsername(username)
+                } catch (e: MojangUtil.MojangException) {
                     e.printStackTrace()
                     UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
+                    return@launch
+                } ?: return@launch
+                Skytils.hylinAPI.getLatestSkyblockProfileForMember(uuid).whenComplete { profile ->
+                    profile?.run { playerStats(username, uuid, this) }
+                }.catch { e ->
+                    e.printStackTrace()
+                    UChat.chat(
+                        "$failPrefix §cUnable to retrieve profile information: ${
+                            e.message?.replace(
+                                Skytils.config.apiKey,
+                                "*".repeat(Skytils.config.apiKey.length)
+                            )
+                        }"
+                    )
                 }
             }
         }

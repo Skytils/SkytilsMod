@@ -22,11 +22,11 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.BaseCommand
+import gg.skytils.skytilsmod.utils.MojangUtil
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import skytils.hylin.mojang.AshconException
 import skytils.hylin.request.HypixelAPIException
 import skytils.hylin.skyblock.Member
 import java.util.*
@@ -53,8 +53,8 @@ abstract class StatCommand(
             val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
             printMessage("§aGetting data for ${username}...")
             val uuid = try {
-                (if (args.isEmpty()) mc.thePlayer.uniqueID else Skytils.hylinAPI.getUUIDSync(username))
-            } catch (e: AshconException) {
+                (if (args.isEmpty()) mc.thePlayer.uniqueID else MojangUtil.getUUIDFromUsername(username))
+            } catch (e: MojangUtil.MojangException) {
                 printMessage("$failPrefix §cFailed to get UUID, reason: ${e.message}")
                 return@launch
             } ?: return@launch

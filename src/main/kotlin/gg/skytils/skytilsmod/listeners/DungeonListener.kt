@@ -250,9 +250,7 @@ object DungeonListener {
                     for (teammate in team.values) {
                         val name = teammate.playerName
                         if (hutaoFans.getIfPresent(name) != null) continue
-                        val uuid = teammate.player?.uniqueID ?: Skytils.hylinAPI.getUUIDSync(
-                            name
-                        )
+                        val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
                         val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
                             uuid
                         ) ?: continue
