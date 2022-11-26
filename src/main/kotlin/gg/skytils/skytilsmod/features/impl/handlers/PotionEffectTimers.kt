@@ -48,13 +48,13 @@ import kotlin.collections.component2
 import kotlin.collections.set
 
 object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTimers.json")) {
-    val effectMenuTitle = Regex("^(?:\\((?<currPage>\\d+)\\/(?<lastPage>\\d+)\\) )?Active Effects\$")
-    val duration =
+    private val effectMenuTitle = Regex("^(?:\\((?<currPage>\\d+)\\/(?<lastPage>\\d+)\\) )?Active Effects\$")
+    private val duration =
         Regex("(?:§7Remaining: §f(?:(?<hours>\\d+):)?(?:(?<minutes>\\d+):)(?<seconds>\\d+)|(?<infinite>§cInfinite))")
     val potionEffectTimers = hashMapOf<String, PotionEffectTimer>()
     val notifications = hashMapOf<String, Long>()
-    var shouldReadEffects = false
-    var neededPage = 1
+    private var shouldReadEffects = false
+    private var neededPage = 1
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.ReceiveEvent) {
@@ -89,7 +89,6 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
             }
             val isEnding = effect.tick()
             if (isEnding) {
-                GuiManager.createTitle("§c${effect.potionName} has worn off!", 40)
                 UChat.chat("${Skytils.prefix} §c${effect.potionName} has worn off!")
             }
 
