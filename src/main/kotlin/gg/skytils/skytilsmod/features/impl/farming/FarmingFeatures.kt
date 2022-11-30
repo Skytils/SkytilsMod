@@ -27,6 +27,7 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.GuiChat
@@ -41,7 +42,7 @@ import org.lwjgl.input.Mouse
 
 object FarmingFeatures {
     val hungerHikerItems = LinkedHashMap<String, String>()
-    var trapperStart = -1.0
+    var trapperCooldownExpire = -1L
     var animalFound = false
     var acceptTrapperCommand = ""
 
@@ -67,13 +68,14 @@ object FarmingFeatures {
         }
         if (Skytils.config.trapperPing) {
             if (unformatted.startsWith("[NPC] Trevor The Trapper: You can find your")) {
-                trapperStart = System.currentTimeMillis().toDouble()
+                trapperCooldownExpire = System.currentTimeMillis() +
+                        if (MayorInfo.currentMayor == "Finnegan") 30000 else 60000
                 animalFound = false
             } else if (unformatted.startsWith("Return to the Trapper soon to get a new animal to hunt!")) {
-                if (trapperStart > 0 && System.currentTimeMillis() - trapperStart > 30000) { //30 seconds cooldown
+                if (trapperCooldownExpire > 0 && System.currentTimeMillis() > trapperCooldownExpire) {
                     Utils.playLoudSound("note.pling", 1.0)
                     UChat.chat("$prefix §bTrapper cooldown has already expired!")
-                    trapperStart = -1.0
+                    trapperCooldownExpire = -1
                 }
                 animalFound = true
             }
@@ -156,9 +158,9 @@ object FarmingFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
-        if (trapperStart > 0 && mc.thePlayer != null) {
-            if (System.currentTimeMillis() - trapperStart > 30000 && animalFound) { //30 seconds cooldown
-                trapperStart = -1.0
+        if (trapperCooldownExpire > 0 && mc.thePlayer != null) {
+            if (System.currentTimeMillis() > trapperCooldownExpire && animalFound) {
+                trapperCooldownExpire = -1
                 UChat.chat("$prefix §bTrapper cooldown has now expired!")
                 for (i in 0..4) {
                     SoundQueue.addToQueue(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
@@ -169,7 +171,7 @@ object FarmingFeatures {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        trapperStart = -1.0
+        trapperCooldownExpire = -1
     }
 
     @SubscribeEvent
