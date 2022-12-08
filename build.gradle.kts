@@ -118,7 +118,7 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.1.3"))
+    shadowMe(platform("io.ktor:ktor-bom:2.2.1"))
     shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
