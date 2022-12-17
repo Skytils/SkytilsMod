@@ -2107,21 +2107,6 @@ object Config : Vigilant(
     var openMaddoxMenu = false
 
     @Property(
-        type = PropertyType.SELECTOR, name = "Carry Mode",
-        description = "Allow middle clicking to set your local LappySheep's slayer boss.\nDisable this if you are doing your own boss.",
-        category = "Slayer", subcategory = "General",
-        options = ["Off", "T1", "T2", "T3", "T4", "T5"]
-    )
-    var slayerCarryMode = 0
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Use Hits to Detect Slayer",
-        description = "Finds your slayer based on the one you hit the most.",
-        category = "Slayer", subcategory = "General"
-    )
-    var useSlayerHitMethod = true
-
-    @Property(
         type = PropertyType.SWITCH, name = "Ping when in Atoned Horror Danger Zone",
         description = "Pings when you are standing on the Atoned Horror's TNT target.",
         category = "Slayer", subcategory = "Quality of Life"

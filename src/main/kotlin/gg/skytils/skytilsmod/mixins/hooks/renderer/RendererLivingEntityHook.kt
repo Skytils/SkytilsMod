@@ -19,8 +19,8 @@ package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
-import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures
-import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures.slayer
+import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
+import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures.slayer
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
