@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.mixins.transformers.crash;
 
 import gg.skytils.skytilsmod.mixins.hooks.crash.CrashReportHook;
+import gg.skytils.skytilsmod.mixins.interfaces.IMCrashReport;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import org.spongepowered.asm.mixin.Final;
@@ -33,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(value = CrashReport.class, priority = 988)
-public abstract class MixinCrashReport {
+public abstract class MixinCrashReport implements IMCrashReport {
 
     @Shadow
     @Final
@@ -61,5 +62,10 @@ public abstract class MixinCrashReport {
     @Inject(method = "populateEnvironment", at = @At("RETURN"))
     private void addDataToCrashReport(CallbackInfo ci) {
         hook.addDataToCrashReport(theReportCategory);
+    }
+
+    @Override
+    public CrashReportHook getSkytilsHook() {
+        return hook;
     }
 }

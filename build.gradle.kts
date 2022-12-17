@@ -124,6 +124,10 @@ dependencies {
     shadowMe("io.ktor:ktor-client-cio-jvm")
     shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
 
+    shadowMe(platform("io.sentry:sentry-bom:6.10.0"))
+    shadowMe("io.sentry:sentry")
+    shadowMe("io.sentry:sentry-log4j2")
+
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
@@ -203,6 +207,11 @@ tasks {
             "fabric.mod.json"
         )
         mergeServiceFiles()
+
+
+        if (!project.hasProperty("isRelease")) {
+            exclude("yesThisIsASkytilsRelease")
+        }
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"

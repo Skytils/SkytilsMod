@@ -32,7 +32,8 @@ import org.spongepowered.asm.mixin.transformer.meta.MixinMerged
 
 class CrashReportHook(private val crash: CrashReport) {
 
-    private var isSkytilsCrash = false
+    var isSkytilsCrash = false
+        private set
 
     fun checkSkytilsCrash(cir: CallbackInfoReturnable<String>, stringbuilder: StringBuilder) {
         runCatching {

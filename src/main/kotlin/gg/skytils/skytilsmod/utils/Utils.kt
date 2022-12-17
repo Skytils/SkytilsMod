@@ -35,6 +35,7 @@ import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
+import io.sentry.Sentry
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.gui.ChatLine
@@ -390,4 +391,9 @@ fun <T> List<T>.elementPairs() = sequence {
     for (i in 0 until arr.size - 1)
         for (j in i + 1 until arr.size)
             yield(arr[i] to arr[j])
+}
+
+fun Throwable.printAndCapture() {
+    this.printStackTrace()
+    Sentry.captureException(this)
 }

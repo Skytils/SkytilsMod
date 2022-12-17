@@ -21,11 +21,12 @@ package gg.skytils.skytilsmod.mixins.transformers;
 import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.core.GuiManager;
 import gg.skytils.skytilsmod.utils.ItemUtil;
+import gg.skytils.skytilsmod.utils.SentryHandler;
 import gg.skytils.skytilsmod.utils.Utils;
-import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.crash.CrashReport;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.spongepowered.asm.mixin.Mixin;
@@ -67,5 +68,10 @@ public abstract class MixinMinecraft {
                 Skytils.sendMessageQueue.add("/undozap");
             }
         }
+    }
+
+    @Inject(method = "displayCrashReport", at = @At("HEAD"))
+    private void displayCrashReport(CrashReport cr, CallbackInfo ci) {
+        SentryHandler.handleCrashReport(cr);
     }
 }

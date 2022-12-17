@@ -32,6 +32,7 @@ import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import gg.skytils.skytilsmod.utils.SentryHandler
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
@@ -95,6 +96,13 @@ object Config : Vigilant(
         hidden = true
     )
     var lastLaunchedVersion = "0"
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Send Debug Info",
+        description = "Automatically sends debug information through Sentry. Info is handled by Sentry according to https://sentry.io/privacy/\nRestart required to apply changes.",
+        category = "General", subcategory = "Other"
+    )
+    var autoSendDebugInfo = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Config Button on Pause",
@@ -2814,6 +2822,15 @@ object Config : Vigilant(
 
         registerListener("apiKey") { key: String ->
             Skytils.hylinAPI.key = key
+        }
+
+        registerListener("autoSendDebugInfo") { state: Boolean ->
+            if (state) {
+                SentryHandler.analyicsCheckFile.delete()
+            } else {
+                SentryHandler.analyicsCheckFile.parentFile.mkdirs()
+                SentryHandler.analyicsCheckFile.createNewFile()
+            }
         }
     }
 

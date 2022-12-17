@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import gg.skytils.skytilsmod.Reference;
+import gg.skytils.skytilsmod.utils.SentryHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 
@@ -102,5 +103,7 @@ public class EssentialPlatformSetup {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
+        SentryHandler.init();
     }
 }
