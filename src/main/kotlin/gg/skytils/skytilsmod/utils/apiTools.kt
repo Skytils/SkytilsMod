@@ -159,6 +159,6 @@ object BlockPosObjectSerializer : KSerializer<BlockPos> {
 
 object UUIDAsString : KSerializer<UUID> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
-    override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString().toDashedUUID())
     override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
 }
