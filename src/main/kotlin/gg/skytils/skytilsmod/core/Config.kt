@@ -1252,6 +1252,13 @@ object Config : Vigilant(
     var twitchFix = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Free Slots Display",
+        description = "Displays the Amount of free slots in your inventory.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var freeSlotsDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Price Paid",
         description = "Records and shows the price you paid for certain items.",
         category = "Miscellaneous", subcategory = "Items"
