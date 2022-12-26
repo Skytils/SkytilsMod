@@ -202,7 +202,7 @@ object PartyFinderStats {
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
                                 buildString {
                                     for (i in 1..highestFloor) {
-                                        append("§2§l●§a ")
+                                        append("§c§l●§4 ")
                                         append("Floor $i: ")
                                         append("§e")
                                         if (i in masterCompletionObj) {
