@@ -18,12 +18,18 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons
 
+import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.structure.FloatPair
+import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.bindColor
+import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,10 +37,42 @@ import org.lwjgl.opengl.GL11
 import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object TankDisplayStuff {
+    var tankNearbyMsg = "§7Unknown"
+
+    init {
+        NearbyTankDisplay()
+    }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons) return
+        if (Skytils.config.nearbyTankDisplay) {
+            tankNearbyMsg = if (DungeonListener.team.values.find {
+                    it.player == mc.thePlayer
+                }?.dungeonClass == DungeonClass.TANK) {
+                "§aYou"
+            } else if (DungeonListener.team.values.any {
+                    it.player != mc.thePlayer && DungeonClass.TANK == it.dungeonClass
+                }) {
+                val tanks = DungeonListener.team.values.filter {
+                    it.player != mc.thePlayer && DungeonClass.TANK == it.dungeonClass
+                }
+                if (DungeonListener.deads.containsAll(tanks)) {
+                    "§cDead"
+                } else {
+                    var foundNearby = false
+                    for (teammate in tanks) {
+                        val tank = teammate.player ?: continue
+                        if (tank.getDistanceToEntity(mc.thePlayer) <= 30) {
+                            foundNearby = true
+                            break
+                        }
+                    }
+                    if (foundNearby) "§aNearby" else "§cFar Away"
+                }
+            } else "§cMissing"
+        }
+
         for (teammate in DungeonListener.team.values) {
             val player = teammate.player ?: continue
             if (!teammate.canRender()) continue
@@ -106,15 +144,54 @@ object TankDisplayStuff {
                     GlStateManager.disableCull()
                     GlStateManager.disableDepth()
                     RenderUtil.drawOutlinedBoundingBox(
-                        player.entityBoundingBox,
-                        Skytils.config.boxedProtectedTeammatesColor,
-                        2f,
-                        1f
+                        player.entityBoundingBox, Skytils.config.boxedProtectedTeammatesColor, 2f, 1f
                     )
                     GlStateManager.enableDepth()
                     GlStateManager.enableCull()
                 }
             }
+        }
+    }
+
+    class NearbyTankDisplay : GuiElement("Nearby Tank Display", FloatPair(0.25f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inDungeons) {
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+
+                ScreenRenderer.fontRenderer.drawString(
+                    "§aTank: $tankNearbyMsg",
+                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§aTank: Nearby",
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                SmartFontRenderer.TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§aTank: Nearby")
+        override val toggled: Boolean
+            get() = Skytils.config.nearbyTankDisplay
+
+        init {
+            Skytils.guiManager.registerElement(this)
         }
     }
 }

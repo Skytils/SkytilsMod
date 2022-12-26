@@ -784,6 +784,13 @@ object Config : Vigilant(
     var lividFinderType = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Display Tank Nearby",
+        description = "Shows if a tank is nearby.",
+        category = "Dungeons", subcategory = "Tank Helper Tools"
+    )
+    var nearbyTankDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Boxed Tanks",
         description = "Shows the bounding box of all tanks through walls.",
         category = "Dungeons", subcategory = "Tank Helper Tools"
