@@ -90,12 +90,14 @@ object ItemFeatures {
     var lowSoulFlowPinged = false
     var lastShieldUse = -1L
     var lastShieldClick = 0L
+    var freeSlots = -1
 
     init {
         SelectedArrowDisplay()
         StackingEnchantDisplay()
         SoulflowGuiElement()
         WitherShieldDisplay()
+        FreeSlotsDisplay()
     }
 
     val interactables = setOf(
@@ -146,6 +148,9 @@ object ItemFeatures {
                     for (i in 0..8) {
                         hotbarRarityCache[i] = ItemUtil.getRarity(mc.thePlayer.inventory.mainInventory[i])
                     }
+                }
+                if (Skytils.config.freeSlotsDisplay) {
+                    freeSlots = mc.thePlayer.inventory.mainInventory.count { it == null }
                 }
                 if (Skytils.config.stackingEnchantProgressDisplay) {
                     apply {
@@ -909,6 +914,49 @@ object ItemFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("§6Shield: §aREADY")
         override val toggled: Boolean
             get() = Skytils.config.witherShieldCooldown
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    class FreeSlotsDisplay : GuiElement("Free Slots Display", FloatPair(0.75f, 0.85f)) {
+        override fun render() {
+            if (toggled && Utils.inSkyblock) {
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                val color = if (freeSlots <= 3) "§c" else if (freeSlots <= 8) "§e" else "§a"
+
+                ScreenRenderer.fontRenderer.drawString(
+                    "§aFree Slots: ${if (freeSlots == -1) "§7?" else "$color$freeSlots"}",
+                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    TextShadow.NORMAL
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val alignment =
+                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "§aFree Slots: 10",
+                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                TextShadow.NORMAL
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§aFree Slots: 10")
+        override val toggled: Boolean
+            get() = Skytils.config.freeSlotsDisplay
 
         init {
             Skytils.guiManager.registerElement(this)
