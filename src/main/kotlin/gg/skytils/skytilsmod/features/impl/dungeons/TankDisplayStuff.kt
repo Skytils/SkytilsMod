@@ -44,6 +44,7 @@ object TankDisplayStuff {
         FAR,
         MISSING
     }
+
     var tankStatus = TankStatus.MISSING
 
     init {
@@ -161,15 +162,15 @@ object TankDisplayStuff {
 
     class NearbyTankDisplay : GuiElement("Nearby Tank Display", FloatPair(0.25f, 0.85f)) {
         override fun render() {
-            if (toggled && Utils.inDungeons && !Utils.equalsOneOf(tankStatus, TankStatus.MISSING, TankStatus.PLAYER)) {
-                val alignment =
-                    if (actualX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+            if (toggled && Utils.inDungeons) {
                 val status = when (tankStatus) {
                     TankStatus.DEAD -> "§cDead"
                     TankStatus.NEARBY -> "§aNearby"
                     TankStatus.FAR -> "§eFar Away"
-                    else -> "§7Unknown"
+                    TankStatus.PLAYER, TankStatus.MISSING -> return
                 }
+                val alignment =
+                    if (actualX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
 
                 ScreenRenderer.fontRenderer.drawString(
                     "§aTank: $status",
