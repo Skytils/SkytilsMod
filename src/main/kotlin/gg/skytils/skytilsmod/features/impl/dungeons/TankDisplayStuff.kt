@@ -37,7 +37,14 @@ import org.lwjgl.opengl.GL11
 import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object TankDisplayStuff {
-    var tankNearbyMsg = "§7Unknown"
+    enum class TankStatus() {
+        PLAYER,
+        DEAD,
+        NEARBY,
+        FAR,
+        MISSING
+    }
+    var tankStatus = TankStatus.MISSING
 
     init {
         NearbyTankDisplay()
@@ -47,19 +54,18 @@ object TankDisplayStuff {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons) return
         if (Skytils.config.nearbyTankDisplay) {
-            tankNearbyMsg = if (DungeonListener.team.values.find {
+            tankStatus = if (DungeonListener.team.values.find {
                     it.player == mc.thePlayer
                 }?.dungeonClass == DungeonClass.TANK) {
-                "§aYou"
+                TankStatus.PLAYER
             } else if (DungeonListener.team.values.any {
                     it.player != mc.thePlayer && DungeonClass.TANK == it.dungeonClass
                 }) {
                 val tanks = DungeonListener.team.values.filter {
                     it.player != mc.thePlayer && DungeonClass.TANK == it.dungeonClass
                 }
-                if (DungeonListener.deads.containsAll(tanks)) {
-                    "§cDead"
-                } else {
+                if (DungeonListener.deads.containsAll(tanks)) TankStatus.DEAD
+                else {
                     var foundNearby = false
                     for (teammate in tanks) {
                         val tank = teammate.player ?: continue
@@ -68,9 +74,9 @@ object TankDisplayStuff {
                             break
                         }
                     }
-                    if (foundNearby) "§aNearby" else "§cFar Away"
+                    if (foundNearby) TankStatus.NEARBY else TankStatus.FAR
                 }
-            } else "§cMissing"
+            } else TankStatus.MISSING
         }
 
         for (teammate in DungeonListener.team.values) {
@@ -155,12 +161,18 @@ object TankDisplayStuff {
 
     class NearbyTankDisplay : GuiElement("Nearby Tank Display", FloatPair(0.25f, 0.85f)) {
         override fun render() {
-            if (toggled && Utils.inDungeons) {
+            if (toggled && Utils.inDungeons && !Utils.equalsOneOf(tankStatus, TankStatus.MISSING, TankStatus.PLAYER)) {
                 val alignment =
                     if (actualX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
+                val status = when (tankStatus) {
+                    TankStatus.DEAD -> "§cDead"
+                    TankStatus.NEARBY -> "§aNearby"
+                    TankStatus.FAR -> "§eFar Away"
+                    else -> "§7Unknown"
+                }
 
                 ScreenRenderer.fontRenderer.drawString(
-                    "§aTank: $tankNearbyMsg",
+                    "§aTank: $status",
                     if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                     0f,
                     CommonColors.WHITE,
