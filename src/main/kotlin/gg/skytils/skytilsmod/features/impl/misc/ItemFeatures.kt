@@ -90,7 +90,7 @@ object ItemFeatures {
     var lowSoulFlowPinged = false
     var lastShieldUse = -1L
     var lastShieldClick = 0L
-    var freeSlots = -1
+    var freeSlots = 0
 
     init {
         SelectedArrowDisplay()
@@ -928,7 +928,7 @@ object ItemFeatures {
                 val color = if (freeSlots <= 3) "§c" else if (freeSlots <= 8) "§e" else "§a"
 
                 ScreenRenderer.fontRenderer.drawString(
-                    "§aFree Slots: ${if (freeSlots == -1) "§7?" else "$color$freeSlots"}",
+                    "§aFree Slots: $color$freeSlots",
                     if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                     0f,
                     CommonColors.WHITE,
