@@ -132,6 +132,13 @@ object Config : Vigilant(
     var guildLeaveConfirmation = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Multiple Party Invites Fix",
+        description = "§b[WIP] Tries to fix the ghost party issue when inviting multiple in one command.",
+        category = "General", subcategory = "Hypixel"
+    )
+    var multiplePartyInviteFix = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Auto-Accept Reparty",
         description = "Automatically accepts reparty invites",
         category = "General", subcategory = "Reparty"
@@ -190,8 +197,8 @@ object Config : Vigilant(
     var dungeonDeathCounter = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "§b[WIP] §rParty Finder Stats",
-        description = "Displays Stats about a Player who joined.",
+        type = PropertyType.SWITCH, name = "Party Finder Stats",
+        description = "§b[WIP] Displays Stats about a Player who joined.",
         category = "Dungeons", subcategory = "Party Finder"
     )
     var partyFinderStats = false
@@ -1063,6 +1070,13 @@ object Config : Vigilant(
     var trapperPing = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Talbot's Theodolite Helper",
+        description = "Shows Y coordinate bounds based on Talbot's Theodolite output",
+        category = "Farming", subcategory = "Quality of Life"
+    )
+    var talbotsTheodoliteHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.",
         category = "Mining", subcategory = "Quality of Life"
@@ -1280,7 +1294,7 @@ object Config : Vigilant(
     var disableBlockAnimation = false
 
     @Property(
-        type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Scale",
+        type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Size",
         description = "Change the size of dropped items.",
         category = "Miscellaneous", subcategory = "Items",
         maxF = 5f,
@@ -1327,7 +1341,7 @@ object Config : Vigilant(
     var starDisplayType = 0
 
     @Property(
-        type = PropertyType.DECIMAL_SLIDER, name = "Larger Heads",
+        type = PropertyType.DECIMAL_SLIDER, name = "Head Display Size",
         description = "Change the size of heads in your inventory.",
         category = "Miscellaneous", subcategory = "Items",
         maxF = 2f,
@@ -1498,7 +1512,7 @@ object Config : Vigilant(
     var showPetRarity = false
 
     @Property(
-        type = PropertyType.PERCENT_SLIDER, name = "Item Rarity Opacity",
+        type = PropertyType.PERCENT_SLIDER, name = "Item Rarity Transparency",
         description = "How opaque the rarity color will be",
         category = "Miscellaneous", subcategory = "Item Rarity"
     )
@@ -1661,7 +1675,7 @@ object Config : Vigilant(
     var transparentArmorLayer = 1f
 
     @Property(
-        type = PropertyType.PERCENT_SLIDER, name = "Transparent Head Layer",
+        type = PropertyType.PERCENT_SLIDER, name = "Head Layer Transparency",
         description = "Changes the transparency of your head layer.",
         category = "Miscellaneous", subcategory = "Other"
     )
@@ -2830,18 +2844,6 @@ object Config : Vigilant(
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
                 !ver.isSafe || ver < UpdateChecker.SkytilsVersion("1.2-pre3") || Skytils.config.lastLaunchedVersion == "0" -> {
-                    if (largerHeadScale > 2) {
-                        largerHeadScale /= 100
-                    }
-                    if (itemDropScale > 5) {
-                        itemDropScale /= 100f
-                    }
-                    if (itemRarityOpacity > 1) {
-                        itemRarityOpacity /= 100f
-                    }
-                    if (transparentHeadLayer > 1) {
-                        transparentHeadLayer /= 100f
-                    }
                     if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
                         GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
                         PersistentSave.markDirty<GuiManager>()

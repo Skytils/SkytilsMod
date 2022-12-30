@@ -27,6 +27,7 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.GuiChat
@@ -41,9 +42,14 @@ import org.lwjgl.input.Mouse
 
 object FarmingFeatures {
     val hungerHikerItems = LinkedHashMap<String, String>()
-    var trapperStart = -1.0
+    var trapperCooldownExpire = -1L
     var animalFound = false
     var acceptTrapperCommand = ""
+
+    private val targetHeightRegex =
+        Regex("^The target is around (?<blocks>\\d+) blocks (?<type>above|below), at a (?<angle>\\d+) degrees angle!$")
+    var targetMinY = 0
+    var targetMaxY = 0
 
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
@@ -62,15 +68,47 @@ object FarmingFeatures {
         }
         if (Skytils.config.trapperPing) {
             if (unformatted.startsWith("[NPC] Trevor The Trapper: You can find your")) {
-                trapperStart = System.currentTimeMillis().toDouble()
+                trapperCooldownExpire = System.currentTimeMillis() +
+                        if (MayorInfo.currentMayor == "Finnegan") 30000 else 60000
                 animalFound = false
             } else if (unformatted.startsWith("Return to the Trapper soon to get a new animal to hunt!")) {
-                if (trapperStart > 0 && System.currentTimeMillis() - trapperStart > 60000) { //1 minute cooldown
+                if (trapperCooldownExpire > 0 && System.currentTimeMillis() > trapperCooldownExpire) {
                     Utils.playLoudSound("note.pling", 1.0)
                     UChat.chat("$prefix §bTrapper cooldown has already expired!")
-                    trapperStart = -1.0
+                    trapperCooldownExpire = -1
                 }
                 animalFound = true
+            }
+        }
+        if (Skytils.config.talbotsTheodoliteHelper) {
+            if (unformatted.startsWith("[NPC] Trevor The Trapper: You can find your")) {
+                targetMinY = -1
+                targetMaxY = -1
+            } else if (unformatted.startsWith("You are at the exact height!")) {
+                targetMinY = mc.thePlayer.posY.toInt();
+                targetMaxY = mc.thePlayer.posY.toInt();
+            } else {
+                val match = targetHeightRegex.find(unformatted);
+                if (match != null) {
+                    val blocks = match.groups["blocks"]!!.value.toInt()
+                    val below = match.groups["type"]!!.value == "below"
+                    val y = mc.thePlayer.posY.toInt() + blocks * if (below) -1 else 1
+                    val filler = if (blocks == 5) 2 else 0
+                    val minY = y - 2 - if (below) 0 else filler
+                    val maxY = y + 2 + if (below) filler else 0
+
+                    if (minY <= targetMaxY && maxY >= targetMinY) {
+                        targetMinY = minY.coerceAtLeast(targetMinY)
+                        targetMaxY = maxY.coerceAtMost(targetMaxY);
+                    } else {
+                        targetMinY = minY;
+                        targetMaxY = maxY;
+                    }
+
+                    UChat.chat("§r§aThe target is at §6Y §r§e$targetMinY${if (targetMinY != targetMaxY) "-$targetMaxY" else ""} §7($blocks blocks ${match.groups["type"]!!.value}, ${match.groups["angle"]!!.value} angle)")
+
+                    event.isCanceled = true
+                }
             }
         }
 
@@ -120,10 +158,10 @@ object FarmingFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
-        if (trapperStart > 0 && mc.thePlayer != null) {
-            if (System.currentTimeMillis() - trapperStart > 60000 && animalFound) { //1 minute cooldown
-                trapperStart = -1.0
-                UChat.chat("§dSkytils: Trapper cooldown has now expired!")
+        if (trapperCooldownExpire > 0 && mc.thePlayer != null) {
+            if (System.currentTimeMillis() > trapperCooldownExpire && animalFound) {
+                trapperCooldownExpire = -1
+                UChat.chat("$prefix §bTrapper cooldown has now expired!")
                 for (i in 0..4) {
                     SoundQueue.addToQueue(SoundQueue.QueuedSound("note.pling", 1f, ticks = i * 4, isLoud = true))
                 }
@@ -133,7 +171,7 @@ object FarmingFeatures {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        trapperStart = -1.0
+        trapperCooldownExpire = -1
     }
 
     @SubscribeEvent
