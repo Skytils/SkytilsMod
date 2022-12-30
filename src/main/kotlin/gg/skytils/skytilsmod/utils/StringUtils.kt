@@ -32,6 +32,7 @@ fun CharSequence?.containsAny(vararg sequences: CharSequence?): Boolean {
 }
 
 fun String.toDashedUUID(): String {
+    if (this.length != 32) return this
     return buildString {
         append(this@toDashedUUID)
         insert(20, "-")

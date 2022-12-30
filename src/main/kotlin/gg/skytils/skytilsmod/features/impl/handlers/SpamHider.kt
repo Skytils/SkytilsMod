@@ -133,7 +133,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         // Regular
         "A Squid appeared.",
         "You caught a Sea Walker.",
-        "Pitch darkness reveals you've caught a Night Squid.",
+        "Pitch darkness reveals a Night Squid.",
         "You stumbled upon a Sea Guardian.",
         "It looks like you've disrupted the Sea Witch's brewing session. Watch out, she's furious!",
         "You reeled in a Sea Archer.",
