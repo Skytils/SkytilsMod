@@ -132,6 +132,13 @@ object Config : Vigilant(
     var guildLeaveConfirmation = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Multiple Party Invites Fix",
+        description = "§b[WIP] Tries to fix the ghost party issue when inviting multiple in one command.",
+        category = "General", subcategory = "Hypixel"
+    )
+    var multiplePartyInviteFix = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Auto-Accept Reparty",
         description = "Automatically accepts reparty invites",
         category = "General", subcategory = "Reparty"

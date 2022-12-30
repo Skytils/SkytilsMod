@@ -25,9 +25,29 @@ import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyFeatures {
+    private val subCommands =
+        setOf(
+            "help",
+            "list",
+            "leave",
+            "warp",
+            "disband",
+            "promote",
+            "demote",
+            "transfer",
+            "kick",
+            "kickoffline",
+            "settings",
+            "poll",
+            "mute",
+            "challenge",
+            "answer",
+            "join"
+        )
+
     @SubscribeEvent
     fun onChatSend(event: SendChatMessageEvent) {
-        if (!Utils.isOnHypixel) return
+        if (!Skytils.config.multiplePartyInviteFix || !Utils.isOnHypixel || !event.addToChat) return
 
         val m = event.message
         if (!m.startsWith("/p ") && !m.startsWith("/party ")) return
@@ -36,12 +56,14 @@ object PartyFeatures {
         if (args.isEmpty()) return
 
         val subcommand = args.removeFirstOrNull() ?: return
-        // I'm not trying to make a list of every single command that's posisble to determine whether it's a name
-        if (subcommand != "invite" && subcommand != "i") return
+        if (subCommands.contains(subcommand)) return
+        if (subcommand != "invite")
+            args.add(0, subcommand)
+
         args.forEach {
             Skytils.sendMessageQueue.add("/p invite $it")
         }
-        
+
         event.isCanceled = true
         mc.ingameGUI.chatGUI.addToSentMessages(m)
 
