@@ -35,9 +35,9 @@ import java.util.*
 
 object FragBotCommand : BaseCommand("fragbot") {
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
-        mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
         Skytils.IO.launch {
+            val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
+            mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
             val response =
                 client.get("https://${Skytils.domain}/api/fragbots/get?uuid=${player.uniqueID}&username=${player.name}&serverId=${serverId}") {
                     expectSuccess = false
