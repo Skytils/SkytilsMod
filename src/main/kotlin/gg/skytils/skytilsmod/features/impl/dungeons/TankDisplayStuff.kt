@@ -65,18 +65,11 @@ object TankDisplayStuff {
                 val tanks = DungeonListener.team.values.filter {
                     it.player != mc.thePlayer && DungeonClass.TANK == it.dungeonClass
                 }
-                if (DungeonListener.deads.containsAll(tanks)) TankStatus.DEAD
-                else {
-                    var foundNearby = false
-                    for (teammate in tanks) {
-                        val tank = teammate.player ?: continue
-                        if (tank.getDistanceToEntity(mc.thePlayer) <= 30) {
-                            foundNearby = true
-                            break
-                        }
-                    }
-                    if (foundNearby) TankStatus.NEARBY else TankStatus.FAR
-                }
+                if (DungeonListener.deads.containsAll(tanks)) {
+                    TankStatus.DEAD
+                } else if (tanks.any { it.player?.getDistanceToEntity(mc.thePlayer)!! <= 30 }) {
+                    TankStatus.NEARBY
+                } else TankStatus.FAR
             } else TankStatus.MISSING
         }
 
