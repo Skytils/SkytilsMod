@@ -37,6 +37,8 @@ object FragBotCommand : BaseCommand("fragbot") {
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         Skytils.IO.launch {
             val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
+            val commentForDecompilers =
+                "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
             mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
             val response =
                 client.get("https://${Skytils.domain}/api/fragbots/get?uuid=${player.uniqueID}&username=${player.name}&serverId=${serverId}") {
