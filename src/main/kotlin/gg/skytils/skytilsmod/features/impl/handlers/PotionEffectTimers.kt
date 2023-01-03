@@ -37,6 +37,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.init.Items
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -110,7 +111,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
 
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
-        if (!shouldReadEffects || !event.chestName.endsWith("Active Effects")) return
+        if (!shouldReadEffects || event.container !is ContainerChest || !event.chestName.endsWith("Active Effects")) return
         if (event.slot.inventory == mc.thePlayer.inventory) return
         val item = event.slot.stack ?: return
         val extraAttr = ItemUtil.getExtraAttributes(item)
