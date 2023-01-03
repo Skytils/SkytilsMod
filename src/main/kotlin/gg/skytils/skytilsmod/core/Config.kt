@@ -1634,7 +1634,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Scam Check",
-        description = "Check if the other party is a known scammer when trading.\nThis relies on a database and may not contain all scammers.",
+        description = "Check if the other party is a known scammer when trading.\nThis relies on databases not controlled by Skytils and may not contain all scammers.",
         category = "Miscellaneous", subcategory = "Other"
     )
     var scamCheck = false
