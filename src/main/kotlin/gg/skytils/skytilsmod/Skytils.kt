@@ -101,7 +101,7 @@ import java.util.concurrent.ThreadPoolExecutor
 import kotlin.coroutines.CoroutineContext
 
 @Mod(
-    modid = Skytils.MODID,
+    modid = Skytils.MOD_ID,
     name = Skytils.MOD_NAME,
     version = Skytils.VERSION,
     acceptedMinecraftVersions = "[1.8.9]",
@@ -110,7 +110,7 @@ import kotlin.coroutines.CoroutineContext
 class Skytils {
 
     companion object : CoroutineScope {
-        const val MODID = Reference.MODID
+        const val MOD_ID = Reference.MOD_ID
         const val MOD_NAME = Reference.MOD_NAME
         const val VERSION = Reference.VERSION
 
