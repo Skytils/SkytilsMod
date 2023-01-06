@@ -204,6 +204,20 @@ object Config : Vigilant(
     var partyFinderStats = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Party Finder Armor Display",
+        description = "Toggles player armour display in party finder stats.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderArmor = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Party Finder Floor Completions Display",
+        description = "Toggles catacombs floor completions display in party finder stats.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderCompletions = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
         description = "Shows the estimated profit for items from chests in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -2795,6 +2809,11 @@ object Config : Vigilant(
                 markDirty()
             }
         }
+
+        listOf(
+            "partyFinderArmor",
+            "partyFinderCompletions"
+        ).forEach { propertyName -> addDependency(propertyName, "partyFinderStats") }
 
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
         registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }

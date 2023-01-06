@@ -102,13 +102,16 @@ object PartyFinderStats {
                                     ClickEvent.Action.RUN_COMMAND, "/skytilscata $username"
                                 )
                         )
-                    profileData.armor?.items?.reversed()?.filterNotNull()?.forEach { armorPiece ->
-                        val lore = armorPiece.asMinecraft.getTooltip(mc.thePlayer, false)
-                        component.append(
-                            UTextComponent("${armorPiece.asMinecraft.displayName}\n").setHoverText(
-                                lore.joinToString(separator = "\n")
+
+                    if (Skytils.config.partyFinderArmor) {
+                        profileData.armor?.items?.reversed()?.filterNotNull()?.forEach { armorPiece ->
+                            val lore = armorPiece.asMinecraft.getTooltip(mc.thePlayer, false)
+                            component.append(
+                                UTextComponent("${armorPiece.asMinecraft.displayName}\n").setHoverText(
+                                    lore.joinToString(separator = "\n")
+                                )
                             )
-                        )
+                        }
                     }
 
                     profileData.pets.find { it.active }?.let { activePet ->
@@ -177,68 +180,70 @@ object PartyFinderStats {
                         )
                     } ?: component.append("§cInventory API disabled!\n\n")
 
-                    cataData.highestCompletion?.let { highestFloor ->
-                        val completionObj = cataData.completions!!
-                        component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
-                            for (i in 0..highestFloor) {
-                                append("§2§l●§a ")
-                                append(if (i == 0) "Entrance: " else "Floor $i: ")
-                                append("§e")
-                                append(if (i in completionObj) completionObj[i] else "§cDNF")
-                                if (i != highestFloor)
-                                    append("\n")
-                            }
-                        }))
+                    if (Skytils.config.partyFinderCompletions) {
+                        cataData.highestCompletion?.let { highestFloor ->
+                            val completionObj = cataData.completions!!
+                            component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(buildString {
+                                for (i in 0..highestFloor) {
+                                    append("§2§l●§a ")
+                                    append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                    append("§e")
+                                    append(if (i in completionObj) completionObj[i] else "§cDNF")
+                                    if (i != highestFloor)
+                                        append("\n")
+                                }
+                            }))
 
-                        cataData.fastestTimeSPlus?.run {
-                            component.append(
-                                UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
-                                    buildString {
-                                        for (i in 0..highestFloor) {
-                                            append("§2§l●§a ")
-                                            append(if (i == 0) "Entrance: " else "Floor $i: ")
-                                            append("§e")
-                                            append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
-                                            if (i != highestFloor)
-                                                append("\n")
+                            cataData.fastestTimeSPlus?.run {
+                                component.append(
+                                    UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
+                                        buildString {
+                                            for (i in 0..highestFloor) {
+                                                append("§2§l●§a ")
+                                                append(if (i == 0) "Entrance: " else "Floor $i: ")
+                                                append("§e")
+                                                append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
+                                                if (i != highestFloor)
+                                                    append("\n")
+                                            }
                                         }
-                                    }
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
 
-                    masterCataData?.highestCompletion?.let { highestFloor ->
-                        val masterCompletionObj = masterCataData.completions!!
-                        component.append(
-                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
-                                buildString {
-                                    for (i in 1..highestFloor) {
-                                        append("§2§l●§a ")
-                                        append("Floor $i: ")
-                                        append("§e")
-                                        append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
-                                        if (i != highestFloor)
-                                            append("\n")
-                                    }
-                                })
-                        )
-
-                        cataData.fastestTimeSPlus?.run {
+                        masterCataData?.highestCompletion?.let { highestFloor ->
+                            val masterCompletionObj = masterCataData.completions!!
                             component.append(
-                                UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
+                                UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
                                     buildString {
                                         for (i in 1..highestFloor) {
                                             append("§2§l●§a ")
                                             append("Floor $i: ")
                                             append("§e")
-                                            append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
+                                            append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
                                             if (i != highestFloor)
                                                 append("\n")
                                         }
-                                    }
-                                )
+                                    })
                             )
+
+                            cataData.fastestTimeSPlus?.run {
+                                component.append(
+                                    UTextComponent("§l§4MM §cFastest §6S+ §cCompletions: §7(Hover)\n\n").setHoverText(
+                                        buildString {
+                                            for (i in 1..highestFloor) {
+                                                append("§2§l●§a ")
+                                                append("Floor $i: ")
+                                                append("§e")
+                                                append(this@run[i]?.timeFormat() ?: "§cNo S+ Completion")
+                                                if (i != highestFloor)
+                                                    append("\n")
+                                            }
+                                        }
+                                    )
+                                )
+                            }
                         }
                     }
 
