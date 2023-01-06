@@ -32,6 +32,7 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.hasMoved
+import net.minecraft.client.multiplayer.ServerData
 import net.minecraft.client.network.OldServerPinger
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
@@ -72,6 +73,7 @@ object Ping {
                     lastPingAt = -1L
                     invokedCommand = false
                 }
+
                 is S37PacketStatistics -> {
                     val diff = (abs(System.nanoTime() - lastPingAt) / 1_000_000.0)
                     lastPingAt *= -1
@@ -100,6 +102,9 @@ object Ping {
             if (Utils.isOnHypixel && toggled && mc.thePlayer != null) {
                 when (Skytils.config.pingDisplay) {
                     1 -> {
+                        if (mc.currentServerData == null) {
+                            mc.setServerData(ServerData("Skytils-Dummy-Hypixel", "mc.hypixel.net", false))
+                        }
                         if (System.currentTimeMillis() - lastOldServerPing > 5000) {
                             lastOldServerPing = System.currentTimeMillis()
                             AccessorServerListEntryNormal.getPingerPool()
@@ -110,6 +115,7 @@ object Ping {
                         if (mc.currentServerData.pingToServer != -1L) pingCache =
                             mc.currentServerData.pingToServer.toDouble()
                     }
+
                     2 -> {
                         if (lastPingAt < 0 && (mc.currentScreen != null || !mc.thePlayer.hasMoved) && System.nanoTime()
                             - lastPingAt.absoluteValue > 1_000_000L * 5_000

@@ -361,7 +361,14 @@ class SpamHiderGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
         addCustomHider.onMouseClick {
             val filter =
-                SpamHider.Filter("New Filter", 0, true, "Pattern".toRegex(), SpamHider.FilterType.STARTSWITH, true)
+                SpamHider.Filter(
+                    "New Filter",
+                    0,
+                    true,
+                    "Input Pattern Here".toRegex(),
+                    SpamHider.FilterType.STARTSWITH,
+                    true
+                )
             SpamHider.filters.add(filter)
             val container = UIContainer()
                 .constrain {

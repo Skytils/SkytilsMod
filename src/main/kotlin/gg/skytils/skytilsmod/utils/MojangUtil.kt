@@ -73,7 +73,7 @@ object MojangUtil {
                         id
                     }
 
-                    HttpStatusCode.NoContent -> null
+                    HttpStatusCode.NoContent, HttpStatusCode.NotFound -> null
                     else -> throw it.body<MojangException>()
                 }
             }
@@ -92,7 +92,7 @@ object MojangUtil {
                         username
                     }
 
-                    HttpStatusCode.NoContent -> null
+                    HttpStatusCode.NoContent, HttpStatusCode.NotFound -> null
                     else -> throw it.body<MojangException>()
                 }
             }

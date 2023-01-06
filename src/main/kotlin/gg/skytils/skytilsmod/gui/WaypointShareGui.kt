@@ -45,6 +45,7 @@ import gg.skytils.skytilsmod.utils.childContainers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.apache.commons.codec.binary.Base64
+import org.apache.commons.codec.binary.Base64InputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipParameters
@@ -152,13 +153,13 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
     private fun importFromClipboard() {
         runCatching {
-            val decoded = Base64.decodeBase64(getClipboardString()).decodeToString()
-
+            val clipboard = getClipboardString()
             runCatching {
-                import(decoded)
+                import(clipboard)
             }.onFailure {
+                it.printStackTrace()
                 // When importing from the SBE format, the clipboard contents are not base64-encoded
-                importSBEFormat(getClipboardString())
+                importSBEFormat(clipboard)
             }
 
             PersistentSave.markDirty<Waypoints>()
@@ -178,16 +179,21 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
 
             val json = when (version) {
                 1 -> {
-                    GzipCompressorInputStream(content.byteInputStream()).use {
+                    GzipCompressorInputStream(Base64InputStream(content.byteInputStream())).use {
                         it.readBytes().decodeToString()
                     }
                 }
 
                 else -> throw IllegalArgumentException("Unknown version $version")
             }
+
             categories.addAll(Skytils.json.decodeFromString<CategoryList>(json).categories)
 
-        } else categories.addAll(Skytils.json.decodeFromString<CategoryList>(str).categories)
+        } else categories.addAll(
+            Skytils.json.decodeFromString<CategoryList>(
+                Base64.decodeBase64(str).decodeToString()
+            ).categories
+        )
 
 
         Waypoints.categories.addAll(categories)
