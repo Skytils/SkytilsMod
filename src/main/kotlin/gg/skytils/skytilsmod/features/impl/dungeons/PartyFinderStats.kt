@@ -50,7 +50,7 @@ object PartyFinderStats {
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.isOnHypixel || event.type == 2.toByte()) return
+         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
         if (Skytils.config.partyFinderStats) {
             val match = partyFinderRegex.find(event.message.formattedText.stripControlCodes()) ?: return
             val username = match.groups["name"]?.value ?: return
@@ -93,8 +93,14 @@ object PartyFinderStats {
                     val name = playerResponse.formattedName
 
                     val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
-                    val component = UMessage("&2&l-----------------------------\n")
-                        .append("$name §8» §dCata §9${NumberUtil.nf.format(cataLevel)} ")
+
+                    val component: UMessage = if (Skytils.config.partyFinderCompact) {
+                        UMessage("$name §8»")
+                    } else {
+                        UMessage("&2&l-----------------------------\n").append("$name §8»")
+                    }
+
+                        component.append(" §dCata §9${NumberUtil.nf.format(cataLevel)} ")
                         .append(
                             UTextComponent("§7[Stats]\n\n")
                                 .setHoverText("§7Click to run: /skytilscata $username")
@@ -130,8 +136,13 @@ object PartyFinderStats {
                         )
                     } ?: component.append("§cNo Pet Equipped!")
                     profileData.pets.find(Pet::isSpirit)?.run {
-                        component.append(" §7(§6Spirit§7)\n\n")
-                    } ?: component.append(" §7(No Spirit)\n\n")
+                        component.append(" §7(§6Spirit§7)")
+                    } ?: component.append(" §7(No Spirit)")
+                    if (!Skytils.config.partyFinderCompact) {
+                        component.append("\n\n")
+                    } else {
+                        component.append("\n")
+                    }
 
                     profileData.inventory?.items?.mapNotNull {
                         ItemUtil.getExtraAttributes(it?.asMinecraft)
@@ -180,6 +191,7 @@ object PartyFinderStats {
                         )
                     } ?: component.append("§cInventory API disabled!\n\n")
 
+
                     if (Skytils.config.partyFinderCompletions) {
                         cataData.highestCompletion?.let { highestFloor ->
                             val completionObj = cataData.completions!!
@@ -196,7 +208,7 @@ object PartyFinderStats {
 
                             cataData.fastestTimeSPlus?.run {
                                 component.append(
-                                    UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n\n").setHoverText(
+                                    UTextComponent("§aFastest §6S+ §aCompletions: §7(Hover)\n").setHoverText(
                                         buildString {
                                             for (i in 0..highestFloor) {
                                                 append("§2§l●§a ")
@@ -210,6 +222,9 @@ object PartyFinderStats {
                                     )
                                 )
                             }
+                        }
+                        if (!Skytils.config.partyFinderCompact) {
+                            component.append("\n")
                         }
 
                         masterCataData?.highestCompletion?.let { highestFloor ->
@@ -249,20 +264,30 @@ object PartyFinderStats {
 
                     component
                         .append("§aTotal Secrets Found: §l§e${NumberUtil.nf.format(secrets)}\n")
-                        .append(
+                    if (Skytils.config.partyFinderKills) {
+                        component.append(
                             "§aBlood Mobs Killed: §l§e${
                                 NumberUtil.nf.format(
                                     (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
                                             (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
                                 )
-                            }\n\n"
+                            }"
                         )
+                    }
+                            if (Skytils.config.partyFinderCompact) {
+                                component.append("\n")
+                            } else {
+                                component.append("\n\n")
+                            }
                         .append(
-                            UTextComponent("§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
+                            UTextComponent("§c§l[KICK]").setHoverText("§cClick to kick ${name}§c.")
                                 .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
                         )
-                        .append("&2&l-----------------------------")
-                        .chat()
+                        if (!Skytils.config.partyFinderCompact) {
+                            component.append("\n&2&l-----------------------------")
+                        }
+
+                        component.chat()
                 } ?: UChat.chat("$failPrefix §c$username has not entered The Catacombs!")
             } catch (e: Throwable) {
                 UChat.chat("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")

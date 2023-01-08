@@ -204,18 +204,32 @@ object Config : Vigilant(
     var partyFinderStats = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Compact Party Finder Stats",
+        description = "Makes the party finder stats display in a more compact way.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderCompact = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Party Finder Armor Display",
         description = "Toggles player armour display in party finder stats.",
         category = "Dungeons", subcategory = "Party Finder"
     )
-    var partyFinderArmor = false
+    var partyFinderArmor = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Party Finder Floor Completions Display",
         description = "Toggles catacombs floor completions display in party finder stats.",
         category = "Dungeons", subcategory = "Party Finder"
     )
-    var partyFinderCompletions = false
+    var partyFinderCompletions = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Party Finder Blood Mob Kill Display",
+        description = "Toggles blood mob kills display in party finder stats.",
+        category = "Dungeons", subcategory = "Party Finder"
+    )
+    var partyFinderKills = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
@@ -2812,7 +2826,9 @@ object Config : Vigilant(
 
         listOf(
             "partyFinderArmor",
-            "partyFinderCompletions"
+            "partyFinderCompletions",
+            "partyFinderCompact",
+            "partyFinderKills"
         ).forEach { propertyName -> addDependency(propertyName, "partyFinderStats") }
 
         registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
