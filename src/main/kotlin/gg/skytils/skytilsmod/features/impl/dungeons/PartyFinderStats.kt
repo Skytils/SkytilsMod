@@ -50,7 +50,7 @@ object PartyFinderStats {
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
-         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
+        if (!Utils.isOnHypixel || event.type == 2.toByte()) return
         if (Skytils.config.partyFinderStats) {
             val match = partyFinderRegex.find(event.message.formattedText.stripControlCodes()) ?: return
             val username = match.groups["name"]?.value ?: return
