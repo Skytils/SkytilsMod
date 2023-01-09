@@ -208,7 +208,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
     }
 
     private fun importOldFormat(str: String) {
-        val waypoints = Skytils.json.decodeFromString<List<Waypoint>>(str)
+        val waypoints = Skytils.json.decodeFromString<List<Waypoint>>(Base64.decodeBase64(str).decodeToString())
         waypoints.groupBy {
             @Suppress("DEPRECATION")
             it.island!!
