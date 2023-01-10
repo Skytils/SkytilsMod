@@ -110,46 +110,51 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     }
 
     @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
+    fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!shouldReadEffects || event.container !is ContainerChest || !event.chestName.endsWith("Active Effects")) return
-        if (event.slot.inventory == mc.thePlayer.inventory) return
-        val item = event.slot.stack ?: return
-        val extraAttr = ItemUtil.getExtraAttributes(item)
-        if (item.item == Items.potionitem && extraAttr != null) {
-            val potionName = item.displayName.stripControlCodes().substringBeforeLast(" ")
-            val potionLevel = extraAttr.getInteger("potion_level")
-            for (line in ItemUtil.getItemLore(item).asReversed()) {
-                val match = duration.matchEntire(line) ?: continue
-                val isInfinite = match.groups["infinite"]?.value != null
-                val hours = match.groups["hours"]?.value?.toIntOrNull() ?: 0
-                val minutes = match.groups["minutes"]?.value?.toIntOrNull() ?: 0
-                val seconds = match.groups["seconds"]?.value?.toIntOrNull() ?: 0
-                val durationTicks = if (isInfinite) Long.MAX_VALUE else (hours * 3600 + minutes * 60 + seconds) * 20L
-                potionEffectTimers[potionName] = PotionEffectTimer(potionName, potionLevel, durationTicks, isInfinite)
-                break
-            }
-        }
-        if (event.slot.slotNumber == 53) {
-            val currPage =
-                effectMenuTitle.matchEntire(event.chestName)?.groups?.get("currPage")?.value?.toIntOrNull() ?: 1
-            if (currPage != neededPage) return
-            if (item.item == Items.arrow && item.displayName == "§aNext Page") {
-                neededPage++
-                TickTask(20) {
-                    UChat.chat("${Skytils.prefix} §fMoving to the next page ${neededPage}...")
-                    mc.playerController.windowClick(
-                        event.container.windowId,
-                        event.slot.slotNumber,
-                        0,
-                        4,
-                        mc.thePlayer
-                    )
+        val lastIndex = event.container.lowerChestInventory.sizeInventory - 1
+        for (i in 0..lastIndex) {
+            val slot = event.container.getSlot(i)
+            val item = slot.stack ?: continue
+            val extraAttr = ItemUtil.getExtraAttributes(item)
+            if (item.item == Items.potionitem && extraAttr != null) {
+                val potionName = item.displayName.stripControlCodes().substringBeforeLast(" ")
+                val potionLevel = extraAttr.getInteger("potion_level")
+                for (line in ItemUtil.getItemLore(item).asReversed()) {
+                    val match = duration.matchEntire(line) ?: continue
+                    val isInfinite = match.groups["infinite"]?.value != null
+                    val hours = match.groups["hours"]?.value?.toIntOrNull() ?: 0
+                    val minutes = match.groups["minutes"]?.value?.toIntOrNull() ?: 0
+                    val seconds = match.groups["seconds"]?.value?.toIntOrNull() ?: 0
+                    val durationTicks =
+                        if (isInfinite) Long.MAX_VALUE else (hours * 3600 + minutes * 60 + seconds) * 20L
+                    potionEffectTimers[potionName] =
+                        PotionEffectTimer(potionName, potionLevel, durationTicks, isInfinite)
+                    break
                 }
-            } else {
-                shouldReadEffects = false
-                TickTask(20) {
-                    mc.thePlayer.closeScreen()
-                    UChat.chat("${Skytils.successPrefix} §aYour ${potionEffectTimers.size} potion effects have been updated!")
+            }
+            if (i == lastIndex) {
+                val currPage =
+                    effectMenuTitle.matchEntire(event.chestName)?.groups?.get("currPage")?.value?.toIntOrNull() ?: 1
+                if (currPage != neededPage) return
+                if (item.item == Items.arrow && item.displayName == "§aNext Page") {
+                    neededPage++
+                    TickTask(20) {
+                        UChat.chat("${Skytils.prefix} §fMoving to the next page ${neededPage}... Don't close your inventory!")
+                        mc.playerController.windowClick(
+                            event.container.windowId,
+                            slot.slotNumber,
+                            0,
+                            4,
+                            mc.thePlayer
+                        )
+                    }
+                } else {
+                    shouldReadEffects = false
+                    TickTask(20) {
+                        mc.thePlayer.closeScreen()
+                        UChat.chat("${Skytils.successPrefix} §aYour ${potionEffectTimers.size} potion effects have been updated!")
+                    }
                 }
             }
         }
