@@ -51,20 +51,23 @@ public class EssentialPlatformSetup {
             String ver = System.getProperty("java.runtime.version", "unknown");
             String javaLoc = System.getProperty("java.home");
             if (ver.contains("1.8.0_51") || javaLoc.contains("jre-legacy")) {
-                Path keyStoreLoc = Paths.get("./config/skytils/updates/files/skytilsletsencrypt.jks");
+                System.out.println("Minecraft is running on legacy Java 8");
+                Path keyStoreLoc = Paths.get("./config/skytils/updates/files/skytilscacerts.jks");
                 File keyStoreFile = keyStoreLoc.toFile();
+                //check if the file matches what's in the jar based on filesize
                 if (!keyStoreFile.exists()) {
                     System.out.println("Skytils is attempting to run keytool.");
                     Files.createDirectories(keyStoreLoc.getParent());
-                    try (InputStream in = EssentialPlatformSetup.class.getResourceAsStream("/skytilsletsencrypt.jks"); OutputStream os = Files.newOutputStream(keyStoreLoc)) {
+                    try (InputStream in = EssentialPlatformSetup.class.getResourceAsStream("/skytilscacerts.jks"); OutputStream os = Files.newOutputStream(keyStoreLoc)) {
                         IOUtils.copy(in, os);
                     }
                     String os = System.getProperty("os.name", "unknown");
-                    String keyStorePath = javaLoc + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts";
-                    String keyToolPath = javaLoc + File.separator + "bin" + File.separator + (os.toLowerCase(Locale.ENGLISH).startsWith("windows") ? "keytool.exe" : "keytool");
+
+                    Path keyStorePath = Paths.get(javaLoc, "lib", "security", "cacerts").toAbsolutePath();
+                    Path keyToolPath = Paths.get(javaLoc, "bin", (os.toLowerCase(Locale.ENGLISH).startsWith("windows") ? "keytool.exe" : "keytool")).toAbsolutePath();
                     File log = new File("./config/skytils/updates/files/sslfix-" + System.currentTimeMillis() + ".log");
                     new ProcessBuilder()
-                            .command(keyToolPath, "-importkeystore", "-srckeystore", keyStoreFile.getAbsolutePath(), "-destkeystore", keyStorePath, "-srcstorepass", "skytilsontop", "-deststorepass", "changeit", "-noprompt")
+                            .command(keyToolPath.toString(), "-importkeystore", "-srckeystore", keyStoreFile.getAbsolutePath(), "-destkeystore", keyStorePath.toString(), "-srcstorepass", "skytilsontop", "-deststorepass", "changeit", "-noprompt")
                             .redirectOutput(log)
                             .redirectError(log)
                             .start().waitFor();
