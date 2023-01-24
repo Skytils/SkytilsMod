@@ -446,9 +446,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
             setText(name)
         }
 
-        val xComponent = container.createSmallTextBox("X", pos.x.toString()).limitToNumericalCharacters()
-        val yComponent = container.createSmallTextBox("Y", pos.y.toString()).limitToNumericalCharacters()
-        val zComponent = container.createSmallTextBox("Z", pos.z.toString()).limitToNumericalCharacters()
+        val xComponent = container.createSmallTextBox("X", pos.x.toString())
+        val yComponent = container.createSmallTextBox("Y", pos.y.toString())
+        val zComponent = container.createSmallTextBox("Z", pos.z.toString())
+
+        listOf(xComponent, yComponent, zComponent).forEach {
+            it.limitToNumericalCharacters().colorIfNumeric(Color.WHITE, Color(170, 0, 0))
+        }
 
         val colorComponent = ColorComponent(color, true).childOf(container).constrain {
             x = SiblingConstraint(25f)
@@ -673,9 +677,9 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
     ) {
         fun toWaypoint() = Waypoint(
             name.getText(),
-            x.getText().toInt(),
-            y.getText().toInt(),
-            z.getText().toInt(),
+            x.getText().toIntOrNull() ?: 0,
+            y.getText().toIntOrNull() ?: 0,
+            z.getText().toIntOrNull() ?: 0,
             enabled.checked!!,
             color.getColor(),
             addedAt

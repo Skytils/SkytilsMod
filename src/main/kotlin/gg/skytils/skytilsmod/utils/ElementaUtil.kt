@@ -23,6 +23,7 @@ import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.gui.settings.SettingComponent
+import java.awt.Color
 
 /**
  * When the tab key is pressed in this text field, [other] will grab the window's focus.
@@ -40,6 +41,14 @@ fun UITextInput.limitToNumericalCharacters() = apply {
     onKeyType { _, _ ->
         setText(getText().filter { c -> c.isDigit() || c == '-' })
     }
+}
+
+/**
+ * Sets this [UITextInput] to [invalidColor] when a non-numeric value is entered and focus is lost.
+ * Resets to the default color when the input is made valid.
+ */
+fun UITextInput.colorIfNumeric(validColor: Color, invalidColor: Color) = apply {
+    onKeyType { _, _ -> setColor(if (getText().isInteger()) validColor else invalidColor) }
 }
 
 /**
