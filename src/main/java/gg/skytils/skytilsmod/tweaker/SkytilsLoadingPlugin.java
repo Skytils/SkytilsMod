@@ -31,6 +31,7 @@ import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
 
 @IFMLLoadingPlugin.Name("Skytils On Top")
 @IFMLLoadingPlugin.SortingIndex(69)
+@IFMLLoadingPlugin.MCVersion("1.8.9")
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
     public static final String missingDependency =
