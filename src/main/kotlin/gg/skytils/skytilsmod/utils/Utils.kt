@@ -266,6 +266,11 @@ fun UTextComponent.setHoverText(text: String): UTextComponent {
     return this
 }
 
+fun IChatComponent.map(action: IChatComponent.() -> Unit) {
+    action(this)
+    siblings.forEach { it.map(action) }
+}
+
 fun Entity.getXZDistSq(other: Entity): Double {
     val xDelta = this.posX - other.posX
     val zDelta = this.posZ - other.posZ
