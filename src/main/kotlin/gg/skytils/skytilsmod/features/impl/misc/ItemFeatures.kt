@@ -203,14 +203,14 @@ object ItemFeatures {
                     }
                 }
             }
-            if (chestName == "Ophelia" || chestName == "Trades") {
+            if (chestName == "Ophelia" || chestName == "Trades" || chestName == "Booster Cookie") {
                 if (Skytils.config.highlightDungeonSellableItems) {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
                         if (stack.displayName.containsAny(
                                 "Defuse Kit", "Lever", "Torch",
                                 "Stone Button", "Tripwire Hook", "Journal Entry",
-                                "Training Weights", "Mimic Fragment", "Healing 8 Splash Potion", "Healing VIII Splash Potion"
+                                "Training Weights", "Mimic Fragment", "Healing 8 Splash Potion", "Healing VIII Splash Potion", "Premium Flesh"
                             )
                         ) event.slot highlight Color(255, 50, 150, 255)
                     }
