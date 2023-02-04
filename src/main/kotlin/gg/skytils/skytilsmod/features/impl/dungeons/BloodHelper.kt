@@ -55,7 +55,7 @@ object BloodHelper {
         watchers.removeIf { it.isDead }
         mobs.also {
             it.filter { it.key.isDead && !it.value.e }
-                .forEach { println(System.currentTimeMillis() - it.value.start); it.value.e = true }
+                .forEach { printDevMessage((System.currentTimeMillis() - it.value.start).toString(), "bloodHelper"); it.value.e = true }
         }.filter { !it.key.isDead && it.value.finalPos != null }.toList()
             .forEachIndexed { index, (_, mob) ->
                 RenderUtil.drawOutlinedBoundingBox(
