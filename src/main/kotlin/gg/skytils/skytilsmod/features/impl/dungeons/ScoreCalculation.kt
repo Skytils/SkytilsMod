@@ -339,7 +339,6 @@ object ScoreCalculation {
                 }
 
                 name.contains("Puzzles:") -> {
-                    println(name)
                     val matcher = missingPuzzlePattern.find(name) ?: return@forEach
                     missingPuzzles.set(matcher.groups["count"]?.value?.toIntOrNull() ?: 0)
                     printDevMessage("puzzles ${missingPuzzles.get()}", "scorecalcpuzzle")
