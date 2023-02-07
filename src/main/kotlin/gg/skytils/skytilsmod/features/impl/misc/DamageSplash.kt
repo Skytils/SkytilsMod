@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * @author Wynntils
  */
 object DamageSplash {
-    private val damagePattern = Regex("✧?(\\d{1,3}(?:,\\d{3})*[⚔+✧❤♞☄✷ﬗ]*)")
+    private val damagePattern = Regex("[✧✯]?(\\d{1,3}(?:,\\d{3})*[⚔+✧❤♞☄✷ﬗ✯]*)")
 
     @SubscribeEvent
     fun renderFakeEntity(e: RenderWorldLastEvent) {
