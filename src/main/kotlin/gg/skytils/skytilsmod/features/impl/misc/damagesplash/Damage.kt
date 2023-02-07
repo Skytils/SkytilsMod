@@ -36,6 +36,7 @@ enum class Damage(val symbol: String, val color: CustomColor) {
     TRUE("❂", CommonColors.WHITE),
     FIRE("火", CommonColors.ORANGE),
     DROWN("水", CommonColors.LIGHT_BLUE),
+    OVERLOAD("✯", CommonColors.YELLOW),
     COMBO("ﬗ", CustomColor(242, 133, 0)),
     NORMAL("", CommonColors.LIGHT_GRAY);
 
