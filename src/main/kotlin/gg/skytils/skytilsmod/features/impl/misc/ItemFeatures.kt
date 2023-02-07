@@ -38,6 +38,7 @@ import gg.skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import gg.skytils.skytilsmod.utils.ItemUtil.getItemLore
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
+import gg.skytils.skytilsmod.utils.MathUtil.ceil
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
@@ -47,9 +48,9 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.block.BlockDoor
 import net.minecraft.block.BlockLadder
-import net.minecraft.block.BlockLiquid
-import net.minecraft.block.BlockSign
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.projectile.EntityFishHook
@@ -60,9 +61,8 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
-import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -72,6 +72,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
+import org.lwjgl.util.vector.Vector3f
 import java.awt.Color
 import java.util.regex.Pattern
 import kotlin.math.pow
@@ -683,18 +684,10 @@ object ItemFeatures {
         if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
             val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return
             if (!extraAttr.getBoolean("ethermerge")) return
-            val dist = 57.0 + extraAttr.getInteger("tuned_transmission")
-            val vec3 = mc.thePlayer.getPositionEyes(event.partialTicks)
-            val vec31 = mc.thePlayer.getLook(event.partialTicks)
-            val vec32 = vec3.addVector(
-                vec31.xCoord * dist,
-                vec31.yCoord * dist,
-                vec31.zCoord * dist
-            )
-            val obj = mc.theWorld.rayTraceBlocks(vec3, vec32, true, false, true) ?: return
-            val block = obj.blockPos ?: return
+            val dist = 57.0f + extraAttr.getInteger("tuned_transmission")
+            val block = raycast(mc.thePlayer, event.partialTicks, dist, 0.1f) ?: return
             val state = mc.theWorld.getBlockState(block)
-            if (isValidEtherwarpPos(obj)) {
+            if (isValidEtherwarpPos(block)) {
                 val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
                 val matrixStack = UMatrixStack()
                 GlStateManager.disableCull()
@@ -716,20 +709,45 @@ object ItemFeatures {
         }
     }
 
-    private fun isValidEtherwarpPos(obj: MovingObjectPosition): Boolean {
-        val pos = obj.blockPos
-        val sideHit = obj.sideHit
+    /**
+     * Adapted from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
+     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
+     *
+     * @author Moulberry
+     */
+    private fun raycast(player: EntityPlayerSP, partialTicks: Float, dist: Float, step: Float): BlockPos? {
+        val pos = Vector3f(player.posX.toFloat(), player.posY.toFloat() + player.getEyeHeight(), player.posZ.toFloat())
+        val lookVec3 = player.getLook(partialTicks)
+        val look = Vector3f(lookVec3.xCoord.toFloat(), lookVec3.yCoord.toFloat(), lookVec3.zCoord.toFloat())
+        look.scale(step / look.length())
+        val stepCount = ceil((dist / step))
+        for (i in 0 until stepCount) {
+            Vector3f.add(pos, look, pos)
+            val world = Minecraft.getMinecraft().theWorld
+            val position = BlockPos(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
+            val state = world.getBlockState(position)
+            if (state.block !== Blocks.air) {
+                //Back-step
+                Vector3f.sub(pos, look, pos)
+                look.scale(0.1f)
+                for (j in 0..9) {
+                    Vector3f.add(pos, look, pos)
+                    val position2 = BlockPos(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
+                    val state2 = world.getBlockState(position2)
+                    if (state2.block !== Blocks.air) {
+                        return BlockPos(position2)
+                    }
+                }
+                return BlockPos(position)
+            }
+        }
+        return null
+    }
 
+    private fun isValidEtherwarpPos(pos: BlockPos): Boolean {
         return mc.theWorld.getBlockState(pos).block.material.isSolid && (1..2).all {
             val newPos = pos.up(it)
             val newBlock = mc.theWorld.getBlockState(newPos)
-            if (sideHit === EnumFacing.UP && (Utils.equalsOneOf(
-                    newBlock.block,
-                    Blocks.fire,
-                    Blocks.skull
-                ) || newBlock.block is BlockLiquid)
-            ) return@all false
-            if (sideHit !== EnumFacing.UP && newBlock.block is BlockSign) return@all false
             if (newBlock.block is BlockLadder || newBlock.block is BlockDoor) return@all false
             return@all newBlock.block.isPassable(mc.theWorld, newPos)
         }
