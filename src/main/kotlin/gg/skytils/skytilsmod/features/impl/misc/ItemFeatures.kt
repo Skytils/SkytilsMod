@@ -63,6 +63,7 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -72,7 +73,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
-import org.lwjgl.util.vector.Vector3f
 import java.awt.Color
 import java.util.regex.Pattern
 import kotlin.math.pow
@@ -716,23 +716,24 @@ object ItemFeatures {
      * @author Moulberry
      */
     private fun raycast(player: EntityPlayerSP, partialTicks: Float, dist: Float, step: Float): BlockPos? {
-        val pos = Vector3f(player.posX.toFloat(), player.posY.toFloat() + player.getEyeHeight(), player.posZ.toFloat())
+        var pos = Vec3(player.posX, player.posY + player.getEyeHeight(), player.posZ)
         val lookVec3 = player.getLook(partialTicks)
-        val look = Vector3f(lookVec3.xCoord.toFloat(), lookVec3.yCoord.toFloat(), lookVec3.zCoord.toFloat())
-        look.scale(step / look.length())
-        val stepCount = ceil((dist / step))
+        var look = Vec3(lookVec3.xCoord, lookVec3.yCoord, lookVec3.zCoord)
+        look *= step / look.lengthVector()
+        val stepCount = ceil(dist / step)
+
         for (i in 0 until stepCount) {
-            Vector3f.add(pos, look, pos)
+            pos += look
             val world = Minecraft.getMinecraft().theWorld
-            val position = BlockPos(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
+            val position = BlockPos(pos.x, pos.y, pos.z)
             val state = world.getBlockState(position)
             if (state.block !== Blocks.air) {
                 //Back-step
-                Vector3f.sub(pos, look, pos)
-                look.scale(0.1f)
+                pos -= look
+                look *= 0.1
                 for (j in 0..9) {
-                    Vector3f.add(pos, look, pos)
-                    val position2 = BlockPos(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
+                    pos += look
+                    val position2 = BlockPos(pos.x, pos.y, pos.z)
                     val state2 = world.getBlockState(position2)
                     if (state2.block !== Blocks.air) {
                         return BlockPos(position2)
