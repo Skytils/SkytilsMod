@@ -53,6 +53,8 @@ object ChatListener {
             val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
             Skytils.config.apiKey = apiKey
             Skytils.hylinAPI.key = Skytils.config.apiKey
+            Skytils.hylinAPI.endpoint =
+                if (Skytils.hylinAPI.key.isNotBlank()) "https://api.hypixel.net" else "https://hypixel.skytils.gg"
             Skytils.config.markDirty()
             UChat.chat("$successPrefix §aSkytils updated your set Hypixel API key to §2${apiKey}")
             return

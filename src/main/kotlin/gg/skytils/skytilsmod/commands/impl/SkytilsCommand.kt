@@ -73,6 +73,8 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     ) {
                         Skytils.config.apiKey = apiKey
                         Skytils.hylinAPI.key = Skytils.config.apiKey
+                        Skytils.hylinAPI.endpoint =
+                            if (Skytils.hylinAPI.key.isNotBlank()) "https://api.hypixel.net" else "https://hypixel.skytils.gg"
                         Skytils.config.markDirty()
                         UChat.chat("$successPrefix §aYour Hypixel API key has been set to §f$apiKey§a.")
                     } else {
@@ -85,7 +87,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
                     "$prefix §bToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()
-                            [(ZonedDateTime.now(ZoneId.of("America/New_York"))
+                        [(ZonedDateTime.now(ZoneId.of("America/New_York"))
                         .dayOfMonth) % MiningFeatures.fetchurItems.size]
                 )
             )

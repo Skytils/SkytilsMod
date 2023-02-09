@@ -240,7 +240,7 @@ class Skytils {
     fun init(event: FMLInitializationEvent) {
         config.init()
         hylinAPI.key = config.apiKey
-
+        hylinAPI.endpoint = if (hylinAPI.key.isNotBlank()) "https://api.hypixel.net" else "https://hypixel.skytils.gg"
         UpdateChecker.downloadDeleteTask()
 
         arrayOf(

@@ -56,7 +56,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.TEXT, name = "Hypixel API Key",
-        description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
+        description = "Your Hypixel API key, which can be obtained from /api new. If no API Key is provided, you will be using Skytils' key.\nFor a faster experience, it is recommended you use your own key, as our key is shared with all users of the mod.\nPlease do not abuse our key for your own services.",
         category = "General", subcategory = "API",
         protectedText = true
     )
@@ -2828,6 +2828,8 @@ object Config : Vigilant(
 
         registerListener("apiKey") { key: String ->
             Skytils.hylinAPI.key = key
+            Skytils.hylinAPI.endpoint =
+                if (Skytils.hylinAPI.key.isNotBlank()) "https://api.hypixel.net" else "https://hypixel.skytils.gg"
         }
     }
 
