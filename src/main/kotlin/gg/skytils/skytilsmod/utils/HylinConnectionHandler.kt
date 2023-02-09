@@ -63,7 +63,7 @@ object HylinConnectionHandler : ConnectionHandler() {
 
     override fun readJSON(endpoint: String): JsonObject = runBlocking {
         try {
-            client.get(endpoint).body()
+            client.get(endpoint.replace("key=", "")).body()
         } catch (e: NoTransformationFoundException) {
             throw IllegalStateException("Error caught during JSON parsing from $endpoint", e)
         }

@@ -36,7 +36,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
         val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
 
         val profileResponse =
-            client.get("${Skytils.hylinAPI.endpoint}/skyblock/profile?profile=$latestProfile&key=$key")
+            client.get("${Skytils.hylinAPI.endpoint}/skyblock/profile?profile=$latestProfile")
                 .body<ProfileResponse>()
         if (!profileResponse.success) {
             printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse.cause}")
