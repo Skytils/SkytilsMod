@@ -69,10 +69,7 @@ object PartyFinderStats {
                     e.printStackTrace()
                     UChat.chat(
                         "$failPrefix §cUnable to retrieve profile information: ${
-                            e.message?.replace(
-                                Skytils.config.apiKey,
-                                "*".repeat(Skytils.config.apiKey.length)
-                            )
+                            e.message
                         }"
                     )
                 }
@@ -243,10 +240,7 @@ object PartyFinderStats {
             e.printStackTrace()
             UChat.chat(
                 "$failPrefix §cFailed to get dungeon stats: ${
-                    e.message?.replace(
-                        Skytils.config.apiKey,
-                        "*".repeat(Skytils.config.apiKey.length)
-                    )
+                    e.message
                 }"
             )
         }

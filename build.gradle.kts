@@ -103,7 +103,7 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:33ce24c56d") {
+    shadowMeMod("com.github.Skytils:Hylin:3ad11efbc1") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
@@ -125,6 +125,9 @@ dependencies {
     shadowMe(ktor("client-cio-jvm"))
     shadowMe(ktor("client-content-negotiation-jvm"))
     shadowMe(ktor("client-encoding-jvm"))
+    shadowMe(ktor("serialization-gson-jvm")) {
+        exclude(module = "gson")
+    }
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
@@ -266,5 +269,5 @@ signing {
  * @param module simple name of the Ktor module, for example "client-core".
  * @param version optional desired version, unspecified if null.
  */
-fun DependencyHandler.ktor(module: String, version: String? = null): Any =
+fun DependencyHandler.ktor(module: String, version: String? = null) =
     "io.ktor:ktor-$module${version?.let { ":$version" } ?: ""}"

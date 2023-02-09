@@ -33,22 +33,14 @@ import java.util.*
 
 abstract class StatCommand(
     name: String,
-    private val needApiKey: Boolean = true,
     private val needProfile: Boolean = true,
     aliases: List<String> = emptyList()
 ) :
     BaseCommand(name, aliases) {
 
-    val key: String
-        get() = Skytils.config.apiKey
-
     override fun getCommandUsage(player: EntityPlayerSP): String = "/${this.commandName} [player]"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (needApiKey && key.isEmpty()) {
-            printMessage("$failPrefix §cYou must have an API key set to use this command!")
-            return
-        }
         Skytils.IO.launch {
             val username = if (args.isEmpty()) mc.thePlayer.name else args[0]
             printMessage("§aGetting data for ${username}...")
@@ -64,10 +56,7 @@ abstract class StatCommand(
                 } catch (e: HypixelAPIException) {
                     printMessage(
                         "$failPrefix §cUnable to retrieve profile information: ${
-                            e.message?.replace(
-                                Skytils.config.apiKey,
-                                "*".repeat(Skytils.config.apiKey.length)
-                            )
+                            e.message
                         }"
                     )
                     return@launch

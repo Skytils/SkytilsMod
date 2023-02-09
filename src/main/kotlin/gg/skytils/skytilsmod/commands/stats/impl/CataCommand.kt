@@ -44,10 +44,7 @@ object CataCommand : StatCommand("skytilscata") {
         } catch (e: HypixelAPIException) {
             printMessage(
                 "$failPrefix §cFailed to get dungeon stats: ${
-                    e.message?.replace(
-                        Skytils.config.apiKey,
-                        "*".repeat(Skytils.config.apiKey.length)
-                    )
+                    e.message
                 }"
             )
             return

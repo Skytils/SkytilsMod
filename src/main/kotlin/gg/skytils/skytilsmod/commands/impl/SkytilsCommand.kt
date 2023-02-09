@@ -23,7 +23,6 @@ import gg.essential.universal.wrappers.UPlayer
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
@@ -42,8 +41,6 @@ import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
 import gg.skytils.skytilsmod.gui.profile.ProfileGui
 import gg.skytils.skytilsmod.utils.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
@@ -61,28 +58,6 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             return
         }
         when (args[0].lowercase()) {
-            "setkey" -> {
-                if (args.size == 1) {
-                    UChat.chat("$failPrefix §cPlease provide your Hypixel API key!")
-                    return
-                }
-                Skytils.IO.launch {
-                    val apiKey = args[1]
-                    if (client.get("https://api.hypixel.net/key?key=$apiKey")
-                            .body<HypixelResponse>().success
-                    ) {
-                        Skytils.config.apiKey = apiKey
-                        Skytils.hylinAPI.key = Skytils.config.apiKey
-                        Skytils.hylinAPI.endpoint =
-                            if (Skytils.hylinAPI.key.isNotBlank()) "https://api.hypixel.net" else "https://hypixel.skytils.gg"
-                        Skytils.config.markDirty()
-                        UChat.chat("$successPrefix §aYour Hypixel API key has been set to §f$apiKey§a.")
-                    } else {
-                        UChat.chat("$failPrefix §cThe Hypixel API key you provided was §finvalid§c.")
-                    }
-                }
-            }
-
             "config" -> Skytils.config.openGUI()
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(

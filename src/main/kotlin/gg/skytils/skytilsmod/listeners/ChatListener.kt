@@ -22,7 +22,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
@@ -49,16 +48,6 @@ object ChatListener {
         if (!Utils.isOnHypixel || event.type == 2.toByte()) return
         val formatted = event.message.formattedText
         val unformatted = formatted.stripControlCodes()
-        if (unformatted.startsWith("Your new API key is ") && event.message.siblings.size >= 1) {
-            val apiKey = event.message.siblings[0].chatStyle.chatClickEvent.value
-            Skytils.config.apiKey = apiKey
-            Skytils.hylinAPI.key = Skytils.config.apiKey
-            Skytils.hylinAPI.endpoint =
-                if (Skytils.hylinAPI.key.isNotBlank()) "https://api.hypixel.net" else "https://hypixel.skytils.gg"
-            Skytils.config.markDirty()
-            UChat.chat("$successPrefix §aSkytils updated your set Hypixel API key to §2${apiKey}")
-            return
-        }
         if (Skytils.config.autoReparty) {
             if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
                 val matcher = playerPattern.matcher(unformatted)

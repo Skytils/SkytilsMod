@@ -22,7 +22,7 @@ import gg.skytils.skytilsmod.commands.stats.StatCommand
 import gg.skytils.skytilsmod.features.impl.misc.ScamCheck
 import java.util.*
 
-object ScamCheckCommand : StatCommand("skytilsscamcheck", needApiKey = false, needProfile = false, listOf("stsc")) {
+object ScamCheckCommand : StatCommand("skytilsscamcheck", needProfile = false, listOf("stsc")) {
     override suspend fun displayStats(username: String, uuid: UUID) {
         val check = ScamCheck.checkScammer(uuid, "command").printResult(username)
     }
