@@ -103,7 +103,7 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:34ee9af85a") {
+    shadowMeMod("com.github.Skytils:Hylin:33ce24c56d") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
@@ -123,7 +123,7 @@ dependencies {
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
     shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
-    shadowMe("io.ktor:ktor-client-encoding")
+    shadowMe("io.ktor:ktor-client-encoding-jvm")
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
