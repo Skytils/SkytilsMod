@@ -42,7 +42,7 @@ val RES_ITEM_GLINT = ResourceLocation("textures/misc/enchanted_item_glint.png")
 
 var skipGlint = false
 
-fun renderRarity(stack: ItemStack, x: Int, y: Int, ci: CallbackInfo) {
+fun renderRarity(stack: ItemStack?, x: Int, y: Int, ci: CallbackInfo) {
     if (Utils.inSkyblock && Skytils.config.showItemRarity) {
         if (mc.currentScreen != null) {
             if (isStorageMenuActive || isTradeWindowActive || isCustomAHActive) {
