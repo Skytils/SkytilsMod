@@ -123,6 +123,7 @@ dependencies {
     shadowMe("io.ktor:ktor-client-core-jvm")
     shadowMe("io.ktor:ktor-client-cio-jvm")
     shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
+    shadowMe("io.ktor:ktor-client-encoding")
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
