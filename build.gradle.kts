@@ -125,9 +125,7 @@ dependencies {
     shadowMe(ktor("client-cio-jvm"))
     shadowMe(ktor("client-content-negotiation-jvm"))
     shadowMe(ktor("client-encoding-jvm"))
-    shadowMe(ktor("serialization-gson-jvm")) {
-        exclude(module = "gson")
-    }
+    shadowMe(ktor("serialization-gson-jvm"))
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
@@ -191,6 +189,7 @@ tasks {
         relocate("io.ktor", "gg.skytils.ktor")
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
+        relocate("com.google.gson", "gg.skytils.gson")
 
         exclude(
             "**/LICENSE.md",
