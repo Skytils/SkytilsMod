@@ -78,6 +78,7 @@
     "sba.MixinContainerPreviewManager",
     "sk1eroam.MixinAnimationHandler",
     "util.MixinChatStyle",
+    "util.MixinIChatComponentSerializer",
     "util.MixinUtil",
     "world.MixinChunk",
     "world.MixinWorld"
