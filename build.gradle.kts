@@ -118,12 +118,13 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.2.3"))
-    shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
-    shadowMe("io.ktor:ktor-client-core-jvm")
-    shadowMe("io.ktor:ktor-client-cio-jvm")
-    shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
-    shadowMe("io.ktor:ktor-client-encoding-jvm")
+    shadowMe(platform(kotlin("bom")))
+    shadowMe(platform(ktor("bom", "2.2.3")))
+    shadowMe(ktor("serialization-kotlinx-json-jvm"))
+    shadowMe(ktor("client-core-jvm"))
+    shadowMe(ktor("client-cio-jvm"))
+    shadowMe(ktor("client-content-negotiation-jvm"))
+    shadowMe(ktor("client-encoding-jvm"))
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
@@ -258,3 +259,12 @@ signing {
         sign(tasks["remapJar"])
     }
 }
+
+/**
+ * Builds the dependency notation for the named Ktor [module] at the given [version].
+ *
+ * @param module simple name of the Ktor module, for example "client-core".
+ * @param version optional desired version, unspecified if null.
+ */
+fun DependencyHandler.ktor(module: String, version: String? = null): Any =
+    "io.ktor:ktor-$module${version?.let { ":$version" } ?: ""}"
