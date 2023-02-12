@@ -664,7 +664,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
 
                 Skytils.config.compactPowderMessages && formatted.startsWith("§r§aYou received §r§b+") && formatted.endsWith(
-                    " Powder§r"
+                    " Powder.§r"
                 ) -> {
                     val matcher = Regexs.POWDERCHEST.pattern.find(formatted)
                     if (matcher != null) {
