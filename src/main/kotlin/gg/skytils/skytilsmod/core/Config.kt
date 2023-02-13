@@ -1258,6 +1258,13 @@ object Config : Vigilant(
     var twitchFix = true
 
     @Property(
+        type = PropertyType.TEXT, name = "Kuudra Auto-Reparty Player",
+        description = "Automatically performs a reparty upon joining a Kuudra bossfight. Leave this blank to disable.",
+        category = "Miscellaneous", subcategory = "Kuudra"
+    )
+    var kuudraAutoRepartyPlayer = ""
+
+    @Property(
         type = PropertyType.SWITCH, name = "Price Paid",
         description = "Records and shows the price you paid for certain items.",
         category = "Miscellaneous", subcategory = "Items"

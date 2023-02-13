@@ -157,7 +157,7 @@ object ChatListener {
             if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
                 val invitee = invitePattern.matcher(unformatted)
                 if (invitee.find()) {
-                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
+                    println("${invitee.group(1)}: ${RepartyCommand.repartyFailList.remove(invitee.group(1))}")
                 }
                 tryRemoveLineAtIndex(1)
                 awaitingDelimiter = true
