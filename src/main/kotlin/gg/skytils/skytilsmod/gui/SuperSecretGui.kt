@@ -40,7 +40,7 @@ import net.minecraft.client.audio.PositionedSoundRecord
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 
-class SuperSecretGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
+class SuperSecretGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
     val catSound: PositionedSoundRecord = PositionedSoundRecord.create(

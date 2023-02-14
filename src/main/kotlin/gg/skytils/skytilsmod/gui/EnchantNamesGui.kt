@@ -39,7 +39,7 @@ import gg.skytils.skytilsmod.gui.components.SimpleButton
 import net.minecraft.util.ChatAllowedCharacters
 import java.awt.Color
 
-class EnchantNamesGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
+class EnchantNamesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
 

@@ -37,7 +37,7 @@ import java.awt.Desktop
 import java.net.URI
 
 class OptionsGui :
-    WindowScreen(ElementaVersion.V1, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
+    WindowScreen(ElementaVersion.V2, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText =
         UIText(if (Utils.isBSMod) "BSMod" else "Skytils", shadow = false).childOf(window).constrain {

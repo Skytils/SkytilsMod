@@ -52,7 +52,7 @@ import skytils.hylin.skyblock.Skills
 import java.awt.Color
 import java.util.*
 
-class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, drawDefaultBackground = false) {
+class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
         it.onSetValue { uuid ->
             val profile = GameProfile(uuid, "")

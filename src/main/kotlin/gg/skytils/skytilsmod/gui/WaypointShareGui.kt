@@ -53,7 +53,7 @@ import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.util.zip.Deflater
 
-class WaypointShareGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
+class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
     companion object {
         private const val CATEGORY_INNER_VERTICAL_PADDING = 7.5
