@@ -1034,6 +1034,13 @@ object Config : Vigilant(
     var gardenPlotCleanupHelper = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Visitor Notifications",
+        description = "Sends a message in chat when a visitor is at your garden.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var visitorNotifications = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Farming RNG Titles",
         description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
         category = "Farming", subcategory = "Quality of Life"

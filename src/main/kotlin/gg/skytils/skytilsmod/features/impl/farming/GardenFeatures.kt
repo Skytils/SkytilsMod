@@ -18,6 +18,10 @@
 
 package gg.skytils.skytilsmod.features.impl.farming
 
+import gg.essential.universal.UChat
+import gg.essential.universal.utils.MCClickEventAction
+import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.ScoreboardUtil
@@ -33,15 +37,46 @@ object GardenFeatures {
         private set
     val trashBlocks = setOf(Blocks.grass, Blocks.tallgrass, Blocks.red_flower, Blocks.yellow_flower)
 
+    // TODO: Check if the visitors has hit the limit (changes with garden level)
+    // private val visitorCount = Regex("^\\s*§r§b§lVisitors: §r§f\\((?<visitors>\\d+)\\)§r\$")
+    private val nextVisitor = Regex("\\s*§r Next Visitor: §r§b(?:(?<min>\\d+)m )?(?<sec>\\d+)s§r")
+    private var nextVisitorAt = -1L
+    private var ticks = 0
+
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (SBInfo.mode != SkyblockIsland.TheGarden.mode || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
 
-        isCleaningPlot = ScoreboardUtil.sidebarLines.any {
-            it.matches(cleanupRegex)
-        }.also {
-            if (it != isCleaningPlot) {
-                mc.renderGlobal.loadRenderers()
+        if (ticks++ % 5 != 0) {
+            val inGarden = SBInfo.mode == SkyblockIsland.TheGarden.mode
+
+            isCleaningPlot = inGarden && ScoreboardUtil.sidebarLines.any {
+                it.matches(cleanupRegex)
+            }.also {
+                if (it != isCleaningPlot) {
+                    mc.renderGlobal.loadRenderers()
+                }
+            }
+
+            if (inGarden) {
+                if (nextVisitorAt == -1L) {
+                    val match = ScoreboardUtil.sidebarLines.firstNotNullOfOrNull { nextVisitor.find(it) }
+                    if (match != null) {
+                        val min = match.groups["min"]?.value?.toIntOrNull() ?: 0
+                        val sec = match.groups["sec"]?.value?.toIntOrNull() ?: 0
+                        nextVisitorAt = System.currentTimeMillis() + (min * 60_000L) + (sec * 1000L)
+                    }
+                }
+            }
+
+            if (nextVisitorAt != -1L && System.currentTimeMillis() >= nextVisitorAt) {
+                nextVisitorAt += 15_000L
+                UChat.chat(
+                    UTextComponent("${Skytils.prefix} §bA new visitor is available on your garden!").setClick(
+                        MCClickEventAction.RUN_COMMAND,
+                        "/warp garden"
+                    )
+                )
             }
         }
     }
