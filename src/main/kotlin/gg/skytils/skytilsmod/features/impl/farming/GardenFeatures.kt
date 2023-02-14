@@ -35,9 +35,10 @@ object GardenFeatures {
     private val cleanupRegex = Regex("^\\s*Cleanup: [\\d.]+%$")
     var isCleaningPlot = false
         private set
-    val trashBlocks = setOf(Blocks.grass, Blocks.tallgrass, Blocks.red_flower, Blocks.yellow_flower)
+    val trashBlocks = setOf(Blocks.tallgrass, Blocks.red_flower, Blocks.yellow_flower)
 
     // TODO: Check if the visitors has hit the limit (changes with garden level)
+    // TODO: New visitors might not be spawned in after time is up if player is offline (needs confirmation)
     // private val visitorCount = Regex("^\\s*§r§b§lVisitors: §r§f\\((?<visitors>\\d+)\\)§r\$")
     private val nextVisitor = Regex("\\s*§r Next Visitor: §r§b(?:(?<min>\\d+)m )?(?<sec>\\d+)s§r")
     private var nextVisitorAt = -1L
@@ -47,7 +48,7 @@ object GardenFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
 
-        if (ticks++ % 5 != 0) {
+        if (ticks++ % 5 == 0) {
             val inGarden = SBInfo.mode == SkyblockIsland.TheGarden.mode
 
             isCleaningPlot = inGarden && ScoreboardUtil.sidebarLines.any {
