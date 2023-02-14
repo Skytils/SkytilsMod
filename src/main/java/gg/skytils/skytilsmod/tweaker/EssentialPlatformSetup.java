@@ -22,9 +22,14 @@ import gg.skytils.skytilsmod.Reference;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,10 +102,24 @@ public class EssentialPlatformSetup {
 
         try {
             if (Integer.parseInt(makeRequest(Reference.dataUrl + "api/version").trim()) > Reference.apiVersion) {
+                JButton btn = new JButton("Open Website");
+                btn.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        try {
+                            Desktop.getDesktop().browse(URI.create("https://skytils.gg"));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+
                 showMessage("<html><p>" +
                         "Your version of Skytils requires a<br>" +
                         "mandatory update before you can play!<br>" +
-                        "</p></html>");
+                        "Please download the latest version,<br>" +
+                        "join the Discord for support.<br>" +
+                        "</p></html>", btn);
             }
         } catch (Throwable t) {
             t.printStackTrace();
