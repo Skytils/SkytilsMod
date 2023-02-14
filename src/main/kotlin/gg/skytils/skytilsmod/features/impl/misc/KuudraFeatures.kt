@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object KuudraFeatures {
 
     private var awaitingJoinFrom: String? = null
+    private var lastWarpAt: Long = 0
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: PacketEvent.ReceiveEvent) {
@@ -38,7 +39,9 @@ object KuudraFeatures {
 
         val kuudraPlayerName = Skytils.config.kuudraAutoRepartyPlayer
         if (kuudraPlayerName.isNotEmpty()) {
-            if (formatted == "§e[NPC] §cElle§f: §rTalk with me to begin!§r") {
+            if (formatted.endsWith("§r§e, summoned you to their server.§r")) {
+                lastWarpAt = System.currentTimeMillis()
+            } else if (formatted == "§e[NPC] §cElle§f: §rTalk with me to begin!§r" && System.currentTimeMillis() - lastWarpAt > 5000) {
                 Skytils.sendMessageQueue.add("/party invite $kuudraPlayerName")
                 awaitingJoinFrom = kuudraPlayerName
             } else if (awaitingJoinFrom != null) {
