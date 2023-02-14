@@ -114,12 +114,24 @@ public class EssentialPlatformSetup {
                     }
                 });
 
+                JButton openModFolder = new JButton("Open Mod Folder");
+                openModFolder.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        try {
+                            Desktop.getDesktop().open(new File("./mods"));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+
                 showMessage("<html><p>" +
                         "Your version of Skytils requires a<br>" +
                         "mandatory update before you can play!<br>" +
                         "Please download the latest version,<br>" +
                         "join the Discord for support.<br>" +
-                        "</p></html>", btn);
+                        "</p></html>", btn, openModFolder);
             }
         } catch (Throwable t) {
             t.printStackTrace();
