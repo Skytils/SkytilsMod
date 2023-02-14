@@ -1027,6 +1027,13 @@ object Config : Vigilant(
     var shinyOrbWaypoints = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Plot Cleanup Helper",
+        description = "Makes flowers and grass more visible by rendering them as sponges.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var gardenPlotCleanupHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Farming RNG Titles",
         description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
         category = "Farming", subcategory = "Quality of Life"

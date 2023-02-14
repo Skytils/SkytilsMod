@@ -280,6 +280,7 @@ class Skytils {
             FarmingFeatures,
             FavoritePets,
             Funny,
+            GardenFeatures,
             GlintCustomizer,
             GriffinBurrows,
             IceFillSolver,
