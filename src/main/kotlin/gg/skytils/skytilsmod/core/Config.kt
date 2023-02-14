@@ -596,8 +596,15 @@ object Config : Vigilant(
     var necronHealth = 0
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
-        description = "Displays a more clear indicator of the dragons HP.",
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' Color as Text",
+        description = "Displays a more clear indicator of the dragons' text to make the game more accessible.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherDragonsColorBlind = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' HP",
+        description = "Displays a more clear indicator of the dragons' HP.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var showWitherKingDragonsHP = false
