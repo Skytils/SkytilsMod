@@ -37,11 +37,11 @@ object GardenFeatures {
         private set
     val trashBlocks = setOf(Blocks.tallgrass, Blocks.red_flower, Blocks.yellow_flower)
 
-    // TODO: Check if the visitors has hit the limit (changes with garden level)
     // TODO: New visitors might not be spawned in after time is up if player is offline (needs confirmation)
-    // private val visitorCount = Regex("^\\s*§r§b§lVisitors: §r§f\\((?<visitors>\\d+)\\)§r\$")
+    private val visitorCount = Regex("^\\s*§r§b§lVisitors: §r§f\\((?<visitors>\\d+)\\)§r\$")
     private val nextVisitor = Regex("\\s*§r Next Visitor: §r§b(?:(?<min>\\d+)m )?(?<sec>\\d+)s§r")
     private var nextVisitorAt = -1L
+    private var lastKnownVisitorCount = 0
     private var ticks = 0
 
     @SubscribeEvent
@@ -60,24 +60,37 @@ object GardenFeatures {
             }
 
             if (inGarden) {
-                if (nextVisitorAt == -1L) {
-                    val match = ScoreboardUtil.sidebarLines.firstNotNullOfOrNull { nextVisitor.find(it) }
-                    if (match != null) {
-                        val min = match.groups["min"]?.value?.toIntOrNull() ?: 0
-                        val sec = match.groups["sec"]?.value?.toIntOrNull() ?: 0
-                        nextVisitorAt = System.currentTimeMillis() + (min * 60_000L) + (sec * 1000L)
-                    }
+                val match = ScoreboardUtil.sidebarLines.firstNotNullOfOrNull { nextVisitor.find(it) }
+                if (match != null) {
+                    val min = match.groups["min"]?.value?.toIntOrNull() ?: 0
+                    val sec = match.groups["sec"]?.value?.toIntOrNull() ?: 0
+                    nextVisitorAt = System.currentTimeMillis() + (min * 60_000L) + (sec * 1000L)
                 }
+
+                lastKnownVisitorCount =
+                    (ScoreboardUtil.sidebarLines.firstNotNullOfOrNull { visitorCount.find(it) }?.groups?.get("visitors")?.value?.toIntOrNull()
+                        ?: 0).also {
+                        if (it > lastKnownVisitorCount) {
+                            UChat.chat("${Skytils.prefix} §b${it} visitors are available on your garden!")
+                        }
+                    }
             }
 
-            if (nextVisitorAt != -1L && System.currentTimeMillis() >= nextVisitorAt) {
-                nextVisitorAt += 15_000L
-                UChat.chat(
-                    UTextComponent("${Skytils.prefix} §bA new visitor is available on your garden!").setClick(
-                        MCClickEventAction.RUN_COMMAND,
-                        "/warp garden"
+            if (nextVisitorAt != -1L) {
+                // TODO: confirm the max count is 5
+                if (lastKnownVisitorCount > 5) {
+                    nextVisitorAt = -1L
+                } else if (System.currentTimeMillis() >= nextVisitorAt) {
+                    // TODO: 15 seconds is not constant, changes based on unique visitors and when crops are broken, however, it provides a good measure for now with a reasonable difference in time
+                    nextVisitorAt += 15_000L
+                    lastKnownVisitorCount++
+                    UChat.chat(
+                        UTextComponent("${Skytils.prefix} §bA new visitor is available on your garden!").setClick(
+                            MCClickEventAction.RUN_COMMAND,
+                            "/warp garden"
+                        )
                     )
-                )
+                }
             }
         }
     }
