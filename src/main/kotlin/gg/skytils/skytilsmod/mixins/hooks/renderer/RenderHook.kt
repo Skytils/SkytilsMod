@@ -22,7 +22,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.Vec3
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
@@ -57,8 +56,6 @@ fun renderLivingLabel(
         val player = mc.thePlayer
         val vec3 = Vec3(entityIn.posX - player.posX, 0.0, entityIn.posZ - player.posZ).normalize()
         matrixStack.translate(-vec3.xCoord, -1.5, -vec3.zCoord)
-    } else if (Skytils.config.bigTentacleTag && str.contains("Tentacle") && entityIn is EntityArmorStand) {
-        matrixStack.scale(10f, 10f, 10f)
     }
     matrixStack.applyToGlobalState()
 }
