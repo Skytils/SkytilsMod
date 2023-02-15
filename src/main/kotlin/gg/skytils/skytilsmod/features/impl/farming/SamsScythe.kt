@@ -34,7 +34,7 @@ object SamsScythe {
     private val validBlocks = setOf<Block>(
         Blocks.tallgrass, Blocks.double_plant, Blocks.leaves, Blocks.leaves2, Blocks.red_flower, Blocks.yellow_flower
     )
-    var items = hashMapOf("SAM_SCYTHE" to 2, "GARDEN_SCYTHE" to 3)
+    var items = hashMapOf("SAM_SCYTHE" to 1, "GARDEN_SCYTHE" to 2)
 
     @SubscribeEvent
     fun draw(event: DrawBlockHighlightEvent) {
@@ -42,15 +42,15 @@ object SamsScythe {
 
         if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
-        val size = isValid(ItemUtil.getSkyBlockItemID(Skytils.mc.thePlayer.heldItem)) ?: return
+        val size = items[ItemUtil.getSkyBlockItemID(Skytils.mc.thePlayer.heldItem)] ?: return
         val base = event.target.blockPos
 
         if (!validBlocks.contains(Skytils.mc.theWorld.getBlockState(base).block)) return
         draw(base, event.partialTicks)
         for (pos in BlockPos.getAllInBox(
-            base.add(-(size - 1), -(size - 1), -(size - 1)), base.add(size - 1, size - 1, size - 1)
+            base.add(-size, -size, -size), base.add(size, size, size)
         )) {
-            if (isAllowed(pos)) {
+            if (validBlocks.contains(Skytils.mc.theWorld.getBlockState(pos).block)) {
                 draw(pos, event.partialTicks)
             }
         }
@@ -74,16 +74,5 @@ object SamsScythe {
         )
         GlStateManager.disableBlend()
         GlStateManager.enableDepth()
-    }
-
-    private fun isAllowed(pos: BlockPos): Boolean {
-        return validBlocks.contains(Skytils.mc.theWorld.getBlockState(pos).block)
-    }
-
-    private fun isValid(s: String?): Int? {
-        for (item in items.keys) {
-            if (item == s) return items[item]
-        }
-        return null
     }
 }
