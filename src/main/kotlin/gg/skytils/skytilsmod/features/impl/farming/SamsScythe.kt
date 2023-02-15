@@ -33,114 +33,66 @@ import net.minecraftforge.client.event.DrawBlockHighlightEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SamsScythe {
-    private val validBlocks = setOf<Block>(Blocks.tallgrass,
-        Blocks.double_plant,
-        Blocks.leaves,
-        Blocks.leaves2,
-        Blocks.red_flower,
-        Blocks.yellow_flower)
-    var items = setOf(ItemInfo("SAM_SCYTHE", 2), ItemInfo("GARDEN_SCYTHE", 4))
-    @SubscribeEvent
-    fun draw(event: DrawBlockHighlightEvent){
-        if(!Config.showSamScytheBlocks)
-            return
+    private val validBlocks = setOf<Block>(
+        Blocks.tallgrass, Blocks.double_plant, Blocks.leaves, Blocks.leaves2, Blocks.red_flower, Blocks.yellow_flower
+    )
+    var items = HashMap<String, Int>()
 
-        if(event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK)
-            return
+    init {
+        items["SAM_SCYTHE"] = 2
+        items["GARDEN_SCYTHE"] = 3
+    }
+
+    @SubscribeEvent
+    fun draw(event: DrawBlockHighlightEvent) {
+        if (!Config.showSamScytheBlocks) return
+
+        if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
         val spread = isValid(ItemUtil.getSkyBlockItemID(Minecraft.getMinecraft().thePlayer.heldItem))
-        if(spread == -1)
-            return
+        if (spread == -1) return
         val base = event.target.blockPos
 
-        if(!validBlocks.contains(Minecraft.getMinecraft().theWorld.getBlockState(base).block))
-            return
+        if (!validBlocks.contains(Minecraft.getMinecraft().theWorld.getBlockState(base).block)) return
+        draw(base, event.partialTicks)
+        if (spread != null) {
+            for (pos in BlockPos.getAllInBox(
+                base.add(-(spread - 1), -(spread - 1), -(spread - 1)), base.add(spread - 1, spread - 1, spread - 1)
+            )) {
+                if (isAllowed(pos)) {
+                    draw(pos, event.partialTicks)
+                }
+            }
+        }
+    }
 
-        val alreadyChecked: MutableSet<BlockPos> = HashSet()
-        alreadyChecked.add(base)
-        val s = Minecraft.getMinecraft().theWorld.getBlockState(base)
-        val (x, y, z) = RenderUtil.getViewerPos(event.partialTicks)
-        val m = UMatrixStack()
+    private fun draw(pos: BlockPos, partialTicks: Float) {
+        val state = Minecraft.getMinecraft().theWorld.getBlockState(pos)
+        val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
+        val matrixStack = UMatrixStack()
         GlStateManager.disableCull()
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        s.block.setBlockBoundsBasedOnState(Skytils.mc.theWorld, base)
+        state.block.setBlockBoundsBasedOnState(Skytils.mc.theWorld, pos)
         RenderUtil.drawFilledBoundingBox(
-            m,
-            s.block.getSelectedBoundingBox(Skytils.mc.theWorld, base)
+            matrixStack,
+            state.block.getSelectedBoundingBox(Skytils.mc.theWorld, pos)
                 .expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
-                .offset(-x, -y, -z),
+                .offset(-viewerX, -viewerY, -viewerZ),
             Skytils.config.samScytheColor
         )
         GlStateManager.disableBlend()
         GlStateManager.enableDepth()
-        val queue: MutableSet<BlockPos> = HashSet()
-        queue.add(event.target.blockPos)
-
-
-
-
-
-       for (i in 1 until spread){
-           for (q: BlockPos in HashSet<BlockPos>(queue)){
-               for (pos in setOf(q.up(), q.down(), q.north(), q.south(), q.east(), q.west(),
-                   q.north().up(), q.north().down(), q.north().west(), q.north().east(),
-                   q.south().up(), q.south().down(), q.south().west(), q.south().east(),
-                   q.west().up(), q.west().down(), q.east().up(), q.east().down(),
-                   q.north().down().west(), q.north().down().east(), q.north().up().west(), q.north().up().east(),
-                   q.south().down().west(), q.south().down().east(), q.south().up().west(), q.south().up().east())){
-                   if (alreadyChecked.contains(pos))
-                       continue
-                   alreadyChecked.add(pos)
-                   if (isAllowed(pos)) {
-                       queue.add(pos)
-                       val state = Minecraft.getMinecraft().theWorld.getBlockState(pos)
-                       val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-                       val matrixStack = UMatrixStack()
-                       GlStateManager.disableCull()
-                       GlStateManager.enableBlend()
-                       GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                       state.block.setBlockBoundsBasedOnState(Skytils.mc.theWorld, pos)
-                       RenderUtil.drawFilledBoundingBox(
-                           matrixStack,
-                           state.block.getSelectedBoundingBox(Skytils.mc.theWorld, pos)
-                               .expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
-                               .offset(-viewerX, -viewerY, -viewerZ),
-                           Skytils.config.samScytheColor
-                       )
-                       GlStateManager.disableBlend()
-                       GlStateManager.enableDepth()
-                   }
-               }
-               queue.remove(q)
-           }
-       }
-
-
     }
-    private fun isAllowed(pos: BlockPos): Boolean{
+
+    private fun isAllowed(pos: BlockPos): Boolean {
         return validBlocks.contains(Minecraft.getMinecraft().theWorld.getBlockState(pos).block)
     }
 
-    private fun isValid(s: String?): Int{
-        for (item in items){
-            if(item.equals(s))
-                return item.blocks
+    private fun isValid(s: String?): Int? {
+        for (item in items.keys) {
+            if (item == s) return items[item]
         }
         return -1
-    }
-
-    data class ItemInfo(val id: String, val blocks: Int){
-        override fun equals(other: Any?): Boolean {
-            val s: String? = other as String?
-
-            return s != null && s == id
-        }
-
-        override fun hashCode(): Int {
-            var result = id.hashCode()
-            result = 31 * result + blocks
-            return result
-        }
     }
 }

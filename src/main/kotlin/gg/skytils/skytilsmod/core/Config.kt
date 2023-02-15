@@ -1062,13 +1062,13 @@ object Config : Vigilant(
     var talbotsTheodoliteHelper = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Sam Scythe Block",
-        description = "Shows the blocks which will be broken when using Sam Scythe or Garden Scythe.",
+        type = PropertyType.SWITCH, name = "Show Sam's Scythe Block",
+        description = "Shows the blocks which will be broken when using Sam's Scythe or Garden Scythe.",
         category = "Farming", subcategory = "Garden"
     )
     var showSamScytheBlocks = false;
     @Property(
-        type = PropertyType.COLOR, name = "Color of Sam Scythe marked blocks",
+        type = PropertyType.COLOR, name = "Color of Sam's Scythe marked blocks",
         description = "Sets the color of the highlighted blocks.",
         category = "Farming", subcategory = "Garden"
 
