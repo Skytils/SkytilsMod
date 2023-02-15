@@ -20,11 +20,9 @@ package gg.skytils.skytilsmod.features.impl.farming
 
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil
 import net.minecraft.block.Block
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
@@ -36,38 +34,31 @@ object SamsScythe {
     private val validBlocks = setOf<Block>(
         Blocks.tallgrass, Blocks.double_plant, Blocks.leaves, Blocks.leaves2, Blocks.red_flower, Blocks.yellow_flower
     )
-    var items = HashMap<String, Int>()
-
-    init {
-        items["SAM_SCYTHE"] = 2
-        items["GARDEN_SCYTHE"] = 3
-    }
+    var items = hashMapOf("SAM_SCYTHE" to 2, "GARDEN_SCYTHE" to 3)
 
     @SubscribeEvent
     fun draw(event: DrawBlockHighlightEvent) {
-        if (!Config.showSamScytheBlocks) return
+        if (!Skytils.config.showSamScytheBlocks) return
 
         if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
-        val spread = isValid(ItemUtil.getSkyBlockItemID(Minecraft.getMinecraft().thePlayer.heldItem))
-        if (spread == -1) return
+        val size = isValid(ItemUtil.getSkyBlockItemID(Skytils.mc.thePlayer.heldItem)) ?: return
         val base = event.target.blockPos
 
-        if (!validBlocks.contains(Minecraft.getMinecraft().theWorld.getBlockState(base).block)) return
+        if (!validBlocks.contains(Skytils.mc.theWorld.getBlockState(base).block)) return
         draw(base, event.partialTicks)
-        if (spread != null) {
-            for (pos in BlockPos.getAllInBox(
-                base.add(-(spread - 1), -(spread - 1), -(spread - 1)), base.add(spread - 1, spread - 1, spread - 1)
-            )) {
-                if (isAllowed(pos)) {
-                    draw(pos, event.partialTicks)
-                }
+        for (pos in BlockPos.getAllInBox(
+            base.add(-(size - 1), -(size - 1), -(size - 1)), base.add(size - 1, size - 1, size - 1)
+        )) {
+            if (isAllowed(pos)) {
+                draw(pos, event.partialTicks)
             }
         }
+
     }
 
     private fun draw(pos: BlockPos, partialTicks: Float) {
-        val state = Minecraft.getMinecraft().theWorld.getBlockState(pos)
+        val state = Skytils.mc.theWorld.getBlockState(pos)
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
         val matrixStack = UMatrixStack()
         GlStateManager.disableCull()
@@ -86,13 +77,13 @@ object SamsScythe {
     }
 
     private fun isAllowed(pos: BlockPos): Boolean {
-        return validBlocks.contains(Minecraft.getMinecraft().theWorld.getBlockState(pos).block)
+        return validBlocks.contains(Skytils.mc.theWorld.getBlockState(pos).block)
     }
 
     private fun isValid(s: String?): Int? {
         for (item in items.keys) {
             if (item == s) return items[item]
         }
-        return -1
+        return null
     }
 }
