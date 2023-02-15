@@ -1062,6 +1062,20 @@ object Config : Vigilant(
     var talbotsTheodoliteHelper = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Sam Scythe Block",
+        description = "Shows the blocks which will be broken when using Sam Scythe or Garden Scythe.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var showSamScytheBlocks = false;
+    @Property(
+        type = PropertyType.COLOR, name = "Color of Sam Scythe marked blocks",
+        description = "Sets the color of the highlighted blocks.",
+        category = "Farming", subcategory = "Garden"
+
+    )
+    var samScytheColor = Color(255, 0, 0, 50);
+
+    @Property(
         type = PropertyType.TEXT, name = "Kuudra Auto-Reparty Player",
         description = "Automatically performs a reparty upon joining a Kuudra bossfight. Leave this blank to disable.",
         category = "Kuudra", subcategory = "Quality of Life"
@@ -2705,6 +2719,8 @@ object Config : Vigilant(
 
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
+
+        addDependency("samScytheColor", "showSamScytheBlocks")
 
         addDependency("itemRarityOpacity", "showItemRarity")
         addDependency("itemRarityShape", "showItemRarity")

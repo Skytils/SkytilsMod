@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.features.impl.events.MayorDiana
 import gg.skytils.skytilsmod.features.impl.events.MayorJerry
 import gg.skytils.skytilsmod.features.impl.events.TechnoMayor
 import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures
+import gg.skytils.skytilsmod.features.impl.farming.SamsScythe
 import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
 import gg.skytils.skytilsmod.features.impl.handlers.*
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -327,6 +328,7 @@ class Skytils {
             TriviaSolver,
             WaterBoardSolver,
             Waypoints,
+            SamsScythe
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
