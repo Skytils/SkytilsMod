@@ -28,13 +28,6 @@ pluginManagement {
         maven("https://repo.sk1er.club/repository/maven-releases/")
         maven("https://jitpack.io")
     }
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "net.minecraftforge.gradle.forge" -> useModule("com.github.Skytils:ForgeGradle:${requested.version}")
-            }
-        }
-    }
 }
 
 rootProject.name = "SkytilsMod"
