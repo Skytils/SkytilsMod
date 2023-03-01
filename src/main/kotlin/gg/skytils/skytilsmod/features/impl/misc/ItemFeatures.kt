@@ -208,9 +208,17 @@ object ItemFeatures {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
                         if (stack.displayName.containsAny(
-                                "Defuse Kit", "Lever", "Torch",
-                                "Stone Button", "Tripwire Hook", "Journal Entry",
-                                "Training Weights", "Mimic Fragment", "Healing 8 Splash Potion", "Healing VIII Splash Potion", "Premium Flesh"
+                                "Defuse Kit",
+                                "Lever",
+                                "Torch",
+                                "Stone Button",
+                                "Tripwire Hook",
+                                "Journal Entry",
+                                "Training Weights",
+                                "Mimic Fragment",
+                                "Healing 8 Splash Potion",
+                                "Healing VIII Splash Potion",
+                                "Premium Flesh"
                             )
                         ) event.slot highlight Color(255, 50, 150, 255)
                     }
@@ -695,23 +703,12 @@ object ItemFeatures {
             val block = obj.blockPos ?: return
             val state = mc.theWorld.getBlockState(block)
             if (isValidEtherwarpPos(obj)) {
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-                val matrixStack = UMatrixStack()
-                GlStateManager.disableCull()
-                GlStateManager.disableDepth()
-                GlStateManager.enableBlend()
-                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                state.block.setBlockBoundsBasedOnState(mc.theWorld, block)
-                RenderUtil.drawFilledBoundingBox(
-                    matrixStack,
-                    state.block.getSelectedBoundingBox(mc.theWorld, block)
-                        .expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
-                        .offset(-viewerX, -viewerY, -viewerZ),
-                    Skytils.config.showEtherwarpTeleportPosColor
+                RenderUtil.drawSelectionBox(
+                    block,
+                    state.block,
+                    Skytils.config.showEtherwarpTeleportPosColor,
+                    event.partialTicks
                 )
-                GlStateManager.disableBlend()
-                GlStateManager.enableCull()
-                GlStateManager.enableDepth()
             }
         }
     }

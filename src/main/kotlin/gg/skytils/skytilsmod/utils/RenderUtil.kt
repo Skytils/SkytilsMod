@@ -32,6 +32,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
+import net.minecraft.block.Block
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
@@ -833,6 +834,31 @@ object RenderUtil {
                 SmartFontRenderer.TextShadow.NORMAL
             )
         }
+    }
+
+    fun drawSelectionBox(
+        pos: BlockPos,
+        block: Block = mc.theWorld.getBlockState(pos).block,
+        color: Color,
+        partialTicks: Float
+    ) {
+        val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
+        val matrixStack = UMatrixStack()
+        GlStateManager.disableCull()
+        GlStateManager.disableDepth()
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        block.setBlockBoundsBasedOnState(mc.theWorld, pos)
+        drawFilledBoundingBox(
+            matrixStack,
+            block.getSelectedBoundingBox(mc.theWorld, pos)
+                .expandBlock()
+                .offset(-viewerX, -viewerY, -viewerZ),
+            color
+        )
+        GlStateManager.disableBlend()
+        GlStateManager.enableCull()
+        GlStateManager.enableDepth()
     }
 }
 
