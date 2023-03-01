@@ -1034,6 +1034,20 @@ object Config : Vigilant(
     var gardenPlotCleanupHelper = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Sam's Scythe Blocks",
+        description = "Shows the blocks which will be broken when using Sam's Scythe or Garden Scythe.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var showSamScytheBlocks = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Color of Sam's Scythe Marked Blocks",
+        description = "Sets the color of the highlighted blocks.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var samScytheColor = Color(255, 0, 0, 50)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Visitor Notifications",
         description = "Sends a message in chat when a visitor is at your garden.",
         category = "Farming", subcategory = "Garden"
@@ -2726,6 +2740,8 @@ object Config : Vigilant(
 
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
+
+        addDependency("samScytheColor", "showSamScytheBlocks")
 
         addDependency("itemRarityOpacity", "showItemRarity")
         addDependency("itemRarityShape", "showItemRarity")

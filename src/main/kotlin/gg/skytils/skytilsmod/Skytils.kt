@@ -328,7 +328,7 @@ class Skytils {
             TreasureHunter,
             TriviaSolver,
             WaterBoardSolver,
-            Waypoints,
+            Waypoints
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
