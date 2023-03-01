@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
+import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
@@ -191,6 +192,13 @@ object MasterMode7Features {
                 if (drag.isDestroyed) continue
                 RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 3.69f, event.partialTicks)
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (event.entity is EntityDragon && event.entity.deathTicks > 1 && shouldHideDragonDeath()) {
+            event.isCanceled = true
         }
     }
 
