@@ -106,7 +106,7 @@ object GardenFeatures {
     }
 
     @SubscribeEvent
-    fun draw(event: DrawBlockHighlightEvent) {
+    fun onBlockSelect(event: DrawBlockHighlightEvent) {
         if (!Utils.inSkyblock || !Skytils.config.showSamScytheBlocks) return
 
         if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
