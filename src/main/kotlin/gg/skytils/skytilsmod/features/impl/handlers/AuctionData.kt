@@ -46,7 +46,7 @@ object AuctionData {
         val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
         var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
         when (id) {
-            "PET" -> if (extraAttr.hasKey("petInfo")) {
+            "PET" -> if (extraAttr.getString("petInfo").startsWith("{")) {
                 val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
                 id = "PET-${petInfo.type}-${petInfo.tier}"
             }

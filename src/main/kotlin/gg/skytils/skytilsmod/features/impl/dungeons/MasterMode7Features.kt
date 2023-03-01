@@ -142,11 +142,12 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         val entity = event.entity
-        if (Skytils.config.showWitherKingDragonsHP && DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
+        if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon && (Skytils.config.showWitherDragonsColorBlind || Skytils.config.showWitherKingDragonsHP || Skytils.config.showWitherKingStatueBox)) {
             val matrixStack = UMatrixStack()
             entity as ExtensionEntityLivingBase
             GlStateManager.disableCull()
             GlStateManager.disableDepth()
+            val text = StringBuilder()
             val percentage = event.entity.health / event.entity.baseMaxHealth
             val color = when {
                 percentage >= 0.75 -> ColorFactory.YELLOWGREEN
@@ -154,17 +155,24 @@ object MasterMode7Features {
                 percentage >= 0.25 -> ColorFactory.DARKORANGE
                 else -> ColorFactory.CRIMSON
             }
+            if (Skytils.config.showWitherDragonsColorBlind) {
+                text.append(entity.skytilsHook.masterDragonType?.textColor)
+                text.append(' ')
+            }
+            if (Skytils.config.showWitherKingDragonsHP) {
+                text.append(NumberUtil.format(event.entity.health))
+            }
+            if (Skytils.config.showWitherKingStatueBox && entity.skytilsHook.masterDragonType?.bb?.isVecInside(entity.positionVector) == true) {
+                text.append(" §fR")
+            }
+
             RenderUtil.drawLabel(
                 Vec3(
                     RenderUtil.interpolate(entity.posX, entity.lastTickPosX, RenderUtil.getPartialTicks()),
                     RenderUtil.interpolate(entity.posY, entity.lastTickPosY, RenderUtil.getPartialTicks()) + 0.5f,
                     RenderUtil.interpolate(entity.posZ, entity.lastTickPosZ, RenderUtil.getPartialTicks())
                 ),
-                "${NumberUtil.format(event.entity.health)} ${
-                    "§fR".toStringIfTrue(
-                        entity.skytilsHook.masterDragonType?.bb?.isVecInside(entity.positionVector)
-                    )
-                }",
+                text.toString(),
                 color,
                 RenderUtil.getPartialTicks(),
                 matrixStack,

@@ -169,6 +169,7 @@ object SBInfo {
 
 enum class SkyblockIsland(val formattedName: String, val mode: String) {
     PrivateIsland("Private Island", "dynamic"),
+    TheGarden("The Garden", "garden"),
     SpiderDen("Spider's Den", "combat_1"),
     CrimsonIsle("Crimson Isle", "crimson_isle"),
     TheEnd("The End", "combat_3"),

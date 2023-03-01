@@ -41,7 +41,7 @@ import gg.skytils.skytilsmod.gui.components.RepoFilterComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class SpamHiderGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
+class SpamHiderGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     @Suppress("UNCHECKED_CAST")
     val configHiders = Skytils.config.getCategories()
         .flatMap { category ->

@@ -596,8 +596,15 @@ object Config : Vigilant(
     var necronHealth = 0
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
-        description = "Displays a more clear indicator of the dragons HP.",
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' Color as Text",
+        description = "Displays a more clear indicator of the dragons' text to make the game more accessible.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherDragonsColorBlind = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' HP",
+        description = "Displays a more clear indicator of the dragons' HP.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var showWitherKingDragonsHP = false
@@ -1018,6 +1025,20 @@ object Config : Vigilant(
         category = "Events", subcategory = "Technoblade"
     )
     var shinyOrbWaypoints = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Plot Cleanup Helper",
+        description = "Makes flowers and grass more visible by rendering them as sponges.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var gardenPlotCleanupHelper = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Visitor Notifications",
+        description = "Sends a message in chat when a visitor is at your garden.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var visitorNotifications = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Farming RNG Titles",

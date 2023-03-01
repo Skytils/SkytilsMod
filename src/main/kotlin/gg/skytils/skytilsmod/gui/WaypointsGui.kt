@@ -44,7 +44,7 @@ import gg.skytils.skytilsmod.utils.*
 import net.minecraft.util.BlockPos
 import java.awt.Color
 
-class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
+class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
 

@@ -35,7 +35,7 @@ import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import net.minecraft.client.gui.GuiMainMenu
 
-class RequestUpdateGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2) {
+class RequestUpdateGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
     init {
         val updateObj = UpdateChecker.updateGetter.updateObj ?: error("Update object is null")

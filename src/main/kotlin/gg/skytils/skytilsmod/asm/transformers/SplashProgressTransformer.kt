@@ -68,11 +68,13 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
 object SplashProgressTransformer {
     val gifs = mapOf(
         0.0 to getSkytilsResource("splashes/sychicpet.gif"),
-        88.5 to getSkytilsResource("splashes/sychiccat.png"),
-        94.5 to getSkytilsResource("splashes/breefingdog.png"),
-        96.0 to getSkytilsResource("splashes/azoopet.gif"),
-        99.0 to getSkytilsResource("splashes/abdpfp.gif"),
-        99.7 to getSkytilsResource("splashes/bigrat.png"),
+        85.5 to getSkytilsResource("splashes/sychiccat.png"),
+        92.5 to getSkytilsResource("splashes/breefingdog.png"),
+        93.0 to getSkytilsResource("splashes/azoopet.gif"),
+        96.0 to getSkytilsResource("splashes/abdpfp.gif"),
+        96.7 to getSkytilsResource("splashes/bigrat.png"),
+        97.0 to getSkytilsResource("splashes/doge.png"),
+        98.5 to getSkytilsResource("splashes/janipfp.gif"),
         // this is around the chance of winning the jackpot on the lottery
         100 - 100 * 1 / 302_575_350.0 to getSkytilsResource("splashes/jamcat.gif")
     )
