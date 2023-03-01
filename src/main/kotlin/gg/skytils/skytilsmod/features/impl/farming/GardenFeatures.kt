@@ -35,7 +35,7 @@ object GardenFeatures {
     private val cleanupRegex = Regex("^\\s*Cleanup: [\\d.]+%$")
     var isCleaningPlot = false
         private set
-    val trashBlocks = setOf(Blocks.tallgrass, Blocks.red_flower, Blocks.yellow_flower)
+    val trashBlocks = setOf(Blocks.tallgrass, Blocks.red_flower, Blocks.yellow_flower, Blocks.double_plant)
 
     // TODO: New visitors might not be spawned in after time is up if player is offline (needs confirmation)
     private val visitorCount = Regex("^\\s*§r§b§lVisitors: §r§f\\((?<visitors>\\d+)\\)§r\$")
