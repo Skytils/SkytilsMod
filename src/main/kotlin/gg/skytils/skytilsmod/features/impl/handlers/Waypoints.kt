@@ -24,9 +24,13 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.commons.codec.binary.Base64
+import org.apache.commons.codec.binary.Base64InputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import java.awt.Color
 import java.io.File
 import java.io.Reader
@@ -34,6 +38,82 @@ import java.io.Writer
 
 object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     val categories = HashSet<WaypointCategory>()
+
+    private val sbeWaypointFormat =
+        Regex("(?:\\.?\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@-(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
+
+    @OptIn(ExperimentalSerializationApi::class)
+    fun getWaypointsFromString(str: String): Set<WaypointCategory> {
+        val categories = hashSetOf<WaypointCategory>()
+        if (str.startsWith("<Skytils-Waypoint-Data>(V")) {
+            val version = str.substringBefore(')').substringAfter('V').toIntOrNull() ?: 0
+            val content = str.substringAfter(':')
+
+            val data = when (version) {
+                1 -> {
+                    GzipCompressorInputStream(Base64InputStream(content.byteInputStream())).use {
+                        it.readBytes().decodeToString()
+                    }
+                }
+
+                else -> throw IllegalArgumentException("Unknown version $version")
+            }
+
+            categories.addAll(json.decodeFromString<CategoryList>(data).categories)
+
+        } else if (Base64.isBase64(str)) {
+            json.decodeFromStream<JsonElement>(Base64InputStream(str.byteInputStream())).let { element ->
+                when (element) {
+                    is JsonObject -> {
+                        categories.addAll(
+                            json.decodeFromJsonElement<CategoryList>(element).categories
+                        )
+                    }
+
+                    is JsonArray -> {
+                        val waypoints = json.decodeFromJsonElement<List<Waypoint>>(element)
+                        waypoints.groupBy {
+                            @Suppress("DEPRECATION")
+                            it.island!!
+                        }.mapTo(categories) { (island, waypoints) ->
+                            WaypointCategory(
+                                name = null,
+                                waypoints = waypoints.toHashSet(),
+                                isExpanded = true,
+                                island = island
+                            )
+                        }
+                    }
+
+                    else -> throw IllegalArgumentException("Unknown JSON element type ${element::class}")
+                }
+            }
+        } else if (sbeWaypointFormat.containsMatchIn(str)) {
+            val island = SkyblockIsland.values().find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
+            val waypoints = sbeWaypointFormat.findAll(str.trim().replace("\n", "")).map {
+                Waypoint(
+                    it.groups["name"]!!.value,
+                    it.groups["x"]!!.value.toInt(), // For some dumb reason SBE inverts the x coordinate
+                    it.groups["y"]!!.value.toInt(),
+                    it.groups["z"]!!.value.toInt(),
+                    true,
+                    Color.RED,
+                    System.currentTimeMillis(),
+                    island
+                )
+            }.toSet()
+            categories.add(
+                WaypointCategory(
+                    name = null,
+                    waypoints = waypoints,
+                    isExpanded = true,
+                    island = island
+                )
+            )
+        } else throw IllegalArgumentException("Unknown waypoint format")
+
+        return categories
+    }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
