@@ -22,11 +22,13 @@ import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Base64InputStream
@@ -41,6 +43,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
 
     private val sbeWaypointFormat =
         Regex("(?:\\.?\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@-(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
+    private var visibleWaypoints = emptyList<Waypoint>()
 
     @OptIn(ExperimentalSerializationApi::class)
     fun getWaypointsFromString(str: String): Set<WaypointCategory> {
@@ -115,18 +118,30 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         return categories
     }
 
+    fun computeVisibleWaypoints() {
+        if (!Utils.inSkyblock) {
+            visibleWaypoints = emptyList()
+            return
+        }
+        val isUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
+        visibleWaypoints = categories.filter {
+            it.island.mode == SBInfo.mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
+        }.flatMap { category ->
+            category.waypoints.filter { it.enabled }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        visibleWaypoints = emptyList()
+        TickTask(20, ::computeVisibleWaypoints)
+    }
+
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (Utils.inSkyblock) {
-            val matrixStack = UMatrixStack()
-            val isUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
-            categories.filter {
-                it.island.mode == SBInfo.mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
-            }.forEach { category ->
-                category.waypoints.filter { it.enabled }.forEach {
-                    it.draw(event.partialTicks, matrixStack)
-                }
-            }
+        val matrixStack = UMatrixStack()
+        visibleWaypoints.forEach {
+            it.draw(event.partialTicks, matrixStack)
         }
     }
 

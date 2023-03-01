@@ -609,6 +609,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
     override fun onScreenClose() {
         super.onScreenClose()
         loadWaypointsForSelection(-1, isClosing = true)
+        Waypoints.computeVisibleWaypoints()
     }
 
     private fun updateCheckbox(category: Category?) {
