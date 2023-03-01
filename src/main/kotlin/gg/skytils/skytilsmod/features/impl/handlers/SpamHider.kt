@@ -66,7 +66,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     override fun read(reader: Reader) {
         filters.clear()
         val obj = json.decodeFromString<SpamHiderSave>(reader.readText())
-        obj.default.forEach { k, v ->
+        obj.default.forEach { (k, v) ->
             repoFilters.find { it.name == k }?.state = v.state
         }
         filters.addAll(obj.filter.values)
@@ -668,7 +668,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 ) -> {
                     val matcher = Regexs.POWDERCHEST.pattern.find(formatted)
                     if (matcher != null) {
-                        val amount = matcher.groups["amount"]?.value?.toInt() ?: 0
+                        val amount = matcher.groups["amount"]?.value?.replace(",", "")?.toInt() ?: 0
                         val type = matcher.groups["type"]?.value ?: "Error"
                         powderQueueTicks = 10
                         powderQueue.compute(type) { _, v ->
@@ -690,7 +690,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         if (powderQueueTicks != -1) {
             if (--powderQueueTicks <= 0) {
                 powderQueueTicks = -1
-                UChat.chat("§r§aYou received ${powderQueue.entries.joinToString(separator = " and ") { "§r§b+${it.value} §r§a${it.key}" }} Powder§r")
+                UChat.chat("§r§aYou received ${powderQueue.entries.joinToString(separator = " and ") { "§r§b+${it.value} §r§a${it.key}" }} Powder.§r")
                 powderQueue.clear()
             }
         }
@@ -783,7 +783,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
         override fun demoRender() {
             val messageWidth =
-                Minecraft.getMinecraft().fontRendererObj.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r".stripControlCodes())
+                ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r".stripControlCodes())
             val shadow: TextShadow = when (Skytils.config.spamShadow) {
                 1 -> TextShadow.NONE
                 2 -> TextShadow.OUTLINE
@@ -819,10 +819,10 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
-    private fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent, addToSpam: Boolean) {
-        if (ReceivePacketEvent.packet !is S02PacketChat) return
-        Utils.cancelChatPacket(ReceivePacketEvent)
-        if (addToSpam) newMessage(ReceivePacketEvent.packet.chatComponent.formattedText)
+    private fun cancelChatPacket(event: ReceiveEvent, addToSpam: Boolean) {
+        if (event.packet !is S02PacketChat) return
+        Utils.cancelChatPacket(event)
+        if (addToSpam) newMessage(event.packet.chatComponent.formattedText)
     }
 
     private fun newMessage(message: String) {
