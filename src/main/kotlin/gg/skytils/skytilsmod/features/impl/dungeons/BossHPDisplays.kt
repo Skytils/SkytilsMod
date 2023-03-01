@@ -31,17 +31,21 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.util.Vec3
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.util.regex.Pattern
 
 object BossHPDisplays {
     private var canGiantsSpawn = false
+    private var names = emptyList<Pair<String, Vec3>>()
 
     init {
         GiantHPElement()
@@ -67,42 +71,49 @@ object BossHPDisplays {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         canGiantsSpawn = false
+        names = emptyList()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (!Utils.inDungeons || event.phase != TickEvent.Phase.START) return
+        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet) {
+            val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
+            names = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().filter {
+                val name = it.displayName.formattedText
+                name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F7",
+                    "M6",
+                    "M7"
+                )) || GiantHPElement.GIANT_NAMES.any {
+                    name.contains(
+                        it
+                    )
+                })
+            }.map {
+                Pair(it.displayName.formattedText, it.positionVector.addVector(0.0, -10.0, 0.0))
+            }
+        } else names = emptyList()
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons) return
-        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet) {
-            val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
-            val matrixStack = UMatrixStack()
-            for (entity in mc.theWorld.loadedEntityList) {
-                if (entity !is EntityArmorStand) continue
-                val name = entity.displayName.formattedText
-                if (name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
-                        DungeonFeatures.dungeonFloor,
-                        "F7",
-                        "M6",
-                        "M7"
-                    )) || GiantHPElement.GIANT_NAMES.any {
-                        name.contains(
-                            it
-                        )
-                    })
-                ) {
-                    GlStateManager.disableCull()
-                    GlStateManager.disableDepth()
-                    RenderUtil.drawLabel(
-                        entity.positionVector.addVector(0.0, -10.0, 0.0),
-                        name,
-                        Color.WHITE,
-                        event.partialTicks,
-                        matrixStack
-                    )
-                    GlStateManager.enableDepth()
-                    GlStateManager.enableCull()
-                }
-            }
+        val matrixStack = UMatrixStack()
+        GlStateManager.disableCull()
+        GlStateManager.disableDepth()
+        for ((name, pos) in names) {
+            RenderUtil.drawLabel(
+                pos,
+                name,
+                Color.WHITE,
+                event.partialTicks,
+                matrixStack
+            )
         }
+        GlStateManager.enableDepth()
+        GlStateManager.enableCull()
     }
 
     class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", FloatPair(200, 30)) {
