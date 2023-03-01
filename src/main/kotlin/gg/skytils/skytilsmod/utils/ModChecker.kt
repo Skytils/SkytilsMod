@@ -37,6 +37,7 @@ object ModChecker {
         ClientBrandRetriever.getClientModName()?.startsWith("fml,forge") != true ||
                 ClientBrandRetriever.getClientModName() != FMLCommonHandler.instance().modName ||
                 Loader.isModLoaded("feather") ||
+                Loader.isModLoaded("labymod") ||
                 ForgeVersion.getStatus().ordinal > 3
     }
 
