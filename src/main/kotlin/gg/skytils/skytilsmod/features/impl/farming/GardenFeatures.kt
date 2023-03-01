@@ -44,7 +44,7 @@ object GardenFeatures {
         Blocks.leaves,
         Blocks.leaves2
     )
-    private val items = hashMapOf("SAM_SCYTHE" to 1, "GARDEN_SCYTHE" to 2)
+    private val scythes = hashMapOf("SAM_SCYTHE" to 1, "GARDEN_SCYTHE" to 2)
 
 
     // TODO: New visitors might not be spawned in after time is up if player is offline (needs confirmation)
@@ -111,7 +111,7 @@ object GardenFeatures {
 
         if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
-        val size = items[ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem)] ?: return
+        val size = scythes[ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem)] ?: return
         val base = event.target.blockPos
         val baseState = mc.theWorld.getBlockState(base)
 
