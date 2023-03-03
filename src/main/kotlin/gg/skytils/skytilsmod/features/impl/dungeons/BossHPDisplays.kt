@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.Vec3
-import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -45,7 +44,7 @@ import java.util.regex.Pattern
 
 object BossHPDisplays {
     private var canGiantsSpawn = false
-    private var names = emptyList<Pair<String, Vec3>>()
+    private var giantNames = emptyList<Pair<String, Vec3>>()
 
     init {
         GiantHPElement()
@@ -71,15 +70,15 @@ object BossHPDisplays {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         canGiantsSpawn = false
-        names = emptyList()
+        giantNames = emptyList()
     }
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inDungeons || event.phase != TickEvent.Phase.START) return
-        if (canGiantsSpawn && Skytils.config.showGiantHPAtFeet) {
+        if (canGiantsSpawn && (Skytils.config.showGiantHPAtFeet || Skytils.config.showGiantHP)) {
             val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
-            names = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().filter {
+            giantNames = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().filter {
                 val name = it.displayName.formattedText
                 name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
@@ -94,16 +93,16 @@ object BossHPDisplays {
             }.map {
                 Pair(it.displayName.formattedText, it.positionVector.addVector(0.0, -10.0, 0.0))
             }
-        } else names = emptyList()
+        } else giantNames = emptyList()
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Utils.inDungeons) return
+        if (!Utils.inDungeons || !Skytils.config.showGiantHPAtFeet) return
         val matrixStack = UMatrixStack()
         GlStateManager.disableCull()
         GlStateManager.disableDepth()
-        for ((name, pos) in names) {
+        for ((name, pos) in giantNames) {
             RenderUtil.drawLabel(
                 pos,
                 name,
@@ -181,32 +180,10 @@ object BossHPDisplays {
 
     class GiantHPElement : GuiElement("Show Giant HP", FloatPair(200, 30)) {
         override fun render() {
-            val player = mc.thePlayer
-            val world: World? = mc.theWorld
-            if (canGiantsSpawn && toggled && Utils.inSkyblock && player != null && world != null) {
-                val giantNames =
-                    world.getEntities(EntityArmorStand::class.java) { entity: EntityArmorStand? ->
-                        val name = entity!!.displayName.formattedText
-                        if (name.contains("❤")) {
-                            if (name.contains("§e﴾ §c§lSadan§r")) {
-                                return@getEntities true
-                            } else if (name.contains("Giant") && Utils.equalsOneOf(
-                                    DungeonFeatures.dungeonFloor,
-                                    "F7",
-                                    "M6",
-                                    "M7"
-                                )
-                            ) return@getEntities true
-                            if (GIANT_NAMES.any { name.contains(it) }) return@getEntities true
-                        }
-                        false
-                    }
-                giantNames.removeAll { entity: EntityArmorStand ->
-                    DungeonFeatures.dungeonFloor == "F6" && entity.displayName.formattedText.contains(
-                        "Sadan"
-                    ) && giantNames.size > 1
-                }
-                RenderUtil.drawAllInList(this, giantNames.map { it.displayName.formattedText })
+            if (giantNames.isNotEmpty()) {
+                RenderUtil.drawAllInList(
+                    this,
+                    giantNames.filter { it.first.contains("Sadan") && giantNames.size > 1 }.map { it.first })
             }
         }
 
