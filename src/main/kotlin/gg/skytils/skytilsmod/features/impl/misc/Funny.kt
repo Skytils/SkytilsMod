@@ -25,7 +25,6 @@ import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -97,7 +96,7 @@ object Funny {
         GuiManager.registerElement(JamCatElement)
     }
 
-    object JamCatElement : GuiElement("Jamcat", fp = FloatPair(0, 0)) {
+    object JamCatElement : GuiElement("Jamcat", pos = 0 to 0) {
         val gif by lazy {
             GIFResource(getSkytilsResource("splashes/jamcat.gif"), frameDelay = 5)
         }

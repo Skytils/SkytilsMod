@@ -31,15 +31,15 @@ class LocationButton(var element: GuiElement) : GuiButton(-1, 0, 0, null) {
     var y2 = 0f
 
     init {
-        x = this.element.actualX - 4
-        y = this.element.actualY - 4
+        x = this.element.scaleX - 4
+        y = this.element.scaleY - 4
         x2 = x + this.element.actualWidth + 6
         y2 = y + this.element.actualHeight + 6
     }
 
     private fun refreshLocations() {
-        x = element.actualX - 4
-        y = element.actualY - 4
+        x = element.scaleX - 4
+        y = element.scaleY - 4
         x2 = x + element.actualWidth + 6
         y2 = y + element.actualHeight + 6
     }

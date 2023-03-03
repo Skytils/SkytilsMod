@@ -19,7 +19,6 @@ package gg.skytils.skytilsmod.core
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.gui.LocationEditGui
@@ -44,7 +43,7 @@ import java.io.Reader
 import java.io.Writer
 
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
-    val GUIPOSITIONS = hashMapOf<String, FloatPair>()
+    val GUIPOSITIONS = hashMapOf<String, Pair<Float, Float>>()
     val GUISCALES = hashMapOf<String, Float>()
     val elements = hashMapOf<Int, GuiElement>()
     private val names = hashMapOf<String, GuiElement>()
@@ -121,7 +120,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             mc.mcProfiler.startSection(element.name)
             try {
                 GlStateManager.pushMatrix()
-                GlStateManager.translate(element.actualX, element.actualY, 0f)
+                GlStateManager.translate(element.scaleX, element.scaleY, 0f)
                 GlStateManager.scale(element.scale, element.scale, 0f)
                 element.render()
                 GlStateManager.popMatrix()
@@ -209,7 +208,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
     override fun read(reader: Reader) {
         json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale) ->
-            val pos = FloatPair(x, y)
+            val pos = x to y
             GUIPOSITIONS[name] = pos
             GUISCALES[name] = scale
             getByName(name)?.pos = pos
@@ -224,8 +223,8 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         }
         writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {
             it.key to GuiElementLocation(
-                it.value.getX(),
-                it.value.getY(),
+                it.value.first,
+                it.value.second,
                 GUISCALES[it.key] ?: 1f
             )
         }))

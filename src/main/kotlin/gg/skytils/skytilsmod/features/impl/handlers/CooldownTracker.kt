@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.SetActionBarEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -77,7 +76,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
         CooldownDisplayElement()
     }
 
-    class CooldownDisplayElement : GuiElement("Item Cooldown Display", FloatPair(10, 10)) {
+    class CooldownDisplayElement : GuiElement("Item Cooldown Display", pos = 10 to 10) {
 
         override fun render() {
             if (Utils.inSkyblock && toggled) {
