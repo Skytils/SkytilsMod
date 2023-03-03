@@ -17,7 +17,6 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc
 
-import com.google.common.collect.HashBiMap
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
@@ -84,7 +83,9 @@ object ItemFeatures {
     private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
-    val itemIdToNameLookup = HashBiMap.create<String, String>()
+
+    // TODO: it is possible for 2 items to have the same name but different material
+    val itemIdToNameLookup = hashMapOf<String, String>()
     val sellPrices = HashMap<String, Double>()
     val bitCosts = HashMap<String, Int>()
     val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
@@ -922,10 +923,10 @@ object ItemFeatures {
         @SerialName("material")
         val material: String,
         @SerialName("motes_sell_price")
-        val motesSellPrice: Double?,
+        val motesSellPrice: Double? = null,
         @SerialName("name")
         val name: String,
         @SerialName("npc_sell_price")
-        val npcSellPrice: Double?,
+        val npcSellPrice: Double? = null,
     )
 }
