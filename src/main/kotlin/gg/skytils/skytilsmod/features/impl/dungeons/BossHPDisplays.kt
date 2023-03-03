@@ -45,6 +45,9 @@ import java.util.regex.Pattern
 object BossHPDisplays {
     private var canGiantsSpawn = false
     private var giantNames = emptyList<Pair<String, Vec3>>()
+    private var guardianRespawnTimers = emptyList<String>()
+    private val guardianNameRegex = Pattern.compile("§c(Healthy|Reinforced|Chaos|Laser) Guardian §e0§c❤")
+    private val timerRegex = Pattern.compile("§c ☠ §7 (.+?) §c ☠ §7")
 
     init {
         GiantHPElement()
@@ -71,12 +74,13 @@ object BossHPDisplays {
     fun onWorldChange(event: WorldEvent.Load) {
         canGiantsSpawn = false
         giantNames = emptyList()
+        guardianRespawnTimers = emptyList()
     }
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inDungeons || event.phase != TickEvent.Phase.START) return
-        if (canGiantsSpawn && (Skytils.config.showGiantHPAtFeet || Skytils.config.showGiantHP)) {
+        if (canGiantsSpawn && mc.theWorld != null && (Skytils.config.showGiantHPAtFeet || Skytils.config.showGiantHP)) {
             val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
             giantNames = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().filter {
                 val name = it.displayName.formattedText
@@ -94,6 +98,35 @@ object BossHPDisplays {
                 Pair(it.displayName.formattedText, it.positionVector.addVector(0.0, -10.0, 0.0))
             }
         } else giantNames = emptyList()
+        if (Skytils.config.showGuardianRespawnTimer && DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
+                DungeonFeatures.dungeonFloor,
+                "M3",
+                "F3"
+            ) && mc.theWorld != null
+        ) {
+            guardianRespawnTimers = mutableListOf<String>().apply {
+                for (entity in mc.theWorld.loadedEntityList) {
+                    if (size >= 4) break
+                    if (entity !is EntityArmorStand) continue
+                    val name = entity.customNameTag
+                    if (name.startsWith("§c ☠ §7 ") && name.endsWith(" §c ☠ §7")) {
+                        val nameTag = mc.theWorld.getEntitiesWithinAABB(
+                            EntityArmorStand::class.java,
+                            entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
+                        ).find {
+                            it.customNameTag.endsWith(" Guardian §e0§c❤")
+                        } ?: continue
+                        val matcher = guardianNameRegex.matcher(nameTag.customNameTag)
+                        if (matcher.find()) {
+                            val timeMatcher = timerRegex.matcher(name)
+                            if (timeMatcher.find()) {
+                                add("${matcher.group(1)}: ${timeMatcher.group(1)}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -116,38 +149,9 @@ object BossHPDisplays {
     }
 
     class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", FloatPair(200, 30)) {
-        private val guardianNameRegex = Pattern.compile("§c(Healthy|Reinforced|Chaos|Laser) Guardian §e0§c❤")
-        private val timerRegex = Pattern.compile("§c ☠ §7 (.+?) §c ☠ §7")
-
         override fun render() {
-            if (toggled && DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
-                    DungeonFeatures.dungeonFloor,
-                    "M3",
-                    "F3"
-                ) && mc.theWorld != null
-            ) {
-                val respawnTimers = HashMap<String, String>()
-                for (entity in mc.theWorld.loadedEntityList) {
-                    if (respawnTimers.size >= 4) break
-                    if (entity !is EntityArmorStand) continue
-                    val name = entity.customNameTag
-                    if (name.startsWith("§c ☠ §7 ") && name.endsWith(" §c ☠ §7")) {
-                        val nameTag = mc.theWorld.getEntitiesWithinAABB(
-                            EntityArmorStand::class.java,
-                            entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
-                        ).find {
-                            it.customNameTag.endsWith(" Guardian §e0§c❤")
-                        } ?: continue
-                        val matcher = guardianNameRegex.matcher(nameTag.customNameTag)
-                        if (matcher.find()) {
-                            val timeMatcher = timerRegex.matcher(name)
-                            if (timeMatcher.find()) {
-                                respawnTimers[matcher.group(1)] = timeMatcher.group(1)
-                            }
-                        }
-                    }
-                }
-                RenderUtil.drawAllInList(this, respawnTimers.entries.map { "${it.key}: ${it.value}" })
+            if (toggled && guardianRespawnTimers.isNotEmpty()) {
+                RenderUtil.drawAllInList(this, guardianRespawnTimers)
             }
         }
 
