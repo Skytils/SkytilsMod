@@ -121,7 +121,6 @@ dependencies {
     shadowMe(platform(kotlin("bom")))
     shadowMe(platform(ktor("bom", "2.2.4")))
     shadowMe(ktor("serialization-kotlinx-json-jvm"))
-    shadowMe("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     shadowMe(ktor("client-core-jvm"))
     shadowMe(ktor("client-cio-jvm"))
     shadowMe(ktor("client-content-negotiation-jvm"))
