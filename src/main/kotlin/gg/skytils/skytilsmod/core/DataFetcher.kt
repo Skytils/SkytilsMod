@@ -44,9 +44,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.*
 import net.minecraft.util.BlockPos
 import kotlin.concurrent.fixedRateTimer
 
@@ -131,6 +129,23 @@ object DataFetcher {
                         RelicWaypoints.relicLocations.clear()
                         mapTo(RelicWaypoints.relicLocations) {
                             json.decodeFromJsonElement(BlockPosArraySerializer, it)
+                        }
+                    }
+                }
+                // no key required
+                client.get("https://api.hypixel.net/resources/skyblock/items").body<JsonObject>().apply {
+                    if (get("success")?.jsonPrimitive?.booleanOrNull == true) {
+                        val items: List<ItemFeatures.APISBItem> = json.decodeFromJsonElement(
+                            get("items")!!
+                        )
+                        val sellPrices =
+                            items.filter { it.npcSellPrice != null }.associate { it.id to it.npcSellPrice!! }
+                        val idToName = items.associate { it.id to it.name }
+                        Utils.checkThreadAndQueue {
+                            ItemFeatures.sellPrices.clear()
+                            ItemFeatures.sellPrices.putAll(sellPrices)
+                            ItemFeatures.itemIdToNameLookup.clear()
+                            ItemFeatures.itemIdToNameLookup.putAll(idToName)
                         }
                     }
                 }

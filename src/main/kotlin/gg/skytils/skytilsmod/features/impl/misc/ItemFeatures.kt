@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc
 
+import com.google.common.collect.HashBiMap
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
@@ -45,6 +46,8 @@ import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.minecraft.block.BlockDoor
 import net.minecraft.block.BlockLadder
 import net.minecraft.block.BlockLiquid
@@ -81,6 +84,7 @@ object ItemFeatures {
     private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
+    val itemIdToNameLookup = HashBiMap.create<String, String>()
     val sellPrices = HashMap<String, Double>()
     val bitCosts = HashMap<String, Int>()
     val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
@@ -910,4 +914,18 @@ object ItemFeatures {
             Skytils.guiManager.registerElement(this)
         }
     }
+
+    @Serializable
+    data class APISBItem(
+        @SerialName("id")
+        val id: String,
+        @SerialName("material")
+        val material: String,
+        @SerialName("motes_sell_price")
+        val motesSellPrice: Double?,
+        @SerialName("name")
+        val name: String,
+        @SerialName("npc_sell_price")
+        val npcSellPrice: Double?,
+    )
 }
