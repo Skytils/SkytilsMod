@@ -33,7 +33,7 @@ plugins {
     signing
 }
 
-version = "1.4.3-pre1"
+version = "1.5.0-pre1"
 group = "gg.skytils"
 
 repositories {
@@ -174,7 +174,7 @@ tasks {
         doLast {
             MessageDigest.getInstance("SHA-256").digest(archiveFile.get().asFile.readBytes())
                 .let {
-                    println("SHA-256: " + it.joinToString(separator = "") { "%02x".format(it) }.toUpperCase())
+                    println("SHA-256: " + it.joinToString(separator = "") { "%02x".format(it) }.uppercase())
                 }
         }
     }
