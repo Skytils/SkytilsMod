@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -90,7 +89,7 @@ object ChestProfit {
             }
             if (chestType.items.size > 0) {
 
-                val leftAlign = element.actualX < UResolution.scaledWidth / 2f
+                val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
@@ -100,8 +99,8 @@ object ChestProfit {
                     chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
                         profit
                     ),
-                    if (leftAlign) element.actualX else element.actualX + element.width,
-                    element.actualY,
+                    if (leftAlign) element.scaleX else element.scaleX + element.width,
+                    element.scaleY,
                     chestType.displayColor,
                     alignment,
                     SmartFontRenderer.TextShadow.NORMAL
@@ -110,8 +109,8 @@ object ChestProfit {
                     val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
                     ScreenRenderer.fontRenderer.drawString(
                         line,
-                        if (leftAlign) element.actualX else element.actualX + element.width,
-                        element.actualY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
+                        if (leftAlign) element.scaleX else element.scaleX + element.width,
+                        element.scaleY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
                         CommonColors.WHITE,
                         alignment,
                         SmartFontRenderer.TextShadow.NORMAL
@@ -181,10 +180,10 @@ object ChestProfit {
     }
 
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
-    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", FloatPair(200, 120)) {
+    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", pos = 200 to 120) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
                 DungeonChest.values().filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->

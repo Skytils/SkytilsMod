@@ -29,7 +29,6 @@ import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
@@ -538,10 +537,10 @@ object SlayerFeatures : CoroutineScope {
 
     }
 
-    class SlayerDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
+    class SlayerDisplayElement : GuiElement("Slayer Display", pos = 150 to 20) {
         override fun render() {
             if (Utils.inSkyblock) {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 slayer?.run {
@@ -618,10 +617,10 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SeraphDisplayElement : GuiElement("Seraph Display", FloatPair(20, 20)) {
+    class SeraphDisplayElement : GuiElement("Seraph Display", pos = 20 to 20) {
         override fun render() {
             if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 (slayer as? SeraphSlayer)?.run {
@@ -693,7 +692,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val leftAlign = scaleX < UResolution.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -735,10 +734,10 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    object TotemDisplayElement : GuiElement("Totem Display", FloatPair(20, 50)) {
+    object TotemDisplayElement : GuiElement("Totem Display", pos = 20 to 50) {
         override fun render() {
             (slayer as? DemonlordSlayer)?.totemEntity?.run {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -753,7 +752,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val leftAlign = scaleX < UResolution.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -779,7 +778,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", FloatPair(150, 20)) {
+    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", pos = 150 to 20) {
         private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 
@@ -811,7 +810,7 @@ object SlayerFeatures : CoroutineScope {
                     }
 
                     if (armors.isNotEmpty()) {
-                        val leftAlign = actualX < UResolution.scaledWidth / 2f
+                        val leftAlign = scaleX < UResolution.scaledWidth / 2f
                         if (!leftAlign) {
                             val longest = fontRenderer.getStringWidth(((armors.maxByOrNull { it.second.length }
                                 ?: (null to ""))).second)
@@ -839,7 +838,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val leftAlign = scaleX < UResolution.scaledWidth / 2f
             val text = "§e99.9% §b(§f199§b)"
             if (leftAlign) {
                 RenderUtil.renderItem(ItemStack(Items.leather_chestplate), 0, 0)

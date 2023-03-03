@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -219,7 +218,7 @@ object DungeonTimer {
         scoreShownAt = -1
     }
 
-    class DungeonTimerElement : GuiElement("Dungeon Timer", FloatPair(200, 80)) {
+    class DungeonTimerElement : GuiElement("Dungeon Timer", pos = 200 to 80) {
         override fun render() {
             if (toggled && Utils.inDungeons && dungeonStartTime != -1L) {
                 val time =
@@ -280,7 +279,7 @@ object DungeonTimer {
         }
     }
 
-    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", FloatPair(200, 120)) {
+    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", pos = 200 to 120) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
@@ -329,7 +328,7 @@ object DungeonTimer {
         }
     }
 
-    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", FloatPair(200, 120)) {
+    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", pos = 200 to 120) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,

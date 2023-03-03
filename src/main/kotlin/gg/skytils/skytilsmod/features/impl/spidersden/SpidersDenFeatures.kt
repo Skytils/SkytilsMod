@@ -21,7 +21,6 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -90,7 +89,7 @@ object SpidersDenFeatures {
         arachneName = null
     }
 
-    class ArachneHPElement : GuiElement("Show Arachne HP", FloatPair(200, 30)) {
+    class ArachneHPElement : GuiElement("Show Arachne HP", pos = 200 to 30) {
         override fun render() {
             if (arachneName != null) {
                 val leftAlign = actualX < UResolution.scaledWidth / 2f
@@ -110,7 +109,7 @@ object SpidersDenFeatures {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val text = "§8[§7Lv500§8] §cArachne §a17.6M§f/§a20M§c❤§r"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(

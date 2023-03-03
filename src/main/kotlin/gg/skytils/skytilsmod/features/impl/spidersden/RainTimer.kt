@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.features.impl.spidersden
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -36,7 +35,7 @@ object RainTimer {
         while (nextRain < System.currentTimeMillis()) nextRain += 4850000
     }
 
-    class RainTimerGuiElement : GuiElement(name = "Rain Timer", fp = FloatPair(10, 10)) {
+    class RainTimerGuiElement : GuiElement(name = "Rain Timer", pos = 10 to 10) {
         override fun render() {
             if (Utils.inSkyblock && toggled) {
                 if (nextRain < System.currentTimeMillis()) nextRain += 4850000

@@ -21,7 +21,6 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.structure.LocationButton
 import gg.skytils.skytilsmod.core.structure.ResizeButton
@@ -91,8 +90,8 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
         val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
         if (button is LocationButton) {
             dragging = button.element
-            xOffset = floatMouseX - dragging!!.actualX
-            yOffset = floatMouseY - dragging!!.actualY
+            xOffset = floatMouseX - dragging!!.scaleX
+            yOffset = floatMouseY - dragging!!.scaleY
         } else if (button is ResizeButton) {
             dragging = button.element
             resizing = true
@@ -106,7 +105,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
         if (mouseButton == 1) {
             buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
-                it.element.pos = FloatPair(10, 10)
+                it.element.setPos(10, 10)
                 it.element.scale = 1f
             }
         }
@@ -151,7 +150,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                     val scaleY = newHeight / height
                     val newScale = scaleX.coerceAtLeast(scaleY).coerceAtLeast(0.01f)
                     locationButton.element.scale *= newScale
-                    locationButton.element.pos.setY((scaledY - newHeight) / sr.scaledHeight)
+                    locationButton.element.setPos(locationButton.element.pos.first, (scaledY - newHeight) / sr.scaledHeight)
                 }
 
                 Corner.BOTTOM_LEFT -> {

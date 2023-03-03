@@ -25,7 +25,6 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -506,12 +505,12 @@ object MiscFeatures {
         }
     }
 
-    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", FloatPair(150, 20)) {
+    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", pos = 150 to 20) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 val text =
                     "§cGolem spawn in: §a" + ((golemSpawnTime - System.currentTimeMillis()) / 1000.0).roundToPrecision(1) + "s"
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -550,7 +549,7 @@ object MiscFeatures {
         }
     }
 
-    class PlayersInRangeDisplay : GuiElement("Players In Range Display", FloatPair(50, 50)) {
+    class PlayersInRangeDisplay : GuiElement("Players In Range Display", pos = 50 to 50) {
         override fun render() {
             if (toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
@@ -590,7 +589,7 @@ object MiscFeatures {
         }
     }
 
-    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", FloatPair(50, 60)) {
+    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", pos = 50 to 60) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
@@ -646,7 +645,7 @@ object MiscFeatures {
         }
     }
 
-    class WorldAgeDisplay : GuiElement("World Age Display", FloatPair(50, 60)) {
+    class WorldAgeDisplay : GuiElement("World Age Display", pos = 50 to 60) {
 
         var usesBaldTimeChanger = false
 
@@ -713,7 +712,7 @@ object MiscFeatures {
         }
     }
 
-    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", FloatPair(50, 60)) {
+    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", pos = 50 to 60) {
         override fun render() {
             //This is a placeholder
         }
@@ -742,7 +741,7 @@ object MiscFeatures {
         }
     }
 
-    object ActionBarDummy : GuiElement("Action Bar", FloatPair(50, 70)) {
+    object ActionBarDummy : GuiElement("Action Bar", pos = 50 to 70) {
         override fun render() {
             //This is a placeholder
         }

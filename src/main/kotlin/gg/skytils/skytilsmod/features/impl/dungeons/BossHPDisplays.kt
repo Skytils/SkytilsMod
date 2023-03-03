@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -145,7 +144,7 @@ object BossHPDisplays {
         GlStateManager.enableCull()
     }
 
-    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", FloatPair(200, 30)) {
+    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", pos = 200 to 30) {
         override fun render() {
             if (toggled && guardianRespawnTimers.isNotEmpty()) {
                 RenderUtil.drawAllInList(this, guardianRespawnTimers)
@@ -154,7 +153,7 @@ object BossHPDisplays {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "Guardian Respawn Timer Here",
@@ -179,7 +178,7 @@ object BossHPDisplays {
         }
     }
 
-    class GiantHPElement : GuiElement("Show Giant HP", FloatPair(200, 30)) {
+    class GiantHPElement : GuiElement("Show Giant HP", pos = 200 to 30) {
         override fun render() {
             if (giantNames.isNotEmpty()) {
                 RenderUtil.drawAllInList(

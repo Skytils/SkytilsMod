@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.BossBarEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -405,7 +404,7 @@ object MiningFeatures {
         waypoints.clear()
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", fp = FloatPair(0, 0)) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", pos = 0 to 0) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
 
         enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {

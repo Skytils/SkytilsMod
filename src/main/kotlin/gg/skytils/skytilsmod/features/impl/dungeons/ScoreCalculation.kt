@@ -22,7 +22,7 @@ import gg.essential.elementa.state.State
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.structure.FloatPair
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
@@ -494,11 +494,11 @@ object ScoreCalculation {
         HugeCryptsCounter()
     }
 
-    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", 2f, FloatPair(200, 200)) {
+    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, pos = 200 to 200) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 ScreenRenderer.fontRenderer.drawString(
                     "Crypts: ${crypts.get()}",
                     if (leftAlign) 0f else width.toFloat(),
@@ -511,7 +511,7 @@ object ScoreCalculation {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             ScreenRenderer.fontRenderer.drawString(
                 "Crypts: 5",
                 if (leftAlign) 0f else width.toFloat(),
@@ -533,7 +533,7 @@ object ScoreCalculation {
         }
     }
 
-    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", FloatPair(200, 100)) {
+    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", pos = 200 to 100) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
                 RenderUtil.drawAllInList(this, text)

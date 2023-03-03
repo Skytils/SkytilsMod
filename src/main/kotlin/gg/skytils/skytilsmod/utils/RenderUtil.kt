@@ -820,7 +820,7 @@ object RenderUtil {
     }
 
     fun drawAllInList(element: GuiElement, lines: Collection<String>) {
-        val leftAlign = element.actualX < UResolution.scaledWidth / 2f
+        val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
         val alignment =
             if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
         val xPos = if (leftAlign) 0f else element.actualWidth.toFloat()
