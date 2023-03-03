@@ -35,17 +35,17 @@ fun modifyItemHighlightPosition(args: Args, highlightingItemStack: ItemStack) {
         val fr = highlightingItemStack.item.getFontRenderer(highlightingItemStack) ?: mc.fontRendererObj
         val itemName = args.get<String>(0)
         val element: GuiElement = MiscFeatures.ItemNameHighlightDummy
-        val x = element.actualX - fr!!.getStringWidth(itemName) / 2f
+        val x = element.scaleX - fr!!.getStringWidth(itemName) / 2f
         args.set(1, x)
-        args.set(2, element.actualY)
+        args.set(2, element.scaleY)
     }
 }
 
 fun modifyActionBarPosition(args: Args) {
     if (Skytils.config.moveableActionBar && Utils.inSkyblock) {
         val element: GuiElement = MiscFeatures.ActionBarDummy
-        args.set(0, element.actualX)
-        args.set(1, element.actualY + 4f)
+        args.set(0, element.scaleX)
+        args.set(1, element.scaleY + 4f)
     }
 }
 

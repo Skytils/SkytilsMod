@@ -24,7 +24,6 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -75,11 +74,11 @@ object ContainerSellValue {
      * of this class so that the user can move the element around normally.
      * @see renderGuiComponent
      */
-    class SellValueDisplay : GuiElement("Container Sell Value", FloatPair(0.258f, 0.283f)) {
+    class SellValueDisplay : GuiElement("Container Sell Value", pos = 0.258f to 0.283f) {
 
         internal val rightAlign: Boolean
-            get() = actualX > (UResolution.scaledWidth * 0.75f) ||
-                    (actualX < UResolution.scaledWidth / 2f && actualX > UResolution.scaledWidth / 4f)
+            get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
+                    (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
             get() = if (rightAlign) actualWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
@@ -235,7 +234,7 @@ object ContainerSellValue {
         // Translate and scale manually because we're not rendering inside the GuiElement#render() method
         val stack = UMatrixStack()
         stack.push()
-        stack.translate(element.actualX, element.actualY, 0f)
+        stack.translate(element.scaleX, element.scaleY, 0f)
         stack.scale(element.scale, element.scale, 0f)
 
         textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }

@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -752,13 +751,13 @@ object DungeonFeatures {
         terracottaSpawns.clear()
     }
 
-    class PortalTimer : GuiElement("Blood Room Portal Timer", FloatPair(0.05f, 0.4f)) {
+    class PortalTimer : GuiElement("Blood Room Portal Timer", pos = 0.05f to 0.4f) {
         override fun render() {
             if (!toggled || !Utils.inDungeons || DungeonTimer.bloodClearTime == -1L || DungeonTimer.bossEntryTime != -1L || mc.thePlayer?.isInsideOfMaterial(
                     Material.portal
                 ) == false
             ) return
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§a${secondsToPortal.roundToPrecision(2)}s",
@@ -771,7 +770,7 @@ object DungeonFeatures {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§aPortal: 3.99s",
@@ -797,7 +796,7 @@ object DungeonFeatures {
         }
     }
 
-    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
+    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", pos = 0.05f to 0.4f) {
         override fun render() {
             if (toggled && lastLitUpTime != -1L) {
                 val time = lastLitUpTime + 3400
@@ -806,7 +805,7 @@ object DungeonFeatures {
                     lastLitUpTime = -1
                 }
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     "Spirit Bear ${diff / 1000f}s",
@@ -821,7 +820,7 @@ object DungeonFeatures {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "Spirit Bear: 3.4s",
@@ -846,14 +845,14 @@ object DungeonFeatures {
         }
     }
 
-    internal class LividGuiElement : GuiElement("Livid HP", FloatPair(0.05f, 0.4f)) {
+    internal class LividGuiElement : GuiElement("Livid HP", pos = 0.05f to 0.4f) {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
                 if (lividTag == null) return
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     lividTag!!.name.replace("§l", ""),
@@ -868,7 +867,7 @@ object DungeonFeatures {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
