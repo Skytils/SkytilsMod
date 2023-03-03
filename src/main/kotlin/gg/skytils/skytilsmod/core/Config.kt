@@ -1048,6 +1048,13 @@ object Config : Vigilant(
     var samScytheColor = Color(255, 0, 0, 50)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Visitor Offer Helper",
+        description = "Displays information about visitor offers.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var visitorOfferHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Visitor Notifications",
         description = "Sends a message in chat when a visitor is at your garden.",
         category = "Farming", subcategory = "Garden"

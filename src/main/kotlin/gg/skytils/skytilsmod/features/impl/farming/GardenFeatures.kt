@@ -80,7 +80,7 @@ object GardenFeatures {
                 lastKnownVisitorCount =
                     (ScoreboardUtil.sidebarLines.firstNotNullOfOrNull { visitorCount.find(it) }?.groups?.get("visitors")?.value?.toIntOrNull()
                         ?: 0).also {
-                        if (it > lastKnownVisitorCount) {
+                        if (it > lastKnownVisitorCount && Skytils.config.visitorNotifications) {
                             UChat.chat("${Skytils.prefix} §b${it} visitors are available on your garden!")
                         }
                     }
