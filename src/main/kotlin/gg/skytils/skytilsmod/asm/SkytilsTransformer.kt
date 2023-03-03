@@ -52,7 +52,6 @@ class SkytilsTransformer : BaseClassTransformer() {
                 injectNullCheck()
                 commitArson()
                 injectScoreboardScoreRemover()
-                fixSBADungeonCheck()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }

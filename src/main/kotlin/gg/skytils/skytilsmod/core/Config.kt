@@ -1272,13 +1272,6 @@ object Config : Vigilant(
     var fixFallingSandRendering = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Fix SBA Chroma",
-        description = "Fixes SBA chroma with Patcher 1.6",
-        category = "Miscellaneous", subcategory = "Fixes"
-    )
-    var fixSbaChroma = true
-
-    @Property(
         type = PropertyType.SWITCH, name = "Fix World Time",
         description = "Fixes world time on other mods being messed up due to certain mods.",
         category = "Miscellaneous", subcategory = "Fixes"

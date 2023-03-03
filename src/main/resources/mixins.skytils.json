@@ -54,7 +54,6 @@
     "neu.MixinStorageOverlay",
     "neu.MixinTradeWindow",
     "particle.MixinEffectRenderer",
-    "patcher.MixinFontRendererHook",
     "renderer.MixinBlockRendererDispatcher",
     "renderer.MixinEntityRenderer",
     "renderer.MixinInventoryEffectRenderer",
