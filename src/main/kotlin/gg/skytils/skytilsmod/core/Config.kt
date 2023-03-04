@@ -1929,6 +1929,13 @@ object Config : Vigilant(
     var noHurtcam = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Party Addons",
+        description = "Adds a few features to the party list.\n§eNote: Requires Hypixel Language to be set to English. §7(/lang en)",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var partyAddons = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Power Orb Lock",
         description = "Prevents placing the power orb if the same or better power orb is within range.",
         category = "Miscellaneous", subcategory = "Quality of Life"

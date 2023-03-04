@@ -299,6 +299,7 @@ class Skytils {
             MinionFeatures,
             MiscFeatures,
             MythologicalTracker,
+            PartyAddons,
             PartyFeatures,
             PartyFinderStats,
             PetFeatures,
