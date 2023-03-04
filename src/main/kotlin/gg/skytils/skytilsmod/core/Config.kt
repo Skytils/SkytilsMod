@@ -50,7 +50,7 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
-        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit"]
+        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Vistor Offer Helper"]
     )
     var fetchLowestBINPrices = false
 
@@ -2752,7 +2752,8 @@ object Config : Vigilant(
             "dungeonChestProfit",
             "showCoinsPerBit",
             "protectItemBINThreshold",
-            "containerSellValue"
+            "containerSellValue",
+            "visitorOfferHelper"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
