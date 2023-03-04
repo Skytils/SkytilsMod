@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object PartyAddons {
     private val partyStartPattern = Regex("^§6Party Members \\((\\d+)\\)§r$")
     private val leaderPattern = Regex("^§eParty Leader: (?<rank>.+? |§7)?(?<name>\\w+) §r(?<status>§a|§c)●§r")
+    private val playerPattern = Regex("(?<rank>.+? |§7)?(?<name>\\w+)§r(?<status>§a|§c) ● ")
     private val party = mutableListOf<PartyMember>()
 
     //0 = not awaiting, 1 = awaiting 2nd delimiter, 2 = awaiting 1st delimiter
@@ -71,9 +72,7 @@ object PartyAddons {
                 event.isCanceled = true
             }
         } else if (message.startsWith("§eParty Moderators: ")) {
-            val moderators = Regex("(?<rank>.+? |§7)?(?<name>\\w+)§r(?<status>§a|§c) ● ")
-
-            moderators.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
+            playerPattern.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
                 val name = it.groups["name"]?.value ?: return
                 val status = it.groups["status"]?.value ?: return
                 val rank = it.groups["rank"]?.value ?: return
@@ -89,9 +88,7 @@ object PartyAddons {
             }
             event.isCanceled = true
         } else if (message.startsWith("§eParty Members: ")) {
-            val members = Regex("(?<rank>.+? |§7)?(?<name>\\w+)§r(?<status>§a|§c) ● ")
-
-            members.findAll(message.substringAfter("§eParty Members: ")).forEach {
+            playerPattern.findAll(message.substringAfter("§eParty Members: ")).forEach {
                 val name = it.groups["name"]?.value ?: return
                 val status = it.groups["status"]?.value ?: return
                 val rank = it.groups["rank"]?.value ?: return
