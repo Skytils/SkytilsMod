@@ -61,13 +61,13 @@ object SBInfo {
     var objective: String? = ""
     var mode: String? = ""
     var currentTimeDate: Date? = null
+    var locraw: LocrawObject? = null
 
     @JvmField
     var lastOpenContainerName: String? = null
     private var lastManualLocRaw: Long = -1
     private var lastLocRaw: Long = -1
     private var joinedWorld: Long = -1
-    private var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
     @SubscribeEvent

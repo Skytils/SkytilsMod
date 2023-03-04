@@ -1,0 +1,176 @@
+[
+  {
+    "name": "English",
+    "locale": "en",
+    "hypixel_name": "English",
+    "available": true
+  },
+  {
+    "name": "Chinese Simplified",
+    "locale": "zh-CN",
+    "hypixel_name": "简体中文",
+    "available": true
+  },
+  {
+    "name": "Chinese Traditional",
+    "locale": "zh-TW",
+    "hypixel_name": "繁體中文",
+    "available": true
+  },
+  {
+    "name": "Czech",
+    "locale": "cs",
+    "hypixel_name": "Čeština",
+    "available": true
+  },
+  {
+    "name": "Dutch",
+    "locale": "nl",
+    "hypixel_name": "Nederlands",
+    "available": true
+  },
+  {
+    "name": "Finnish",
+    "locale": "fi",
+    "hypixel_name": "Suomi",
+    "available": true
+  },
+  {
+    "name": "French",
+    "locale": "fr",
+    "hypixel_name": "Français",
+    "available": true
+  },
+  {
+    "name": "German",
+    "locale": "de",
+    "hypixel_name": "Deutsch",
+    "available": true
+  },
+  {
+    "name": "Greek",
+    "locale": "el",
+    "hypixel_name": "Ελληνικά",
+    "available": true
+  },
+  {
+    "name": "Italian",
+    "locale": "it",
+    "hypixel_name": "Italiano",
+    "available": true
+  },
+  {
+    "name": "Japanese",
+    "locale": "ja",
+    "hypixel_name": "日本語",
+    "available": true
+  },
+  {
+    "name": "Korean",
+    "locale": "ko",
+    "hypixel_name": "한국어",
+    "available": true
+  },
+  {
+    "name": "Norwegian",
+    "locale": "no",
+    "hypixel_name": "Norsk",
+    "available": true
+  },
+  {
+    "name": "Pirate Speak",
+    "locale": "en-PIRATE",
+    "hypixel_name": "Pirate Speak",
+    "available": true
+  },
+  {
+    "name": "Polish",
+    "locale": "pl",
+    "hypixel_name": "Polski",
+    "available": true
+  },
+  {
+    "name": "Portuguese",
+    "locale": "pt",
+    "hypixel_name": "Português",
+    "available": true
+  },
+  {
+    "name": "Brazilian Portuguese",
+    "locale": "pt-BR",
+    "hypixel_name": "Português do Brasil",
+    "available": true
+  },
+  {
+    "name": "Russian",
+    "locale": "ru",
+    "hypixel_name": "Русский",
+    "available": true
+  },
+  {
+    "name": "Spanish",
+    "locale": "es",
+    "hypixel_name": "Español",
+    "available": true
+  },
+  {
+    "name": "Turkish",
+    "locale": "tr",
+    "hypixel_name": "Türkçe",
+    "available": true
+  },
+  {
+    "name": "Ukrainian",
+    "locale": "uk",
+    "hypixel_name": "Українська",
+    "available": true
+  },
+  {
+    "name": "Bulgarian",
+    "locale": "bg",
+    "hypixel_name": "Български",
+    "available": false
+  },
+  {
+    "name": "Danish",
+    "locale": "da",
+    "hypixel_name": "Dansk",
+    "available": false
+  },
+  {
+    "name": "Filipino",
+    "locale": "fil",
+    "hypixel_name": "Filipino",
+    "available": false
+  },
+  {
+    "name": "Hungarian",
+    "locale": "hu",
+    "hypixel_name": "Magyar",
+    "available": false
+  },
+  {
+    "name": "Malay",
+    "locale": "ms",
+    "hypixel_name": "Bahasa Melayu",
+    "available": false
+  },
+  {
+    "name": "Romanian",
+    "locale": "ro",
+    "hypixel_name": "Română",
+    "available": false
+  },
+  {
+    "name": "Swedish",
+    "locale": "sv",
+    "hypixel_name": "Svenska",
+    "available": false
+  },
+  {
+    "name": "Thai",
+    "locale": "th",
+    "hypixel_name": "ไทย",
+    "available": false
+  }
+]

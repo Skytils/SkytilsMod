@@ -25,8 +25,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.stripControlCodes
+import gg.skytils.skytilsmod.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraftforge.client.ClientCommandHandler
@@ -50,7 +49,7 @@ class ChatListener {
             return
         }
         if (Skytils.config.autoReparty) {
-            if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
+            if (formatted.endsWith("{{PARTY_DISBANDED}}".localized())) {
                 val matcher = playerPattern.matcher(unformatted)
                 if (matcher.find()) {
                     lastPartyDisbander = matcher.group(1)
@@ -68,7 +67,7 @@ class ChatListener {
                     return
                 }
             }
-            if (unformatted.contains("You have 60 seconds to accept") && lastPartyDisbander.isNotEmpty() && event.message.siblings.size >= 7) {
+            if (formatted.contains("{{PARTY_INVITED}}".localized()) && lastPartyDisbander.isNotEmpty() && event.message.siblings.size >= 7) {
                 val acceptMessage = event.message.siblings[6].chatStyle
                 if (acceptMessage.chatHoverEvent.value.unformattedText.contains(lastPartyDisbander)) {
                     Skytils.sendMessageQueue.add("/p accept $lastPartyDisbander")
@@ -146,14 +145,14 @@ class ChatListener {
                         return
                     }
                 }
-            } else if (unformatted.endsWith("has disbanded the party!")) {
+            } else if (formatted.endsWith("{{PARTY_DISBANDED}}".localized())) {
                 event.isCanceled = true
                 return
             }
         }
         // Inviting
         if (RepartyCommand.inviting) {
-            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
+            if (formatted.endsWith("{{PARTY_INVITED_PLAYER}}".localized())) {
                 val invitee = invitePattern.matcher(unformatted)
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
@@ -164,7 +163,7 @@ class ChatListener {
                 println("Player Invited!")
                 RepartyCommand.inviting = false
                 return
-            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
+            } else if (formatted.contains("{{PARTY_NONEXISTENT_PLAYER}}".localized()) || formatted.contains("{{PARTY_CANT_INVITE}}".localized())) {
                 tryRemoveLineAtIndex(1)
                 event.isCanceled = true
                 println("Player Invited!")
@@ -174,7 +173,7 @@ class ChatListener {
         }
         // Fail Inviting
         if (RepartyCommand.failInviting) {
-            if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
+            if (formatted.endsWith("{{PARTY_INVITED_PLAYER}}".localized())) {
                 val invitee = invitePattern.matcher(unformatted)
                 if (invitee.find()) {
                     println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
@@ -183,7 +182,7 @@ class ChatListener {
                 event.isCanceled = true
                 RepartyCommand.inviting = false
                 return
-            } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
+            } else if (formatted.contains("{{PARTY_NONEXISTENT_PLAYER}}".localized()) || formatted.contains("{{PARTY_CANT_INVITE}}".localized())) {
                 tryRemoveLineAtIndex(1)
                 event.isCanceled = true
                 println("Player Invited!")
@@ -210,7 +209,7 @@ class ChatListener {
 
     companion object {
         private var lastPartyDisbander = ""
-        private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
+        private val invitePattern = Internationalization.getPattern("PARTY_INVITE")
         private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
         private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
         private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")

@@ -212,21 +212,22 @@ object ChatTabs {
     ) {
         ALL("A"),
         PARTY("P", { _, formatted ->
-            formatted.startsWith("§r§9Party §8> ") ||
+            formatted.startsWith("§r§9{{PARTY}} §8> ".localized()) ||
                     formatted.startsWith("§r§9P §8> ") ||
-                    formatted.endsWith("§r§ehas invited you to join their party!") ||
-                    formatted.endsWith("§r§eto the party! They have §r§c60 §r§eseconds to accept.§r") ||
-                    formatted == "§cThe party was disbanded because all invites expired and the party was empty§r" ||
-                    formatted.endsWith("§r§ehas disbanded the party!§r") ||
-                    formatted.endsWith("§r§ehas disconnected, they have §r§c5 §r§eminutes to rejoin before they are removed from the party.§r") ||
-                    formatted.endsWith(" §r§ejoined the party.§r") ||
-                    formatted.endsWith(" §r§ehas left the party.§r") ||
-                    formatted.endsWith(" §r§ehas been removed from the party.§r") ||
+                    formatted.contains("{{PARTY_INVITED}}".localized()) ||
+                    formatted.endsWith("{{PARTY_INVITED_PLAYER}}".localized()) ||
+                    formatted == "{{PARTY_DISBANDED_EXPIRED}}".localized() ||
+                    formatted.endsWith("{{PARTY_DISBANDED}}".localized()) ||
+                    formatted.endsWith("{{PARTY_DISCONNECTED}}".localized()) ||
+                    formatted.endsWith("{{PARTY_JOINED}}".localized()) ||
+                    formatted.endsWith("{{PARTY_LEFT}}".localized()) ||
+                    formatted.endsWith("{{PARTY_KICKED}}") ||
                     formatted.startsWith("§eThe party was transferred to §r") ||
+                    // TODO: Solution for this, probably a regex.
                     (formatted.startsWith("§eKicked §r") && formatted.endsWith("§r§e because they were offline.§r"))
         }),
         GUILD("G", { _, formatted ->
-            formatted.startsWith("§r§2Guild > ") || formatted.startsWith("§r§2G > ")
+            formatted.startsWith("§r§2{{GUILD}} > ") || formatted.startsWith("§r§2G > ")
         }),
         PRIVATE("PM", { _, formatted ->
             formatted.startsWith("§dTo ") || formatted.startsWith("§dFrom ")

@@ -70,6 +70,21 @@ object Config : Vigilant(
     var commandAliasMode = 0
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Language",
+        description = "Choose which language you use on Hypixel. This will ensure that some features work properly.",
+        category = "General", subcategory = "Internationalization (Experimental)",
+        options = ["English", "简体中文", "繁體中文", "Čeština", "Nederlands", "Suomi", "Français", "Deutsch", "Ελληνικά", "Italiano", "日本語", "한국어", "Norsk", "Pirate Speak", "Polski", "Português", "Português do Brasil", "Русский", "Español", "Türkçe", "Українська"]
+    )
+    var language = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Automatically Detect Language",
+        description = "Attempts to automatically detect your language. Turn this off if you want to manually set your language. (Requires API Key)",
+        category = "General", subcategory = "Internationalization (Experimental)"
+    )
+    var autoDetectLanguage = true
+
+    @Property(
         type = PropertyType.BUTTON, name = "Join the Skytils Discord",
         description = "Join the Skytils Discord server for help using any of the features.",
         category = "General", subcategory = "Other",

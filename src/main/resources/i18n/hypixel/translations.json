@@ -1,0 +1,43 @@
+{
+  "PARTY_DISBANDED": {
+    "en": "§r§ehas disbanded the party!§r"
+  },
+  "PARTY_INVITED": {
+    "en": "§r§eYou have §r§c60 §r§eseconds to accept."
+  },
+  "PARTY_INVITED_PLAYER": {
+    "en": "§r§eto the party! They have §r§c60 §r§eseconds to accept.§r"
+  },
+  "PARTY_CANT_INVITE": {
+    "en": "§cYou cannot invite that player"
+  },
+  "PARTY_NONEXISTENT_PLAYER": {
+    "en": "§cCouldn't find a player"
+  },
+  "PARTY_DISBANDED_EXPIRED": {
+    "en": "§cThe party was disbanded because all invites expired and the party was empty§r"
+  },
+  "PARTY_DISCONNECTED": {
+    "en": "§r§ehas disconnected, they have §r§c5 §r§eminutes to rejoin before they are removed from the party.§r"
+  },
+  "PARTY_JOINED": {
+    "en": " §r§ejoined the party.§r"
+  },
+  "PARTY_LEFT": {
+    "en": " §r§ehas left the party.§r"
+  },
+  "PARTY_KICKED": {
+    "en": " §r§ehas been removed from the party.§r"
+  },
+  "PARTY_TRANSFERRED": {
+    "en": "§eThe party was transferred to §r"
+  },
+  "PARTY": {
+    "en": "Party"
+  },
+  "GUILD": {
+    "en": "Guild"
+  },
+  "TO": {},
+  "FROM": {}
+}
