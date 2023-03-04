@@ -112,6 +112,7 @@ object VisitorHelper {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (textLines.isEmpty()) return
         val stack = UMatrixStack()
         stack.push()
         stack.translate(VisitorHelperDisplay.actualX, VisitorHelperDisplay.actualY, 0f)
