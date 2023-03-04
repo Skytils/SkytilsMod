@@ -22,6 +22,7 @@ import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -49,33 +50,30 @@ object PartyAddons {
 
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte() || !Skytils.config.partyAddons) return
+        if (!Utils.isOnHypixel || event.type == 2.toByte() || !Skytils.config.partyAddons) return
         val message = event.message.formattedText
 
         if (message == "§f§r" && awaitingMessage != 0) {
             event.isCanceled = true
-        } else if (message.startsWith("§6Party Members")) {
-            val partyStart = partyStartPattern.find(message)
-            if (partyStart != null) {
-                party.clear()
-                event.isCanceled = true
-            }
+        } else if (partyStartPattern.matches(message)) {
+            party.clear()
+            event.isCanceled = true
         } else if (message.startsWith("§eParty Leader")) {
             val leader = leaderPattern.find(message)
 
             if (leader != null) {
-                val name = leader.groups["name"]?.value ?: return
-                val status = leader.groups["status"]?.value ?: return
-                val rank = leader.groups["rank"]?.value ?: return
+                val name = leader.groups["name"]?.value!!
+                val status = leader.groups["status"]?.value!!
+                val rank = leader.groups["rank"]?.value!!
 
                 party.add(PartyMember(name, PartyMemberType.LEADER, status, rank))
                 event.isCanceled = true
             }
         } else if (message.startsWith("§eParty Moderators: ")) {
             playerPattern.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
-                val name = it.groups["name"]?.value ?: return
-                val status = it.groups["status"]?.value ?: return
-                val rank = it.groups["rank"]?.value ?: return
+                val name = it.groups["name"]?.value!!
+                val status = it.groups["status"]?.value!!
+                val rank = it.groups["rank"]?.value!!
 
                 party.add(
                     PartyMember(
@@ -111,9 +109,9 @@ object PartyAddons {
 
             val component = UMessage("§aParty members (${party.size})\n")
 
-            val player = party.first { it.name == Skytils.mc.thePlayer.name }
+            val self = party.first { it.name == mc.thePlayer.name }
 
-            if (player.type == PartyMemberType.LEADER) {
+            if (self.type == PartyMemberType.LEADER) {
                 component.append(
                     createButton(
                         "§9[Party Warp] ",
@@ -152,12 +150,13 @@ object PartyAddons {
                 "\n${partyLeader.status}➡§r ${partyLeader.rank}${partyLeader.name}"
             )
 
-            if (party.any { it.type == PartyMemberType.MODERATOR }) component.append("\n§eMods")
-            party.filter { it.type == PartyMemberType.MODERATOR }.forEach {
+            val mods = party.filter { it.type == PartyMemberType.MODERATOR }
+            if (mods.isNotEmpty()) component.append("\n§eMods")
+            mods.forEach {
                 component.append(
                     "\n${it.status}➡§r ${it.rank}${it.name} "
                 )
-                if (player.type != PartyMemberType.LEADER) return@forEach
+                if (self.type != PartyMemberType.LEADER) return@forEach
                 component.append(
                     createButton(
                         "§a[⋀] ",
@@ -179,12 +178,13 @@ object PartyAddons {
                 )
             }
 
-            if (party.any { it.type == PartyMemberType.MEMBER }) component.append("\n§eMembers")
-            party.filter { it.type == PartyMemberType.MEMBER }.forEach {
+            val members = party.filter { it.type == PartyMemberType.MEMBER }
+            if (members.isNotEmpty()) component.append("\n§eMembers")
+            members.forEach {
                 component.append(
                     "\n${it.status}➡§r ${it.rank}${it.name} "
                 )
-                if (player.type != PartyMemberType.LEADER) return@forEach
+                if (self.type != PartyMemberType.LEADER) return@forEach
                 component.append(
                     createButton(
                         "§9[⋀] ",
