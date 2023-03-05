@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.utils.ItemRarity
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.toStringIfTrue
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiButton
@@ -39,17 +40,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
 
     private val favorited = hashSetOf<String>()
     private var highlighting = false
     private val petNameRegex =
-        Pattern.compile("^§7\\[Lvl (?<lvl>\\d{1,3})] (?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> ✦)?$")
+        Regex("^§7\\[Lvl (?<lvl>\\d{1,3})] (?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> ✦)?$")
     private val petLevelUpRegex =
-        Pattern.compile("§r§aYour §r(?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> §r§6✦)? §r§alevelled up to level §r§9(?<lvl>\\d{1,3})§r§a!§r")
+        Regex("§r§aYour §r(?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> §r§6✦)? §r§alevelled up to level §r§9(?<lvl>\\d{1,3})§r§a!§r")
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
@@ -57,23 +56,16 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
 
         val formatted = event.message.formattedText
         if (formatted.contains(" §r§alevelled up to level §r§9")) {
-            val matcher = petLevelUpRegex.matcher(formatted)
-            if (matcher.find())
+            petLevelUpRegex.find(formatted)?.let {
                 for (favorite in favorited) {
-                    if (favorite == "${
-                            matcher.group("name").uppercase().replace(" ", "_")
-                        }-${ItemRarity.byBaseColor(matcher.group("rarityColor"))?.rarityName}-${
-                            matcher.group("lvl").toInt() - 1
-                        }${
-                            if (matcher.group("skinned") != null) "-SKINNED" else ""
-                        }"
-                    ) {
-                        favorited.add(getPetIdFromMatcher(matcher))
+                    if (favorite == getPetIdFromMatcher(it.groups, true)) {
+                        favorited.add(getPetIdFromMatcher(it.groups, false))
                         favorited.remove(favorite)
                         markDirty<FavoritePets>()
                         break
                     }
                 }
+            }
         }
 
     }
@@ -96,6 +88,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
                             "${if (highlighting) "§6" else "§f"}Favorite"
                         )
                     )
+
                     event is GuiScreenEvent.ActionPerformedEvent.Pre && event.button.id == 69420 -> {
                         highlighting = !highlighting
                         event.button.displayString = "${if (highlighting) "§6" else "§f"}Favorite"
@@ -117,7 +110,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
             )
         ) return
         val item = event.slot.stack!!
-        val petId = getPetIdFromItem(item)
+        val petId = getPetIdFromItem(item) ?: return
         event.isCanceled = true
         if (favorited.contains(petId)) favorited.remove(petId) else favorited.add(petId)
         markDirty<FavoritePets>()
@@ -143,18 +136,17 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
         }
     }
 
-    private fun getPetIdFromItem(item: ItemStack): String {
-        val matcher = petNameRegex.matcher(ItemUtil.getDisplayName(item))
-        if (!matcher.matches()) return ""
-        return getPetIdFromMatcher(matcher)
+    private fun getPetIdFromItem(item: ItemStack): String? {
+        return petNameRegex.find(ItemUtil.getDisplayName(item))?.let { getPetIdFromMatcher(it.groups) }
     }
 
-    private fun getPetIdFromMatcher(matcher: Matcher): String {
+
+    private fun getPetIdFromMatcher(groups: MatchGroupCollection, sub1: Boolean = false): String {
         return "${
-            matcher.group("name").uppercase().replace(" ", "_")
-        }-${ItemRarity.byBaseColor(matcher.group("rarityColor"))?.rarityName}-${matcher.group("lvl")}${
-            if (matcher.group("skinned") != null) "-SKINNED" else ""
-        }"
+            groups["name"]!!.value.uppercase().replace(" ", "_")
+        }-${ItemRarity.byBaseColor(groups["rarityColor"]!!.value)?.rarityName}-${
+            groups["lvl"]!!.value.toInt().minus(if (sub1) 1 else 0)
+        }${"-SKINNED".toStringIfTrue(groups["skinned"] != null)}"
     }
 
     override fun read(reader: Reader) {

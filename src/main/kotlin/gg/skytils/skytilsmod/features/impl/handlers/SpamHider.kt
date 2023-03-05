@@ -629,9 +629,8 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     when (Skytils.config.autoRecombHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.autoRecombHider == 2)
                         3 -> {
-                            val matcher = RecombToast.pattern.matcher(formatted)
-                            if (matcher.find(formatted.indexOf(" "))) {
-                                GuiManager.toastGui.add(RecombToast(matcher.group(1)))
+                            RecombToast.pattern.find(formatted, formatted.indexOf(" "))?.let {
+                                GuiManager.toastGui.add(RecombToast(it.groupValues[1]))
                             }
                             cancelChatPacket(event, false)
                         }

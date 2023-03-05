@@ -22,28 +22,27 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.ifNull
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 import kotlin.random.Random
 
 object StartsWithSequenceSolver {
 
 
     @JvmField
-    val shouldClick = ArrayList<Int>()
+    val shouldClick = mutableListOf<Int>()
     private var sequenceNeeded: String? = null
-    private val titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$")
+    private val titlePattern = Regex("^What starts with: ['\"](.+)['\"]\\?$")
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver || event.container !is ContainerChest) return
-        val nameMatcher = titlePattern.matcher(event.chestName)
-        if (nameMatcher.find()) {
-            val sequence = nameMatcher.group(1)
+        titlePattern.find(event.chestName)?.also {
+            val sequence = it.groupValues[1]
             if (sequence != sequenceNeeded) {
                 sequenceNeeded = sequence
                 shouldClick.clear()
@@ -54,7 +53,7 @@ object StartsWithSequenceSolver {
                     if (item.isItemEnchanted) continue
                     if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
                     if (SuperSecretSettings.bennettArthur) {
-                        if (Random.nextInt(3) == 0) SelectAllColorSolver.shouldClick.add(slot.slotNumber)
+                        if (Random.nextInt(3) == 0) shouldClick.add(slot.slotNumber)
                     } else if (item.displayName.stripControlCodes().startsWith(sequenceNeeded!!)) {
                         shouldClick.add(slot.slotNumber)
                     }
@@ -65,7 +64,7 @@ object StartsWithSequenceSolver {
                     return@removeIf slot.hasStack && slot.stack.isItemEnchanted
                 }
             }
-        } else {
+        }.ifNull {
             shouldClick.clear()
             sequenceNeeded = null
         }
