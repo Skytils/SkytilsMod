@@ -156,10 +156,12 @@ object UpdateChecker {
                 2 -> client.get(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases/latest"
                 ).body()
+
                 1 -> client.get(
                     "https://api.github.com/repos/Skytils/SkytilsMod/releases"
-                ).body<List<GithubRelease>>()[0]
-                else -> return println("Channel set as none")
+                ).body<List<GithubRelease>>().maxBy { SkytilsVersion(it.tagName.substringAfter("v")) }
+
+                else -> return println("Update Channel set as none")
             }
             val latestTag = latestRelease.tagName
             val currentTag = Skytils.VERSION.substringBefore("-dev")
