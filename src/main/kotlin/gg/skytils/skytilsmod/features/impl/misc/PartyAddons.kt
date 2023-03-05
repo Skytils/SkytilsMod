@@ -33,9 +33,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  */
 object PartyAddons {
     private val partyStartPattern = Regex("^§6Party Members \\((\\d+)\\)§r$")
-    private val leaderPattern = Regex("^§eParty Leader: (?<rank>.+? |§7)?(?<name>\\w+) §r(?<status>§a|§c)●§r")
-    private val playerPattern = Regex("(?<rank>.+? |§7)?(?<name>\\w+)§r(?<status>§a|§c) ● ")
+    private val playerPattern = Regex("(?<rank>.+? |§7)?(?<name>\\w+) ?§r(?<status>§a|§c) ?●")
     private val party = mutableListOf<PartyMember>()
+    private val partyCommands = setOf("/pl", "/party list", "/p list", "/party l")
 
     //0 = not awaiting, 1 = awaiting 2nd delimiter, 2 = awaiting 1st delimiter
     private var awaitingDelimiter = 0
@@ -43,7 +43,7 @@ object PartyAddons {
     @SubscribeEvent
     fun onCommandRun(event: SendChatMessageEvent) {
         if (!Utils.isOnHypixel || !Skytils.config.partyAddons) return
-        if (event.message in setOf("/pl", "/party list", "/p list", "/party l")) {
+        if (event.message in partyCommands) {
             awaitingDelimiter = 2
         }
     }
@@ -58,39 +58,19 @@ object PartyAddons {
         } else if (partyStartPattern.matches(message)) {
             party.clear()
             event.isCanceled = true
-        } else if (message.startsWith("§eParty Leader: ")) {
-            leaderPattern.find(message)?.destructured?.let { (rank, name, status) ->
-                party.add(
-                    PartyMember(
-                        name,
-                        PartyMemberType.LEADER,
-                        status,
-                        rank
-                    )
-                )
-                event.isCanceled = true
+        } else if (message.startsWith("§eParty ")) {
+            val playerType = when {
+                message.startsWith("§eParty Leader: ") -> PartyMemberType.LEADER
+                message.startsWith("§eParty Moderators: ") -> PartyMemberType.MODERATOR
+                message.startsWith("§eParty Members: ") -> PartyMemberType.MEMBER
+                else -> return
             }
-        } else if (message.startsWith("§eParty Moderators: ")) {
-            playerPattern.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
+            playerPattern.findAll(message.substringAfter(": ")).forEach {
                 it.destructured.let { (rank, name, status) ->
                     party.add(
                         PartyMember(
                             name,
-                            PartyMemberType.MODERATOR,
-                            status,
-                            rank
-                        )
-                    )
-                }
-            }
-            event.isCanceled = true
-        } else if (message.startsWith("§eParty Members: ")) {
-            playerPattern.findAll(message.substringAfter("§eParty Members: ")).forEach {
-                it.destructured.let { (rank, name, status) ->
-                    party.add(
-                        PartyMember(
-                            name,
-                            PartyMemberType.MEMBER,
+                            playerType,
                             status,
                             rank
                         )
@@ -100,7 +80,7 @@ object PartyAddons {
             event.isCanceled = true
         } else if (message.startsWith("§cYou are not currently in a party.") && awaitingDelimiter != 0) {
             party.clear()
-        } else if (message.startsWith("§9§m----") && awaitingDelimiter != 0) {
+        } else if (event.message.unformattedText.startsWith("-----") && awaitingDelimiter != 0) {
             awaitingDelimiter--
             if (awaitingDelimiter == 1 || party.isEmpty()) return
 
