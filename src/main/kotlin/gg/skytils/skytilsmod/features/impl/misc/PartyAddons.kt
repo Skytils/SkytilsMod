@@ -111,19 +111,19 @@ object PartyAddons {
             if (self.type == PartyMemberType.LEADER) {
                 component.append(
                     createButton(
-                        "§9[Party Warp] ",
+                        "§9[Warp] ",
                         "/p warp",
                         "§9Click to warp the party."
                     )
                 ).append(
                     createButton(
-                        "§e[Toggle All Invite]\n",
+                        "§e[All Invite] ",
                         "/p settings allinvite",
                         "§eClick to toggle all invite."
                     )
                 ).append(
                     createButton(
-                        "§6[Toggle Mute] ",
+                        "§6[Mute]\n",
                         "/p mute",
                         "§6Click to toggle mute."
                     )
@@ -168,7 +168,7 @@ object PartyAddons {
                     )
                 ).append(
                     createButton(
-                        "§4[☠]",
+                        "§4[✖]",
                         "/p kick ${it.name}",
                         "§4Kick ${it.name}"
                     )
@@ -196,7 +196,7 @@ object PartyAddons {
                     )
                 ).append(
                     createButton(
-                        "§4[☠]",
+                        "§4[✖]",
                         "/p kick ${it.name}",
                         "§4Kick ${it.name}"
                     )
