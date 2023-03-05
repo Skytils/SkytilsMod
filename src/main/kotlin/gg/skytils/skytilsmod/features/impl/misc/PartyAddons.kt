@@ -38,13 +38,13 @@ object PartyAddons {
     private val party = mutableListOf<PartyMember>()
 
     //0 = not awaiting, 1 = awaiting 2nd delimiter, 2 = awaiting 1st delimiter
-    private var awaitingMessage = 0
+    private var awaitingDelimiter = 0
 
     @SubscribeEvent
     fun onCommandRun(event: SendChatMessageEvent) {
-        if (!Utils.inSkyblock || !Skytils.config.partyAddons) return
-        if (Utils.equalsOneOf(event.message, "/pl", "/party list", "/p list", "/party l")) {
-            awaitingMessage = 2
+        if (!Utils.isOnHypixel || !Skytils.config.partyAddons) return
+        if (event.message in setOf("/pl", "/party list", "/p list", "/party l")) {
+            awaitingDelimiter = 2
         }
     }
 
@@ -53,59 +53,56 @@ object PartyAddons {
         if (!Utils.isOnHypixel || event.type == 2.toByte() || !Skytils.config.partyAddons) return
         val message = event.message.formattedText
 
-        if (message == "§f§r" && awaitingMessage != 0) {
+        if (message == "§f§r" && awaitingDelimiter != 0) {
             event.isCanceled = true
         } else if (partyStartPattern.matches(message)) {
             party.clear()
             event.isCanceled = true
-        } else if (message.startsWith("§eParty Leader")) {
-            val leader = leaderPattern.find(message)
-
-            if (leader != null) {
-                val name = leader.groups["name"]?.value!!
-                val status = leader.groups["status"]?.value!!
-                val rank = leader.groups["rank"]?.value!!
-
-                party.add(PartyMember(name, PartyMemberType.LEADER, status, rank))
-                event.isCanceled = true
-            }
-        } else if (message.startsWith("§eParty Moderators: ")) {
-            playerPattern.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
-                val name = it.groups["name"]?.value!!
-                val status = it.groups["status"]?.value!!
-                val rank = it.groups["rank"]?.value!!
-
+        } else if (message.startsWith("§eParty Leader: ")) {
+            leaderPattern.find(message)!!.destructured.let { (rank, name, status) ->
                 party.add(
                     PartyMember(
                         name,
-                        PartyMemberType.MODERATOR,
+                        PartyMemberType.LEADER,
                         status,
                         rank
                     )
                 )
+            }
+            event.isCanceled = true
+        } else if (message.startsWith("§eParty Moderators: ")) {
+            playerPattern.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
+                it.destructured.let { (rank, name, status) ->
+                    party.add(
+                        PartyMember(
+                            name,
+                            PartyMemberType.MODERATOR,
+                            status,
+                            rank
+                        )
+                    )
+                }
             }
             event.isCanceled = true
         } else if (message.startsWith("§eParty Members: ")) {
             playerPattern.findAll(message.substringAfter("§eParty Members: ")).forEach {
-                val name = it.groups["name"]?.value ?: return
-                val status = it.groups["status"]?.value ?: return
-                val rank = it.groups["rank"]?.value ?: return
-
-                party.add(
-                    PartyMember(
-                        name,
-                        PartyMemberType.MEMBER,
-                        status,
-                        rank
+                it.destructured.let { (rank, name, status) ->
+                    party.add(
+                        PartyMember(
+                            name,
+                            PartyMemberType.MEMBER,
+                            status,
+                            rank
+                        )
                     )
-                )
+                }
             }
             event.isCanceled = true
-        } else if (message.startsWith("§cYou are not currently in a party.") && awaitingMessage != 0) {
+        } else if (message.startsWith("§cYou are not currently in a party.") && awaitingDelimiter != 0) {
             party.clear()
-        } else if (message == "§9§m-----------------------------------------------------§r" && awaitingMessage != 0) {
-            awaitingMessage--
-            if (awaitingMessage == 1 || party.isEmpty()) return
+        } else if (message.startsWith("§9§m----") && awaitingDelimiter != 0) {
+            awaitingDelimiter--
+            if (awaitingDelimiter == 1 || party.isEmpty()) return
 
             val component = UMessage("§aParty members (${party.size})\n")
 
