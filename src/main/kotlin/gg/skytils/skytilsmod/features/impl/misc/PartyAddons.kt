@@ -59,7 +59,7 @@ object PartyAddons {
             party.clear()
             event.isCanceled = true
         } else if (message.startsWith("§eParty Leader: ")) {
-            leaderPattern.find(message)!!.destructured.let { (rank, name, status) ->
+            leaderPattern.find(message)?.destructured?.let { (rank, name, status) ->
                 party.add(
                     PartyMember(
                         name,
@@ -68,8 +68,8 @@ object PartyAddons {
                         rank
                     )
                 )
+                event.isCanceled = true
             }
-            event.isCanceled = true
         } else if (message.startsWith("§eParty Moderators: ")) {
             playerPattern.findAll(message.substringAfter("§eParty Moderators: ")).forEach {
                 it.destructured.let { (rank, name, status) ->
