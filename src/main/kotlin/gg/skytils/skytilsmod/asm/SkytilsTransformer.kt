@@ -46,7 +46,6 @@ class SkytilsTransformer : BaseClassTransformer() {
             madeTransformers = true
             try {
                 addColoredNamesCheck()
-                injectSplashProgressTransformer()
                 changeRenderedName()
                 insertReceivePacketEvent()
                 injectNullCheck()

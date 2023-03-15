@@ -40,6 +40,7 @@
     "gui.MixinGuiMainMenu",
     "gui.MixinGuiNewChat",
     "gui.MixinGuiScreen",
+    "gui.MixinSplashProgress",
     "inventory.MixinSlot",
     "item.MixinItemArmor",
     "item.MixinItemStack",

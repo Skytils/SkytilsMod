@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,56 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.asm.transformers
+package gg.skytils.skytilsmod.utils
 
-import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
-import dev.falsehonesty.asmhelper.dsl.modify
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.getSkytilsResource
 import net.minecraft.util.ResourceLocation
-import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.VarInsnNode
-import java.util.*
+import net.minecraftforge.fml.client.SplashProgress
+import java.util.GregorianCalendar
 import kotlin.random.Random
 
-fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.SplashProgress") {
-    findMethod("start", "()V").apply {
-        val v = localVariables.find {
-            it.name == "forgeLoc" && (it.desc == "Ljy;" || it.desc == "Lnet/minecraft/util/ResourceLocation;")
-        } ?: return@modify println("unable to find localvar")
-        var index = -1
-        for (insn in instructions) {
-            if (insn is MethodInsnNode) {
-                if (insn.owner == "net/minecraftforge/fml/client/SplashProgress" && insn.name == "getMaxTextureSize") {
-                    val list = InsnListBuilder(this).apply {
-                        aload(v.index)
-                        invokeStatic(
-                            "gg/skytils/skytilsmod/asm/transformers/SplashProgressTransformer",
-                            "setForgeGif",
-                            "(Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;"
-                        )
-                        astore().also {
-                            index = it.index
-                        }
-                    }
-                    instructions.insertBefore(insn, list.build())
-                }
-                if (insn.owner == "net/minecraftforge/fml/client/SplashProgress$3" && insn.name == "<init>") {
-                    if (index == -1) {
-                        println("Failed to inject local variable, breaking")
-                        break
-                    }
-                    instructions.remove(insn.previous)
-                    instructions.insertBefore(insn, VarInsnNode(Opcodes.ALOAD, index))
-                }
-            }
-        }
-    }
-}
 
-object SplashProgressTransformer {
+object SplashProgressHelper {
+    val t: SplashProgress? = null
     val gifs = mapOf(
         0.0 to getSkytilsResource("splashes/sychicpet.gif"),
         85.5 to getSkytilsResource("splashes/sychiccat.png"),
