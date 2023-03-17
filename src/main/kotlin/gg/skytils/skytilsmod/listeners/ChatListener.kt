@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -190,12 +191,15 @@ object ChatListener {
                 return
             }
         }
-        if (Skytils.config.firstLaunch && unformatted == "Welcome to Hypixel SkyBlock!") {
-            UChat.chat("$prefix §bThank you for downloading Skytils!")
-            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
-            Skytils.config.firstLaunch = false
-            Skytils.config.markDirty()
-            Skytils.config.writeData()
+        if (unformatted == "Welcome to Hypixel SkyBlock!") {
+            if (Skytils.config.firstLaunch) {
+                UChat.chat("$prefix §bThank you for downloading Skytils!")
+                ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
+                Skytils.config.firstLaunch = false
+                Skytils.config.markDirty()
+                Skytils.config.writeData()
+            }
+            Funny.joinedSkyblock()
         }
     }
 
