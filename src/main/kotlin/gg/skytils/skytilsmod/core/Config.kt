@@ -617,6 +617,13 @@ object Config : Vigilant(
     var showWitherKingDragonsHP = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' Spawn Timer",
+        description = "Displays a timer for when the dragons are about to spawn in.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingDragonsSpawnTimer = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Spirit Bear Timer",
         description = "Shows the time it takes for the Spirit Bears to spawn.",
         category = "Dungeons", subcategory = "Quality of Life"
