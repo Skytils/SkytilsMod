@@ -26,7 +26,6 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
@@ -37,8 +36,6 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
@@ -47,25 +44,10 @@ object VisitorHelper {
     private val inGarden
         get() = Utils.inSkyblock && SBInfo.mode == SkyblockIsland.TheGarden.mode
 
-    private var lastTalkedNpc: String? = null
-    private val npcRegex = Regex("§e\\[NPC\\] §.(?<npcName>.+)§f: §r")
     private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+) §8x(?<quantity>[\\d,]+)\$")
     private val textLines = mutableListOf<String>()
     private var totalOfferValue: Double = 0.0
     private var ticks = 0
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
-        if (!inGarden || !Skytils.config.visitorOfferHelper) return
-        when (event.packet) {
-            is S02PacketChat -> {
-                val chat = event.packet.chatComponent.formattedText
-                npcRegex.find(chat)?.groups?.get("npcName")?.value?.let {
-                    lastTalkedNpc = it
-                }
-            }
-        }
-    }
 
     @SubscribeEvent
     fun onGuiClose(event: GuiContainerEvent.CloseWindowEvent) {
@@ -82,30 +64,25 @@ object VisitorHelper {
         textLines.clear()
         totalOfferValue = 0.0
 
-        if (!inGarden) {
-            lastTalkedNpc = null
-            return
-        }
+        if (!inGarden) return
 
         val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return
         val chestName = container.lowerChestInventory.name
-        if (chestName == lastTalkedNpc) {
-            val npcSummary: ItemStack? = container.getSlot(13).stack
-            val acceptOffer: ItemStack? = container.getSlot(29).stack
-            if (npcSummary?.displayName.stripControlCodes() == lastTalkedNpc?.stripControlCodes() && acceptOffer?.displayName == "§aAccept Offer") {
-                val lore = ItemUtil.getItemLore(acceptOffer)
-                lore.dropWhile { !requiredItemRegex.containsMatchIn(it) }
-                    .takeWhile { requiredItemRegex.containsMatchIn(it) }.map { requiredItemRegex.find(it)!!.groups }
-                    .forEach {
-                        val formattedName = it["formattedItemName"]!!.value
-                        val unformattedName = formattedName.stripControlCodes()
-                        val itemId = ItemFeatures.itemIdToNameLookup.entries.find { it.value == unformattedName }?.key
-                        val quantity = it["quantity"]!!.value.replace(",", "").toInt()
-                        val value = (AuctionData.lowestBINs[itemId] ?: 0.0) * quantity
-                        textLines.add("$formattedName §8x$quantity - §a${NumberUtil.format(value)}")
-                        totalOfferValue += value
-                    }
-            }
+        val npcSummary: ItemStack? = container.getSlot(13).stack
+        val acceptOffer: ItemStack? = container.getSlot(29).stack
+        if (npcSummary?.displayName.stripControlCodes() == chestName.stripControlCodes() && acceptOffer?.displayName == "§aAccept Offer") {
+            val lore = ItemUtil.getItemLore(acceptOffer)
+            lore.dropWhile { !requiredItemRegex.containsMatchIn(it) }
+                .takeWhile { requiredItemRegex.containsMatchIn(it) }.map { requiredItemRegex.find(it)!!.groups }
+                .forEach {
+                    val formattedName = it["formattedItemName"]!!.value
+                    val unformattedName = formattedName.stripControlCodes()
+                    val itemId = ItemFeatures.itemIdToNameLookup.entries.find { it.value == unformattedName }?.key
+                    val quantity = it["quantity"]!!.value.replace(",", "").toInt()
+                    val value = (AuctionData.lowestBINs[itemId] ?: 0.0) * quantity
+                    textLines.add("$formattedName §8x$quantity - §a${NumberUtil.format(value)}")
+                    totalOfferValue += value
+                }
         }
     }
 
