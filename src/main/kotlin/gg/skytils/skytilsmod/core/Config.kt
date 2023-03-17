@@ -588,6 +588,13 @@ object Config : Vigilant(
     var showSadanInterest = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Terracotta Respawn Time",
+        description = "Displays a timer until Terracotta respawn",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var terracottaRespawnTimer = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Show Necron's HP",
         description = "Shows additional info about Necron's health.",
         category = "Dungeons", subcategory = "Quality of Life",
