@@ -105,8 +105,10 @@ object ContainerSellValue {
 
         override val toggled: Boolean
             get() = Skytils.config.containerSellValue
-        override val height: Int = fr.FONT_HEIGHT * 3
-        override val width: Int = fr.getStringWidth("Dctr's Space Helmet - 900M")
+        override val height: Int
+            get() = fr.FONT_HEIGHT * 3
+        override val width: Int
+            get() = fr.getStringWidth("Dctr's Space Helmet - 900M")
 
         init {
             Skytils.guiManager.registerElement(this)

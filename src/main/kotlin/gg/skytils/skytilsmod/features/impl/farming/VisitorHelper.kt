@@ -161,8 +161,10 @@ object VisitorHelper {
 
         override val toggled: Boolean
             get() = Skytils.config.visitorOfferHelper
-        override val height: Int = fr.FONT_HEIGHT * 3
-        override val width: Int = fr.getStringWidth("§aEnchanted Cocoa Bean §8x69 - §a900M")
+        override val height: Int
+            get() = fr.FONT_HEIGHT * 3
+        override val width: Int
+            get() = fr.getStringWidth("§aEnchanted Cocoa Bean §8x69 - §a900M")
 
         init {
             Skytils.guiManager.registerElement(this)
