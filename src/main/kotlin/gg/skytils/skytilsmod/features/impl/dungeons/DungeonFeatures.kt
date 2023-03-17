@@ -42,7 +42,6 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraft.block.BlockColored
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.material.Material
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -126,10 +125,7 @@ object DungeonFeatures {
                 printDevMessage("change light $lastLitUpTime", "spiritbear")
             }
         } else if (isInTerracottaPhase && Skytils.config.terracottaRespawnTimer && dungeonFloor?.endsWith('6') == true) {
-            if (event.old.block == Blocks.air && event.update.block == Blocks.stained_hardened_clay && event.update.getValue(
-                    BlockColored.COLOR
-                ) == EnumDyeColor.BROWN
-            ) {
+            if (event.old.block == Blocks.air && event.update.block == Blocks.flower_pot) {
                 // TODO: needs confirmation
                 terracottaSpawns[event.pos] = System.currentTimeMillis() + 11000
             }
