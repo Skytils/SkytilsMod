@@ -45,6 +45,7 @@ object VisitorHelper {
         get() = Utils.inSkyblock && SBInfo.mode == SkyblockIsland.TheGarden.mode
 
     private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+) §8x(?<quantity>[\\d,]+)\$")
+    private val rewardRegex = Regex("^\\s+ §8+(?<reward>§.+)\$")
     private val textLines = mutableListOf<String>()
     private var totalOfferValue: Double = 0.0
     private var ticks = 0
@@ -72,6 +73,21 @@ object VisitorHelper {
         val acceptOffer: ItemStack? = container.getSlot(29).stack
         if (npcSummary?.displayName.stripControlCodes() == chestName.stripControlCodes() && acceptOffer?.displayName == "§aAccept Offer") {
             val lore = ItemUtil.getItemLore(acceptOffer)
+
+            textLines.add("§eRewards:")
+            lore.dropWhile {
+                !rewardRegex.containsMatchIn(it)
+            }.takeWhile {
+                rewardRegex.containsMatchIn(it)
+            }.map {
+                rewardRegex.find(it)!!.groups["reward"]!!.value
+            }.forEach {
+                textLines.add(it)
+            }
+
+            textLines.add("")
+
+            textLines.add("§eNeeded Items:")
             lore.dropWhile { !requiredItemRegex.containsMatchIn(it) }
                 .takeWhile { requiredItemRegex.containsMatchIn(it) }.map { requiredItemRegex.find(it)!!.groups }
                 .forEach {
