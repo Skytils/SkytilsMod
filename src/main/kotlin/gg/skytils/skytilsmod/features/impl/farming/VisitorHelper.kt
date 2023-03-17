@@ -134,8 +134,8 @@ object VisitorHelper {
      */
     object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", FloatPair(0.258f, 0.283f)) {
         internal val rightAlign: Boolean
-            get() = ContainerSellValue.element.actualX > (UResolution.scaledWidth * 0.75f) ||
-                    (ContainerSellValue.element.actualX < UResolution.scaledWidth / 2f && ContainerSellValue.element.actualX > UResolution.scaledWidth / 4f)
+            get() = actualX > (UResolution.scaledWidth * 0.75f) ||
+                    (actualX < UResolution.scaledWidth / 2f && actualX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
             get() = if (rightAlign) actualWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
