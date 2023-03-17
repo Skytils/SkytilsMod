@@ -128,59 +128,63 @@ object PartyAddons {
             )
 
             val mods = party.filter { it.type == PartyMemberType.MODERATOR }
-            if (mods.isNotEmpty()) component.append("\n§eMods")
-            mods.forEach {
-                component.append(
-                    "\n${it.status}➡§r ${it.rank}${it.name} "
-                )
-                if (self.type != PartyMemberType.LEADER) return@forEach
-                component.append(
-                    createButton(
-                        "§a[⋀] ",
-                        "/p promote ${it.name}",
-                        "§aPromote ${it.name}"
+            if (mods.isNotEmpty()) {
+                component.append("\n§eMods")
+                mods.forEach {
+                    component.append(
+                        "\n${it.status}➡§r ${it.rank}${it.name} "
                     )
-                ).append(
-                    createButton(
-                        "§c[⋁] ",
-                        "/p demote ${it.name}",
-                        "§cDemote ${it.name}"
+                    if (self.type != PartyMemberType.LEADER) return@forEach
+                    component.append(
+                        createButton(
+                            "§a[⋀] ",
+                            "/p promote ${it.name}",
+                            "§aPromote ${it.name}"
+                        )
+                    ).append(
+                        createButton(
+                            "§c[⋁] ",
+                            "/p demote ${it.name}",
+                            "§cDemote ${it.name}"
+                        )
+                    ).append(
+                        createButton(
+                            "§4[✖]",
+                            "/p kick ${it.name}",
+                            "§4Kick ${it.name}"
+                        )
                     )
-                ).append(
-                    createButton(
-                        "§4[✖]",
-                        "/p kick ${it.name}",
-                        "§4Kick ${it.name}"
-                    )
-                )
+                }
             }
 
             val members = party.filter { it.type == PartyMemberType.MEMBER }
-            if (members.isNotEmpty()) component.append("\n§eMembers")
-            members.forEach {
-                component.append(
-                    "\n${it.status}➡§r ${it.rank}${it.name} "
-                )
-                if (self.type != PartyMemberType.LEADER) return@forEach
-                component.append(
-                    createButton(
-                        "§9[⋀] ",
-                        "/p transfer ${it.name}",
-                        "§9Transfer ${it.name}"
+            if (members.isNotEmpty()) {
+                component.append("\n§eMembers")
+                members.forEach {
+                    component.append(
+                        "\n${it.status}➡§r ${it.rank}${it.name} "
                     )
-                ).append(
-                    createButton(
-                        "§a[⋀] ",
-                        "/p promote ${it.name}",
-                        "§aPromote ${it.name}"
+                    if (self.type != PartyMemberType.LEADER) return@forEach
+                    component.append(
+                        createButton(
+                            "§9[⋀] ",
+                            "/p transfer ${it.name}",
+                            "§9Transfer ${it.name}"
+                        )
+                    ).append(
+                        createButton(
+                            "§a[⋀] ",
+                            "/p promote ${it.name}",
+                            "§aPromote ${it.name}"
+                        )
+                    ).append(
+                        createButton(
+                            "§4[✖]",
+                            "/p kick ${it.name}",
+                            "§4Kick ${it.name}"
+                        )
                     )
-                ).append(
-                    createButton(
-                        "§4[✖]",
-                        "/p kick ${it.name}",
-                        "§4Kick ${it.name}"
-                    )
-                )
+                }
             }
             component.chat()
         }
