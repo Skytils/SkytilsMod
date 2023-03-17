@@ -40,14 +40,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
-import java.util.regex.Pattern
 
 object BossHPDisplays {
     private var canGiantsSpawn = false
     private var giantNames = emptyList<Pair<String, Vec3>>()
     private var guardianRespawnTimers = emptyList<String>()
-    private val guardianNameRegex = Pattern.compile("§c(Healthy|Reinforced|Chaos|Laser) Guardian §e0§c❤")
-    private val timerRegex = Pattern.compile("§c ☠ §7 (.+?) §c ☠ §7")
+    private val guardianNameRegex = Regex("§c(Healthy|Reinforced|Chaos|Laser) Guardian §e0§c❤")
+    private val timerRegex = Regex("§c ☠ §7 (.+?) §c ☠ §7")
 
     init {
         GiantHPElement()
@@ -116,11 +115,9 @@ object BossHPDisplays {
                         ).find {
                             it.customNameTag.endsWith(" Guardian §e0§c❤")
                         } ?: continue
-                        val matcher = guardianNameRegex.matcher(nameTag.customNameTag)
-                        if (matcher.find()) {
-                            val timeMatcher = timerRegex.matcher(name)
-                            if (timeMatcher.find()) {
-                                add("${matcher.group(1)}: ${timeMatcher.group(1)}")
+                        guardianNameRegex.find(nameTag.customNameTag)?.let {
+                            timerRegex.find(name)?.let {
+                                add("${it.groupValues[1]}: ${it.groupValues[1]}")
                             }
                         }
                     }

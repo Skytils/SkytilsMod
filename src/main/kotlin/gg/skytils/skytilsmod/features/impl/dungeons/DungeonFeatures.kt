@@ -79,11 +79,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
-import java.util.regex.Pattern
 
 object DungeonFeatures {
     private val deathOrPuzzleFail =
-        Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
+        Regex("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
     private val thornMissMessages = arrayOf(
         "chickens",
         "shot",
@@ -370,8 +369,7 @@ object DungeonFeatures {
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
-                val deathFailMatcher = deathOrPuzzleFail.matcher(unformatted)
-                if (deathFailMatcher.find() || (unformatted.startsWith("[CROWD]") && thornMissMessages.any {
+                if (deathOrPuzzleFail.containsMatchIn(unformatted) || (unformatted.startsWith("[CROWD]") && thornMissMessages.any {
                         unformatted.contains(
                             it,
                             true

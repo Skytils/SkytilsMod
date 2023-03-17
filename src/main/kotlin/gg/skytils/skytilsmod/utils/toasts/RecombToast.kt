@@ -28,7 +28,6 @@ import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
-import java.util.regex.Pattern
 
 class RecombToast(private val recombItem: String) : IToast<KeyToast> {
     private val buffer = GLAllocation.createDirectFloatBuffer(16)
@@ -52,7 +51,7 @@ class RecombToast(private val recombItem: String) : IToast<KeyToast> {
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWRmZjhkYmJhYjE1YmZiYjExZTIzYjFmNTBiMzRlZjU0OGFkOTgzMmMwYmQ3ZjVhMTM3OTFhZGFkMDA1N2UxYiJ9fX0K",
             "10479f18-e67f-3c86-93e2-b4df79d0457e"
         )
-        val pattern: Pattern = Pattern.compile(" §r§([\\w ]+)§r§e")
+        val pattern = Regex(" §r§([\\w ]+)§r§e")
     }
 
 }

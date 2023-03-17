@@ -75,12 +75,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
-import java.util.regex.Pattern
 import kotlin.math.pow
 
 object ItemFeatures {
 
-    private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+    private val candyPattern = Regex("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
 
@@ -621,9 +620,8 @@ object ItemFeatures {
         }
         if (Skytils.config.showPetCandies && item.item === Items.skull) {
             lore?.forEach { line ->
-                val candyLineMatcher = candyPattern.matcher(line)
-                if (candyLineMatcher.matches()) {
-                    stackTip = candyLineMatcher.group(1).toString()
+                candyPattern.find(line)?.let {
+                    stackTip = it.groups[1]!!.value
                     return@forEach
                 }
             }
