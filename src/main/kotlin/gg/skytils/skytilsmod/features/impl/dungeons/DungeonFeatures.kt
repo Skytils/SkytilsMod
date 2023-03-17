@@ -128,7 +128,7 @@ object DungeonFeatures {
         } else if (isInTerracottaPhase && Skytils.config.terracottaRespawnTimer && dungeonFloor?.endsWith('6') == true) {
             if (event.old.block == Blocks.air && event.update.block == Blocks.stained_hardened_clay && event.update.getValue(
                     BlockColored.COLOR
-                ) == EnumDyeColor.ORANGE
+                ) == EnumDyeColor.BROWN
             ) {
                 // TODO: needs confirmation
                 terracottaSpawns[event.pos] = System.currentTimeMillis() + 11000
