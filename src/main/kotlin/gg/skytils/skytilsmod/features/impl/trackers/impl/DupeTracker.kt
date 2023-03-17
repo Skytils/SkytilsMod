@@ -70,6 +70,7 @@ object DupeTracker : Tracker("duped_items") {
                 printDevMessage("Cleared dupe check", "dupecheck")
                 printDevMessage("Cleared auction", "dupecheck")
             }
+
             is S2DPacketOpenWindow -> {
                 inAuctionBrowser =
                     Utils.inSkyblock && packet.slotCount == 54 && packet.windowTitle.unformattedText.run {
@@ -81,12 +82,14 @@ object DupeTracker : Tracker("duped_items") {
                 printDevMessage("Cleared dupe check", "dupecheck")
                 printDevMessage("Is auction $inAuctionBrowser", "dupecheck")
             }
+
             is S2EPacketCloseWindow -> {
                 inAuctionBrowser = false
                 dupeChecking.clear()
                 printDevMessage("Cleared dupe check", "dupecheck")
                 printDevMessage("Cleared auction", "dupecheck")
             }
+
             is S2FPacketSetSlot -> {
                 if (!inAuctionBrowser || !Skytils.config.dupeTracker) return
                 val windowId = packet.func_149175_c()
@@ -106,6 +109,7 @@ object DupeTracker : Tracker("duped_items") {
                     }
                 }
             }
+
             is S30PacketWindowItems -> {
                 if (!inAuctionBrowser || !Skytils.config.dupeTracker) return
                 val windowId = packet.func_148911_c()

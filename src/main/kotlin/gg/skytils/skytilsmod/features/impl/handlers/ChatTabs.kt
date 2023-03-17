@@ -102,6 +102,7 @@ object ChatTabs {
             is GuiScreenEvent.InitGuiEvent.Post -> {
                 event.buttonList.addAll(ChatTab.buttons.values)
             }
+
             is GuiScreenEvent.ActionPerformedEvent.Pre -> {
                 ChatTab.buttons.entries.find {
                     it.value == event.button
@@ -137,6 +138,7 @@ object ChatTabs {
                     }
                 }
             }
+
             is GuiScreenEvent.DrawScreenEvent.Pre -> {
                 ChatTab.buttons.entries.forEach { (c, b) ->
                     b.enabled = c != selectedTab

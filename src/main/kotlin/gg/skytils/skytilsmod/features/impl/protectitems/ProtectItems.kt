@@ -34,7 +34,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ProtectItems {
-    
+
     init {
         ItemProtectStrategy.isAnyToggled()
     }

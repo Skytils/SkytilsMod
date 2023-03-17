@@ -33,6 +33,7 @@ object StarredItemStrategy : ItemProtectStrategy() {
             ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
                 isStarred
             }
+
             ProtectType.HOTBARDROPKEY -> {
                 !DungeonFeatures.hasClearedText && isStarred
             }

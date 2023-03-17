@@ -70,11 +70,13 @@ object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) 
             is JsonArray -> {
                 shortcuts.addAll(json.decodeFromJsonElement<List<KeybindShortcut>>(data))
             }
+
             is JsonObject -> {
                 json.decodeFromJsonElement<Map<String, Int>>(data).mapTo(shortcuts) { (cmd, keyCode) ->
                     KeybindShortcut(cmd, keyCode)
                 }
             }
+
             else -> error("Invalid shortcuts file")
         }
     }

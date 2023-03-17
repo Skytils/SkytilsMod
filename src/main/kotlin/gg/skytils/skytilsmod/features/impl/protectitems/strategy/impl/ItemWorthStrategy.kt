@@ -35,6 +35,7 @@ object ItemWorthStrategy : ItemProtectStrategy() {
             ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
                 value >= threshold
             }
+
             ProtectType.HOTBARDROPKEY -> {
                 !DungeonFeatures.hasClearedText && value >= threshold
             }
