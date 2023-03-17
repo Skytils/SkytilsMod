@@ -106,8 +106,10 @@ object DataFetcher {
                     }
                 }
                 client.get("${dataUrl}solvers/threeweirdos.json").body<List<String>>().apply {
-                    ThreeWeirdosSolver.solutions.clear()
-                    ThreeWeirdosSolver.solutions.addAll(this)
+                    Utils.checkThreadAndQueue {
+                        ThreeWeirdosSolver.solutions.clear()
+                        ThreeWeirdosSolver.solutions.addAll(this)
+                    }
                 }
                 client.get("${dataUrl}solvers/treasurehunter.json").body<Map<String, String>>().apply {
                     Utils.checkThreadAndQueue {
