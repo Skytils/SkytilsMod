@@ -37,6 +37,7 @@ import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -105,12 +106,21 @@ object MasterMode7Features {
             val drag =
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag)) {
-                printDevMessage("${drag.name} spawning", "witherkingdrags")
+                printDevMessage("${drag.name} spawning $x $y $z", "witherkingdrags")
                 if (Skytils.config.witherKingDragonSpawnAlert) {
-                    UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§ldragon is spawning! §f(${x}, ${y}, ${z})")
+                    UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§ldragon is spawning!")
                 }
                 // TODO: needs confirm
                 dragonSpawnTimes[drag] = System.currentTimeMillis() + 4800
+            }
+        } else if (event.packet is S2APacketParticles) {
+            event.packet.apply {
+                WitherKingDragons.values().find { it.bb.isVecInside(event.packet.vec3) }?.let {
+                    printDevMessage(
+                        "${it.textColor} $count ${if (isLongDistance) "long-distance" else ""} ${type.particleName} particles with $speed speed at $x, $y, $z, offset by $xOffset, $yOffset, $zOffset",
+                        "witherkingparticles"
+                    )
+                }
             }
         }
     }

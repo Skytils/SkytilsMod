@@ -341,6 +341,9 @@ inline val S2APacketParticles.count
 inline val S2APacketParticles.speed
     get() = this.particleSpeed
 
+inline val S2APacketParticles.vec3
+    get() = Vec3(x, y, z)
+
 operator fun <K : Any, V : Any> Cache<K, V>.set(name: K, value: V) = put(name, value)
 
 fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
