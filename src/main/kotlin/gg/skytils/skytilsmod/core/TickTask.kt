@@ -22,15 +22,22 @@ import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, val task: () -> T) {
+class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Boolean = true, val task: () -> T) {
     var remainingTicks = ticks
     private var callback: (T) -> Unit = {}
     private var failure: (Throwable) -> Unit = {}
 
     init {
-        Utils.checkThreadAndQueue {
-            TickTaskManager.tasks.add(this)
-        }
+        if (register)
+            register()
+    }
+
+    fun register() = Utils.checkThreadAndQueue {
+        TickTaskManager.tasks.add(this)
+    }
+
+    fun unregister() = Utils.checkThreadAndQueue {
+        TickTaskManager.tasks.remove(this)
     }
 
     internal fun complete() = try {

@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -37,8 +38,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.util.*
 import kotlin.random.Random
@@ -56,16 +55,13 @@ object WaterBoardSolver {
     private var prevInWaterRoom = false
     private var inWaterRoom = false
     private var variant = -1
-    private var ticks = 0
     private var job: Job? = null
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons) return
-        if (!Skytils.config.waterBoardSolver) return
-        val player = mc.thePlayer ?: return
-        val world = mc.theWorld ?: return
-        if (ticks % 20 == 0) {
+    init {
+        TickTask(20, repeats = true) {
+            if (!Skytils.config.waterBoardSolver || !Utils.inDungeons) return@TickTask
+            val player = mc.thePlayer ?: return@TickTask
+            val world = mc.theWorld ?: return@TickTask
             if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
                 job = Skytils.launch {
                     prevInWaterRoom = inWaterRoom
@@ -246,9 +242,7 @@ object WaterBoardSolver {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent

@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -36,12 +37,9 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 
 object IceFillSolver {
-    private var ticks = 0
     private var chestPos: BlockPos? = null
     private var roomFacing: EnumFacing? = null
     private var three: IceFillPuzzle? = null
@@ -49,12 +47,10 @@ object IceFillSolver {
     private var seven: IceFillPuzzle? = null
     private var job: Job? = null
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
-        if (!Skytils.config.iceFillSolver) return
-        val world: World = mc.theWorld
-        if (ticks % 20 == 0) {
+    init {
+        TickTask(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.iceFillSolver || mc.thePlayer == null) return@TickTask
+            val world: World = mc.theWorld
             if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
                 if (chestPos == null || roomFacing == null) {
                     job = Skytils.launch {
@@ -107,9 +103,7 @@ object IceFillSolver {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     private fun checkForStart(world: World, pos: BlockPos) =
@@ -217,6 +211,7 @@ object IceFillSolver {
                         Blocks.ice, Blocks.packed_ice ->
                             if (world.getBlockState(pos).block === Blocks.air)
                                 spaces.add(pos)
+
                         Blocks.stone_brick_stairs, Blocks.stone -> {
                             if (!::start.isInitialized && checkForStart(world, pos))
                                 start = pos.offset(roomFacing)

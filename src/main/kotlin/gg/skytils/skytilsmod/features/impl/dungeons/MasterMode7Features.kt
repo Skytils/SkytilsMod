@@ -24,6 +24,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
@@ -44,8 +45,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
@@ -56,7 +55,6 @@ object MasterMode7Features {
     private val killedDragons = hashSetOf<WitherKingDragons>()
     private val dragonMap = hashMapOf<Int, WitherKingDragons>()
     private val glowstones = hashSetOf<AxisAlignedBB>()
-    private var ticks = 0
     private val dragonSpawnTimes = hashMapOf<WitherKingDragons, Long>()
 
     @SubscribeEvent
@@ -77,18 +75,15 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
-        if (ticks % 15 == 0) {
+    init {
+        TickTask(15, repeats = true) {
+            if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || mc.thePlayer == null) return@TickTask
             if (Skytils.config.witherKingDragonSlashAlert) {
                 if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
                     GuiManager.createTitle("Dimensional Slash!", 10)
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent

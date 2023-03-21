@@ -22,6 +22,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -38,7 +39,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import kotlin.random.Random
 
 object BlazeSolver {
@@ -46,95 +46,98 @@ object BlazeSolver {
     var blazeMode = 0
     var blazeChest: BlockPos? = null
     var impossible = false
-    private var ticks = 0
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        val player = mc.thePlayer
-        val world = mc.theWorld
-        if (!Utils.inDungeons || world == null || player == null) return
-        if (ticks % 20 == 0) {
-            ticks = 0
-            if (blazeMode == 0 && orderedBlazes.size > 0) {
-                Skytils.launch {
-                    val blazes = world.getEntities(
-                        EntityBlaze::class.java
-                    ) { blaze: EntityBlaze? -> player.getDistanceSqToEntity(blaze) < 100 * 100 }
-                    if (blazes.size > 10) {
-                        println("More than 10 blazes, was there an update?")
-                    } else if (blazes.size > 0) {
-                        val diffY = 5 * (10 - blazes.size)
-                        val blaze = blazes[0]
-                        val blazeX = blaze.posX.toInt()
-                        val blazeZ = blaze.posZ.toInt()
-                        val xRange = blazeX - 13..blazeX + 13
-                        val zRange = blazeZ - 13..blazeZ + 13
-                        findChest@ for (te in world.loadedTileEntityList) {
-                            val y1 = 70 + diffY
-                            val y2 = 69 - diffY
-                            if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
-                            ) {
-                                val pos = te.pos
-                                if (world.getBlockState(te.pos.up()).block == Blocks.iron_bars) {
-                                    if (pos.y == y1) {
-                                        blazeChest = pos
-                                        if (blazes.size < 10) {
-                                            blazeMode = -1
-                                            println("Block scanning determined lowest -> highest")
+    init {
+        TickTask(20, repeats = true) {
+            val player = mc.thePlayer
+            val world = mc.theWorld
+            if (Skytils.config.blazeSolver && Utils.inDungeons && world != null && DungeonListener.missingPuzzles.contains(
+                    "Higher Or Lower"
+                )
+            ) {
+                if (blazeMode == 0 && orderedBlazes.size > 0) {
+                    Skytils.launch {
+                        val blazes = world.getEntities(
+                            EntityBlaze::class.java
+                        ) { blaze: EntityBlaze? -> player.getDistanceSqToEntity(blaze) < 100 * 100 }
+                        if (blazes.size > 10) {
+                            println("More than 10 blazes, was there an update?")
+                        } else if (blazes.size > 0) {
+                            val diffY = 5 * (10 - blazes.size)
+                            val blaze = blazes[0]
+                            val blazeX = blaze.posX.toInt()
+                            val blazeZ = blaze.posZ.toInt()
+                            val xRange = blazeX - 13..blazeX + 13
+                            val zRange = blazeZ - 13..blazeZ + 13
+                            findChest@ for (te in world.loadedTileEntityList) {
+                                val y1 = 70 + diffY
+                                val y2 = 69 - diffY
+                                if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                                ) {
+                                    val pos = te.pos
+                                    if (world.getBlockState(te.pos.up()).block == Blocks.iron_bars) {
+                                        if (pos.y == y1) {
+                                            blazeChest = pos
+                                            if (blazes.size < 10) {
+                                                blazeMode = -1
+                                                println("Block scanning determined lowest -> highest")
+                                            }
+                                            break
+                                        } else {
+                                            blazeChest = pos
+                                            if (blazes.size < 10) {
+                                                blazeMode = 1
+                                                println("Block scanning determined highest -> lowest")
+                                            }
+                                            break@findChest
                                         }
-                                        break
-                                    } else {
-                                        blazeChest = pos
-                                        if (blazes.size < 10) {
-                                            blazeMode = 1
-                                            println("Block scanning determined highest -> lowest")
-                                        }
-                                        break@findChest
                                     }
                                 }
                             }
-                        }
-                        if (blazeChest != null && blazes.size == 10) {
-                            blazeMode = if (world.getBlockState(blazeChest!!.down()).block == Blocks.stone) {
-                                println("Bottom block scanning determined lowest -> highest")
-                                -1
-                            } else {
-                                println("Bottom block scanning determined highest -> lowest")
-                                1
+                            if (blazeChest != null && blazes.size == 10) {
+                                blazeMode = if (world.getBlockState(blazeChest!!.down()).block == Blocks.stone) {
+                                    println("Bottom block scanning determined lowest -> highest")
+                                    -1
+                                } else {
+                                    println("Bottom block scanning determined highest -> lowest")
+                                    1
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        if (ticks % 4 == 0) {
-            if (Skytils.config.blazeSolver) {
+        TickTask(4, repeats = true) {
+            val world = mc.theWorld
+            if (Skytils.config.blazeSolver && Utils.inDungeons && world != null && DungeonListener.missingPuzzles.contains(
+                    "Higher Or Lower"
+                )
+            ) {
                 orderedBlazes.clear()
-                if (DungeonListener.missingPuzzles.contains("Higher Or Lower")) {
-                    for (entity in world.getLoadedEntityList()) {
-                        if (entity is EntityArmorStand && entity.getName().contains("Blaze") && entity.getName()
-                                .contains("/")
-                        ) {
-                            val blazeName = entity.getName().stripControlCodes()
-                            try {
-                                val health =
-                                    blazeName.substringAfter("/").dropLast(1).toInt()
-                                val aabb = AxisAlignedBB(
-                                    entity.posX - 0.5,
-                                    entity.posY - 2,
-                                    entity.posZ - 0.5,
-                                    entity.posX + 0.5,
-                                    entity.posY,
-                                    entity.posZ + 0.5
-                                )
-                                val blazes = mc.theWorld.getEntitiesWithinAABB(
-                                    EntityBlaze::class.java, aabb
-                                )
-                                if (blazes.isEmpty()) continue
-                                orderedBlazes.add(ShootableBlaze(blazes[0], health))
-                            } catch (ex: NumberFormatException) {
-                                ex.printStackTrace()
-                            }
+                for (entity in world.getLoadedEntityList()) {
+                    if (entity is EntityArmorStand && entity.getName().contains("Blaze") && entity.getName()
+                            .contains("/")
+                    ) {
+                        val blazeName = entity.getName().stripControlCodes()
+                        try {
+                            val health =
+                                blazeName.substringAfter("/").dropLast(1).toInt()
+                            val aabb = AxisAlignedBB(
+                                entity.posX - 0.5,
+                                entity.posY - 2,
+                                entity.posZ - 0.5,
+                                entity.posX + 0.5,
+                                entity.posY,
+                                entity.posZ + 0.5
+                            )
+                            val blazes = mc.theWorld.getEntitiesWithinAABB(
+                                EntityBlaze::class.java, aabb
+                            )
+                            if (blazes.isEmpty()) continue
+                            orderedBlazes.add(ShootableBlaze(blazes[0], health))
+                        } catch (ex: NumberFormatException) {
+                            ex.printStackTrace()
                         }
                     }
                 }
@@ -152,7 +155,6 @@ object BlazeSolver {
                 }
             }
         }
-        ticks++
     }
 
     @SubscribeEvent
