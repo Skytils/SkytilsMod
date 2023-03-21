@@ -72,6 +72,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -488,6 +489,13 @@ object MiscFeatures {
             )
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onEnderTeleport(event: EnderTeleportEvent) {
+        if (Utils.inSkyblock && Skytils.config.disableEndermanTeleport) {
+            event.isCanceled = true
         }
     }
 

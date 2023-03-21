@@ -1781,6 +1781,13 @@ object Config : Vigilant(
     var customDamageSplash = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Disable Enderman Teleportation",
+        description = "Removes the enderman teleport effect.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var disableEndermanTeleport = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Night Vision",
         description = "Removes the vanilla effects of Night Vision.",
         category = "Miscellaneous", subcategory = "Quality of Life"
