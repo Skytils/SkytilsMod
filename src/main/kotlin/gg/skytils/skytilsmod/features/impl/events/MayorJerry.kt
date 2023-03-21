@@ -36,8 +36,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
 object MayorJerry {
 
@@ -79,13 +78,12 @@ object MayorJerry {
     }
 
     class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", FloatPair(10, 10)) {
-        @OptIn(ExperimentalTime::class)
         override fun render() {
             if (Utils.inSkyblock && toggled && MayorInfo.currentMayor == "Jerry") {
                 if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
                     ScreenRenderer.fontRenderer.drawString("Visit Jerry!", 0f, 0f, CommonColors.RED)
                 } else {
-                    val timeUntilNext = Duration.milliseconds(MayorInfo.newJerryPerks - System.currentTimeMillis())
+                    val timeUntilNext = (MayorInfo.newJerryPerks - System.currentTimeMillis()).milliseconds
                     ScreenRenderer.fontRenderer.drawString(
                         "${MayorInfo.jerryMayor!!.name}: ${
                             timeUntilNext.toComponents { hours, minutes, _, _ ->
@@ -129,11 +127,10 @@ object MayorJerry {
     class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", FloatPair(10, 10)) {
         private val villagerEgg = ItemStack(Items.spawn_egg, 1, 120)
 
-        @OptIn(ExperimentalTime::class)
         override fun render() {
             if (Utils.inSkyblock && toggled && lastJerry != -1L) {
                 renderItem(villagerEgg, 0, 0)
-                val elapsed = Duration.milliseconds(System.currentTimeMillis() - lastJerry)
+                val elapsed = (System.currentTimeMillis() - lastJerry).milliseconds
                 ScreenRenderer.fontRenderer.drawString(
                     elapsed.toComponents { minutes, seconds, _ ->
                         "${if (minutes >= 6) "§a" else ""}${minutes}:${

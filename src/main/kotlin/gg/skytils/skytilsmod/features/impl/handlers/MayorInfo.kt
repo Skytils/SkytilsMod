@@ -46,8 +46,8 @@ import java.net.URLEncoder
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.round
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 object MayorInfo {
 
@@ -140,7 +140,6 @@ object MayorInfo {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
@@ -195,7 +194,7 @@ object MayorInfo {
                 } ?: return
                 val matcher = jerryNextPerkRegex.find(endingIn) ?: return
                 val timeLeft =
-                    Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
+                    matcher.groups["h"]!!.value.toInt().hours + matcher.groups["m"]!!.value.toInt().minutes
                 val nextPerksNoRound = System.currentTimeMillis() + timeLeft.inWholeMilliseconds
                 val nextPerks = round(nextPerksNoRound / 300000.0).toLong() * 300000L
                 if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 60000) {

@@ -78,8 +78,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
 object MiscFeatures {
     private var golemSpawnTime: Long = 0
@@ -134,7 +133,6 @@ object MiscFeatures {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
@@ -160,7 +158,7 @@ object MiscFeatures {
                 }
             }
             if (unformatted == "Your zapper is temporarily fatigued!") {
-                val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
+                val duration = (blockZapperCooldownExpiration - System.currentTimeMillis()).milliseconds
                 printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
                 if (duration.isPositive()) {
                     UChat.chat("$prefix §eThis will expire in${
