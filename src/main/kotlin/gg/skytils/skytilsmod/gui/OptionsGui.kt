@@ -30,6 +30,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
 import net.minecraft.client.Minecraft
@@ -82,7 +83,7 @@ class OptionsGui :
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            mc.displayGuiScreen(LocationEditGui())
+            mc.displayGuiScreen(ElementaEditingGui())
         }
         SimpleButton("Edit Key Shortcuts").childOf(window).constrain {
             x = CenterConstraint()
