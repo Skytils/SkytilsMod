@@ -823,7 +823,7 @@ object RenderUtil {
         val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
         val alignment =
             if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-        val xPos = if (leftAlign) 0f else element.actualWidth.toFloat()
+        val xPos = if (leftAlign) 0f else element.scaleWidth.toFloat()
         for ((i, str) in lines.withIndex()) {
             ScreenRenderer.fontRenderer.drawString(
                 str,

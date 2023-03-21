@@ -174,9 +174,9 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
         buttonList.removeIf { button: GuiButton? -> button is ResizeButton && button.element !== element }
         val locationButton = locationButtons[element] ?: return
         val boxXOne = locationButton.x - ResizeButton.SIZE * element.scale
-        val boxXTwo = locationButton.x + element.actualWidth + ResizeButton.SIZE * 2 * element.scale
+        val boxXTwo = locationButton.x + element.scaleWidth + ResizeButton.SIZE * 2 * element.scale
         val boxYOne = locationButton.y - ResizeButton.SIZE * element.scale
-        val boxYTwo = locationButton.y + element.actualHeight + ResizeButton.SIZE * 2 * element.scale
+        val boxYTwo = locationButton.y + element.scaleHeight + ResizeButton.SIZE * 2 * element.scale
         buttonList.add(ResizeButton(boxXOne, boxYOne, element, Corner.TOP_LEFT))
         buttonList.add(ResizeButton(boxXTwo, boxYOne, element, Corner.TOP_RIGHT))
         buttonList.add(ResizeButton(boxXOne, boxYTwo, element, Corner.BOTTOM_LEFT))
@@ -190,9 +190,9 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                 val element = button.element
                 val locationButton = locationButtons[element] ?: continue
                 val boxXOne = locationButton.x - ResizeButton.SIZE * element.scale
-                val boxXTwo = locationButton.x + element.actualWidth + ResizeButton.SIZE * element.scale
+                val boxXTwo = locationButton.x + element.scaleWidth + ResizeButton.SIZE * element.scale
                 val boxYOne = locationButton.y - ResizeButton.SIZE * element.scale
-                val boxYTwo = locationButton.y + element.actualHeight + ResizeButton.SIZE * element.scale
+                val boxYTwo = locationButton.y + element.scaleHeight + ResizeButton.SIZE * element.scale
                 when (corner) {
                     Corner.TOP_LEFT -> {
                         button.x = boxXOne
