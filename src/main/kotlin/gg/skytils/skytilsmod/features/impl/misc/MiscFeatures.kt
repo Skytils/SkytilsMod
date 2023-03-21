@@ -185,37 +185,35 @@ object MiscFeatures {
                 }
             }
         }
-        if (Utils.inSkyblock) {
-            if (Skytils.config.autoCopyRNGDrops) {
-                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith(
-                        "§r§6§lPET DROP! "
-                    ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
-                ) {
-                    GuiScreen.setClipboardString(unformatted)
-                    UChat.chat("$prefix §aCopied RNG drop to clipboard.")
-                    event.message.chatStyle
-                        .setChatHoverEvent(
-                            HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("§aClick to copy to clipboard.")
-                            )
-                        ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
-                }
+        if (Skytils.config.autoCopyRNGDrops) {
+            if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith(
+                    "§r§6§lPET DROP! "
+                ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
+            ) {
+                GuiScreen.setClipboardString(unformatted)
+                UChat.chat("$prefix §aCopied RNG drop to clipboard.")
+                event.message.chatStyle
+                    .setChatHoverEvent(
+                        HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            ChatComponentText("§aClick to copy to clipboard.")
+                        )
+                    ).chatClickEvent =
+                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
             }
-            if (Skytils.config.autoCopyVeryRareDrops) {
-                if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
-                    GuiScreen.setClipboardString(unformatted)
-                    UChat.chat("$prefix §aCopied very rare drop to clipboard.")
-                    event.message.chatStyle
-                        .setChatHoverEvent(
-                            HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("§aClick to copy to clipboard.")
-                            )
-                        ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
-                }
+        }
+        if (Skytils.config.autoCopyVeryRareDrops) {
+            if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
+                GuiScreen.setClipboardString(unformatted)
+                UChat.chat("$prefix §aCopied very rare drop to clipboard.")
+                event.message.chatStyle
+                    .setChatHoverEvent(
+                        HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            ChatComponentText("§aClick to copy to clipboard.")
+                        )
+                    ).chatClickEvent =
+                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
             }
         }
     }

@@ -47,7 +47,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
 
     fun updateCooldownReduction() {
         val mages = DungeonListener.team.values.filter { it.dungeonClass == DungeonClass.MAGE }
-        val self = mages.find { it.playerName == Skytils.mc.session.username } ?: return
+        val self = mages.find { it.playerName == mc.session.username } ?: return
         val soloMage = mages.size == 1
         cooldownReduction = ((if (soloMage) 50 else 25) + floor(self.classLevel / 2.0))
         println("Mage ${self.classLevel}, they are ${if (soloMage) "a" else "not a"} solo mage with cooldown reduction ${cooldownReduction}.")
