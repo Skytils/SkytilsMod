@@ -1894,6 +1894,13 @@ object Config : Vigilant(
     var hidePetHealth = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Players in Spawn",
+        description = "Hides players in the spawn area at the Hub.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hidePlayersInSpawn = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Potion Effects in Inventory",
         description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"

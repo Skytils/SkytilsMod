@@ -93,6 +93,7 @@ object MiscFeatures {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0=",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhMDg3ZWI3NmU3Njg3YTgxZTRlZjgxYTdlNjc3MjY0OTk5MGY2MTY3Y2ViMGY3NTBhNGM1ZGViNmM0ZmJhZCJ9fX0="
     )
+    private val hubSpawnPoint = BlockPos(-2, 70, -69)
 
     init {
         GolemSpawnTimerElement()
@@ -244,6 +245,10 @@ object MiscFeatures {
             }
         } else if (event.entity is EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
+                event.isCanceled = true
+            }
+        } else if (event.entity is EntityOtherPlayerMP) {
+            if (Skytils.config.hidePlayersInSpawn && event.entity.position == hubSpawnPoint && SBInfo.mode == SkyblockIsland.Hub.mode) {
                 event.isCanceled = true
             }
         } else if (Skytils.deobfEnvironment && DevTools.getToggle("invis")) {
