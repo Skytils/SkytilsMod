@@ -196,7 +196,7 @@ object DupeTracker : Tracker("duped_items") {
 
     init {
         fixedRateTimer(name = "Skytils-FetchDupeData", period = 7 * 60 * 1000L) {
-            if (Utils.skyblock && Skytils.config.dupeTracker) {
+            if (Utils.inSkyblock && Skytils.config.dupeTracker) {
                 Skytils.IO.launch {
                     client.get("https://${Skytils.domain}/api/auctions/dupeditems").body<List<IdentifiableItem>>()
                         .apply {

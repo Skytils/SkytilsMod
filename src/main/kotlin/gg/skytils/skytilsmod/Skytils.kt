@@ -560,7 +560,7 @@ class Skytils {
             }
         }
         if (old is AccessorGuiStreamUnavailable) {
-            if (config.twitchFix && event.gui == null && !(Utils.skyblock && old.parentScreen is GuiGameOver)) {
+            if (config.twitchFix && event.gui == null && !(Utils.inSkyblock && old.parentScreen is GuiGameOver)) {
                 event.gui = old.parentScreen
             }
         }

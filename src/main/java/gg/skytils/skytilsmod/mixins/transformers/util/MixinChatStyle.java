@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ChatStyle.class)
-public class MixinChatStyle implements ExtensionChatStyle {
+public abstract class MixinChatStyle implements ExtensionChatStyle {
     @Unique
     ChatTabs.ChatTab[] chatTab = null;
 
