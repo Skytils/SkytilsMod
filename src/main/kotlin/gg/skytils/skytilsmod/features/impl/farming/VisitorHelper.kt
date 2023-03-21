@@ -23,7 +23,7 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.structure.FloatPair
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -108,7 +108,7 @@ object VisitorHelper {
         if (textLines.isEmpty()) return
         val stack = UMatrixStack()
         stack.push()
-        stack.translate(VisitorHelperDisplay.actualX, VisitorHelperDisplay.actualY, 0f)
+        stack.translate(VisitorHelperDisplay.scaleX, VisitorHelperDisplay.scaleX, 0f)
         stack.scale(VisitorHelperDisplay.scale, VisitorHelperDisplay.scale, 0f)
 
         textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
@@ -125,12 +125,12 @@ object VisitorHelper {
      * of this class so that the user can move the element around normally.
      * @see ContainerSellValue
      */
-    object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", FloatPair(0.258f, 0.283f)) {
+    object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", x = 0.258f, y = 0.283f) {
         internal val rightAlign: Boolean
-            get() = actualX > (UResolution.scaledWidth * 0.75f) ||
-                    (actualX < UResolution.scaledWidth / 2f && actualX > UResolution.scaledWidth / 4f)
+            get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
+                    (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
-            get() = if (rightAlign) actualWidth else 0f
+            get() = if (rightAlign) scaleWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
             get() = if (rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
             else SmartFontRenderer.TextAlignment.LEFT_RIGHT
