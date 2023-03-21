@@ -368,6 +368,13 @@ object Config : Vigilant(
     var bloodHelperColor = Color.RED
 
     @Property(
+        type = PropertyType.SWITCH, name = "Box Starred Mobs",
+        description = "Draws the bounding box for Starred Mobs.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxStarredMobs = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"

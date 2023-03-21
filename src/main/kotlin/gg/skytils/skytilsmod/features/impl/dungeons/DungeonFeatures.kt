@@ -524,8 +524,7 @@ object DungeonFeatures {
                         3f,
                         RenderUtil.getPartialTicks()
                     )
-                }
-                if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
+                } else if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
                         event.entity.getCurrentArmor(0)
                     ) == "SKELETON_MASTER_BOOTS"
                 ) {
@@ -535,14 +534,23 @@ object DungeonFeatures {
                         3f,
                         RenderUtil.getPartialTicks()
                     )
-                }
-                if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
+                } else if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
                     RenderUtil.drawOutlinedBoundingBox(
                         event.entity.entityBoundingBox,
                         Color(121, 11, 255, 255),
                         3f,
                         RenderUtil.getPartialTicks()
                     )
+                } else if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName()) {
+                    val name = event.entity.customNameTag.stripControlCodes()
+                    if (name.startsWith("✯ ") && '❤' in name) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(255, 255, 0, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    }
                 }
             }
             if (event.entity == lividTag) {
