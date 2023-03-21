@@ -35,7 +35,7 @@ object RainTimer {
         while (nextRain < System.currentTimeMillis()) nextRain += 4850000
     }
 
-    class RainTimerGuiElement : GuiElement(name = "Rain Timer", pos = 10 to 10) {
+    class RainTimerGuiElement : GuiElement(name = "Rain Timer", x = 10, y = 10) {
         override fun render() {
             if (Utils.inSkyblock && toggled) {
                 if (nextRain < System.currentTimeMillis()) nextRain += 4850000

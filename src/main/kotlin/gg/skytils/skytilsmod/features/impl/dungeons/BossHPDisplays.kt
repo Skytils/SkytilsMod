@@ -144,7 +144,7 @@ object BossHPDisplays {
         GlStateManager.enableCull()
     }
 
-    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", pos = 200 to 30) {
+    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", x = 200, y = 30) {
         override fun render() {
             if (toggled && guardianRespawnTimers.isNotEmpty()) {
                 RenderUtil.drawAllInList(this, guardianRespawnTimers)
@@ -178,7 +178,7 @@ object BossHPDisplays {
         }
     }
 
-    class GiantHPElement : GuiElement("Show Giant HP", pos = 200 to 30) {
+    class GiantHPElement : GuiElement("Show Giant HP", x = 200, y = 30) {
         override fun render() {
             if (giantNames.isNotEmpty()) {
                 RenderUtil.drawAllInList(

@@ -299,7 +299,7 @@ object MythologicalTracker : Tracker("mythological") {
         write(writer)
     }
 
-    object MythologicalTrackerElement : GuiElement("Mythological Tracker", pos = 150 to 120) {
+    object MythologicalTrackerElement : GuiElement("Mythological Tracker", x = 150, y = 120) {
         override fun render() {
             if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SkyblockIsland.Hub.mode) {
 

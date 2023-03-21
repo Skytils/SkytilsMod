@@ -404,7 +404,7 @@ object MiningFeatures {
         waypoints.clear()
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", pos = 0 to 0) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", x = 0, y = 0) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
 
         enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {
