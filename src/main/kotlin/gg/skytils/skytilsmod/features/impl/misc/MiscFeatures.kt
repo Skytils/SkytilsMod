@@ -304,6 +304,8 @@ object MiscFeatures {
             event.isCanceled = true
         } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTH && Skytils.config.hideHealthDisplay) {
             event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTHMOUNT && Skytils.config.hidePetHealth) {
+            event.isCanceled = true
         }
     }
 

@@ -1887,6 +1887,13 @@ object Config : Vigilant(
     var hideDeathParticles = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Pet Health Display",
+        description = "Hides the Vanilla pet hearts.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hidePetHealth = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Potion Effects in Inventory",
         description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"
