@@ -109,6 +109,19 @@ object DungeonFeatures {
     private var secondsToPortal = 0f
     var hasClearedText = false
     private var terracottaSpawns = hashMapOf<BlockPos, Long>()
+    private val dungeonMobSpawns = setOf(
+        "Lurker",
+        "Dreadlord",
+        "Souleater",
+        "Zombie",
+        "Skeleton",
+        "Skeletor",
+        "Sniper",
+        "Super Archer",
+        "Spider",
+        "Fels",
+        "Withermancer"
+    )
 
     init {
         LividGuiElement()
@@ -445,11 +458,11 @@ object DungeonFeatures {
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
             val matrixStack = UMatrixStack()
-            if (Skytils.config.boxSpiritBow && equalsOneOf(
+            if (Skytils.config.boxSpiritBow && hasBossSpawned && event.entity.isInvisible && equalsOneOf(
                     dungeonFloor,
                     "F4",
                     "M4"
-                ) && hasBossSpawned && event.entity is EntityArmorStand && event.entity.isInvisible && event.entity.heldItem?.item == Items.bow
+                ) && event.entity is EntityArmorStand && event.entity.heldItem?.item == Items.bow
             ) {
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
@@ -485,14 +498,9 @@ object DungeonFeatures {
                 }
                 if (Skytils.config.hideNonStarredNametags) {
                     val name = event.entity.customNameTag.stripControlCodes()
-                    if (!name.startsWith("✯ ") && name.contains("❤")) if (name.contains("Lurker") || name.contains("Dreadlord") || name.contains(
-                            "Souleater"
-                        ) || name.contains("Zombie") || name.contains("Skeleton") || name.contains("Skeletor") || name.contains(
-                            "Sniper"
-                        ) || name.contains("Super Archer") || name.contains("Spider") || name.contains("Fels") || name.contains(
-                            "Withermancer"
-                        )
-                    ) mc.theWorld.removeEntity(event.entity)
+                    if (!name.startsWith("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
+                        mc.theWorld.removeEntity(event.entity)
+                    }
                 }
                 if (Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
                     event.isCanceled = true
