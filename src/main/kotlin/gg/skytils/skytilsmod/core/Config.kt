@@ -1893,7 +1893,6 @@ object Config : Vigilant(
     )
     var hideScoreboardScore = false
 
-
     @Property(
         type = PropertyType.SWITCH, name = "Hide Vanilla Health Display",
         description = "Prevents the game from rendering the vanilla heart points.",
@@ -1970,6 +1969,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var partyAddons = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Cursor Reset",
+        description = "Prevents the cursor from resetting to the center of the screen when you open a GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventCursorReset = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Power Orb Lock",

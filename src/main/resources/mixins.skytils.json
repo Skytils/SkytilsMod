@@ -84,6 +84,7 @@
   ],
   "verbose": true,
   "client": [
-    "gui.MixinGuiEditSign"
+    "gui.MixinGuiEditSign",
+    "util.MixinMouseHelper"
   ]
 }
