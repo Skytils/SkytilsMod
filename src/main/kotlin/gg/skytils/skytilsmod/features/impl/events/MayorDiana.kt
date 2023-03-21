@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.baseMaxHealth
@@ -98,7 +97,7 @@ object MayorDiana {
                         Vec3(posX, posY + 2, posZ),
                         "Hits: $hits / $neededHits",
                         if (hits < neededHits) Color.RED else Color.GREEN,
-                        (mc as AccessorMinecraft).timer.renderPartialTicks,
+                        RenderUtil.getPartialTicks(),
                         matrixStack
                     )
                     UGraphics.enableDepth()
