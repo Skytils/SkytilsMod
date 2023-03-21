@@ -22,7 +22,7 @@ import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 
 abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float) {
-    constructor(name: String, x: Int, y: Int, scale: Float = 1f) : this(
+    constructor(name: String, scale: Float = 1f, x: Int, y: Int) : this(
         name,
         scale,
         (x / UResolution.scaledWidth).toFloat(),
