@@ -211,14 +211,16 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             val pos = x to y
             GUIPOSITIONS[name] = pos
             GUISCALES[name] = scale
-            getByName(name)?.pos = pos
-            getByName(name)?.scale = scale
+            getByName(name)?.let { element ->
+                element.setPos(x, y)
+                element.scale = scale
+            }
         }
     }
 
     override fun write(writer: Writer) {
         names.entries.forEach { (n, e) ->
-            GUIPOSITIONS[n] = e.pos
+            GUIPOSITIONS[n] = e.x to e.y
             GUISCALES[n] = e.scale
         }
         writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {

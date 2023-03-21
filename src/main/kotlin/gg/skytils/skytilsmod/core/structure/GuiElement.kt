@@ -21,11 +21,12 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 
-abstract class GuiElement(var name: String, var scale: Float = 1f, var pos: FloatPair = 0f to 0f) {
-    constructor(name: String, pos: IntPair = 0 to 0, scale: Float = 1f) : this(
+abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float) {
+    constructor(name: String, x: Int, y: Int, scale: Float = 1f) : this(
         name,
         scale,
-        (pos.first / UResolution.scaledWidth).toFloat() to (pos.second / UResolution.scaledHeight).toFloat()
+        (x / UResolution.scaledWidth).toFloat(),
+        (y / UResolution.scaledHeight).toFloat()
     )
 
     abstract fun render()
@@ -39,18 +40,19 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var pos: Floa
     }
 
     fun setPos(x: Float, y: Float) {
-        pos = x to y
+        this.x = x
+        this.y = y
     }
 
     val scaleX: Float
         get() {
             val maxX = UResolution.scaledWidth
-            return maxX * pos.first
+            return maxX * x
         }
     val scaleY: Float
         get() {
             val maxY = UResolution.scaledHeight
-            return maxY * pos.second
+            return maxY * y
         }
     abstract val height: Int
     abstract val width: Int
@@ -67,7 +69,9 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var pos: Floa
     }
 
     init {
-        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, pos)
+        val pos = GuiManager.GUIPOSITIONS.getOrDefault(name, x to y)
+        x = pos.first
+        y = pos.second
         scale = GuiManager.GUISCALES.getOrDefault(name, scale)
     }
 }

@@ -76,7 +76,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
         CooldownDisplayElement()
     }
 
-    class CooldownDisplayElement : GuiElement("Item Cooldown Display", pos = 10 to 10) {
+    class CooldownDisplayElement : GuiElement("Item Cooldown Display", x = 10, y = 10) {
 
         override fun render() {
             if (Utils.inSkyblock && toggled) {

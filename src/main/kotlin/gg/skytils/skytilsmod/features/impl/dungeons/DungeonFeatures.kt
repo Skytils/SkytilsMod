@@ -751,7 +751,7 @@ object DungeonFeatures {
         terracottaSpawns.clear()
     }
 
-    class PortalTimer : GuiElement("Blood Room Portal Timer", pos = 0.05f to 0.4f) {
+    class PortalTimer : GuiElement("Blood Room Portal Timer", x = 0.05f, y = 0.4f) {
         override fun render() {
             if (!toggled || !Utils.inDungeons || DungeonTimer.bloodClearTime == -1L || DungeonTimer.bossEntryTime != -1L || mc.thePlayer?.isInsideOfMaterial(
                     Material.portal
@@ -796,7 +796,7 @@ object DungeonFeatures {
         }
     }
 
-    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", pos = 0.05f to 0.4f) {
+    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
         override fun render() {
             if (toggled && lastLitUpTime != -1L) {
                 val time = lastLitUpTime + 3400
@@ -845,7 +845,7 @@ object DungeonFeatures {
         }
     }
 
-    internal class LividGuiElement : GuiElement("Livid HP", pos = 0.05f to 0.4f) {
+    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f) {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld

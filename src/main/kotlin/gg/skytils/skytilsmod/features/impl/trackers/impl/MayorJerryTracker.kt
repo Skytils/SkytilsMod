@@ -161,7 +161,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         JerryTrackerElement()
     }
 
-    class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", pos = 150 to 120) {
+    class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", x = 150, y = 120) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
 

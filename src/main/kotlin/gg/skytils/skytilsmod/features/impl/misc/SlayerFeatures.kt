@@ -537,7 +537,7 @@ object SlayerFeatures : CoroutineScope {
 
     }
 
-    class SlayerDisplayElement : GuiElement("Slayer Display", pos = 150 to 20) {
+    class SlayerDisplayElement : GuiElement("Slayer Display", x = 150, y = 20) {
         override fun render() {
             if (Utils.inSkyblock) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -617,7 +617,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SeraphDisplayElement : GuiElement("Seraph Display", pos = 20 to 20) {
+    class SeraphDisplayElement : GuiElement("Seraph Display", x = 20, y = 20) {
         override fun render() {
             if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -734,7 +734,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    object TotemDisplayElement : GuiElement("Totem Display", pos = 20 to 50) {
+    object TotemDisplayElement : GuiElement("Totem Display", x = 20, y = 50) {
         override fun render() {
             (slayer as? DemonlordSlayer)?.totemEntity?.run {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -778,7 +778,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", pos = 150 to 20) {
+    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", x = 150, y = 20) {
         private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 
