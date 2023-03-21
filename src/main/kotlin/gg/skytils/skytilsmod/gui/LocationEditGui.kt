@@ -150,7 +150,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                     val scaleY = newHeight / height
                     val newScale = scaleX.coerceAtLeast(scaleY).coerceAtLeast(0.01f)
                     locationButton.element.scale *= newScale
-                    locationButton.element.setPos(locationButton.element.pos.first, (scaledY - newHeight) / sr.scaledHeight)
+                    locationButton.element.setPos(locationButton.element.x, (scaledY - newHeight) / sr.scaledHeight)
                 }
 
                 Corner.BOTTOM_LEFT -> {

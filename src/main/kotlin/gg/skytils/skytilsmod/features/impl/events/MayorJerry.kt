@@ -76,7 +76,7 @@ object MayorJerry {
         }
     }
 
-    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", pos = 10 to 10) {
+    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", x = 10, y = 10) {
         override fun render() {
             if (Utils.inSkyblock && toggled && MayorInfo.currentMayor == "Jerry") {
                 if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
@@ -123,7 +123,7 @@ object MayorJerry {
         }
     }
 
-    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", pos = 10 to 10) {
+    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", x = 10, y = 10) {
         private val villagerEgg = ItemStack(Items.spawn_egg, 1, 120)
 
         override fun render() {

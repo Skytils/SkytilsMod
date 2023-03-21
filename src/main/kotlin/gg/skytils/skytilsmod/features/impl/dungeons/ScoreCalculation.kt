@@ -484,7 +484,7 @@ object ScoreCalculation {
         HugeCryptsCounter()
     }
 
-    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, pos = 200 to 200) {
+    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, x = 200, y = 200) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
 
@@ -523,7 +523,7 @@ object ScoreCalculation {
         }
     }
 
-    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", pos = 200 to 100) {
+    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", x = 200, y = 100) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
                 RenderUtil.drawAllInList(this, text)

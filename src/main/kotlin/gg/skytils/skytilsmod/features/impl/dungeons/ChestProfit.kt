@@ -180,7 +180,7 @@ object ChestProfit {
     }
 
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
-    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", pos = 200 to 120) {
+    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
                 val leftAlign = scaleX < sr.scaledWidth / 2f

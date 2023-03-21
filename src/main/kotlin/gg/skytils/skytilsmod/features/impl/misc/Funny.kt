@@ -96,7 +96,7 @@ object Funny {
         GuiManager.registerElement(JamCatElement)
     }
 
-    object JamCatElement : GuiElement("Jamcat", pos = 0 to 0) {
+    object JamCatElement : GuiElement("Jamcat", x = 0, y = 0) {
         val gif by lazy {
             GIFResource(getSkytilsResource("splashes/jamcat.gif"), frameDelay = 5)
         }
