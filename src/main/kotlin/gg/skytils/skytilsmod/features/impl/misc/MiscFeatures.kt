@@ -103,11 +103,11 @@ object MiscFeatures {
         TickTask(40, repeats = true) {
             // TODO: investigate compat
             if (Utils.inSkyblock) {
-                GuiIngameForge.renderAir = Skytils.config.hideAirDisplay && !Utils.inDungeons
-                GuiIngameForge.renderArmor = Skytils.config.hideArmorDisplay
-                GuiIngameForge.renderFood = Skytils.config.hideHungerDisplay
-                GuiIngameForge.renderHealth = Skytils.config.hideHealthDisplay
-                GuiIngameForge.renderHealthMount = Skytils.config.hidePetHealth
+                GuiIngameForge.renderAir = !(Skytils.config.hideAirDisplay && !Utils.inDungeons)
+                GuiIngameForge.renderArmor = !Skytils.config.hideArmorDisplay
+                GuiIngameForge.renderFood = !Skytils.config.hideHungerDisplay
+                GuiIngameForge.renderHealth = !Skytils.config.hideHealthDisplay
+                GuiIngameForge.renderHealthMount = !Skytils.config.hidePetHealth
             } else {
                 GuiIngameForge.renderAir = true
                 GuiIngameForge.renderArmor = true
