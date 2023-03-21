@@ -134,7 +134,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         visibleWaypoints = emptyList()
-        TickTask(20, ::computeVisibleWaypoints)
+        TickTask(20, task = ::computeVisibleWaypoints)
     }
 
     @SubscribeEvent
