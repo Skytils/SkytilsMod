@@ -30,7 +30,6 @@ import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
 import gg.skytils.skytilsmod.utils.*
-import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RenderDragon
@@ -114,8 +113,9 @@ object MasterMode7Features {
                 val owner = WitherKingDragons.values().find {
                     it.particleLocation.x == x.toInt() && it.particleLocation.z == z.toInt()
                 } ?: return
-                // TODO: needs confirm
-                dragonSpawnTimes[owner] = System.currentTimeMillis() + 5000
+                if (owner !in dragonSpawnTimes) {
+                    dragonSpawnTimes[owner] = System.currentTimeMillis() + 5000
+                }
             }
         }
     }
@@ -210,13 +210,18 @@ object MasterMode7Features {
             GlStateManager.disableDepth()
             dragonSpawnTimes.entries.removeAll { (drag, time) ->
                 val diff = time - System.currentTimeMillis()
+                val color = when {
+                    diff <= 1000 -> 'c'
+                    diff <= 3000 -> 'e'
+                    else -> 'a'
+                }
                 RenderUtil.drawLabel(
                     drag.bottomChin.middleVec(),
-                    "${drag.textColor} ${(diff / 1000.0).roundToPrecision(2)}s",
+                    "${drag.textColor}: §${color}$diff ms",
                     drag.color,
                     event.partialTicks,
                     stack,
-                    scale = 5f
+                    scale = 6f
                 )
                 return@removeAll diff < 0
             }
