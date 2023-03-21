@@ -1978,6 +1978,13 @@ object Config : Vigilant(
     var preventCursorReset = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Prevent Moving on Death",
+        description = "Unpresses all keys on death to prevent you from moving.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventMovingOnDeath = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Power Orb Lock",
         description = "Prevents placing the power orb if the same or better power orb is within range.",
         category = "Miscellaneous", subcategory = "Quality of Life"
