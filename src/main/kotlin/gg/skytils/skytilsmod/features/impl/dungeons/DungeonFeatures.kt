@@ -506,92 +506,95 @@ object DungeonFeatures {
                     event.isCanceled = true
                 }
             }
-            if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
-                if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
-                    if (MayorInfo.currentMayor == "Derpy") equalsOneOf(
-                        event.entity.maxHealth,
-                        200f,
-                        800f
-                    ) else equalsOneOf(
-                        event.entity.maxHealth,
-                        100f,
-                        400f
-                    )
-                ) {
-                    RenderUtil.drawOutlinedBoundingBox(
-                        event.entity.entityBoundingBox,
-                        Color(0, 255, 255, 255),
-                        3f,
-                        RenderUtil.getPartialTicks()
-                    )
-                } else if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
-                        event.entity.getCurrentArmor(0)
-                    ) == "SKELETON_MASTER_BOOTS"
-                ) {
-                    RenderUtil.drawOutlinedBoundingBox(
-                        event.entity.entityBoundingBox,
-                        Color(255, 107, 11, 255),
-                        3f,
-                        RenderUtil.getPartialTicks()
-                    )
-                } else if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
-                    RenderUtil.drawOutlinedBoundingBox(
-                        event.entity.entityBoundingBox,
-                        Color(121, 11, 255, 255),
-                        3f,
-                        RenderUtil.getPartialTicks()
-                    )
-                } else if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName()) {
-                    val name = event.entity.customNameTag.stripControlCodes()
-                    if (name.startsWith("✯ ") && '❤' in name) {
-
-                        val x =
-                            RenderUtil.interpolate(
-                                event.entity.lastTickPosX,
-                                event.entity.posX,
-                                RenderUtil.getPartialTicks()
-                            )
-                        val y =
-                            RenderUtil.interpolate(
-                                event.entity.lastTickPosY,
-                                event.entity.posY,
-                                RenderUtil.getPartialTicks()
-                            )
-                        val z =
-                            RenderUtil.interpolate(
-                                event.entity.lastTickPosZ,
-                                event.entity.posZ,
-                                RenderUtil.getPartialTicks()
-                            )
-                        val color = Color(255, 255, 0, 255)
-                        if ("Spider" in name) {
-                            RenderUtil.drawOutlinedBoundingBox(
-                                AxisAlignedBB(
-                                    x - 0.625,
-                                    y - 1,
-                                    z - 0.625,
-                                    x + 0.625,
-                                    y - 0.25,
-                                    z + 0.625
-                                ),
-                                color,
-                                3f,
-                                RenderUtil.getPartialTicks()
-                            )
-                        } else if ("Fels" in name || "Withermancer" in name) {
-                            RenderUtil.drawOutlinedBoundingBox(
-                                AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
-                                color,
-                                3f,
-                                RenderUtil.getPartialTicks()
-                            )
-                        } else {
-                            RenderUtil.drawOutlinedBoundingBox(
-                                AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
-                                color,
-                                3f,
-                                RenderUtil.getPartialTicks()
-                            )
+            if (!mc.renderManager.isDebugBoundingBox) {
+                if (!event.entity.isInvisible) {
+                    if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
+                        if (MayorInfo.currentMayor == "Derpy") equalsOneOf(
+                            event.entity.maxHealth,
+                            200f,
+                            800f
+                        ) else equalsOneOf(
+                            event.entity.maxHealth,
+                            100f,
+                            400f
+                        )
+                    ) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(0, 255, 255, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    } else if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
+                            event.entity.getCurrentArmor(0)
+                        ) == "SKELETON_MASTER_BOOTS"
+                    ) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(255, 107, 11, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    } else if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(121, 11, 255, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    }
+                } else {
+                    if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName()) {
+                        val name = event.entity.name
+                        if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
+                            val x =
+                                RenderUtil.interpolate(
+                                    event.entity.lastTickPosX,
+                                    event.entity.posX,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            val y =
+                                RenderUtil.interpolate(
+                                    event.entity.lastTickPosY,
+                                    event.entity.posY,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            val z =
+                                RenderUtil.interpolate(
+                                    event.entity.lastTickPosZ,
+                                    event.entity.posZ,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            val color = Color(255, 255, 0, 255)
+                            if ("Spider" in name) {
+                                RenderUtil.drawOutlinedBoundingBox(
+                                    AxisAlignedBB(
+                                        x - 0.625,
+                                        y - 1,
+                                        z - 0.625,
+                                        x + 0.625,
+                                        y - 0.25,
+                                        z + 0.625
+                                    ),
+                                    color,
+                                    3f,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            } else if ("Fels" in name || "Withermancer" in name) {
+                                RenderUtil.drawOutlinedBoundingBox(
+                                    AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
+                                    color,
+                                    3f,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            } else {
+                                RenderUtil.drawOutlinedBoundingBox(
+                                    AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
+                                    color,
+                                    3f,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            }
                         }
                     }
                 }
