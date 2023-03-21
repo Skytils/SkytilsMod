@@ -544,7 +544,7 @@ object DungeonFeatures {
                         )
                     }
                 } else {
-                    if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName()) {
+                    if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
                         val name = event.entity.name
                         if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
                             val x =
@@ -565,7 +565,7 @@ object DungeonFeatures {
                                     event.entity.posZ,
                                     RenderUtil.getPartialTicks()
                                 )
-                            val color = Color(255, 255, 0, 255)
+                            val color = Color(0, 255, 255, 255)
                             if ("Spider" in name) {
                                 RenderUtil.drawOutlinedBoundingBox(
                                     AxisAlignedBB(
