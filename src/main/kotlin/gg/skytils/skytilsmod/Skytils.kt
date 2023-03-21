@@ -135,7 +135,6 @@ class Skytils {
 
         @JvmStatic
         lateinit var guiManager: GuiManager
-        var ticks = 0
 
         @JvmField
         val sendMessageQueue = ArrayDeque<String>()
@@ -414,19 +413,6 @@ class Skytils {
             val msg = sendMessageQueue.pollFirst()
             if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(msg)
         }
-
-        if (ticks % 20 == 0) {
-            if (mc.thePlayer != null) {
-                if (deobfEnvironment) {
-                    if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
-                    if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.skyblock = true
-                    if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.dungeons = true
-                }
-                if (DevTools.getToggle("sprint"))
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
-            }
-            ticks = 0
-        }
         if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
             if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
                 UChat.chat("Copied tab data to clipboard")
@@ -447,8 +433,20 @@ class Skytils {
                 )
             }
         }
+    }
 
-        ticks++
+    init {
+        TickTask(20, repeats = true) {
+            if (mc.thePlayer != null) {
+                if (deobfEnvironment) {
+                    if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
+                    if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.skyblock = true
+                    if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.dungeons = true
+                }
+                if (DevTools.getToggle("sprint"))
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
+            }
+        }
     }
 
     @SubscribeEvent

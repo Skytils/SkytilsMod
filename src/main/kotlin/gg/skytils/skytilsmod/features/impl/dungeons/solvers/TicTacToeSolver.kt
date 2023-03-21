@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -35,7 +36,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.experimental.and
 
 object TicTacToeSolver {
@@ -46,14 +46,9 @@ object TicTacToeSolver {
     private var mappedPositions = HashMap<Int, EntityItemFrame>()
     private var bestMove: BlockPos? = null
 
-    private var ticks = 0
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inDungeons || !Skytils.config.ticTacToeSolver) return
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
-        if (ticks % 20 == 0) {
-            ticks = 0
+    init {
+        TickTask(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.ticTacToeSolver || mc.thePlayer == null) return@TickTask
             if (SuperSecretSettings.azooPuzzoo || DungeonListener.missingPuzzles.contains("Tic Tac Toe")) {
                 val frames = mc.theWorld.loadedEntityList.filter {
                     if (it !is EntityItemFrame) return@filter false
@@ -157,7 +152,6 @@ object TicTacToeSolver {
                 bestMove = null
             }
         }
-        ticks++
     }
 
     @SubscribeEvent

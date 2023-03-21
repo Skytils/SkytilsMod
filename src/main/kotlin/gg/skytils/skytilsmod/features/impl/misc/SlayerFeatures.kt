@@ -91,7 +91,6 @@ import kotlin.math.floor
 object SlayerFeatures : CoroutineScope {
     override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
 
-    private var ticks = 0
     private val ZOMBIE_MINIBOSSES = arrayOf(
         "§cRevenant Sycophant",
         "§cRevenant Champion",
@@ -105,6 +104,11 @@ object SlayerFeatures : CoroutineScope {
     private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
     private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
+        set(value) {
+            field?.unset()
+            field = value
+            value?.set()
+        }
     val slayerEntity: Entity?
         get() = slayer?.entity
     var hasSlayerText = false
@@ -170,22 +174,10 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (!Utils.inSkyblock) return
-        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
-        lastTickHasSlayerText = hasSlayerText
-        hasSlayerText = sidebarLines.any { it == "Slay the boss!" }
-        if (!lastTickHasSlayerText && hasSlayerText) {
-            val currentTier =
-                sidebarLines.find { it.startsWith("Voidgloom Seraph") }
-                    ?.substringAfter("Voidgloom Seraph")?.drop(1)
-                    ?: ""
-            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier) ?: 0
-        }
-        slayer?.tick(event)
-        if (ticks % 4 == 0) {
-            if (Skytils.config.showRNGMeter) {
+
+    init {
+        TickTask(4, repeats = true) {
+            if (Utils.inSkyblock && Skytils.config.showRNGMeter) {
                 for ((index, line) in sidebarLines.withIndex()) {
                     if (line == "Slayer Quest") {
                         val boss = sidebarLines.elementAtOrNull(index + 1) ?: continue
@@ -232,9 +224,23 @@ object SlayerFeatures : CoroutineScope {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (!Utils.inSkyblock) return
+        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
+        lastTickHasSlayerText = hasSlayerText
+        hasSlayerText = sidebarLines.any { it == "Slay the boss!" }
+        if (!lastTickHasSlayerText && hasSlayerText) {
+            val currentTier =
+                sidebarLines.find { it.startsWith("Voidgloom Seraph") }
+                    ?.substringAfter("Voidgloom Seraph")?.drop(1)
+                    ?: ""
+            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier) ?: 0
+        }
+        slayer?.tick(event)
     }
 
     @SubscribeEvent
@@ -958,42 +964,55 @@ object SlayerFeatures : CoroutineScope {
             }
 
         open fun tick(event: ClientTickEvent) {}
+
+        open fun set() {}
+        open fun unset() {}
     }
 
     class RevenantSlayer(entity: EntityZombie) :
         Slayer<EntityZombie>(entity, "Revenant Horror", "§c☠ §bRevenant Horror", "§c☠ §fAtoned Horror") {
-        override fun tick(event: ClientTickEvent) {
-            if (ticks % 4 != 0) return
-            if (Skytils.config.rev5TNTPing) {
-                if (hasSlayerText) {
-                    var under: BlockPos? = null
-                    if (mc.thePlayer.onGround) {
-                        under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                    } else {
-                        for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
-                            val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
-                            if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
-                                under = test
-                                break
-                            }
-                        }
-                    }
-                    if (under != null) {
-                        val blockUnder = mc.theWorld.getBlockState(under)
-                        val isDanger = when {
-                            blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
-                            blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
-                            blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
-                            blockUnder.block === Blocks.stained_hardened_clay -> {
-                                val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
-                                color == 0 || color == 8 || color == 14
-                            }
 
-                            blockUnder.block === Blocks.bedrock -> true
-                            else -> false
+        override fun set() {
+            rev5PingTask.register()
+        }
+
+        override fun unset() {
+            rev5PingTask.unregister()
+        }
+
+        companion object {
+            private val rev5PingTask = TickTask(4, repeats = true, register = false) {
+                if (Utils.inSkyblock && Skytils.config.rev5TNTPing && mc.thePlayer != null) {
+                    if (hasSlayerText) {
+                        var under: BlockPos? = null
+                        if (mc.thePlayer.onGround) {
+                            under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
+                        } else {
+                            for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
+                                val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
+                                if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
+                                    under = test
+                                    break
+                                }
+                            }
                         }
-                        if (isDanger) {
-                            SoundQueue.addToQueue("random.orb", 1f)
+                        if (under != null) {
+                            val blockUnder = mc.theWorld.getBlockState(under)
+                            val isDanger = when {
+                                blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
+                                blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
+                                blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
+                                blockUnder.block === Blocks.stained_hardened_clay -> {
+                                    val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
+                                    color == 0 || color == 8 || color == 14
+                                }
+
+                                blockUnder.block === Blocks.bedrock -> true
+                                else -> false
+                            }
+                            if (isDanger) {
+                                SoundQueue.addToQueue("random.orb", 1f)
+                            }
                         }
                     }
                 }

@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -39,8 +40,6 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.random.Random
@@ -52,17 +51,10 @@ object BoulderSolver {
     var roomVariant = -1
     var variantSteps = ArrayList<ArrayList<BoulderPush>>()
     var expectedBoulders = ArrayList<ArrayList<BoulderState>>()
-    private var ticks = 0
     private var job: Job? = null
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        ticks++
-        if (ticks % 20 == 0) {
-            ticks = 0
-            update()
-        }
+    init {
+        TickTask(20, repeats = true, task = ::update)
     }
 
     @SubscribeEvent

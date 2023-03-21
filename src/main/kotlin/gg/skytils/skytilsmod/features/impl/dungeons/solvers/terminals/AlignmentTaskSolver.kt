@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -36,7 +37,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
@@ -60,17 +60,13 @@ object AlignmentTaskSolver {
 
     private val directionSet = HashMap<Point, Int>()
 
-    private var ticks = 0
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (mc.thePlayer == null || mc.theWorld == null || event.phase != TickEvent.Phase.START) return
-        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || !Utils.equalsOneOf(
-                DungeonFeatures.dungeonFloor,
-                "F7", "M7"
-            ) || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L))
-        ) return
-        if (ticks % 20 == 0) {
+    init {
+        TickTask(20, repeats = true) {
+            if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || mc.thePlayer == null || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L) || !Utils.equalsOneOf(
+                    DungeonFeatures.dungeonFloor,
+                    "F7", "M7"
+                ))
+            ) return@TickTask
             if (mc.thePlayer.getDistanceSqToCenter(topLeft) <= 25 * 25) {
                 if (grid.size < 25) {
                     val frames = mc.theWorld.getEntities(EntityItemFrame::class.java) {
@@ -97,6 +93,7 @@ object AlignmentTaskSolver {
                                                 else -> SpaceType.PATH
                                             }
                                         }
+
                                         else -> SpaceType.EMPTY
                                     }
                                 }
@@ -122,9 +119,7 @@ object AlignmentTaskSolver {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent

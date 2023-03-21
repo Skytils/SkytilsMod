@@ -23,6 +23,7 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -72,7 +73,6 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import kotlin.math.pow
@@ -138,12 +138,8 @@ object ItemFeatures {
         Blocks.skull
     )
 
-    var ticks = 0
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (ticks % 4 == 0) {
+    init {
+        TickTask(4, repeats = true) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
                 val held = mc.thePlayer.inventory.getCurrentItem()
                 if (Skytils.config.showItemRarity) {
@@ -178,9 +174,7 @@ object ItemFeatures {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent

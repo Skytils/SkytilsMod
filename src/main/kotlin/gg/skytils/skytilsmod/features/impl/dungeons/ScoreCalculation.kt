@@ -22,6 +22,7 @@ import gg.essential.elementa.state.State
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
@@ -42,15 +43,11 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
 object ScoreCalculation {
-
-    private var ticks = 0
 
     private val deathsTabPattern = Regex("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
     private val missingPuzzlePattern = Regex("§r§b§lPuzzles: §r§f\\((?<count>\\d)\\)§r")
@@ -402,18 +399,12 @@ object ScoreCalculation {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (mc.thePlayer != null && mc.theWorld != null && Utils.inDungeons) {
-            if (Skytils.config.showScoreCalculation && ticks % 5 == 0) {
-                isPaul.set(
-                    (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
-                )
-                ticks = 0
-            }
+    init {
+        TickTask(5, repeats = true) {
+            isPaul.set(
+                (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
+            )
         }
-        ticks++
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

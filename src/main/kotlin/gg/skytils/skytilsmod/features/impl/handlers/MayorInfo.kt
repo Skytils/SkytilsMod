@@ -39,8 +39,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
@@ -58,7 +56,6 @@ object MayorInfo {
     var isLocal = true
     var jerryMayor: Mayor? = null
     var newJerryPerks = 0L
-    private var ticks = 0
     private var lastCheckedElectionOver = 0L
     private var lastFetchedMayorData = 0L
     private var lastSentData = 0L
@@ -67,13 +64,11 @@ object MayorInfo {
 
     private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (mc.currentServerData?.serverIP?.lowercase()
-                ?.contains("alpha") == true
-        ) return
-        if (ticks % (60 * 20) == 0) {
+    init {
+        TickTask(60 * 20, repeats = true) {
+            if (!Utils.inSkyblock || mc.currentServerData?.serverIP?.lowercase()
+                    ?.contains("alpha") == true
+            ) return@TickTask
             if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {
                 if (jerryMayor != null && Skytils.config.displayJerryPerks) {
                     SoundQueue.addToQueue("random.orb", 0.8f, 1f, 1, true)
@@ -97,9 +92,7 @@ object MayorInfo {
                 }
                 lastCheckedElectionOver = System.currentTimeMillis()
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import skytils.hylin.skyblock.Pet
 import skytils.hylin.skyblock.dungeons.DungeonClass
 
@@ -82,8 +81,6 @@ object DungeonListener {
         Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
 
-    private var ticks = 0
-
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons) return
@@ -115,11 +112,9 @@ object DungeonListener {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inDungeons) return
-        if (event.phase != TickEvent.Phase.START) return
-        if (ticks % 4 == 0) {
+    init {
+        TickTask(4, repeats = true) {
+            if (!Utils.inDungeons) return@TickTask
             val localMissingPuzzles = TabListUtils.tabEntries.mapNotNull {
                 val name = it.second
                 if (name.contains("✦")) {
@@ -135,10 +130,9 @@ object DungeonListener {
             }
             missingPuzzles.clear()
             missingPuzzles.addAll(localMissingPuzzles)
-            ticks = 0
         }
-        if (ticks % 2 == 0) {
-            if (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500) {
+        TickTask(2, repeats = true) {
+            if (Utils.inDungeons && DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500) {
                 val tabEntries = TabListUtils.tabEntries
                 for (teammate in team.values) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
@@ -180,7 +174,6 @@ object DungeonListener {
                 }
             }
         }
-        ticks++
     }
 
     private fun getMembers() {
