@@ -317,9 +317,9 @@ object DungeonTimer {
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 5
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§cMaxor: 0s")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§7Wither King: 0s")
 
         override val toggled: Boolean
             get() = Skytils.config.necronPhaseTimer

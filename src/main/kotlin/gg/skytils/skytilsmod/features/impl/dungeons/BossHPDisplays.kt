@@ -193,7 +193,7 @@ object BossHPDisplays {
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * GIANT_NAMES.size
         override val width: Int
             get() = ScreenRenderer.fontRenderer.getStringWidth("§3§lThe Diamond Giant §a19.9M§c❤")
 
