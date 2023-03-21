@@ -1817,6 +1817,13 @@ object Config : Vigilant(
     var hideAirDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Armor Display",
+        description = "Prevents the game from rendering the vanilla armor points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideArmorDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Cheap Coins",
         description = "Prevents the game from rendering cheap coins.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1843,6 +1850,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hideFishingHooks = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Hunger Display",
+        description = "Prevents the game from rendering the vanilla hunger points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideHungerDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Hide Jerry Rune",
@@ -1878,6 +1892,14 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hideScoreboardScore = false
+
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Vanilla Health Display",
+        description = "Prevents the game from rendering the vanilla heart points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideHealthDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Disabled Potion Effects",
