@@ -22,7 +22,8 @@ import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
+class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, val task: () -> T) {
+    var remainingTicks = ticks
     private var callback: (T) -> Unit = {}
     private var failure: (Throwable) -> Unit = {}
 
@@ -54,10 +55,13 @@ object TickTaskManager {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
         tasks.removeAll {
-            if (it.ticks-- <= 0) {
+            if (it.remainingTicks-- <= 0) {
                 it.complete()
-                return@removeAll true
-            } else return@removeAll false
+                if (it.repeats) {
+                    it.remainingTicks = it.ticks
+                } else return@removeAll true
+            }
+            return@removeAll false
         }
     }
 }
