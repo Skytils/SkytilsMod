@@ -92,10 +92,10 @@ object SpidersDenFeatures {
     class ArachneHPElement : GuiElement("Show Arachne HP", x = 200, y = 30) {
         override fun render() {
             if (arachneName != null) {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                val xPos = if (leftAlign) 0f else actualWidth
+                val xPos = if (leftAlign) 0f else scaleWidth
                 ScreenRenderer.fontRenderer.drawString(
                     arachneName,
                     xPos,
