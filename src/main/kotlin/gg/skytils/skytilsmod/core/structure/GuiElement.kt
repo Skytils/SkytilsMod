@@ -75,6 +75,3 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
         scale = GuiManager.GUISCALES.getOrDefault(name, scale)
     }
 }
-
-typealias FloatPair = Pair<Float, Float>
-typealias IntPair = Pair<Int, Int>
