@@ -56,9 +56,9 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
         }
     abstract val height: Int
     abstract val width: Int
-    val actualHeight: Float
+    val scaleHeight: Float
         get() = height * scale
-    val actualWidth: Float
+    val scaleWidth: Float
         get() = width * scale
 
     companion object {

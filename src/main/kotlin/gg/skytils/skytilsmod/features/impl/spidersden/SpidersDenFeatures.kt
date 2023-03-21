@@ -114,7 +114,7 @@ object SpidersDenFeatures {
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 text,
-                if (leftAlign) 0f else 0 + actualWidth,
+                if (leftAlign) 0f else 0 + scaleWidth,
                 0f,
                 CommonColors.WHITE,
                 alignment,

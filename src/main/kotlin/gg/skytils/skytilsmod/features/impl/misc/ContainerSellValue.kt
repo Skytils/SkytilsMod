@@ -81,7 +81,7 @@ object ContainerSellValue {
             get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
                     (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
-            get() = if (rightAlign) actualWidth else 0f
+            get() = if (rightAlign) scaleWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
             get() = if (rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
             else SmartFontRenderer.TextAlignment.LEFT_RIGHT
