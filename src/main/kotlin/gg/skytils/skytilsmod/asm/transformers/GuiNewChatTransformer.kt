@@ -32,7 +32,7 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
         var chatLineVar: VarInsnNode? = null
         for (insn in instructions) {
             if (chatLineVar == null && insn is VarInsnNode && insn.opcode == Opcodes.ASTORE) {
-                var prev = insn.previous
+                val prev = insn.previous
                 if (prev is TypeInsnNode && prev.opcode == Opcodes.CHECKCAST && Utils.equalsOneOf(
                         prev.desc,
                         "net/minecraft/client/gui/ChatLine", "ava"
@@ -105,6 +105,7 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
                             "net/minecraft/client/gui/GuiNewChat",
                             "avt"
                         ) && Utils.equalsOneOf(prev.name, "chatLines", "h") && prev.desc == "Ljava/util/List;"
+
                         else -> throw NotImplementedError()
                     }
                     prev = prev.previous

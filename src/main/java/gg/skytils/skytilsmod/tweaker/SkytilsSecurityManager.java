@@ -31,6 +31,8 @@ import java.security.AccessController;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.trySetLookAndFeel;
+
 public class SkytilsSecurityManager extends SecurityManager {
     private final boolean isForge;
 
@@ -68,11 +70,7 @@ public class SkytilsSecurityManager extends SecurityManager {
     }
 
     private void showMessage() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        trySetLookAndFeel();
 
         // This makes the JOptionPane show on taskbar and stay on top
         JFrame frame = new JFrame();

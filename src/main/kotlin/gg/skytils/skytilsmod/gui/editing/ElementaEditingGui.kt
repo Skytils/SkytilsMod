@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2023 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -28,7 +28,7 @@ import gg.skytils.skytilsmod.gui.editing.components.LocationComponent
 class ElementaEditingGui : WindowScreen(ElementaVersion.V2), ReopenableGUI {
     override fun initScreen(width: Int, height: Int) {
         super.initScreen(width, height)
-        Skytils.guiManager.elements.forEach { _, element ->
+        Skytils.guiManager.elements.forEach { (_, element) ->
             if (!element.toggled) return@forEach
             LocationComponent(element) childOf window
         }

@@ -17,7 +17,6 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc.damagesplash
 
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.RenderGlobal
 import net.minecraft.client.renderer.entity.RenderManager
 import java.util.*

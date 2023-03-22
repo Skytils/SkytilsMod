@@ -147,7 +147,7 @@ object SBInfo {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
                         val parseFormat = SimpleDateFormat("hh:mm a")
                         currentTimeDate = parseFormat.parse(timeSpace)
-                    } catch (e: ParseException) {
+                    } catch (_: ParseException) {
                     }
                 }
                 lines.find { it.contains('⏣') }?.replace(junkRegex, "")?.trim()?.let {

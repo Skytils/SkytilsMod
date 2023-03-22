@@ -296,7 +296,7 @@ enum class WitherKingDragons(
     val bb = blockPos.run {
         AxisAlignedBB(x - a, y - 8.0, z - a, x + a, y + a + 2, z + a)
     }
-    val particleLocation = blockPos.up(5)
+    val particleLocation: BlockPos = blockPos.up(5)
 
     companion object {
         private const val a = 13.5

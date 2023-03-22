@@ -22,7 +22,6 @@ import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.core.GuiManager;
 import gg.skytils.skytilsmod.utils.ItemUtil;
 import gg.skytils.skytilsmod.utils.Utils;
-import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
@@ -45,7 +44,7 @@ public abstract class MixinMinecraft {
     /**
      * Taken from Skyblockcatia under MIT License
      * Modified
-     * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
+     * <a href="https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md">...</a>
      *
      * @author SteveKunG
      */

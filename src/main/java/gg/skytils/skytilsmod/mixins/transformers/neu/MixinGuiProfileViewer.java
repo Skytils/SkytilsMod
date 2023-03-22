@@ -33,13 +33,13 @@ public abstract class MixinGuiProfileViewer extends GuiScreen {
 
     @Dynamic
     @Redirect(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V"))
-    private void renderRarityOnInvPage(ItemStack stack, int x, int y) throws Throwable {
+    private void renderRarityOnInvPage(ItemStack stack, int x, int y) {
         GuiProfileViewerHookKt.renderRarityOnPage(stack, x, y);
     }
 
     @Dynamic
     @Redirect(method = "drawPetsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", ordinal = 0))
-    private void renderRarityOnPetsPage(ItemStack stack, int x, int y) throws Throwable {
+    private void renderRarityOnPetsPage(ItemStack stack, int x, int y) {
         GuiProfileViewerHookKt.renderRarityOnPage(stack, x, y);
     }
 }

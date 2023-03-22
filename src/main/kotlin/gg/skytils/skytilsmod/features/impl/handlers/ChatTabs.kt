@@ -143,7 +143,7 @@ object ChatTabs {
                 ChatTab.buttons.entries.forEach { (c, b) ->
                     b.enabled = c != selectedTab
                     b.yPosition =
-                        (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2).toInt()
+                        (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2)
                 }
             }
         }

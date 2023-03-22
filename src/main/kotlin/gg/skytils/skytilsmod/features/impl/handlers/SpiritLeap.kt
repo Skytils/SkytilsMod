@@ -47,7 +47,7 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
 
     private val playerPattern = Regex("(?:\\[.+?] )?(?<name>\\w+)")
     private val doorOpenedPattern = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
-    private val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
+    private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
     private var doorOpener: String? = null
     val names = HashMap<String, Boolean>()
     val classes = DungeonClass.values()

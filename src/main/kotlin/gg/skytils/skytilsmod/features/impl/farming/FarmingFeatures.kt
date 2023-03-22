@@ -123,7 +123,7 @@ object FarmingFeatures {
             }, null)
             TickTask(4) {
                 if (solution != null) {
-                    UChat.chat("$successPrefix §aThe Hiker needs: §l§2 " + solution + "§a!")
+                    UChat.chat("$successPrefix §aThe Hiker needs: §l§2 $solution§a!")
                 } else {
                     if (unformatted.contains("I asked for") || unformatted.contains("The food I want")) {
                         println("Missing Hiker item: $unformatted")

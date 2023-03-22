@@ -823,7 +823,7 @@ object RenderUtil {
         val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
         val alignment =
             if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-        val xPos = if (leftAlign) 0f else element.scaleWidth.toFloat()
+        val xPos = if (leftAlign) 0f else element.scaleWidth
         for ((i, str) in lines.withIndex()) {
             ScreenRenderer.fontRenderer.drawString(
                 str,
@@ -872,4 +872,5 @@ fun Color.multAlpha(mult: Float) = Color(
     (alpha * mult).toInt().coerceIn(0, 255)
 )
 
-fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
+fun AxisAlignedBB.expandBlock(): AxisAlignedBB =
+    expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)

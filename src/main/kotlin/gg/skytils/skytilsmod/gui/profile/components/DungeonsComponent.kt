@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.gui.profile.components
 
-import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText

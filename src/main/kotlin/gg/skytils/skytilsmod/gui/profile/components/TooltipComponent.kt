@@ -38,7 +38,7 @@ import java.awt.Color
 class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalette.getBackground(), radius: Float = 5f) :
     UIRoundedRectangle(radius) {
 
-    val lore = item.getTooltip(UPlayer.getPlayer()!!, false)
+    val lore: MutableList<String> = item.getTooltip(UPlayer.getPlayer()!!, false)
 
     val itemTitle = UIRoundedRectangle(radius).constrain {
         y = 0.pixels

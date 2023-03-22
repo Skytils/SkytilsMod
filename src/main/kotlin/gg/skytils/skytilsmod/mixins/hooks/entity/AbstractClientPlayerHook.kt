@@ -85,8 +85,7 @@ class AbstractClientPlayerHook(player: Any) {
         for (entity in nearbyEntities) {
             val name = entity.customNameTag
             val type = typeRegex.matchEntire(name)?.let { result ->
-                val e = result.groups["type"]?.value ?: return@let null
-                return@let e
+                return@let result.groups["type"]?.value ?: return@let null
             } ?: return null
             printDevMessage("summon type: $type", "summonskins")
             return type.lowercase().replace(' ', '_')
@@ -133,7 +132,7 @@ class AbstractClientPlayerHook(player: Any) {
     companion object {
         val sychicSkin = ResourceLocation("skytils:sychicskin.png")
 
-        val phoenixSkinObject =
+        const val phoenixSkinObject =
             "eyJ0aW1lc3RhbXAiOjE1NzU0NzAyNzE3MTUsInByb2ZpbGVJZCI6ImRlNTcxYTEwMmNiODQ4ODA4ZmU3YzlmNDQ5NmVjZGFkIiwicHJvZmlsZU5hbWUiOiJNSEZfTWluZXNraW4iLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM2YTAzODNhNTI3ODAzZDk5YjY2MmFkMThiY2FjNzhjMTE5MjUwZWJiZmIxNDQ3NWI0ZWI0ZDRhNjYyNzk2YjQifX19"
 
         val typeRegex = Regex("§a§o\\w+'s (?<type>[\\w ]+) §a(?<health>[\\dkmb.]+)§c❤", RegexOption.IGNORE_CASE)
