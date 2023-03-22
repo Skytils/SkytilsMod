@@ -21,12 +21,12 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.printDevMessage
+import gg.skytils.skytilsmod.utils.tasks.TickTask
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Items

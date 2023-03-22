@@ -22,9 +22,9 @@ import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.LocrawReceivedEvent
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.tasks.TickTask
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import net.minecraft.util.BlockPos

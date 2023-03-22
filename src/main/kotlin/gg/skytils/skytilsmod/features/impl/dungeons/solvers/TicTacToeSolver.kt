@@ -20,11 +20,11 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.tasks.TickTask
 import gg.skytils.skytilsmod.utils.tictactoe.AlphaBetaAdvanced
 import gg.skytils.skytilsmod.utils.tictactoe.Board
 import net.minecraft.entity.item.EntityItemFrame
