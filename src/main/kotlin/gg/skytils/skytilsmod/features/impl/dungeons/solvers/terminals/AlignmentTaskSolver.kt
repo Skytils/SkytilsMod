@@ -62,7 +62,7 @@ object AlignmentTaskSolver {
 
     init {
         TickTask(20, repeats = true) {
-            if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || mc.thePlayer == null || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L) || !Utils.equalsOneOf(
+            if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || mc.thePlayer == null || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.bossEntryTime == -1L || DungeonTimer.phase3ClearTime != -1L) || !Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
                     "F7", "M7"
                 ))
