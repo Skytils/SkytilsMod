@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.core.GuiManager;
 import gg.skytils.skytilsmod.utils.ItemUtil;
@@ -27,6 +28,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,12 +36,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 @Mixin(Minecraft.class)
-public abstract class MixinMinecraft {
+public abstract class MixinMinecraft implements Executor {
     private final Minecraft $this = (Minecraft) (Object) this;
     @Shadow
     public EntityPlayerSP thePlayer;
+
+    @Shadow
+    public abstract ListenableFuture<Object> addScheduledTask(Runnable runnableToSchedule);
 
     /**
      * Taken from Skyblockcatia under MIT License
@@ -66,5 +72,10 @@ public abstract class MixinMinecraft {
                 Skytils.sendMessageQueue.add("/undozap");
             }
         }
+    }
+
+    @Override
+    public void execute(@NotNull Runnable command) {
+        addScheduledTask(command);
     }
 }

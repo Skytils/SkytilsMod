@@ -18,9 +18,18 @@
 
 package gg.skytils.skytilsmod.utils.tasks
 
+import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.utils.Utils
+import kotlinx.coroutines.*
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executor
+
+val mcDispatcher = (mc as Executor).asCoroutineDispatcher()
+val mcScope = CoroutineScope(mcDispatcher) + SupervisorJob()
+
+val mcLaunch = mcScope::launch
 
 class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Boolean = true, val task: () -> T) {
     var remainingTicks = ticks
