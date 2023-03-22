@@ -365,7 +365,7 @@ object Config : Vigilant(
         description = "Changes the color of the outline.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var bloodHelperColor = Color.RED
+    var bloodHelperColor: Color = Color.RED
 
     @Property(
         type = PropertyType.SWITCH, name = "Box Starred Mobs",

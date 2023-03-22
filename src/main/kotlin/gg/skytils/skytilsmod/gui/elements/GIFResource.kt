@@ -39,18 +39,16 @@ data class GIFResource(
     }
 
     private val frames: List<DynamicResource> by lazy {
-        ImageIO.createImageInputStream(
+        return@lazy ImageIO.createImageInputStream(
             mc.resourceManager.getResource(loc).inputStream
-        )
-            .use { stream ->
-                ImageIO.getImageReaders(stream).nextOrNull()?.apply {
-                    input = stream
-                    return@lazy (0 until getNumImages(true)).map {
-                        DynamicResource("skytils_${name}_frame", read(it))
-                    }
+        ).use { stream ->
+            ImageIO.getImageReaders(stream).nextOrNull()?.run {
+                input = stream
+                (0 until getNumImages(true)).map {
+                    DynamicResource("skytils_${name}_frame", read(it))
                 }
             }
-        return@lazy emptyList()
+        } ?: emptyList()
     }
     private lateinit var currentFrame: DynamicResource
     private var frameCounter = 0

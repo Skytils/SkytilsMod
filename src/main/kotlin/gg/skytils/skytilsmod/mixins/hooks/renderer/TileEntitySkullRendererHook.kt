@@ -33,7 +33,7 @@ import net.minecraft.util.ResourceLocation
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
 val instance: TileEntitySkullRenderer = TileEntitySkullRenderer.instance
-private val ENCHANTED_ITEM_GLINT_RES = ResourceLocation("textures/misc/enchanted_item_glint.png")
+private val enchantedItemGlintResource = ResourceLocation("textures/misc/enchanted_item_glint.png")
 
 fun addGlintToSkull(
     x: Float,
@@ -58,7 +58,7 @@ fun addGlintToSkull(
 fun renderGlint(entity: EntityLivingBase?, model: ModelBase?, rotation: Float, color: CustomColor?) {
     val partialTicks = getPartialTicks()
     val f = entity!!.ticksExisted.toFloat() + partialTicks
-    mc.textureManager.bindTexture(ENCHANTED_ITEM_GLINT_RES)
+    mc.textureManager.bindTexture(enchantedItemGlintResource)
     GlStateManager.enableBlend()
     GlStateManager.depthFunc(514)
     GlStateManager.depthMask(false)

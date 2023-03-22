@@ -33,7 +33,7 @@ object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntrack
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         if (!Skytils.config.itemCooldownDisplay) return UChat.chat("$failPrefix §cYou must turn on Item Cooldown Display to use this command!")
-        if (args.size < 2) UChat.chat("$prefix" + getCommandUsage(player))
+        if (args.size < 2) UChat.chat("$prefix ${getCommandUsage(player)}")
         val seconds = args[0].toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
         val ability = args.drop(1).joinToString(" ")
         if (ability.isBlank()) throw WrongUsageException("You must specify valid arguments.")

@@ -29,10 +29,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
 @Mixin(targets = "io.github.moulberry.notenoughupdates.miscfeatures.StorageManager", remap = false)
-public class MixinStorageManager {
+public abstract class MixinStorageManager {
     @Dynamic
     @Shadow
-    private boolean shouldRenderStorageOverlayCached = false;
+    private boolean shouldRenderStorageOverlayCached;
 
     @Dynamic
     @Inject(method = "shouldRenderStorageOverlay", at = @At("RETURN"))

@@ -551,7 +551,7 @@ object SlayerFeatures : CoroutineScope {
                         } else if (toggled) {
                             ScreenRenderer.fontRenderer.drawString(
                                 displayName.formattedText,
-                                if (leftAlign) 0f else width.toFloat(),
+                                if (leftAlign) 0f else width,
                                 0f,
                                 CommonColors.WHITE,
                                 alignment,

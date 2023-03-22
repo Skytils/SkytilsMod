@@ -74,7 +74,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     override fun write(writer: Writer) {
         writer.write(json.encodeToString(SpamHiderSave(
             default = repoFilters.associate { it.name to RepoFilterSave(it.state, it.name) },
-            filter = filters.associate { it.name to it }
+            filter = filters.associateBy { it.name }
         )))
     }
 
@@ -331,7 +331,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         2 -> {
                             val blessingTypeMatcher = Regexs.BLESSINGNAME.pattern.find(unformatted)
                             if (blessingTypeMatcher != null) {
-                                lastBlessingType = blessingTypeMatcher.groups.get("blessing")?.value?.lowercase() ?: ""
+                                lastBlessingType = blessingTypeMatcher.groups["blessing"]?.value?.lowercase() ?: ""
                                 cancelChatPacket(event, false)
                             }
                         }
@@ -347,8 +347,8 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                                     Regexs.BLESSINGBUFF.pattern.matchEntire(blessingGroup)
                                 }.map { blessingBuffMatch ->
                                     BlessingBuff(
-                                        blessingBuffMatch.groups.get("buff1")?.value ?: return@let,
-                                        blessingBuffMatch.groups.get("symbol1")?.value ?: return@let
+                                        blessingBuffMatch.groups["buff1"]?.value ?: return@let,
+                                        blessingBuffMatch.groups["symbol1"]?.value ?: return@let
                                     )
                                 }
                                 if (lastBlessingType != "") GuiManager.toastGui.add(

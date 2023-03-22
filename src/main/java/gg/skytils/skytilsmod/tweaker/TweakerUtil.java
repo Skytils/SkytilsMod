@@ -54,11 +54,7 @@ public class TweakerUtil {
     }
 
     public static void showMessage(String errorMessage, JButton... options) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        trySetLookAndFeel();
 
         // This makes the JOptionPane show on taskbar and stay on top
         JFrame frame = new JFrame();
@@ -146,5 +142,13 @@ public class TweakerUtil {
         conn.setReadTimeout(30000);
 
         return IOUtils.toString(conn.getInputStream());
+    }
+
+    public static void trySetLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

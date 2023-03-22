@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.components.UIImage
 import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.AspectConstraint
 import gg.essential.elementa.constraints.CenterConstraint

@@ -356,6 +356,7 @@ object ColorFactory {
                     b = color.substring(2, 3).toInt(16)
                     return Color(r / 15.0f, g / 15.0f, b / 15.0f, opacity.toFloat())
                 }
+
                 4 -> {
                     r = color.substring(0, 1).toInt(16)
                     g = color.substring(1, 2).toInt(16)
@@ -363,12 +364,14 @@ object ColorFactory {
                     a = color.substring(3, 4).toInt(16)
                     return Color(r / 15.0f, g / 15.0f, b / 15.0f, (opacity * a / 15.0).toFloat())
                 }
+
                 6 -> {
                     r = color.substring(0, 2).toInt(16)
                     g = color.substring(2, 4).toInt(16)
                     b = color.substring(4, 6).toInt(16)
                     return Color(r, g, b, (opacity * 255 + 0.5).toInt())
                 }
+
                 8 -> {
                     r = color.substring(0, 2).toInt(16)
                     g = color.substring(2, 4).toInt(16)
@@ -377,7 +380,7 @@ object ColorFactory {
                     return Color(r, g, b, (opacity * a + 0.5).toInt())
                 }
             }
-        } catch (nfe: NumberFormatException) {
+        } catch (_: NumberFormatException) {
         }
         throw IllegalArgumentException("Invalid color specification")
     }
@@ -401,7 +404,7 @@ object ColorFactory {
                 }
                 return Color(r.toFloat(), g.toFloat(), b.toFloat(), a1.toFloat())
             }
-        } catch (nfe: NumberFormatException) {
+        } catch (_: NumberFormatException) {
         }
         throw IllegalArgumentException("Invalid color specification")
     }
@@ -425,7 +428,7 @@ object ColorFactory {
                 }
                 return hsb(h, s, l, alpha)
             }
-        } catch (nfe: NumberFormatException) {
+        } catch (_: NumberFormatException) {
         }
         throw IllegalArgumentException("Invalid color specification")
     }
@@ -1393,26 +1396,31 @@ object ColorFactory {
                     g = t
                     b = p
                 }
+
                 1 -> {
                     r = q
                     g = brightness
                     b = p
                 }
+
                 2 -> {
                     r = p
                     g = brightness
                     b = t
                 }
+
                 3 -> {
                     r = p
                     g = q
                     b = brightness
                 }
+
                 4 -> {
                     r = t
                     g = p
                     b = brightness
                 }
+
                 5 -> {
                     r = brightness
                     g = p
