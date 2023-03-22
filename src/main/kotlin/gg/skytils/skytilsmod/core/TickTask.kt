@@ -56,7 +56,7 @@ class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Bo
 }
 
 object TickTaskManager {
-    val tasks = ArrayList<TickTask<*>>(20)
+    val tasks = mutableSetOf<TickTask<*>>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
