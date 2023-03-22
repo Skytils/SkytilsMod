@@ -1003,7 +1003,7 @@ object SlayerFeatures : CoroutineScope {
     /**
      * Represents a slayer which can throw a thing
      *
-     * Sub-type of [Slayer]
+     * Subtype of [Slayer]
      */
     abstract class ThrowingSlayer<T : EntityLiving>(entity: T, name: String, nameStart: String) : Slayer<T>(
         entity, name, nameStart,
@@ -1142,7 +1142,7 @@ object SlayerFeatures : CoroutineScope {
         var totemPos: BlockPos? = null
 
         companion object {
-            private val thrownTexture =
+            private const val thrownTexture =
                 "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
         }
 
