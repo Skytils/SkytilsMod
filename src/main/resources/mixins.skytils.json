@@ -49,7 +49,6 @@
     "network.MixinNetworkManager",
     "neu.MixinCustomAH",
     "neu.MixinGuiProfileViewer",
-    "neu.MixinSBInfo",
     "neu.MixinStorageManager",
     "neu.MixinStorageOverlay",
     "neu.MixinTradeWindow",

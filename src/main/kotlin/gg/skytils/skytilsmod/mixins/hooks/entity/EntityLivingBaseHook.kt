@@ -33,10 +33,6 @@ import kotlin.random.Random
 
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
 
-    companion object {
-        private val dmgPattern = Regex("✧?(?<num>\\d+)[⚔+✧❤♞☄✷]*")
-    }
-
     var overrideDisplayName: String? = null
     var colorMultiplier: Color? = null
     var masterDragonType: WitherKingDragons? = null
