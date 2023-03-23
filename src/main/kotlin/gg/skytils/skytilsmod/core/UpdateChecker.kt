@@ -177,7 +177,7 @@ object UpdateChecker {
     class SkytilsVersion(val versionString: String) : Comparable<SkytilsVersion> {
 
         companion object {
-            val regex by lazy { Regex("^(?<version>[\\d.]+)-?(?<type>\\D+)?(?<typever>\\d+\\.?\\d*)?\$") }
+            val regex = Regex("^(?<version>[\\d.]+)-?(?<type>\\D+)?(?<typever>\\d+\\.?\\d*)?\$")
         }
 
         private val matched by lazy { regex.find(versionString) }
@@ -195,13 +195,31 @@ object UpdateChecker {
             return@lazy matched!!.groups["typever"]?.value?.toDoubleOrNull()
         }
 
+        private val stringForm by lazy {
+            "SkytilsVersion(versionString='$versionString', isSafe=$isSafe, version='$version', versionArtifact=$versionArtifact, specialVersionType=$specialVersionType, specialVersion=$specialVersion)"
+        }
+
         override fun compareTo(other: SkytilsVersion): Int {
-            if (!isSafe || !other.isSafe) return -1
+            if (!isSafe) return Int.MAX_VALUE
+            if (!other.isSafe) return Int.MIN_VALUE
             return if (versionArtifact.compareTo(other.versionArtifact) == 0) {
                 if (specialVersionType.ordinal == other.specialVersionType.ordinal) {
                     (specialVersion ?: 0.0).compareTo(other.specialVersion ?: 0.0)
                 } else other.specialVersionType.ordinal - specialVersionType.ordinal
             } else versionArtifact.compareTo(other.versionArtifact)
+        }
+
+        override fun toString(): String = stringForm
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is SkytilsVersion) return false
+
+            return versionString == other.versionString
+        }
+
+        override fun hashCode(): Int {
+            return versionString.hashCode()
         }
     }
 
