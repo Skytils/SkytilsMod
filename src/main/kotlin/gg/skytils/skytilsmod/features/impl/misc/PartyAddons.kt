@@ -33,7 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  */
 object PartyAddons {
     private val partyStartPattern = Regex("^§6Party Members \\((\\d+)\\)§r$")
-    private val playerPattern = Regex("(?<rank>.+? |§7)?(?<name>\\w+) ?§r(?<status>§a|§c) ?●")
+    private val playerPattern = Regex("(?<rank>§r§.(?:\\[.+?] )?)(?<name>\\w+) ?§r(?<status>§a|§c) ?● ?")
     private val party = mutableListOf<PartyMember>()
     private val partyCommands = setOf("/pl", "/party list", "/p list", "/party l")
 
@@ -67,6 +67,7 @@ object PartyAddons {
             }
             playerPattern.findAll(message.substringAfter(": ")).forEach {
                 it.destructured.let { (rank, name, status) ->
+                printDevMessage("Found Party Member: rank=$rank, name=$name, status=$status", "PartyAddons")
                     party.add(
                         PartyMember(
                             name,
