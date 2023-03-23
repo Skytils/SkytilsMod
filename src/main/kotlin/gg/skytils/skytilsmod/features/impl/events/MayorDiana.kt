@@ -23,7 +23,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.baseMaxHealth
@@ -34,6 +34,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
@@ -42,8 +43,8 @@ object MayorDiana {
 
     private val gaiaConstructHits = HashMap<EntityIronGolem, Int>()
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.trackGaiaHits && event.packet is S29PacketSoundEffect) {
             if (event.packet.volume == 0.8f && event.packet.soundName == "random.anvil_land") {
@@ -51,9 +52,7 @@ object MayorDiana {
                 val golem = (mc.theWorld.loadedEntityList.filter {
                     it is EntityIronGolem && it.health > 0 && it.getDistanceSq(pos) <= 25 * 25
                 }.minByOrNull { it.getDistanceSq(pos) } ?: return) as EntityIronGolem
-                Utils.checkThreadAndQueue {
-                    gaiaConstructHits.compute(golem) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
-                }
+                gaiaConstructHits.compute(golem) { _: EntityIronGolem, i: Int? -> (i ?: 0) + 1 }
             }
         }
     }
