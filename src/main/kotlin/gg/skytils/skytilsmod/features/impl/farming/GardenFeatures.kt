@@ -64,7 +64,7 @@ object GardenFeatures {
             isCleaningPlot = inGarden && ScoreboardUtil.sidebarLines.any {
                 it.matches(cleanupRegex)
             }.also {
-                if (it != isCleaningPlot) {
+                if (it != isCleaningPlot && Skytils.config.gardenPlotCleanupHelper) {
                     mc.renderGlobal.loadRenderers()
                 }
             }
