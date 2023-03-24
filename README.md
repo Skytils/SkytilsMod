@@ -247,7 +247,6 @@ And more to come!
 - /skytils - Opens the main GUI. (Alias is /st)
 - /skytils config - Opens the GUI to edit the config.
 - /skytils help - Displays the various commands and their usages
-- /skytils setkey <apikey> - Sets your api key (will also grab it from /api new).
 - /skytils reload <data/mayor/slayer> - Forces Skytils to refresh of data.
 - /skytils fetchur - Displays the current Fetchur item for the day.
 - /skytils griffin refresh - Forces a refresh for the Griffin burrow waypoints.

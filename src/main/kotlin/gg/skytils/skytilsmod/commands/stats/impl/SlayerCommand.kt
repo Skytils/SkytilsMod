@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -36,7 +36,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
         val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
 
         val profileResponse =
-            client.get("https://api.hypixel.net/skyblock/profile?profile=$latestProfile&key=$key")
+            client.get("${Skytils.hylinAPI.endpoint}/skyblock/profile?profile=$latestProfile")
                 .body<ProfileResponse>()
         if (!profileResponse.success) {
             printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse.cause}")

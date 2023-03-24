@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ import gg.skytils.skytilsmod.commands.stats.StatCommand
 import gg.skytils.skytilsmod.features.impl.misc.ScamCheck
 import java.util.*
 
-object ScamCheckCommand : StatCommand("skytilsscamcheck", needApiKey = false, needProfile = false, listOf("stsc")) {
+object ScamCheckCommand : StatCommand("skytilsscamcheck", needProfile = false, listOf("stsc")) {
     override suspend fun displayStats(username: String, uuid: UUID) {
         val check = ScamCheck.checkScammer(uuid, "command").printResult(username)
     }

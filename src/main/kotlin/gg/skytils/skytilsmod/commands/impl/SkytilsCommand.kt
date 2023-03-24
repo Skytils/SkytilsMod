@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,7 +23,6 @@ import gg.essential.universal.wrappers.UPlayer
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
@@ -40,10 +39,9 @@ import gg.skytils.skytilsmod.features.impl.misc.PricePaid
 import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
+import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.gui.profile.ProfileGui
 import gg.skytils.skytilsmod.utils.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
@@ -61,31 +59,11 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             return
         }
         when (args[0].lowercase()) {
-            "setkey" -> {
-                if (args.size == 1) {
-                    UChat.chat("$failPrefix §cPlease provide your Hypixel API key!")
-                    return
-                }
-                Skytils.IO.launch {
-                    val apiKey = args[1]
-                    if (client.get("https://api.hypixel.net/key?key=$apiKey")
-                            .body<HypixelResponse>().success
-                    ) {
-                        Skytils.config.apiKey = apiKey
-                        Skytils.hylinAPI.key = Skytils.config.apiKey
-                        Skytils.config.markDirty()
-                        UChat.chat("$successPrefix §aYour Hypixel API key has been set to §f$apiKey§a.")
-                    } else {
-                        UChat.chat("$failPrefix §cThe Hypixel API key you provided was §finvalid§c.")
-                    }
-                }
-            }
-
             "config" -> Skytils.config.openGUI()
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
                     "$prefix §bToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()
-                            [(ZonedDateTime.now(ZoneId.of("America/New_York"))
+                        [(ZonedDateTime.now(ZoneId.of("America/New_York"))
                         .dayOfMonth) % MiningFeatures.fetchurItems.size]
                 )
             )
@@ -159,51 +137,49 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
 
             "help" -> if (args.size == 1) {
-                player.addChatMessage(
-                    ChatComponentText(
-                        """
-                            #§9➜ Skytils Commands and Info
-                            #  §2§l ❣ §7§oCommands marked with a §a§o✯ §7§orequire an §f§oAPI key§7§o to work correctly.
-                            #  §2§l ❣ §7§oThe current mod version is §f§o${Skytils.VERSION}§7§o.
-                            # §9§l➜ Setup:
-                            #  §3/skytils §l➡ §bOpens the main mod GUI. §7(Alias: §f/st§7)
-                            #  §3/skytils config §l➡ §bOpens the configuration GUI.
-                            #  §3/skytils setkey §l➡ §bSets your Hypixel API key.
-                            #  §3/skytils help §l➡ §bShows this help menu.
-                            #  §3/skytils reload <data/mayor/slayer> §l➡ §bForces a refresh of data.
-                            #  §3/skytils update §l➡ §bChecks for updates in-game.
-                            #  §3/skytils editlocations §l➡ §bOpens the location editing GUI.
-                            #  §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
-                            #  §3/skytils spamhider §l➡ §bOpens the command spam hider editing GUI.
-                            #  §3/skytils enchant §l➡ §bOpens a GUI allowing you to rename enchants.
-                            #  §3/skytils waypoints §l➡ §bOpens a GUI allowing you to modify waypoints.
-                            # §9§l➜ Events:
-                            #  §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints. §a§o✯
-                            #  §3/skytils fetchur §l➡ §bShows the item that Fetchur wants.
-                            #  §3/skytils resettracker §l➡ §bResets the specified tracker.
-                            # §9§l➜ Color and Glint
-                            #  §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)
-                            #  §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item.
-                            #  §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item.
-                            # §9§l➜ Miscellaneous:
-                            #  §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)
-                            #  §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics. §a§o✯
-                            #  §3/skytilsslayer <player> §l➡ §bShows information about a player's Slayer statistics. §a§o✯
-                            #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability.
-                            #      §4Must have§c Item Cooldown Display§4 enabled to work.
-                            #  §3/sthw <set/remove/clear/help> <x y z> <name> §l➡ §bAllows to set waypoints while in the Crystal Hollows. §7(Alias: §f/sthw§7)"
-                            #  §3/skytilscalcxp <dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer> <start level> <end level> §l➡ §bCalculates the xp between two levels
-                            #  §3/skytils pv <player> §l➡ §bOpens the profile viewer. §a§o✯
-                            #  §3/skytils pricepaid <price> §l➡ §bSets your currently held item to a given price.
-                        """.trimMargin("#")
-                    )
+                UChat.chat(
+                    """
+                        #§9➜ Skytils Commands and Info
+                        #  §2§l ❣ §7§oThe current mod version is §f§o${Skytils.VERSION}§7§o.
+                        # §9§l➜ Setup:
+                        #  §3/skytils §l➡ §bOpens the main mod GUI. §7(Alias: §f/st§7)
+                        #  §3/skytils config §l➡ §bOpens the configuration GUI.
+                        #  §3/skytils help §l➡ §bShows this help menu.
+                        #  §3/skytils reload <data/mayor/slayer> §l➡ §bForces a refresh of data.
+                        #  §3/skytils update §l➡ §bChecks for updates in-game.
+                        #  §3/skytils editlocations §l➡ §bOpens the location editing GUI.
+                        #  §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
+                        #  §3/skytils spamhider §l➡ §bOpens the command spam hider editing GUI.
+                        #  §3/skytils enchant §l➡ §bOpens a GUI allowing you to rename enchants.
+                        #  §3/skytils waypoints §l➡ §bOpens a GUI allowing you to modify waypoints.
+                        # §9§l➜ Events:
+                        #  §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints.
+                        #  §3/skytils fetchur §l➡ §bShows the item that Fetchur wants.
+                        #  §3/skytils resettracker §l➡ §bResets the specified tracker.
+                        # §9§l➜ Color and Glint
+                        #  §3/armorcolor <set/clear/clearall> §l➡ §bChanges the color of an armor piece to the hexcode or decimal color. §7(Alias: §f/armourcolour§7)
+                        #  §3/glintcustomize override <on/off/clear/clearall> §l➡ §bEnables or disables the enchantment glint on an item.
+                        #  §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item.
+                        # §9§l➜ Miscellaneous:
+                        #  §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)
+                        #  §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics.
+                        #  §3/skytilsslayer <player> §l➡ §bShows information about a player's Slayer statistics.
+                        #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability.
+                        #      §4Must have§c Item Cooldown Display§4 enabled to work.
+                        #  §3/sthw <set/remove/clear/help> <x y z> <name> §l➡ §bAllows to set waypoints while in the Crystal Hollows. §7(Alias: §f/sthw§7)"
+                        #  §3/skytilscalcxp <dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer> <start level> <end level> §l➡ §bCalculates the xp between two levels
+                        #  §3/skytils pv <player> §l➡ §bOpens the profile viewer.
+                        #  §3/skytils pricepaid <price> §l➡ §bSets your currently held item to a given price.
+                    """.trimMargin("#")
                 )
                 return
             }
 
             "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen = CommandAliasesGui()
-            "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
-                LocationEditGui()
+            "editlocation", "editlocations", "location", "locations", "loc", "gui" ->
+                Skytils.displayScreen = ElementaEditingGui()
+
+            "oldgui" -> Skytils.displayScreen = LocationEditGui()
 
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()

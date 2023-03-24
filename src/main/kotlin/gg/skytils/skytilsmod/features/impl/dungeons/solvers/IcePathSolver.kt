@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -35,8 +36,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
@@ -48,13 +47,10 @@ object IcePathSolver {
     private var grid: Array<IntArray>? = null
     private var silverfish: EntitySilverfish? = null
     private var silverfishPos: Point? = null
-    private var ticks = 0
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null || mc.theWorld == null) return
-        if (!Skytils.config.icePathSolver) return
-        if (ticks % 20 == 0) {
+    init {
+        TickTask(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null) return@TickTask
             if (DungeonListener.missingPuzzles.contains("Ice Path")) {
                 val silverfish = mc.theWorld.getEntities(
                     EntitySilverfish::class.java
@@ -92,28 +88,26 @@ object IcePathSolver {
                     }
                 }
             }
-            ticks = 0
-        }
-        if (silverfishChestPos != null && roomFacing != null) {
-            if (grid == null) {
-                grid = layout
-                silverfishPos = getGridPointFromPos(silverfish!!.position)
-                steps.clear()
-                if (silverfishPos != null) {
-                    steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
-                }
-            } else if (silverfish != null) {
-                val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
-                if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
-                    silverfishPos = silverfishGridPos
+            if (silverfishChestPos != null && roomFacing != null) {
+                if (grid == null) {
+                    grid = layout
+                    silverfishPos = getGridPointFromPos(silverfish!!.position)
+                    steps.clear()
                     if (silverfishPos != null) {
-                        steps.clear()
                         steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                    }
+                } else if (silverfish != null) {
+                    val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
+                    if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
+                        silverfishPos = silverfishGridPos
+                        if (silverfishPos != null) {
+                            steps.clear()
+                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                        }
                     }
                 }
             }
         }
-        ticks++
     }
 
     @SubscribeEvent

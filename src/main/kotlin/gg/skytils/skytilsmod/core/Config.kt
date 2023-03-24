@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -50,17 +50,9 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
-        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit"]
+        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Vistor Offer Helper"]
     )
     var fetchLowestBINPrices = false
-
-    @Property(
-        type = PropertyType.TEXT, name = "Hypixel API Key",
-        description = "Your Hypixel API key, which can be obtained from /api new. Required for some features.",
-        category = "General", subcategory = "API",
-        protectedText = true
-    )
-    var apiKey = System.getenv("HYPIXEL_KEY") ?: ""
 
     @Property(
         type = PropertyType.SELECTOR, name = "Command Alias Mode",
@@ -373,7 +365,14 @@ object Config : Vigilant(
         description = "Changes the color of the outline.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var bloodHelperColor = Color.RED
+    var bloodHelperColor: Color = Color.RED
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Box Starred Mobs",
+        description = "Draws the bounding box for Starred Mobs.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxStarredMobs = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
@@ -596,6 +595,13 @@ object Config : Vigilant(
     var showSadanInterest = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Terracotta Respawn Time",
+        description = "Displays a timer until Terracotta respawn",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var terracottaRespawnTimer = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Show Necron's HP",
         description = "Shows additional info about Necron's health.",
         category = "Dungeons", subcategory = "Quality of Life",
@@ -604,11 +610,25 @@ object Config : Vigilant(
     var necronHealth = 0
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Wither King's Dragons HP",
-        description = "Displays a more clear indicator of the dragons HP.",
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' Color as Text",
+        description = "Displays a more clear indicator of the dragons' text to make the game more accessible.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherDragonsColorBlind = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' HP",
+        description = "Displays a more clear indicator of the dragons' HP.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var showWitherKingDragonsHP = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' Spawn Timer",
+        description = "Displays a timer for when the dragons are about to spawn in.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingDragonsSpawnTimer = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Spirit Bear Timer",
@@ -1028,6 +1048,41 @@ object Config : Vigilant(
     var shinyOrbWaypoints = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Plot Cleanup Helper",
+        description = "Makes flowers and grass more visible by rendering them as sponges.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var gardenPlotCleanupHelper = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Sam's Scythe Blocks",
+        description = "Shows the blocks which will be broken when using Sam's Scythe or Garden Scythe.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var showSamScytheBlocks = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Color of Sam's Scythe Marked Blocks",
+        description = "Sets the color of the highlighted blocks.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var samScytheColor = Color(255, 0, 0, 50)
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Visitor Offer Helper",
+        description = "Displays information about visitor offers.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var visitorOfferHelper = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Visitor Notifications",
+        description = "Sends a message in chat when a visitor is at your garden.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var visitorNotifications = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Farming RNG Titles",
         description = "Removes the titles that show up after getting a drop with Pumpkin Dicer / Melon Dicer",
         category = "Farming", subcategory = "Quality of Life"
@@ -1068,6 +1123,13 @@ object Config : Vigilant(
         category = "Farming", subcategory = "Quality of Life"
     )
     var talbotsTheodoliteHelper = false
+
+    @Property(
+        type = PropertyType.TEXT, name = "Kuudra Auto-Reparty Player",
+        description = "Automatically performs a reparty upon joining a Kuudra bossfight. Leave this blank to disable.",
+        category = "Kuudra", subcategory = "Quality of Life"
+    )
+    var kuudraAutoRepartyPlayer = ""
 
     @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
@@ -1236,13 +1298,6 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Fixes"
     )
     var fixFallingSandRendering = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Fix SBA Chroma",
-        description = "Fixes SBA chroma with Patcher 1.6",
-        category = "Miscellaneous", subcategory = "Fixes"
-    )
-    var fixSbaChroma = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix World Time",
@@ -1733,6 +1788,13 @@ object Config : Vigilant(
     var customDamageSplash = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Disable Enderman Teleportation",
+        description = "Removes the enderman teleport effect.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var disableEndermanTeleport = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Night Vision",
         description = "Removes the vanilla effects of Night Vision.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1769,6 +1831,13 @@ object Config : Vigilant(
     var hideAirDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Armor Display",
+        description = "Prevents the game from rendering the vanilla armor points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideArmorDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Cheap Coins",
         description = "Prevents the game from rendering cheap coins.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1797,6 +1866,13 @@ object Config : Vigilant(
     var hideFishingHooks = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Hunger Display",
+        description = "Prevents the game from rendering the vanilla hunger points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideHungerDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Jerry Rune",
         description = "Prevents the game from rendering the items spawned by the Jerry rune.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1818,6 +1894,20 @@ object Config : Vigilant(
     var hideDeathParticles = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Pet Health Display",
+        description = "Hides the Vanilla pet hearts.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hidePetHealth = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Players in Spawn",
+        description = "Hides players in the spawn area at the Hub.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hidePlayersInSpawn = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Potion Effects in Inventory",
         description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1830,6 +1920,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hideScoreboardScore = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Vanilla Health Display",
+        description = "Prevents the game from rendering the vanilla heart points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideHealthDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Disabled Potion Effects",
@@ -1893,6 +1990,27 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var noHurtcam = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Party Addons",
+        description = "Adds a few features to the party list.\n§eNote: Requires Hypixel Language to be set to English. §7(/lang en)",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var partyAddons = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Cursor Reset",
+        description = "Prevents the cursor from resetting to the center of the screen when you open a GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventCursorReset = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Moving on Death",
+        description = "Unpresses all keys on death to prevent you from moving.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventMovingOnDeath = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Power Orb Lock",
@@ -1997,13 +2115,6 @@ object Config : Vigilant(
     fun resetRelicWaypoints() {
         Tracker.getTrackerById("found_spiders_den_relics")!!.doReset()
     }
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Big Tentacle Nametags",
-        description = "Increases the size of the tentacle nametags in the Kuudra fight.",
-        category = "Miscellaneous", subcategory = "Quality of Life"
-    )
-    var bigTentacleTag = false
 
     @Property(
         type = PropertyType.BUTTON, name = "Potion Duration Notifications",
@@ -2714,6 +2825,8 @@ object Config : Vigilant(
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
+        addDependency("samScytheColor", "showSamScytheBlocks")
+
         addDependency("itemRarityOpacity", "showItemRarity")
         addDependency("itemRarityShape", "showItemRarity")
 
@@ -2723,7 +2836,8 @@ object Config : Vigilant(
             "dungeonChestProfit",
             "showCoinsPerBit",
             "protectItemBINThreshold",
-            "containerSellValue"
+            "containerSellValue",
+            "visitorOfferHelper"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
@@ -2824,10 +2938,6 @@ object Config : Vigilant(
                 (ClientCommandHandler.instance as AccessorCommandHandler).commandMap["rp"] =
                     RepartyCommand
             }
-        }
-
-        registerListener("apiKey") { key: String ->
-            Skytils.hylinAPI.key = key
         }
     }
 

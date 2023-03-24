@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -46,7 +46,7 @@ object AuctionData {
         val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
         var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
         when (id) {
-            "PET" -> if (extraAttr.hasKey("petInfo")) {
+            "PET" -> if (extraAttr.getString("petInfo").startsWith("{")) {
                 val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
                 id = "PET-${petInfo.type}-${petInfo.tier}"
             }

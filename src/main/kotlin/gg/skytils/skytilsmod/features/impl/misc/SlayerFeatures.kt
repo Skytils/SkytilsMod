@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,14 +29,12 @@ import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.NumberUtil.toRoman
@@ -92,7 +90,6 @@ import kotlin.math.floor
 object SlayerFeatures : CoroutineScope {
     override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
 
-    private var ticks = 0
     private val ZOMBIE_MINIBOSSES = arrayOf(
         "§cRevenant Sycophant",
         "§cRevenant Champion",
@@ -106,6 +103,11 @@ object SlayerFeatures : CoroutineScope {
     private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
     private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
+        set(value) {
+            field?.unset()
+            field = value
+            value?.set()
+        }
     val slayerEntity: Entity?
         get() = slayer?.entity
     var hasSlayerText = false
@@ -171,22 +173,10 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (!Utils.inSkyblock) return
-        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
-        lastTickHasSlayerText = hasSlayerText
-        hasSlayerText = sidebarLines.any { it == "Slay the boss!" }
-        if (!lastTickHasSlayerText && hasSlayerText) {
-            val currentTier =
-                sidebarLines.find { it.startsWith("Voidgloom Seraph") }
-                    ?.substringAfter("Voidgloom Seraph")?.drop(1)
-                    ?: ""
-            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier) ?: 0
-        }
-        slayer?.tick(event)
-        if (ticks % 4 == 0) {
-            if (Skytils.config.showRNGMeter) {
+
+    init {
+        TickTask(4, repeats = true) {
+            if (Utils.inSkyblock && Skytils.config.showRNGMeter) {
                 for ((index, line) in sidebarLines.withIndex()) {
                     if (line == "Slayer Quest") {
                         val boss = sidebarLines.elementAtOrNull(index + 1) ?: continue
@@ -233,9 +223,23 @@ object SlayerFeatures : CoroutineScope {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (!Utils.inSkyblock) return
+        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
+        lastTickHasSlayerText = hasSlayerText
+        hasSlayerText = sidebarLines.any { it == "Slay the boss!" }
+        if (!lastTickHasSlayerText && hasSlayerText) {
+            val currentTier =
+                sidebarLines.find { it.startsWith("Voidgloom Seraph") }
+                    ?.substringAfter("Voidgloom Seraph")?.drop(1)
+                    ?: ""
+            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier) ?: 0
+        }
+        slayer?.tick(event)
     }
 
     @SubscribeEvent
@@ -247,17 +251,17 @@ object SlayerFeatures : CoroutineScope {
             val name = entity.displayName.unformattedText
             if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.endsWith("§e0§c❤") && !mc.renderManager.isDebugBoundingBox) {
                 val x =
-                    entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (mc as AccessorMinecraft).timer.renderPartialTicks
+                    RenderUtil.interpolate(event.entity.lastTickPosX, event.entity.posX, RenderUtil.getPartialTicks())
                 val y =
-                    entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (mc as AccessorMinecraft).timer.renderPartialTicks
+                    RenderUtil.interpolate(event.entity.lastTickPosY, event.entity.posY, RenderUtil.getPartialTicks())
                 val z =
-                    entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (mc as AccessorMinecraft).timer.renderPartialTicks
+                    RenderUtil.interpolate(event.entity.lastTickPosZ, event.entity.posZ, RenderUtil.getPartialTicks())
                 if (ZOMBIE_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
                         AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
                         Color(0, 255, 255, 255),
                         3f,
-                        (mc as AccessorMinecraft).timer.renderPartialTicks
+                        RenderUtil.getPartialTicks()
                     )
                 } else if (SPIDER_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
@@ -271,21 +275,21 @@ object SlayerFeatures : CoroutineScope {
                         ),
                         Color(0, 255, 255, 255),
                         3f,
-                        (mc as AccessorMinecraft).timer.renderPartialTicks
+                        RenderUtil.getPartialTicks()
                     )
                 } else if (WOLF_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
                         AxisAlignedBB(x - 0.5, y - 1, z - 0.5, x + 0.5, y, z + 0.5),
                         Color(0, 255, 255, 255),
                         3f,
-                        (mc as AccessorMinecraft).timer.renderPartialTicks
+                        RenderUtil.getPartialTicks()
                     )
                 } else if (ENDERMAN_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
                         AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
                         Color(0, 255, 255, 255),
                         3f,
-                        (mc as AccessorMinecraft).timer.renderPartialTicks
+                        RenderUtil.getPartialTicks()
                     )
                 }
             }
@@ -539,10 +543,10 @@ object SlayerFeatures : CoroutineScope {
 
     }
 
-    class SlayerDisplayElement : GuiElement("Slayer Display", FloatPair(150, 20)) {
+    class SlayerDisplayElement : GuiElement("Slayer Display", x = 150, y = 20) {
         override fun render() {
             if (Utils.inSkyblock) {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 slayer?.run {
@@ -553,7 +557,7 @@ object SlayerFeatures : CoroutineScope {
                         } else if (toggled) {
                             ScreenRenderer.fontRenderer.drawString(
                                 displayName.formattedText,
-                                if (leftAlign) 0f else width.toFloat(),
+                                if (leftAlign) 0f else width,
                                 0f,
                                 CommonColors.WHITE,
                                 alignment,
@@ -619,10 +623,10 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SeraphDisplayElement : GuiElement("Seraph Display", FloatPair(20, 20)) {
+    class SeraphDisplayElement : GuiElement("Seraph Display", x = 20, y = 20) {
         override fun render() {
             if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 (slayer as? SeraphSlayer)?.run {
@@ -694,7 +698,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val leftAlign = scaleX < UResolution.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -736,10 +740,10 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    object TotemDisplayElement : GuiElement("Totem Display", FloatPair(20, 50)) {
+    object TotemDisplayElement : GuiElement("Totem Display", x = 20, y = 50) {
         override fun render() {
             (slayer as? DemonlordSlayer)?.totemEntity?.run {
-                val leftAlign = actualX < UResolution.scaledWidth / 2f
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -754,7 +758,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val leftAlign = scaleX < UResolution.scaledWidth / 2f
             val alignment =
                 if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
@@ -780,7 +784,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", FloatPair(150, 20)) {
+    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", x = 150, y = 20) {
         private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 
@@ -812,7 +816,7 @@ object SlayerFeatures : CoroutineScope {
                     }
 
                     if (armors.isNotEmpty()) {
-                        val leftAlign = actualX < UResolution.scaledWidth / 2f
+                        val leftAlign = scaleX < UResolution.scaledWidth / 2f
                         if (!leftAlign) {
                             val longest = fontRenderer.getStringWidth(((armors.maxByOrNull { it.second.length }
                                 ?: (null to ""))).second)
@@ -840,7 +844,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < UResolution.scaledWidth / 2f
+            val leftAlign = scaleX < UResolution.scaledWidth / 2f
             val text = "§e99.9% §b(§f199§b)"
             if (leftAlign) {
                 RenderUtil.renderItem(ItemStack(Items.leather_chestplate), 0, 0)
@@ -959,42 +963,55 @@ object SlayerFeatures : CoroutineScope {
             }
 
         open fun tick(event: ClientTickEvent) {}
+
+        open fun set() {}
+        open fun unset() {}
     }
 
     class RevenantSlayer(entity: EntityZombie) :
         Slayer<EntityZombie>(entity, "Revenant Horror", "§c☠ §bRevenant Horror", "§c☠ §fAtoned Horror") {
-        override fun tick(event: ClientTickEvent) {
-            if (ticks % 4 != 0) return
-            if (Skytils.config.rev5TNTPing) {
-                if (hasSlayerText) {
-                    var under: BlockPos? = null
-                    if (mc.thePlayer.onGround) {
-                        under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                    } else {
-                        for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
-                            val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
-                            if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
-                                under = test
-                                break
-                            }
-                        }
-                    }
-                    if (under != null) {
-                        val blockUnder = mc.theWorld.getBlockState(under)
-                        val isDanger = when {
-                            blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
-                            blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
-                            blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
-                            blockUnder.block === Blocks.stained_hardened_clay -> {
-                                val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
-                                color == 0 || color == 8 || color == 14
-                            }
 
-                            blockUnder.block === Blocks.bedrock -> true
-                            else -> false
+        override fun set() {
+            rev5PingTask.register()
+        }
+
+        override fun unset() {
+            rev5PingTask.unregister()
+        }
+
+        companion object {
+            private val rev5PingTask = TickTask(4, repeats = true, register = false) {
+                if (Utils.inSkyblock && Skytils.config.rev5TNTPing && mc.thePlayer != null) {
+                    if (hasSlayerText) {
+                        var under: BlockPos? = null
+                        if (mc.thePlayer.onGround) {
+                            under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
+                        } else {
+                            for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
+                                val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
+                                if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
+                                    under = test
+                                    break
+                                }
+                            }
                         }
-                        if (isDanger) {
-                            SoundQueue.addToQueue("random.orb", 1f)
+                        if (under != null) {
+                            val blockUnder = mc.theWorld.getBlockState(under)
+                            val isDanger = when {
+                                blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
+                                blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
+                                blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
+                                blockUnder.block === Blocks.stained_hardened_clay -> {
+                                    val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
+                                    color == 0 || color == 8 || color == 14
+                                }
+
+                                blockUnder.block === Blocks.bedrock -> true
+                                else -> false
+                            }
+                            if (isDanger) {
+                                SoundQueue.addToQueue("random.orb", 1f)
+                            }
                         }
                     }
                 }
@@ -1005,7 +1022,7 @@ object SlayerFeatures : CoroutineScope {
     /**
      * Represents a slayer which can throw a thing
      *
-     * Sub-type of [Slayer]
+     * Subtype of [Slayer]
      */
     abstract class ThrowingSlayer<T : EntityLiving>(entity: T, name: String, nameStart: String) : Slayer<T>(
         entity, name, nameStart,
@@ -1144,7 +1161,7 @@ object SlayerFeatures : CoroutineScope {
         var totemPos: BlockPos? = null
 
         companion object {
-            private val thrownTexture =
+            private const val thrownTexture =
                 "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
         }
 

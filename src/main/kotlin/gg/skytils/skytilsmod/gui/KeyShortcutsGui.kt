@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,7 +39,7 @@ import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ChatAllowedCharacters
 import java.awt.Color
 
-class KeyShortcutsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
+class KeyShortcutsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
     private var clickedButton: Entry? = null
@@ -159,10 +159,12 @@ class KeyShortcutsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reope
                     clickedButton!!.keyCode = 0
                     clickedButton!!.modifiers = emptyList()
                 }
+
                 keyCode != 0 -> {
                     clickedButton!!.keyCode = keyCode
                     clickedButton!!.modifiers = extra
                 }
+
                 typedChar.code > 0 -> {
                     clickedButton!!.keyCode = typedChar.code + 256
                     clickedButton!!.modifiers = extra

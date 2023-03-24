@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,7 @@ import java.security.MessageDigest
 plugins {
     kotlin("jvm") version "1.8.10"
     kotlin("plugin.serialization") version "1.8.10"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("io.github.juuxel.loom-quiltflower") version "1.8.0"
@@ -33,7 +33,7 @@ plugins {
     signing
 }
 
-version = "1.3.2"
+version = "1.5.0-pre2"
 group = "gg.skytils"
 
 repositories {
@@ -96,14 +96,14 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     shadowMe("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:11640+g7f637cfee") {
+    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:34ee9af85a") {
+    shadowMeMod("com.github.Skytils:Hylin:3ad11efbc1") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(module = "kotlin-stdlib-jdk7")
@@ -118,11 +118,14 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core")
     }
 
-    shadowMe(platform("io.ktor:ktor-bom:2.2.3"))
-    shadowMe("io.ktor:ktor-serialization-kotlinx-json-jvm")
-    shadowMe("io.ktor:ktor-client-core-jvm")
-    shadowMe("io.ktor:ktor-client-cio-jvm")
-    shadowMe("io.ktor:ktor-client-content-negotiation-jvm")
+    shadowMe(platform(kotlin("bom")))
+    shadowMe(platform(ktor("bom", "2.2.4")))
+    shadowMe(ktor("serialization-kotlinx-json-jvm"))
+    shadowMe(ktor("client-core-jvm"))
+    shadowMe(ktor("client-cio-jvm"))
+    shadowMe(ktor("client-content-negotiation-jvm"))
+    shadowMe(ktor("client-encoding-jvm"))
+    shadowMe(ktor("serialization-gson-jvm"))
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
@@ -171,7 +174,7 @@ tasks {
         doLast {
             MessageDigest.getInstance("SHA-256").digest(archiveFile.get().asFile.readBytes())
                 .let {
-                    println("SHA-256: " + it.joinToString(separator = "") { "%02x".format(it) }.toUpperCase())
+                    println("SHA-256: " + it.joinToString(separator = "") { "%02x".format(it) }.uppercase())
                 }
         }
     }
@@ -186,6 +189,7 @@ tasks {
         relocate("io.ktor", "gg.skytils.ktor")
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
+        relocate("com.google.gson", "gg.skytils.gson")
 
         exclude(
             "**/LICENSE.md",
@@ -257,3 +261,12 @@ signing {
         sign(tasks["remapJar"])
     }
 }
+
+/**
+ * Builds the dependency notation for the named Ktor [module] at the given [version].
+ *
+ * @param module simple name of the Ktor module, for example "client-core".
+ * @param version optional desired version, unspecified if null.
+ */
+fun DependencyHandler.ktor(module: String, version: String? = null) =
+    "io.ktor:ktor-$module${version?.let { ":$version" } ?: ""}"

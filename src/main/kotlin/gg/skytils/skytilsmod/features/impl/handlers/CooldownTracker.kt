@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.SetActionBarEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -47,7 +46,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
 
     fun updateCooldownReduction() {
         val mages = DungeonListener.team.values.filter { it.dungeonClass == DungeonClass.MAGE }
-        val self = mages.find { it.playerName == Skytils.mc.session.username } ?: return
+        val self = mages.find { it.playerName == mc.session.username } ?: return
         val soloMage = mages.size == 1
         cooldownReduction = ((if (soloMage) 50 else 25) + floor(self.classLevel / 2.0))
         println("Mage ${self.classLevel}, they are ${if (soloMage) "a" else "not a"} solo mage with cooldown reduction ${cooldownReduction}.")
@@ -77,7 +76,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
         CooldownDisplayElement()
     }
 
-    class CooldownDisplayElement : GuiElement("Item Cooldown Display", FloatPair(10, 10)) {
+    class CooldownDisplayElement : GuiElement("Item Cooldown Display", x = 10, y = 10) {
 
         override fun render() {
             if (Utils.inSkyblock && toggled) {

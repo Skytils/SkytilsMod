@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -40,7 +40,7 @@ import java.util.zip.ZipEntry;
 
 /**
  * Modified from SkyblockAddons under MIT License
- * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
+ * <a href="https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE">...</a>
  *
  * @author BiscuitDevelopment
  */
@@ -84,7 +84,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
             testPanel.add(chooser, BorderLayout.EAST);
 
             // Footer
-            footer = new FooterPanel(w / 2 + (getOperatingSystem( ) == OperatingSystem.LINUX ?  60  : 0) , h / 11, 16, 16, new Color(0x8193ff));
+            footer = new FooterPanel(w / 2 + (getOperatingSystem() == OperatingSystem.LINUX ? 60 : 0), h / 11, 16, 16, new Color(0x8193ff));
             footer.openFolder.addActionListener(this);
             footer.install.addActionListener(this);
             footer.install.setEnabled(true);
@@ -189,13 +189,13 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        String forgeUrl = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html";
+        String forgeUrl = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html";
         if (e.getSource() == descriptionPanel.forge) {
             try {
                 Desktop.getDesktop().browse(new URI(forgeUrl));
-            } catch (IOException  | URISyntaxException ex) {
+            } catch (IOException | URISyntaxException ex) {
                 showErrorPopup(ex);
-            } catch(/** Throws on linux */ UnsupportedOperationException ex) {
+            } catch (/* Throws on linux */UnsupportedOperationException ex) {
                 ex.printStackTrace();
                 JTextArea textArea = new JTextArea("Failed to open url open it manually instead\n" + forgeUrl);
                 textArea.setEditable(false);
@@ -473,7 +473,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         }
     }
 
-    private class DescriptionPanel extends RoundedRectanglePanel {
+    private static class DescriptionPanel extends RoundedRectanglePanel {
         public final JTextArea forge;
 
         public DescriptionPanel(int width, int height, int radiusW, int radiusH, Color color) {
@@ -575,7 +575,7 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
         }
     }
 
-    private class FooterPanel extends RoundedRectanglePanel {
+    private static class FooterPanel extends RoundedRectanglePanel {
 
         public final JButton install;
         public final JButton openFolder;

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,9 +37,8 @@ object ModChecker {
         ClientBrandRetriever.getClientModName()?.startsWith("fml,forge") != true ||
                 ClientBrandRetriever.getClientModName() != FMLCommonHandler.instance().modName ||
                 Loader.isModLoaded("feather") ||
-                ForgeVersion.getStatus().ordinal > 3 ||
-                (!Skytils.deobfEnvironment && Loader.instance().activeModList.filter { it.modId == "Forge" || it.modId == "FML" }
-                    .any { it.signingCertificate == null })
+                Loader.isModLoaded("labymod") ||
+                ForgeVersion.getStatus().ordinal > 3
     }
 
     fun checkModdedForge() {
@@ -71,6 +70,7 @@ object ModChecker {
                 frame.isVisible = false
                 frame.dispose()
             }
+            // TODO: find out how to fix linkage error eventually
             val totalOptions = arrayOf(discordLink, close)
             JOptionPane.showOptionDialog(
                 frame,

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -147,7 +147,7 @@ object SBInfo {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
                         val parseFormat = SimpleDateFormat("hh:mm a")
                         currentTimeDate = parseFormat.parse(timeSpace)
-                    } catch (e: ParseException) {
+                    } catch (_: ParseException) {
                     }
                 }
                 lines.find { it.contains('⏣') }?.replace(junkRegex, "")?.trim()?.let {
@@ -169,6 +169,7 @@ object SBInfo {
 
 enum class SkyblockIsland(val formattedName: String, val mode: String) {
     PrivateIsland("Private Island", "dynamic"),
+    TheGarden("The Garden", "garden"),
     SpiderDen("Spider's Den", "combat_1"),
     CrimsonIsle("Crimson Isle", "crimson_isle"),
     TheEnd("The End", "combat_3"),

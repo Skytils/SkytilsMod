@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,7 +23,7 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.structure.FloatPair
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -40,7 +40,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 import kotlin.math.roundToInt
 
@@ -51,11 +50,11 @@ import kotlin.math.roundToInt
  */
 object ContainerSellValue {
 
-    val element = SellValueDisplay()
+    private val element = SellValueDisplay()
 
     /**
      * Represents a line in the sell value display. To conserve space, multiple items can
-     * be stacked into one line if their display names are equal, so all of the original
+     * be stacked into one line if their display names are equal, so all the original
      * `ItemStack`s must be saved to find the lowest BIN price of this display line.
      */
     private class DisplayLine(itemStack: ItemStack) {
@@ -75,13 +74,13 @@ object ContainerSellValue {
      * of this class so that the user can move the element around normally.
      * @see renderGuiComponent
      */
-    class SellValueDisplay : GuiElement("Container Sell Value", FloatPair(0.258f, 0.283f)) {
+    class SellValueDisplay : GuiElement("Container Sell Value", x = 0.258f, y = 0.283f) {
 
         internal val rightAlign: Boolean
-            get() = element.actualX > (UResolution.scaledWidth * 0.75f) ||
-                    (element.actualX < UResolution.scaledWidth / 2f && element.actualX > UResolution.scaledWidth / 4f)
+            get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
+                    (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
-            get() = if (rightAlign) actualWidth else 0f
+            get() = if (rightAlign) scaleWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
             get() = if (rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
             else SmartFontRenderer.TextAlignment.LEFT_RIGHT
@@ -105,8 +104,10 @@ object ContainerSellValue {
 
         override val toggled: Boolean
             get() = Skytils.config.containerSellValue
-        override val height: Int = fr.FONT_HEIGHT * (Skytils.config.containerSellValueMaxItems + 2)
-        override val width: Int = fr.getStringWidth("Dctr's Space Helmet - 900M")
+        override val height: Int
+            get() = fr.FONT_HEIGHT * 3
+        override val width: Int
+            get() = fr.getStringWidth("Dctr's Space Helmet - 900M")
 
         init {
             Skytils.guiManager.registerElement(this)
@@ -192,8 +193,6 @@ object ContainerSellValue {
     private var totalContainerValue: Double = 0.0
     private var lines: Int = 0
 
-    private var ticks = 0
-
     private fun shouldRenderGuiComponent(): Boolean {
         val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return false
         val chestName = container.lowerChestInventory.name
@@ -235,7 +234,7 @@ object ContainerSellValue {
         // Translate and scale manually because we're not rendering inside the GuiElement#render() method
         val stack = UMatrixStack()
         stack.push()
-        stack.translate(element.actualX, element.actualY, 0f)
+        stack.translate(element.scaleX, element.scaleY, 0f)
         stack.scale(element.scale, element.scale, 0f)
 
         textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
@@ -261,56 +260,53 @@ object ContainerSellValue {
     /**
      * Update the list of items in the GUI to be displayed after the container background is drawn.
      */
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Skytils.config.containerSellValue) return
+    init {
+        TickTask(4, repeats = true) {
+            if (!Skytils.config.containerSellValue) return@TickTask
 
-        // Limit this method to only run a few times per second
-        ticks++
-        if (ticks % 4 != 0) return
-        ticks = 0
 
-        val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return
-        val chestName = container.lowerChestInventory.name
+            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@TickTask
+            val chestName = container.lowerChestInventory.name
 
-        if (!isChestNameValid(chestName)) return
+            if (!isChestNameValid(chestName)) return@TickTask
 
-        val isMinion = chestName.contains(" Minion ")
+            val isMinion = chestName.contains(" Minion ")
 
-        // Map all of the items in the chest to their lowest BIN prices
-        val slots = container.inventorySlots.filter {
-            it.hasStack && it.inventory != mc.thePlayer.inventory
-                    && (!isMinion || it.slotNumber % 9 != 1) // Ignore minion upgrades and fuels
-        }
-
-        // Combine items with the same name to save space in the GUI
-        val distinctItems = mutableMapOf<String, DisplayLine>()
-        slots.forEach {
-            if (distinctItems.containsKey(it.stack.prettyDisplayName)) {
-                distinctItems[it.stack.prettyDisplayName]!!.stackedItems.add(it.stack)
-            } else {
-                distinctItems[it.stack.prettyDisplayName] = DisplayLine(it.stack)
+            // Map all of the items in the chest to their lowest BIN prices
+            val slots = container.inventorySlots.filter {
+                it.hasStack && it.inventory != mc.thePlayer.inventory
+                        && (!isMinion || it.slotNumber % 9 != 1) // Ignore minion upgrades and fuels
             }
-        }
 
-        totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
-
-        // Sort the items from most to least valuable and convert them into a readable format
-        textLines.clear()
-        if (distinctItems.isEmpty() || totalContainerValue == 0.0) return
-        textLines.addAll(
-            distinctItems.entries.asSequence()
-                .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
-                .filter { it.value.shouldDisplay() }
-                .map { (itemName, displayItem) ->
-                    "$itemName§r${
-                        (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
-                    }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
+            // Combine items with the same name to save space in the GUI
+            val distinctItems = mutableMapOf<String, DisplayLine>()
+            slots.forEach {
+                if (distinctItems.containsKey(it.stack.prettyDisplayName)) {
+                    distinctItems[it.stack.prettyDisplayName]!!.stackedItems.add(it.stack)
+                } else {
+                    distinctItems[it.stack.prettyDisplayName] = DisplayLine(it.stack)
                 }
-                .toList()
-                .also { lines = it.size }
-                .take(Skytils.config.containerSellValueMaxItems)
-        )
+            }
+
+            totalContainerValue = distinctItems.entries.sumOf { it.value.lowestBIN }
+
+            // Sort the items from most to least valuable and convert them into a readable format
+            textLines.clear()
+            if (distinctItems.isEmpty() || totalContainerValue == 0.0) return@TickTask
+            textLines.addAll(
+                distinctItems.entries.asSequence()
+                    .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }
+                    .filter { it.value.shouldDisplay() }
+                    .map { (itemName, displayItem) ->
+                        "$itemName§r${
+                            (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
+                        }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
+                    }
+                    .toList()
+                    .also { lines = it.size }
+                    .take(Skytils.config.containerSellValueMaxItems)
+            )
+        }
     }
 
     private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {

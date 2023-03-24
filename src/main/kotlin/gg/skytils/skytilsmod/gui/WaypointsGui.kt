@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -44,7 +44,7 @@ import gg.skytils.skytilsmod.utils.*
 import net.minecraft.util.BlockPos
 import java.awt.Color
 
-class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), ReopenableGUI {
+class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
 
@@ -609,6 +609,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V1, newGuiScale = 2), Reopenab
     override fun onScreenClose() {
         super.onScreenClose()
         loadWaypointsForSelection(-1, isClosing = true)
+        Waypoints.computeVisibleWaypoints()
     }
 
     private fun updateCheckbox(category: Category?) {

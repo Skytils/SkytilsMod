@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -102,6 +102,7 @@ object ChatTabs {
             is GuiScreenEvent.InitGuiEvent.Post -> {
                 event.buttonList.addAll(ChatTab.buttons.values)
             }
+
             is GuiScreenEvent.ActionPerformedEvent.Pre -> {
                 ChatTab.buttons.entries.find {
                     it.value == event.button
@@ -137,11 +138,12 @@ object ChatTabs {
                     }
                 }
             }
+
             is GuiScreenEvent.DrawScreenEvent.Pre -> {
                 ChatTab.buttons.entries.forEach { (c, b) ->
                     b.enabled = c != selectedTab
                     b.yPosition =
-                        (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2).toInt()
+                        (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2)
                 }
             }
         }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -52,7 +52,7 @@ import skytils.hylin.skyblock.Skills
 import java.awt.Color
 import java.util.*
 
-class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V1, drawDefaultBackground = false) {
+class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
         it.onSetValue { uuid ->
             val profile = GameProfile(uuid, "")

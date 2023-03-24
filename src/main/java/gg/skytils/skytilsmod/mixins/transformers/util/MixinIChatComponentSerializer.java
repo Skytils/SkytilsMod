@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,6 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.util;
 
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
 import gg.skytils.skytilsmod.mixins.hooks.util.IChatComponent_SerializerHookKt;
 import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(IChatComponent.Serializer.class)
-public abstract class MixinIChatComponentSerializer implements JsonDeserializer<IChatComponent>, JsonSerializer<IChatComponent> {
+public abstract class MixinIChatComponentSerializer {
     @ModifyVariable(method = "serialize", at = @At("HEAD"), argsOnly = true)
     private IChatComponent fixUTextComponentSerialize(IChatComponent component) {
         return IChatComponent_SerializerHookKt.fixUTextComponentSerialize(component);

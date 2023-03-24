@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,12 +19,12 @@ package gg.skytils.skytilsmod.utils.toasts
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.ifNull
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.util.ResourceLocation
-import java.util.regex.Pattern
 
 class ComboToast(input: String) : IToast<ComboToast> {
     private val buffer = GLAllocation.createDirectFloatBuffer(16)
@@ -46,31 +46,31 @@ class ComboToast(input: String) : IToast<ComboToast> {
 
     companion object {
         private val TEXTURE = ResourceLocation("skytils:gui/toast.png")
-        private val comboPattern = Pattern.compile("(§r§.§l)\\+(\\d+ Kill Combo) (§r§8.+)")
-        private val noBuffPattern = Pattern.compile("(§r§.§l)\\+(\\d+ Kill Combo)")
+        private val comboPattern = Regex("(§r§.§l)\\+(\\d+ Kill Combo) (§r§8.+)")
+        private val noBuffPattern = Regex("(§r§.§l)\\+(\\d+ Kill Combo)")
     }
 
     init {
-        val comboMatcher = comboPattern.matcher(input)
-        if (comboMatcher.find()) {
-            length = comboMatcher.group(1) + comboMatcher.group(2)
-            buff = comboMatcher.group(3)
+        comboPattern.find(input)?.also {
+            length = it.groupValues[1] + it.groupValues[2]
+            buff = it.groupValues[3]
             when {
                 input.contains("Magic Find") -> {
                     buffTexture = ResourceLocation("skytils:toasts/combo/luck.png")
                 }
+
                 input.contains("coins per kill") -> {
                     buffTexture = ResourceLocation("skytils:toasts/combo/coin.png")
                 }
+
                 input.contains("Combat Exp") -> {
                     buffTexture = ResourceLocation("skytils:toasts/combo/combat.png")
                 }
             }
-        } else {
+        }.ifNull {
             buffTexture = null
-            val noBuffMatcher = noBuffPattern.matcher(input)
-            if (noBuffMatcher.find()) {
-                length = noBuffMatcher.group(1) + noBuffMatcher.group(2)
+            noBuffPattern.find(input)?.let {
+                length = it.groupValues[1] + it.groupValues[2]
             }
         }
     }

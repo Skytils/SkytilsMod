@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,7 +42,7 @@ val RES_ITEM_GLINT = ResourceLocation("textures/misc/enchanted_item_glint.png")
 
 var skipGlint = false
 
-fun renderRarity(stack: ItemStack, x: Int, y: Int, ci: CallbackInfo) {
+fun renderRarity(stack: ItemStack?, x: Int, y: Int, ci: CallbackInfo) {
     if (Utils.inSkyblock && Skytils.config.showItemRarity) {
         if (mc.currentScreen != null) {
             if (isStorageMenuActive || isTradeWindowActive || isCustomAHActive) {

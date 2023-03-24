@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,7 @@
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.features.impl.farming.GardenFeatures
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.Utils
@@ -39,24 +40,32 @@ fun modifyGetModelFromBlockState(
     pos: BlockPos?,
     cir: CallbackInfoReturnable<IBakedModel>
 ) {
-    if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.DwarvenMines.mode || state == null || pos == null) return
+    if (!Utils.inSkyblock || state == null || pos == null) return
     var returnState = state
-    if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
-            state.getValue(
-                BlockCarpet.COLOR
-            ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
+    if (SBInfo.mode == SkyblockIsland.DwarvenMines.mode) {
+        if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
+                state.getValue(
+                    BlockCarpet.COLOR
+                ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
+            )
+        ) {
+            returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
+        } else if (Skytils.config.darkModeMist && pos.y <= 76) {
+            if (state.block === Blocks.stained_glass &&
+                state.getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE
+            ) {
+                returnState = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
+            } else if (state.block === Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
+                returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
+            }
+        }
+    } else if (Skytils.config.gardenPlotCleanupHelper && GardenFeatures.isCleaningPlot && GardenFeatures.trashBlocks.contains(
+            state.block
         )
     ) {
-        returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)
-    } else if (Skytils.config.darkModeMist && pos.y <= 76) {
-        if (state.block === Blocks.stained_glass &&
-            state.getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE
-        ) {
-            returnState = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
-        } else if (state.block === Blocks.carpet && state.getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
-            returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
-        }
+        returnState = Blocks.sponge.defaultState
     }
+
     if (returnState !== state) {
         cir.returnValue = blockRendererDispatcher.blockModelShapes.getModelForState(returnState)
     }

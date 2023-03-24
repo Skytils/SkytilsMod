@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,6 +30,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
 import net.minecraft.client.Minecraft
@@ -37,7 +38,7 @@ import java.awt.Desktop
 import java.net.URI
 
 class OptionsGui :
-    WindowScreen(ElementaVersion.V1, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
+    WindowScreen(ElementaVersion.V2, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText =
         UIText(if (Utils.isBSMod) "BSMod" else "Skytils", shadow = false).childOf(window).constrain {
@@ -82,7 +83,7 @@ class OptionsGui :
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            mc.displayGuiScreen(LocationEditGui())
+            mc.displayGuiScreen(ElementaEditingGui())
         }
         SimpleButton("Edit Key Shortcuts").childOf(window).constrain {
             x = CenterConstraint()

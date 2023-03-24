@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -85,8 +85,9 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                     } else {
                         MiningFeatures.waypoints[loc] = BlockPos(x, y, z)
                     }
-                    UChat.chat("$successPrefix §aSuccessfully created waypoint ${loc}")
+                    UChat.chat("$successPrefix §aSuccessfully created waypoint $loc")
                 }
+
                 "remove", "delete" -> {
                     if (args.size >= 2) {
                         val name = args.drop(1).joinToString(" ")
@@ -101,11 +102,13 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                     } else
                         UChat.chat("$prefix §b/sthw remove <name>")
                 }
+
                 "clear" -> {
                     MiningFeatures.CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
                     MiningFeatures.waypoints.clear()
                     UChat.chat("$successPrefix §aSuccessfully cleared all waypoints.")
                 }
+
                 else -> {
                     UChat.chat(
                         "$prefix §e/sthw ➔ Shows all waypoints\n" +
