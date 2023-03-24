@@ -57,15 +57,19 @@ object BossHPDisplays {
         if (!Utils.inDungeons || event.type.toInt() == 2) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.startsWith("[BOSS] Sadan")) {
-            if (unformatted.contains("My giants! Unleashed!")) canGiantsSpawn = true
-            if (unformatted.contains("It was inevitable.") || unformatted.contains("NOOOOOOOOO")) canGiantsSpawn = false
-        }
-        if (unformatted == "[BOSS] The Watcher: Plus I needed to give my new friends some space to roam...") canGiantsSpawn =
-            true
-        if (unformatted.startsWith("[BOSS] The Watcher: You have failed to prove yourself, and have paid with your lives.") || unformatted.startsWith(
+            if (unformatted.contains("My giants! Unleashed!")) {
+                canGiantsSpawn = true
+            } else if (unformatted.contains("It was inevitable.") || unformatted.contains("NOOOOOOOOO")) {
+                canGiantsSpawn = false
+            }
+        } else if (unformatted == "[BOSS] The Watcher: Plus I needed to give my new friends some space to roam...") {
+            canGiantsSpawn = true
+        } else if (unformatted.startsWith("[BOSS] The Watcher: You have failed to prove yourself, and have paid with your lives.") || unformatted.startsWith(
                 "[BOSS] The Watcher: You have proven yourself"
             )
-        ) canGiantsSpawn = false
+        ) {
+            canGiantsSpawn = false
+        }
     }
 
     @SubscribeEvent
@@ -79,10 +83,10 @@ object BossHPDisplays {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inDungeons || event.phase != TickEvent.Phase.START) return
         if (canGiantsSpawn && mc.theWorld != null && (Skytils.config.showGiantHPAtFeet || Skytils.config.showGiantHP)) {
-            val isSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
+            val hasSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
             giantNames = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().filter {
                 val name = it.displayName.formattedText
-                name.contains("❤") && (!isSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
+                name.contains("❤") && (!hasSadanPlayer && name.contains("§e﴾ §c§lSadan§r") || (name.contains("Giant") && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
                     "F7",
                     "M6",
@@ -183,7 +187,10 @@ object BossHPDisplays {
             if (giantNames.isNotEmpty()) {
                 RenderUtil.drawAllInList(
                     this,
-                    giantNames.filter { it.first.contains("Sadan") && giantNames.size > 1 }.map { it.first })
+                    (giantNames.takeIf { it.size == 1 } ?: giantNames.filter { !it.first.contains("Sadan") }).map {
+                        it.first
+                    }
+                )
             }
         }
 
