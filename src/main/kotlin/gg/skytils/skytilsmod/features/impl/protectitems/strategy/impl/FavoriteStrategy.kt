@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 import gg.skytils.skytilsmod.utils.ItemUtil
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonArray
@@ -72,6 +73,7 @@ object FavoriteStrategy : ItemProtectStrategy() {
             writer.write(json.encodeToString(Schema()))
         }
 
+        @Serializable
         data class Schema(val favoriteUUIDs: Set<String> = emptySet(), val favoriteItemIds: Set<String> = emptySet())
     }
 }
