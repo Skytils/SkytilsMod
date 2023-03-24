@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.utils
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.events.impl.LocrawReceivedEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import kotlinx.serialization.KSerializer
@@ -110,6 +111,7 @@ object SBInfo {
                     }
                     locraw = obj
                     mode = obj.mode
+                    LocrawReceivedEvent(obj).postAndCatch()
                 } catch (e: SerializationException) {
                     e.printStackTrace()
                 }
