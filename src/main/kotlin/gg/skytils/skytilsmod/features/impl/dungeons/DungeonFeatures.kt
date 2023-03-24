@@ -138,7 +138,8 @@ object DungeonFeatures {
             }
         } else if (isInTerracottaPhase && Skytils.config.terracottaRespawnTimer && dungeonFloor?.endsWith('6') == true) {
             if (event.old.block == Blocks.air && event.update.block == Blocks.flower_pot) {
-                terracottaSpawns[event.pos] = System.currentTimeMillis() + 15000
+                // TODO: verify 10500
+                terracottaSpawns[event.pos] = System.currentTimeMillis() + if (dungeonFloor == "F6") 15000 else 10500
             }
         }
     }
