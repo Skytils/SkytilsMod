@@ -58,10 +58,11 @@ object GardenFeatures {
             if (mc.thePlayer != null) {
                 val inGarden = SBInfo.mode == SkyblockIsland.TheGarden.mode
 
+                    mc.renderGlobal.loadRenderers()
                 isCleaningPlot = inGarden && ScoreboardUtil.sidebarLines.any {
                     it.matches(cleanupRegex)
                 }.also {
-                    if (it != isCleaningPlot) {
+                    if (it != isCleaningPlot && Skytils.config.gardenPlotCleanupHelper) {
                         mc.renderGlobal.loadRenderers()
                     }
                 }
