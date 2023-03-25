@@ -22,6 +22,8 @@ import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.dsl.childOf
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.gui.editing.components.LocationComponent
 
@@ -32,5 +34,10 @@ class ElementaEditingGui : WindowScreen(ElementaVersion.V2), ReopenableGUI {
             if (!element.toggled) return@forEach
             LocationComponent(element) childOf window
         }
+    }
+
+    override fun onScreenClose() {
+        super.onScreenClose()
+        PersistentSave.markDirty<GuiManager>()
     }
 }
