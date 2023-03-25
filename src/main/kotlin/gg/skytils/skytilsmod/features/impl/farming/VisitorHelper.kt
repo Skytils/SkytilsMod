@@ -23,7 +23,6 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -45,7 +44,7 @@ object VisitorHelper {
         get() = Utils.inSkyblock && SBInfo.mode == SkyblockIsland.TheGarden.mode
 
     private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+) §8x(?<quantity>[\\d,]+)\$")
-    private val rewardRegex = Regex("^\\s+ §8+(?<reward>§.+)\$")
+    private val rewardRegex = Regex("^\\s+§8\\+(?<reward>§.+)\$")
     private val textLines = mutableListOf<String>()
     private var totalOfferValue: Double = 0.0
     private var ticks = 0
