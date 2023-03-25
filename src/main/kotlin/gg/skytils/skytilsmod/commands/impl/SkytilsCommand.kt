@@ -283,6 +283,13 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 PersistentSave.markDirty<PricePaid>()
             }
 
+            "resetelement" -> {
+                val element = Skytils.guiManager.getByName(args.getOrNull(1))
+                    ?: return UChat.chat("$failPrefix §cThat element was not found!")
+                element.setPos(0.5f, 0.5f)
+                element.scale = 1f
+            }
+
             else -> UChat.chat("$failPrefix §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
         }
     }
