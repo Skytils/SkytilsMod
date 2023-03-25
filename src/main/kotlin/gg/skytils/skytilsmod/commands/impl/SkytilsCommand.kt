@@ -284,7 +284,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
 
             "resetelement" -> {
-                val element = Skytils.guiManager.getByName(args.getOrNull(1))
+                val element = Skytils.guiManager.getByName(args.drop(1).joinToString(" "))
                     ?: return UChat.chat("$failPrefix §cThat element was not found!")
                 element.setPos(0.5f, 0.5f)
                 element.scale = 1f
