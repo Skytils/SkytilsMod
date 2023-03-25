@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2023 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,7 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import java.awt.Color
 
-class LocationComponent (val element: GuiElement) : UIComponent() {
+class LocationComponent(val element: GuiElement) : UIComponent() {
     init {
         constrain {
             x = RelativeConstraint(element.x)
