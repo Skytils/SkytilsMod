@@ -24,7 +24,10 @@ import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.append
+import gg.skytils.skytilsmod.utils.printDevMessage
+import gg.skytils.skytilsmod.utils.setHoverText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -67,7 +70,7 @@ object PartyAddons {
             }
             playerPattern.findAll(message.substringAfter(": ")).forEach {
                 it.destructured.let { (rank, name, status) ->
-                printDevMessage("Found Party Member: rank=$rank, name=$name, status=$status", "PartyAddons")
+                    printDevMessage("Found Party Member: rank=$rank, name=$name, status=$status", "PartyAddons")
                     party.add(
                         PartyMember(
                             name,
