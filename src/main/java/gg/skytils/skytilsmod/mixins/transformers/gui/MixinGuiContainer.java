@@ -39,7 +39,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
         hook.closeWindowPressed(ci);
     }
 
-    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1, shift = At.Shift.AFTER))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         hook.backgroundDrawn(mouseX, mouseY, partialTicks, ci);
     }
