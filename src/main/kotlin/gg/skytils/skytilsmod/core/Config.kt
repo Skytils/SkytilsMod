@@ -1366,7 +1366,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Filled Bazaar Orders",
-        description = "Highlights 100% filled orders in the bazaar.",
+        description = "Highlights 100%% filled orders in the bazaar.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var highlightFilledBazaarOrders = false
@@ -1589,7 +1589,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Low Health Vignette Threshold",
-        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0% to disable.",
+        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0%% to disable.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var lowHealthVignetteThreshold = 0.0f
