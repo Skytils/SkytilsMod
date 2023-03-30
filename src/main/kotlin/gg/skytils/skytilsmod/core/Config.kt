@@ -2446,6 +2446,13 @@ object Config : Vigilant(
     var totemPing = 0
 
     @Property(
+        PropertyType.SWITCH, name = "Attunement Display",
+        description = "Recolors the Inferno boss and demons depending on the correct dagger attunement.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var attunementDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
         description = "Blocks the sound effect played while an item is on cooldown.",
         category = "Sounds", subcategory = "Abilities"

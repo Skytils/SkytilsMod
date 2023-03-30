@@ -104,7 +104,7 @@ object SlayerFeatures : CoroutineScope {
     // there might be a point replacing this with §c\d+:\d+(?:§r)?$ and only partially check for matches
     // but that requires a more extensive testing of all skyblock timers,
     // something I am not quite particularly fond of doing
-    private val timerRegex = Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d|§4§lIMMUNE)? §c\\d+:\\d+(?:§r)?")
+    private val timerRegex = Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d |§4§lIMMUNE )?§c\\d+:\\d+(?:§r)?")
     private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
         set(value) {
@@ -968,7 +968,7 @@ object SlayerFeatures : CoroutineScope {
                         if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
                             return@TickTask potentialNameEntities.first() to potentialTimerEntities.first()
                         } else {
-                            printDevMessage("not the right entity!", "slayer")
+                            printDevMessage("not the right entity! (${potentialNameEntities.size}, ${potentialTimerEntities.size})", "slayer")
                             slayer = null
                             throw IllegalStateException("Wrong entity!")
                         }
@@ -1176,9 +1176,99 @@ object SlayerFeatures : CoroutineScope {
         var totemEntity: EntityArmorStand? = null
         var totemPos: BlockPos? = null
 
+        private var lastTickInvis = false
+        val relevantEntity: Entity?
+            get() {
+                return if (entity.isInvisible) {
+                    if (quazii == null || typhoeus == null) {
+                        null
+                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true) {
+                        quazii
+                    } else {
+                        typhoeus
+                    }
+                } else {
+                    entity
+                }
+            }
+        val relevantColor: Color?
+            get() {
+                val relevantTimer = if (entity.isInvisible) {
+                    if (quazii == null || typhoeus == null) {
+                        null
+                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true) {
+                        quaziiTimer
+                    } else {
+                        typhoeusTimer
+                    }
+                } else {
+                    timerEntity
+                } ?: return null
+                val attunement = relevantTimer.displayName.unformattedText.substringBefore(" ").stripControlCodes()
+                return attunementColors[attunement]
+            }
+        // Is there a point making a class for the demons and storing the entity and the timer in the same place?
+        var quazii: EntitySkeleton? = null
+        var quaziiTimer: EntityArmorStand? = null
+        var typhoeus: EntityPigZombie? = null
+        var typhoeusTimer: EntityArmorStand? = null
+
         companion object {
             private const val thrownTexture =
                 "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
+            private const val quaziiTexture = // this the wither skeleton
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTZjYTE0NWJhNDM1YjM3NWY3NjNmZjUzYjRjZTA0YjJhMGM4NzNlOGZmNTQ3ZThiMTRiMzkyZmRlNmZiZmQ5NCJ9fX0="
+            private const val typhoeusTexture = // and this is the pig
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTJmMjk5NDVhYTUzY2Q5NWEwOTc4YTYyZWYxYThjMTk3ODgwMzM5NWE4YWQ1YzA5MjFkOWNiZTVlMTk2YmI4YiJ9fX0="
+
+            // Taken directly from https://minecraft.fandom.com/wiki/Formatting_codes#Color_codes
+            // Ashen might be too dark?
+            private val attunementColors = mapOf(
+                "ASHEN" to Color(85, 85, 85),
+                "CRYSTAL" to Color(85, 255, 255),
+                "AURIC" to Color(255, 255, 85),
+                "SPIRIT" to Color(255, 255, 255)
+            )
+        }
+
+        override fun tick(event: ClientTickEvent) {
+            if (entity.isInvisible && !lastTickInvis) {
+                lastTickInvis = true
+                val demons = entity.entityWorld.getEntitiesInAABBexcluding(
+                    entity, entity.entityBoundingBox.expand(3.0, 1.5, 3.0)
+                ) { it is EntityPigZombie || (it is EntitySkeleton && it.skeletonType == 1) }
+                for (demon in demons) {
+                    val helmet = ItemUtil.getSkullTexture(demon.inventory.getOrNull(4) ?: continue)
+                    val helmetTexture = if (demon is EntitySkeleton) {
+                        quaziiTexture
+                    } else {
+                        typhoeusTexture
+                    }
+                    if (helmet == helmetTexture) {
+                        demon.entityWorld.getEntitiesInAABBexcluding(
+                            demon, demon.entityBoundingBox.expand(0.2, 3.0, 0.2)
+                        ) {
+                            it is EntityArmorStand && it.isInvisible && it.hasCustomName()
+                                    && it.displayName.formattedText.matches(timerRegex)
+                        }.firstOrNull()?.let {
+                            if (demon is EntitySkeleton) {
+                                quazii = demon
+                                quaziiTimer = it as EntityArmorStand
+                            } else if (demon is EntityPigZombie) {
+                                typhoeus = demon
+                                typhoeusTimer = it as EntityArmorStand
+                            }
+                        }
+                    }
+                }
+            } else if (!entity.isInvisible && lastTickInvis) {
+                lastTickInvis = false
+                quazii = null
+                quaziiTimer = null
+                typhoeus = null
+                typhoeusTimer = null
+            }
+            super.tick(event)
         }
 
         override fun entityJoinWorld(event: EntityJoinWorldEvent) {

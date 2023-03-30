@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import gg.skytils.skytilsmod.utils.withAlpha
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -48,6 +49,15 @@ fun setColorMultiplier(
                 cir.returnValue = Skytils.config.seraphHitsPhaseColor.withAlpha(169)
             } else {
                 cir.returnValue = Skytils.config.seraphNormalPhaseColor.withAlpha(169)
+            }
+        }
+    } else if (Skytils.config.attunementDisplay && Utils.inSkyblock && entity is EntityLiving) {
+        (slayer as? SlayerFeatures.DemonlordSlayer)?.let {
+            if (entity == it.relevantEntity) {
+                entity.hurtTime = 0
+                it.relevantColor?.let {
+                    cir.returnValue = it.withAlpha(169)
+                }
             }
         }
     } else if (DungeonFeatures.livid == entity) {
