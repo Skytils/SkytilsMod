@@ -222,6 +222,16 @@ object SlayerFeatures : CoroutineScope {
                             )
                             break
                         }
+                        if (boss.startsWith("Inferno Demonlord")) {
+                            BossStatus.setBossStatus(
+                                RNGMeter(
+                                    100f,
+                                    Skytils.config.blazeRNG,
+                                    ChatComponentText("§c§lInferno Demonlord RNG§r - §d${Skytils.config.blazeRNG}%")
+                                ), true
+                            )
+                            break
+                        }
                     }
                 }
             }
@@ -258,7 +268,7 @@ object SlayerFeatures : CoroutineScope {
                     RenderUtil.interpolate(event.entity.lastTickPosY, event.entity.posY, RenderUtil.getPartialTicks())
                 val z =
                     RenderUtil.interpolate(event.entity.lastTickPosZ, event.entity.posZ, RenderUtil.getPartialTicks())
-                if (ZOMBIE_MINIBOSSES.any { name.contains(it) }) {
+                if (ZOMBIE_MINIBOSSES.any { name.contains(it) } || BLAZE_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
                         AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
                         Color(0, 255, 255, 255),
@@ -374,6 +384,10 @@ object SlayerFeatures : CoroutineScope {
                         }
                         if (boss.startsWith("Voidgloom Seraph")) {
                             Skytils.config.voidRNG = rngMeter
+                            break
+                        }
+                        if (boss.startsWith("Inferno Demonlord")) {
+                            Skytils.config.blazeRNG = rngMeter
                             break
                         }
                     }

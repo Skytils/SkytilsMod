@@ -2232,6 +2232,16 @@ object Config : Vigilant(
     var voidRNG = 0f
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Current Inferno RNG Meter",
+        description = "Internal value to store current Inferno Demonlord RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var blazeRNG = 0f
+
+    @Property(
         type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
         description = "Open chat, then click anywhere on screen to open Maddox Menu.",
         category = "Slayer", subcategory = "Quality of Life"
