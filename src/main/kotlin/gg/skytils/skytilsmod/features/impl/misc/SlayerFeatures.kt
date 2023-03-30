@@ -974,6 +974,11 @@ object SlayerFeatures : CoroutineScope {
                                 }
                             }
                         }
+                        (this@Slayer as? DemonlordSlayer)?.let {
+                            if (potentialTimerEntities.removeIf { it == quaziiTimer || it == typhoeusTimer }) {
+                                printDevMessage("Ignored demon timers", "slayer")
+                            }
+                        }
                         if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
                             return@TickTask potentialNameEntities.first() to potentialTimerEntities.first()
                         } else {
@@ -1271,10 +1276,6 @@ object SlayerFeatures : CoroutineScope {
                 }
             } else if (!entity.isInvisible && lastTickInvis) {
                 lastTickInvis = false
-                quazii = null
-                quaziiTimer = null
-                typhoeus = null
-                typhoeusTimer = null
             }
             super.tick(event)
         }
