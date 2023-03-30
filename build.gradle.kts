@@ -23,7 +23,7 @@ import java.security.MessageDigest
 
 plugins {
     kotlin("jvm") version "1.8.10"
-    kotlin("plugin.serialization") version "1.8.10"
+    kotlin("plugin.serialization") version "1.8.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
