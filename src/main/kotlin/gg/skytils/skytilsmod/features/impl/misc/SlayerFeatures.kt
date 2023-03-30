@@ -35,6 +35,7 @@ import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
+import gg.skytils.skytilsmod.features.impl.handlers.PotionEffectTimers
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.NumberUtil.toRoman
@@ -497,17 +498,25 @@ object SlayerFeatures : CoroutineScope {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!Skytils.config.hideOthersBrokenHeartRadiation || !event.entity.isInvisible || event.entity !is EntityGuardian) return
-        (slayer as? SeraphSlayer)?.run {
-            if (entity.isRiding) {
-                printDevMessage("Slayer is Riding", "slayer", "seraph", "seraphRadiation")
-                if (event.entity.getDistanceSqToEntity(entity) > 3.5 * 3.5) {
-                    printDevMessage("Guardian too far", "slayer", "seraph", "seraphRadiation")
+        if (Skytils.config.hideOthersBrokenHeartRadiation && event.entity.isInvisible && event.entity is EntityGuardian) {
+            (slayer as? SeraphSlayer)?.run {
+                if (entity.isRiding) {
+                    printDevMessage("Slayer is Riding", "slayer", "seraph", "seraphRadiation")
+                    if (event.entity.getDistanceSqToEntity(entity) > 3.5 * 3.5) {
+                        printDevMessage("Guardian too far", "slayer", "seraph", "seraphRadiation")
+                        event.isCanceled = true
+                    }
+                } else {
+                    printDevMessage("Slayer not riding, removing guardian", "slayer", "seraph", "seraphRadiation")
                     event.isCanceled = true
                 }
-            } else {
-                printDevMessage("Slayer not riding, removing guardian", "slayer", "seraph", "seraphRadiation")
-                event.isCanceled = true
+            }
+        }
+        if (Skytils.config.ignorePacifiedBlazes && event.entity is EntityBlaze && PotionEffectTimers.potionEffectTimers.containsKey("Smoldering Polarization")) {
+            (slayer as? DemonlordSlayer)?.run {
+                if (event.entity.getDistanceSqToEntity(mc.renderViewEntity) > 3 * 3 && event.entity != entity) {
+                    event.isCanceled = true
+                }
             }
         }
     }
@@ -1222,7 +1231,6 @@ object SlayerFeatures : CoroutineScope {
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTJmMjk5NDVhYTUzY2Q5NWEwOTc4YTYyZWYxYThjMTk3ODgwMzM5NWE4YWQ1YzA5MjFkOWNiZTVlMTk2YmI4YiJ9fX0="
 
             // Taken directly from https://minecraft.fandom.com/wiki/Formatting_codes#Color_codes
-            // Ashen might be too dark?
             private val attunementColors = mapOf(
                 "ASHEN" to Color(85, 85, 85),
                 "CRYSTAL" to Color(85, 255, 255),

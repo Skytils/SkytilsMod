@@ -2453,6 +2453,14 @@ object Config : Vigilant(
     var attunementDisplay = false
 
     @Property(
+        PropertyType.SWITCH, name = "Ignore pacified blazes",
+        description = "Stops rendering faraway blazes when fighting the Inferno Demonlord if Smoldering Polarization is active.\n" +
+                "Do note that you will still be able to interact with them! /skytilsupdatepotioneffects",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var ignorePacifiedBlazes = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
         description = "Blocks the sound effect played while an item is on cooldown.",
         category = "Sounds", subcategory = "Abilities"

@@ -56,6 +56,8 @@ fun setColorMultiplier(
             if (entity == it.relevantEntity) {
                 entity.hurtTime = 0
                 it.relevantColor?.let {
+                    // Colors might be too hard to see because of the entities textures and colors,
+                    // as opposed to the enderman's almost fully black texture
                     cir.returnValue = it.withAlpha(169)
                 }
             }
