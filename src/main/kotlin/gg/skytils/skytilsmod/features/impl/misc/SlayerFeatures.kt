@@ -100,7 +100,11 @@ object SlayerFeatures : CoroutineScope {
     private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
     private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
     private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
-    private val timerRegex = Regex("(?:§8§lASHEN§8 ♨8 )?§c\\d+:\\d+(?:§r)?")
+    private val BLAZE_MINIBOSSES = arrayOf("Flare Demon", "Kindleheart Demon", "Burningsoul Demon")
+    // there might be a point replacing this with §c\d+:\d+(?:§r)?$ and only partially check for matches
+    // but that requires a more extensive testing of all skyblock timers,
+    // something I am not quite particularly fond of doing
+    private val timerRegex = Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d|§4§lIMMUNE)? §c\\d+:\\d+(?:§r)?")
     private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
         set(value) {
@@ -137,7 +141,6 @@ object SlayerFeatures : CoroutineScope {
             ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
     }
 
-
     init {
         SlayerArmorDisplayElement()
         SlayerDisplayElement()
@@ -172,7 +175,6 @@ object SlayerFeatures : CoroutineScope {
             }
         }
     }
-
 
     init {
         TickTask(4, repeats = true) {
