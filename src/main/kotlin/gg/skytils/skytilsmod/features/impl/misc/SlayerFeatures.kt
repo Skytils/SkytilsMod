@@ -244,13 +244,14 @@ object SlayerFeatures : CoroutineScope {
         if (!Utils.inSkyblock) return
         if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
         lastTickHasSlayerText = hasSlayerText
-        hasSlayerText = sidebarLines.any { it == "Slay the boss!" }
+        val index = sidebarLines.indexOf("Slay the boss!")
+        hasSlayerText = index != -1
         if (!lastTickHasSlayerText && hasSlayerText) {
-            val currentTier =
-                sidebarLines.find { it.startsWith("Voidgloom Seraph") }
-                    ?.substringAfter("Voidgloom Seraph")?.drop(1)
-                    ?: ""
-            expectedMaxHp = BossHealths["Voidgloom"]?.get(currentTier) ?: 0
+            sidebarLines.elementAtOrNull(index - 1)?.let {
+                val boss = it.substringBeforeLast(" ")
+                val tier = it.substringAfterLast(" ")
+                expectedMaxHp = BossHealths[boss.substringBefore(" ")]?.get(tier) ?: 0
+            }
         }
         slayer?.tick(event)
     }
@@ -1196,7 +1197,8 @@ object SlayerFeatures : CoroutineScope {
                 return if (entity.isInvisible) {
                     if (quazii == null || typhoeus == null) {
                         null
-                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true) {
+                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true
+                        || (typhoeus?.health ?: 0f) <= 0f) {
                         quazii
                     } else {
                         typhoeus
@@ -1210,7 +1212,8 @@ object SlayerFeatures : CoroutineScope {
                 val relevantTimer = if (entity.isInvisible) {
                     if (quazii == null || typhoeus == null) {
                         null
-                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true) {
+                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true
+                        || (typhoeus?.health ?: 0f) <= 0f) {
                         quaziiTimer
                     } else {
                         typhoeusTimer
@@ -1247,29 +1250,34 @@ object SlayerFeatures : CoroutineScope {
         override fun tick(event: ClientTickEvent) {
             if (entity.isInvisible && !lastTickInvis) {
                 lastTickInvis = true
-                val demons = entity.entityWorld.getEntitiesInAABBexcluding(
-                    entity, entity.entityBoundingBox.expand(3.0, 1.5, 3.0)
-                ) { it is EntityPigZombie || (it is EntitySkeleton && it.skeletonType == 1) }
-                for (demon in demons) {
-                    val helmet = ItemUtil.getSkullTexture(demon.inventory.getOrNull(4) ?: continue)
-                    val helmetTexture = if (demon is EntitySkeleton) {
-                        quaziiTexture
-                    } else {
-                        typhoeusTexture
-                    }
-                    if (helmet == helmetTexture) {
-                        demon.entityWorld.getEntitiesInAABBexcluding(
-                            demon, demon.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                        ) {
-                            it is EntityArmorStand && it.isInvisible && it.hasCustomName()
-                                    && it.displayName.formattedText.matches(timerRegex)
-                        }.firstOrNull()?.let {
-                            if (demon is EntitySkeleton) {
-                                quazii = demon
-                                quaziiTimer = it as EntityArmorStand
-                            } else if (demon is EntityPigZombie) {
-                                typhoeus = demon
-                                typhoeusTimer = it as EntityArmorStand
+                val prevBB = entity.entityBoundingBox.expand(3.0, 1.5, 3.0)
+                TickTask(10) {
+                    val demons = entity.entityWorld.getEntitiesInAABBexcluding(
+                        entity, prevBB
+                    ) { it is EntityPigZombie || (it is EntitySkeleton && it.skeletonType == 1) }
+                    for (demon in demons) {
+                        val helmet = ItemUtil.getSkullTexture(demon.inventory.getOrNull(4) ?: continue)
+                        val helmetTexture = if (demon is EntitySkeleton) {
+                            quaziiTexture
+                        } else {
+                            typhoeusTexture
+                        }
+                        if (helmet == helmetTexture) {
+                            demon.entityWorld.getEntitiesInAABBexcluding(
+                                demon, demon.entityBoundingBox.expand(0.2, 3.0, 0.2)
+                            ) {
+                                it is EntityArmorStand && it.isInvisible && it.hasCustomName()
+                                        && it.displayName.formattedText.matches(timerRegex)
+                            }.firstOrNull()?.let {
+                                if (demon is EntitySkeleton) {
+                                    quazii = demon
+                                    quaziiTimer = it as EntityArmorStand
+                                    printDevMessage("Quazii", "slayer")
+                                } else if (demon is EntityPigZombie) {
+                                    typhoeus = demon
+                                    typhoeusTimer = it as EntityArmorStand
+                                    printDevMessage("Typhoeus", "slayer")
+                                }
                             }
                         }
                     }
@@ -1277,7 +1285,6 @@ object SlayerFeatures : CoroutineScope {
             } else if (!entity.isInvisible && lastTickInvis) {
                 lastTickInvis = false
             }
-            super.tick(event)
         }
 
         override fun entityJoinWorld(event: EntityJoinWorldEvent) {
