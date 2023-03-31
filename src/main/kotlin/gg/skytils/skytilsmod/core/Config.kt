@@ -2461,6 +2461,13 @@ object Config : Vigilant(
     var ignorePacifiedBlazes = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show a warning when in Inferno Demonlord fire",
+        description = "Shows a warning when you are standing on Inferno Demonlord's fire.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var blazeFireWarning = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
         description = "Blocks the sound effect played while an item is on cooldown.",
         category = "Sounds", subcategory = "Abilities"

@@ -61,6 +61,7 @@ import net.minecraft.entity.monster.*
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.Item
 import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
@@ -1230,6 +1231,8 @@ object SlayerFeatures : CoroutineScope {
         var typhoeus: EntityPigZombie? = null
         var typhoeusTimer: EntityArmorStand? = null
 
+        val activeFire = mutableSetOf<BlockPos>()
+
         companion object {
             private const val thrownTexture =
                 "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
@@ -1245,6 +1248,29 @@ object SlayerFeatures : CoroutineScope {
                 "AURIC" to Color(255, 255, 85),
                 "SPIRIT" to Color(255, 255, 255)
             )
+
+            private val blazeFirePingTask = TickTask(4, repeats = true, register = false) {
+                if (Utils.inSkyblock && Skytils.config.blazeFireWarning && mc.thePlayer != null) {
+                    (slayer as? DemonlordSlayer)?.let {
+                        if (!mc.thePlayer.onGround) return@TickTask
+                        val under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
+                        if (under in it.activeFire) {
+                            // The reason this is a title and not just sound is because there is much less time
+                            // to react to the pit warning than a rev5 tnt ping
+                            createTitle("§c§lFire pit!", 4)
+                            SoundQueue.addToQueue("random.orb", 1f)
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun set() {
+            blazeFirePingTask.register()
+        }
+
+        override fun unset() {
+            blazeFirePingTask.unregister()
         }
 
         override fun tick(event: ClientTickEvent) {
@@ -1315,6 +1341,15 @@ object SlayerFeatures : CoroutineScope {
             ) {
                 thrownEntity = null
                 totemPos = event.pos
+            }
+
+            // This also triggers on the totem, could check for yellow clay replacing red clay,
+            // but might be better to not delay anything
+            if (event.update.block == Blocks.stained_hardened_clay
+                && event.update.getValue(BlockColored.COLOR) == EnumDyeColor.RED) {
+                    activeFire.add(event.pos)
+            } else if (event.old.block == Blocks.fire && event.update.block == Blocks.air) {
+                activeFire.remove(event.pos.down())
             }
         }
     }
