@@ -254,6 +254,7 @@ class Skytils {
             UpdateChecker,
 
             AlignmentTaskSolver,
+            AntiFool,
             ArmorColor,
             AuctionData,
             AuctionPriceOverlay,
