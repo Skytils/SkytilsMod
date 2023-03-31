@@ -23,18 +23,24 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorS3BPacketScor
 import gg.skytils.skytilsmod.utils.ScoreboardUtil
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
-import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Random
 
 object AntiFool {
-    private val CHARS = (('0'..'9')+('a'..'f')+'z')
+    private val CHARS = (('0'..'9') + ('a'..'f') + 'z' + 'k')
+    private var e = CHARS.random()
+
+    @SubscribeEvent
+    fun changeStuff(event: WorldEvent.Load) {
+        e = CHARS.random()
+    }
 
     @SubscribeEvent
     fun fixStuff(event: MainReceivePacketEvent<*, *>) {
         (event.packet as? S3BPacketScoreboardObjective)?.let { packet ->
-            if (ScoreboardUtil.cleanSB(packet.func_149337_d().stripControlCodes()) == "SKIBLOCK") {
-                (packet as AccessorS3BPacketScoreboardObjective).setObjectiveValue("§l§${CHARS.random()}SKYBLOCK")
+            if (ScoreboardUtil.cleanSB(packet.func_149337_d().stripControlCodes()).contains("SKIBLOCK")) {
+                (packet as AccessorS3BPacketScoreboardObjective).setObjectiveValue("§${e}§lSKYBLOCK")
             }
         }
     }
