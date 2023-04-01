@@ -42,7 +42,7 @@ object VisitorHelper {
     private val inGarden
         get() = Utils.inSkyblock && SBInfo.mode == SkyblockIsland.TheGarden.mode
 
-    private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+) §8x(?<quantity>[\\d,]+)\$")
+    private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+)( §8x(?<quantity>[\\d,]+))?\$")
     private val rewardRegex = Regex("^\\s+§8\\+(?<reward>§.+)\$")
     private val copperRewardRegex = Regex("^§c(?<count>[\\d,]+) Copper\$")
     private val textLines = mutableListOf<String>()
@@ -95,7 +95,7 @@ object VisitorHelper {
                         val formattedName = it["formattedItemName"]!!.value
                         val unformattedName = formattedName.stripControlCodes()
                         val itemId = ItemFeatures.itemIdToNameLookup.entries.find { it.value == unformattedName }?.key
-                        val quantity = it["quantity"]!!.value.replace(",", "").toInt()
+                        val quantity = it["quantity"]?.value?.replace(",", "")?.toInt() ?: 1
                         val value = (AuctionData.lowestBINs[itemId] ?: 0.0) * quantity
                         textLines.add("$formattedName §8x$quantity - §a${NumberUtil.format(value)}")
                         totalItemCost += value
