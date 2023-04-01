@@ -54,7 +54,9 @@ object BoulderSolver {
     private var job: Job? = null
 
     init {
-        TickTask(20, repeats = true, task = ::update)
+        TickTask(20, repeats = true, task = {
+            update()
+        })
     }
 
     @SubscribeEvent
