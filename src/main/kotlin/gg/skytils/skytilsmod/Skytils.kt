@@ -250,7 +250,7 @@ class Skytils {
             MayorInfo,
             SBInfo,
             SoundQueue,
-            TickTaskManager,
+            TickTask,
             UpdateChecker,
 
             AlignmentTaskSolver,

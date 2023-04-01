@@ -18,9 +18,9 @@
 
 package gg.skytils.skytilsmod.core
 
-import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Boolean = true, val task: () -> T) {
     var remainingTicks = ticks
@@ -32,13 +32,8 @@ class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Bo
             register()
     }
 
-    fun register() = Utils.checkThreadAndQueue {
-        TickTaskManager.tasks.add(this)
-    }
-
-    fun unregister() = Utils.checkThreadAndQueue {
-        TickTaskManager.tasks.remove(this)
-    }
+    fun register() = tasks.add(this)
+    fun unregister() = tasks.remove(this)
 
     internal fun complete() = try {
         callback(task())
@@ -53,22 +48,22 @@ class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Bo
     fun onFailure(block: (Throwable) -> Unit) = apply {
         failure = block
     }
-}
 
-object TickTaskManager {
-    val tasks = mutableSetOf<TickTask<*>>()
+    companion object {
+        private val tasks = ConcurrentLinkedQueue<TickTask<*>>()
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
-        tasks.removeAll {
-            if (it.remainingTicks-- <= 0) {
-                it.complete()
-                if (it.repeats) {
-                    it.remainingTicks = it.ticks
-                } else return@removeAll true
+        @SubscribeEvent
+        fun onTick(event: TickEvent.ClientTickEvent) {
+            if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
+            tasks.removeAll {
+                if (it.remainingTicks-- <= 0) {
+                    it.complete()
+                    if (it.repeats) {
+                        it.remainingTicks = it.ticks
+                    } else return@removeAll true
+                }
+                return@removeAll false
             }
-            return@removeAll false
         }
     }
 }
