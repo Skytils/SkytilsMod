@@ -18,34 +18,48 @@
 
 package gg.skytils.skytilsmod.utils.tasks
 
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.utils.Utils
-import kotlinx.coroutines.*
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-val mcDispatcher = (mc as Executor).asCoroutineDispatcher()
-val mcScope = CoroutineScope(mcDispatcher) + SupervisorJob()
-
-val mcLaunch = mcScope::launch
-
-class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Boolean = true, val task: () -> T) {
-    var remainingTicks = ticks
+class TickTask<T>(
+    val ticks: Int = 0,
+    val repeats: Boolean = false,
+    register: Boolean = true,
+    val task: (CoroutineContext) -> T
+) {
     private var callback: (T) -> Unit = {}
     private var failure: (Throwable) -> Unit = {}
+    private var job: Job? = null
+    private val delayDuration = ticks * 50L
+
 
     init {
-        if (register)
+        if (register) {
             register()
+        }
     }
 
-    fun register() = tasks.add(this)
-    fun unregister() = tasks.remove(this)
+    fun register() {
+        if (job != null) error("Task is already registered!")
+        job = mcScope.launch {
+            while (isActive) {
+                delay(delayDuration)
+                complete(coroutineContext)
+                if (!repeats) break
+            }
+        }
+    }
 
-    internal fun complete() = try {
-        callback(task())
+    fun unregister() {
+        job?.cancel() ?: error("Task is not registered!")
+        job = null
+    }
+
+    private fun complete(ctx: CoroutineContext) = try {
+        callback(task(ctx))
     } catch (t: Throwable) {
         failure(t)
     }
@@ -56,23 +70,5 @@ class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Bo
 
     fun onFailure(block: (Throwable) -> Unit) = apply {
         failure = block
-    }
-
-    companion object {
-        private val tasks = ConcurrentLinkedQueue<TickTask<*>>()
-
-        @SubscribeEvent
-        fun onTick(event: TickEvent.ClientTickEvent) {
-            if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
-            tasks.removeAll {
-                if (it.remainingTicks-- <= 0) {
-                    it.complete()
-                    if (it.repeats) {
-                        it.remainingTicks = it.ticks
-                    } else return@removeAll true
-                }
-                return@removeAll false
-            }
-        }
     }
 }
