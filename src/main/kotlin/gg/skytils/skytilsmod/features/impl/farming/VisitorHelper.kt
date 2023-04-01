@@ -37,7 +37,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 object VisitorHelper {
     private val inGarden
@@ -45,13 +44,14 @@ object VisitorHelper {
 
     private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+) §8x(?<quantity>[\\d,]+)\$")
     private val rewardRegex = Regex("^\\s+§8\\+(?<reward>§.+)\$")
+    private val copperRewardRegex = Regex("^§c(?<count>[\\d,]+) Copper\$")
     private val textLines = mutableListOf<String>()
-    private var totalOfferValue: Double = 0.0
+    private var totalItemCost: Double = 0.0
 
     @SubscribeEvent
     fun onGuiClose(event: GuiContainerEvent.CloseWindowEvent) {
         textLines.clear()
-        totalOfferValue = 0.0
+        totalItemCost = 0.0
     }
 
     init {
@@ -59,7 +59,7 @@ object VisitorHelper {
             if (!Skytils.config.visitorOfferHelper) return@TickTask
 
             textLines.clear()
-            totalOfferValue = 0.0
+            totalItemCost = 0.0
 
             if (!inGarden) return@TickTask
 
@@ -69,6 +69,8 @@ object VisitorHelper {
             val acceptOffer: ItemStack? = container.getSlot(29).stack
             if (npcSummary?.displayName.stripControlCodes() == chestName.stripControlCodes() && acceptOffer?.displayName == "§aAccept Offer") {
                 val lore = ItemUtil.getItemLore(acceptOffer)
+                var copper = 0
+
 
                 textLines.add("§eRewards:")
                 lore.dropWhile {
@@ -79,6 +81,9 @@ object VisitorHelper {
                     rewardRegex.find(it)!!.groups["reward"]!!.value
                 }.forEach {
                     textLines.add(it)
+                    copperRewardRegex.find(it)?.also {
+                        copper += it.groups["count"]!!.value.replace(",", "").toInt()
+                    }
                 }
 
                 textLines.add("")
@@ -93,8 +98,15 @@ object VisitorHelper {
                         val quantity = it["quantity"]!!.value.replace(",", "").toInt()
                         val value = (AuctionData.lowestBINs[itemId] ?: 0.0) * quantity
                         textLines.add("$formattedName §8x$quantity - §a${NumberUtil.format(value)}")
-                        totalOfferValue += value
+                        totalItemCost += value
                     }
+                if (totalItemCost > 0) {
+                    textLines.add("§eTotal Cost: §a${NumberUtil.format(totalItemCost)}")
+
+                    if (copper > 0) {
+                        textLines.add("§eCoins/Copper: §a${NumberUtil.format(totalItemCost / copper)}")
+                    }
+                }
             }
         }
     }
@@ -110,7 +122,6 @@ object VisitorHelper {
 
         stack.runWithGlobalState {
             textLines.forEachIndexed { i, str -> drawLine(i, str) }
-            drawLine(textLines.size, "§eTotal Value: §a${NumberUtil.format(totalOfferValue)}")
         }
         stack.pop()
     }
