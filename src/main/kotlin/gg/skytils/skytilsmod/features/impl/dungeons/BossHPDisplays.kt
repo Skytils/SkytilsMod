@@ -161,7 +161,7 @@ object BossHPDisplays {
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "Guardian Respawn Timer Here",
-                if (leftAlign) 0f else scaleWidth,
+                if (leftAlign) 0f else 0f + width,
                 0f,
                 CommonColors.WHITE,
                 alignment,

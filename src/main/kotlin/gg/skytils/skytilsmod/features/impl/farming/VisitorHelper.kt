@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.features.impl.farming
 
-import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
@@ -36,6 +35,7 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -101,16 +101,17 @@ object VisitorHelper {
 
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (textLines.isEmpty()) return
+    fun onBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (textLines.isEmpty() || event.gui !is GuiChest) return
         val stack = UMatrixStack()
         stack.push()
-        stack.translate(VisitorHelperDisplay.scaleX, VisitorHelperDisplay.scaleX, 0f)
+        stack.translate(VisitorHelperDisplay.scaleX, VisitorHelperDisplay.scaleY, 0f)
         stack.scale(VisitorHelperDisplay.scale, VisitorHelperDisplay.scale, 0f)
 
-        textLines.forEachIndexed { i, str -> drawLine(stack, i, str) }
-        drawLine(stack, textLines.size, "§eTotal Value: §a${NumberUtil.format(totalOfferValue)}")
-
+        stack.runWithGlobalState {
+            textLines.forEachIndexed { i, str -> drawLine(i, str) }
+            drawLine(textLines.size, "§eTotal Value: §a${NumberUtil.format(totalOfferValue)}")
+        }
         stack.pop()
     }
 
@@ -127,7 +128,7 @@ object VisitorHelper {
             get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
                     (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)
         internal val textPosX: Float
-            get() = if (rightAlign) scaleWidth else 0f
+            get() = if (rightAlign) width.toFloat() else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
             get() = if (rightAlign) SmartFontRenderer.TextAlignment.RIGHT_LEFT
             else SmartFontRenderer.TextAlignment.LEFT_RIGHT
@@ -161,14 +162,14 @@ object VisitorHelper {
         }
     }
 
-    private fun drawLine(matrixStack: UMatrixStack, index: Int, str: String) {
-        UGraphics.drawString(
-            matrixStack, str,
-            if (VisitorHelperDisplay.rightAlign) VisitorHelperDisplay.textPosX - UGraphics.getStringWidth(
-                str
-            ) else VisitorHelperDisplay.textPosX,
+    private fun drawLine(index: Int, str: String) {
+        ScreenRenderer.fontRenderer.drawString(
+            str,
+            VisitorHelperDisplay.textPosX,
             (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
-            Color.WHITE.rgb, true
+            CommonColors.WHITE,
+            VisitorHelperDisplay.alignment,
+            SmartFontRenderer.TextShadow.NORMAL
         )
     }
 
