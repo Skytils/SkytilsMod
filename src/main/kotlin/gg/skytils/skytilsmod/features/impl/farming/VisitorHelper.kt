@@ -44,7 +44,7 @@ object VisitorHelper {
         get() = Utils.inSkyblock && SBInfo.mode == SkyblockIsland.TheGarden.mode
 
     private val requiredItemRegex = Regex("^\\s+(?<formattedItemName>.+) §8x(?<quantity>[\\d,]+)\$")
-    private val rewardRegex = Regex("^\\s+ §8+(?<reward>§.+)\$")
+    private val rewardRegex = Regex("^\\s+§8\\+(?<reward>§.+)\$")
     private val textLines = mutableListOf<String>()
     private var totalOfferValue: Double = 0.0
 
