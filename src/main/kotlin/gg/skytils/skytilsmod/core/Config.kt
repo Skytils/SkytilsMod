@@ -2453,7 +2453,7 @@ object Config : Vigilant(
     var attunementDisplay = false
 
     @Property(
-        PropertyType.SWITCH, name = "Ignore pacified blazes",
+        PropertyType.SWITCH, name = "Ignore Pacified Blazes",
         description = "Stops rendering faraway blazes when fighting the Inferno Demonlord if Smoldering Polarization is active.\n" +
                 "Do note that you will still be able to interact with them! /skytilsupdatepotioneffects",
         category = "Slayer", subcategory = "Inferno Demonlord"
@@ -2461,7 +2461,7 @@ object Config : Vigilant(
     var ignorePacifiedBlazes = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show a warning when in Inferno Demonlord fire",
+        type = PropertyType.SWITCH, name = "Show a Warning when in Inferno Demonlord Fire",
         description = "Shows a warning when you are standing on Inferno Demonlord's fire.",
         category = "Slayer", subcategory = "Inferno Demonlord"
     )
