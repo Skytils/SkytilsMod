@@ -46,11 +46,9 @@ object LockOrb {
         }
         for (orbEntity in orbs) {
             if (orbEntity == null) return
-            println(orbEntity.displayName.formattedText)
             val orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.displayName.formattedText) ?: continue
             if (orb.ordinal >= heldOrb.ordinal) {
                 orbTimeRegex.find(orbEntity.displayName.formattedText)?.destructured?.let { (seconds) ->
-                    println("Seconds: $seconds")
                     if (seconds.toInt() >= Skytils.config.powerOrbDuration) {
                         if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= orb.radius.pow(2.0)) {
                             mc.thePlayer.playSound("random.orb", 0.8f, 1f)

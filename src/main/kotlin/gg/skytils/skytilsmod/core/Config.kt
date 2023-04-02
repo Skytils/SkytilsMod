@@ -2021,7 +2021,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.NUMBER, name = "Power Orb Lock Duration",
-        description = "Needs Power Orb Lock to be active. Allows overwriting a power orb, if it has less time left than this option.",
+        description = "Allows overwriting a power orb, if it has less time left than this option.",
         min = 1, max = 120,
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
@@ -2893,6 +2893,7 @@ object Config : Vigilant(
             "seraphNormalPhaseColor"
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
+        addDependency("powerOrbDuration", "powerOrbLock")
         addDependency("markDirtyItems", "dupeTracker")
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
