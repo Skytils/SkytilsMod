@@ -119,13 +119,29 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.2.4")))
-    shadowMe(ktor("serialization-kotlinx-json-jvm"))
-    shadowMe(ktor("client-core-jvm"))
-    shadowMe(ktor("client-cio-jvm"))
-    shadowMe(ktor("client-content-negotiation-jvm"))
-    shadowMe(ktor("client-encoding-jvm"))
-    shadowMe(ktor("serialization-gson-jvm"))
+    shadowMe(platform(ktor("bom", "2.2.4", addSuffix = false)))
+
+    shadowMe(ktor("serialization-kotlinx-json"))
+    shadowMe(ktor("serialization-gson"))
+
+    shadowMe(ktorClient("core"))
+    shadowMe(ktorClient("cio"))
+    shadowMe(ktorClient("content-negotiation"))
+    shadowMe(ktorClient("encoding"))
+
+    shadowMe(ktorServer("core"))
+    shadowMe(ktorServer("cio"))
+    shadowMe(ktorServer("content-negotiation"))
+    shadowMe(ktorServer("compression"))
+    shadowMe(ktorServer("cors"))
+    shadowMe(ktorServer("conditional-headers"))
+    shadowMe(ktorServer("auto-head-response"))
+    shadowMe(ktorServer("default-headers"))
+    shadowMe(ktorServer("host-common"))
+    shadowMe(ktorServer("auth"))
+
+
+
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
@@ -268,5 +284,9 @@ signing {
  * @param module simple name of the Ktor module, for example "client-core".
  * @param version optional desired version, unspecified if null.
  */
-fun DependencyHandler.ktor(module: String, version: String? = null) =
-    "io.ktor:ktor-$module${version?.let { ":$version" } ?: ""}"
+fun DependencyHandler.ktor(module: String, version: String? = null, addSuffix: Boolean = true) =
+    "io.ktor:ktor-$module${if (addSuffix) "-jvm" else ""}${version?.let { ":$version" } ?: ""}"
+
+fun DependencyHandler.ktorClient(module: String, version: String? = null) = ktor("client-${module}", version)
+
+fun DependencyHandler.ktorServer(module: String, version: String? = null) = ktor("server-${module}", version)
