@@ -28,6 +28,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.pow
 
 object LockOrb {
+    private val orbTimeRegex = Regex(" §e(?<seconds>\\d+)s§r")
+
     @SubscribeEvent
     fun onPacket(event: PacketEvent.SendEvent) {
         if (!Utils.inSkyblock || !Skytils.config.powerOrbLock) return
@@ -44,12 +46,17 @@ object LockOrb {
         }
         for (orbEntity in orbs) {
             if (orbEntity == null) return
-            val orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.displayName.formattedText)
-            if (orb != null && orb.ordinal >= heldOrb.ordinal) {
-                if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= orb.radius.pow(2.0)) {
-                    mc.thePlayer.playSound("random.orb", 0.8f, 1f)
-                    event.isCanceled = true
-                    break
+            println(orbEntity.displayName.formattedText)
+            val orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.displayName.formattedText) ?: continue
+            if (orb.ordinal >= heldOrb.ordinal) {
+                orbTimeRegex.find(orbEntity.displayName.formattedText)?.destructured?.let { (seconds) ->
+                    println("Seconds: $seconds")
+                    if (seconds.toInt() >= Skytils.config.powerOrbDuration) {
+                        if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= orb.radius.pow(2.0)) {
+                            mc.thePlayer.playSound("random.orb", 0.8f, 1f)
+                            event.isCanceled = true
+                        }
+                    }
                 }
             }
         }
