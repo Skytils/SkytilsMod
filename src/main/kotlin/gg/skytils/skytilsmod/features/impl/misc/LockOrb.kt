@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.pow
 
 object LockOrb {
-    private val orbTimeRegex = Regex(" §e(?<seconds>\\d+)s§r")
+    private val orbTimeRegex = Regex("§e(?<seconds>\\d+)s§r")
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.SendEvent) {
