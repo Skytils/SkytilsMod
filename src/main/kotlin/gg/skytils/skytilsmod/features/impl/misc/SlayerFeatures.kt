@@ -479,7 +479,7 @@ object SlayerFeatures : CoroutineScope {
         (slayer as? SeraphSlayer)?.run {
             if (entity.isRiding) {
                 printDevMessage("Slayer is Riding", "slayer", "seraph", "seraphRadiation")
-                if (event.entity.getDistanceSqToEntity(entity) > 2 * 2) {
+                if (event.entity.getDistanceSqToEntity(entity) > 3.5 * 3.5) {
                     printDevMessage("Guardian too far", "slayer", "seraph", "seraphRadiation")
                     event.isCanceled = true
                 }
