@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.localapi.routes
 
 import gg.skytils.skytilsmod.core.PersistentSave
+import gg.skytils.skytilsmod.features.impl.handlers.CategoryList
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
 import io.ktor.http.*
@@ -29,13 +30,13 @@ import io.ktor.server.routing.*
 fun Route.registerWaypointRoutes() = apply {
     route("/waypoints") {
         get {
-            context.respond(Waypoints.categories)
+            context.respond(CategoryList(Waypoints.categories))
         }
         post {
             try {
-                val body = context.receive<Set<WaypointCategory>>()
+                val body = context.receive<CategoryList>()
                 Waypoints.categories.clear()
-                Waypoints.categories.addAll(body)
+                Waypoints.categories.addAll(body.categories)
                 PersistentSave.markDirty<Waypoints>()
                 Waypoints.computeVisibleWaypoints()
                 context.respond(HttpStatusCode.OK)
