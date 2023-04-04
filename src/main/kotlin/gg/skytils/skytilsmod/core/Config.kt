@@ -63,6 +63,13 @@ object Config : Vigilant(
     var commandAliasMode = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Auto Start Local API",
+        description = "Automatically launches the Local API on game startup.",
+        category = "General", subcategory = "Local API",
+    )
+    var localAPIAutoStart = false
+
+    @Property(
         type = PropertyType.TEXT, name = "Local API Password",
         description = "Sets the password for the local API. No password will cause all requests to be rejected.",
         category = "General", subcategory = "Local API",

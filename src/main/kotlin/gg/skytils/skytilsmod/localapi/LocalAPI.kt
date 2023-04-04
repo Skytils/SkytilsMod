@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.localapi
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.localapi.routes.registerMiscRoutes
 import gg.skytils.skytilsmod.localapi.routes.registerWaypointRoutes
 import io.ktor.http.*
@@ -35,56 +34,78 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.launch
 
 object LocalAPI {
     const val port = 56969
     const val version = 1
+    private var server: ApplicationEngine? = null
+
+    fun startServer() {
+        if (server != null) error("Server is already running!")
+        Skytils.IO.launch {
+            server = embeddedServer(CIO, port = port, host = "127.0.0.1", module = Application::module).start()
+        }
+    }
+
+    fun stopServer() {
+        Skytils.IO.launch {
+            server?.stop() ?: error("Server wasn't started!")
+            server = null
+        }
+    }
 
     init {
-        embeddedServer(CIO, port = port, host = "127.0.0.1", module = {
-            install(ContentNegotiation) {
-                json(Skytils.json)
-            }
-            install(DefaultHeaders) {
-                header(HttpHeaders.Server, "Skytils/${Skytils.VERSION}")
-            }
-            install(CORS) {
-                allowHeader(HttpHeaders.Authorization)
-                allowCredentials = true
-                anyHost()
-            }
-            install(ConditionalHeaders)
-            install(Compression) {
-                gzip {
-                    priority = 1.0
-                    minimumSize(1024)
-                }
-                deflate {
-                    minimumSize(1024)
-                }
-            }
-            install(AutoHeadResponse)
+        if (Skytils.config.localAPIAutoStart) {
+            startServer()
+        }
+    }
+}
 
-            authentication {
-                basic(name = "auth") {
-                    realm = "Skytils API"
-                    validate { credentials ->
-                        if (credentials.password == Config.localAPIPassword && Config.localAPIPassword.isNotEmpty()) {
-                            UserIdPrincipal(credentials.name)
-                        } else {
-                            null
-                        }
-                    }
+private fun Application.module() {
+    install(ContentNegotiation) {
+        json(Skytils.json)
+    }
+    install(DefaultHeaders) {
+        header(HttpHeaders.Server, "Skytils/${Skytils.VERSION}")
+    }
+    install(CORS) {
+        allowHeader(HttpHeaders.Authorization)
+        allowCredentials = true
+        anyHost()
+    }
+    install(ConditionalHeaders)
+    install(Compression) {
+        gzip {
+            priority = 1.0
+            minimumSize(1024)
+        }
+        deflate {
+            minimumSize(1024)
+        }
+    }
+    install(AutoHeadResponse)
+
+    authentication {
+        basic(name = "auth") {
+            realm = "Skytils API"
+            validate { credentials ->
+                if (credentials.password == Skytils.config.localAPIPassword && Skytils.config.localAPIPassword.isNotEmpty()) {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
                 }
             }
-            routing {
-                route("/api") {
-                    authenticate("auth", strategy = AuthenticationStrategy.Required) {
-                        registerWaypointRoutes()
-                    }
-                    registerMiscRoutes()
+        }
+    }
+    routing {
+        route("/api") {
+            authenticate("auth", strategy = AuthenticationStrategy.Required) {
+                route("/skytils") {
+                    registerWaypointRoutes()
                 }
             }
-        }).start()
+            registerMiscRoutes()
+        }
     }
 }
