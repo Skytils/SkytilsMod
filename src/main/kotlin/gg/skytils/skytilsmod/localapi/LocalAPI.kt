@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.localapi
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.Config
+import gg.skytils.skytilsmod.localapi.routes.registerMiscRoutes
 import gg.skytils.skytilsmod.localapi.routes.registerWaypointRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -37,6 +38,7 @@ import io.ktor.server.routing.*
 
 object LocalAPI {
     const val port = 56969
+    const val version = 1
 
     init {
         embeddedServer(CIO, port = port, host = "127.0.0.1", module = {
@@ -76,10 +78,11 @@ object LocalAPI {
                 }
             }
             routing {
-                authenticate("auth", strategy = AuthenticationStrategy.Required) {
-                    route("/api") {
+                route("/api") {
+                    authenticate("auth", strategy = AuthenticationStrategy.Required) {
                         registerWaypointRoutes()
                     }
+                    registerMiscRoutes()
                 }
             }
         }).start()
