@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.localapi.routes
 
+import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
 import io.ktor.http.*
@@ -34,6 +35,8 @@ fun Route.registerWaypointRoutes() = apply {
             val body = context.receive<Set<WaypointCategory>>()
             Waypoints.categories.clear()
             Waypoints.categories.addAll(body)
+            PersistentSave.markDirty<Waypoints>()
+            Waypoints.computeVisibleWaypoints()
             context.respond(HttpStatusCode.OK)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -44,6 +47,8 @@ fun Route.registerWaypointRoutes() = apply {
         try {
             val body = context.receive<Set<WaypointCategory>>()
             Waypoints.categories.addAll(body)
+            PersistentSave.markDirty<Waypoints>()
+            Waypoints.computeVisibleWaypoints()
             context.respond(HttpStatusCode.OK)
         } catch (e: Exception) {
             e.printStackTrace()

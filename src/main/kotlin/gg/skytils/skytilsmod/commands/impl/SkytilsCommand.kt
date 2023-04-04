@@ -41,8 +41,11 @@ import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.gui.profile.ProfileGui
+import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.utils.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
@@ -60,6 +63,20 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
         }
         when (args[0].lowercase()) {
             "config" -> Skytils.config.openGUI()
+            "localapi" -> {
+                runCatching {
+                    when (args.getOrNull(1)?.lowercase()) {
+                        "on" -> LocalAPI.startServer()
+                        "off" -> LocalAPI.stopServer()
+                        else -> UChat.chat("$prefix §b/skytils localapi <on/off>")
+                    }
+                }.onFailure {
+                    UChat.chat("$failPrefix §cThe LocalAPI server emitted an error: ${it.message}.")
+                }.onSuccess {
+                    UChat.chat("$successPrefix §bThe LocalAPI server has been modified.")
+                }
+            }
+
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
                     "$prefix §bToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()
@@ -191,7 +208,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "swaphub" -> {
                 if (Utils.inSkyblock) {
                     Skytils.sendMessageQueue.add("/warpforge")
-                    CoroutineScope(Dispatchers.Default).launch {
+                    Skytils.launch {
                         delay(2000)
                         Skytils.sendMessageQueue.add("/warp ${args.getOrNull(1) ?: "hub"}")
                     }
