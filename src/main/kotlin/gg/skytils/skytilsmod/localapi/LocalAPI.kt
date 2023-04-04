@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.localapi
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.Config
+import gg.skytils.skytilsmod.localapi.routes.registerWaypointRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -77,6 +78,7 @@ object LocalAPI {
             routing {
                 authenticate("auth", strategy = AuthenticationStrategy.Required) {
                     route("/api") {
+                        registerWaypointRoutes()
                     }
                 }
             }
