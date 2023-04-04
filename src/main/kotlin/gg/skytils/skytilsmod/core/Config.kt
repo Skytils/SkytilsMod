@@ -63,6 +63,14 @@ object Config : Vigilant(
     var commandAliasMode = 0
 
     @Property(
+        type = PropertyType.TEXT, name = "Local API Password",
+        description = "Sets the password for the local API. No password will cause all requests to be rejected.",
+        category = "General", subcategory = "Local API",
+        protectedText = true
+    )
+    var localAPIPassword = ""
+
+    @Property(
         type = PropertyType.BUTTON, name = "Join the Skytils Discord",
         description = "Join the Skytils Discord server for help using any of the features.",
         category = "General", subcategory = "Other",
