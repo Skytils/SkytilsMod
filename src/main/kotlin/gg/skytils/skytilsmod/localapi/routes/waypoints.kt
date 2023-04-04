@@ -27,32 +27,34 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.registerWaypointRoutes() = apply {
-    get {
-        context.respond(Waypoints.categories)
-    }
-    post {
-        try {
-            val body = context.receive<Set<WaypointCategory>>()
-            Waypoints.categories.clear()
-            Waypoints.categories.addAll(body)
-            PersistentSave.markDirty<Waypoints>()
-            Waypoints.computeVisibleWaypoints()
-            context.respond(HttpStatusCode.OK)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            context.respond(HttpStatusCode.BadRequest)
+    route("/waypoints") {
+        get {
+            context.respond(Waypoints.categories)
         }
-    }
-    put {
-        try {
-            val body = context.receive<Set<WaypointCategory>>()
-            Waypoints.categories.addAll(body)
-            PersistentSave.markDirty<Waypoints>()
-            Waypoints.computeVisibleWaypoints()
-            context.respond(HttpStatusCode.OK)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            context.respond(HttpStatusCode.BadRequest)
+        post {
+            try {
+                val body = context.receive<Set<WaypointCategory>>()
+                Waypoints.categories.clear()
+                Waypoints.categories.addAll(body)
+                PersistentSave.markDirty<Waypoints>()
+                Waypoints.computeVisibleWaypoints()
+                context.respond(HttpStatusCode.OK)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                context.respond(HttpStatusCode.BadRequest)
+            }
+        }
+        put {
+            try {
+                val body = context.receive<Set<WaypointCategory>>()
+                Waypoints.categories.addAll(body)
+                PersistentSave.markDirty<Waypoints>()
+                Waypoints.computeVisibleWaypoints()
+                context.respond(HttpStatusCode.OK)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                context.respond(HttpStatusCode.BadRequest)
+            }
         }
     }
 }
