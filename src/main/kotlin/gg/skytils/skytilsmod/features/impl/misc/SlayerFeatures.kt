@@ -249,9 +249,9 @@ object SlayerFeatures : CoroutineScope {
         hasSlayerText = index != -1
         if (!lastTickHasSlayerText && hasSlayerText) {
             sidebarLines.elementAtOrNull(index - 1)?.let {
-                val boss = it.substringBeforeLast(" ")
+                val boss = it.substringBefore(" ")
                 val tier = it.substringAfterLast(" ")
-                expectedMaxHp = BossHealths[boss.substringBefore(" ")]?.get(tier) ?: 0
+                expectedMaxHp = BossHealths[boss]?.get(tier) ?: 0
             }
         }
         slayer?.tick(event)
