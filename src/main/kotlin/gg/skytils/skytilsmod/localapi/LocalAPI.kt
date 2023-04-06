@@ -33,6 +33,7 @@ import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 
@@ -99,6 +100,9 @@ private fun Application.module() {
         }
     }
     routing {
+        get {
+            context.respond("Your Skytils Local API is running correctly! (API v${LocalAPI.version}, Skytils v${Skytils.VERSION}")
+        }
         route("/api") {
             authenticate("auth", strategy = AuthenticationStrategy.Required) {
                 route("/skytils") {
