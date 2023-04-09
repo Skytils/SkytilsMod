@@ -83,7 +83,10 @@ class OptionsGui :
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            mc.displayGuiScreen(ElementaEditingGui())
+            mc.displayGuiScreen(
+                if (it.mouseButton == 1) ElementaEditingGui()
+                else LocationEditGui()
+            )
         }
         SimpleButton("Edit Key Shortcuts").childOf(window).constrain {
             x = CenterConstraint()
