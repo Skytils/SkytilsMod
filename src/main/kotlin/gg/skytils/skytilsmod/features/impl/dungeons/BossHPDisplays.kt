@@ -184,7 +184,7 @@ object BossHPDisplays {
 
     class GiantHPElement : GuiElement("Show Giant HP", x = 200, y = 30) {
         override fun render() {
-            if (giantNames.isNotEmpty()) {
+            if (toggled && giantNames.isNotEmpty()) {
                 RenderUtil.drawAllInList(
                     this,
                     (giantNames.takeIf { it.size == 1 } ?: giantNames.filter { !it.first.contains("Sadan") }).map {
