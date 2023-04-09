@@ -23,7 +23,6 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -41,6 +40,7 @@ import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
+import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -86,6 +86,7 @@ object ItemFeatures {
     val itemIdToNameLookup = hashMapOf<String, String>()
     val sellPrices = HashMap<String, Double>()
     val bitCosts = HashMap<String, Int>()
+    val copperCosts = HashMap<String, Int>()
     val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
     var selectedArrow = ""
     var soulflowAmount = ""
@@ -299,7 +300,7 @@ object ItemFeatures {
             }
         }
         if (itemId != null) {
-            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit) {
+            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit || Skytils.config.showCoinsPerCopper) {
                 val auctionIdentifier = if (isSuperpairsReward) itemId else AuctionData.getIdentifier(item)
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
@@ -336,6 +337,31 @@ object ItemFeatures {
                                 }
                             }
                             if (bitValue != -1) event.toolTip.add("§6Coin/Bit: §b" + NumberUtil.nf.format(valuePer / bitValue))
+                        }
+                        if (Skytils.config.showCoinsPerCopper) {
+                            var copperValue = copperCosts.getOrDefault(auctionIdentifier, -1)
+                            if (copperValue == -1 && SBInfo.lastOpenContainerName == "SkyMart") {
+                                val lore = getItemLore(item!!)
+                                for (i in lore.indices) {
+                                    val line = lore[i]
+                                    if (line == "§7Cost" && i + 3 < lore.size && equalsOneOf(
+                                            lore[i + 3],
+                                            "§eClick to trade!",
+                                            "§cNot unlocked!"
+                                        )
+                                    ) {
+                                        val copper = lore[i + 1]
+                                        if (copper.startsWith("§c") && copper.endsWith(" Copper")) {
+                                            copperValue = copper.replace("[^0-9]".toRegex(), "").toInt()
+                                            copperCosts[auctionIdentifier] = copperValue
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                            if (copperValue != -1) event.toolTip.add(
+                                "§6Coin/Copper: §c" + NumberUtil.nf.format(valuePer / copperValue)
+                            )
                         }
                     }
                 }
