@@ -2079,6 +2079,13 @@ object Config : Vigilant(
     var showCoinsPerBit = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Coins per Copper",
+        description = "Shows how many coins you will get per copper spent at the SkyMart.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showCoinsPerCopper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Lowest BIN Price",
         description = "Shows the lowest Buy It Now price for various items in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -2837,7 +2844,8 @@ object Config : Vigilant(
             "showCoinsPerBit",
             "protectItemBINThreshold",
             "containerSellValue",
-            "visitorOfferHelper"
+            "visitorOfferHelper",
+            "showCoinsPerCopper"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
