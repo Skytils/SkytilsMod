@@ -78,7 +78,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             SBInfo.mode == it.mode
         }.run { if (this == -1) 0 else this },
             SkyblockIsland.values()
-                .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.formattedName }
+                .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.displayName }
         ).childOf(window)
             .constrain {
                 x = 5.pixels(true)
@@ -202,7 +202,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         EssentialAPI.getNotifications()
             .push(
                 "Waypoints Exported",
-                "$count ${island.formattedName} waypoints were copied to your clipboard!",
+                "$count ${island.displayName} waypoints were copied to your clipboard!",
                 2.5f
             )
     }
