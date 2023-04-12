@@ -75,7 +75,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
         val isOnUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
         val hasAnyUnknownWaypoint = Waypoints.categories.any { it.island == SkyblockIsland.Unknown }
         val options = SkyblockIsland.values()
-            .mapNotNull { if (it == SkyblockIsland.Unknown && !isOnUnknownIsland && !hasAnyUnknownWaypoint) null else it.formattedName }
+            .mapNotNull { if (it == SkyblockIsland.Unknown && !isOnUnknownIsland && !hasAnyUnknownWaypoint) null else it.displayName }
         islandDropdown = DropDown(
             SkyblockIsland.values().indexOfFirst {
                 SBInfo.mode == it.mode
@@ -268,7 +268,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
     private fun loadWaypointsForSelection(selection: Int, savePrev: Boolean = true, isClosing: Boolean = false) {
         if (savePrev) {
             val current = SkyblockIsland.values().find {
-                it.formattedName == islandDropdown.childrenOfType<UIText>()
+                it.displayName == islandDropdown.childrenOfType<UIText>()
                     .find { it.componentName == "currentSelectionText" }?.getText()
             } ?: error("previous selected island not found")
             Waypoints.categories.removeAll {
