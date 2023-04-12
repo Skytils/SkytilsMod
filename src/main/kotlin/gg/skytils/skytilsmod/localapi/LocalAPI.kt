@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.localapi
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.localapi.routes.registerMiscRoutes
+import gg.skytils.skytilsmod.localapi.routes.registerSkytilsDataRoutes
 import gg.skytils.skytilsmod.localapi.routes.registerWaypointRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -106,6 +107,7 @@ private fun Application.module() {
         route("/api") {
             authenticate("auth", strategy = AuthenticationStrategy.Required) {
                 route("/skytils") {
+                    registerSkytilsDataRoutes()
                     registerWaypointRoutes()
                 }
             }
