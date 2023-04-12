@@ -27,11 +27,8 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C01PacketChatMessage
@@ -169,6 +166,7 @@ object SBInfo {
     }
 }
 
+@Serializable(with = SkyblockIsland.ObjectSerializer::class)
 enum class SkyblockIsland(val displayName: String, val mode: String) {
     PrivateIsland("Private Island", "dynamic"),
     TheGarden("The Garden", "garden"),
@@ -197,6 +195,30 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
             decoder.decodeString().let { s -> values().firstOrNull { it.mode == s } ?: Unknown }
 
         override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
+    }
+
+    object ObjectSerializer : KSerializer<SkyblockIsland> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SkyblockIsland") {
+            element("displayName", serialDescriptor<String>())
+            element("mode", serialDescriptor<String>())
+        }
+
+        override fun deserialize(decoder: Decoder): SkyblockIsland = decoder.decodeStructure(descriptor) {
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    1 -> return@decodeStructure SkyblockIsland.values()
+                        .first { it.mode == decodeStringElement(descriptor, index) }
+
+                    CompositeDecoder.DECODE_DONE -> break
+                }
+            }
+            error("Failed to decode SkyblockIsland")
+        }
+
+        override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeStructure(descriptor) {
+            encodeStringElement(descriptor, 0, value.displayName)
+            encodeStringElement(descriptor, 1, value.mode)
+        }
     }
 }
 
