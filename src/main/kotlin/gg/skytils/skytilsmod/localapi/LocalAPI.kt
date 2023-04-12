@@ -72,8 +72,11 @@ private fun Application.module() {
         header(HttpHeaders.Server, "Skytils/${Skytils.VERSION}")
     }
     install(CORS) {
+        allowMethod(HttpMethod.Put)
         allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
         allowCredentials = true
+        allowNonSimpleContentTypes = true
         anyHost()
     }
     install(ConditionalHeaders)
