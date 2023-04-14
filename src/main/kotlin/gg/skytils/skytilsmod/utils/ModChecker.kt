@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.utils
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.tweaker.createButton
 import kotlinx.coroutines.launch
 import net.minecraft.client.ClientBrandRetriever
 import net.minecraftforge.common.ForgeVersion
@@ -28,6 +27,8 @@ import net.minecraftforge.fml.common.Loader
 import java.awt.Desktop
 import java.awt.Image
 import java.awt.Toolkit
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.*
 
@@ -66,11 +67,12 @@ object ModChecker {
             val discordLink = createButton("Join the Discord") {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
             }
+
             val close = createButton("Close") {
                 frame.isVisible = false
                 frame.dispose()
             }
-            // TODO: find out how to fix linkage error eventually
+
             val totalOptions = arrayOf(discordLink, close)
             JOptionPane.showOptionDialog(
                 frame,
@@ -94,5 +96,15 @@ object ModChecker {
             frame.isVisible = false
             frame.dispose()
         }
+    }
+}
+
+private fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
+    return JButton(text).apply {
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                onClick(this@apply)
+            }
+        })
     }
 }

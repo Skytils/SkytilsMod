@@ -156,7 +156,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 }
 
-fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
+private fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
     return JButton(text).apply {
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
