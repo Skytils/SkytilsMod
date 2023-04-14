@@ -25,7 +25,6 @@ import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.pow
 
 object LockOrb {
     private val orbTimeRegex = Regex("§e(?<seconds>\\d+)s§r")
@@ -34,26 +33,21 @@ object LockOrb {
     fun onPacket(event: PacketEvent.SendEvent) {
         if (!Utils.inSkyblock || !Skytils.config.powerOrbLock) return
         if (event.packet !is C08PacketPlayerBlockPlacement) return
-        val item = mc.thePlayer.heldItem
-        val itemId = getSkyBlockItemID(item)
-        if (itemId == null || !itemId.endsWith("_POWER_ORB")) return
+        val itemId = getSkyBlockItemID(mc.thePlayer.heldItem) ?: return
+        if (!itemId.endsWith("_POWER_ORB")) return
         val heldOrb = PowerOrbs.getPowerOrbMatchingItemId(itemId) ?: return
-        val orbs = mc.theWorld.getEntities(
-            EntityArmorStand::class.java
-        ) { entity: EntityArmorStand? ->
-            val orb = PowerOrbs.getPowerOrbMatchingName(entity!!.displayName.formattedText)
-            orb != null
+        val orbs = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().mapNotNull {
+            val name = it.displayName.formattedText
+            val orb = PowerOrbs.getPowerOrbMatchingName(name) ?: return@mapNotNull null
+            Triple(it, orb, name)
         }
-        for (orbEntity in orbs) {
-            if (orbEntity == null) return
-            val orb = PowerOrbs.getPowerOrbMatchingName(orbEntity.displayName.formattedText) ?: continue
+        for ((orbEntity, orb, name) in orbs) {
             if (orb.ordinal >= heldOrb.ordinal) {
-                orbTimeRegex.find(orbEntity.displayName.formattedText)?.destructured?.let { (seconds) ->
-                    if (seconds.toInt() >= Skytils.config.powerOrbDuration) {
-                        if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= orb.radius.pow(2.0)) {
-                            mc.thePlayer.playSound("random.orb", 0.8f, 1f)
-                            event.isCanceled = true
-                        }
+                val remainingTime = orbTimeRegex.find(name)?.groupValues?.get(1)?.toInt() ?: continue
+                if (remainingTime >= Skytils.config.powerOrbDuration) {
+                    if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= (orb.radius * orb.radius)) {
+                        mc.thePlayer.playSound("random.orb", 0.8f, 1f)
+                        event.isCanceled = true
                     }
                 }
             }
@@ -61,29 +55,15 @@ object LockOrb {
     }
 
     private enum class PowerOrbs(var orbName: String, var radius: Double, var itemId: String) {
-        RADIANT("§aRadiant", 18.0, "RADIANT_POWER_ORB"), MANAFLUX(
-            "§9Mana Flux",
-            18.0,
-            "MANA_FLUX_POWER_ORB"
-        ),
-        OVERFLUX("§5Overflux", 18.0, "OVERFLUX_POWER_ORB"), PLASMAFLUX("§d§lPlasmaflux", 20.0, "PLASMAFLUX_POWER_ORB");
+        RADIANT("§aRadiant", 18.0, "RADIANT_POWER_ORB"),
+        MANAFLUX("§9Mana Flux", 18.0, "MANA_FLUX_POWER_ORB"),
+        OVERFLUX("§5Overflux", 18.0, "OVERFLUX_POWER_ORB"),
+        PLASMAFLUX("§d§lPlasmaflux", 20.0, "PLASMAFLUX_POWER_ORB");
 
         companion object {
-            fun getPowerOrbMatchingName(name: String): PowerOrbs? {
-                for (orb in values()) {
-                    if (name.startsWith(orb.orbName)) {
-                        return orb
-                    }
-                }
-                return null
-            }
+            fun getPowerOrbMatchingName(name: String): PowerOrbs? = values().find { name.startsWith(it.orbName) }
 
-            fun getPowerOrbMatchingItemId(itemId: String): PowerOrbs? {
-                for (orb in values()) {
-                    if (orb.itemId == itemId) return orb
-                }
-                return null
-            }
+            fun getPowerOrbMatchingItemId(itemId: String): PowerOrbs? = values().find { it.itemId == itemId }
         }
     }
 }
