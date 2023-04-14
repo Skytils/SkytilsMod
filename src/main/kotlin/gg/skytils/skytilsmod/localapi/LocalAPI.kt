@@ -88,7 +88,7 @@ object LocalAPI {
                 }
                 routing {
                     get {
-                        context.respond("Your Skytils Local API is running correctly! (API v${LocalAPI.version}, Skytils v${Skytils.VERSION}")
+                        context.respond("Your Skytils Local API is running correctly! (API v${LocalAPI.version}, Skytils v${Skytils.VERSION})")
                     }
                     route("/api") {
                         authenticate("auth", strategy = AuthenticationStrategy.Required) {
