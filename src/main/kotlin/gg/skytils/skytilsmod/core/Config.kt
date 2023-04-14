@@ -50,7 +50,7 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
-        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Vistor Offer Helper"]
+        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Vistor Offer Helper", "Copper"]
     )
     var fetchLowestBINPrices = false
 
@@ -2265,7 +2265,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SELECTOR, name = "Carry Mode",
-        description = "Allow middle clicking to set your local LappySheep's slayer boss.\nDisable this if you are doing your own boss.",
+        description = "Allow middle clicking to set your slayer boss.\nDisable this if you are doing your own boss.",
         category = "Slayer", subcategory = "General",
         options = ["Off", "T1", "T2", "T3", "T4", "T5"]
     )
@@ -2461,14 +2461,7 @@ object Config : Vigilant(
     var totemPing = 0
 
     @Property(
-        PropertyType.SWITCH, name = "Attunement Display",
-        description = "Recolors the Inferno boss and demons depending on the correct dagger attunement.",
-        category = "Slayer", subcategory = "Inferno Demonlord"
-    )
-    var attunementDisplay = false
-
-    @Property(
-        PropertyType.SWITCH, name = "Ignore Pacified Blazes",
+        PropertyType.SWITCH, name = "Hide Pacified Blazes",
         description = "Stops rendering faraway blazes when fighting the Inferno Demonlord if Smoldering Polarization is active.\n" +
                 "Do note that you will still be able to interact with them! /skytilsupdatepotioneffects",
         category = "Slayer", subcategory = "Inferno Demonlord"
@@ -2476,11 +2469,18 @@ object Config : Vigilant(
     var ignorePacifiedBlazes = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show a Warning when in Inferno Demonlord Fire",
+        type = PropertyType.SWITCH, name = "Ping when in Inferno Demonlord Fire",
         description = "Shows a warning when you are standing on Inferno Demonlord's fire.",
         category = "Slayer", subcategory = "Inferno Demonlord"
     )
     var blazeFireWarning = false
+
+    @Property(
+        PropertyType.SWITCH, name = "Recolor Demonlord Boss by Attunement",
+        description = "Recolors the Inferno boss and demons depending on the correct dagger attunement.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var attunementDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
