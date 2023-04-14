@@ -33,7 +33,7 @@ plugins {
     signing
 }
 
-version = "1.5.0-pre2"
+version = "1.6.0-pre1"
 group = "gg.skytils"
 
 repositories {
