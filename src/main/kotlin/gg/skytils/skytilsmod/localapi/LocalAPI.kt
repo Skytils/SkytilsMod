@@ -46,7 +46,61 @@ object LocalAPI {
     fun startServer() {
         if (server != null) error("Server is already running!")
         Skytils.IO.launch {
-            server = embeddedServer(CIO, port = port, host = "127.0.0.1", module = Application::module).start()
+            server = embeddedServer(CIO, port = port, host = "127.0.0.1", module = {
+                install(ContentNegotiation) {
+                    json(Skytils.json)
+                }
+                install(DefaultHeaders) {
+                    header(HttpHeaders.Server, "Skytils/${Skytils.VERSION}")
+                }
+                install(CORS) {
+                    allowMethod(HttpMethod.Put)
+                    allowMethod(HttpMethod.Options)
+                    allowHeader(HttpHeaders.Authorization)
+                    allowHeader(HttpHeaders.ContentType)
+                    allowCredentials = true
+                    allowNonSimpleContentTypes = true
+                    anyHost()
+                }
+                install(ConditionalHeaders)
+                install(Compression) {
+                    gzip {
+                        priority = 1.0
+                        minimumSize(1024)
+                    }
+                    deflate {
+                        minimumSize(1024)
+                    }
+                }
+                install(AutoHeadResponse)
+
+                authentication {
+                    basic(name = "auth") {
+                        realm = "Skytils API"
+                        validate { credentials ->
+                            if (credentials.password == Skytils.config.localAPIPassword && Skytils.config.localAPIPassword.isNotEmpty()) {
+                                UserIdPrincipal(credentials.name)
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                }
+                routing {
+                    get {
+                        context.respond("Your Skytils Local API is running correctly! (API v${LocalAPI.version}, Skytils v${Skytils.VERSION}")
+                    }
+                    route("/api") {
+                        authenticate("auth", strategy = AuthenticationStrategy.Required) {
+                            route("/skytils") {
+                                registerSkytilsDataRoutes()
+                                registerWaypointRoutes()
+                            }
+                        }
+                        registerMiscRoutes()
+                    }
+                }
+            }).start()
         }
     }
 
@@ -60,61 +114,6 @@ object LocalAPI {
     init {
         if (Skytils.config.localAPIAutoStart) {
             startServer()
-        }
-    }
-}
-
-private fun Application.module() {
-    install(ContentNegotiation) {
-        json(Skytils.json)
-    }
-    install(DefaultHeaders) {
-        header(HttpHeaders.Server, "Skytils/${Skytils.VERSION}")
-    }
-    install(CORS) {
-        allowMethod(HttpMethod.Put)
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader(HttpHeaders.ContentType)
-        allowCredentials = true
-        allowNonSimpleContentTypes = true
-        anyHost()
-    }
-    install(ConditionalHeaders)
-    install(Compression) {
-        gzip {
-            priority = 1.0
-            minimumSize(1024)
-        }
-        deflate {
-            minimumSize(1024)
-        }
-    }
-    install(AutoHeadResponse)
-
-    authentication {
-        basic(name = "auth") {
-            realm = "Skytils API"
-            validate { credentials ->
-                if (credentials.password == Skytils.config.localAPIPassword && Skytils.config.localAPIPassword.isNotEmpty()) {
-                    UserIdPrincipal(credentials.name)
-                } else {
-                    null
-                }
-            }
-        }
-    }
-    routing {
-        get {
-            context.respond("Your Skytils Local API is running correctly! (API v${LocalAPI.version}, Skytils v${Skytils.VERSION}")
-        }
-        route("/api") {
-            authenticate("auth", strategy = AuthenticationStrategy.Required) {
-                route("/skytils") {
-                    registerSkytilsDataRoutes()
-                    registerWaypointRoutes()
-                }
-            }
-            registerMiscRoutes()
         }
     }
 }
