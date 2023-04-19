@@ -67,9 +67,9 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
+import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -99,23 +99,6 @@ object MiscFeatures {
         PlayersInRangeDisplay()
         PlacedSummoningEyeDisplay()
         WorldAgeDisplay()
-
-        TickTask(40, repeats = true) {
-            // TODO: investigate compat
-            if (Utils.inSkyblock) {
-                GuiIngameForge.renderAir = !(Skytils.config.hideAirDisplay && !Utils.inDungeons)
-                GuiIngameForge.renderArmor = !Skytils.config.hideArmorDisplay
-                GuiIngameForge.renderFood = !Skytils.config.hideHungerDisplay
-                GuiIngameForge.renderHealth = !Skytils.config.hideHealthDisplay
-                GuiIngameForge.renderHealthMount = !Skytils.config.hidePetHealth
-            } else {
-                GuiIngameForge.renderAir = true
-                GuiIngameForge.renderArmor = true
-                GuiIngameForge.renderFood = true
-                GuiIngameForge.renderHealth = true
-                GuiIngameForge.renderHealthMount = true
-            }
-        }
     }
 
     @SubscribeEvent
@@ -311,6 +294,22 @@ object MiscFeatures {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
+        if (!Utils.inSkyblock) return
+        if (event.type == RenderGameOverlayEvent.ElementType.AIR && Skytils.config.hideAirDisplay && !Utils.inDungeons) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.ARMOR && Skytils.config.hideArmorDisplay) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.FOOD && Skytils.config.hideHungerDisplay) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTH && Skytils.config.hideHealthDisplay) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTHMOUNT && Skytils.config.hidePetHealth) {
+            event.isCanceled = true
         }
     }
 
