@@ -24,10 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.TabListUtils
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.stripControlCodes
+import gg.skytils.skytilsmod.utils.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -160,7 +157,10 @@ object MayorInfo {
                     }
                     val color = item.displayName.substring(0, 2)
                     val lore = ItemUtil.getItemLore(item)
-                    if (lore.contains("§8Perks List") && (lore.contains("§7The listed perks are") || lore.contains("§7This perk is available to all"))) {
+                    if ((lore.contains("§8Perks List") || lore.contains("§7The mayor has been elected")) && (lore.contains(
+                            "§7The listed perks are"
+                        ) || lore.contains("§7This perk is available to all"))
+                    ) {
                         val perks = HashSet<String>()
                         for (line in lore) {
                             if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {
@@ -234,6 +234,7 @@ object MayorInfo {
             val commentForDecompilers =
                 "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
             mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
+            if (DevTools.getToggle("mayor")) println(url)
             println(client.get(url).bodyAsText())
         } catch (e: AuthenticationException) {
             e.printStackTrace()
