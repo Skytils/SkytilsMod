@@ -37,15 +37,18 @@ object SelectAllColorSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver || event.container !is ContainerChest) return
-        if (event.chestName.startsWith("Select all the")) {
+        if (Skytils.config.selectAllColorTerminalSolver && Utils.inDungeons && event.container is ContainerChest && event.chestName.startsWith(
+                "Select all the"
+            )
+        ) {
             val promptColor = EnumDyeColor.values().find {
                 event.chestName.contains(it.getName().replace("_", " ").uppercase())
             }?.unlocalizedName
             if (promptColor != colorNeeded) {
                 colorNeeded = promptColor
                 shouldClick.clear()
-            } else if (shouldClick.size == 0) {
+            }
+            if (shouldClick.size == 0) {
                 for (slot in event.container.inventorySlots) {
                     if (slot.inventory === mc.thePlayer?.inventory || !slot.hasStack) continue
                     val item = slot.stack ?: continue
