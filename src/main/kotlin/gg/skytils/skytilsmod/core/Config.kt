@@ -2204,7 +2204,7 @@ object Config : Vigilant(
         description = "Requires a confirmation before using a pet item.",
         category = "Pets", subcategory = "Quality of Life"
     )
-    var petItemConfirmation = false
+    var petItemConfirmation = true
 
     @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Current Revenant RNG Meter",
