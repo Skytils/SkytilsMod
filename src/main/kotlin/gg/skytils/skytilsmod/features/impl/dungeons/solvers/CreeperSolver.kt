@@ -35,7 +35,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import javax.xml.ws.Holder
 
 
 object CreeperSolver {
@@ -64,9 +63,15 @@ object CreeperSolver {
                         it.y > 68 && mc.theWorld?.getBlockState(it)?.block in candidateBlocks
                     }
                     val pairs = candidates.elementPairs()
-
+                    val usedPositions = mutableSetOf<BlockPos>()
                     solutionPairs.addAll(pairs.filter { (a, b) ->
-                        checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(null))
+                        if (a in usedPositions || b in usedPositions) return@filter false
+                        checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(Vec3(0.0, 0.0, 0.0))).also {
+                            if (it) {
+                                usedPositions.add(a)
+                                usedPositions.add(b)
+                            }
+                        }
                     })
 
                     if (SuperSecretSettings.bennettArthur) {
@@ -242,4 +247,6 @@ object CreeperSolver {
     private fun AxisAlignedBB.isVecInXY(vec: Vec3): Boolean {
         return vec.xCoord >= this.minX && vec.xCoord <= this.maxX && vec.yCoord >= this.minY && vec.yCoord <= this.maxY
     }
+
+    private class Holder<T>(var value: T)
 }
