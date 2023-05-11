@@ -59,6 +59,9 @@ import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.nbt.NBTBase
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagString
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
@@ -398,10 +401,14 @@ object ItemFeatures {
         if (Skytils.config.showGemstones && extraAttr?.hasKey("gems") == true) {
             val gems = extraAttr.getCompoundTag("gems")
             event.toolTip.add("§bGemstones: ")
-            event.toolTip.addAll(gems.keySet.filter { !it.endsWith("_gem") && it != "unlocked_slots" }.map {
-                "  §6- ${
-                    gems.getString(it).toTitleCase()
-                } ${
+            event.toolTip.addAll(gems.keySet.filterNot { it.endsWith("_gem") || it == "unlocked_slots" }.map {
+                val quality = when (val tag: NBTBase? = gems.getTag(it)) {
+                    is NBTTagCompound -> tag.getString("quality").toTitleCase().ifEmpty { "Report Unknown" }
+                    is NBTTagString -> tag.string.toTitleCase()
+                    null -> "Report Issue"
+                    else -> "Report Tag $tag"
+                }
+                "  §6- $quality ${
                     gems.getString("${it}_gem").ifEmpty { it.substringBeforeLast("_") }.toTitleCase()
                 }"
             })
