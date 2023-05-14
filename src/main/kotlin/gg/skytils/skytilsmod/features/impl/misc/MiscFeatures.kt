@@ -425,7 +425,7 @@ object MiscFeatures {
             ) return
             if (SBInfo.lastOpenContainerName.startsWithAny(
                     "Salvage Item"
-                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§cSalvage Item"
+                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§aSalvage Item"
             ) return
             if (ItemUtil.getItemLore(item).asReversed().any {
                     it.contains("-click", true)
