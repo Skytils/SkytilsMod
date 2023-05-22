@@ -41,7 +41,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /**
  * Provides the functionality for an overlay that is rendered on top of chests, minions, ender chest pages,
@@ -300,7 +300,7 @@ object ContainerSellValue {
                     .map { (itemName, displayItem) ->
                         "$itemName§r${
                             (" §7x${displayItem.amount}").toStringIfTrue(displayItem.amount > 1)
-                        }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToInt())}"
+                        }§8 - §a${NumberUtil.format(displayItem.lowestBIN.roundToLong())}"
                     }
                     .toList()
                     .also { lines = it.size }
