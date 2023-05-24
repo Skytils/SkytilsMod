@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,19 +18,22 @@
 
 package gg.skytils.skytilsmod.core
 
-import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.concurrent.ConcurrentLinkedQueue
 
-class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
+class TickTask<T>(val ticks: Int = 0, val repeats: Boolean = false, register: Boolean = true, val task: () -> T) {
+    var remainingTicks = ticks
     private var callback: (T) -> Unit = {}
     private var failure: (Throwable) -> Unit = {}
 
     init {
-        Utils.checkThreadAndQueue {
-            TickTaskManager.tasks.add(this)
-        }
+        if (register)
+            register()
     }
+
+    fun register() = tasks.add(this)
+    fun unregister() = tasks.remove(this)
 
     internal fun complete() = try {
         callback(task())
@@ -45,19 +48,22 @@ class TickTask<T>(var ticks: Int = 0, val task: () -> T) {
     fun onFailure(block: (Throwable) -> Unit) = apply {
         failure = block
     }
-}
 
-object TickTaskManager {
-    val tasks = ArrayList<TickTask<*>>(20)
+    companion object {
+        private val tasks = ConcurrentLinkedQueue<TickTask<*>>()
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
-        tasks.removeAll {
-            if (it.ticks-- <= 0) {
-                it.complete()
-                return@removeAll true
-            } else return@removeAll false
+        @SubscribeEvent
+        fun onTick(event: TickEvent.ClientTickEvent) {
+            if (event.phase != TickEvent.Phase.START || tasks.isEmpty()) return
+            tasks.removeAll {
+                if (it.remainingTicks-- <= 0) {
+                    it.complete()
+                    if (it.repeats) {
+                        it.remainingTicks = it.ticks
+                    } else return@removeAll true
+                }
+                return@removeAll false
+            }
         }
     }
 }

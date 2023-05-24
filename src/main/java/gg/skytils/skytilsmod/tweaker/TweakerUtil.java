@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -54,11 +54,7 @@ public class TweakerUtil {
     }
 
     public static void showMessage(String errorMessage, JButton... options) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        trySetLookAndFeel();
 
         // This makes the JOptionPane show on taskbar and stay on top
         JFrame frame = new JFrame();
@@ -146,5 +142,13 @@ public class TweakerUtil {
         conn.setReadTimeout(30000);
 
         return IOUtils.toString(conn.getInputStream());
+    }
+
+    public static void trySetLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

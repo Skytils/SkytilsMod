@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,9 +18,9 @@
 package gg.skytils.skytilsmod.features.impl.spidersden
 
 import gg.essential.universal.UMatrixStack
+import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -28,18 +28,30 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 object SpidersDenFeatures {
     private var shouldShowArachneSpawn = false
+    private var arachneName: String? = null
 
     init {
         ArachneHPElement()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        arachneName =
+            if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.SpiderDen.mode || !Skytils.config.showArachneHP) null else mc.theWorld.loadedEntityList.find {
+                val name = it.displayName.formattedText
+                name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
+            }?.displayName?.formattedText
     }
 
     @SubscribeEvent
@@ -74,30 +86,35 @@ object SpidersDenFeatures {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         shouldShowArachneSpawn = false
+        arachneName = null
     }
 
-    class ArachneHPElement : GuiElement("Show Arachne HP", FloatPair(200, 30)) {
+    class ArachneHPElement : GuiElement("Show Arachne HP", x = 200, y = 30) {
         override fun render() {
-            val world = mc.theWorld ?: return
-            if (toggled && Utils.inSkyblock) {
-                if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
-                val arachneNames =
-                    world.getEntities(EntityArmorStand::class.java) { entity: EntityArmorStand? ->
-                        val name = entity!!.displayName.formattedText
-                        name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
-                    }
-                RenderUtil.drawAllInList(this, arachneNames.map { it.displayName.formattedText })
+            if (arachneName != null) {
+                val leftAlign = scaleX < UResolution.scaledWidth / 2f
+                val alignment =
+                    if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                val xPos = if (leftAlign) 0f else scaleWidth
+                ScreenRenderer.fontRenderer.drawString(
+                    arachneName,
+                    xPos,
+                    0f,
+                    CommonColors.WHITE,
+                    alignment,
+                    SmartFontRenderer.TextShadow.NORMAL
+                )
             }
         }
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val text = "§8[§7Lv500§8] §cArachne §a17.6M§f/§a20M§c❤§r"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 text,
-                if (leftAlign) 0f else 0 + actualWidth,
+                if (leftAlign) 0f else 0 + scaleWidth,
                 0f,
                 CommonColors.WHITE,
                 alignment,

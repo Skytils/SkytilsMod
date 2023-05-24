@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -38,7 +38,7 @@ import java.awt.Color
 class TooltipComponent(item: ItemStack, backgroundColor: Color = VigilancePalette.getBackground(), radius: Float = 5f) :
     UIRoundedRectangle(radius) {
 
-    val lore = item.getTooltip(UPlayer.getPlayer()!!, false)
+    val lore: MutableList<String> = item.getTooltip(UPlayer.getPlayer()!!, false)
 
     val itemTitle = UIRoundedRectangle(radius).constrain {
         y = 0.pixels

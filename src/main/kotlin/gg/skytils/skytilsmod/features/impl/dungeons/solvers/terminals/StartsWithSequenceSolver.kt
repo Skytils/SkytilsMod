@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,45 +27,44 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 import kotlin.random.Random
 
 object StartsWithSequenceSolver {
 
 
     @JvmField
-    val shouldClick = ArrayList<Int>()
+    val shouldClick = mutableListOf<Int>()
     private var sequenceNeeded: String? = null
-    private val titlePattern = Pattern.compile("^What starts with: ['\"](.+)['\"]\\?$")
+    private val titlePattern = Regex("^What starts with: ['\"](.+)['\"]\\?$")
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver || event.container !is ContainerChest) return
-        val nameMatcher = titlePattern.matcher(event.chestName)
-        if (nameMatcher.find()) {
-            val sequence = nameMatcher.group(1)
-            if (sequence != sequenceNeeded) {
-                sequenceNeeded = sequence
-                shouldClick.clear()
-            } else if (shouldClick.size == 0) {
-                for (slot in event.container.inventorySlots) {
-                    if (slot.inventory === mc.thePlayer?.inventory || !slot.hasStack) continue
-                    val item = slot.stack ?: continue
-                    if (item.isItemEnchanted) continue
-                    if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
-                    if (SuperSecretSettings.bennettArthur) {
-                        if (Random.nextInt(3) == 0) SelectAllColorSolver.shouldClick.add(slot.slotNumber)
-                    } else if (item.displayName.stripControlCodes().startsWith(sequenceNeeded!!)) {
-                        shouldClick.add(slot.slotNumber)
+        if (Utils.inDungeons && Skytils.config.startsWithSequenceTerminalSolver && event.container !is ContainerChest &&
+            titlePattern.find(event.chestName)?.also {
+                val sequence = it.groupValues[1]
+                if (sequence != sequenceNeeded) {
+                    sequenceNeeded = sequence
+                    shouldClick.clear()
+                } else if (shouldClick.size == 0) {
+                    for (slot in event.container.inventorySlots) {
+                        if (slot.inventory === mc.thePlayer?.inventory || !slot.hasStack) continue
+                        val item = slot.stack ?: continue
+                        if (item.isItemEnchanted) continue
+                        if (slot.slotNumber < 9 || slot.slotNumber > 44 || slot.slotNumber % 9 == 0 || slot.slotNumber % 9 == 8) continue
+                        if (SuperSecretSettings.bennettArthur) {
+                            if (Random.nextInt(3) == 0) shouldClick.add(slot.slotNumber)
+                        } else if (item.displayName.stripControlCodes().startsWith(sequenceNeeded!!)) {
+                            shouldClick.add(slot.slotNumber)
+                        }
+                    }
+                } else {
+                    shouldClick.removeIf {
+                        val slot = event.container.getSlot(it)
+                        return@removeIf slot.hasStack && slot.stack.isItemEnchanted
                     }
                 }
-            } else {
-                shouldClick.removeIf {
-                    val slot = event.container.getSlot(it)
-                    return@removeIf slot.hasStack && slot.stack.isItemEnchanted
-                }
-            }
-        } else {
+            } == null
+        ) {
             shouldClick.clear()
             sequenceNeeded = null
         }

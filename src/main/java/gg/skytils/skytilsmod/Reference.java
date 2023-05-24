@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ public class Reference {
     public static String dataUrl = "https://data.skytils.gg/";
     public static final String MOD_ID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "1.4.3-pre1";
+    public static final String VERSION = "1.6.0-pre1";
 
     public static final int apiVersion = 2;
 }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
@@ -30,7 +31,6 @@ import net.minecraft.tileentity.TileEntityBrewingStand
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 
 object BrewingFeatures {
@@ -39,17 +39,14 @@ object BrewingFeatures {
     val timeRegex = Regex("§a(?<sec>\\d+(?:.\\d)?)s")
     private val green = Color(0, 255, 0, 128)
     private val red = Color(255, 0, 0, 128)
-    private var ticks = 0
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (!Skytils.config.colorBrewingStands || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.PrivateIsland.mode) return
-        if (ticks++ % 100 != 0) return
-        brewingStandToTimeMap.entries.removeIf {
-            mc.theWorld?.getTileEntity(it.key) !is TileEntityBrewingStand
+    init {
+        TickTask(100, repeats = true) {
+            if (!Skytils.config.colorBrewingStands || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.PrivateIsland.mode) return@TickTask
+            brewingStandToTimeMap.entries.removeIf {
+                mc.theWorld?.getTileEntity(it.key) !is TileEntityBrewingStand
+            }
         }
-        ticks = 0
     }
 
     @SubscribeEvent

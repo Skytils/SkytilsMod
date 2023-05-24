@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
+import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -32,15 +33,14 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 object ChatListener {
     private var lastPartyDisbander = ""
-    private val invitePattern = Pattern.compile("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
-    private val playerPattern = Pattern.compile("(?:\\[.+?] )?(\\w+)")
-    private val party_start_pattern = Pattern.compile("^Party Members \\((\\d+)\\)$")
-    private val leader_pattern = Pattern.compile("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
-    private val members_pattern = Pattern.compile(" (?:\\[.+?] )?(\\w+) ●")
+    private val invitePattern = Regex("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
+    private val playerPattern = Regex("(?:\\[.+?] )?(\\w+)")
+    private val party_start_pattern = Regex("^Party Members \\((\\d+)\\)$")
+    private val leader_pattern = Regex("^Party Leader: (?:\\[.+?] )?(\\w+) ●$")
+    private val members_pattern = Regex(" (?:\\[.+?] )?(\\w+) ●")
     private var awaitingDelimiter = false
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -50,9 +50,8 @@ object ChatListener {
         val unformatted = formatted.stripControlCodes()
         if (Skytils.config.autoReparty) {
             if (formatted.endsWith("§r§ehas disbanded the party!§r")) {
-                val matcher = playerPattern.matcher(unformatted)
-                if (matcher.find()) {
-                    lastPartyDisbander = matcher.group(1)
+                playerPattern.find(unformatted)?.let {
+                    lastPartyDisbander = it.groupValues[1]
                     println("Party disbanded by $lastPartyDisbander")
                     Skytils.launch {
                         if (Skytils.config.autoRepartyTimeout == 0) return@launch
@@ -106,18 +105,18 @@ object ChatListener {
                 }
             } else if (unformatted.startsWith("Party M") || unformatted.startsWith("Party Leader")) {
                 val player = mc.thePlayer
-                val partyStart = party_start_pattern.matcher(unformatted)
-                val leader = leader_pattern.matcher(unformatted)
-                val members = members_pattern.matcher(unformatted)
-                if (partyStart.matches() && partyStart.group(1).toInt() == 1) {
+                val partyStart = party_start_pattern.find(unformatted)
+                val leader = leader_pattern.find(unformatted)
+                val members = members_pattern.findAll(unformatted)
+                if (partyStart != null && partyStart.groupValues[1].toInt() == 1) {
                     UChat.chat("$failPrefix §cYou cannot reparty yourself.")
                     RepartyCommand.partyThread!!.interrupt()
-                } else if (leader.matches() && leader.group(1) != player.name) {
+                } else if (leader != null && leader.groupValues[1] != player.name) {
                     UChat.chat("$failPrefix §cYou are not party leader.")
                     RepartyCommand.partyThread!!.interrupt()
                 } else {
-                    while (members.find()) {
-                        val partyMember = members.group(1)
+                    members.forEach {
+                        val partyMember = it.groupValues[1]
                         if (partyMember != player.name) {
                             RepartyCommand.party.add(partyMember)
                             println(partyMember)
@@ -155,9 +154,9 @@ object ChatListener {
         // Inviting
         if (RepartyCommand.inviting) {
             if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                val invitee = invitePattern.matcher(unformatted)
-                if (invitee.find()) {
-                    println("${invitee.group(1)}: ${RepartyCommand.repartyFailList.remove(invitee.group(1))}")
+                val invitee = invitePattern.find(unformatted)
+                if (invitee != null) {
+                    println("${invitee.groupValues[1]}: ${RepartyCommand.repartyFailList.remove(invitee.groupValues[1])}")
                 }
                 tryRemoveLineAtIndex(1)
                 awaitingDelimiter = true
@@ -176,9 +175,9 @@ object ChatListener {
         // Fail Inviting
         if (RepartyCommand.failInviting) {
             if (unformatted.endsWith(" to the party! They have 60 seconds to accept.")) {
-                val invitee = invitePattern.matcher(unformatted)
-                if (invitee.find()) {
-                    println("" + invitee.group(1) + ": " + RepartyCommand.repartyFailList.remove(invitee.group(1)))
+                val invitee = invitePattern.find(unformatted)
+                if (invitee != null) {
+                    println("${invitee.groupValues[1]}: ${RepartyCommand.repartyFailList.remove(invitee.groupValues[1])}")
                 }
                 tryRemoveLineAtIndex(1)
                 event.isCanceled = true
@@ -192,12 +191,15 @@ object ChatListener {
                 return
             }
         }
-        if (Skytils.config.firstLaunch && unformatted == "Welcome to Hypixel SkyBlock!") {
-            UChat.chat("$prefix §bThank you for downloading Skytils!")
-            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
-            Skytils.config.firstLaunch = false
-            Skytils.config.markDirty()
-            Skytils.config.writeData()
+        if (unformatted == "Welcome to Hypixel SkyBlock!") {
+            if (Skytils.config.firstLaunch) {
+                UChat.chat("$prefix §bThank you for downloading Skytils!")
+                ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
+                Skytils.config.firstLaunch = false
+                Skytils.config.markDirty()
+                Skytils.config.writeData()
+            }
+            Funny.joinedSkyblock()
         }
     }
 

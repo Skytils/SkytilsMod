@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -219,7 +218,7 @@ object DungeonTimer {
         scoreShownAt = -1
     }
 
-    class DungeonTimerElement : GuiElement("Dungeon Timer", FloatPair(200, 80)) {
+    class DungeonTimerElement : GuiElement("Dungeon Timer", x = 200, y = 80) {
         override fun render() {
             if (toggled && Utils.inDungeons && dungeonStartTime != -1L) {
                 val time =
@@ -280,7 +279,7 @@ object DungeonTimer {
         }
     }
 
-    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", FloatPair(200, 120)) {
+    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", x = 200, y = 120) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
@@ -317,9 +316,9 @@ object DungeonTimer {
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 4
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 5
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§cMaxor: 0s")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§7Wither King: 0s")
 
         override val toggled: Boolean
             get() = Skytils.config.necronPhaseTimer
@@ -329,7 +328,7 @@ object DungeonTimer {
         }
     }
 
-    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", FloatPair(200, 120)) {
+    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", x = 200, y = 120) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,

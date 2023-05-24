@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,7 +39,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
         hook.closeWindowPressed(ci);
     }
 
-    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1, shift = At.Shift.AFTER))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         hook.backgroundDrawn(mouseX, mouseY, partialTicks, ci);
     }

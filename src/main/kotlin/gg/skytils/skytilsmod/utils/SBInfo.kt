@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,17 +20,15 @@ package gg.skytils.skytilsmod.utils
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.events.impl.LocrawReceivedEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C01PacketChatMessage
@@ -110,6 +108,7 @@ object SBInfo {
                     }
                     locraw = obj
                     mode = obj.mode
+                    LocrawReceivedEvent(obj).postAndCatch()
                 } catch (e: SerializationException) {
                     e.printStackTrace()
                 }
@@ -147,7 +146,7 @@ object SBInfo {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
                         val parseFormat = SimpleDateFormat("hh:mm a")
                         currentTimeDate = parseFormat.parse(timeSpace)
-                    } catch (e: ParseException) {
+                    } catch (_: ParseException) {
                     }
                 }
                 lines.find { it.contains('⏣') }?.replace(junkRegex, "")?.trim()?.let {
@@ -167,7 +166,8 @@ object SBInfo {
     }
 }
 
-enum class SkyblockIsland(val formattedName: String, val mode: String) {
+@Serializable(with = SkyblockIsland.ObjectSerializer::class)
+enum class SkyblockIsland(val displayName: String, val mode: String) {
     PrivateIsland("Private Island", "dynamic"),
     TheGarden("The Garden", "garden"),
     SpiderDen("Spider's Den", "combat_1"),
@@ -195,6 +195,30 @@ enum class SkyblockIsland(val formattedName: String, val mode: String) {
             decoder.decodeString().let { s -> values().firstOrNull { it.mode == s } ?: Unknown }
 
         override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
+    }
+
+    object ObjectSerializer : KSerializer<SkyblockIsland> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SkyblockIsland") {
+            element("displayName", serialDescriptor<String>())
+            element("mode", serialDescriptor<String>())
+        }
+
+        override fun deserialize(decoder: Decoder): SkyblockIsland = decoder.decodeStructure(descriptor) {
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    1 -> return@decodeStructure SkyblockIsland.values()
+                        .first { it.mode == decodeStringElement(descriptor, index) }
+
+                    CompositeDecoder.DECODE_DONE -> break
+                }
+            }
+            error("Failed to decode SkyblockIsland")
+        }
+
+        override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeStructure(descriptor) {
+            encodeStringElement(descriptor, 0, value.displayName)
+            encodeStringElement(descriptor, 1, value.mode)
+        }
     }
 }
 

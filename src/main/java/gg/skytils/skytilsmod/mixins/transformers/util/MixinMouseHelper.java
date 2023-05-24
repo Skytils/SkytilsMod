@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,23 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.mixins.transformers.patcher;
+package gg.skytils.skytilsmod.mixins.transformers.util;
 
-import gg.skytils.skytilsmod.mixins.hooks.patcher.FontRendererHookHookKt;
-import org.spongepowered.asm.mixin.Dynamic;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHookKt;
+import net.minecraft.util.MouseHelper;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Pseudo
-@Mixin(targets = "club.sk1er.patcher.hooks.FontRendererHook", remap = false)
-public class MixinFontRendererHook {
-
-    @Dynamic
-    @Inject(method = "renderStringAtPos", at = @At("HEAD"), cancellable = true)
-    private void overridePatcherFontRendererHook(String text, boolean shadow, CallbackInfoReturnable<Boolean> cir) {
-        FontRendererHookHookKt.overridePatcherFontRendererHook(text, shadow, cir);
+@Mixin(MouseHelper.class)
+public class MixinMouseHelper {
+    @WrapWithCondition(method = "ungrabMouseCursor", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;setCursorPosition(II)V", remap = false))
+    private boolean shouldSetCursorPos(int newX, int newY) {
+        return MouseHelperHookKt.shouldResetMouseToCenter();
     }
 }

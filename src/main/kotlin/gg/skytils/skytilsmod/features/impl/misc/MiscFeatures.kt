@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,7 +25,6 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.TickTask
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -50,6 +49,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
@@ -71,14 +71,14 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
 object MiscFeatures {
     private var golemSpawnTime: Long = 0
@@ -92,6 +92,7 @@ object MiscFeatures {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0=",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhMDg3ZWI3NmU3Njg3YTgxZTRlZjgxYTdlNjc3MjY0OTk5MGY2MTY3Y2ViMGY3NTBhNGM1ZGViNmM0ZmJhZCJ9fX0="
     )
+    private val hubSpawnPoint = BlockPos(-2, 70, -69)
 
     init {
         GolemSpawnTimerElement()
@@ -133,12 +134,14 @@ object MiscFeatures {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
         val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
+        if (formatted.startsWith("§r§cYou died") && Skytils.config.preventMovingOnDeath) {
+            KeyBinding.unPressAllKeys()
+        }
         if (unformatted == "The ground begins to shake as an Endstone Protector rises from below!") {
             golemSpawnTime = System.currentTimeMillis() + 20000
         }
@@ -156,7 +159,7 @@ object MiscFeatures {
                 }
             }
             if (unformatted == "Your zapper is temporarily fatigued!") {
-                val duration = Duration.milliseconds(blockZapperCooldownExpiration - System.currentTimeMillis())
+                val duration = (blockZapperCooldownExpiration - System.currentTimeMillis()).milliseconds
                 printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
                 if (duration.isPositive()) {
                     UChat.chat("$prefix §eThis will expire in${
@@ -185,37 +188,35 @@ object MiscFeatures {
                 }
             }
         }
-        if (Utils.inSkyblock) {
-            if (Skytils.config.autoCopyRNGDrops) {
-                if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith(
-                        "§r§6§lPET DROP! "
-                    ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
-                ) {
-                    GuiScreen.setClipboardString(unformatted)
-                    UChat.chat("$prefix §aCopied RNG drop to clipboard.")
-                    event.message.chatStyle
-                        .setChatHoverEvent(
-                            HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("§aClick to copy to clipboard.")
-                            )
-                        ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
-                }
+        if (Skytils.config.autoCopyRNGDrops) {
+            if (formatted.startsWith("§r§d§lCRAZY RARE DROP! ") || formatted.startsWith("§r§c§lINSANE DROP! ") || formatted.startsWith(
+                    "§r§6§lPET DROP! "
+                ) || formatted.contains(" §r§ehas obtained §r§6§r§7[Lvl 1]")
+            ) {
+                GuiScreen.setClipboardString(unformatted)
+                UChat.chat("$prefix §aCopied RNG drop to clipboard.")
+                event.message.chatStyle
+                    .setChatHoverEvent(
+                        HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            ChatComponentText("§aClick to copy to clipboard.")
+                        )
+                    ).chatClickEvent =
+                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
             }
-            if (Skytils.config.autoCopyVeryRareDrops) {
-                if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
-                    GuiScreen.setClipboardString(unformatted)
-                    UChat.chat("$prefix §aCopied very rare drop to clipboard.")
-                    event.message.chatStyle
-                        .setChatHoverEvent(
-                            HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                ChatComponentText("§aClick to copy to clipboard.")
-                            )
-                        ).chatClickEvent =
-                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
-                }
+        }
+        if (Skytils.config.autoCopyVeryRareDrops) {
+            if (formatted.startsWith("§r§9§lVERY RARE DROP! ") || formatted.startsWith("§r§5§lVERY RARE DROP! ")) {
+                GuiScreen.setClipboardString(unformatted)
+                UChat.chat("$prefix §aCopied very rare drop to clipboard.")
+                event.message.chatStyle
+                    .setChatHoverEvent(
+                        HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            ChatComponentText("§aClick to copy to clipboard.")
+                        )
+                    ).chatClickEvent =
+                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skytilscopy $unformatted")
             }
         }
     }
@@ -243,6 +244,10 @@ object MiscFeatures {
             }
         } else if (event.entity is EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
+                event.isCanceled = true
+            }
+        } else if (event.entity is EntityOtherPlayerMP) {
+            if (Skytils.config.hidePlayersInSpawn && event.entity.position == hubSpawnPoint && SBInfo.mode == SkyblockIsland.Hub.mode) {
                 event.isCanceled = true
             }
         } else if (Skytils.deobfEnvironment && DevTools.getToggle("invis")) {
@@ -297,6 +302,14 @@ object MiscFeatures {
         if (!Utils.inSkyblock) return
         if (event.type == RenderGameOverlayEvent.ElementType.AIR && Skytils.config.hideAirDisplay && !Utils.inDungeons) {
             event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.ARMOR && Skytils.config.hideArmorDisplay) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.FOOD && Skytils.config.hideHungerDisplay) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTH && Skytils.config.hideHealthDisplay) {
+            event.isCanceled = true
+        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTHMOUNT && Skytils.config.hidePetHealth) {
+            event.isCanceled = true
         }
     }
 
@@ -347,16 +360,20 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
             val slot = event.slot ?: return
             val item = slot.stack ?: return
+            if (Skytils.config.coopAddConfirmation && item.item == Items.diamond && item.displayName == "§aCo-op Request") {
+                event.isCanceled = true
+                UChat.chat("$failPrefix §c§lBe careful! Skytils stopped you from giving a player full control of your island!")
+            }
             val extraAttributes = getExtraAttributes(item)
             if (event.chestName == "Ophelia") {
                 if (Skytils.config.dungeonPotLock > 0) {
-                    if (slot.inventory === mc.thePlayer.inventory || Utils.equalsOneOf(slot.slotNumber, 49, 53)) return
+                    if (slot.inventory === mc.thePlayer.inventory || equalsOneOf(slot.slotNumber, 49, 53)) return
                     if (item.item !== Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
                         event.isCanceled = true
                         return
@@ -408,7 +425,7 @@ object MiscFeatures {
             ) return
             if (SBInfo.lastOpenContainerName.startsWithAny(
                     "Salvage Item"
-                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§cSalvage Item"
+                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§aSalvage Item"
             ) return
             if (ItemUtil.getItemLore(item).asReversed().any {
                     it.contains("-click", true)
@@ -481,12 +498,19 @@ object MiscFeatures {
         }
     }
 
-    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", FloatPair(150, 20)) {
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onEnderTeleport(event: EnderTeleportEvent) {
+        if (Utils.inSkyblock && Skytils.config.disableEndermanTeleport) {
+            event.isCanceled = true
+        }
+    }
+
+    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 val text =
                     "§cGolem spawn in: §a" + ((golemSpawnTime - System.currentTimeMillis()) / 1000.0).roundToPrecision(1) + "s"
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
@@ -525,7 +549,7 @@ object MiscFeatures {
         }
     }
 
-    class PlayersInRangeDisplay : GuiElement("Players In Range Display", FloatPair(50, 50)) {
+    class PlayersInRangeDisplay : GuiElement("Players In Range Display", x = 50, y = 50) {
         override fun render() {
             if (toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
@@ -565,7 +589,7 @@ object MiscFeatures {
         }
     }
 
-    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", FloatPair(50, 60)) {
+    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", x = 50, y = 60) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
@@ -621,7 +645,7 @@ object MiscFeatures {
         }
     }
 
-    class WorldAgeDisplay : GuiElement("World Age Display", FloatPair(50, 60)) {
+    class WorldAgeDisplay : GuiElement("World Age Display", x = 50, y = 60) {
 
         var usesBaldTimeChanger = false
 
@@ -688,7 +712,7 @@ object MiscFeatures {
         }
     }
 
-    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", FloatPair(50, 60)) {
+    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", x = 50, y = 60) {
         override fun render() {
             //This is a placeholder
         }
@@ -717,7 +741,7 @@ object MiscFeatures {
         }
     }
 
-    object ActionBarDummy : GuiElement("Action Bar", FloatPair(50, 70)) {
+    object ActionBarDummy : GuiElement("Action Bar", x = 50, y = 70) {
         override fun render() {
             //This is a placeholder
         }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,10 +32,6 @@ import java.awt.Color
 import kotlin.random.Random
 
 class EntityLivingBaseHook(val entity: EntityLivingBase) {
-
-    companion object {
-        private val dmgPattern = Regex("✧?(?<num>\\d+)[⚔+✧❤♞☄✷]*")
-    }
 
     var overrideDisplayName: String? = null
     var colorMultiplier: Color? = null

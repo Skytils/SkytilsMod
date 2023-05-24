@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -33,7 +33,8 @@ object ProtectItemCommand : BaseCommand("protectitem") {
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         val subcommand = args.getOrNull(0)?.lowercase()
         if (subcommand == "clearall") {
-            FavoriteStrategy.favoriteItems.clear()
+            FavoriteStrategy.favoriteUUIDs.clear()
+            FavoriteStrategy.favoriteItemIds.clear()
             PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
             UChat.chat("$successPrefix §aCleared all your protected items!")
             return
@@ -42,15 +43,28 @@ object ProtectItemCommand : BaseCommand("protectitem") {
         val item = player.heldItem
             ?: throw WrongUsageException("You must hold an item to use this command")
         val extraAttributes = ItemUtil.getExtraAttributes(item)
-        if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
-        val uuid = extraAttributes.getString("uuid")
-        if (FavoriteStrategy.favoriteItems.remove(uuid)) {
-            PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-            UChat.chat("$successPrefix §aI will no longer protect your ${item.displayName}§a!")
+            ?: throw WrongUsageException("This isn't a Skyblock Item? Where'd you get it from cheater...")
+        if (extraAttributes.hasKey("uuid") && subcommand != "itemid") {
+            val uuid = extraAttributes.getString("uuid")
+            if (FavoriteStrategy.favoriteUUIDs.remove(uuid)) {
+                PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
+                UChat.chat("$successPrefix §aI will no longer protect your ${item.displayName}§a!")
+            } else {
+                FavoriteStrategy.favoriteUUIDs.add(uuid)
+                PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
+                UChat.chat("$successPrefix §aI will now protect your ${item.displayName}!")
+            }
         } else {
-            FavoriteStrategy.favoriteItems.add(uuid)
-            PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-            UChat.chat("$successPrefix §aI will now protect your ${item.displayName}!")
+            val itemId =
+                ItemUtil.getSkyBlockItemID(item) ?: throw WrongUsageException("This item doesn't have a Skyblock ID.")
+            if (FavoriteStrategy.favoriteItemIds.remove(itemId)) {
+                PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
+                UChat.chat("$successPrefix §aI will no longer protect all of your ${itemId}s!")
+            } else {
+                FavoriteStrategy.favoriteItemIds.add(itemId)
+                PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
+                UChat.chat("$successPrefix §aI will now protect all of your ${itemId}s!")
+            }
         }
     }
 }

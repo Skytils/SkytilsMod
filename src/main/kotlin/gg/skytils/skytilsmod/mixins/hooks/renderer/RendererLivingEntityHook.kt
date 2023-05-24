@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import gg.skytils.skytilsmod.utils.withAlpha
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -48,6 +49,17 @@ fun setColorMultiplier(
                 cir.returnValue = Skytils.config.seraphHitsPhaseColor.withAlpha(169)
             } else {
                 cir.returnValue = Skytils.config.seraphNormalPhaseColor.withAlpha(169)
+            }
+        }
+    } else if (Skytils.config.attunementDisplay && Utils.inSkyblock && entity is EntityLiving) {
+        (slayer as? SlayerFeatures.DemonlordSlayer)?.let {
+            if (entity == it.relevantEntity) {
+                entity.hurtTime = 0
+                it.relevantColor?.let {
+                    // Colors might be too hard to see because of the entities textures and colors,
+                    // as opposed to the enderman's almost fully black texture
+                    cir.returnValue = it.withAlpha(169)
+                }
             }
         }
     } else if (DungeonFeatures.livid == entity) {

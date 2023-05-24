@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -85,10 +85,10 @@ object FarmingFeatures {
                 targetMinY = -1
                 targetMaxY = -1
             } else if (unformatted.startsWith("You are at the exact height!")) {
-                targetMinY = mc.thePlayer.posY.toInt();
-                targetMaxY = mc.thePlayer.posY.toInt();
+                targetMinY = mc.thePlayer.posY.toInt()
+                targetMaxY = mc.thePlayer.posY.toInt()
             } else {
-                val match = targetHeightRegex.find(unformatted);
+                val match = targetHeightRegex.find(unformatted)
                 if (match != null) {
                     val blocks = match.groups["blocks"]!!.value.toInt()
                     val below = match.groups["type"]!!.value == "below"
@@ -99,10 +99,10 @@ object FarmingFeatures {
 
                     if (minY <= targetMaxY && maxY >= targetMinY) {
                         targetMinY = minY.coerceAtLeast(targetMinY)
-                        targetMaxY = maxY.coerceAtMost(targetMaxY);
+                        targetMaxY = maxY.coerceAtMost(targetMaxY)
                     } else {
-                        targetMinY = minY;
-                        targetMaxY = maxY;
+                        targetMinY = minY
+                        targetMaxY = maxY
                     }
 
                     UChat.chat("§r§aThe target is at §6Y §r§e$targetMinY${if (targetMinY != targetMaxY) "-$targetMaxY" else ""} §7($blocks blocks ${match.groups["type"]!!.value}, ${match.groups["angle"]!!.value} angle)")
@@ -123,7 +123,7 @@ object FarmingFeatures {
             }, null)
             TickTask(4) {
                 if (solution != null) {
-                    UChat.chat("$successPrefix §aThe Hiker needs: §l§2 " + solution + "§a!")
+                    UChat.chat("$successPrefix §aThe Hiker needs: §l§2 $solution§a!")
                 } else {
                     if (unformatted.contains("I asked for") || unformatted.contains("The food I want")) {
                         println("Missing Hiker item: $unformatted")

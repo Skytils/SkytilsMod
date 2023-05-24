@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,7 +23,7 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.structure.FloatPair
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -41,10 +41,13 @@ import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
+import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.minecraft.block.BlockDoor
 import net.minecraft.block.BlockLadder
 import net.minecraft.block.BlockLiquid
@@ -56,6 +59,9 @@ import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.nbt.NBTBase
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagString
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
@@ -70,19 +76,21 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
-import java.util.regex.Pattern
 import kotlin.math.pow
 
 object ItemFeatures {
 
-    private val candyPattern = Pattern.compile("§a\\((\\d+)/10\\) Pet Candy Used")
+    private val candyPattern = Regex("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
+
+    // TODO: it is possible for 2 items to have the same name but different material
+    val itemIdToNameLookup = hashMapOf<String, String>()
     val sellPrices = HashMap<String, Double>()
     val bitCosts = HashMap<String, Int>()
+    val copperCosts = HashMap<String, Int>()
     val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
     var selectedArrow = ""
     var soulflowAmount = ""
@@ -134,12 +142,8 @@ object ItemFeatures {
         Blocks.skull
     )
 
-    var ticks = 0
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (ticks % 4 == 0) {
+    init {
+        TickTask(4, repeats = true) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
                 val held = mc.thePlayer.inventory.getCurrentItem()
                 if (Skytils.config.showItemRarity) {
@@ -174,9 +178,7 @@ object ItemFeatures {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent
@@ -208,9 +210,17 @@ object ItemFeatures {
                     if (event.slot.hasStack) {
                         val stack = event.slot.stack
                         if (stack.displayName.containsAny(
-                                "Defuse Kit", "Lever", "Torch",
-                                "Stone Button", "Tripwire Hook", "Journal Entry",
-                                "Training Weights", "Mimic Fragment", "Healing 8 Splash Potion", "Healing VIII Splash Potion", "Premium Flesh"
+                                "Defuse Kit",
+                                "Lever",
+                                "Torch",
+                                "Stone Button",
+                                "Tripwire Hook",
+                                "Journal Entry",
+                                "Training Weights",
+                                "Mimic Fragment",
+                                "Healing 8 Splash Potion",
+                                "Healing VIII Splash Potion",
+                                "Premium Flesh"
                             )
                         ) event.slot highlight Color(255, 50, 150, 255)
                     }
@@ -294,7 +304,7 @@ object ItemFeatures {
             }
         }
         if (itemId != null) {
-            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit) {
+            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit || Skytils.config.showCoinsPerCopper) {
                 val auctionIdentifier = if (isSuperpairsReward) itemId else AuctionData.getIdentifier(item)
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
@@ -332,6 +342,31 @@ object ItemFeatures {
                             }
                             if (bitValue != -1) event.toolTip.add("§6Coin/Bit: §b" + NumberUtil.nf.format(valuePer / bitValue))
                         }
+                        if (Skytils.config.showCoinsPerCopper) {
+                            var copperValue = copperCosts.getOrDefault(auctionIdentifier, -1)
+                            if (copperValue == -1 && SBInfo.lastOpenContainerName == "SkyMart") {
+                                val lore = getItemLore(item!!)
+                                for (i in lore.indices) {
+                                    val line = lore[i]
+                                    if (line == "§7Cost" && i + 3 < lore.size && equalsOneOf(
+                                            lore[i + 3],
+                                            "§eClick to trade!",
+                                            "§cNot unlocked!"
+                                        )
+                                    ) {
+                                        val copper = lore[i + 1]
+                                        if (copper.startsWith("§c") && copper.endsWith(" Copper")) {
+                                            copperValue = copper.replace("[^0-9]".toRegex(), "").toInt()
+                                            copperCosts[auctionIdentifier] = copperValue
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                            if (copperValue != -1) event.toolTip.add(
+                                "§6Coin/Copper: §c" + NumberUtil.nf.format(valuePer / copperValue)
+                            )
+                        }
                     }
                 }
             }
@@ -366,10 +401,14 @@ object ItemFeatures {
         if (Skytils.config.showGemstones && extraAttr?.hasKey("gems") == true) {
             val gems = extraAttr.getCompoundTag("gems")
             event.toolTip.add("§bGemstones: ")
-            event.toolTip.addAll(gems.keySet.filter { !it.endsWith("_gem") && it != "unlocked_slots" }.map {
-                "  §6- ${
-                    gems.getString(it).toTitleCase()
-                } ${
+            event.toolTip.addAll(gems.keySet.filterNot { it.endsWith("_gem") || it == "unlocked_slots" }.map {
+                val quality = when (val tag: NBTBase? = gems.getTag(it)) {
+                    is NBTTagCompound -> tag.getString("quality").toTitleCase().ifEmpty { "Report Unknown" }
+                    is NBTTagString -> tag.string.toTitleCase()
+                    null -> "Report Issue"
+                    else -> "Report Tag $tag"
+                }
+                "  §6- $quality ${
                     gems.getString("${it}_gem").ifEmpty { it.substringBeforeLast("_") }.toTitleCase()
                 }"
             })
@@ -608,9 +647,8 @@ object ItemFeatures {
         }
         if (Skytils.config.showPetCandies && item.item === Items.skull) {
             lore?.forEach { line ->
-                val candyLineMatcher = candyPattern.matcher(line)
-                if (candyLineMatcher.matches()) {
-                    stackTip = candyLineMatcher.group(1).toString()
+                candyPattern.find(line)?.let {
+                    stackTip = it.groups[1]!!.value
                     return@forEach
                 }
             }
@@ -695,23 +733,12 @@ object ItemFeatures {
             val block = obj.blockPos ?: return
             val state = mc.theWorld.getBlockState(block)
             if (isValidEtherwarpPos(obj)) {
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
-                val matrixStack = UMatrixStack()
-                GlStateManager.disableCull()
-                GlStateManager.disableDepth()
-                GlStateManager.enableBlend()
-                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                state.block.setBlockBoundsBasedOnState(mc.theWorld, block)
-                RenderUtil.drawFilledBoundingBox(
-                    matrixStack,
-                    state.block.getSelectedBoundingBox(mc.theWorld, block)
-                        .expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
-                        .offset(-viewerX, -viewerY, -viewerZ),
-                    Skytils.config.showEtherwarpTeleportPosColor
+                RenderUtil.drawSelectionBox(
+                    block,
+                    state.block,
+                    Skytils.config.showEtherwarpTeleportPosColor,
+                    event.partialTicks
                 )
-                GlStateManager.disableBlend()
-                GlStateManager.enableCull()
-                GlStateManager.enableDepth()
             }
         }
     }
@@ -735,14 +762,14 @@ object ItemFeatures {
         }
     }
 
-    class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", FloatPair(0.65f, 0.85f)) {
+    class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
                 val alignment =
-                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     selectedArrow,
-                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                     0f,
                     CommonColors.WHITE,
                     alignment,
@@ -753,10 +780,10 @@ object ItemFeatures {
 
         override fun demoRender() {
             val alignment =
-                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§aSelected: §rSkytils Arrow",
-                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.RAINBOW,
                 alignment,
@@ -776,14 +803,14 @@ object ItemFeatures {
         }
     }
 
-    class StackingEnchantDisplay : GuiElement("Stacking Enchant Display", FloatPair(0.65f, 0.85f)) {
+    class StackingEnchantDisplay : GuiElement("Stacking Enchant Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (toggled && Utils.inSkyblock && stackingEnchantDisplayText.isNotBlank()) {
                 val alignment =
-                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     stackingEnchantDisplayText,
-                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                     0f,
                     CommonColors.WHITE,
                     alignment,
@@ -794,10 +821,10 @@ object ItemFeatures {
 
         override fun demoRender() {
             val alignment =
-                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "Expertise 10: Maxed",
-                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.RAINBOW,
                 alignment,
@@ -817,14 +844,14 @@ object ItemFeatures {
         }
     }
 
-    class SoulflowGuiElement : GuiElement("Soulflow Display", FloatPair(0.65f, 0.85f)) {
+    class SoulflowGuiElement : GuiElement("Soulflow Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (Utils.inSkyblock && toggled) {
                 val alignment =
-                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     soulflowAmount,
-                    if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                    if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                     0f,
                     CommonColors.WHITE,
                     alignment,
@@ -835,10 +862,10 @@ object ItemFeatures {
 
         override fun demoRender() {
             val alignment =
-                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§3100⸎ Soulflow",
-                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.WHITE,
                 alignment,
@@ -859,17 +886,17 @@ object ItemFeatures {
     }
 
 
-    class WitherShieldDisplay : GuiElement("Wither Shield Display", FloatPair(0.65f, 0.85f)) {
+    class WitherShieldDisplay : GuiElement("Wither Shield Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
                 val alignment =
-                    if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 if (lastShieldUse != -1L) {
                     val diff =
                         ((lastShieldUse + (if (Skytils.config.assumeWitherImpact) 5000 else 10000) - System.currentTimeMillis()) / 1000f)
                     ScreenRenderer.fontRenderer.drawString(
                         "Shield: §c${"%.2f".format(diff)}s",
-                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                         0f,
                         CommonColors.ORANGE,
                         alignment,
@@ -879,7 +906,7 @@ object ItemFeatures {
                 } else {
                     ScreenRenderer.fontRenderer.drawString(
                         "Shield: §aREADY",
-                        if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                        if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                         0f,
                         CommonColors.ORANGE,
                         alignment,
@@ -891,10 +918,10 @@ object ItemFeatures {
 
         override fun demoRender() {
             val alignment =
-                if (actualX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§6Shield: §aREADY",
-                if (actualX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
+                if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.WHITE,
                 alignment,
@@ -913,4 +940,18 @@ object ItemFeatures {
             Skytils.guiManager.registerElement(this)
         }
     }
+
+    @Serializable
+    data class APISBItem(
+        @SerialName("id")
+        val id: String,
+        @SerialName("material")
+        val material: String,
+        @SerialName("motes_sell_price")
+        val motesSellPrice: Double? = null,
+        @SerialName("name")
+        val name: String,
+        @SerialName("npc_sell_price")
+        val npcSellPrice: Double? = null,
+    )
 }
