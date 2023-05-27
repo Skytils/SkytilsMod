@@ -129,8 +129,11 @@ object ChestProfit {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (Skytils.config.kismetRerollThreshold == 0 || !Utils.inDungeons) return
-        if (!rerollBypass && event.slotId == 50 && event.chestName.endsWith(" Chest")) {
+        if (!Utils.inDungeons || event.container !is ContainerChest) return
+        if (Skytils.config.kismetRerollThreshold != 0 && !rerollBypass && event.slotId == 50 && event.chestName.endsWith(
+                " Chest"
+            )
+        ) {
             val chestType = DungeonChest.getFromName(event.chestName) ?: return
             if (chestType.value >= Skytils.config.kismetRerollThreshold * 1_000_000) {
                 event.isCanceled = true
@@ -143,6 +146,8 @@ object ChestProfit {
                             rerollBypass = true
                         })
             }
+        } else if (event.slotId in 9..17 && event.chestName.endsWith(" Chest") && DungeonChest.getFromName(event.chestName) != null) {
+            event.isCanceled = true
         }
     }
 
