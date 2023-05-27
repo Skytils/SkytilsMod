@@ -92,7 +92,7 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
 
     override fun read(reader: Reader) {
         prices.clear()
-        prices.putAll(json.decodeFromString<Map<UUID, Double>>(reader.readText()))
+        prices.putAll(json.decodeFromString<Map<@Contextual UUID, Double>>(reader.readText()))
     }
 
     override fun write(writer: Writer) {
