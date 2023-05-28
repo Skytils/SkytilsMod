@@ -18,6 +18,7 @@
     "accessors.AccessorMinecraft",
     "accessors.AccessorModelDragon",
     "accessors.AccessorRenderItem",
+    "accessors.AccessorRenderManager",
     "accessors.AccessorS3BPacketScoreboardObjective",
     "accessors.AccessorServerListEntryNormal",
     "accessors.AccessorSettingsGui",

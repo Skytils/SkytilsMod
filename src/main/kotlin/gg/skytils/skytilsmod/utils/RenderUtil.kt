@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.mixins.hooks.renderer.skipGlint
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorRenderManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -709,6 +710,36 @@ object RenderUtil {
 
     fun getPartialTicks() =
         (mc as AccessorMinecraft).timer.renderPartialTicks
+
+    /**
+     * Helper method for fixRenderPos
+     */
+    fun getRenderX() : Double {
+        return (mc.renderManager as AccessorRenderManager).renderX
+    }
+
+    /**
+     * Helper method for fixRenderPos
+     */
+    fun getRenderY() : Double {
+        return (mc.renderManager as AccessorRenderManager).renderY
+    }
+
+    /**
+     * Helper method for fixRenderPos
+     */
+    fun getRenderZ() : Double {
+        return (mc.renderManager as AccessorRenderManager).renderZ
+    }
+
+    /**
+     * Method used to Gather event location parameters and return their interpolated counterparts.
+     *
+     * Working particularly well in RenderLivingEvent.Pre/Post<*>
+     */
+    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false) : Triple<Double, Double, Double> {
+        return Triple(x + getRenderX(), y + getRenderY(), z + getRenderZ())
+    }
 
     infix fun Slot.highlight(color: Color) {
         Gui.drawRect(
