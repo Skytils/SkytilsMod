@@ -119,7 +119,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.0", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.2.4", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))
