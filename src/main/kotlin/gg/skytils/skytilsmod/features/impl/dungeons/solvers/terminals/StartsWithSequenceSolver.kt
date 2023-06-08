@@ -39,7 +39,7 @@ object StartsWithSequenceSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (Utils.inDungeons && Skytils.config.startsWithSequenceTerminalSolver && event.container !is ContainerChest &&
+        if (Utils.inDungeons && Skytils.config.startsWithSequenceTerminalSolver && event.container is ContainerChest) {
             titlePattern.find(event.chestName)?.also {
                 val sequence = it.groupValues[1]
                 if (sequence != sequenceNeeded) {
@@ -63,8 +63,9 @@ object StartsWithSequenceSolver {
                         return@removeIf slot.hasStack && slot.stack.isItemEnchanted
                     }
                 }
-            } == null
-        ) {
+                return
+            }
+        } else {
             shouldClick.clear()
             sequenceNeeded = null
         }
