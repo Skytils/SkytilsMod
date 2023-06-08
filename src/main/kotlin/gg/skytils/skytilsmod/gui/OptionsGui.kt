@@ -136,6 +136,14 @@ class OptionsGui :
         }.onMouseClick {
             Desktop.getDesktop().open(Skytils.modDir)
         }
+        SimpleButton("Open Web Editor").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            Desktop.getDesktop().browse(URI("https://editor.skytils.gg/"))
+        }
         SimpleButton("Discord").childOf(window).constrain {
             x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
             y = basicYConstraint { window.getHeight() - this.getHeight() - 3 }
