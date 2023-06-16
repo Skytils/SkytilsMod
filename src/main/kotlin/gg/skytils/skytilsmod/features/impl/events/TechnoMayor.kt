@@ -140,7 +140,7 @@ object TechnoMayor {
         val entity = event.target;
         mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             entity,
-            AxisAlignedBB(BlockPos(entity.posX, entity.posY, entity.posZ),
+            AxisAlignedBB(BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
                 BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1))
         ).find {
             if (it is EntityArmorStand && it.hasCustomName() && !it.isDead && it.customNameTag == "§6§lSHINY PIG") {
