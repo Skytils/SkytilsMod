@@ -1058,9 +1058,17 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.SWITCH, name = "Show Shiny Orb Waypoints",
         description = "Creates a waypoint of where your shiny orbs are",
-        category = "Events", subcategory = "Technoblade"
+        category = "Events", subcategory = "Technoblade",
+        searchTags = ["Shiny", "Technoblade", "Pig"]
     )
     var shinyOrbWaypoints = false
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Shiny Pig Locations",
+        description = "Shows the location of the pig and draws a line to its orb.",
+        category = "Events", subcategory = "Technoblade",
+        searchTags = ["Shiny", "Technoblade", "Pig"]
+    )
+    var shinyPigLocations = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Plot Cleanup Helper",
@@ -2949,6 +2957,8 @@ object Config : Vigilant(
         addDependency("includeModifiersInSellValue", "containerSellValue")
 
         addDependency("assumeWitherImpact", "witherShieldCooldown")
+
+        addDependency("shinyPigLocations", "shinyOrbWaypoints")
 
         registerListener("protectItemBINThreshold") { _: String ->
             TickTask(1) {
