@@ -66,7 +66,13 @@ object TechnoMayor {
         if (SBInfo.mode != SkyblockIsland.Hub.mode && SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
 
-        shinyPigs.entries.removeAll { it.value == null || it.value!!.isDead }
+        val iterator = shinyPigs.entries.iterator();
+        while (iterator.hasNext()) {
+            val it = iterator.next();
+            if (it.value == null || it.value!!.isDead) {
+                iterator.remove()
+            }
+        }
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
@@ -118,7 +124,7 @@ object TechnoMayor {
         val entity = event.target;
         mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             entity,
-            AxisAlignedBB(BlockPos(entity.posX, entity.posY, entity.posZ),
+            AxisAlignedBB(BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
                 BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1))
         ).find {
             if (it is EntityArmorStand && it.hasCustomName() && !it.isDead && it.customNameTag == "§6§lSHINY PIG") {
