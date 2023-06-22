@@ -234,6 +234,16 @@ object SlayerFeatures : CoroutineScope {
                             )
                             break
                         }
+                        if (boss.startsWith("Riftstalker Bloodfiend")) {
+                            BossStatus.setBossStatus(
+                                RNGMeter(
+                                    100f,
+                                    Skytils.config.vampRNG,
+                                    ChatComponentText("§4§lRiftstalker Bloodfiend RNG§r - §d${Skytils.config.vampRNG}%")
+                                ), true
+                            )
+                            break
+                        }
                     }
                 }
             }
@@ -391,6 +401,10 @@ object SlayerFeatures : CoroutineScope {
                         }
                         if (boss.startsWith("Inferno Demonlord")) {
                             Skytils.config.blazeRNG = rngMeter
+                            break
+                        }
+                        if (boss.startsWith("Riftstalker Bloodfiend")) {
+                            Skytils.config.vampRNG = rngMeter
                             break
                         }
                     }

@@ -2257,6 +2257,16 @@ object Config : Vigilant(
     var blazeRNG = 0f
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Current Bloodfiend RNG Meter",
+        description = "Internal value to store current Riftstalker Bloodfiend RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var vampRNG = 0f
+
+    @Property(
         type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
         description = "Open chat, then click anywhere on screen to open Maddox Menu.",
         category = "Slayer", subcategory = "Quality of Life"
