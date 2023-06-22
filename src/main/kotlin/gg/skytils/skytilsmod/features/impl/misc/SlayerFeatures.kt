@@ -47,6 +47,7 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.*
 import net.minecraft.block.*
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -123,7 +124,7 @@ object SlayerFeatures : CoroutineScope {
     var BossHealths = HashMap<String, HashMap<String, Int>>()
     var maddoxCommand = ""
 
-    fun processSlayerEntity(entity: Entity, countTime: Boolean = true) {
+    fun processSlayerEntity(entity: Entity) {
         slayer = try {
             when (entity) {
                 is EntityZombie -> RevenantSlayer(entity)
@@ -131,6 +132,7 @@ object SlayerFeatures : CoroutineScope {
                 is EntityWolf -> Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
                 is EntityEnderman -> SeraphSlayer(entity)
                 is EntityBlaze -> DemonlordSlayer(entity)
+                is EntityOtherPlayerMP -> Slayer(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend")
                 else -> null
             }
         } catch (e: IllegalStateException) {
