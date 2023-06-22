@@ -104,10 +104,12 @@ object SlayerFeatures : CoroutineScope {
     private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
     private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
     private val BLAZE_MINIBOSSES = arrayOf("Flare Demon", "Kindleheart Demon", "Burningsoul Demon")
+
     // there might be a point replacing this with §c\d+:\d+(?:§r)?$ and only partially check for matches
     // but that requires a more extensive testing of all skyblock timers,
     // something I am not quite particularly fond of doing
-    private val timerRegex = Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d |§4§lIMMUNE )?§c\\d+:\\d+(?:§r)?")
+    private val timerRegex =
+        Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d |§4§lIMMUNE )?§c\\d+:\\d+(?:§r)?")
     private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
         set(value) {
@@ -479,7 +481,7 @@ object SlayerFeatures : CoroutineScope {
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
         if (!Utils.inSkyblock || mc.pointedEntity == null || Skytils.config.slayerCarryMode == 0 || Mouse.getEventButton() != 2 || !Mouse.getEventButtonState() || mc.currentScreen != null || mc.thePlayer == null) return
-        processSlayerEntity(mc.pointedEntity, false)
+        processSlayerEntity(mc.pointedEntity)
     }
 
     @SubscribeEvent
@@ -530,7 +532,10 @@ object SlayerFeatures : CoroutineScope {
                 }
             }
         }
-        if (Skytils.config.ignorePacifiedBlazes && event.entity is EntityBlaze && PotionEffectTimers.potionEffectTimers.containsKey("Smoldering Polarization")) {
+        if (Skytils.config.ignorePacifiedBlazes && event.entity is EntityBlaze && PotionEffectTimers.potionEffectTimers.containsKey(
+                "Smoldering Polarization"
+            )
+        ) {
             (slayer as? DemonlordSlayer)?.run {
                 if (event.entity.getDistanceSqToEntity(mc.renderViewEntity) > 3 * 3 && event.entity != entity) {
                     event.isCanceled = true
@@ -928,7 +933,7 @@ object SlayerFeatures : CoroutineScope {
      *
      * [nameEntity] and [timerEntity] must be mutable as the entity changes for Inferno Demonlord
      */
-    open class Slayer<T : EntityLiving>(
+    open class Slayer<T : EntityLivingBase>(
         val entity: T,
         private val name: String,
         private vararg val nameStart: String,
@@ -1000,7 +1005,10 @@ object SlayerFeatures : CoroutineScope {
                         if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
                             return@TickTask potentialNameEntities.first() to potentialTimerEntities.first()
                         } else {
-                            printDevMessage("not the right entity! (${potentialNameEntities.size}, ${potentialTimerEntities.size})", "slayer")
+                            printDevMessage(
+                                "not the right entity! (${potentialNameEntities.size}, ${potentialTimerEntities.size})",
+                                "slayer"
+                            )
                             slayer = null
                             throw IllegalStateException("Wrong entity!")
                         }
@@ -1215,7 +1223,8 @@ object SlayerFeatures : CoroutineScope {
                     if (quazii == null || typhoeus == null) {
                         null
                     } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true
-                        || (typhoeus?.health ?: 0f) <= 0f) {
+                        || (typhoeus?.health ?: 0f) <= 0f
+                    ) {
                         quazii
                     } else {
                         typhoeus
@@ -1230,7 +1239,8 @@ object SlayerFeatures : CoroutineScope {
                     if (quazii == null || typhoeus == null) {
                         null
                     } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true
-                        || (typhoeus?.health ?: 0f) <= 0f) {
+                        || (typhoeus?.health ?: 0f) <= 0f
+                    ) {
                         quaziiTimer
                     } else {
                         typhoeusTimer
@@ -1241,6 +1251,7 @@ object SlayerFeatures : CoroutineScope {
                 val attunement = relevantTimer.displayName.unformattedText.substringBefore(" ").stripControlCodes()
                 return attunementColors[attunement]
             }
+
         // Is there a point making a class for the demons and storing the entity and the timer in the same place?
         var quazii: EntitySkeleton? = null
         var quaziiTimer: EntityArmorStand? = null
@@ -1362,8 +1373,9 @@ object SlayerFeatures : CoroutineScope {
             // This also triggers on the totem, could check for yellow clay replacing red clay,
             // but might be better to not delay anything
             if (event.update.block == Blocks.stained_hardened_clay
-                && event.update.getValue(BlockColored.COLOR) == EnumDyeColor.RED) {
-                    activeFire.add(event.pos)
+                && event.update.getValue(BlockColored.COLOR) == EnumDyeColor.RED
+            ) {
+                activeFire.add(event.pos)
             } else if (event.old.block == Blocks.fire && event.update.block == Blocks.air) {
                 activeFire.remove(event.pos.down())
             }
