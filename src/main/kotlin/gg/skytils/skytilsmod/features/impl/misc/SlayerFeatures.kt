@@ -134,7 +134,12 @@ object SlayerFeatures : CoroutineScope {
                 is EntityWolf -> Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
                 is EntityEnderman -> SeraphSlayer(entity)
                 is EntityBlaze -> DemonlordSlayer(entity)
-                is EntityOtherPlayerMP -> Slayer(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend")
+                is EntityOtherPlayerMP -> {
+                    if (entity.name == "Bloodfiend ") {
+                        Slayer(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend")
+                    } else null
+                }
+
                 else -> null
             }
         } catch (e: IllegalStateException) {
