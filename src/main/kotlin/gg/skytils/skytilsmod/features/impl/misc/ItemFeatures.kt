@@ -517,7 +517,8 @@ object ItemFeatures {
                 "FLOWER_OF_TRUTH",
                 "MOODY_GRAPPLESHOT",
                 "BAT_WAND",
-                "WEIRD_TUBA"
+                "WEIRD_TUBA",
+                "WEIRDER_TUBA"
             ))
         ) {
             val block = mc.theWorld.getBlockState(event.pos)
