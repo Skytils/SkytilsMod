@@ -122,7 +122,7 @@ object SlayerFeatures : CoroutineScope {
     var hasSlayerText = false
     private var lastTickHasSlayerText = false
     var expectedMaxHp: Int? = null
-    private val hitMap = HashMap<EntityLiving, Int>()
+    private val hitMap = HashMap<EntityLivingBase, Int>()
     var BossHealths = HashMap<String, HashMap<String, Int>>()
     var maddoxCommand = ""
 
@@ -491,8 +491,9 @@ object SlayerFeatures : CoroutineScope {
 
     @SubscribeEvent
     fun onAttack(event: AttackEntityEvent) {
-        if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || event.target !is EntityLiving || !Skytils.config.useSlayerHitMethod) return
-        val entity = event.target as EntityLiving
+        val entity = event.target as? EntityLivingBase ?: return
+
+        if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || !Skytils.config.useSlayerHitMethod) return
         if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(entity.baseMaxHealth).toInt() == expectedMaxHp) {
             printDevMessage("A valid entity was attacked", "slayer", "seraph", "seraphHit")
             hitMap.compute(entity) { _, int ->
