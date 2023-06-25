@@ -2493,6 +2493,20 @@ object Config : Vigilant(
     var attunementDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Vampire Slayer One Shot Alert",
+        description = "Shows a title when you can one-shot the Vampire Slayer with Steak Stake",
+        category = "Slayer"
+    )
+    var oneShotAlert = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Twinclaw Alert",
+        description = "Shows a title when the Vampire Slayer is about to do a Twinclaw attack",
+        category = "Slayer"
+    )
+    var twinclawAlert = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
         description = "Blocks the sound effect played while an item is on cooldown.",
         category = "Sounds", subcategory = "Abilities"

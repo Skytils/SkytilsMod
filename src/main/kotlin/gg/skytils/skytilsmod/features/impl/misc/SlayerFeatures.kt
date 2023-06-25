@@ -25,6 +25,7 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.SoundQueue
@@ -136,7 +137,7 @@ object SlayerFeatures : CoroutineScope {
                 is EntityBlaze -> DemonlordSlayer(entity)
                 is EntityOtherPlayerMP -> {
                     if (entity.name == "Bloodfiend ") {
-                        Slayer(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend")
+                        BloodfiendSlayer(entity)
                     } else null
                 }
 
@@ -1385,6 +1386,20 @@ object SlayerFeatures : CoroutineScope {
             } else if (event.old.block == Blocks.fire && event.update.block == Blocks.air) {
                 activeFire.remove(event.pos.down())
             }
+        }
+    }
+
+    class BloodfiendSlayer(entity: EntityOtherPlayerMP) :
+        Slayer<EntityOtherPlayerMP>(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend") {
+        override fun tick(event: ClientTickEvent) {
+            if (Config.oneShotAlert && this.nameEntity?.displayName?.unformattedText?.contains(
+                    "҉"
+                ) == true
+            ) createTitle("§cSteak Stake!", 2)
+            else if (Config.twinclawAlert && this.timerEntity?.displayName?.unformattedText?.contains(
+                    "TWINCLAWS"
+                ) == true
+            ) createTitle("§6§lTWINCLAWS!", 2)
         }
     }
 }
