@@ -2497,14 +2497,14 @@ object Config : Vigilant(
         description = "Shows a title when you can one-shot the Vampire Slayer with Steak Stake",
         category = "Slayer", subcategory = "Vampire Slayer"
     )
-    var oneShotAllert = false;
+    var oneShotAlert = false;
 
     @Property(
         type = PropertyType.SWITCH, name = "Twinclaw Alert",
         description = "Shows a title when the Vampire Slayer is about to do a Twinclaw attack",
         category = "Slayer", subcategory = "Vampire Slayer"
     )
-    var twinclawAllert = false;
+    var twinclawAlert = false;
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
