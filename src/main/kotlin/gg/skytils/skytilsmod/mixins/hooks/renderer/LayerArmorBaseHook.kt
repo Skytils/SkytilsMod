@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,7 +27,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ResourceLocation
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
-private val ENCHANTED_ITEM_GLINT_RES = ResourceLocation("textures/misc/enchanted_item_glint.png")
+private val enchantedItemGlintResource = ResourceLocation("textures/misc/enchanted_item_glint.png")
 
 
 fun replaceArmorGlint(
@@ -51,7 +51,7 @@ fun replaceArmorGlint(
             GlintCustomizer.glintItems[itemId]?.color?.let { color ->
                 ci.cancel()
                 val f = entitylivingbaseIn.ticksExisted.toFloat() + partialTicks
-                rendererLivingEntity.bindTexture(ENCHANTED_ITEM_GLINT_RES)
+                rendererLivingEntity.bindTexture(enchantedItemGlintResource)
                 GlStateManager.enableBlend()
                 GlStateManager.depthFunc(514)
                 GlStateManager.depthMask(false)

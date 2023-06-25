@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,6 +30,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
 import net.minecraft.client.Minecraft
@@ -82,7 +83,10 @@ class OptionsGui :
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            mc.displayGuiScreen(LocationEditGui())
+            mc.displayGuiScreen(
+                if (it.mouseButton == 1) ElementaEditingGui()
+                else LocationEditGui()
+            )
         }
         SimpleButton("Edit Key Shortcuts").childOf(window).constrain {
             x = CenterConstraint()
@@ -131,6 +135,14 @@ class OptionsGui :
             height = 20.pixels()
         }.onMouseClick {
             Desktop.getDesktop().open(Skytils.modDir)
+        }
+        SimpleButton("Open Web Editor").childOf(window).constrain {
+            x = CenterConstraint()
+            y = SiblingConstraint() + 2.pixels()
+            width = 200.pixels()
+            height = 20.pixels()
+        }.onMouseClick {
+            Desktop.getDesktop().browse(URI("https://editor.skytils.gg/"))
         }
         SimpleButton("Discord").childOf(window).constrain {
             x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }

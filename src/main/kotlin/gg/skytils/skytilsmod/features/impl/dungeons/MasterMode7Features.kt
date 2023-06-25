@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,9 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
+import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
@@ -35,18 +37,14 @@ import net.minecraft.client.renderer.entity.RenderDragon
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.Vec3
+import net.minecraft.util.*
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
@@ -57,7 +55,7 @@ object MasterMode7Features {
     private val killedDragons = hashSetOf<WitherKingDragons>()
     private val dragonMap = hashMapOf<Int, WitherKingDragons>()
     private val glowstones = hashSetOf<AxisAlignedBB>()
-    private var ticks = 0
+    private val dragonSpawnTimes = hashMapOf<WitherKingDragons, Long>()
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
@@ -77,18 +75,15 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
-        if (ticks % 15 == 0) {
+    init {
+        TickTask(15, repeats = true) {
+            if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || mc.thePlayer == null) return@TickTask
             if (Skytils.config.witherKingDragonSlashAlert) {
                 if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
                     GuiManager.createTitle("Dimensional Slash!", 10)
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent
@@ -102,8 +97,20 @@ object MasterMode7Features {
             val drag =
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag)) {
-                printDevMessage("${drag.name} spawning", "witherkingdrags")
-                if (Skytils.config.witherKingDragonSpawnAlert) UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§ldragon is spawning! §f(${x}, ${y}, ${z})")
+                printDevMessage("${drag.name} spawning $x $y $z", "witherkingdrags")
+                if (Skytils.config.witherKingDragonSpawnAlert) {
+                    UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§ldragon is spawning!")
+                }
+            }
+        } else if (event.packet is S2APacketParticles) {
+            event.packet.apply {
+                if (count != 20 || y != WitherKingDragons.particleYConstant || type != EnumParticleTypes.FLAME || xOffset != 2f || yOffset != 3f || zOffset != 2f || speed != 0f || !isLongDistance || x % 1 != 0.0 || z % 1 != 0.0) return
+                val owner = WitherKingDragons.values().find {
+                    it.particleLocation.x == x.toInt() && it.particleLocation.z == z.toInt()
+                } ?: return
+                if (owner !in dragonSpawnTimes) {
+                    dragonSpawnTimes[owner] = System.currentTimeMillis() + 5000
+                }
             }
         }
     }
@@ -192,6 +199,37 @@ object MasterMode7Features {
                 RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 3.69f, event.partialTicks)
             }
         }
+        if (Skytils.config.showWitherKingDragonsSpawnTimer) {
+            val stack = UMatrixStack()
+            GlStateManager.disableCull()
+            GlStateManager.disableDepth()
+            dragonSpawnTimes.entries.removeAll { (drag, time) ->
+                val diff = time - System.currentTimeMillis()
+                val color = when {
+                    diff <= 1000 -> 'c'
+                    diff <= 3000 -> 'e'
+                    else -> 'a'
+                }
+                RenderUtil.drawLabel(
+                    drag.bottomChin.middleVec(),
+                    "${drag.textColor}: §${color}$diff ms",
+                    drag.color,
+                    event.partialTicks,
+                    stack,
+                    scale = 6f
+                )
+                return@removeAll diff < 0
+            }
+            GlStateManager.enableCull()
+            GlStateManager.enableDepth()
+        }
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (event.entity is EntityDragon && event.entity.deathTicks > 1 && shouldHideDragonDeath()) {
+            event.isCanceled = true
+        }
     }
 
     fun getHurtOpacity(
@@ -254,9 +292,14 @@ enum class WitherKingDragons(
 
     val itemName = "§cCorrupted $textColor Relic"
     val itemId = "${textColor.uppercase()}_KING_RELIC"
-    val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${this.name.lowercase()}.png")
-    private val a = 13.5
+    val texture = ResourceLocation("skytils", "textures/dungeons/m7/dragon_${name.lowercase()}.png")
     val bb = blockPos.run {
         AxisAlignedBB(x - a, y - 8.0, z - a, x + a, y + a + 2, z + a)
+    }
+    val particleLocation: BlockPos = blockPos.up(5)
+
+    companion object {
+        private const val a = 13.5
+        const val particleYConstant = 19.0
     }
 }

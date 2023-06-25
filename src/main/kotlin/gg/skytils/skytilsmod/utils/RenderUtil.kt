@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -820,10 +820,10 @@ object RenderUtil {
     }
 
     fun drawAllInList(element: GuiElement, lines: Collection<String>) {
-        val leftAlign = element.actualX < UResolution.scaledWidth / 2f
+        val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
         val alignment =
             if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-        val xPos = if (leftAlign) 0f else element.actualWidth.toFloat()
+        val xPos = if (leftAlign) 0f else element.scaleWidth
         for ((i, str) in lines.withIndex()) {
             ScreenRenderer.fontRenderer.drawString(
                 str,
@@ -872,4 +872,5 @@ fun Color.multAlpha(mult: Float) = Color(
     (alpha * mult).toInt().coerceIn(0, 255)
 )
 
-fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
+fun AxisAlignedBB.expandBlock(): AxisAlignedBB =
+    expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)

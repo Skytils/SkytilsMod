@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.utils
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.tweaker.createButton
 import kotlinx.coroutines.launch
 import net.minecraft.client.ClientBrandRetriever
 import net.minecraftforge.common.ForgeVersion
@@ -28,6 +27,8 @@ import net.minecraftforge.fml.common.Loader
 import java.awt.Desktop
 import java.awt.Image
 import java.awt.Toolkit
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.*
 
@@ -37,6 +38,7 @@ object ModChecker {
         ClientBrandRetriever.getClientModName()?.startsWith("fml,forge") != true ||
                 ClientBrandRetriever.getClientModName() != FMLCommonHandler.instance().modName ||
                 Loader.isModLoaded("feather") ||
+                Loader.isModLoaded("labymod") ||
                 ForgeVersion.getStatus().ordinal > 3
     }
 
@@ -65,11 +67,12 @@ object ModChecker {
             val discordLink = createButton("Join the Discord") {
                 Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
             }
+
             val close = createButton("Close") {
                 frame.isVisible = false
                 frame.dispose()
             }
-            // TODO: find out how to fix linkage error eventually
+
             val totalOptions = arrayOf(discordLink, close)
             JOptionPane.showOptionDialog(
                 frame,
@@ -93,5 +96,15 @@ object ModChecker {
             frame.isVisible = false
             frame.dispose()
         }
+    }
+}
+
+private fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
+    return JButton(text).apply {
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                onClick(this@apply)
+            }
+        })
     }
 }

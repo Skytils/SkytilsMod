@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,13 +21,18 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 
-abstract class GuiElement(var name: String, var scale: Float, var pos: FloatPair) {
-    @JvmOverloads
-    constructor(name: String, fp: FloatPair = FloatPair(0, 0)) : this(name, 1.0f, fp)
+abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float) {
+    constructor(name: String, scale: Float = 1f, x: Int, y: Int) : this(
+        name,
+        scale,
+        (x / UResolution.scaledWidth).toFloat(),
+        (y / UResolution.scaledHeight).toFloat()
+    )
 
     abstract fun render()
     abstract fun demoRender()
     abstract val toggled: Boolean
+
     fun setPos(x: Int, y: Int) {
         val fX = x / sr.scaledWidth.toFloat()
         val fY = y / sr.scaledHeight.toFloat()
@@ -35,24 +40,25 @@ abstract class GuiElement(var name: String, var scale: Float, var pos: FloatPair
     }
 
     fun setPos(x: Float, y: Float) {
-        pos = FloatPair(x, y)
+        this.x = x
+        this.y = y
     }
 
-    val actualX: Float
+    val scaleX: Float
         get() {
             val maxX = UResolution.scaledWidth
-            return maxX * pos.getX()
+            return maxX * x
         }
-    val actualY: Float
+    val scaleY: Float
         get() {
             val maxY = UResolution.scaledHeight
-            return maxY * pos.getY()
+            return maxY * y
         }
     abstract val height: Int
     abstract val width: Int
-    val actualHeight: Float
+    val scaleHeight: Float
         get() = height * scale
-    val actualWidth: Float
+    val scaleWidth: Float
         get() = width * scale
 
     companion object {
@@ -63,7 +69,9 @@ abstract class GuiElement(var name: String, var scale: Float, var pos: FloatPair
     }
 
     init {
-        pos = GuiManager.GUIPOSITIONS.getOrDefault(name, pos)
+        val pos = GuiManager.GUIPOSITIONS.getOrDefault(name, x to y)
+        x = pos.first
+        y = pos.second
         scale = GuiManager.GUISCALES.getOrDefault(name, scale)
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -36,6 +36,7 @@ import gg.skytils.skytilsmod.features.impl.events.TechnoMayor
 import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import gg.skytils.skytilsmod.features.impl.farming.GardenFeatures
 import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
+import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.handlers.*
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
@@ -52,6 +53,7 @@ import gg.skytils.skytilsmod.gui.OptionsGui
 import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
@@ -134,7 +136,6 @@ class Skytils {
 
         @JvmStatic
         lateinit var guiManager: GuiManager
-        var ticks = 0
 
         @JvmField
         val sendMessageQueue = ArrayDeque<String>()
@@ -247,13 +248,15 @@ class Skytils {
             ChatListener,
             DungeonListener,
             guiManager,
+            LocalAPI,
             MayorInfo,
             SBInfo,
             SoundQueue,
-            TickTaskManager,
+            TickTask,
             UpdateChecker,
 
             AlignmentTaskSolver,
+            AntiFool,
             ArmorColor,
             AuctionData,
             AuctionPriceOverlay,
@@ -298,6 +301,7 @@ class Skytils {
             MinionFeatures,
             MiscFeatures,
             MythologicalTracker,
+            PartyAddons,
             PartyFeatures,
             PartyFinderStats,
             PetFeatures,
@@ -327,6 +331,7 @@ class Skytils {
             TicTacToeSolver,
             TreasureHunter,
             TriviaSolver,
+            VisitorHelper,
             WaterBoardSolver,
             Waypoints
         ).forEach(MinecraftForge.EVENT_BUS::register)
@@ -411,19 +416,6 @@ class Skytils {
             val msg = sendMessageQueue.pollFirst()
             if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(msg)
         }
-
-        if (ticks % 20 == 0) {
-            if (mc.thePlayer != null) {
-                if (deobfEnvironment) {
-                    if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
-                    if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.skyblock = true
-                    if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.dungeons = true
-                }
-                if (DevTools.getToggle("sprint"))
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
-            }
-            ticks = 0
-        }
         if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
             if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
                 UChat.chat("Copied tab data to clipboard")
@@ -444,8 +436,20 @@ class Skytils {
                 )
             }
         }
+    }
 
-        ticks++
+    init {
+        TickTask(20, repeats = true) {
+            if (mc.thePlayer != null) {
+                if (deobfEnvironment) {
+                    if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
+                    if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.skyblock = true
+                    if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.dungeons = true
+                }
+                if (DevTools.getToggle("sprint"))
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
+            }
+        }
     }
 
     @SubscribeEvent
@@ -557,7 +561,7 @@ class Skytils {
             }
         }
         if (old is AccessorGuiStreamUnavailable) {
-            if (config.twitchFix && event.gui == null && !(Utils.skyblock && old.parentScreen is GuiGameOver)) {
+            if (config.twitchFix && event.gui == null && !(Utils.inSkyblock && old.parentScreen is GuiGameOver)) {
                 event.gui = old.parentScreen
             }
         }

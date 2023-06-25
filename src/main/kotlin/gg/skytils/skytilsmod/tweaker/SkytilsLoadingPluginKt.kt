@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -156,7 +156,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
     }
 }
 
-fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
+private fun createButton(text: String, onClick: JButton.() -> Unit): JButton {
     return JButton(text).apply {
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {

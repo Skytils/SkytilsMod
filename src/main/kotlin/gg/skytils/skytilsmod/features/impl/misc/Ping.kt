@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,6 @@ import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorServerListEntryNormal
@@ -97,7 +96,7 @@ object Ping {
         }
     }
 
-    class PingDisplayElement : GuiElement(name = "Ping Display", fp = FloatPair(10, 10)) {
+    class PingDisplayElement : GuiElement(name = "Ping Display", x = 10, y = 10) {
         override fun render() {
             if (Utils.isOnHypixel && toggled && mc.thePlayer != null) {
                 when (Skytils.config.pingDisplay) {

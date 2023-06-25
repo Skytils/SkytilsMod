@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -70,6 +70,7 @@ object DupeTracker : Tracker("duped_items") {
                 printDevMessage("Cleared dupe check", "dupecheck")
                 printDevMessage("Cleared auction", "dupecheck")
             }
+
             is S2DPacketOpenWindow -> {
                 inAuctionBrowser =
                     Utils.inSkyblock && packet.slotCount == 54 && packet.windowTitle.unformattedText.run {
@@ -81,12 +82,14 @@ object DupeTracker : Tracker("duped_items") {
                 printDevMessage("Cleared dupe check", "dupecheck")
                 printDevMessage("Is auction $inAuctionBrowser", "dupecheck")
             }
+
             is S2EPacketCloseWindow -> {
                 inAuctionBrowser = false
                 dupeChecking.clear()
                 printDevMessage("Cleared dupe check", "dupecheck")
                 printDevMessage("Cleared auction", "dupecheck")
             }
+
             is S2FPacketSetSlot -> {
                 if (!inAuctionBrowser || !Skytils.config.dupeTracker) return
                 val windowId = packet.func_149175_c()
@@ -106,6 +109,7 @@ object DupeTracker : Tracker("duped_items") {
                     }
                 }
             }
+
             is S30PacketWindowItems -> {
                 if (!inAuctionBrowser || !Skytils.config.dupeTracker) return
                 val windowId = packet.func_148911_c()
@@ -192,7 +196,7 @@ object DupeTracker : Tracker("duped_items") {
 
     init {
         fixedRateTimer(name = "Skytils-FetchDupeData", period = 7 * 60 * 1000L) {
-            if (Utils.skyblock && Skytils.config.dupeTracker) {
+            if (Utils.inSkyblock && Skytils.config.dupeTracker) {
                 Skytils.IO.launch {
                     client.get("https://${Skytils.domain}/api/auctions/dupeditems").body<List<IdentifiableItem>>()
                         .apply {

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,11 +42,8 @@ import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.childContainers
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.apache.commons.codec.binary.Base64
-import org.apache.commons.codec.binary.Base64InputStream
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipParameters
 import java.awt.Color
@@ -81,7 +78,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             SBInfo.mode == it.mode
         }.run { if (this == -1) 0 else this },
             SkyblockIsland.values()
-                .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.formattedName }
+                .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.displayName }
         ).childOf(window)
             .constrain {
                 x = 5.pixels(true)
@@ -154,13 +151,13 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private fun importFromClipboard() {
         runCatching {
             val clipboard = getClipboardString()
-            runCatching {
-                import(clipboard)
-            }.onFailure {
-                it.printStackTrace()
-                // When importing from the SBE format, the clipboard contents are not base64-encoded
-                importSBEFormat(clipboard)
-            }
+            val categories = Waypoints.getWaypointsFromString(clipboard)
+            Waypoints.categories.addAll(categories)
+            EssentialAPI.getNotifications().push(
+                "Waypoints Imported",
+                "Successfully imported ${categories.sumOf { it.waypoints.size }} waypoints!",
+                2.5f
+            )
 
             PersistentSave.markDirty<Waypoints>()
             loadWaypointsForSelection(islandDropdown.getValue())
@@ -169,101 +166,6 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             EssentialAPI.getNotifications()
                 .push("Error", "Failed to import waypoints, reason: ${it::class.simpleName}: ${it.message}")
         }
-    }
-
-    private fun import(str: String) = runCatching {
-        val categories = hashSetOf<WaypointCategory>()
-        if (str.startsWith("<Skytils-Waypoint-Data>(V")) {
-            val version = str.substringBefore(')').substringAfter('V').toIntOrNull() ?: 0
-            val content = str.substringAfter(':')
-
-            val json = when (version) {
-                1 -> {
-                    GzipCompressorInputStream(Base64InputStream(content.byteInputStream())).use {
-                        it.readBytes().decodeToString()
-                    }
-                }
-
-                else -> throw IllegalArgumentException("Unknown version $version")
-            }
-
-            categories.addAll(Skytils.json.decodeFromString<CategoryList>(json).categories)
-
-        } else categories.addAll(
-            Skytils.json.decodeFromString<CategoryList>(
-                Base64.decodeBase64(str).decodeToString()
-            ).categories
-        )
-
-
-        Waypoints.categories.addAll(categories)
-        EssentialAPI.getNotifications().push(
-            "Waypoints Imported",
-            "Successfully imported ${categories.sumOf { it.waypoints.size }} waypoints!",
-            2.5f
-        )
-    }.onFailure {
-        it.printStackTrace()
-        importOldFormat(str)
-    }
-
-    private fun importOldFormat(str: String) {
-        val waypoints = Skytils.json.decodeFromString<List<Waypoint>>(Base64.decodeBase64(str).decodeToString())
-        waypoints.groupBy {
-            @Suppress("DEPRECATION")
-            it.island!!
-        }.forEach { (island, waypoints) ->
-            Waypoints.categories.add(
-                WaypointCategory(
-                    name = null,
-                    waypoints = waypoints.toHashSet(),
-                    isExpanded = true,
-                    island = island
-                )
-            )
-        }
-
-        EssentialAPI.getNotifications()
-            .push(
-                "Waypoints Imported",
-                "Successfully imported ${waypoints.size} waypoints!",
-                2.5f
-            )
-    }
-
-    private val sbeWaypointFormat =
-        Regex("(?:\\.?\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
-
-    private fun importSBEFormat(str: String) {
-        val island = SkyblockIsland.values().find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
-        val waypoints = sbeWaypointFormat.findAll(str.trim().replace("\n", "")).map {
-            Waypoint(
-                it.groups["name"]!!.value,
-                -it.groups["x"]!!.value.toInt(), // For some dumb reason SBE inverts the x coordinate
-                it.groups["y"]!!.value.toInt(),
-                it.groups["z"]!!.value.toInt(),
-                true,
-                Color.RED,
-                System.currentTimeMillis(),
-                island
-            )
-        }.toSet()
-        if (waypoints.isEmpty()) {
-            error("Valid format not detected.")
-        }
-        Waypoints.categories.add(
-            WaypointCategory(
-                name = null,
-                waypoints = waypoints,
-                isExpanded = true,
-                island = island
-            )
-        )
-        EssentialAPI.getNotifications().push(
-            "Waypoints Imported",
-            "Successfully imported ${waypoints.size} waypoints!",
-            2.5f
-        )
     }
 
     private fun exportSelectedWaypoints() {
@@ -300,7 +202,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         EssentialAPI.getNotifications()
             .push(
                 "Waypoints Exported",
-                "$count ${island.formattedName} waypoints were copied to your clipboard!",
+                "$count ${island.displayName} waypoints were copied to your clipboard!",
                 2.5f
             )
     }

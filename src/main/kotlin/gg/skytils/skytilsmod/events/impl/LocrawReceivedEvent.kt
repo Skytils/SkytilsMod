@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,4 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.misc
+package gg.skytils.skytilsmod.events.impl
+
+import gg.skytils.skytilsmod.events.SkytilsEvent
+import gg.skytils.skytilsmod.utils.LocrawObject
+
+data class LocrawReceivedEvent(val loc: LocrawObject) : SkytilsEvent()

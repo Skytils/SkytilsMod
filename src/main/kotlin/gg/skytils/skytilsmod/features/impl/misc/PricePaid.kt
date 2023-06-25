@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -92,7 +92,7 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
 
     override fun read(reader: Reader) {
         prices.clear()
-        prices.putAll(json.decodeFromString<Map<UUID, Double>>(reader.readText()))
+        prices.putAll(json.decodeFromString<Map<@Contextual UUID, Double>>(reader.readText()))
     }
 
     override fun write(writer: Writer) {

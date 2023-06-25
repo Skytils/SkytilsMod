@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,6 +37,8 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 object BloodHelper {
     val watcherSkins = setOf(
@@ -48,38 +50,63 @@ object BloodHelper {
     val watchers = mutableSetOf<EntityZombie>()
     val mobs = hashMapOf<EntityArmorStand, BloodMob>()
 
+    private var neededRender = listOf<Triple<String, AxisAlignedBB, Vec3>>()
+
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) {
+            neededRender = emptyList()
+            return
+        } else {
+            watchers.removeIf { it.isDead }
+            mobs.entries.removeAll { (mob, bloodMob) ->
+                return@removeAll mob.isDead.also {
+                    printDevMessage(
+                        (System.currentTimeMillis() - bloodMob.start).toString(),
+                        "bloodHelper"
+                    )
+                }
+            }
+            neededRender = mobs.filter { it.value.finalPos != null }.entries
+                .mapIndexed { index, (_, mob) ->
+                    Triple(
+                        "${index + 1}",
+                        AxisAlignedBB(
+                            mob.finalPos!!.xCoord - 0.4,
+                            mob.finalPos!!.yCoord + 1,
+                            mob.finalPos!!.zCoord - 0.4,
+                            mob.finalPos!!.xCoord + 0.4,
+                            mob.finalPos!!.yCoord + 3,
+                            mob.finalPos!!.zCoord + 0.4
+                        ),
+                        mob.finalPos!!
+                    )
+                }
+        }
+    }
+
     @SubscribeEvent
     fun render(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) return
         val matrixStack = UMatrixStack()
-        watchers.removeIf { it.isDead }
-        mobs.also {
-            it.filter { it.key.isDead && !it.value.e }
-                .forEach { printDevMessage((System.currentTimeMillis() - it.value.start).toString(), "bloodHelper"); it.value.e = true }
-        }.filter { !it.key.isDead && it.value.finalPos != null }.toList()
-            .forEachIndexed { index, (_, mob) ->
-                RenderUtil.drawOutlinedBoundingBox(
-                    AxisAlignedBB(
-                        mob.finalPos!!.xCoord - 0.4,
-                        mob.finalPos!!.yCoord + 1,
-                        mob.finalPos!!.zCoord - 0.4,
-                        mob.finalPos!!.xCoord + 0.4,
-                        mob.finalPos!!.yCoord + 3,
-                        mob.finalPos!!.zCoord + 0.4
-                    ),
-                    Skytils.config.bloodHelperColor,
-                    1f,
-                    event.partialTicks
-                )
-                RenderUtil.renderWaypointText(
-                    "${index + 1}",
-                    mob.finalPos!!.xCoord,
-                    mob.finalPos!!.yCoord + 2,
-                    mob.finalPos!!.zCoord,
-                    event.partialTicks,
-                    matrixStack
-                )
-            }
+        neededRender.forEach { (num, box, pos) ->
+            RenderUtil.drawOutlinedBoundingBox(
+                box,
+                Skytils.config.bloodHelperColor,
+                1f,
+                event.partialTicks
+            )
+            RenderUtil.renderWaypointText(
+                num,
+                pos.xCoord,
+                pos.yCoord + 2,
+                pos.zCoord,
+                event.partialTicks,
+                matrixStack
+            )
+        }
     }
 
     @SubscribeEvent
@@ -101,6 +128,7 @@ object BloodHelper {
     fun onWorldChange(event: WorldEvent.Load) {
         watchers.clear()
         mobs.clear()
+        neededRender = emptyList()
     }
 
     @SubscribeEvent
@@ -139,7 +167,6 @@ object BloodHelper {
         val deltas: MutableList<Vec3> = mutableListOf(),
         var finalPos: Vec3? = null,
         val start: Long,
-        var e: Boolean = false
     ) {
         val limit: Int = 3
 

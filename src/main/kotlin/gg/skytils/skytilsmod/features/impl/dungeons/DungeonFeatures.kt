@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
@@ -71,6 +70,7 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -79,11 +79,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
-import java.util.regex.Pattern
 
 object DungeonFeatures {
     private val deathOrPuzzleFail =
-        Pattern.compile("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
+        Regex("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
     private val thornMissMessages = arrayOf(
         "chickens",
         "shot",
@@ -108,6 +107,20 @@ object DungeonFeatures {
     private var blazes = 0
     private var secondsToPortal = 0f
     var hasClearedText = false
+    private var terracottaSpawns = hashMapOf<BlockPos, Long>()
+    private val dungeonMobSpawns = setOf(
+        "Lurker",
+        "Dreadlord",
+        "Souleater",
+        "Zombie",
+        "Skeleton",
+        "Skeletor",
+        "Sniper",
+        "Super Archer",
+        "Spider",
+        "Fels",
+        "Withermancer"
+    )
 
     init {
         LividGuiElement()
@@ -122,6 +135,11 @@ object DungeonFeatures {
                 lastLitUpTime =
                     if (event.update.block === Blocks.sea_lantern && event.old.block === Blocks.coal_block) System.currentTimeMillis() else -1L
                 printDevMessage("change light $lastLitUpTime", "spiritbear")
+            }
+        } else if (isInTerracottaPhase && Skytils.config.terracottaRespawnTimer && dungeonFloor?.endsWith('6') == true) {
+            if (event.old.block == Blocks.air && event.update.block == Blocks.flower_pot) {
+                // TODO: verify M6 time
+                terracottaSpawns[event.pos] = System.currentTimeMillis() + if (dungeonFloor == "F6") 15000 else 13000
             }
         }
     }
@@ -370,8 +388,7 @@ object DungeonFeatures {
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
-                val deathFailMatcher = deathOrPuzzleFail.matcher(unformatted)
-                if (deathFailMatcher.find() || (unformatted.startsWith("[CROWD]") && thornMissMessages.any {
+                if (deathOrPuzzleFail.containsMatchIn(unformatted) || (unformatted.startsWith("[CROWD]") && thornMissMessages.any {
                         unformatted.contains(
                             it,
                             true
@@ -410,9 +427,12 @@ object DungeonFeatures {
                     hasBossSpawned = true
                 }
                 if (bossName == "Sadan") {
-                    if (unformatted.contains("So you made it all the way here")) isInTerracottaPhase = true
-                    if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable.")) isInTerracottaPhase =
-                        false
+                    if (unformatted.contains("So you made it all the way here")) {
+                        isInTerracottaPhase = true
+                    } else if (unformatted.contains("ENOUGH!") || unformatted.contains("It was inevitable.")) {
+                        isInTerracottaPhase = false
+                        terracottaSpawns.clear()
+                    }
                 }
             }
         }
@@ -438,11 +458,11 @@ object DungeonFeatures {
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
             val matrixStack = UMatrixStack()
-            if (Skytils.config.boxSpiritBow && equalsOneOf(
+            if (Skytils.config.boxSpiritBow && hasBossSpawned && event.entity.isInvisible && equalsOneOf(
                     dungeonFloor,
                     "F4",
                     "M4"
-                ) && hasBossSpawned && event.entity is EntityArmorStand && event.entity.isInvisible && event.entity.heldItem?.item == Items.bow
+                ) && event.entity is EntityArmorStand && event.entity.heldItem?.item == Items.bow
             ) {
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
@@ -478,56 +498,105 @@ object DungeonFeatures {
                 }
                 if (Skytils.config.hideNonStarredNametags) {
                     val name = event.entity.customNameTag.stripControlCodes()
-                    if (!name.startsWith("✯ ") && name.contains("❤")) if (name.contains("Lurker") || name.contains("Dreadlord") || name.contains(
-                            "Souleater"
-                        ) || name.contains("Zombie") || name.contains("Skeleton") || name.contains("Skeletor") || name.contains(
-                            "Sniper"
-                        ) || name.contains("Super Archer") || name.contains("Spider") || name.contains("Fels") || name.contains(
-                            "Withermancer"
-                        )
-                    ) mc.theWorld.removeEntity(event.entity)
+                    if (!name.startsWith("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
+                        mc.theWorld.removeEntity(event.entity)
+                    }
                 }
                 if (Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
                     event.isCanceled = true
                 }
             }
-            if (!mc.renderManager.isDebugBoundingBox && !event.entity.isInvisible) {
-                if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
-                    if (MayorInfo.currentMayor == "Derpy") equalsOneOf(
-                        event.entity.maxHealth,
-                        200f,
-                        800f
-                    ) else equalsOneOf(
-                        event.entity.maxHealth,
-                        100f,
-                        400f
-                    )
-                ) {
-                    RenderUtil.drawOutlinedBoundingBox(
-                        event.entity.entityBoundingBox,
-                        Color(0, 255, 255, 255),
-                        3f,
-                        RenderUtil.getPartialTicks()
-                    )
-                }
-                if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
-                        event.entity.getCurrentArmor(0)
-                    ) == "SKELETON_MASTER_BOOTS"
-                ) {
-                    RenderUtil.drawOutlinedBoundingBox(
-                        event.entity.entityBoundingBox,
-                        Color(255, 107, 11, 255),
-                        3f,
-                        RenderUtil.getPartialTicks()
-                    )
-                }
-                if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
-                    RenderUtil.drawOutlinedBoundingBox(
-                        event.entity.entityBoundingBox,
-                        Color(121, 11, 255, 255),
-                        3f,
-                        RenderUtil.getPartialTicks()
-                    )
+            if (!mc.renderManager.isDebugBoundingBox) {
+                if (!event.entity.isInvisible) {
+                    if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
+                        if (MayorInfo.currentMayor == "Derpy") equalsOneOf(
+                            event.entity.maxHealth,
+                            200f,
+                            800f
+                        ) else equalsOneOf(
+                            event.entity.maxHealth,
+                            100f,
+                            400f
+                        )
+                    ) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(0, 255, 255, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    } else if (event.entity is EntitySkeleton && Skytils.config.boxSkeletonMasters && ItemUtil.getSkyBlockItemID(
+                            event.entity.getCurrentArmor(0)
+                        ) == "SKELETON_MASTER_BOOTS"
+                    ) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(255, 107, 11, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    } else if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
+                        RenderUtil.drawOutlinedBoundingBox(
+                            event.entity.entityBoundingBox,
+                            Color(121, 11, 255, 255),
+                            3f,
+                            RenderUtil.getPartialTicks()
+                        )
+                    }
+                } else {
+                    if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
+                        val name = event.entity.name
+                        if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
+                            val x =
+                                RenderUtil.interpolate(
+                                    event.entity.lastTickPosX,
+                                    event.entity.posX,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            val y =
+                                RenderUtil.interpolate(
+                                    event.entity.lastTickPosY,
+                                    event.entity.posY,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            val z =
+                                RenderUtil.interpolate(
+                                    event.entity.lastTickPosZ,
+                                    event.entity.posZ,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            val color = Color(0, 255, 255, 255)
+                            if ("Spider" in name) {
+                                RenderUtil.drawOutlinedBoundingBox(
+                                    AxisAlignedBB(
+                                        x - 0.625,
+                                        y - 1,
+                                        z - 0.625,
+                                        x + 0.625,
+                                        y - 0.25,
+                                        z + 0.625
+                                    ),
+                                    color,
+                                    3f,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            } else if ("Fels" in name || "Withermancer" in name) {
+                                RenderUtil.drawOutlinedBoundingBox(
+                                    AxisAlignedBB(x - 0.5, y - 3, z - 0.5, x + 0.5, y, z + 0.5),
+                                    color,
+                                    3f,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            } else {
+                                RenderUtil.drawOutlinedBoundingBox(
+                                    AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),
+                                    color,
+                                    3f,
+                                    RenderUtil.getPartialTicks()
+                                )
+                            }
+                        }
+                    }
                 }
             }
             if (event.entity == lividTag) {
@@ -547,6 +616,26 @@ object DungeonFeatures {
                 )
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        val stack = UMatrixStack()
+        GlStateManager.disableCull()
+        GlStateManager.disableDepth()
+        terracottaSpawns.entries.removeAll {
+            val diff = it.value - System.currentTimeMillis()
+            RenderUtil.drawLabel(
+                it.key.middleVec(),
+                "${(diff / 1000.0).roundToPrecision(2)}s",
+                Color.WHITE,
+                event.partialTicks,
+                stack
+            )
+            return@removeAll diff < 0
+        }
+        GlStateManager.enableCull()
+        GlStateManager.enableDepth()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -660,15 +749,16 @@ object DungeonFeatures {
         startWithoutFullParty = false
         blazes = 0
         hasClearedText = false
+        terracottaSpawns.clear()
     }
 
-    class PortalTimer : GuiElement("Blood Room Portal Timer", FloatPair(0.05f, 0.4f)) {
+    class PortalTimer : GuiElement("Blood Room Portal Timer", x = 0.05f, y = 0.4f) {
         override fun render() {
             if (!toggled || !Utils.inDungeons || DungeonTimer.bloodClearTime == -1L || DungeonTimer.bossEntryTime != -1L || mc.thePlayer?.isInsideOfMaterial(
                     Material.portal
                 ) == false
             ) return
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§a${secondsToPortal.roundToPrecision(2)}s",
@@ -681,7 +771,7 @@ object DungeonFeatures {
         }
 
         override fun demoRender() {
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "§aPortal: 3.99s",
@@ -707,7 +797,7 @@ object DungeonFeatures {
         }
     }
 
-    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", FloatPair(0.05f, 0.4f)) {
+    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
         override fun render() {
             if (toggled && lastLitUpTime != -1L) {
                 val time = lastLitUpTime + 3400
@@ -716,7 +806,7 @@ object DungeonFeatures {
                     lastLitUpTime = -1
                 }
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     "Spirit Bear ${diff / 1000f}s",
@@ -731,7 +821,7 @@ object DungeonFeatures {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
                 "Spirit Bear: 3.4s",
@@ -756,14 +846,14 @@ object DungeonFeatures {
         }
     }
 
-    internal class LividGuiElement : GuiElement("Livid HP", FloatPair(0.05f, 0.4f)) {
+    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f) {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
             if (toggled && Utils.inDungeons && player != null && world != null) {
                 if (lividTag == null) return
 
-                val leftAlign = actualX < sr.scaledWidth / 2f
+                val leftAlign = scaleX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     lividTag!!.name.replace("§l", ""),
@@ -778,7 +868,7 @@ object DungeonFeatures {
 
         override fun demoRender() {
 
-            val leftAlign = actualX < sr.scaledWidth / 2f
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             val text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿"
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(

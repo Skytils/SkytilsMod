@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -32,24 +33,18 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import javax.xml.ws.Holder
 
 
 object CreeperSolver {
     private val colors = CommonColors.set.copySet()
     private val solutionPairs = arrayListOf<Pair<BlockPos, BlockPos>>()
-    private var ticks = 0
     private var creeper: EntityCreeper? = null
     private val candidateBlocks = setOf(Blocks.prismarine, Blocks.sea_lantern)
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (ticks % 20 == 0) {
+    init {
+        TickTask(20, repeats = true) {
             if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Creeper Beams"
                 )
@@ -68,9 +63,15 @@ object CreeperSolver {
                         it.y > 68 && mc.theWorld?.getBlockState(it)?.block in candidateBlocks
                     }
                     val pairs = candidates.elementPairs()
-
+                    val usedPositions = mutableSetOf<BlockPos>()
                     solutionPairs.addAll(pairs.filter { (a, b) ->
-                        checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(null))
+                        if (a in usedPositions || b in usedPositions) return@filter false
+                        checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(Vec3(0.0, 0.0, 0.0))).also {
+                            if (it) {
+                                usedPositions.add(a)
+                                usedPositions.add(b)
+                            }
+                        }
                     })
 
                     if (SuperSecretSettings.bennettArthur) {
@@ -83,9 +84,7 @@ object CreeperSolver {
                     }
                 }
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent
@@ -248,4 +247,6 @@ object CreeperSolver {
     private fun AxisAlignedBB.isVecInXY(vec: Vec3): Boolean {
         return vec.xCoord >= this.minX && vec.xCoord <= this.maxX && vec.yCoord >= this.minY && vec.yCoord <= this.maxY
     }
+
+    private class Holder<T>(var value: T)
 }

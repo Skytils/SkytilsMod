@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.events
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
@@ -36,8 +35,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
 object MayorJerry {
 
@@ -78,14 +76,13 @@ object MayorJerry {
         }
     }
 
-    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", FloatPair(10, 10)) {
-        @OptIn(ExperimentalTime::class)
+    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", x = 10, y = 10) {
         override fun render() {
             if (Utils.inSkyblock && toggled && MayorInfo.currentMayor == "Jerry") {
                 if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
                     ScreenRenderer.fontRenderer.drawString("Visit Jerry!", 0f, 0f, CommonColors.RED)
                 } else {
-                    val timeUntilNext = Duration.milliseconds(MayorInfo.newJerryPerks - System.currentTimeMillis())
+                    val timeUntilNext = (MayorInfo.newJerryPerks - System.currentTimeMillis()).milliseconds
                     ScreenRenderer.fontRenderer.drawString(
                         "${MayorInfo.jerryMayor!!.name}: ${
                             timeUntilNext.toComponents { hours, minutes, _, _ ->
@@ -126,14 +123,13 @@ object MayorJerry {
         }
     }
 
-    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", FloatPair(10, 10)) {
+    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", x = 10, y = 10) {
         private val villagerEgg = ItemStack(Items.spawn_egg, 1, 120)
 
-        @OptIn(ExperimentalTime::class)
         override fun render() {
             if (Utils.inSkyblock && toggled && lastJerry != -1L) {
                 renderItem(villagerEgg, 0, 0)
-                val elapsed = Duration.milliseconds(System.currentTimeMillis() - lastJerry)
+                val elapsed = (System.currentTimeMillis() - lastJerry).milliseconds
                 ScreenRenderer.fontRenderer.drawString(
                     elapsed.toComponents { minutes, seconds, _ ->
                         "${if (minutes >= 6) "§a" else ""}${minutes}:${

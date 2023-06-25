@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,10 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.TabListUtils
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.stripControlCodes
+import gg.skytils.skytilsmod.utils.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -39,15 +36,13 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.round
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 object MayorInfo {
 
@@ -58,7 +53,6 @@ object MayorInfo {
     var isLocal = true
     var jerryMayor: Mayor? = null
     var newJerryPerks = 0L
-    private var ticks = 0
     private var lastCheckedElectionOver = 0L
     private var lastFetchedMayorData = 0L
     private var lastSentData = 0L
@@ -67,13 +61,11 @@ object MayorInfo {
 
     private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
-        if (mc.currentServerData?.serverIP?.lowercase()
-                ?.contains("alpha") == true
-        ) return
-        if (ticks % (60 * 20) == 0) {
+    init {
+        TickTask(60 * 20, repeats = true) {
+            if (!Utils.inSkyblock || mc.currentServerData?.serverIP?.lowercase()
+                    ?.contains("alpha") == true
+            ) return@TickTask
             if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {
                 if (jerryMayor != null && Skytils.config.displayJerryPerks) {
                     SoundQueue.addToQueue("random.orb", 0.8f, 1f, 1, true)
@@ -97,9 +89,7 @@ object MayorInfo {
                 }
                 lastCheckedElectionOver = System.currentTimeMillis()
             }
-            ticks = 0
         }
-        ticks++
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -140,7 +130,6 @@ object MayorInfo {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
         if (!Utils.inSkyblock) return
@@ -168,7 +157,10 @@ object MayorInfo {
                     }
                     val color = item.displayName.substring(0, 2)
                     val lore = ItemUtil.getItemLore(item)
-                    if (lore.contains("§8Perks List") && (lore.contains("§7The listed perks are") || lore.contains("§7This perk is available to all"))) {
+                    if ((lore.contains("§8Perks List") || lore.contains("§7The mayor has been elected")) && (lore.contains(
+                            "§7The listed perks are"
+                        ) || lore.contains("§7This perk is available to all"))
+                    ) {
                         val perks = HashSet<String>()
                         for (line in lore) {
                             if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {
@@ -195,7 +187,7 @@ object MayorInfo {
                 } ?: return
                 val matcher = jerryNextPerkRegex.find(endingIn) ?: return
                 val timeLeft =
-                    Duration.hours(matcher.groups["h"]!!.value.toInt()) + Duration.minutes(matcher.groups["m"]!!.value.toInt())
+                    matcher.groups["h"]!!.value.toInt().hours + matcher.groups["m"]!!.value.toInt().minutes
                 val nextPerksNoRound = System.currentTimeMillis() + timeLeft.inWholeMilliseconds
                 val nextPerks = round(nextPerksNoRound / 300000.0).toLong() * 300000L
                 if (jerryMayor != mayor || abs(nextPerks - newJerryPerks) > 60000) {
@@ -242,6 +234,7 @@ object MayorInfo {
             val commentForDecompilers =
                 "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
             mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
+            if (DevTools.getToggle("mayor")) println(url)
             println(client.get(url).bodyAsText())
         } catch (e: AuthenticationException) {
             e.printStackTrace()

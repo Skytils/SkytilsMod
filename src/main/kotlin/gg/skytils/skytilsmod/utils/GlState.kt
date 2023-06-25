@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import org.lwjgl.opengl.GLContext
+import java.nio.FloatBuffer
 import java.util.*
 
 class GlState {
@@ -53,7 +54,7 @@ class GlState {
     var blendAlphaDst = 0
     var alphaState = false
     var depthState = false
-    var colorState = GLAllocation.createDirectByteBuffer(64).asFloatBuffer()
+    var colorState: FloatBuffer = GLAllocation.createDirectByteBuffer(64).asFloatBuffer()
 
     fun pushState() {
         lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)

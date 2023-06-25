@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,6 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.structure.FloatPair
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.structure.LocationButton
 import gg.skytils.skytilsmod.core.structure.ResizeButton
@@ -91,8 +90,8 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
         val floatMouseY = (mc.displayHeight - Mouse.getY()) / minecraftScale
         if (button is LocationButton) {
             dragging = button.element
-            xOffset = floatMouseX - dragging!!.actualX
-            yOffset = floatMouseY - dragging!!.actualY
+            xOffset = floatMouseX - dragging!!.scaleX
+            yOffset = floatMouseY - dragging!!.scaleY
         } else if (button is ResizeButton) {
             dragging = button.element
             resizing = true
@@ -106,7 +105,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
         if (mouseButton == 1) {
             buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
-                it.element.pos = FloatPair(10, 10)
+                it.element.setPos(10, 10)
                 it.element.scale = 1f
             }
         }
@@ -151,7 +150,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                     val scaleY = newHeight / height
                     val newScale = scaleX.coerceAtLeast(scaleY).coerceAtLeast(0.01f)
                     locationButton.element.scale *= newScale
-                    locationButton.element.pos.setY((scaledY - newHeight) / sr.scaledHeight)
+                    locationButton.element.setPos(locationButton.element.x, (scaledY - newHeight) / sr.scaledHeight)
                 }
 
                 Corner.BOTTOM_LEFT -> {
@@ -175,9 +174,9 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
         buttonList.removeIf { button: GuiButton? -> button is ResizeButton && button.element !== element }
         val locationButton = locationButtons[element] ?: return
         val boxXOne = locationButton.x - ResizeButton.SIZE * element.scale
-        val boxXTwo = locationButton.x + element.actualWidth + ResizeButton.SIZE * 2 * element.scale
+        val boxXTwo = locationButton.x + element.scaleWidth + ResizeButton.SIZE * 2 * element.scale
         val boxYOne = locationButton.y - ResizeButton.SIZE * element.scale
-        val boxYTwo = locationButton.y + element.actualHeight + ResizeButton.SIZE * 2 * element.scale
+        val boxYTwo = locationButton.y + element.scaleHeight + ResizeButton.SIZE * 2 * element.scale
         buttonList.add(ResizeButton(boxXOne, boxYOne, element, Corner.TOP_LEFT))
         buttonList.add(ResizeButton(boxXTwo, boxYOne, element, Corner.TOP_RIGHT))
         buttonList.add(ResizeButton(boxXOne, boxYTwo, element, Corner.BOTTOM_LEFT))
@@ -191,9 +190,9 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                 val element = button.element
                 val locationButton = locationButtons[element] ?: continue
                 val boxXOne = locationButton.x - ResizeButton.SIZE * element.scale
-                val boxXTwo = locationButton.x + element.actualWidth + ResizeButton.SIZE * element.scale
+                val boxXTwo = locationButton.x + element.scaleWidth + ResizeButton.SIZE * element.scale
                 val boxYOne = locationButton.y - ResizeButton.SIZE * element.scale
-                val boxYTwo = locationButton.y + element.actualHeight + ResizeButton.SIZE * element.scale
+                val boxYTwo = locationButton.y + element.scaleHeight + ResizeButton.SIZE * element.scale
                 when (corner) {
                     Corner.TOP_LEFT -> {
                         button.x = boxXOne

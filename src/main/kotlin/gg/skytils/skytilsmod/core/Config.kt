@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -50,7 +50,7 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
-        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit"]
+        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Vistor Offer Helper", "Copper"]
     )
     var fetchLowestBINPrices = false
 
@@ -61,6 +61,21 @@ object Config : Vigilant(
         options = ["Simple", "Advanced"]
     )
     var commandAliasMode = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Auto Start Local API",
+        description = "Automatically launches the Local API on game startup.",
+        category = "General", subcategory = "Local API",
+    )
+    var localAPIAutoStart = false
+
+    @Property(
+        type = PropertyType.TEXT, name = "Local API Password",
+        description = "Sets the password for the local API. No password will cause all requests to be rejected.",
+        category = "General", subcategory = "Local API",
+        protectedText = true
+    )
+    var localAPIPassword = ""
 
     @Property(
         type = PropertyType.BUTTON, name = "Join the Skytils Discord",
@@ -365,7 +380,14 @@ object Config : Vigilant(
         description = "Changes the color of the outline.",
         category = "Dungeons", subcategory = "Quality of Life"
     )
-    var bloodHelperColor = Color.RED
+    var bloodHelperColor: Color = Color.RED
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Box Starred Mobs",
+        description = "Draws the bounding box for Starred Mobs.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxStarredMobs = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
@@ -588,6 +610,13 @@ object Config : Vigilant(
     var showSadanInterest = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Terracotta Respawn Time",
+        description = "Displays a timer until Terracotta respawn",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var terracottaRespawnTimer = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Show Necron's HP",
         description = "Shows additional info about Necron's health.",
         category = "Dungeons", subcategory = "Quality of Life",
@@ -608,6 +637,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var showWitherKingDragonsHP = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Wither King's Dragons' Spawn Timer",
+        description = "Displays a timer for when the dragons are about to spawn in.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showWitherKingDragonsSpawnTimer = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Spirit Bear Timer",
@@ -1048,6 +1084,13 @@ object Config : Vigilant(
     var samScytheColor = Color(255, 0, 0, 50)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Visitor Offer Helper",
+        description = "Displays information about visitor offers.",
+        category = "Farming", subcategory = "Garden"
+    )
+    var visitorOfferHelper = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Visitor Notifications",
         description = "Sends a message in chat when a visitor is at your garden.",
         category = "Farming", subcategory = "Garden"
@@ -1272,13 +1315,6 @@ object Config : Vigilant(
     var fixFallingSandRendering = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Fix SBA Chroma",
-        description = "Fixes SBA chroma with Patcher 1.6",
-        category = "Miscellaneous", subcategory = "Fixes"
-    )
-    var fixSbaChroma = true
-
-    @Property(
         type = PropertyType.SWITCH, name = "Fix World Time",
         description = "Fixes world time on other mods being messed up due to certain mods.",
         category = "Miscellaneous", subcategory = "Fixes"
@@ -1345,7 +1381,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Filled Bazaar Orders",
-        description = "Highlights 100% filled orders in the bazaar.",
+        description = "Highlights 100%% filled orders in the bazaar.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var highlightFilledBazaarOrders = false
@@ -1568,7 +1604,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Low Health Vignette Threshold",
-        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0% to disable.",
+        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0%% to disable.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var lowHealthVignetteThreshold = 0.0f
@@ -1767,6 +1803,13 @@ object Config : Vigilant(
     var customDamageSplash = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Disable Enderman Teleportation",
+        description = "Removes the enderman teleport effect.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var disableEndermanTeleport = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Disable Night Vision",
         description = "Removes the vanilla effects of Night Vision.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1803,6 +1846,13 @@ object Config : Vigilant(
     var hideAirDisplay = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Armor Display",
+        description = "Prevents the game from rendering the vanilla armor points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideArmorDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Cheap Coins",
         description = "Prevents the game from rendering cheap coins.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1831,6 +1881,13 @@ object Config : Vigilant(
     var hideFishingHooks = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Hunger Display",
+        description = "Prevents the game from rendering the vanilla hunger points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideHungerDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Jerry Rune",
         description = "Prevents the game from rendering the items spawned by the Jerry rune.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1852,6 +1909,20 @@ object Config : Vigilant(
     var hideDeathParticles = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Pet Health Display",
+        description = "Hides the Vanilla pet hearts.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hidePetHealth = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Players in Spawn",
+        description = "Hides players in the spawn area at the Hub.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hidePlayersInSpawn = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Hide Potion Effects in Inventory",
         description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1864,6 +1935,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var hideScoreboardScore = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Vanilla Health Display",
+        description = "Prevents the game from rendering the vanilla heart points.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var hideHealthDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Disabled Potion Effects",
@@ -1929,6 +2007,27 @@ object Config : Vigilant(
     var noHurtcam = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Party Addons",
+        description = "Adds a few features to the party list.\n§eNote: Requires Hypixel Language to be set to English. §7(/lang en)",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var partyAddons = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Cursor Reset",
+        description = "Prevents the cursor from resetting to the center of the screen when you open a GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventCursorReset = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Moving on Death",
+        description = "Unpresses all keys on death to prevent you from moving.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventMovingOnDeath = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Power Orb Lock",
         description = "Prevents placing the power orb if the same or better power orb is within range.",
         category = "Miscellaneous", subcategory = "Quality of Life"
@@ -1937,7 +2036,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.NUMBER, name = "Power Orb Lock Duration",
-        description = "Needs Power Orb Lock to be active. Allows overwriting a power orb, if it has less time left than this option.",
+        description = "Allows overwriting a power orb, if it has less time left than this option.",
         min = 1, max = 120,
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
@@ -1993,6 +2092,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var showCoinsPerBit = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Coins per Copper",
+        description = "Shows how many coins you will get per copper spent at the SkyMart.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showCoinsPerCopper = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Lowest BIN Price",
@@ -2141,6 +2247,26 @@ object Config : Vigilant(
     var voidRNG = 0f
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Current Inferno RNG Meter",
+        description = "Internal value to store current Inferno Demonlord RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var blazeRNG = 0f
+
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Current Bloodfiend RNG Meter",
+        description = "Internal value to store current Riftstalker Bloodfiend RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var vampRNG = 0f
+
+    @Property(
         type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
         description = "Open chat, then click anywhere on screen to open Maddox Menu.",
         category = "Slayer", subcategory = "Quality of Life"
@@ -2149,7 +2275,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SELECTOR, name = "Carry Mode",
-        description = "Allow middle clicking to set your local LappySheep's slayer boss.\nDisable this if you are doing your own boss.",
+        description = "Allow middle clicking to set your slayer boss.\nDisable this if you are doing your own boss.",
         category = "Slayer", subcategory = "General",
         options = ["Off", "T1", "T2", "T3", "T4", "T5"]
     )
@@ -2343,6 +2469,28 @@ object Config : Vigilant(
         max = 8
     )
     var totemPing = 0
+
+    @Property(
+        PropertyType.SWITCH, name = "Hide Pacified Blazes",
+        description = "Stops rendering faraway blazes when fighting the Inferno Demonlord if Smoldering Polarization is active.\n" +
+                "Do note that you will still be able to interact with them! /skytilsupdatepotioneffects",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var ignorePacifiedBlazes = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Ping when in Inferno Demonlord Fire",
+        description = "Shows a warning when you are standing on Inferno Demonlord's fire.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var blazeFireWarning = false
+
+    @Property(
+        PropertyType.SWITCH, name = "Recolor Demonlord Boss by Attunement",
+        description = "Recolors the Inferno boss and demons depending on the correct dagger attunement.",
+        category = "Slayer", subcategory = "Inferno Demonlord"
+    )
+    var attunementDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
@@ -2752,7 +2900,9 @@ object Config : Vigilant(
             "dungeonChestProfit",
             "showCoinsPerBit",
             "protectItemBINThreshold",
-            "containerSellValue"
+            "containerSellValue",
+            "visitorOfferHelper",
+            "showCoinsPerCopper"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
@@ -2808,6 +2958,7 @@ object Config : Vigilant(
             "seraphNormalPhaseColor"
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
+        addDependency("powerOrbDuration", "powerOrbLock")
         addDependency("markDirtyItems", "dupeTracker")
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 

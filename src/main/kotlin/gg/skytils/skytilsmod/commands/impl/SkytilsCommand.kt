@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2022 Skytils
+ * Copyright (C) 2020-2023 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,9 +39,13 @@ import gg.skytils.skytilsmod.features.impl.misc.PricePaid
 import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
+import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.gui.profile.ProfileGui
+import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.utils.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
@@ -59,6 +63,20 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
         }
         when (args[0].lowercase()) {
             "config" -> Skytils.config.openGUI()
+            "localapi" -> {
+                runCatching {
+                    when (args.getOrNull(1)?.lowercase()) {
+                        "on" -> LocalAPI.startServer()
+                        "off" -> LocalAPI.stopServer()
+                        else -> UChat.chat("$prefix §b/skytils localapi <on/off>")
+                    }
+                }.onFailure {
+                    UChat.chat("$failPrefix §cThe LocalAPI server emitted an error: ${it.message}.")
+                }.onSuccess {
+                    UChat.chat("$successPrefix §bThe LocalAPI server has been modified.")
+                }
+            }
+
             "fetchur" -> player.addChatMessage(
                 ChatComponentText(
                     "$prefix §bToday's Fetchur item is: §f" + MiningFeatures.fetchurItems.values.toTypedArray()
@@ -175,8 +193,10 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
 
             "aliases", "alias", "editaliases", "commandaliases" -> Skytils.displayScreen = CommandAliasesGui()
-            "editlocation", "editlocations", "location", "locations", "loc", "gui" -> Skytils.displayScreen =
-                LocationEditGui()
+            "editlocation", "editlocations", "location", "locations", "loc", "gui" ->
+                Skytils.displayScreen = ElementaEditingGui()
+
+            "oldgui" -> Skytils.displayScreen = LocationEditGui()
 
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()
@@ -188,7 +208,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "swaphub" -> {
                 if (Utils.inSkyblock) {
                     Skytils.sendMessageQueue.add("/warpforge")
-                    CoroutineScope(Dispatchers.Default).launch {
+                    Skytils.launch {
                         delay(2000)
                         Skytils.sendMessageQueue.add("/warp ${args.getOrNull(1) ?: "hub"}")
                     }
@@ -278,6 +298,13 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 PricePaid.prices[UUID.fromString(extraAttr.getString("uuid").ifEmpty { return })] =
                     args[1].toDoubleOrNull() ?: return
                 PersistentSave.markDirty<PricePaid>()
+            }
+
+            "resetelement" -> {
+                val element = Skytils.guiManager.getByName(args.drop(1).joinToString(" "))
+                    ?: return UChat.chat("$failPrefix §cThat element was not found!")
+                element.setPos(0.5f, 0.5f)
+                element.scale = 1f
             }
 
             else -> UChat.chat("$failPrefix §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")
