@@ -137,7 +137,7 @@ object SlayerFeatures : CoroutineScope {
                 is EntityBlaze -> DemonlordSlayer(entity)
                 is EntityOtherPlayerMP -> {
                     if (entity.name == "Bloodfiend ") {
-                        RiftstalkerSlayer(entity)
+                        BloodfiendSlayer(entity)
                     } else null
                 }
 
@@ -1389,7 +1389,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class RiftstalkerSlayer(entity: EntityOtherPlayerMP) :
+    class BloodfiendSlayer(entity: EntityOtherPlayerMP) :
         Slayer<EntityOtherPlayerMP>(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend") {
         override fun tick(event: ClientTickEvent) {
             if (Config.oneShotAlert && this.nameEntity?.displayName?.unformattedText?.contains(

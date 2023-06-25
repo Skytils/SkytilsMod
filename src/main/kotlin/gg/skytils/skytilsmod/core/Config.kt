@@ -2495,14 +2495,14 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.SWITCH, name = "Vampire Slayer One Shot Alert",
         description = "Shows a title when you can one-shot the Vampire Slayer with Steak Stake",
-        category = "Slayer", subcategory = "Vampire Slayer"
+        category = "Slayer"
     )
     var oneShotAlert = false;
 
     @Property(
         type = PropertyType.SWITCH, name = "Twinclaw Alert",
         description = "Shows a title when the Vampire Slayer is about to do a Twinclaw attack",
-        category = "Slayer", subcategory = "Vampire Slayer"
+        category = "Slayer"
     )
     var twinclawAlert = false;
 
