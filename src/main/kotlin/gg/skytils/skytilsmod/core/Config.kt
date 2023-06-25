@@ -2497,14 +2497,14 @@ object Config : Vigilant(
         description = "Shows a title when you can one-shot the Vampire Slayer with Steak Stake",
         category = "Slayer"
     )
-    var oneShotAlert = false;
+    var oneShotAlert = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Twinclaw Alert",
         description = "Shows a title when the Vampire Slayer is about to do a Twinclaw attack",
         category = "Slayer"
     )
-    var twinclawAlert = false;
+    var twinclawAlert = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
@@ -2899,7 +2899,6 @@ object Config : Vigilant(
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var windHider = 0
-
 
     init {
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
