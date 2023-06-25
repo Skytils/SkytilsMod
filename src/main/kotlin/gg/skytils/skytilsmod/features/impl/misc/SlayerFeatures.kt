@@ -137,7 +137,7 @@ object SlayerFeatures : CoroutineScope {
                 is EntityBlaze -> DemonlordSlayer(entity)
                 is EntityOtherPlayerMP -> {
                     if (entity.name == "Bloodfiend ") {
-                        VampireSlayer(entity)
+                        RiftstalkerSlayer(entity)
                     } else null
                 }
 
@@ -1389,14 +1389,14 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class VampireSlayer(entity: EntityOtherPlayerMP) :
+    class RiftstalkerSlayer(entity: EntityOtherPlayerMP) :
         Slayer<EntityOtherPlayerMP>(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend") {
         override fun tick(event: ClientTickEvent) {
-            if (Config.oneShotAlert && this.nameEntity != null && this.nameEntity?.displayName?.unformattedText?.contains(
+            if (Config.oneShotAlert && this.nameEntity?.displayName?.unformattedText?.contains(
                     "҉"
                 ) == true
             ) createTitle("§cSteak Stake!", 2)
-            else if (Config.twinclawAlert && this.timerEntity != null && this.timerEntity?.displayName?.unformattedText?.contains(
+            else if (Config.twinclawAlert && this.timerEntity?.displayName?.unformattedText?.contains(
                     "TWINCLAWS"
                 ) == true
             ) createTitle("§6§lTWINCLAWS!", 2)
