@@ -67,17 +67,17 @@ object ScoreCalculation {
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
         "F3" to FloorRequirement(.5),
-        "F4" to FloorRequirement(.6),
-        "F5" to FloorRequirement(.7, 10 * 60),
+        "F4" to FloorRequirement(.6, 12 * 60),
+        "F5" to FloorRequirement(.7),
         "F6" to FloorRequirement(.85, 12 * 60),
-        "F7" to FloorRequirement(speed = 12 * 60),
+        "F7" to FloorRequirement(speed = 14 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
         "M2" to FloorRequirement(speed = 8 * 60),
         "M3" to FloorRequirement(speed = 8 * 60),
         "M4" to FloorRequirement(speed = 8 * 60),
         "M5" to FloorRequirement(speed = 8 * 60),
-        "M6" to FloorRequirement(speed = 8 * 60),
-        "M7" to FloorRequirement(speed = 15 * 60),
+        "M6" to FloorRequirement(),
+        "M7" to FloorRequirement(speed = 14 * 60),
         "default" to FloorRequirement()
     )
 
@@ -178,7 +178,7 @@ object ScoreCalculation {
             time < 600.0 -> 140 - time / 12.0
             time < 840.0 -> 115 - time / 24.0
             time < 1140.0 -> 108 - time / 30.0
-            time < 3940.0 -> 98.5 - time / 40.0
+            time < 3570.0 -> 98.5 - time / 40.0
             else -> 0.0
         }.toInt()
     }
@@ -206,7 +206,7 @@ object ScoreCalculation {
             state.onSetValue { score ->
                 updateText(score)
                 if (!Utils.inDungeons) return@onSetValue
-                if (score < 200) {
+                if (score < 200 || Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "E")) {
                     hasSaid270 = false
                     hasSaid300 = false
                     return@onSetValue
@@ -232,7 +232,7 @@ object ScoreCalculation {
 
     val rank: String
         get() {
-            val score = totalScore.get()
+            val score = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "E")) (totalScore.get() * 0.7).toInt() else totalScore.get()
             return when {
                 score < 100 -> "§cD"
                 score < 160 -> "§9C"
@@ -269,15 +269,27 @@ object ScoreCalculation {
                 }
                 ScoreCalculationElement.text.add("")
                 ScoreCalculationElement.text.add("§6Score")
-                ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
-                ScoreCalculationElement.text.add(
-                    "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
-                        roomClearScore.get().toInt()
-                    } §7+ §6${secretScore.get().toInt()}§7)"
-                )
-                ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
-                ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
-                ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+                if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "E")) {
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${(skillScore.get().coerceIn(20, 100) * 0.7).toInt()}")
+                    ScoreCalculationElement.text.add(
+                        "§f• §eExplore Score:§a ${(discoveryScore.get() * 0.7).toInt()} §7(§e${
+                            (roomClearScore.get() * 0.7).toInt()
+                        } §7+ §6${(secretScore.get() * 0.7).toInt()}§7)"
+                    )
+                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${(speedScore.get() * 0.7).toInt()}")
+                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${(bonusScore.get() * 0.7).toInt()}")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a ${(score * 0.7).toInt()}" + if (isPaul.get()) " §7(§6+7§7)" else "")
+                } else {
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
+                    ScoreCalculationElement.text.add(
+                        "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
+                            roomClearScore.get().toInt()
+                        } §7+ §6${secretScore.get().toInt()}§7)"
+                    )
+                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
+                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+                }
                 ScoreCalculationElement.text.add("§f• §eRank: $rank")
 
             }
