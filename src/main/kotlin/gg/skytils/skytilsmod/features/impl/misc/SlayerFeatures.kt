@@ -1392,9 +1392,14 @@ object SlayerFeatures : CoroutineScope {
     class VampireSlayer(entity: EntityOtherPlayerMP) :
         Slayer<EntityOtherPlayerMP>(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend") {
         override fun tick(event: ClientTickEvent) {
-            //The else is not a bug it is because the stake is higher priority!
-            if(Config.oneShotAllert && super.nameEntity != null && super.nameEntity?.displayName?.unformattedText?.contains("҉") == true) createTitle("§cSteak Stake!", 2)
-            else if(Config.twinclawAllert && super.timerEntity != null && super.timerEntity?.displayName?.unformattedText?.contains("TWINCLAWS") == true) createTitle("§6§lTWINCLAWS!", 2)
+            if (Config.oneShotAllert && this.nameEntity != null && this.nameEntity?.displayName?.unformattedText?.contains(
+                    "҉"
+                ) == true
+            ) createTitle("§cSteak Stake!", 2)
+            else if (Config.twinclawAllert && this.timerEntity != null && this.timerEntity?.displayName?.unformattedText?.contains(
+                    "TWINCLAWS"
+                ) == true
+            ) createTitle("§6§lTWINCLAWS!", 2)
         }
     }
 }
