@@ -63,14 +63,14 @@ object ScoreCalculation {
     private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
 
     val floorRequirements = hashMapOf(
-        "E" to FloorRequirement(.3),
+        "E" to FloorRequirement(.3, 20 * 60),
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
         "F3" to FloorRequirement(.5),
-        "F4" to FloorRequirement(.6),
-        "F5" to FloorRequirement(.7, 10 * 60),
+        "F4" to FloorRequirement(.6, 12 * 60),
+        "F5" to FloorRequirement(.7),
         "F6" to FloorRequirement(.85, 12 * 60),
-        "F7" to FloorRequirement(speed = 12 * 60),
+        "F7" to FloorRequirement(speed = 14 * 60),
         "M1" to FloorRequirement(speed = 8 * 60),
         "M2" to FloorRequirement(speed = 8 * 60),
         "M3" to FloorRequirement(speed = 8 * 60),
@@ -80,7 +80,6 @@ object ScoreCalculation {
         "M7" to FloorRequirement(speed = 15 * 60),
         "default" to FloorRequirement()
     )
-
 
     // clear stuff
     var completedRooms = BasicState(0)
@@ -135,7 +134,8 @@ object ScoreCalculation {
 
     val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
         printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        clear.toInt() + secret.toInt()
+        if (DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
+        else clear.toInt() + secret.toInt()
     }
 
 
@@ -160,8 +160,9 @@ object ScoreCalculation {
 
     val skillScore = (calcingClearPercentage.zip(deathPenalty.zip(puzzlePenalty))).map { (clear, penalties) ->
         printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
-        (20.0 + clear * 80.0 - penalties.first - penalties.second)
-            .toInt()
+        if (DungeonFeatures.dungeonFloor == "E")
+            ((20.0 + clear * 80.0 - penalties.first - penalties.second) * 0.7).toInt()
+        else (20.0 + clear * 80.0 - penalties.first - penalties.second).toInt()
     }
 
     // speed stuff
@@ -173,14 +174,25 @@ object ScoreCalculation {
         seconds + 480 - req.speed
     }
     val speedScore = totalElapsed.map { time ->
-        when {
-            time < 492.0 -> 100.0
-            time < 600.0 -> 140 - time / 12.0
-            time < 840.0 -> 115 - time / 24.0
-            time < 1140.0 -> 108 - time / 30.0
-            time < 3940.0 -> 98.5 - time / 40.0
-            else -> 0.0
-        }.toInt()
+        if (DungeonFeatures.dungeonFloor == "E") {
+            when {
+                time < 492.0 -> 70.0
+                time < 600.0 -> (140 - time / 12.0) * 0.7
+                time < 840.0 -> (115 - time / 24.0) * 0.7
+                time < 1140.0 -> (108 - time / 30.0) * 0.7
+                time < 3570.0 -> (98.5 - time / 40.0) * 0.7
+                else -> 0.0
+            }.toInt()
+        } else {
+            when {
+                time < 492.0 -> 100.0
+                time < 600.0 -> 140 - time / 12.0
+                time < 840.0 -> 115 - time / 24.0
+                time < 1140.0 -> 108 - time / 30.0
+                time < 3570.0 -> 98.5 - time / 40.0
+                else -> 0.0
+            }.toInt()
+        }
     }
 
     // bonus stuff
@@ -188,7 +200,7 @@ object ScoreCalculation {
     var mimicKilled = BasicState(false)
     var isPaul = BasicState(false)
     val bonusScore = (crypts.zip(mimicKilled.zip(isPaul))).map { (crypts, bools) ->
-        (if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0
+        ((if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0)
     }
 
     var hasSaid270 = false
@@ -201,7 +213,9 @@ object ScoreCalculation {
                 "skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}",
                 "scorecalctotal"
             )
-            first.first.coerceIn(20, 100) + first.second + second.first + second.second
+            if (DungeonFeatures.dungeonFloor == "E")
+                first.first.coerceIn(14, 70) + first.second + second.first + (second.second * 0.7).toInt()
+            else first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also { state ->
             state.onSetValue { score ->
                 updateText(score)
@@ -269,15 +283,24 @@ object ScoreCalculation {
                 }
                 ScoreCalculationElement.text.add("")
                 ScoreCalculationElement.text.add("§6Score")
-                ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
+                if (DungeonFeatures.dungeonFloor == "E")
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(14, 70)}")
+                else
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
                 ScoreCalculationElement.text.add(
                     "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
                         roomClearScore.get().toInt()
                     } §7+ §6${secretScore.get().toInt()}§7)"
                 )
                 ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
-                ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
-                ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+
+                if (DungeonFeatures.dungeonFloor == "E") {
+                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${(bonusScore.get() * 0.7).toInt()}")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+7§7)" else "")
+                } else {
+                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+                }
                 ScoreCalculationElement.text.add("§f• §eRank: $rank")
 
             }
