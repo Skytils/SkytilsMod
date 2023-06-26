@@ -63,7 +63,7 @@ object ScoreCalculation {
     private val roomCompletedPattern = Regex("§r Completed Rooms: §r§d(?<count>\\d+)§r")
 
     val floorRequirements = hashMapOf(
-        "E" to FloorRequirement(.3),
+        "E" to FloorRequirement(.3, 20 * 60),
         "F1" to FloorRequirement(.3),
         "F2" to FloorRequirement(.4),
         "F3" to FloorRequirement(.5),
@@ -76,11 +76,10 @@ object ScoreCalculation {
         "M3" to FloorRequirement(speed = 8 * 60),
         "M4" to FloorRequirement(speed = 8 * 60),
         "M5" to FloorRequirement(speed = 8 * 60),
-        "M6" to FloorRequirement(),
-        "M7" to FloorRequirement(speed = 14 * 60),
+        "M6" to FloorRequirement(speed = 8 * 60),
+        "M7" to FloorRequirement(speed = 15 * 60),
         "default" to FloorRequirement()
     )
-
 
     // clear stuff
     var completedRooms = BasicState(0)
@@ -135,7 +134,8 @@ object ScoreCalculation {
 
     val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
         printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        clear.toInt() + secret.toInt()
+        if(DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
+        else clear.toInt() + secret.toInt()
     }
 
 
@@ -160,8 +160,9 @@ object ScoreCalculation {
 
     val skillScore = (calcingClearPercentage.zip(deathPenalty.zip(puzzlePenalty))).map { (clear, penalties) ->
         printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
-        (20.0 + clear * 80.0 - penalties.first - penalties.second)
-            .toInt()
+        if(DungeonFeatures.dungeonFloor == "E")
+                ((20.0 + clear * 80.0 - penalties.first - penalties.second) * 0.7).toInt()
+        else (20.0 + clear * 80.0 - penalties.first - penalties.second).toInt()
     }
 
     // speed stuff
@@ -173,14 +174,26 @@ object ScoreCalculation {
         seconds + 480 - req.speed
     }
     val speedScore = totalElapsed.map { time ->
-        when {
-            time < 492.0 -> 100.0
-            time < 600.0 -> 140 - time / 12.0
-            time < 840.0 -> 115 - time / 24.0
-            time < 1140.0 -> 108 - time / 30.0
-            time < 3570.0 -> 98.5 - time / 40.0
-            else -> 0.0
-        }.toInt()
+        if(DungeonFeatures.dungeonFloor == "E"){
+            when {
+                time < 492.0 -> 70.0
+                time < 600.0 -> (140 - time / 12.0) * 0.7
+                time < 840.0 -> (115 - time / 24.0) * 0.7
+                time < 1140.0 -> (108 - time / 30.0) * 0.7
+                time < 3570.0 -> (98.5 - time / 40.0) * 0.7
+                else -> 0.0
+            }.toInt()
+        }
+        else {
+            when {
+                time < 492.0 -> 100.0
+                time < 600.0 -> 140 - time / 12.0
+                time < 840.0 -> 115 - time / 24.0
+                time < 1140.0 -> 108 - time / 30.0
+                time < 3570.0 -> 98.5 - time / 40.0
+                else -> 0.0
+            }.toInt()
+        }
     }
 
     // bonus stuff
@@ -188,7 +201,7 @@ object ScoreCalculation {
     var mimicKilled = BasicState(false)
     var isPaul = BasicState(false)
     val bonusScore = (crypts.zip(mimicKilled.zip(isPaul))).map { (crypts, bools) ->
-        (if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0
+        ((if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0)
     }
 
     var hasSaid270 = false
@@ -201,12 +214,14 @@ object ScoreCalculation {
                 "skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}",
                 "scorecalctotal"
             )
-            first.first.coerceIn(20, 100) + first.second + second.first + second.second
+            if(DungeonFeatures.dungeonFloor == "E")
+                first.first.coerceIn(14, 70) + first.second + second.first + (second.second * 0.7).toInt()
+            else first.first.coerceIn(20, 100) + first.second + second.first + second.second
         }.also { state ->
             state.onSetValue { score ->
                 updateText(score)
                 if (!Utils.inDungeons) return@onSetValue
-                if (score < 200 || Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "E")) {
+                if (score < 200) {
                     hasSaid270 = false
                     hasSaid300 = false
                     return@onSetValue
@@ -232,7 +247,7 @@ object ScoreCalculation {
 
     val rank: String
         get() {
-            val score = if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "E")) (totalScore.get() * 0.7).toInt() else totalScore.get()
+            val score = totalScore.get()
             return when {
                 score < 100 -> "§cD"
                 score < 160 -> "§9C"
@@ -269,24 +284,21 @@ object ScoreCalculation {
                 }
                 ScoreCalculationElement.text.add("")
                 ScoreCalculationElement.text.add("§6Score")
-                if (Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "E")) {
-                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${(skillScore.get().coerceIn(20, 100) * 0.7).toInt()}")
-                    ScoreCalculationElement.text.add(
-                        "§f• §eExplore Score:§a ${(discoveryScore.get() * 0.7).toInt()} §7(§e${
-                            (roomClearScore.get() * 0.7).toInt()
-                        } §7+ §6${(secretScore.get() * 0.7).toInt()}§7)"
-                    )
-                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${(speedScore.get() * 0.7).toInt()}")
-                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${(bonusScore.get() * 0.7).toInt()}")
-                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a ${(score * 0.7).toInt()}" + if (isPaul.get()) " §7(§6+7§7)" else "")
-                } else {
+                if(DungeonFeatures.dungeonFloor == "E")
+                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(14, 70)}")
+                else
                     ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
-                    ScoreCalculationElement.text.add(
-                        "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
-                            roomClearScore.get().toInt()
-                        } §7+ §6${secretScore.get().toInt()}§7)"
-                    )
-                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
+                ScoreCalculationElement.text.add(
+                    "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
+                        roomClearScore.get().toInt()
+                    } §7+ §6${secretScore.get().toInt()}§7)"
+                )
+                ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
+
+                if(DungeonFeatures.dungeonFloor == "E"){
+                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${(bonusScore.get() * 0.7).toInt()}")
+                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+7§7)" else "")
+                } else {
                     ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
                     ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
                 }
