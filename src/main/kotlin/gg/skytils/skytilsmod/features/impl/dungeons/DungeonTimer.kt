@@ -92,7 +92,7 @@ object DungeonTimer {
                 )
             }
 
-            bloodClearTime != -1L && bossEntryTime == -1L && unformatted.startsWith("[BOSS] ") && unformatted.contains(":") -> {
+            bossEntryTime == -1L && unformatted.startsWith("[BOSS] ") && unformatted.contains(":") -> {
                 val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
                 if (bossName != "The Watcher" && DungeonFeatures.dungeonFloor != null && Utils.checkBossName(
                         DungeonFeatures.dungeonFloor!!,
@@ -100,7 +100,7 @@ object DungeonTimer {
                     )
                 ) {
                     bossEntryTime = System.currentTimeMillis()
-                    if (Skytils.config.dungeonTimer) UChat.chat(
+                    if (Skytils.config.dungeonTimer && bloodClearTime != -1L) UChat.chat(
                         "§dPortal §btook ${diff(bossEntryTime, bloodClearTime)} seconds to enter."
                     )
                 }
@@ -113,8 +113,13 @@ object DungeonTimer {
                         if (Skytils.config.dungeonTimer) {
                             add("§7Wither Doors: $witherDoors")
                             add("§4Blood §btook ${diff(bloodOpenTime, dungeonStartTime)} seconds to open.")
-                            add("§cWatcher §btook ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
-                            add("§dPortal §btook ${diff(bossEntryTime, bloodClearTime)} seconds to enter.")
+                            if (bloodClearTime == -1L) {
+                                add("§c§lGG! §cWatcher §bWAS SKIPPED!")
+                                add("§d§lGG! §dPortal §bWAS SKIPPED!")
+                            } else {
+                                add("§cWatcher §btook ${diff(bloodClearTime, bloodOpenTime)} seconds to clear.")
+                                add("§dPortal §btook ${diff(bossEntryTime, bloodClearTime)} seconds to enter.")
+                            }
                             add("§9Boss entry §bwas ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
                         }
                         if (Skytils.config.sadanPhaseTimer && Utils.equalsOneOf(
