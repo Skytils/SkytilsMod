@@ -25,7 +25,6 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.SoundQueue
@@ -375,6 +374,14 @@ object SlayerFeatures : CoroutineScope {
                     }
                 }
             }
+            (slayer as? BloodfiendSlayer)?.run {
+                val newName = packet.func_149376_c()?.find { it.dataValueId == 2 }?.`object` as? String ?: return
+                if (packet.entityId == nameEntity?.entityId) {
+                    nameEntityChanged(newName)
+                } else if (packet.entityId == timerEntity?.entityId) {
+                    timerEntityChanged(newName)
+                }
+            }
         }
 
         if (packet is S29PacketSoundEffect) {
@@ -550,7 +557,6 @@ object SlayerFeatures : CoroutineScope {
             }
         }
     }
-
 
     @SubscribeEvent
     fun onRenderHud(event: RenderHUDEvent) {
@@ -1391,15 +1397,27 @@ object SlayerFeatures : CoroutineScope {
 
     class BloodfiendSlayer(entity: EntityOtherPlayerMP) :
         Slayer<EntityOtherPlayerMP>(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend") {
-        override fun tick(event: ClientTickEvent) {
-            if (Config.oneShotAlert && this.nameEntity?.displayName?.unformattedText?.contains(
-                    "҉"
-                ) == true
-            ) createTitle("§cSteak Stake!", 2)
-            else if (Config.twinclawAlert && this.timerEntity?.displayName?.unformattedText?.contains(
-                    "TWINCLAWS"
-                ) == true
-            ) createTitle("§6§lTWINCLAWS!", 2)
+
+        var lastHadTwinclaws = false
+        var isStakeable = false
+        private val stakeTitle = "§cSteak Stake!"
+
+        fun nameEntityChanged(newName: String) {
+            if (!isStakeable && newName.contains("҉")) {
+                isStakeable = true
+                if (Skytils.config.oneShotAlert) createTitle(stakeTitle, 10)
+            } else {
+                isStakeable = false
+            }
+        }
+
+        fun timerEntityChanged(newName: String) {
+            if (!lastHadTwinclaws && newName.contains("TWINCLAWS")) {
+                if (Skytils.config.twinclawAlert && GuiManager.title != stakeTitle) createTitle("§6§lTWINCLAWS!", 10)
+                lastHadTwinclaws = true
+            } else {
+                lastHadTwinclaws = false
+            }
         }
     }
 }
