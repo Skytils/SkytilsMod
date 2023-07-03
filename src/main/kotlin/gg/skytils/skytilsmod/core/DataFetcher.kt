@@ -151,12 +151,6 @@ object DataFetcher {
                         }
                     }
                 }
-                client.get("https://${domain}/api/auctions/npcprices").body<Map<String, Double>>().apply {
-                    Utils.checkThreadAndQueue {
-                        ItemFeatures.sellPrices.clear()
-                        ItemFeatures.sellPrices.putAll(this)
-                    }
-                }
                 client.get("${dataUrl}constants/slayerhealth.json").body<Map<String, HashMap<String, Int>>>().apply {
                     Utils.checkThreadAndQueue {
                         SlayerFeatures.BossHealths.clear()
