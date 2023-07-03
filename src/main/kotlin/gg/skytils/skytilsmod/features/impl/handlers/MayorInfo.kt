@@ -255,11 +255,11 @@ object MayorInfo {
         if (mayor == null || nextSwitch <= System.currentTimeMillis()) return@launch
         try {
             val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
-            val url =
-                "$baseURL/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}"
             val commentForDecompilers =
                 "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
             mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
+            val url =
+                "$baseURL/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}&currTime=${System.currentTimeMillis()}"
             println(client.get(url).bodyAsText())
         } catch (e: AuthenticationException) {
             e.printStackTrace()
