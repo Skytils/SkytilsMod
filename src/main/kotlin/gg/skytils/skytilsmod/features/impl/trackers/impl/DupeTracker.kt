@@ -46,7 +46,6 @@ import kotlin.concurrent.fixedRateTimer
 
 object DupeTracker : Tracker("duped_items") {
     val dupedUUIDs = hashSetOf<IdentifiableItem>()
-    val dirtyUUIDs = hashSetOf<IdentifiableItem>()
     val dupeChecking = hashMapOf<IdentifiableItem, Int>()
     var inAuctionBrowser = false
 
@@ -139,7 +138,7 @@ object DupeTracker : Tracker("duped_items") {
         val uuid = stack.getUUID() ?: return
         val itemId = ItemUtil.getSkyBlockItemID(stack) ?: return
         val idItem = IdentifiableItem(itemId, uuid)
-        if (dupedUUIDs.contains(idItem) || dirtyUUIDs.contains(idItem)) {
+        if (dupedUUIDs.contains(idItem)) {
             GlStateManager.pushMatrix()
             GlStateManager.translate(0f, 0f, 299f)
             event.slot highlight Skytils.config.dupeTrackerOverlayColor
@@ -159,9 +158,6 @@ object DupeTracker : Tracker("duped_items") {
             if (dupedUUIDs.contains(idItem)) {
                 event.toolTip.add("§c§lDUPED ITEM")
             }
-            if (dirtyUUIDs.contains(idItem)) {
-                event.toolTip.add("§c§lDIRTY ITEM")
-            }
         }
         when (val origin = extraAttrib.getString("originTag")) {
             "" -> return
@@ -177,7 +173,6 @@ object DupeTracker : Tracker("duped_items") {
 
     override fun resetLoot() {
         dupedUUIDs.clear()
-        dirtyUUIDs.clear()
     }
 
     override fun read(reader: Reader) {
@@ -204,14 +199,6 @@ object DupeTracker : Tracker("duped_items") {
                                 dupedUUIDs.addAll(this)
                             }
                         }
-                    if (Skytils.config.markDirtyItems) {
-                        client.get("https://${Skytils.domain}/api/auctions/dirtyitems").body<List<IdentifiableItem>>()
-                            .apply {
-                                Utils.checkThreadAndQueue {
-                                    dirtyUUIDs.addAll(this)
-                                }
-                            }
-                    }
                 }
             }
         }

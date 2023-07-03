@@ -1659,13 +1659,6 @@ object Config : Vigilant(
     var dupeTrackerOverlayColor = Color.BLACK.withAlpha(169)
 
     @Property(
-        type = PropertyType.SWITCH, name = "Mark 'Dirty' Items",
-        description = "Tries to track 'dirty' items on the Auction House.\nDirty items are items that are probably not legitimately obtained.\nThis will not catch every single dirty item.",
-        category = "Miscellaneous", subcategory = "Other"
-    )
-    var markDirtyItems = true
-
-    @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",
         description = "Counts down the time until the Endstone Protector spawns.",
         category = "Miscellaneous", subcategory = "Other"
