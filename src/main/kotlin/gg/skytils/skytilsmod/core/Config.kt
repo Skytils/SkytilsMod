@@ -2966,7 +2966,6 @@ object Config : Vigilant(
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         addDependency("powerOrbDuration", "powerOrbLock")
-        addDependency("markDirtyItems", "dupeTracker")
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
         addDependency("containerSellValueMaxItems", "containerSellValue")
