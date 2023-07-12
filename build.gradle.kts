@@ -27,7 +27,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
-    id("io.github.juuxel.loom-quiltflower") version "1.10.0"
+    id("io.github.juuxel.loom-quiltflower") version "1.11.0"
     java
     idea
     signing
