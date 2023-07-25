@@ -1444,7 +1444,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Attribute Shard Abbreviation",
-        description = "Shows the abbreivated name of shards with only 1 enchantment.",
+        description = "Shows the abbreviated name of shards with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items",
         searchTags = ["1.3.0-pre1"]
     )
