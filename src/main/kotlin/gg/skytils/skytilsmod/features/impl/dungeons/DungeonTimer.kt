@@ -66,7 +66,7 @@ object DungeonTimer {
                 scoreShownAt = System.currentTimeMillis()
             }
 
-            (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
+            (message == "§r§aStarting in 1 second.§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
             }
 
