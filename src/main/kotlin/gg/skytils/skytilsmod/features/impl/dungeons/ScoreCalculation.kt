@@ -48,7 +48,7 @@ import kotlin.math.roundToInt
 
 object ScoreCalculation {
 
-    private val deathsTabPattern = Regex("§r§a§lDeaths: §r§f\\((?<deaths>\\d+)\\)§r")
+    private val deathsTabPattern = Regex("§r§a§lTeam Deaths: §r§f(?<deaths>\\d+)§r")
     private val missingPuzzlePattern = Regex("§r§b§lPuzzles: §r§f\\((?<count>\\d)\\)§r")
     private val failedPuzzlePattern =
         Regex("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §.+")
