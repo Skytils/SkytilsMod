@@ -21,6 +21,7 @@ import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -66,7 +67,7 @@ object DungeonTimer {
                 scoreShownAt = System.currentTimeMillis()
             }
 
-            (message == "§r§aDungeon starts in 1 second.§r" || message == "§r§aDungeon starts in 1 second. Get ready!§r") && dungeonStartTime == -1L -> {
+            (message == "§r§aStarting in 1 second.§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
             }
 
@@ -100,6 +101,7 @@ object DungeonTimer {
                     )
                 ) {
                     bossEntryTime = System.currentTimeMillis()
+                    DungeonListener.markAllRevived()
                     if (Skytils.config.dungeonTimer && bloodClearTime != -1L) UChat.chat(
                         "§dPortal §btook ${diff(bossEntryTime, bloodClearTime)} seconds to enter."
                     )
