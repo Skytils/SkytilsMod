@@ -85,7 +85,7 @@ object DungeonListener {
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
-            if (event.packet.chatComponent.unformattedText.startsWith("Dungeon starts in 1 second.")) {
+            if (event.packet.chatComponent.unformattedText.startsWith("Starting in 1 second.")) {
                 team.clear()
                 deads.clear()
                 missingPuzzles.clear()
@@ -132,7 +132,7 @@ object DungeonListener {
             missingPuzzles.addAll(localMissingPuzzles)
         }
         TickTask(2, repeats = true) {
-            if (Utils.inDungeons && DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500) {
+            if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 for (teammate in team.values) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
@@ -159,7 +159,7 @@ object DungeonListener {
                             if (Skytils.config.dungeonDeathCounter) {
                                 TickTask(1) {
                                     UChat.chat(
-                                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total deaths.${
+                                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total tracked deaths.${
                                             " §6(SPIRIT)".toStringIfTrue(
                                                 `silly~churl, billy~churl, silly~billy hilichurl`
                                             )
