@@ -22,7 +22,7 @@ public class Reference {
     public static String dataUrl = "https://data.skytils.gg/";
     public static final String MOD_ID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "1.7.3";
+    public static final String VERSION = "1.7.4";
 
     public static final int apiVersion = 3;
 }
