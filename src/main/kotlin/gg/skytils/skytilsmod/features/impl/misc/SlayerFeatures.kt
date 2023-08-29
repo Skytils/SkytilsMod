@@ -284,12 +284,7 @@ object SlayerFeatures : CoroutineScope {
             if (!entity.hasCustomName()) return
             val name = entity.displayName.unformattedText
             if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.endsWith("§e0§c❤") && !mc.renderManager.isDebugBoundingBox) {
-                val x =
-                    RenderUtil.interpolate(event.entity.lastTickPosX, event.entity.posX, RenderUtil.getPartialTicks())
-                val y =
-                    RenderUtil.interpolate(event.entity.lastTickPosY, event.entity.posY, RenderUtil.getPartialTicks())
-                val z =
-                    RenderUtil.interpolate(event.entity.lastTickPosZ, event.entity.posZ, RenderUtil.getPartialTicks())
+                val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                 if (ZOMBIE_MINIBOSSES.any { name.contains(it) } || BLAZE_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
                         AxisAlignedBB(x - 0.5, y - 2, z - 0.5, x + 0.5, y, z + 0.5),

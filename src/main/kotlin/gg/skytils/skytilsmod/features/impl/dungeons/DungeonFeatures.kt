@@ -466,10 +466,8 @@ object DungeonFeatures {
             ) {
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(1f)
-                val x = event.entity.posX - viewerX
-                val y = event.entity.posY - viewerY
-                val z = event.entity.posZ - viewerZ
+                val (vx, vy, vz) = RenderUtil.getViewerPos(RenderUtil.getPartialTicks())
+                val (x, y, z) = RenderUtil.fixRenderPos(event.x - vx, event.y - vy, event.z - vz)
                 RenderUtil.drawFilledBoundingBox(
                     matrixStack,
                     AxisAlignedBB(x, y, z, x + 0.75, y + 1.975, z + 0.75),
@@ -536,8 +534,17 @@ object DungeonFeatures {
                             RenderUtil.getPartialTicks()
                         )
                     } else if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
+                        val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
+                        val aabb = AxisAlignedBB(
+                            x - 0.5,
+                            y,
+                            z - 0.5,
+                            x + 0.5,
+                            y + 2,
+                            z + 0.5
+                        )
                         RenderUtil.drawOutlinedBoundingBox(
-                            event.entity.entityBoundingBox,
+                            aabb,
                             Color(121, 11, 255, 255),
                             3f,
                             RenderUtil.getPartialTicks()
@@ -547,24 +554,7 @@ object DungeonFeatures {
                     if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
                         val name = event.entity.name
                         if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
-                            val x =
-                                RenderUtil.interpolate(
-                                    event.entity.lastTickPosX,
-                                    event.entity.posX,
-                                    RenderUtil.getPartialTicks()
-                                )
-                            val y =
-                                RenderUtil.interpolate(
-                                    event.entity.lastTickPosY,
-                                    event.entity.posY,
-                                    RenderUtil.getPartialTicks()
-                                )
-                            val z =
-                                RenderUtil.interpolate(
-                                    event.entity.lastTickPosZ,
-                                    event.entity.posZ,
-                                    RenderUtil.getPartialTicks()
-                                )
+                            val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                             val color = Color(0, 255, 255, 255)
                             if ("Spider" in name) {
                                 RenderUtil.drawOutlinedBoundingBox(
@@ -600,13 +590,14 @@ object DungeonFeatures {
                 }
             }
             if (event.entity == lividTag) {
+                val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                 val aabb = AxisAlignedBB(
-                    event.entity.posX - 0.5,
-                    event.entity.posY - 2,
-                    event.entity.posZ - 0.5,
-                    event.entity.posX + 0.5,
-                    event.entity.posY,
-                    event.entity.posZ + 0.5
+                    x - 0.5,
+                    y - 2,
+                    z - 0.5,
+                    x + 0.5,
+                    y,
+                    z + 0.5
                 )
                 RenderUtil.drawOutlinedBoundingBox(
                     aabb,
