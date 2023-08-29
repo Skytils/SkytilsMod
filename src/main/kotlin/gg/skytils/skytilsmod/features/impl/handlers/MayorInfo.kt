@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.handlers
 import com.mojang.authlib.exceptions.AuthenticationException
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
@@ -30,6 +31,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -50,14 +53,10 @@ object MayorInfo {
 
     var currentMayor: String? = null
     var mayorPerks = HashSet<String>()
-    var isLocal = true
     var jerryMayor: Mayor? = null
     var newJerryPerks = 0L
     private var lastCheckedElectionOver = 0L
     private var lastFetchedMayorData = 0L
-    private var lastSentData = 0L
-    val baseURL
-        get() = "https://${Skytils.domain}/api/mayor"
 
     private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
 
@@ -75,7 +74,7 @@ object MayorInfo {
                 jerryMayor = null
                 fetchJerryData()
             }
-            if (System.currentTimeMillis() - lastFetchedMayorData > 24 * 60 * 60 * 1000 || isLocal) {
+            if (System.currentTimeMillis() - lastFetchedMayorData > 24 * 60 * 60 * 1000) {
                 fetchMayorData()
             }
             if (System.currentTimeMillis() - lastCheckedElectionOver > 60 * 60 * 1000) {
@@ -83,9 +82,7 @@ object MayorInfo {
                     it.second.startsWith("§r §r§fWinner: §r§a")
                 }.run { this?.second?.substring(19, this.second.length - 2) } ?: currentMayor
                 if (currentMayor != elected) {
-                    isLocal = true
-                    currentMayor = elected
-                    mayorPerks.clear()
+                    fetchMayorData()
                 }
                 lastCheckedElectionOver = System.currentTimeMillis()
             }
@@ -95,38 +92,8 @@ object MayorInfo {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
-        if (mc.currentServerData?.serverIP?.lowercase()
-                ?.contains("alpha") == true
-        ) return
         if (event.message.unformattedText == "§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]") {
-            val hoverEvent = event.message.chatStyle.chatHoverEvent
-            if (hoverEvent?.action != HoverEvent.Action.SHOW_TEXT) return
-            println(hoverEvent.value.formattedText)
-            val lines = hoverEvent.value.formattedText.split("\n").takeIf {
-                it.size >= 2
-            } ?: return
-            val color = lines[0].takeIf {
-                it.stripControlCodes().startsWith("Mayor ")
-            }?.substring(0, 2)
-            isLocal = true
-            currentMayor = lines[0].substringAfterLast(" ")
-            mayorPerks.clear()
             fetchMayorData()
-            val perks = hashSetOf<String>()
-            for (i in 1 until lines.size) {
-                val line = lines[i]
-                if (line.indexOf("§") != 0 || line.lastIndexOf("§") != 2) continue
-                if (color != null) {
-                    if (line.startsWith("§r$color")) {
-                        perks.add(line.stripControlCodes())
-                    }
-                } else if (!line.startsWith("§r§7") && !line.startsWith("§r§8")) {
-                    perks.add(line.stripControlCodes())
-                }
-            }
-            println("Got perks from chat: $perks")
-            mayorPerks.addAll(perks)
-            sendMayorData(currentMayor, mayorPerks)
         }
     }
 
@@ -138,42 +105,7 @@ object MayorInfo {
         ) return
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (chestName == "Calendar and Events" || ((chestName == "Mayor $currentMayor" && mayorPerks.size == 0) || (chestName.startsWith(
-                    "Mayor "
-                ) && (currentMayor == null || !chestName.contains(
-                    currentMayor!!
-                ))))
-            ) {
-                val item = event.slot.stack
-                if (item?.item === Items.skull && (item.displayName.contains("Mayor $currentMayor") || (currentMayor == null && item.displayName.contains(
-                        "Mayor "
-                    ) && !item.displayName.contains("Election")))
-                ) {
-                    if (currentMayor == null) {
-                        isLocal = true
-                        currentMayor = item.displayName.stripControlCodes().substringAfter("Mayor ")
-                        mayorPerks.clear()
-                        fetchMayorData()
-                    }
-                    val color = item.displayName.substring(0, 2)
-                    val lore = ItemUtil.getItemLore(item)
-                    if ((lore.contains("§8Perks List") || lore.contains("§7The mayor has been elected")) && (lore.contains(
-                            "§7The listed perks are"
-                        ) || lore.contains("§7This perk is available to all"))
-                    ) {
-                        val perks = HashSet<String>()
-                        for (line in lore) {
-                            if (line.startsWith(color) && line.indexOf("§") == line.lastIndexOf("§")) {
-                                perks.add(line.stripControlCodes())
-                            }
-                        }
-                        println("Got Perks: $perks")
-                        mayorPerks.addAll(perks)
-                        sendMayorData(currentMayor, mayorPerks)
-                    }
-                }
-            }
-            if (currentMayor == "Jerry" && ((chestName == "Mayor Jerry" && event.slot.slotNumber == 11) || (chestName == "Calendar and Events" || event.slot.slotNumber == 46)) && event.slot.hasStack) {
+            if (((chestName == "Mayor Jerry" && event.slot.slotNumber == 11) || (chestName == "Calendar and Events" || event.slot.slotNumber == 46)) && event.slot.hasStack) {
                 val lore = ItemUtil.getItemLore(event.slot.stack)
                 if (!lore.contains("§9Perkpocalypse Perks:")) return
                 val endingIn = lore.find { it.startsWith("§7Next set of perks in") } ?: return
@@ -201,50 +133,18 @@ object MayorInfo {
     }
 
     fun fetchMayorData() = Skytils.IO.launch {
-        val res = client.get(baseURL).body<Mayor>()
-        if (res.name == currentMayor || currentMayor == null || mayorPerks.size == 0)
-            isLocal = false
-        if (!isLocal) {
-            TickTask(1) {
-                currentMayor = res.name
-                lastFetchedMayorData = System.currentTimeMillis()
-                if (currentMayor != "Jerry") jerryMayor = null
-                mayorPerks.clear()
-                mayorPerks.addAll(res.perks.map { it.name })
-            }
-        }
-    }
-
-    fun sendMayorData(mayor: String?, perks: HashSet<String>) = Skytils.IO.launch {
-        if (mayor == null || perks.size == 0) return@launch
-        if (lastSentData - System.currentTimeMillis() < 300000) lastSentData = System.currentTimeMillis()
-        try {
-            val serverId = UUID.randomUUID().toString().replace("-", "")
-            val url =
-                "$baseURL/new?username=${mc.session.username}&serverId=${serverId}&mayor=${mayor}${
-                    perks.joinToString(separator = "") {
-                        "&perks[]=${
-                            URLEncoder.encode(
-                                it,
-                                "UTF-8"
-                            )
-                        }"
-                    }
-                }"
-            val commentForDecompilers =
-                "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
-            mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
-            if (DevTools.getToggle("mayor")) println(url)
-            println(client.get(url).bodyAsText())
-        } catch (e: AuthenticationException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
+        val res = json.decodeFromJsonElement<Mayor>(client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()["mayor"]!!)
+        TickTask(1) {
+            currentMayor = res.name
+            lastFetchedMayorData = System.currentTimeMillis()
+            if (currentMayor != "Jerry") jerryMayor = null
+            mayorPerks.clear()
+            mayorPerks.addAll(res.perks.map { it.name })
         }
     }
 
     fun fetchJerryData() = Skytils.IO.launch {
-        val res = client.get("$baseURL/jerry").body<JerrySession>()
+        val res = client.get("https://${Skytils.domain}/api/mayor").body<JerrySession>()
         TickTask(1) {
             newJerryPerks = res.nextSwitch
             jerryMayor = res.mayor
@@ -259,7 +159,7 @@ object MayorInfo {
                 "This sends a request to Mojang's auth server, used for verification. This is how we verify you are the real user without your session details. This is the exact same system Optifine uses."
             mc.sessionService.joinServer(mc.session.profile, mc.session.token, serverId)
             val url =
-                "$baseURL/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}&currTime=${System.currentTimeMillis()}"
+                "https://${Skytils.domain}/api/mayor/jerry/perks?username=${mc.session.username}&serverId=${serverId}&nextPerks=${nextSwitch}&mayor=${mayor.name}&currTime=${System.currentTimeMillis()}"
             println(client.get(url).bodyAsText())
         } catch (e: AuthenticationException) {
             e.printStackTrace()
@@ -270,7 +170,7 @@ object MayorInfo {
 }
 
 @Serializable
-class Mayor(val name: String, val role: String, val perks: List<MayorPerk>, val special: Boolean)
+class Mayor(val name: String, val perks: List<MayorPerk>)
 
 @Serializable
 class MayorPerk(val name: String, val description: String)
