@@ -56,10 +56,11 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     val notifications = hashMapOf<String, Long>()
     private var shouldReadEffects = false
     private var neededPage = 1
+    private var lastCommandRun = -1L
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.ReceiveEvent) {
-        if (!Utils.inSkyblock || Utils.inDungeons) return
+        if (!Utils.inSkyblock || Utils.inDungeons || notifications.size == 0) return
         when (event.packet) {
             is S02PacketChat -> {
                 val message = event.packet.chatComponent.formattedText
@@ -101,11 +102,16 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     @SubscribeEvent
     fun onCommandRun(event: SendChatMessageEvent) {
         if (event.message == "/skytilsupdatepotioneffects") {
-            event.isCanceled = true
-            shouldReadEffects = true
-            potionEffectTimers.clear()
-            neededPage = 1
-            Skytils.sendMessageQueue.add("/effects")
+            if (System.currentTimeMillis() > lastCommandRun + 2500) {
+                lastCommandRun = System.currentTimeMillis()
+                event.isCanceled = true
+                shouldReadEffects = true
+                potionEffectTimers.clear()
+                neededPage = 1
+                Skytils.sendMessageQueue.add("/effects")
+            } else {
+                UChat.chat("${Skytils.failPrefix} §cPlease wait a few seconds before running this command again!")
+            }
         }
     }
 
