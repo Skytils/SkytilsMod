@@ -88,14 +88,14 @@ object DungeonListener {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
-            if (event.packet.chatComponent.unformattedText.startsWith("Starting in 1 second.")) {
+            if (text == "§r§aStarting in 1 second.§r") {
                 team.clear()
                 deads.clear()
                 missingPuzzles.clear()
                 TickTask(40) {
                     getMembers()
                 }
-            } else if (event.packet.chatComponent.unformattedText.stripControlCodes()
+            } else if (text.stripControlCodes()
                     .trim() == "> EXTRA STATS <"
             ) {
                 if (Skytils.config.dungeonDeathCounter) {
@@ -149,6 +149,7 @@ object DungeonListener {
         TickTask(2, repeats = true) {
             if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
+                val self = team[mc.thePlayer.name]
                 for (teammate in team.values) {
                     if (tabEntries.size <= teammate.tabEntryIndex) continue
                     val entry = tabEntries[teammate.tabEntryIndex].second
@@ -156,11 +157,12 @@ object DungeonListener {
                     teammate.player = mc.theWorld.playerEntities.find {
                         it.name == teammate.playerName && it.uniqueID.version() == 4
                     }
-                    teammate.dead = entry.endsWith("§r§cDEAD§r§f)§r")
-                    if (teammate.dead) {
-                        markDead(teammate)
-                    } else {
-                        deads.remove(teammate)
+                    if (self?.dead != true) {
+                        if (entry.endsWith("§r§cDEAD§r§f)§r")) {
+                            markDead(teammate)
+                        } else if (deads.remove(teammate)) {
+                            teammate.dead = true
+                        }
                     }
                 }
             }
@@ -174,6 +176,7 @@ object DungeonListener {
             // there's no way they die twice in less than half a second
             if (lastDeath != null && time - lastDeath <= 500) return
             teammate.lastMarkedDead = time
+            teammate.dead = true
             teammate.deaths++
             val totalDeaths = team.values.sumOf { it.deaths }
             val isFirstDeath = totalDeaths == 1
