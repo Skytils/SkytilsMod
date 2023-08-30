@@ -98,7 +98,6 @@ object MasterMode7Features {
                 WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag)) {
                 printDevMessage("${drag.name} spawning $x $y $z", "witherkingdrags")
-
             }
         } else if (event.packet is S2APacketParticles) {
             event.packet.apply {
@@ -108,9 +107,9 @@ object MasterMode7Features {
                 } ?: return
                 if (owner !in dragonSpawnTimes) {
                     dragonSpawnTimes[owner] = System.currentTimeMillis() + 5000
-                }
-                if (Skytils.config.witherKingDragonSpawnAlert) {
-                    UChat.chat("§c§lThe ${owner.chatColor}§l${owner.name} §c§ldragon is spawning!")
+                    if (Skytils.config.witherKingDragonSpawnAlert) {
+                        UChat.chat("§c§lThe ${owner.chatColor}§l${owner.name} §c§ldragon is spawning!")
+                    }
                 }
             }
         }
