@@ -76,7 +76,7 @@ object MiningFeatures {
     private var inRaffle = false
     var lastTPLoc: BlockPos? = null
     var waypoints = hashMapOf<String, BlockPos>()
-    var deadCount = 0
+    var waypointDelayTicks = 0
     private val SBE_DSM_PATTERN =
         Regex("\\\$(?:SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@-(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)")
     private val xyzPattern =
@@ -240,8 +240,8 @@ object MiningFeatures {
         ) {
             CrystalHollowsMap.Locations.KingYolkar.loc.set()
         }
-        if (formatted.startsWith("§r§cYou died")) {
-            deadCount =
+        if (formatted.startsWith("§r§f§r§c ☠")) {
+            waypointDelayTicks =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
             if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
                 UChat.chat(
@@ -251,6 +251,8 @@ object MiningFeatures {
                     )
                 )
             }
+        } else if (unformatted.startsWith("Warp")) {
+            waypointDelayTicks = 50
         }
     }
 
@@ -387,11 +389,11 @@ object MiningFeatures {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
-            && deadCount == 0 && mc.thePlayer != null
+            && waypointDelayTicks == 0 && mc.thePlayer != null
         ) {
             CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.loc?.set()
-        } else if (deadCount > 0)
-            deadCount--
+        } else if (waypointDelayTicks > 0)
+            waypointDelayTicks--
     }
 
     @SubscribeEvent
