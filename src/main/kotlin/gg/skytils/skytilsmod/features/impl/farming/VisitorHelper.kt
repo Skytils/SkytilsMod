@@ -73,18 +73,19 @@ object VisitorHelper {
 
 
                 textLines.add("§eRewards:")
-                lore.dropWhile {
-                    !rewardRegex.containsMatchIn(it)
-                }.takeWhile {
-                    rewardRegex.containsMatchIn(it)
-                }.map {
-                    rewardRegex.find(it)!!.groups["reward"]!!.value
-                }.forEach {
-                    textLines.add(it)
-                    copperRewardRegex.find(it)?.also {
-                        copper += it.groups["count"]!!.value.replace(",", "").toInt()
+
+                val rewardIndex = lore.indexOf("§7Rewards:")
+                if (rewardIndex == -1) return@TickTask
+
+                lore.drop(rewardIndex + 1)
+                    .takeWhile { it != "" }
+                    .map { rewardRegex.find(it)?.groups?.get("reward")?.value ?: it.trim() }
+                    .forEach { line ->
+                        textLines.add(line)
+                        copperRewardRegex.find(line)?.also {
+                            copper += it.groups["count"]!!.value.replace(",", "").toInt()
+                        }
                     }
-                }
 
                 textLines.add("")
 
