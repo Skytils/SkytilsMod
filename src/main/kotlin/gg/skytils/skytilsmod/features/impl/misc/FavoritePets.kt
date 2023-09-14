@@ -76,7 +76,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
         if (event.gui is GuiChest) {
             val chest = event.gui as GuiChest
             val container = chest.inventorySlots as ContainerChest
-            if (container.lowerChestInventory.name.endsWith(") Pets") || container.lowerChestInventory.name == "Pets") {
+            if (container.lowerChestInventory.name.startsWith("Pets")) {
                 when {
                     event is GuiScreenEvent.InitGuiEvent -> event.buttonList.add(
                         GuiButton(
@@ -102,7 +102,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!Utils.inSkyblock || !highlighting || event.container !is ContainerChest) return
         val chest = event.container
-        if (!chest.lowerChestInventory.name.endsWith(") Pets") && chest.lowerChestInventory.name != "Pets") return
+        if (!chest.lowerChestInventory.name.startsWith("Pets")) return
         if (event.slot == null || !event.slot.hasStack || event.slotId < 10 || event.slotId > 43 || Utils.equalsOneOf(
                 event.slot.slotNumber % 9,
                 0,
@@ -120,7 +120,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
     fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets || event.container !is ContainerChest) return
         val chest = event.container
-        if (!chest.lowerChestInventory.name.endsWith(") Pets") && chest.lowerChestInventory.name != "Pets") return
+        if (!chest.lowerChestInventory.name.startsWith("Pets")) return
         if (!event.slot.hasStack || event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || Utils.equalsOneOf(
                 event.slot.slotNumber % 9,
                 0,
