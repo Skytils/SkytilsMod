@@ -70,11 +70,12 @@ object WaterBoardSolver {
                             world.getBlockState(it).block === Blocks.sticky_piston
                         }) {
                         if (chestPos == null || roomFacing == null) {
-                            findChest@ for (te in world.loadedTileEntityList) {
-                                val playerX = mc.thePlayer.posX.toInt()
-                                val playerZ = mc.thePlayer.posZ.toInt()
-                                val xRange = playerX - 25..playerX + 25
-                                val zRange = playerZ - 25..playerZ + 25
+                            val playerX = mc.thePlayer.posX.toInt()
+                            val playerZ = mc.thePlayer.posZ.toInt()
+                            val xRange = playerX - 25..playerX + 25
+                            val zRange = playerZ - 25..playerZ + 25
+                            findChest@
+                            for (te in world.loadedTileEntityList) {
                                 if (te.pos.y == 56 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                                 ) {
                                     val potentialChestPos = te.pos
@@ -118,27 +119,12 @@ object WaterBoardSolver {
                                         BlockPos(x + 1, 78, z + 1),
                                         BlockPos(x - 1, 77, z - 1)
                                     )) {
-                                        val block = world.getBlockState(puzzleBlockPos).block
-                                        when {
-                                            block === Blocks.gold_block -> {
-                                                foundGold = true
-                                            }
-
-                                            block === Blocks.hardened_clay -> {
-                                                foundClay = true
-                                            }
-
-                                            block === Blocks.emerald_block -> {
-                                                foundEmerald = true
-                                            }
-
-                                            block === Blocks.quartz_block -> {
-                                                foundQuartz = true
-                                            }
-
-                                            block === Blocks.diamond_block -> {
-                                                foundDiamond = true
-                                            }
+                                        when (world.getBlockState(puzzleBlockPos).block) {
+                                            Blocks.gold_block -> foundGold = true
+                                            Blocks.hardened_clay -> foundClay = true
+                                            Blocks.emerald_block -> foundEmerald = true
+                                            Blocks.quartz_block -> foundQuartz = true
+                                            Blocks.diamond_block -> foundDiamond = true
                                         }
                                     }
                                     if (foundGold && foundClay) {
@@ -307,9 +293,11 @@ object WaterBoardSolver {
     }
 
     enum class WoolColor(var dyeColor: EnumDyeColor) {
-        PURPLE(EnumDyeColor.PURPLE), ORANGE(EnumDyeColor.ORANGE), BLUE(EnumDyeColor.BLUE), GREEN(EnumDyeColor.GREEN), RED(
-            EnumDyeColor.RED
-        );
+        PURPLE(EnumDyeColor.PURPLE),
+        ORANGE(EnumDyeColor.ORANGE),
+        BLUE(EnumDyeColor.BLUE),
+        GREEN(EnumDyeColor.GREEN),
+        RED(EnumDyeColor.RED);
 
         val isExtended: Boolean
             get() = if (chestPos == null || roomFacing == null) false else mc.theWorld.getBlockState(
@@ -320,9 +308,11 @@ object WaterBoardSolver {
     }
 
     enum class LeverBlock(var block: Block) {
-        QUARTZ(Blocks.quartz_block), GOLD(Blocks.gold_block), COAL(Blocks.coal_block), DIAMOND(Blocks.diamond_block), EMERALD(
-            Blocks.emerald_block
-        ),
+        QUARTZ(Blocks.quartz_block),
+        GOLD(Blocks.gold_block),
+        COAL(Blocks.coal_block),
+        DIAMOND(Blocks.diamond_block),
+        EMERALD(Blocks.emerald_block),
         CLAY(Blocks.hardened_clay);
 
         val leverPos: BlockPos?
