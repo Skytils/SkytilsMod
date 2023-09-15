@@ -128,35 +128,6 @@ object MythologicalTracker : Tracker("mythological") {
         }
     }
 
-    @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (lastMinosChamp != 0L && Utils.inSkyblock && mc.thePlayer != null && Skytils.config.trackMythEvent && event.entity is EntityOtherPlayerMP && event.entity.getXZDistSq(
-                mc.thePlayer
-            ) < 5.5 * 5.5 && System.currentTimeMillis() - lastMinosChamp <= 2500
-        ) {
-            if (event.entity.name == "Minos Champion") {
-                println("Dug is: Minos Champion")
-                lastMinosChamp = 0L
-                BurrowMob.CHAMP.dugTimes++
-                UChat.chat("$prefix §eYou dug up a §2Minos Champion§e!")
-                markDirty<MythologicalTracker>()
-            } else if (event.entity.name == "Minos Inquisitor") {
-                println("Dug is: Minos Inquisitor")
-                lastMinosChamp = 0L
-                BurrowMob.INQUIS.dugTimes++
-                UChat.chat("$prefix §eYou dug up a §2Minos Inquisitor§e!")
-                markDirty<MythologicalTracker>()
-            }
-        }
-        if (lastMinosChamp != 0L && System.currentTimeMillis() - lastMinosChamp > 2500) {
-            println("Dug is: Unknown")
-            lastMinosChamp = 0L
-            BurrowMob.CHAMP.dugTimes++
-            UChat.chat("$prefix §eNo idea what you dug, counting as §2Minos Champion§e!")
-            markDirty<MythologicalTracker>()
-        }
-    }
-
     @SubscribeEvent(receiveCanceled = true)
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
@@ -177,14 +148,8 @@ object MythologicalTracker : Tracker("mythological") {
                 } else if (unformatted.contains("! You dug out ")) {
                     mythCreatureDug.matchEntire(unformatted)?.let {
                         val mob = BurrowMob.getFromName(it.groups[1]?.value ?: return) ?: return
-                        //for some reason, minos inquisitors say minos champion in the chat
-                        if (mob == BurrowMob.CHAMP) {
-                            Utils.cancelChatPacket(event)
-                            lastMinosChamp = System.currentTimeMillis()
-                        } else {
-                            mob.dugTimes++
-                            markDirty<MythologicalTracker>()
-                        }
+                        mob.dugTimes++
+                        markDirty<MythologicalTracker>()
                     }
                 } else if (unformatted.endsWith("/4)") && (unformatted.startsWith("You dug out a Griffin Burrow! (") || unformatted.startsWith(
                         "You finished the Griffin burrow chain! (4"
