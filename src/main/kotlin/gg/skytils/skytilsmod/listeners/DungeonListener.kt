@@ -116,17 +116,12 @@ object DungeonListener {
                 val match = deathRegex.find(text) ?: return
                 val username = match.groups["username"]?.value ?: mc.thePlayer.name
                 val teammate = team[username] ?: return
-                UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} detected dead from chat message")
                 markDead(teammate)
             } else if (text.startsWith("§r§a ❣ ")) {
                 val match = reviveRegex.find(text) ?: return
                 val username = match.groups["username"]!!.value
                 val teammate = team[username] ?: return
-                UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} detected revived from chat message")
-                if (deads.remove(teammate)) {
-                    UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} removed from dead list")
-                    teammate.dead = false
-                }
+                markRevived(teammate)
             }
         }
     }
@@ -172,13 +167,8 @@ object DungeonListener {
                         it.name == teammate.playerName && it.uniqueID.version() == 4
                     }
                     if (self?.dead != true) {
-                        if (entry.endsWith("§r§cDEAD§r§f)§r")) {
-                            UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} detected dead from tablist")
-                            markDead(teammate)
-                        } else if (deads.remove(teammate)) {
-                            UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} removed from dead list")
-                            teammate.dead = false
-                        }
+                        if (entry.endsWith("§r§cDEAD§r§f)§r")) markDead(teammate)
+                        else markRevived(teammate)
                     }
                 }
             }
@@ -187,13 +177,10 @@ object DungeonListener {
 
     fun markDead(teammate: DungeonTeammate) {
         if (deads.add(teammate)) {
-            UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} added on dead list")
             val time = System.currentTimeMillis()
-            val lastDeath = teammate.lastMarkedDead
-            // there's no way they die twice in less than half a second
-            if (lastDeath != null && time - lastDeath <= 500) return
-            UChat.chat("${Skytils.prefix} §fdebug: ${teammate.playerName} passed dead time check")
-            teammate.lastMarkedDead = time
+            val lastDeath = teammate.lastLivingStateChange
+            if (lastDeath != null && time - lastDeath <= 1000) return
+            teammate.lastLivingStateChange = time
             teammate.dead = true
             teammate.deaths++
             val totalDeaths = team.values.sumOf { it.deaths }
@@ -218,6 +205,13 @@ object DungeonListener {
                     )
                 }
             }
+        }
+    }
+
+    fun markRevived(teammate: DungeonTeammate) {
+        if (deads.remove(teammate)) {
+            teammate.dead = false
+            teammate.lastLivingStateChange = System.currentTimeMillis()
         }
     }
 
@@ -319,7 +313,7 @@ object DungeonListener {
         var player: EntityPlayer? = null
         var dead = false
         var deaths = 0
-        var lastMarkedDead: Long? = null
+        var lastLivingStateChange: Long? = null
 
 
         fun canRender() = player != null && player!!.health > 0 && !dead
