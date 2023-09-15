@@ -96,6 +96,7 @@ object MiscFeatures {
         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODg0NzA4MjYxMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQwZDZlMzYyYmM3ZWVlNGY5MTFkYmQwNDQ2MzA3ZTc0NThkMTA1MGQwOWFlZTUzOGViY2IwMjczY2Y3NTc0MiIKICAgIH0KICB9Cn0=",
     )
     private val hubSpawnPoint = BlockPos(-2, 70, -69)
+    private val bestiaryTitleRegex = Regex("\"(?:\\\\(\\\\d+\\\\/\\\\d+\\\\) )?(?:Bestiary ➜ (?!Fishing)|(?:Fishing ➜ ))|Search Results\"")
 
     init {
         GolemSpawnTimerElement()
@@ -465,11 +466,7 @@ object MiscFeatures {
         val c = mc.thePlayer.openContainer
         if (c is ContainerChest) {
             val name = c.lowerChestInventory.name
-            if (Skytils.config.showBestiaryLevel && name.startsWithAny(
-                    "Bestiary ➜ ",
-                    "Search Results"
-                ) && item.item != Item.getItemFromBlock(Blocks.stained_glass_pane)
-            ) {
+            if (Skytils.config.showBestiaryLevel && bestiaryTitleRegex in name) {
                 val arrowSlot = c.inventorySlots.getOrNull(48)?.stack
                 if (arrowSlot != null && arrowSlot.item == Items.arrow && ItemUtil.getItemLore(item)
                         .lastOrNull() == "§eClick to view!"
