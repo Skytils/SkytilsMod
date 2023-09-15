@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -37,6 +38,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
@@ -48,111 +50,134 @@ object BlazeSolver {
     var impossible = false
 
     init {
-        TickTask(20, repeats = true) {
-            val player = mc.thePlayer
-            val world = mc.theWorld
-            if (Skytils.config.blazeSolver && Utils.inDungeons && world != null && DungeonListener.missingPuzzles.contains(
+        TickTask(4, repeats = true) {
+            if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Higher Or Lower"
                 )
             ) {
-                if (blazeMode == 0 && orderedBlazes.size > 0) {
-                    Skytils.launch {
-                        val blazes = world.getEntities(
-                            EntityBlaze::class.java
-                        ) { blaze: EntityBlaze? -> player.getDistanceSqToEntity(blaze) < 100 * 100 }
-                        if (blazes.size > 10) {
-                            println("More than 10 blazes, was there an update?")
-                        } else if (blazes.size > 0) {
-                            val diffY = 5 * (10 - blazes.size)
-                            val blaze = blazes[0]
-                            val blazeX = blaze.posX.toInt()
-                            val blazeZ = blaze.posZ.toInt()
-                            val xRange = blazeX - 13..blazeX + 13
-                            val zRange = blazeZ - 13..blazeZ + 13
-                            findChest@ for (te in world.loadedTileEntityList) {
-                                val y1 = 70 + diffY
-                                val y2 = 69 - diffY
-                                if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
-                                ) {
-                                    val pos = te.pos
-                                    if (world.getBlockState(te.pos.up()).block == Blocks.iron_bars) {
-                                        if (pos.y == y1) {
-                                            blazeChest = pos
-                                            if (blazes.size < 10) {
-                                                blazeMode = -1
-                                                println("Block scanning determined lowest -> highest")
-                                            }
-                                            break
-                                        } else {
-                                            blazeChest = pos
-                                            if (blazes.size < 10) {
-                                                blazeMode = 1
-                                                println("Block scanning determined highest -> lowest")
-                                            }
-                                            break@findChest
-                                        }
+                calcOrder()
+            }
+        }
+        TickTask(20, repeats = true) {
+            if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
+                    "Higher Or Lower"
+                )
+            ) {
+                detectOrientation()
+            }
+        }
+    }
+
+    fun detectOrientation() {
+        if (blazeMode == 0 && orderedBlazes.size > 0 && mc.thePlayer != null) {
+            Skytils.launch {
+                val blazes = mc.theWorld.getEntities(
+                    EntityBlaze::class.java
+                ) { blaze: EntityBlaze? -> mc.thePlayer.getDistanceSqToEntity(blaze) < 100 * 100 }
+                if (blazes.size > 10) {
+                    println("More than 10 blazes, was there an update?")
+                } else if (blazes.size > 0) {
+                    val diffY = 5 * (10 - blazes.size)
+                    val blaze = blazes[0]
+                    val blazeX = blaze.posX.toInt()
+                    val blazeZ = blaze.posZ.toInt()
+                    val xRange = blazeX - 13..blazeX + 13
+                    val zRange = blazeZ - 13..blazeZ + 13
+                    findChest@ for (te in mc.theWorld.loadedTileEntityList) {
+                        val y1 = 70 + diffY
+                        val y2 = 69 - diffY
+                        if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
+                        ) {
+                            val pos = te.pos
+                            if (mc.theWorld.getBlockState(te.pos.up()).block == Blocks.iron_bars) {
+                                if (pos.y == y1) {
+                                    blazeChest = pos
+                                    if (blazes.size < 10) {
+                                        blazeMode = -1
+                                        println("Block scanning determined lowest -> highest")
                                     }
-                                }
-                            }
-                            if (blazeChest != null && blazes.size == 10) {
-                                blazeMode = if (world.getBlockState(blazeChest!!.down()).block == Blocks.stone) {
-                                    println("Bottom block scanning determined lowest -> highest")
-                                    -1
+                                    break
                                 } else {
-                                    println("Bottom block scanning determined highest -> lowest")
-                                    1
+                                    blazeChest = pos
+                                    if (blazes.size < 10) {
+                                        blazeMode = 1
+                                        println("Block scanning determined highest -> lowest")
+                                    }
+                                    break@findChest
                                 }
                             }
+                        }
+                    }
+                    if (blazeChest != null && blazes.size == 10) {
+                        blazeMode = if (mc.theWorld.getBlockState(blazeChest!!.down()).block == Blocks.stone) {
+                            println("Bottom block scanning determined lowest -> highest")
+                            -1
+                        } else {
+                            println("Bottom block scanning determined highest -> lowest")
+                            1
                         }
                     }
                 }
             }
         }
-        TickTask(4, repeats = true) {
-            val world = mc.theWorld
-            if (Skytils.config.blazeSolver && Utils.inDungeons && world != null && DungeonListener.missingPuzzles.contains(
-                    "Higher Or Lower"
-                )
+    }
+
+    fun calcOrder() {
+        if (mc.theWorld == null) return
+        orderedBlazes.clear()
+        for (entity in mc.theWorld.loadedEntityList) {
+            if (entity is EntityArmorStand && entity.name.contains("Blaze") && entity.name
+                    .contains("/")
             ) {
-                orderedBlazes.clear()
-                for (entity in world.getLoadedEntityList()) {
-                    if (entity is EntityArmorStand && entity.getName().contains("Blaze") && entity.getName()
-                            .contains("/")
-                    ) {
-                        val blazeName = entity.getName().stripControlCodes()
-                        try {
-                            val health =
-                                blazeName.substringAfter("/").dropLast(1).toInt()
-                            val aabb = AxisAlignedBB(
-                                entity.posX - 0.5,
-                                entity.posY - 2,
-                                entity.posZ - 0.5,
-                                entity.posX + 0.5,
-                                entity.posY,
-                                entity.posZ + 0.5
-                            )
-                            val blazes = mc.theWorld.getEntitiesWithinAABB(
-                                EntityBlaze::class.java, aabb
-                            )
-                            if (blazes.isEmpty()) continue
-                            orderedBlazes.add(ShootableBlaze(blazes[0], health))
-                        } catch (ex: NumberFormatException) {
-                            ex.printStackTrace()
-                        }
-                    }
+                val blazeName = entity.name.stripControlCodes()
+                try {
+                    val health =
+                        blazeName.substringAfter("/").dropLast(1).toInt()
+                    val aabb = AxisAlignedBB(
+                        entity.posX - 0.5,
+                        entity.posY - 2,
+                        entity.posZ - 0.5,
+                        entity.posX + 0.5,
+                        entity.posY,
+                        entity.posZ + 0.5
+                    )
+                    val blazes = mc.theWorld.getEntitiesWithinAABB(
+                        EntityBlaze::class.java, aabb
+                    )
+                    if (blazes.isEmpty()) continue
+                    orderedBlazes.add(ShootableBlaze(blazes[0], health))
+                } catch (ex: NumberFormatException) {
+                    ex.printStackTrace()
                 }
-                orderedBlazes.sortWith { blaze1, blaze2 ->
-                    if (SuperSecretSettings.bennettArthur) return@sortWith Random.nextInt(-1, 2)
-                    val compare = blaze1.health.compareTo(blaze2.health)
-                    if (compare == 0 && !impossible) {
-                        impossible = true
-                        UChat.chat("$failPrefix §cDetected two blazes with the exact same amount of health!")
-                        val first = blaze1.blaze.health
-                        val second = blaze2.blaze.health
-                        if (first.toInt() == second.toInt()) return@sortWith first.compareTo(second)
-                    }
-                    return@sortWith compare
-                }
+            }
+        }
+        orderedBlazes.sortWith { blaze1, blaze2 ->
+            if (SuperSecretSettings.bennettArthur) return@sortWith Random.nextInt(-1, 2)
+            val compare = blaze1.health.compareTo(blaze2.health)
+            if (compare == 0 && !impossible) {
+                impossible = true
+                UChat.chat("$failPrefix §cDetected two blazes with the exact same amount of health!")
+                val first = blaze1.blaze.health
+                val second = blaze2.blaze.health
+                if (first.toInt() == second.toInt()) return@sortWith first.compareTo(second)
+            }
+            return@sortWith compare
+        }
+    }
+
+    @SubscribeEvent
+    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+        if (event.puzzle == "Higher Or Lower") {
+            calcOrder()
+            detectOrientation()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityDeath(event: LivingDeathEvent) {
+        if (event.entity is EntityBlaze && orderedBlazes.isNotEmpty()) {
+            orderedBlazes.firstOrNull { it.blaze == event.entity }?.let {
+                orderedBlazes.remove(it)
             }
         }
     }
