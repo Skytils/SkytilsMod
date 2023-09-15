@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -55,6 +56,13 @@ object BoulderSolver {
 
     init {
         TickTask(20, repeats = true, task = ::update)
+    }
+
+    @SubscribeEvent
+    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+        if (event.puzzle == "Boulder") {
+            update()
+        }
     }
 
     @SubscribeEvent

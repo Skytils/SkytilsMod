@@ -21,6 +21,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -43,46 +44,57 @@ object CreeperSolver {
     private var creeper: EntityCreeper? = null
     private val candidateBlocks = setOf(Blocks.prismarine, Blocks.sea_lantern)
 
+    @SubscribeEvent
+    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+        if (event.puzzle == "Creeper Beams") {
+            updatePuzzleState()
+        }
+    }
+
+    fun updatePuzzleState() {
+        if (this.creeper == null) {
+            val creeperScan = mc.thePlayer.entityBoundingBox.expand(14.0, 8.0, 13.0)
+            this.creeper = mc.theWorld?.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan) {
+                it != null && !it.isInvisible && it.maxHealth == 20f && it.health == 20f && !it.hasCustomName()
+            }?.firstOrNull()
+        } else if (solutionPairs.isEmpty()) {
+            val creeper = this.creeper!!.entityBoundingBox
+            val validBox = creeper.expand(0.5, 0.75, 0.5)
+
+            val roomBB = creeper.expand(14.0, 10.0, 13.0)
+            val candidates = BlockPos.getAllInBox(BlockPos(roomBB.minVec), BlockPos(roomBB.maxVec)).filter {
+                it.y > 68 && mc.theWorld?.getBlockState(it)?.block in candidateBlocks
+            }
+            val pairs = candidates.elementPairs()
+            val usedPositions = mutableSetOf<BlockPos>()
+            solutionPairs.addAll(pairs.filter { (a, b) ->
+                if (a in usedPositions || b in usedPositions) return@filter false
+                checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(Vec3(0.0, 0.0, 0.0))).also {
+                    if (it) {
+                        usedPositions.add(a)
+                        usedPositions.add(b)
+                    }
+                }
+            })
+
+            if (SuperSecretSettings.bennettArthur) {
+                solutionPairs.mapIndexed { i, pair ->
+                    pair.first to solutionPairs[(i + 1) % solutionPairs.size].second
+                }.let {
+                    solutionPairs.clear()
+                    solutionPairs.addAll(it)
+                }
+            }
+        }
+    }
+
     init {
         TickTask(20, repeats = true) {
             if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Creeper Beams"
                 )
             ) {
-                if (this.creeper == null) {
-                    val creeperScan = mc.thePlayer.entityBoundingBox.expand(14.0, 8.0, 13.0)
-                    this.creeper = mc.theWorld?.getEntitiesWithinAABB(EntityCreeper::class.java, creeperScan) {
-                        it != null && !it.isInvisible && it.maxHealth == 20f && it.health == 20f && !it.hasCustomName()
-                    }?.firstOrNull()
-                } else if (solutionPairs.isEmpty()) {
-                    val creeper = this.creeper!!.entityBoundingBox
-                    val validBox = creeper.expand(0.5, 0.75, 0.5)
-
-                    val roomBB = creeper.expand(14.0, 10.0, 13.0)
-                    val candidates = BlockPos.getAllInBox(BlockPos(roomBB.minVec), BlockPos(roomBB.maxVec)).filter {
-                        it.y > 68 && mc.theWorld?.getBlockState(it)?.block in candidateBlocks
-                    }
-                    val pairs = candidates.elementPairs()
-                    val usedPositions = mutableSetOf<BlockPos>()
-                    solutionPairs.addAll(pairs.filter { (a, b) ->
-                        if (a in usedPositions || b in usedPositions) return@filter false
-                        checkLineBox(validBox, a.middleVec(), b.middleVec(), Holder(Vec3(0.0, 0.0, 0.0))).also {
-                            if (it) {
-                                usedPositions.add(a)
-                                usedPositions.add(b)
-                            }
-                        }
-                    })
-
-                    if (SuperSecretSettings.bennettArthur) {
-                        solutionPairs.mapIndexed { i, pair ->
-                            pair.first to solutionPairs[(i + 1) % solutionPairs.size].second
-                        }.let {
-                            solutionPairs.clear()
-                            solutionPairs.addAll(it)
-                        }
-                    }
-                }
+                updatePuzzleState()
             }
         }
     }
