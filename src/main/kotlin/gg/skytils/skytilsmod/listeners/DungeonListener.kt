@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -143,8 +144,18 @@ object DungeonListener {
                 }
                 return@mapNotNull null
             }
-            missingPuzzles.clear()
-            missingPuzzles.addAll(localMissingPuzzles)
+            if (missingPuzzles.size != localMissingPuzzles.size || !missingPuzzles.containsAll(localMissingPuzzles)) {
+                val newPuzzles = localMissingPuzzles.filter { it !in missingPuzzles }
+                val completedPuzzles = missingPuzzles.filter { it !in localMissingPuzzles }
+                newPuzzles.forEach {
+                    DungeonEvent.PuzzleEvent.Discovered(it).postAndCatch()
+                }
+                completedPuzzles.forEach {
+                    DungeonEvent.PuzzleEvent.Completed(it).postAndCatch()
+                }
+                missingPuzzles.clear()
+                missingPuzzles.addAll(localMissingPuzzles)
+            }
         }
         TickTask(2, repeats = true) {
             if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.events.impl
+package gg.skytils.skytilsmod.events.impl.skyblock
 
 import gg.skytils.skytilsmod.events.SkytilsEvent
 import gg.skytils.skytilsmod.utils.LocrawObject

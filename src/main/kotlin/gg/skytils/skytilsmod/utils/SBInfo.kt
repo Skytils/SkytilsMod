@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.utils
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.events.impl.LocrawReceivedEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import kotlinx.serialization.KSerializer
