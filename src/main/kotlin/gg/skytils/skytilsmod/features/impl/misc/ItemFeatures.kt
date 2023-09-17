@@ -515,8 +515,10 @@ object ItemFeatures {
         if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (Utils.equalsOneOf(
                 itemId,
                 "FLOWER_OF_TRUTH",
+                "BOUQUET_OF_LIES",
                 "MOODY_GRAPPLESHOT",
                 "BAT_WAND",
+                "STARRED_BAT_WAND",
                 "WEIRD_TUBA",
                 "WEIRDER_TUBA"
             ))
