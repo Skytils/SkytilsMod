@@ -1140,13 +1140,6 @@ object Config : Vigilant(
     var talbotsTheodoliteHelper = false
 
     @Property(
-        type = PropertyType.TEXT, name = "Kuudra Auto-Reparty Player",
-        description = "Automatically performs a reparty upon joining a Kuudra bossfight. Leave this blank to disable.",
-        category = "Kuudra", subcategory = "Quality of Life"
-    )
-    var kuudraAutoRepartyPlayer = ""
-
-    @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.",
         category = "Mining", subcategory = "Quality of Life"
