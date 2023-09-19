@@ -216,7 +216,7 @@ object DungeonListener {
     }
 
     fun markAllRevived() {
-        UChat.chat("${Skytils.prefix} §fdebug: marking all teammates as revived")
+        printDevMessage("${Skytils.prefix} §fdebug: marking all teammates as revived", "scorecalc")
         deads.clear()
         team.values.forEach {
             it.dead = false
