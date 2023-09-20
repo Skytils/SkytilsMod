@@ -391,6 +391,7 @@ object MiningFeatures {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && waypointDelayTicks == 0 && mc.thePlayer != null
         ) {
+            if (Skytils.config.disableAutoChWaypoints) return
             CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.loc?.set()
         } else if (waypointDelayTicks > 0)
             waypointDelayTicks--

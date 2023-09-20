@@ -1251,6 +1251,13 @@ object Config : Vigilant(
     )
     var crystalHollowWaypoints = false
 
+    @Property (
+        type = PropertyType.SWITCH, name = "Disable Auto Waypoints",
+        description = "Disable automatic creation of new waypoints.",
+        category = "Mining", subcategory = "Crystal Hollows"
+    )
+    var disableAutoChWaypoints = false
+
     @Property(
         type = PropertyType.SWITCH, name = "King Yolkar waypoint",
         description = "Adds a waypoint for King Yolkar upon interacting with him",
