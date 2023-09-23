@@ -53,22 +53,6 @@ object PetFeatures {
     private var lastPetLockNotif: Long = 0
     var lastPet: String? = null
 
-
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!Utils.inSkyblock) return
-        if (event.entity is EntityArmorStand) {
-            val entity = event.entity
-            val name = entity.customNameTag
-            if (Skytils.config.hidePetNametags && name.startsWith("§8[§7Lv") && name.contains(
-                    "'s "
-                ) && !name.contains("❤") && !name.contains("Hit")
-            ) {
-                event.isCanceled = true
-            }
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || event.type.toInt() == 2) return

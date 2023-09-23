@@ -169,13 +169,6 @@ object Config : Vigilant(
     var updateChannel = 2
 
     @Property(
-        type = PropertyType.SWITCH, name = "Blood Room Portal Timer",
-        description = "Displays time to portal on your HUD.",
-        category = "Dungeons", subcategory = "HUD"
-    )
-    var bloodPortalTimer = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
         description = "Shows the amount of crypts destroyed on your HUD.",
         category = "Dungeons", subcategory = "HUD"
@@ -2149,13 +2142,6 @@ object Config : Vigilant(
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var hideAutopetMessages = 0
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Hide Pet Nametags",
-        description = "Hides the nametags above pets.",
-        category = "Pets", subcategory = "Quality of Life"
-    )
-    var hidePetNametags = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Active Pet",

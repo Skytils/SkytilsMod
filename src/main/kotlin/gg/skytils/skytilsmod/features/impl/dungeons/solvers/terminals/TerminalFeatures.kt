@@ -64,7 +64,7 @@ object TerminalFeatures {
         if (chest is ContainerChest) {
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText
-            if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {
+            if (chestName == "Click the button on time!" || chestName == "Correct all the panes!") {
                 event.toolTip.clear()
             }
         }
