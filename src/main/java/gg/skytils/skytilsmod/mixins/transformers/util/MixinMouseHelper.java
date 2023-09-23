@@ -19,15 +19,21 @@
 package gg.skytils.skytilsmod.mixins.transformers.util;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHookKt;
+import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook;
 import net.minecraft.util.MouseHelper;
+import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseHelper.class)
 public class MixinMouseHelper {
-    @WrapWithCondition(method = "ungrabMouseCursor", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;setCursorPosition(II)V", remap = false))
-    private boolean shouldSetCursorPos(int newX, int newY) {
-        return MouseHelperHookKt.shouldResetMouseToCenter();
+    @Inject(method = "ungrabMouseCursor", at = @At("HEAD"), cancellable = true)
+    private void ungrabMouseCursor(CallbackInfo ci) {
+        if (MouseHelperHook.INSTANCE.shouldResetMouseToCenter()) {
+            ci.cancel();
+            Mouse.setGrabbed(false);
+        }
     }
 }
