@@ -55,6 +55,7 @@ import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
+import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
@@ -332,7 +333,8 @@ class Skytils {
             TriviaSolver,
             VisitorHelper,
             WaterBoardSolver,
-            Waypoints
+            Waypoints,
+            MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
