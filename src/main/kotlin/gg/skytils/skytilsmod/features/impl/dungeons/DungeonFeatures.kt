@@ -551,7 +551,7 @@ object DungeonFeatures {
                         val name = event.entity.name
                         if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
                             val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
-                            val color = Color(0, 255, 255, 255)
+                            val color = Skytils.config.boxStarredMobsColor
                             if ("Spider" in name) {
                                 RenderUtil.drawOutlinedBoundingBox(
                                     AxisAlignedBB(

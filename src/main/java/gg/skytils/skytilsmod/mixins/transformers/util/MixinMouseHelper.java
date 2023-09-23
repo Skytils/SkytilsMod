@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.util;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook;
 import net.minecraft.util.MouseHelper;
 import org.lwjgl.input.Mouse;
