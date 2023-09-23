@@ -124,7 +124,7 @@ object ChestProfit {
     }
 
     private fun getEssenceValue(text: String): Double? {
-        if (Skytils.config.dungeonChestProfitIncludesEssence) return null
+        if (!Skytils.config.dungeonChestProfitIncludesEssence) return null
         val groups = essenceRegex.matchEntire(text)?.groups ?: return null
         val type = groups["type"]?.value?.uppercase() ?: return null
         val count = groups["count"]?.value?.toInt() ?: return null
