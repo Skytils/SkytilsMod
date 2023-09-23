@@ -39,12 +39,12 @@ object DungeonTimer {
     var dungeonStartTime = -1L
     var bloodOpenTime = -1L
     var bloodClearTime = -1L
-    var portalEnterTime = -1L
     var bossEntryTime = -1L
     var bossClearTime = -1L
     var phase1ClearTime = -1L
     var phase2ClearTime = -1L
     var phase3ClearTime = -1L
+    var terminalClearTime = -1L
     var phase4ClearTime = -1L
     var terraClearTime = -1L
     var giantsClearTime = -1L
@@ -141,7 +141,8 @@ object DungeonTimer {
                         ) {
                             add("§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
                             add("§cStorm §btook ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
-                            add("§6Goldor §btook ${diff(phase3ClearTime, phase2ClearTime)} seconds.")
+                            add("§eTerminals §btook ${diff(terminalClearTime, phase2ClearTime)} seconds.")
+                            add("§6Goldor §btook ${diff(phase3ClearTime, terminalClearTime)} seconds.")
                             add("§4Necron §btook ${diff(phase4ClearTime, phase3ClearTime)} seconds.")
                             if (DungeonFeatures.dungeonFloor == "M7") {
                                 add("§7Wither King §btook ${diff(bossClearTime, phase4ClearTime)} seconds.")
@@ -155,7 +156,7 @@ object DungeonTimer {
                 }
             }
 
-            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && message.startsWith("§r§4[BOSS] ") -> {
+            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && (message.startsWith("§r§4[BOSS] ") || message.startsWith("§r§aThe Core entrance ")) -> {
                 when {
                     message.endsWith("§r§cPathetic Maxor, just like expected.§r") && phase1ClearTime == -1L -> {
                         phase1ClearTime = System.currentTimeMillis()
@@ -164,17 +165,24 @@ object DungeonTimer {
                         )
                     }
 
-                    message.endsWith("§r§cAt least my son died by your hands.§r") && phase2ClearTime == -1L -> {
+                    message.endsWith("§r§cWho dares trespass into my domain?§r") && phase2ClearTime == -1L -> {
                         phase2ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
                             "§cStorm §btook ${diff(phase2ClearTime, phase1ClearTime)} seconds."
                         )
                     }
 
-                    message.endsWith("§r§c....§r") && phase3ClearTime == -1L -> {
+                    message.endsWith(" is opening!§r") && terminalClearTime == -1L -> {
+                        terminalClearTime = System.currentTimeMillis()
+                        if (Skytils.config.necronPhaseTimer) UChat.chat(
+                            "§eTerminals §btook ${diff(terminalClearTime, phase2ClearTime)} seconds."
+                        )
+                    }
+
+                    message.endsWith("§r§cYou went further than any human before, congratulations.§r") && phase3ClearTime == -1L -> {
                         phase3ClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
-                            "§6Goldor §btook ${diff(phase3ClearTime, phase2ClearTime)} seconds."
+                            "§6Goldor §btook ${diff(phase3ClearTime, terminalClearTime)} seconds."
                         )
                     }
 
@@ -212,11 +220,11 @@ object DungeonTimer {
         dungeonStartTime = -1
         bloodOpenTime = -1
         bloodClearTime = -1
-        portalEnterTime = -1
         bossEntryTime = -1
         bossClearTime = -1
         phase1ClearTime = -1
         phase2ClearTime = -1
+        terminalClearTime = -1
         phase3ClearTime = -1
         phase4ClearTime = -1
         terraClearTime = -1
@@ -300,7 +308,9 @@ object DungeonTimer {
                     if (phase1ClearTime != -1L)
                         add("§cStorm: ${dungeonTimeFormat(((if (phase2ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase2ClearTime) - phase1ClearTime) / 1000.0)}")
                     if (phase2ClearTime != -1L)
-                        add("§6Goldor: ${dungeonTimeFormat(((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - phase2ClearTime) / 1000.0)}")
+                        add("§eTerminals: ${dungeonTimeFormat(((if (terminalClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else terminalClearTime) - phase2ClearTime) / 1000.0)}")
+                    if (terminalClearTime != -1L)
+                        add("§6Goldor: ${dungeonTimeFormat(((if (phase3ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase3ClearTime) - terminalClearTime) / 1000.0)}")
                     if (phase3ClearTime != -1L)
                         add("§4Necron: ${dungeonTimeFormat(((if (phase4ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase4ClearTime) - phase3ClearTime) / 1000.0)}")
                     if (phase4ClearTime != -1L && DungeonFeatures.dungeonFloor == "M7")
@@ -314,6 +324,7 @@ object DungeonTimer {
             val displayText = """
                 §bMaxor: 0s
                 §cStorm: 0s
+                §eTerminals: 0s
                 §6Goldor: 0s
                 §4Necron: 0s
                 §7Wither King: 0s
