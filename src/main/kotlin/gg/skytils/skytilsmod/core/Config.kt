@@ -383,6 +383,13 @@ object Config : Vigilant(
     var boxStarredMobs = false
 
     @Property(
+        type = PropertyType.COLOR, name = "Box Starred Mobs Color",
+        description = "Color of the bounding box for Starred Mobs.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxStarredMobsColor = Color(0, 255, 255, 255)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"

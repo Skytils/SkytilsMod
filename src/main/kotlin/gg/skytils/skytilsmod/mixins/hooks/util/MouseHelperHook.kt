@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.mixins.hooks.util
 
-import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.GuiOpenEvent
