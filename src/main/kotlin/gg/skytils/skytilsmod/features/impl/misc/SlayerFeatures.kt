@@ -1183,7 +1183,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun blockChange(event: BlockChangeEvent) {
-            if (event.pos == thrownLocation && event.old.block is BlockBeacon && event.update.block is BlockAir) {
+            if (event.pos == thrownLocation && event.old.block is BlockBeacon && event.update.block !is BlockBeacon) {
                 thrownLocation = null
                 thrownEntity = null
                 return
