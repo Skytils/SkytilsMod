@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
+import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.GuiChat
@@ -53,7 +54,7 @@ object FarmingFeatures {
 
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+        if (SBInfo.mode != "farming_1" || event.type == 2.toByte()) return
 
         val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()

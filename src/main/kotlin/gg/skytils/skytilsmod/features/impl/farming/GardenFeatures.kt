@@ -46,8 +46,7 @@ object GardenFeatures {
     )
     private val scythes = hashMapOf("SAM_SCYTHE" to 1, "GARDEN_SCYTHE" to 2)
 
-
-    // TODO: New visitors might not be spawned in after time is up if player is offline (needs confirmation)
+    // Only up to 1 visitor can spawn if the player is offline or out of the garden, following the same timer.
     private val visitorCount = Regex("^\\s*§r§b§lVisitors: §r§f\\((?<visitors>\\d+)\\)§r\$")
     private val nextVisitor = Regex("\\s*§r Next Visitor: §r§b(?:(?<min>\\d+)m )?(?<sec>\\d+)s§r")
     private var nextVisitorAt = -1L
@@ -84,11 +83,12 @@ object GardenFeatures {
                 }
 
                 if (nextVisitorAt != -1L) {
-                    // TODO: confirm the max count is 5
+                    // Max number of visitors on your island is 5. However, after the 5th visitor the timer keeps going so there can be a 6th one that spawns after the 5th visitor is gone.
                     if (lastKnownVisitorCount > 5) {
                         nextVisitorAt = -1L
                     } else if (System.currentTimeMillis() >= nextVisitorAt) {
                         // TODO: 15 seconds is not constant, changes based on unique visitors and when crops are broken, however, it provides a good measure for now with a reasonable difference in time
+                        // -0.1s per crop broken
                         nextVisitorAt += 15_000L
                         lastKnownVisitorCount++
                         UChat.chat(
