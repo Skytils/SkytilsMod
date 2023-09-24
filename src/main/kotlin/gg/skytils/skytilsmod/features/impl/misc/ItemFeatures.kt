@@ -648,7 +648,7 @@ object ItemFeatures {
                     }
             }
         }
-        if (Skytils.config.showPetCandies && item.item === Items.skull) {
+        if (Skytils.config.showPetCandies && item.item === Items.skull) { // TODO: Use NBT
             lore?.forEach { line ->
                 candyPattern.find(line)?.let {
                     stackTip = it.groups[1]!!.value

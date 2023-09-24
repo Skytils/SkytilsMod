@@ -64,6 +64,7 @@ object SimonSaysSolver {
                         if (state.block === Blocks.air) {
                             //println("Buttons on simon says were removed!")
                             clickNeeded = 0
+                            clickInOrder.clear()
                         } else if (state.block === Blocks.stone_button) {
                             if (old.block === Blocks.stone_button) {
                                 if (state.getValue(BlockButtonStone.POWERED)) {
@@ -88,17 +89,28 @@ object SimonSaysSolver {
 
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
             val matrixStack = UMatrixStack()
-            val pos = clickInOrder[clickNeeded].west()
-            val x = pos.x - viewerX
-            val y = pos.y - viewerY
-            val z = pos.z - viewerZ
-            GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(
-                matrixStack,
-                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-                if (clickNeeded == clickInOrder.size - 1) Color.GREEN else Color.RED,
-                0.5f * Funny.alphaMult
-            )
+
+            clickInOrder.forEachIndexed { index, pos ->
+
+                var alpha = 0.5f
+                val x = pos.x - viewerX
+                val y = pos.y - viewerY + .318
+                val z = pos.z - viewerZ + .3
+                val color = when (index) {
+                    clickNeeded -> Color.GREEN
+                    clickNeeded + 1 -> Color.YELLOW
+                    else -> Color.RED
+                }
+
+                if (index < clickNeeded) alpha = 0f
+
+                RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
+                    AxisAlignedBB(x, y, z, x - .13, y + .322, z + .4),
+                    color,
+                    alpha * Funny.alphaMult
+                )
+            }
             GlStateManager.enableCull()
         }
     }
