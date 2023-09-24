@@ -714,7 +714,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         return false
     }
 
-    class SpamMessage(var message: String, var time: Long, var height: Double)
+    data class SpamMessage(var message: String, var time: Long, var height: Double)
     class SpamGuiElement : GuiElement("Spam Gui", scale = 1.0f, x = 0.65f, y = 0.925f) {
         /**
          * Based off of Soopyboo32's SoopyApis module
@@ -730,10 +730,11 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             lastTimeRender = now
             var i = 0
             val reversed = spamMessages.asReversed()
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             while (i in spamMessages.indices) {
                 val message = reversed[i]
-                val messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(
-                    message.message.stripControlCodes()
+                val messageWidth = ScreenRenderer.fontRenderer.getStringWidth(
+                    message?.message?.stripControlCodes()
                 )
                 if (scaleY > sr.scaledHeight / 2f) {
                     message.height = message.height + (i * 10 - message.height) * (animDiv * 5)
@@ -753,7 +754,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 animOnOff = sin(animOnOff)
                 animOnOff *= -1.0
                 animOnOff += 1.0
-                val x = animOnOff * (messageWidth + 30) * if (scaleX < sr.scaledWidth / 2f) -1 else 1
+                val x = animOnOff * (messageWidth + 30) * if (leftAlign) -1 else 1
                 val y = -1 * message.height
                 val shadow: TextShadow = when (Skytils.config.spamShadow) {
                     1 -> TextShadow.NONE
@@ -761,10 +762,10 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     else -> TextShadow.NORMAL
                 }
                 val alignment =
-                    if (scaleX < sr.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     message.message,
-                    (if (scaleX < sr.scaledWidth / 2f) x else x + width).toFloat(),
+                    (if (leftAlign) x else x + width).toFloat(),
                     y.toFloat(),
                     CommonColors.WHITE,
                     alignment,
@@ -823,8 +824,8 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         if (addToSpam) newMessage(event.packet.chatComponent.formattedText)
     }
 
-    private fun newMessage(message: String) {
-        spamMessages.add(SpamMessage(message, 0, 0.0))
+    private fun newMessage(message: String?) {
+        spamMessages.add(SpamMessage(message ?: return, 0, 0.0))
     }
 
     init {
