@@ -446,9 +446,9 @@ object MiscFeatures {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
 
         if (Skytils.config.playersInRangeDisplay) {
-            inRangePlayerCount = mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
-                it.uniqueID.version() == 4 && it.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30
-            }
+            inRangePlayerCount = (mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
+                (it.uniqueID.version() == 4 || it.uniqueID.version() == 1) && it.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30 // Nicked players have uuid v1, Watchdog has uuid v4
+            } - 1).coerceAtLeast(0) // The -1 is to remove watchdog from the list
         }
         if (Skytils.config.summoningEyeDisplay && SBInfo.mode == SkyblockIsland.TheEnd.mode) {
             placedEyes = PlacedSummoningEyeDisplay.SUMMONING_EYE_FRAMES.count {
