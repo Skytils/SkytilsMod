@@ -8,6 +8,7 @@
     "MixinMinecraft",
     "accessors.AccessorChatComponentText",
     "accessors.AccessorCommandHandler",
+    "accessors.AccessorEntityArmorstand",
     "accessors.AccessorEnumDyeColor",
     "accessors.AccessorGuiChat",
     "accessors.AccessorGuiContainer",
