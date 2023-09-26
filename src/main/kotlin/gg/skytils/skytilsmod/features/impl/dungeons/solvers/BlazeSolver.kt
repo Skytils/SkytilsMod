@@ -48,6 +48,7 @@ object BlazeSolver {
     var blazeMode = 0
     var blazeChest: BlockPos? = null
     var impossible = false
+    var lastKilledBlazeHp = 0
 
     init {
         TickTask(4, repeats = true) {
@@ -133,6 +134,10 @@ object BlazeSolver {
                 try {
                     val health =
                         blazeName.substringAfter("/").dropLast(1).toInt()
+                    if (lastKilledBlazeHp != 0 && blazeMode != 0) {
+                        if (blazeMode == -1 && health <= lastKilledBlazeHp) continue
+                        if (blazeMode == 1 && health >= lastKilledBlazeHp) continue
+                    }
                     val aabb = AxisAlignedBB(
                         entity.posX - 0.5,
                         entity.posY - 2,
@@ -178,6 +183,7 @@ object BlazeSolver {
         if (event.entity is EntityBlaze && orderedBlazes.isNotEmpty()) {
             orderedBlazes.firstOrNull { it.blaze == event.entity }?.let {
                 orderedBlazes.remove(it)
+                lastKilledBlazeHp = it.health
             }
         }
     }
@@ -217,6 +223,7 @@ object BlazeSolver {
         blazeMode = 0
         blazeChest = null
         impossible = false
+        lastKilledBlazeHp = 0
     }
 
     data class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
