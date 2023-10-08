@@ -94,8 +94,8 @@ object SimonSaysSolver {
 
                 var alpha = 0.5f
                 val x = pos.x - viewerX
-                val y = pos.y - viewerY + .318
-                val z = pos.z - viewerZ + .3
+                val y = pos.y - viewerY + .372
+                val z = pos.z - viewerZ + .308
                 val color = when (index) {
                     clickNeeded -> Color.GREEN
                     clickNeeded + 1 -> Color.YELLOW
@@ -106,7 +106,7 @@ object SimonSaysSolver {
 
                 RenderUtil.drawFilledBoundingBox(
                     matrixStack,
-                    AxisAlignedBB(x, y, z, x - .13, y + .322, z + .4),
+                    AxisAlignedBB(x, y, z, x - .13, y + .26, z + .382),
                     color,
                     alpha * Funny.alphaMult
                 )
