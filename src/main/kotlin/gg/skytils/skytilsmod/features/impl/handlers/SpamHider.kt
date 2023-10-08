@@ -200,7 +200,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     fun onChatPacket(event: ReceiveEvent) {
         val packet = event.packet
         if (Utils.inSkyblock && packet is S0BPacketAnimation && packet.animationType == 0) {
-            val entity = mc.theWorld.getEntityByID(packet.entityID) ?: return
+            val entity = mc.theWorld?.getEntityByID(packet.entityID) ?: return
             if (entity !is EntityOtherPlayerMP) return
             if (entity.heldItem?.item != deadBush || entity.getDistanceSqToEntity(mc.thePlayer) > 4 * 4) return
             lastSpooked = System.currentTimeMillis()
