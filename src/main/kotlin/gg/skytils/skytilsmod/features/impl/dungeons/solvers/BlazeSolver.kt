@@ -133,7 +133,7 @@ object BlazeSolver {
                 val blazeName = entity.name.stripControlCodes()
                 try {
                     val health =
-                        blazeName.substringAfter("/").dropLast(1).replace(",","").toInt()
+                        blazeName.substringAfter("/").dropLast(1).replace(",", "").toInt()
                     if (lastKilledBlazeHp != 0 && blazeMode != 0) {
                         if (blazeMode == -1 && health <= lastKilledBlazeHp) continue
                         if (blazeMode == 1 && health >= lastKilledBlazeHp) continue
