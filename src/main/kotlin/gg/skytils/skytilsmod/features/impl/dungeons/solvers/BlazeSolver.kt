@@ -132,7 +132,7 @@ object BlazeSolver {
                 val blazeName = entity.name.stripControlCodes()
                 try {
                     val health =
-                        blazeName.substringAfter("/").dropLast(1).toInt()
+                        blazeName.substringAfter("/").dropLast(1).replace(",", "").toInt()
                     val aabb = AxisAlignedBB(
                         entity.posX - 0.5,
                         entity.posY - 2,
