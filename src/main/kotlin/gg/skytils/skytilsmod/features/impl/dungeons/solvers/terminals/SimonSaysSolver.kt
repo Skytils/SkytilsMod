@@ -90,25 +90,22 @@ object SimonSaysSolver {
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
             val matrixStack = UMatrixStack()
 
-            clickInOrder.forEachIndexed { index, pos ->
-
-                var alpha = 0.5f
+            for (i in clickNeeded until clickInOrder.size) {
+                val pos = clickInOrder[i]
                 val x = pos.x - viewerX
                 val y = pos.y - viewerY + .372
                 val z = pos.z - viewerZ + .308
-                val color = when (index) {
+                val color = when (i) {
                     clickNeeded -> Color.GREEN
                     clickNeeded + 1 -> Color.YELLOW
                     else -> Color.RED
                 }
 
-                if (index < clickNeeded) alpha = 0f
-
                 RenderUtil.drawFilledBoundingBox(
                     matrixStack,
                     AxisAlignedBB(x, y, z, x - .13, y + .26, z + .382),
                     color,
-                    alpha * Funny.alphaMult
+                    0.5f * Funny.alphaMult
                 )
             }
             GlStateManager.enableCull()
