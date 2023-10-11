@@ -39,6 +39,6 @@ object MouseHelperHook {
     }
 
     fun shouldResetMouseToCenter(): Boolean {
-        return Skytils.config.preventCursorReset && System.currentTimeMillis() - lastOpen <= 150
+        return !(Skytils.config.preventCursorReset && System.currentTimeMillis() - lastOpen <= 150)
     }
 }
