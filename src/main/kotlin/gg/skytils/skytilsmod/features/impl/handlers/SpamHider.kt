@@ -183,7 +183,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
     private enum class Regexs(var pattern: Regex) {
         BLESSINGBUFF(Regex("(?<buff1>\\+[\\d,.%& \\+x]+) (?<symbol1>\\S{1,2})")),
-        BLESSINGGRANT(Regex("Grant.{1,2} you (.*) and (.*)\\.")),
+        BLESSINGGRANT(Regex("(?:Also g|G)rant.{1,2} you (.*) (?:and|&) (.*)\\.")),
         BLESSINGNAME(Regex("Blessing of (?<blessing>\\w+)")),
         BUILDINGTOOLS(Regex("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
         MANAUSED(Regex("(§b-\\d+ Mana \\(§6.+§b\\))")),
@@ -338,11 +338,12 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
-                Utils.inDungeons && unformatted.contains("Grant") -> {
+                Utils.inDungeons && unformatted.contains("rant") -> {
                     Regexs.BLESSINGGRANT.pattern.find(unformatted)?.let { match ->
                         when (Skytils.config.blessingHider) {
                             1 -> cancelChatPacket(event, false)
                             2 -> {
+                                // TODO: account for new format
                                 val buffs = match.groupValues.mapNotNull { blessingGroup ->
                                     Regexs.BLESSINGBUFF.pattern.matchEntire(blessingGroup)
                                 }.map { blessingBuffMatch ->
