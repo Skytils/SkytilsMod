@@ -24,21 +24,28 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object MouseHelperHook {
     private var lastOpen = -1L
+    private var hasScreen = false
+
 
     @SubscribeEvent
     fun onGuiOpen(e: GuiOpenEvent) {
         val oldGui = mc.currentScreen
-        if (e.gui == null) {
-            lastOpen = -1L
-        } else if (e.gui is GuiChest && (oldGui is GuiContainer || oldGui == null)) {
+        if (e.gui is GuiChest && (oldGui is GuiContainer || oldGui == null)) {
             lastOpen = System.currentTimeMillis()
         }
     }
 
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        hasScreen = mc.currentScreen != null
+    }
+
     fun shouldResetMouseToCenter(): Boolean {
-        return !(Skytils.config.preventCursorReset && System.currentTimeMillis() - lastOpen <= 150)
+        return !(Skytils.config.preventCursorReset && System.currentTimeMillis() - lastOpen <= 150 && hasScreen)
     }
 }

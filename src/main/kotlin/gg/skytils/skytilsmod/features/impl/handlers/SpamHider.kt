@@ -738,9 +738,9 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     message?.message?.stripControlCodes()
                 )
                 if (scaleY > sr.scaledHeight / 2f) {
-                    message.height = message.height + (i * 10 - message.height) * (animDiv * 5)
+                    message.height += (i * 10 - message.height) * (animDiv * 5)
                 } else if (scaleY < sr.scaledHeight / 2f) {
-                    message.height = message.height + (i * -10 - message.height) * (animDiv * 5)
+                    message.height += (i * -10 - message.height) * (animDiv * 5)
                 }
                 var animOnOff = 0.0
                 if (message.time < 500) {
@@ -751,7 +751,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
                 animOnOff *= 90.0
                 animOnOff += 90.0
-                animOnOff = animOnOff * Math.PI / 180
+                animOnOff *= Math.PI / 180
                 animOnOff = sin(animOnOff)
                 animOnOff *= -1.0
                 animOnOff += 1.0
