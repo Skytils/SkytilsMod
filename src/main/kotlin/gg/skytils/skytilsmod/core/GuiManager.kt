@@ -65,11 +65,11 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     var titleDisplayTicks = 0
     var subtitleDisplayTicks = 0
 
-    val gui = Window(ElementaVersion.V2)
-    val toastQueue: Queue<Toast> = LinkedList()
-    val maxToasts: Int
+    private val gui = Window(ElementaVersion.V2)
+    private val toastQueue: Queue<Toast> = LinkedList()
+    private val maxToasts: Int
         get() = ((UResolution.scaledHeight * 0.5) / 32).toInt()
-    val takenSlots = sortedSetOf<Int>()
+    private val takenSlots = sortedSetOf<Int>()
 
     private var counter = 0
     fun registerElement(e: GuiElement): Boolean {
