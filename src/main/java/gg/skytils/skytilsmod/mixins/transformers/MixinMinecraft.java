@@ -37,21 +37,8 @@ import java.util.Objects;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
-    private final Minecraft $this = (Minecraft) (Object) this;
     @Shadow
     public EntityPlayerSP thePlayer;
-
-    /**
-     * Taken from Skyblockcatia under MIT License
-     * Modified
-     * <a href="https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md">...</a>
-     *
-     * @author SteveKunG
-     */
-    @Inject(method = "runGameLoop()V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/EntityRenderer.updateCameraAndRender(FJ)V", shift = At.Shift.AFTER))
-    private void runGameLoop(CallbackInfo info) {
-        GuiManager.toastGui.drawToast(new ScaledResolution($this));
-    }
 
     @Inject(method = "clickMouse()V", at = @At(value = "INVOKE", target = "net/minecraft/client/entity/EntityPlayerSP.swingItem()V", shift = At.Shift.AFTER))
     private void clickMouse(CallbackInfo info) {

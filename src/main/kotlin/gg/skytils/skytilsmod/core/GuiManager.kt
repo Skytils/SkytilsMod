@@ -30,7 +30,6 @@ import gg.skytils.skytilsmod.gui.LocationEditGui
 import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.toast.Toast
-import gg.skytils.skytilsmod.utils.toasts.GuiToast
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -55,9 +54,6 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     val GUISCALES = hashMapOf<String, Float>()
     val elements = hashMapOf<Int, GuiElement>()
     private val names = hashMapOf<String, GuiElement>()
-
-    @JvmField
-    var toastGui = GuiToast(Minecraft.getMinecraft())
 
     @JvmField
     var title: String? = null
