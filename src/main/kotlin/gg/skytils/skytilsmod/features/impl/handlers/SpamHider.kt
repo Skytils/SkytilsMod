@@ -39,6 +39,7 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import gg.skytils.skytilsmod.utils.toast.BlessingToast
 import gg.skytils.skytilsmod.utils.toast.ComboToast
 import gg.skytils.skytilsmod.utils.toast.KeyToast
+import gg.skytils.skytilsmod.utils.toast.RecombToast
 import gg.skytils.skytilsmod.utils.toasts.*
 import kotlinx.serialization.*
 import net.minecraft.client.Minecraft
@@ -638,10 +639,10 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     when (Skytils.config.autoRecombHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.autoRecombHider == 2)
                         3 -> {
-                            RecombToast.pattern.find(formatted, formatted.indexOf(" "))?.let {
-                                GuiManager.toastGui.add(RecombToast(it.groupValues[1]))
-                            }
                             cancelChatPacket(event, false)
+                            RecombToast.pattern.find(formatted, formatted.indexOf(" "))?.let {
+                                GuiManager.addToast(RecombToast(it.groupValues[1]))
+                            }
                         }
                     }
                 }
