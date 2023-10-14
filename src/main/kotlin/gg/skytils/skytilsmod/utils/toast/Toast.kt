@@ -43,7 +43,7 @@ open class Toast(title: String, image: UIComponent? = null, subtext: String = ""
             width = 16.pixels
             height = 16.pixels
             y = CenterConstraint()
-            x = SiblingConstraint(8f)
+            x = SiblingConstraint() + 8.pixels
         }?.childOf(background)
     }
 
