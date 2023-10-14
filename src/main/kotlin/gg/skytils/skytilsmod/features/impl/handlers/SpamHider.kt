@@ -36,8 +36,8 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
+import gg.skytils.skytilsmod.utils.toast.BlessingToast
 import gg.skytils.skytilsmod.utils.toasts.*
-import gg.skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
 import kotlinx.serialization.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -347,17 +347,14 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                                 val buffs = match.groupValues.mapNotNull { blessingGroup ->
                                     Regexs.BLESSINGBUFF.pattern.matchEntire(blessingGroup)
                                 }.map { blessingBuffMatch ->
-                                    BlessingBuff(
+                                    BlessingToast.BlessingBuff(
                                         blessingBuffMatch.groups["buff1"]?.value ?: return@let,
                                         blessingBuffMatch.groups["symbol1"]?.value ?: return@let
                                     )
                                 }
-                                if (lastBlessingType != "") GuiManager.toastGui.add(
-                                    BlessingToast(
-                                        lastBlessingType,
-                                        buffs
-                                    )
-                                )
+                                if (lastBlessingType != "") {
+                                    GuiManager.addToast(BlessingToast(lastBlessingType, buffs))
+                                }
                                 cancelChatPacket(event, false)
                             }
                         }
