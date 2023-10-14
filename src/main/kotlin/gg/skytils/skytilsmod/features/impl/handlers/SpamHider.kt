@@ -36,15 +36,8 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
-import gg.skytils.skytilsmod.utils.toast.BlessingToast
-import gg.skytils.skytilsmod.utils.toast.ComboToast
-import gg.skytils.skytilsmod.utils.toast.KeyToast
-import gg.skytils.skytilsmod.utils.toast.RecombToast
-import gg.skytils.skytilsmod.utils.toast.ReviveStoneToast
-import gg.skytils.skytilsmod.utils.toast.SuperboomToast
-import gg.skytils.skytilsmod.utils.toasts.*
+import gg.skytils.skytilsmod.utils.toast.*
 import kotlinx.serialization.*
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
