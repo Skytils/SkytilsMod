@@ -40,6 +40,7 @@ import gg.skytils.skytilsmod.utils.toast.BlessingToast
 import gg.skytils.skytilsmod.utils.toast.ComboToast
 import gg.skytils.skytilsmod.utils.toast.KeyToast
 import gg.skytils.skytilsmod.utils.toast.RecombToast
+import gg.skytils.skytilsmod.utils.toast.ReviveStoneToast
 import gg.skytils.skytilsmod.utils.toasts.*
 import kotlinx.serialization.*
 import net.minecraft.client.Minecraft
@@ -441,7 +442,9 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         3 -> {
                             cancelChatPacket(event, false)
                             val username = mc.thePlayer.name
-                            if (formatted.contains(username)) GuiManager.toastGui.add(ReviveStoneToast())
+                            if (formatted.contains(username)) {
+                                GuiManager.addToast(ReviveStoneToast())
+                            }
                         }
                     }
                 }
