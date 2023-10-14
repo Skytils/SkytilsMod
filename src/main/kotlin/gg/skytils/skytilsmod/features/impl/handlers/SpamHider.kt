@@ -38,6 +38,7 @@ import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import gg.skytils.skytilsmod.utils.toast.BlessingToast
 import gg.skytils.skytilsmod.utils.toast.ComboToast
+import gg.skytils.skytilsmod.utils.toast.KeyToast
 import gg.skytils.skytilsmod.utils.toasts.*
 import kotlinx.serialization.*
 import net.minecraft.client.Minecraft
@@ -375,12 +376,16 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.witherKeyHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            if (unformatted.contains("was picked up")) {
-                                GuiManager.toastGui.add(KeyToast("wither", ""))
-                            } else {
-                                val player = formatted.substringBefore("§r§f §r§ehas")
-                                GuiManager.toastGui.add(KeyToast("wither", player))
-                            }
+                            GuiManager.addToast(
+                                KeyToast(
+                                    "wither",
+                                    if (unformatted.contains("was picked up")) {
+                                        ""
+                                    } else {
+                                        formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
+                                    }
+                                )
+                            )
                         }
                     }
                 }
@@ -396,12 +401,16 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.bloodKeyHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            if (unformatted.contains("was picked up")) {
-                                GuiManager.toastGui.add(KeyToast("blood", ""))
-                            } else {
-                                val player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
-                                GuiManager.toastGui.add(KeyToast("blood", player))
-                            }
+                            GuiManager.addToast(
+                                KeyToast(
+                                    "blood",
+                                    if (unformatted.contains("was picked up")) {
+                                        ""
+                                    } else {
+                                        formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
+                                    }
+                                )
+                            )
                         }
                     }
                 }
