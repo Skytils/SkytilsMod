@@ -37,6 +37,7 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import gg.skytils.skytilsmod.utils.toast.BlessingToast
+import gg.skytils.skytilsmod.utils.toast.ComboToast
 import gg.skytils.skytilsmod.utils.toasts.*
 import kotlinx.serialization.*
 import net.minecraft.client.Minecraft
@@ -441,9 +442,11 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
                         3 -> {
                             if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                                GuiManager.toastGui.add(ComboEndToast(unformatted))
+                                GuiManager.addToast(ComboToast("§r§c§lCombo Failed!", "§r§cYou reached ${unformatted.filter { it.isDigit() }}"))
                             } else {
-                                GuiManager.toastGui.add(ComboToast(formatted))
+                                ComboToast.fromString(formatted)?.let { toast ->
+                                    GuiManager.addToast(toast)
+                                }
                             }
                             cancelChatPacket(event, false)
                         }
