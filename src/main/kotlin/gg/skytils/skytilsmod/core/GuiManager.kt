@@ -17,13 +17,19 @@
  */
 package gg.skytils.skytilsmod.core
 
+import gg.essential.elementa.ElementaVersion
+import gg.essential.elementa.components.Window
+import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
+import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.gui.LocationEditGui
 import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.toast.Toast
 import gg.skytils.skytilsmod.utils.toasts.GuiToast
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -41,6 +47,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
+import java.util.LinkedList
+import java.util.Queue
 
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     val GUIPOSITIONS = hashMapOf<String, Pair<Float, Float>>()
@@ -57,6 +65,12 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     var titleDisplayTicks = 0
     var subtitleDisplayTicks = 0
 
+    val gui = Window(ElementaVersion.V2)
+    val toastQueue: Queue<Toast> = LinkedList()
+    val maxToasts: Int
+        get() = ((UResolution.scaledHeight * 0.5) / 32).toInt()
+    val takenSlots = sortedSetOf<Int>()
+
     private var counter = 0
     fun registerElement(e: GuiElement): Boolean {
         return try {
@@ -67,6 +81,24 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         } catch (err: Exception) {
             err.printStackTrace()
             false
+        }
+    }
+
+    fun addToast(toast: Toast) {
+        val index = (0 until maxToasts).firstOrNull { it !in takenSlots }
+        if (index != null) {
+            gui.addChild(toast)
+            toast.constraints.y = (index*32).pixels
+            takenSlots.add(index)
+            toast.animateBeforeHide {
+                takenSlots.remove(index)
+                toastQueue.poll()?.let { newToast ->
+                    addToast(newToast)
+                }
+            }
+            toast.animateIn()
+        } else {
+            toastQueue.add(toast)
         }
     }
 
@@ -116,6 +148,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun onRenderHUD(event: RenderHUDEvent) {
         if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
         mc.mcProfiler.startSection("SkytilsHUD")
+        gui.draw(UMatrixStack.Compat.get())
         for ((_, element) in elements) {
             mc.mcProfiler.startSection(element.name)
             try {
