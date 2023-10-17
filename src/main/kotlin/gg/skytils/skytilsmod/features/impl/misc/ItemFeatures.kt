@@ -394,8 +394,10 @@ object ItemFeatures {
                     for (potentialInt in contacts)
                         if (potentialInt.toIntOrNull() != null)
                             potentialTotal += potentialInt.toInt()
-                    event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
+                    if (potentialTotal != 0) event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
                         " §7Total Maximum Contacts: §b$potentialTotal")
+                    else event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
+                        "§4§lREPORT ISSUE") //this is in case hypixel changes formatting but still keeps spaces somehow
                 }
             }
         }
