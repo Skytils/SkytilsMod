@@ -1544,6 +1544,13 @@ object Config : Vigilant(
     var showRadioactiveBonus = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Abiphone Contact Total Capacity",
+        description = "Shows the total number of contacts an Abiphone can have.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showAbiphoneContactCapacity = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show Item Rarity",
         description = "Shows the rarity of an item in the color",
         category = "Miscellaneous", subcategory = "Item Rarity"

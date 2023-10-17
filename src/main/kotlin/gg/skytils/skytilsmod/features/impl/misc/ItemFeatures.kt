@@ -378,6 +378,26 @@ object ItemFeatures {
                     ) + " each§7)" else ""
                 )
             }
+            if (Skytils.config.showAbiphoneContactCapacity && itemId.contains("ABIPHONE_") && getItemLore(item).any { it.contains("§7Maximum Contacts: ") }) {
+                // §7Maximum Contacts: §b7 §c(+15) §5(+1)
+                // 7 15 1
+                var potentialTotal = 0
+                val contactsBeforeSplit = getItemLore(item).find { it.contains("§7Maximum Contacts: ") }
+                    ?.substringAfter("§7Maximum Contacts: ")
+                    ?.stripControlCodes()?.replace("+", "")
+                    ?.replace("(", "")?.replace(")", "")
+                val contacts = contactsBeforeSplit?.split(" ")
+                if (contacts?.first() == contactsBeforeSplit)
+                    event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
+                        "§4§lREPORT ISSUE")
+                else if (contacts != null) {
+                        for (potentialInt in contacts)
+                            if (potentialInt.toIntOrNull() != null)
+                                potentialTotal += potentialInt.toInt()
+                    event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
+                        " §7Total Maximum Contacts: §b$potentialTotal")
+                }
+            }
         }
         if (Skytils.config.showRadioactiveBonus && itemId == "TARANTULA_HELMET") {
             val bonus = try {
