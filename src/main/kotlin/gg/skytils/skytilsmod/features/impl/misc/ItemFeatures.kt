@@ -389,7 +389,7 @@ object ItemFeatures {
                 val contacts = contactsBeforeSplit.split(" ")
                 if (contacts.first() == contactsBeforeSplit)
                     event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
-                        "§4§lREPORT ISSUE")
+                        "§4§lREPORT ISSUE") //this is in case hypixel changes their formatting of the maximum contacts lore line and things go terribly wrong
                 else {
                     for (potentialInt in contacts)
                         if (potentialInt.toIntOrNull() != null)
