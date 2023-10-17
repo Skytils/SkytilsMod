@@ -384,16 +384,16 @@ object ItemFeatures {
                 var potentialTotal = 0
                 val contactsBeforeSplit = getItemLore(item).find { it.contains("§7Maximum Contacts: ") }
                     ?.substringAfter("§7Maximum Contacts: ")
-                    ?.stripControlCodes()?.replace("+", "")
-                    ?.replace("(", "")?.replace(")", "")
-                val contacts = contactsBeforeSplit?.split(" ")
-                if (contacts?.first() == contactsBeforeSplit)
+                    .stripControlCodes().replace("+", "")
+                    .replace("(", "").replace(")", "")
+                val contacts = contactsBeforeSplit.split(" ")
+                if (contacts.first() == contactsBeforeSplit)
                     event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
                         "§4§lREPORT ISSUE")
-                else if (contacts != null) {
-                        for (potentialInt in contacts)
-                            if (potentialInt.toIntOrNull() != null)
-                                potentialTotal += potentialInt.toInt()
+                else {
+                    for (potentialInt in contacts)
+                        if (potentialInt.toIntOrNull() != null)
+                            potentialTotal += potentialInt.toInt()
                     event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
                         " §7Total Maximum Contacts: §b$potentialTotal")
                 }
