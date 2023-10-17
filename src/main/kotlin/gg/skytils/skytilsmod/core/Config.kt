@@ -1530,6 +1530,13 @@ object Config : Vigilant(
     var showStarCount = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Stacking Enchant Tier",
+        description = "Displays an item's stacking enchant tier as the stack size. Items with dungeon stars are ignored.",
+        category = "Miscellaneous", subcategory = "Items"
+    )
+    var showStackingEnchant = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Stacking Enchant Progress Display",
         description = "Displays the progress for the held item's stacking enchant.",
         category = "Miscellaneous", subcategory = "Items"

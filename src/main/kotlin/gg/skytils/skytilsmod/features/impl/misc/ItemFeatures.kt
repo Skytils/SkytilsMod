@@ -656,6 +656,16 @@ object ItemFeatures {
                 }
             }
         }
+        if (Skytils.config.showStackingEnchant && getExtraAttributes(item)?.let { ItemUtil.getStarCount(it) < 1} == true) { //" == true" because nullability, ignore items with dungeon stars property
+            also {
+                val extraAttr: NBTTagCompound = getExtraAttributes(item) ?: return@also
+                val enchantments = extraAttr.getCompoundTag("enchantments")
+                val stacking =
+                    EnchantUtil.enchants.find { it is StackingEnchant && extraAttr.hasKey(it.nbtNum) } as? StackingEnchant
+                        ?: return@also //right now items that haven't gotten any relevant skill xp won't get the stack size
+                stackTip = enchantments.getInteger(stacking.nbtName).toString()
+            }
+        }
         if (stackTip.isNotEmpty()) {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
