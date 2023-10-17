@@ -33,6 +33,7 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -378,7 +379,8 @@ object ItemFeatures {
                     ) + " each§7)" else ""
                 )
             }
-            if (Skytils.config.showAbiphoneContactCapacity && itemId.contains("ABIPHONE_") && getItemLore(item).any { it.contains("§7Maximum Contacts: ") }) {
+            if (Skytils.config.showAbiphoneContactCapacity && mc.currentScreen !is AccessorGuiEditSign && itemId.contains("ABIPHONE_") && getItemLore(item).any { it.contains("§7Maximum Contacts: ") }) {
+                // "mc.currentScreen !is AccessorGuiEditSign" is to prevent such calculations happening with NEU custom auction house search
                 // §7Maximum Contacts: §b7 §c(+15) §5(+1)
                 // 7 15 1
                 var potentialTotal = 0
@@ -389,15 +391,15 @@ object ItemFeatures {
                 val contacts = contactsBeforeSplit.split(" ")
                 if (contacts.first() == contactsBeforeSplit)
                     event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
-                        "§4§lREPORT ISSUE") //this is in case hypixel changes their formatting of the maximum contacts lore line and things go terribly wrong
+                        " §8Could not calculate contact slots. [Skytils]") //this is in case hypixel changes their formatting of the maximum contacts lore line and things go terribly wrong
                 else {
                     for (potentialInt in contacts)
                         if (potentialInt.toIntOrNull() != null)
                             potentialTotal += potentialInt.toInt()
-                    if (potentialTotal != 0) event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
+                    if (potentialTotal > -1) event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
                         " §7Total Maximum Contacts: §b$potentialTotal")
                     else event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
-                        "§4§lREPORT ISSUE") //this is in case hypixel changes formatting but still keeps spaces somehow
+                        " §8Could not calculate contact slots. [Skytils]") //this is in case hypixel changes formatting but still keeps spaces somehow
                 }
             }
         }
