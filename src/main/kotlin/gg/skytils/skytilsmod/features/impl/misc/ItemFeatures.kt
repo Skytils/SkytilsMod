@@ -473,6 +473,16 @@ object ItemFeatures {
                 }
             }
         }
+        if (Skytils.config.wardrobeUnequipPrevent && event.toolTip.any { it.contains(" unequip ") }) {
+            also {
+                for (i in event.toolTip.indices) {
+                    if (event.toolTip[i].contains(" unequip ")) {
+                        event.toolTip[i] = "§eAlt-click to unequip this armor"
+                        return@also
+                    }
+                }
+            }
+        }
         if (DevTools.getToggle("nbt") && Keyboard.isKeyDown(46) && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown()) {
             GuiScreen.setClipboardString(event.itemStack?.tagCompound?.toString())
         }

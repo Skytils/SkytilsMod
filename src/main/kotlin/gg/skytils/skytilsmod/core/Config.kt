@@ -2067,8 +2067,8 @@ object Config : Vigilant(
     var mayorVotePerkThreshold = 1
 
     @Property(
-        type = PropertyType.SWITCH, name = "Wardrobe Unequiping Prevention",
-        description = "Prevents you from unequiping your currently worn wardrobe slot without holding the Alt key. Does not override NEU's Wardrobe Keybinds.",
+        type = PropertyType.SWITCH, name = "Wardrobe Unequipping Prevention",
+        description = "Prevents you from unequipping your currently worn wardrobe slot without holding the Alt key. Does not override NEU's Wardrobe Keybinds.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var wardrobeUnequipPrevent = false
