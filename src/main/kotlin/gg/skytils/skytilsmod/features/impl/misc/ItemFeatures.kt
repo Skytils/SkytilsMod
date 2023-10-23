@@ -281,6 +281,17 @@ object ItemFeatures {
                         event.isCanceled = true
                     }
                 }
+                if (Skytils.config.mayorVotePerkThreshold > 1 && chestName.startsWith("Election")) {
+                    val mayorColorCode = item.displayName.take(2)
+                    val numPerks = getItemLore(item)
+                        .filter {
+                            it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§")
+                            && !(it.contains(" vote") || it.contains("SPECIAL "))
+                        }
+                    if (numPerks.size < Skytils.config.mayorVotePerkThreshold) {
+                        event.isCanceled = true
+                    }
+                }
             }
         }
     }
@@ -425,6 +436,28 @@ object ItemFeatures {
                     if (event.toolTip[i].contains("click to call!")) {
                         event.toolTip[i] = "§eAlt-click to call!"
                         return@also
+                    }
+                }
+            }
+        }
+        if (Skytils.config.mayorVotePerkThreshold > 1 && event.toolTip.any { it.contains("vote") }) {
+            also {
+                val mayorColorCode = item.displayName.take(2)
+                val numPerks = getItemLore(item)
+                    .filter {
+                        it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§")
+                        && !(it.contains(" vote") || it.contains("SPECIAL "))
+                    }
+                val plural = if (Skytils.config.mayorVotePerkThreshold > 1) "s" else ""
+                if (numPerks.size < Skytils.config.mayorVotePerkThreshold) {
+                    for (i in event.toolTip.indices) {
+                        if (event.toolTip[i].contains("Click to vote for ")) {
+                            event.toolTip[i] = "§eThis candidate has less than ${Skytils.config.mayorVotePerkThreshold} perk$plural!"
+                            return@also
+                        } else if (event.toolTip[i].contains("You voted for this candidate!")) {
+                            event.toolTip[i] = "§ePlease vote for another candidate that has more than ${Skytils.config.mayorVotePerkThreshold} perk$plural."
+                            return@also
+                        }
                     }
                 }
             }

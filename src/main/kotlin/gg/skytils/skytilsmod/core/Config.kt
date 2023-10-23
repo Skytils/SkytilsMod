@@ -2054,10 +2054,17 @@ object Config : Vigilant(
     @Property(
     type = PropertyType.SWITCH, name = "Abiphone Call Prevention",
     description = "Prevents you from calling your Abiphone contacts without holding the Alt key.",
-    category = "Miscellaneous", subcategory = "Quality of Life",
-    searchTags = ["Abiphone"]
+    category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var abiphoneCallPrevention = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Mayor Voting Perk Threshold",
+        description = "Prevents you from voting for mayors with fewer than this many perks. Set to \"1\" to disable.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 1, max = 3
+    )
+    var mayorVotePerkThreshold = 1
 
     @Property(
         type = PropertyType.SWITCH, name = "Spider's Den Rain Timer",
