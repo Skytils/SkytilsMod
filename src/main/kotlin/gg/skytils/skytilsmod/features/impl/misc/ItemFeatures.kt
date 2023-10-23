@@ -266,7 +266,7 @@ object ItemFeatures {
                 val item = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
                 val chestName = event.chestName
-                val isAltKeyPressed = (Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184))
+                val isTabKeyPressed = (Keyboard.isKeyDown(15)) //15 = TAB
                 if (Skytils.config.stopClickingNonSalvageable) {
                     if (chestName.startsWith("Salvage") && extraAttr != null) {
                         if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
@@ -279,7 +279,7 @@ object ItemFeatures {
                 }
                 if (Skytils.config.abiphoneCallPrevention && getItemLore(item).isNotEmpty()) { //keycode 56 and 184 = LMENU and RMENU (ALT) keys respectively
                     //i would check for chest name here, but bingo abiphones have this "SuPeR sPeCiAL" `B` variant that i can't be bothered to check for, so enjoy this catch-all conditional below
-                    if ((getItemLore(item).any { it.contains("click to call!") }) && !isAltKeyPressed) {
+                    if ((getItemLore(item).any { it.contains("click to call!") }) && !isTabKeyPressed) {
                         event.isCanceled = true
                     }
                 }
@@ -290,13 +290,18 @@ object ItemFeatures {
                             it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§") //count lines that actually contain mayor perks w/o false positives
                             && !(it.contains(" vote") || it.contains("SPECIAL ")) //ignore non-perk lines that share color code with that of mayor
                         }
-                    if (numPerks.size < Skytils.config.mayorVotePerkThreshold && !isAltKeyPressed) {
+                    if (numPerks.size < Skytils.config.mayorVotePerkThreshold && !isTabKeyPressed) {
                         event.isCanceled = true
                     }
                 }
                 //implement suggestion #2743 by Ownwn — NOTE: does not override NEU's wardrobe keybinds
                 if (Skytils.config.wardrobeUnequipPrevent && getItemLore(item).isNotEmpty() && chestName.startsWith("Wardrobe")) {
-                    if ((item.displayName.contains("Equipped")) && !isAltKeyPressed) {
+                    if ((item.displayName.contains("Equipped")) && !isTabKeyPressed) {
+                        event.isCanceled = true
+                    }
+                }
+                if (Skytils.config.pickupMinionPrevent && chestName.contains(" Minion ") && !chestName.endsWith(" Recipe") && getItemLore(item).isNotEmpty()) {
+                    if (item.displayName.contains("Pickup Minion") && !isTabKeyPressed) {
                         event.isCanceled = true
                     }
                 }
@@ -442,7 +447,7 @@ object ItemFeatures {
             also {
                 for (i in event.toolTip.indices) {
                     if (event.toolTip[i].contains("click to call!")) {
-                        event.toolTip[i] = "§eAlt-click to call!"
+                        event.toolTip[i] = "§eTab-click to call!"
                         return@also
                     }
                 }
@@ -463,7 +468,7 @@ object ItemFeatures {
                     for (i in event.toolTip.indices) { //A lot of this can be done with event.toolTip.last(), but with how frequently Hypixel admins can change item tooltips...
                         if (event.toolTip[i].contains("Click to vote for ")) {
                             event.toolTip[i] = "§e$lessThanMessage!"
-                            event.toolTip.add("§eVote for $mayorName anyway by Alt-clicking.")
+                            event.toolTip.add("§eVote for $mayorName anyway by Tab-clicking.")
                             return@also
                         } else if (event.toolTip[i].contains("You voted for this candidate!")) {
                             event.toolTip[i] = "§eChange your vote; $lessThanMessage."
@@ -477,7 +482,17 @@ object ItemFeatures {
             also {
                 for (i in event.toolTip.indices) {
                     if (event.toolTip[i].contains(" unequip ")) {
-                        event.toolTip[i] = "§eAlt-click to unequip this armor"
+                        event.toolTip[i] = "§eTab-click to unequip this armor"
+                        return@also
+                    }
+                }
+            }
+        }
+        if (Skytils.config.pickupMinionPrevent && event.toolTip.any { it.contains(" pickup!") }) {
+            also {
+                for (i in event.toolTip.indices) {
+                    if (event.toolTip[i].contains(" pickup!")) {
+                        event.toolTip[i] = "§eTab-click to pickup!"
                         return@also
                     }
                 }
