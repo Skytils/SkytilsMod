@@ -2060,7 +2060,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.NUMBER, name = "Mayor Voting Perk Threshold",
-        description = "Prevents you from voting for mayors with fewer than this many perks. Set to \"1\" to disable.",
+        description = "Prevents you from voting for mayors with fewer than this many perks. Set to \"1\" to disable. Hold the Alt key when voting to override this threshold.",
         category = "Miscellaneous", subcategory = "Quality of Life",
         min = 1, max = 3
     )

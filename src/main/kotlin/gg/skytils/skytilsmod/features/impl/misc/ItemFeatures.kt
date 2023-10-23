@@ -276,7 +276,7 @@ object ItemFeatures {
                         }
                     }
                 }
-                if (Skytils.config.abiphoneCallPrevention && getItemLore(item).isNotEmpty()) {
+                if (Skytils.config.abiphoneCallPrevention && getItemLore(item).isNotEmpty()) { //keycode 56 and 184 = LMENU and RMENU (ALT) keys respectively
                     if ((getItemLore(item).any { it.contains("click to call!") }) && !(Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184))) {
                         event.isCanceled = true
                     }
@@ -285,10 +285,10 @@ object ItemFeatures {
                     val mayorColorCode = item.displayName.take(2)
                     val numPerks = getItemLore(item)
                         .filter {
-                            it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§")
-                            && !(it.contains(" vote") || it.contains("SPECIAL "))
+                            it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§") //count lines that actually contain mayor perks w/o false positives
+                            && !(it.contains(" vote") || it.contains("SPECIAL ")) //ignore non-perk lines that share color code with that of mayor
                         }
-                    if (numPerks.size < Skytils.config.mayorVotePerkThreshold) {
+                    if (numPerks.size < Skytils.config.mayorVotePerkThreshold && !(Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184))) {
                         event.isCanceled = true
                     }
                 }
@@ -442,6 +442,7 @@ object ItemFeatures {
         }
         if (Skytils.config.mayorVotePerkThreshold > 1 && event.toolTip.any { it.contains("vote") }) {
             also {
+                val mayorName =item.displayName.stripControlCodes()
                 val mayorColorCode = item.displayName.take(2)
                 val numPerks = getItemLore(item)
                     .filter {
@@ -450,12 +451,14 @@ object ItemFeatures {
                     }
                 val plural = if (Skytils.config.mayorVotePerkThreshold > 1) "s" else ""
                 if (numPerks.size < Skytils.config.mayorVotePerkThreshold) {
-                    for (i in event.toolTip.indices) {
+                    val lessThanMessage = "$mayorName has less than ${Skytils.config.mayorVotePerkThreshold} perk$plural"
+                    for (i in event.toolTip.indices) { //A lot of this can be done with event.toolTip.last(), but with how frequently Hypixel admins can change item tooltips...
                         if (event.toolTip[i].contains("Click to vote for ")) {
-                            event.toolTip[i] = "§eThis candidate has less than ${Skytils.config.mayorVotePerkThreshold} perk$plural!"
+                            event.toolTip[i] = "§e$lessThanMessage!"
+                            event.toolTip.add("§eVote for $mayorName anyway by Alt-clicking.")
                             return@also
                         } else if (event.toolTip[i].contains("You voted for this candidate!")) {
-                            event.toolTip[i] = "§ePlease vote for another candidate that has more than ${Skytils.config.mayorVotePerkThreshold} perk$plural."
+                            event.toolTip[i] = "§eChange your vote; $lessThanMessage."
                             return@also
                         }
                     }
