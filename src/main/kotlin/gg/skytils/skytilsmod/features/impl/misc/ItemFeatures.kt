@@ -265,14 +265,20 @@ object ItemFeatures {
             if (event.slot != null && event.slot.hasStack) {
                 val item = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
+                val chestName = event.chestName
                 if (Skytils.config.stopClickingNonSalvageable) {
-                    if (event.chestName.startsWith("Salvage") && extraAttr != null) {
+                    if (chestName.startsWith("Salvage") && extraAttr != null) {
                         if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
                             )
                         ) {
                             event.isCanceled = true
                         }
+                    }
+                }
+                if (Skytils.config.abiphoneCallPrevention && getItemLore(item).isNotEmpty()) {
+                    if ((getItemLore(item).any { it.contains("click to call!") }) && !(Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184))) {
+                        event.isCanceled = true
                     }
                 }
             }
@@ -412,6 +418,16 @@ object ItemFeatures {
                     gems.getString("${it}_gem").ifEmpty { it.substringBeforeLast("_") }.toTitleCase()
                 }"
             })
+        }
+        if (Skytils.config.abiphoneCallPrevention && event.toolTip.any { it.contains("click to call!") }) {
+            also {
+                for (i in event.toolTip.indices) {
+                    if (event.toolTip[i].contains("click to call!")) {
+                        event.toolTip[i] = "§eAlt-click to call!"
+                        return@also
+                    }
+                }
+            }
         }
         if (DevTools.getToggle("nbt") && Keyboard.isKeyDown(46) && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown()) {
             GuiScreen.setClipboardString(event.itemStack?.tagCompound?.toString())

@@ -2052,6 +2052,14 @@ object Config : Vigilant(
     var protectStarredItems = false
 
     @Property(
+    type = PropertyType.SWITCH, name = "Abiphone Call Prevention",
+    description = "Prevents you from calling your Abiphone contacts without holding the Alt key.",
+    category = "Miscellaneous", subcategory = "Quality of Life",
+    searchTags = ["Abiphone"]
+    )
+    var abiphoneCallPrevention = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Spider's Den Rain Timer",
         description = "Shows the duration of rain in the Spider's Den.",
         category = "Miscellaneous", subcategory = "Quality of Life"
