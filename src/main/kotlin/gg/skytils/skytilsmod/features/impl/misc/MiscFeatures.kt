@@ -408,8 +408,9 @@ object MiscFeatures {
             val chest = player.openContainer as ContainerChest
             val inventory = chest.lowerChestInventory
             val chestName = inventory.displayName.unformattedText
+            val itemName = ItemUtil.getDisplayName(event.itemStack)
             if (chestName.equals("Storage") && Skytils.config.hideTooltipsOnStorage) {
-                if (ItemUtil.getDisplayName(event.itemStack).containsAny(
+                if (itemName.containsAny(
                         "Backpack",
                         "Ender Chest",
                         "Locked Page"
@@ -417,7 +418,7 @@ object MiscFeatures {
                 )
                     event.toolTip.clear()
             }
-            if (chestName.equals("Museum Appraisal") && Skytils.config.showIrlValueOfMuseum && Skytils.config.fetchLowestBINPrices) {
+            if (chestName.equals("Museum Appraisal") && itemName.contains("Museum Appraisal Service") && Skytils.config.showIrlValueOfMuseum && Skytils.config.fetchLowestBINPrices) {
                 also {
                     for (i in event.toolTip.indices) {
                         val line = event.toolTip[i]
