@@ -100,7 +100,6 @@ object MiscFeatures {
     private val hubSpawnPoint = BlockPos(-2, 70, -69)
     private val bestiaryTitleRegex = Regex("(?:\\(\\d+/\\d+\\) )?(?:Bestiary ➜ (?!Fishing)|Fishing ➜ )|Search Results")
     private val coinsRegex = ".*((§.)(?<coins>(\\d([,.])?)+) Coins).*".toRegex()
-    private val boosterCookieCost = AuctionData.lowestBINs["BOOSTER_COOKIE"] ?: 1.0 // most of the skytils code opts for "?: 0.0", but since this code block divides by zero later, opt for "?: 1.0" instead
     private const val gemsPerCookie = 325.0 //see wiki.hypixel.net/BOOSTER_COOKIE
     private const val gemsPerSmallestBundle = 675.0 //see store.hypixel.net
     private const val usdPerSmallestBundle = 4.99 //see store.hypixel.net
@@ -420,6 +419,7 @@ object MiscFeatures {
             }
             if (chestName.equals("Museum Appraisal") && itemName.contains("Museum Appraisal Service") && Skytils.config.showIrlValueOfMuseum && Skytils.config.fetchLowestBINPrices) {
                 also {
+                    val boosterCookieCost = AuctionData.lowestBINs["BOOSTER_COOKIE"] ?: 1.0 // most of the skytils code opts for "?: 0.0", but since this code block divides by zero later, opt for "?: 1.0" instead
                     for (i in event.toolTip.indices) {
                         val line = event.toolTip[i]
                         if (line.matches(coinsRegex)) {
