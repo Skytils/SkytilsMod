@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntityArmorstand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import gg.skytils.skytilsmod.utils.*
@@ -98,6 +99,11 @@ object MiscFeatures {
     )
     private val hubSpawnPoint = BlockPos(-2, 70, -69)
     private val bestiaryTitleRegex = Regex("(?:\\(\\d+/\\d+\\) )?(?:Bestiary ➜ (?!Fishing)|Fishing ➜ )|Search Results")
+    private val coinsRegex = ".*((§.)(?<coins>(\\d([,.])?)+) Coins).*".toRegex()
+    private val boosterCookieCost = AuctionData.lowestBINs["BOOSTER_COOKIE"] ?: 1.0 // most of the skytils code opts for "?: 0.0", but since this code block divides by zero later, opt for "?: 1.0" instead
+    private const val gemsPerCookie = 325.0 //see wiki.hypixel.net/BOOSTER_COOKIE
+    private const val gemsPerSmallestBundle = 675.0 //see store.hypixel.net
+    private const val usdPerSmallestBundle = 4.99 //see store.hypixel.net
 
     init {
         GolemSpawnTimerElement()
@@ -396,14 +402,13 @@ object MiscFeatures {
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock) return
-        if (!Skytils.config.hideTooltipsOnStorage) return
         if (event.toolTip == null) return
         if (mc.currentScreen is GuiChest) {
             val player = Minecraft.getMinecraft().thePlayer
             val chest = player.openContainer as ContainerChest
             val inventory = chest.lowerChestInventory
             val chestName = inventory.displayName.unformattedText
-            if (chestName.equals("Storage")) {
+            if (chestName.equals("Storage") && Skytils.config.hideTooltipsOnStorage) {
                 if (ItemUtil.getDisplayName(event.itemStack).containsAny(
                         "Backpack",
                         "Ender Chest",
@@ -411,6 +416,20 @@ object MiscFeatures {
                     )
                 )
                     event.toolTip.clear()
+            }
+            if (chestName.equals("Museum Appraisal") && Skytils.config.showIrlValueOfMuseum && Skytils.config.fetchLowestBINPrices) {
+                also {
+                    for (i in event.toolTip.indices) {
+                        val line = event.toolTip[i]
+                        if (line.matches(coinsRegex)) {
+                            val coinsValue = coinsRegex.find(line)!!.groups["coins"]!!.value.replace(",", "").toLong()
+                            val irlValue = ((((coinsValue / boosterCookieCost) * gemsPerCookie) / gemsPerSmallestBundle) * usdPerSmallestBundle) //math adapted from NEU's /pv
+                            val stringToInsert = "§7(IRL Value: §2$${"%.2f".format(irlValue)} USD§7)"
+                            event.toolTip.add((i + 2), stringToInsert)
+                            return@also
+                        }
+                    }
+                }
             }
         }
     }

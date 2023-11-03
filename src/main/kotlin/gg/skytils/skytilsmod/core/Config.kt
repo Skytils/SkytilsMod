@@ -1745,6 +1745,13 @@ object Config : Vigilant(
     var usePlayerSkin = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show IRL Value of Museum",
+        description = "Shows the IRL value of your museum in the Museum Appraisal menu in USD. Requires \"Fetch Lowest BIN Prices\" to be enabled.",
+        category = "Miscellaneous", subcategory = "Other"
+    )
+    var showIrlValueOfMuseum = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Custom Auction Price Input",
         description = "Displays Skytils' own auction input GUI instead of a sign.",
         category = "Miscellaneous", subcategory = "Quality of Life"
