@@ -76,10 +76,12 @@ class FixedChildBasedRangeConstraint : WidthConstraint, HeightConstraint {
                 visitor.visitChildren(ConstraintType.X)
                 visitor.visitChildren(ConstraintType.WIDTH)
             }
+
             ConstraintType.HEIGHT -> {
                 visitor.visitChildren(ConstraintType.Y)
                 visitor.visitChildren(ConstraintType.HEIGHT)
             }
+
             else -> throw IllegalArgumentException(type.prettyName)
         }
     }

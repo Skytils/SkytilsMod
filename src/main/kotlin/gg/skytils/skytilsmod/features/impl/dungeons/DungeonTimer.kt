@@ -156,7 +156,11 @@ object DungeonTimer {
                 }
             }
 
-            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && (message.startsWith("§r§4[BOSS] ") || message.startsWith("§r§aThe Core entrance ")) -> {
+            Utils.equalsOneOf(
+                DungeonFeatures.dungeonFloor,
+                "F7",
+                "M7"
+            ) && (message.startsWith("§r§4[BOSS] ") || message.startsWith("§r§aThe Core entrance ")) -> {
                 when {
                     message.endsWith("§r§cPathetic Maxor, just like expected.§r") && phase1ClearTime == -1L -> {
                         phase1ClearTime = System.currentTimeMillis()

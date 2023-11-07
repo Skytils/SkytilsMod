@@ -18,9 +18,6 @@
 
 package gg.skytils.skytilsmod.utils.tictactoe
 
-import java.lang.StringBuilder
-import java.util.HashSet
-
 /**
  * Represents the Tic Tac Toe board.
  * Modified version of LazoCoder's Tic-Tac-Toe Java Implementation, GPLv3 License

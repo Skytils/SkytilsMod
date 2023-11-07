@@ -23,7 +23,6 @@ import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.*
 import java.awt.Color
 

@@ -101,9 +101,11 @@ open class CustomColor {
                 r == cmax -> {
                     bluec - greenc
                 }
+
                 g == cmax -> {
                     2.0f + redc - bluec
                 }
+
                 else -> {
                     4.0f + greenc - redc
                 }
@@ -179,6 +181,7 @@ open class CustomColor {
                     } catch (ignored: Exception) {
                     }
                 }
+
                 3 -> {
                     // "rgb" -> "rrggbb"
                     try {
@@ -190,6 +193,7 @@ open class CustomColor {
                     } catch (ignored: Exception) {
                     }
                 }
+
                 2 -> {
                     // "vv" -> "vvvvvv"
                     try {

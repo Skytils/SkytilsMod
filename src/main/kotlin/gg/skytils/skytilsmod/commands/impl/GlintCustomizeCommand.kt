@@ -49,12 +49,14 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         UChat.chat("$successPrefix §aForced an enchant glint for your item.")
                         return
                     }
+
                     originalMessage.contains("off") -> {
                         GlintCustomizer.getGlintItem(itemId).override = false
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aForce disabled an enchant glint for your item.")
                         return
                     }
+
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.glintItems.values.forEach {
                             it.override = null
@@ -63,17 +65,20 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         UChat.chat("$successPrefix §aRemoved all your glint overrides.")
                         return
                     }
+
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.getGlintItem(itemId).override = null
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aCleared glint overrides for your item.")
                         return
                     }
+
                     else -> {
                         throw WrongUsageException("/glintcustomize override <on/off/clear/clearall>")
                     }
                 }
             }
+
             "color" -> {
                 when {
                     originalMessage.contains("set") -> {
@@ -87,6 +92,7 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         }
                         return
                     }
+
                     originalMessage.contains("clearall") -> {
                         GlintCustomizer.glintItems.values.forEach {
                             it.color = null
@@ -95,17 +101,20 @@ object GlintCustomizeCommand : BaseCommand("glintcustomize", listOf("customizegl
                         UChat.chat("$successPrefix §aRemoved all your custom glint colors.")
                         return
                     }
+
                     originalMessage.contains("clear") -> {
                         GlintCustomizer.getGlintItem(itemId).color = null
                         PersistentSave.markDirty<GlintCustomizer>()
                         UChat.chat("$successPrefix §aCleared the custom glint color for your item.")
                         return
                     }
+
                     else -> {
                         throw WrongUsageException("/glintcustomize color <set/clearall/clear>")
                     }
                 }
             }
+
             else -> {
                 throw WrongUsageException(getCommandUsage(player))
             }

@@ -90,10 +90,12 @@ class MultiCheckboxComponent(initialValue: Boolean?) : SettingComponent() {
                 checkmark.hide()
                 indeterminate.unhide()
             }
+
             true -> { // Enabled
                 indeterminate.hide()
                 checkmark.unhide()
             }
+
             else -> { // Disabled
                 checkmark.hide()
                 indeterminate.hide()

@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.utils.RegexAsString
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -451,7 +450,12 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
                         3 -> {
                             if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                                GuiManager.addToast(ComboToast("§r§c§lCombo Failed!", "§r§cYou reached ${unformatted.filter { it.isDigit() }}"))
+                                GuiManager.addToast(
+                                    ComboToast(
+                                        "§r§c§lCombo Failed!",
+                                        "§r§cYou reached ${unformatted.filter { it.isDigit() }}"
+                                    )
+                                )
                             } else {
                                 ComboToast.fromString(formatted)?.let { toast ->
                                     GuiManager.addToast(toast)

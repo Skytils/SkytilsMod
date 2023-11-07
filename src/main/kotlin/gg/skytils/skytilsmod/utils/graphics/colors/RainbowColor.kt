@@ -57,9 +57,11 @@ class RainbowColor(var speed: Int, var offset: Int, var saturation: Float, var b
                 r == cmax -> {
                     bluec - greenc
                 }
+
                 g == cmax -> {
                     2.0f + redc - bluec
                 }
+
                 else -> {
                     4.0f + greenc - redc
                 }

@@ -21,8 +21,8 @@ package gg.skytils.skytilsmod.utils.toast
 import gg.essential.elementa.components.UIImage
 
 class KeyToast(type: String, player: String) :
-        Toast(
-            "§${if(type.equals("blood", ignoreCase = true)) "c" else "7"}§l${type.uppercase()} KEY!",
-            UIImage.ofResource("/assets/skytils/toasts/keys/$type.png"),
-            player
-        )
+    Toast(
+        "§${if (type.equals("blood", ignoreCase = true)) "c" else "7"}§l${type.uppercase()} KEY!",
+        UIImage.ofResource("/assets/skytils/toasts/keys/$type.png"),
+        player
+    )

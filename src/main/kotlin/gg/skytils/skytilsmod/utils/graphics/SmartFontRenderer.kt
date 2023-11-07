@@ -64,6 +64,7 @@ class SmartFontRenderer : FontRenderer(
                 TextAlignment.LEFT_RIGHT,
                 shadow
             )
+
             TextAlignment.RIGHT_LEFT -> drawString(
                 text,
                 x - getStringWidth(drawnText),
@@ -72,6 +73,7 @@ class SmartFontRenderer : FontRenderer(
                 TextAlignment.LEFT_RIGHT,
                 shadow
             )
+
             else -> {
                 GlStateManager.enableTexture2D()
                 GlStateManager.enableAlpha()
@@ -139,6 +141,7 @@ class SmartFontRenderer : FontRenderer(
                     posX = originPosX
                     posY = originPosY
                 }
+
                 TextShadow.NORMAL -> {
                     GlStateManager.color(red * (1 - 0.8f), green * (1 - 0.8f), blue * (1 - 0.8f), 1f)
                     posX = originPosX + offset
@@ -147,6 +150,7 @@ class SmartFontRenderer : FontRenderer(
                     posX = originPosX
                     posY = originPosY
                 }
+
                 TextShadow.NONE -> {
                 }
             }
@@ -206,6 +210,7 @@ class SmartFontRenderer : FontRenderer(
                     posX = originPosX
                     posY = originPosY
                 }
+
                 TextShadow.NORMAL -> {
                     GlStateManager.color(red * (1 - 0.8f), green * (1 - 0.8f), blue * (1 - 0.8f), 1f)
                     posX = originPosX + offset
@@ -214,6 +219,7 @@ class SmartFontRenderer : FontRenderer(
                     posX = originPosX
                     posY = originPosY
                 }
+
                 TextShadow.NONE -> {
 
                 }
@@ -248,14 +254,17 @@ class SmartFontRenderer : FontRenderer(
                             obfuscated = true
                             index++ // skips the the next char
                         }
+
                         'o' -> {
                             italic = true
                             index++ // skips the the next char
                         }
+
                         'l' -> {
                             bold = true
                             index++
                         }
+
                         'r' -> {
                             obfuscated = false
                             italic = false
@@ -313,6 +322,7 @@ class SmartFontRenderer : FontRenderer(
                         i++
                     }
                 }
+
                 TextShadow.NORMAL -> {
                     posY = y + offset
                     var i = 0
@@ -322,6 +332,7 @@ class SmartFontRenderer : FontRenderer(
                         i++
                     }
                 }
+
                 else -> {
                 }
             }

@@ -24,17 +24,17 @@ import net.minecraft.util.EnumChatFormatting
 
 class BlessingToast(blessingType: String, buffs: List<BlessingBuff>) :
     Toast(
-         title = when (blessingType) {
-                            "life" -> ChatColor.RED
-                            "power" -> ChatColor.LIGHT_PURPLE
-                            "stone" -> ChatColor.GREEN
-                            "wisdom" -> ChatColor.AQUA
-                            "time" -> ChatColor.GOLD
-                            else -> ChatColor.GOLD
-                    } +
-                "§l${blessingType.uppercase()} BLESSING!"
-        , UIImage.ofResource("/assets/skytils/toasts/blessings/${blessingType}.png"))
-{
+        title = when (blessingType) {
+            "life" -> ChatColor.RED
+            "power" -> ChatColor.LIGHT_PURPLE
+            "stone" -> ChatColor.GREEN
+            "wisdom" -> ChatColor.AQUA
+            "time" -> ChatColor.GOLD
+            else -> ChatColor.GOLD
+        } +
+                "§l${blessingType.uppercase()} BLESSING!",
+        UIImage.ofResource("/assets/skytils/toasts/blessings/${blessingType}.png")
+    ) {
     init {
         subtextState.set(
             buffs.joinToString(separator = " ") { buff ->
