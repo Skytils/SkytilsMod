@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.utils.toast
 import gg.essential.elementa.components.UIImage
 
 class ReviveStoneToast :
-    Toast(
-        "§6Revive Stone",
-        UIImage.ofResource("/assets/skytils/toasts/revive.png")
-    )
+        Toast(
+            "§6Revive Stone",
+            UIImage.ofResource("/assets/skytils/toasts/revive.png")
+        )

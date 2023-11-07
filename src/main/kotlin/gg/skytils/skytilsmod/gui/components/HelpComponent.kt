@@ -19,10 +19,7 @@
 package gg.skytils.skytilsmod.gui.components
 
 import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIBlock
-import gg.essential.elementa.components.UICircle
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.components.UIWrappedText
+import gg.essential.elementa.components.*
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.CoerceAtLeastConstraint

@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.Random
 
 object AntiFool {
     private val CHARS = (('0'..'9') + ('a'..'f') + 'z' + 'k')

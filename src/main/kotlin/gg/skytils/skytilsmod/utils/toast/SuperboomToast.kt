@@ -25,10 +25,11 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 
 class SuperboomToast :
-    Toast(
-        "§9Superboom TNT",
-        ItemComponent(superboom)
-    ) {
+        Toast(
+            "§9Superboom TNT",
+            ItemComponent(superboom)
+        )
+{
     companion object {
         private val superboom = ItemStack(Item.getItemFromBlock(Blocks.tnt))
             .apply { addEnchantment(Enchantment.unbreaking, 1) }

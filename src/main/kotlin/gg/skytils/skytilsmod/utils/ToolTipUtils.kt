@@ -25,7 +25,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.events.UIScrollEvent
 import gg.essential.elementa.utils.ObservableClearEvent
 import gg.essential.elementa.utils.ObservableRemoveEvent
-import java.util.*
+import java.util.Observer
 
 /**
  * All of this is from Replaymod - https://github.com/ReplayMod/ReplayMod

@@ -24,11 +24,12 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 class RecombToast(item: String) :
-    Toast(
-        "§6§lAuto-Recomb Item!",
-        ItemComponent(RECOMB),
-        item
-    ) {
+        Toast(
+            "§6§lAuto-Recomb Item!",
+            ItemComponent(RECOMB),
+            item
+        )
+{
     companion object {
         private val RECOMB = ItemUtil.setSkullTexture(
             ItemStack(Items.skull, 1, 3),

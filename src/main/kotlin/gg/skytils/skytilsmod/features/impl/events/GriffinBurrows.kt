@@ -86,7 +86,6 @@ object GriffinBurrows {
                 event.packet is C07PacketPlayerDigging && event.packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
                     event.packet.position
                 }
-
                 event.packet is C08PacketPlayerBlockPlacement && event.packet.stack != null -> event.packet.position
                 else -> return
             }

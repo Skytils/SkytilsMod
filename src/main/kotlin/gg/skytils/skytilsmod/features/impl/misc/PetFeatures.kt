@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.SendEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -34,6 +35,7 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.setHoverText
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.event.ClickEvent
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity

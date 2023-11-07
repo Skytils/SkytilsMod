@@ -46,7 +46,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.util.*
+import java.util.LinkedList
+import java.util.Queue
 
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     val GUIPOSITIONS = hashMapOf<String, Pair<Float, Float>>()
