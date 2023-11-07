@@ -277,7 +277,7 @@ object MythologicalTracker : Tracker("mythological") {
                     0f,
                     CommonColors.YELLOW,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    Utils.getTextShadowSetting()
                 )
                 var drawnLines = 1
                 for (mob in BurrowMob.values()) {
@@ -288,7 +288,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        Utils.getTextShadowSetting()
                     )
                     drawnLines++
                 }
@@ -300,7 +300,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        Utils.getTextShadowSetting()
                     )
                     drawnLines++
                 }
@@ -318,7 +318,7 @@ object MythologicalTracker : Tracker("mythological") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                Utils.getTextShadowSetting()
             )
             var drawnLines = 1
             for (mob in BurrowMob.values()) {
@@ -328,7 +328,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    Utils.getTextShadowSetting()
                 )
                 drawnLines++
             }
@@ -339,7 +339,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    Utils.getTextShadowSetting()
                 )
                 drawnLines++
             }

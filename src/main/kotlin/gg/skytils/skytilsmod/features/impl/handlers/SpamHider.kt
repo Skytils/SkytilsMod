@@ -766,11 +766,6 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 animOnOff += 1.0
                 val x = animOnOff * (messageWidth + 30) * if (leftAlign) -1 else 1
                 val y = -1 * message.height
-                val shadow: TextShadow = when (Skytils.config.spamShadow) {
-                    1 -> TextShadow.NONE
-                    2 -> TextShadow.OUTLINE
-                    else -> TextShadow.NORMAL
-                }
                 val alignment =
                     if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
@@ -779,7 +774,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     y.toFloat(),
                     CommonColors.WHITE,
                     alignment,
-                    shadow
+                    Utils.getTextShadowSetting()
                 )
                 if (message.time > 4000) {
                     spamMessages.remove(message)
@@ -793,11 +788,6 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         override fun demoRender() {
             val messageWidth =
                 ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r".stripControlCodes())
-            val shadow: TextShadow = when (Skytils.config.spamShadow) {
-                1 -> TextShadow.NONE
-                2 -> TextShadow.OUTLINE
-                else -> TextShadow.NORMAL
-            }
             val x = (sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30)
             val y = 0.0
             ScreenRenderer.fontRenderer.drawString(
@@ -806,7 +796,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 y.toFloat(),
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                shadow
+                Utils.getTextShadowSetting()
             )
         }
 

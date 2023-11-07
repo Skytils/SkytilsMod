@@ -89,6 +89,14 @@ object Config : Vigilant(
     }
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Text Shadow",
+        description = "Changes the shadow type for the text displayed on the hud.",
+        category = "General", subcategory = "Other",
+        options = ["Normal", "None", "Outline"]
+    )
+    var textShadow = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "First Launch",
         description = "Used to see if the user is a new user of Skytils.",
         category = "General", subcategory = "Other",
@@ -2512,14 +2520,6 @@ object Config : Vigilant(
         category = "Sounds", subcategory = "Dungeons"
     )
     var disableTerracottaSounds = false
-
-    @Property(
-        type = PropertyType.SELECTOR, name = "Text Shadow",
-        description = "Changes the shadow type for the text displayed in the spam hider element.",
-        category = "Spam", subcategory = "Display",
-        options = ["Normal", "None", "Outline"]
-    )
-    var spamShadow = 0
 
     @Property(
         type = PropertyType.SELECTOR, name = "Implosion Hider",

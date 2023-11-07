@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -165,7 +164,7 @@ object BossHPDisplays {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                Utils.getTextShadowSetting()
             )
         }
 

@@ -35,14 +35,12 @@ import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.block.material.Material
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -756,7 +754,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.PURPLE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    Utils.getTextShadowSetting()
                 )
             }
         }
@@ -771,7 +769,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.PURPLE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                Utils.getTextShadowSetting()
             )
         }
 
@@ -803,7 +801,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    Utils.getTextShadowSetting()
                 )
             }
         }
@@ -819,7 +817,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                Utils.getTextShadowSetting()
             )
         }
 

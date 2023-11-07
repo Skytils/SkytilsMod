@@ -27,7 +27,6 @@ import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -176,7 +175,7 @@ object ChestProfit {
                 element.scaleY,
                 chest.displayColor,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                Utils.getTextShadowSetting()
             )
 
             for (item in chest.items) {
@@ -187,7 +186,7 @@ object ChestProfit {
                     element.scaleY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    Utils.getTextShadowSetting()
                 )
                 drawnLines++
             }
@@ -269,7 +268,7 @@ object ChestProfit {
                         (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         chest.displayColor,
                         if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        Utils.getTextShadowSetting()
                     )
                 }
             }
