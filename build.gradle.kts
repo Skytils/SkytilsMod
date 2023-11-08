@@ -64,11 +64,12 @@ loom {
             property("legacy.debugClassLoadingFiner", "true")
             programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             programArgs("--mixin", "mixins.skytils.json")
+            programArgs("--mixin", "mixins.skytils-events.json")
         }
         remove(getByName("server"))
     }
     forge {
-        mixinConfig("mixins.skytils.json")
+        mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
     }
     mixin {
         defaultRefmapName = "mixins.skytils.refmap.json"
@@ -130,6 +131,8 @@ dependencies {
     shadowMe(ktorServer("host-common"))
     shadowMe(ktorServer("auth"))
 
+    shadowMe(project(":events"))
+
 
 
 
@@ -163,7 +166,7 @@ tasks {
                     "FMLCorePlugin" to "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,
-                    "MixinConfigs" to "mixins.skytils.json",
+                    "MixinConfigs" to "mixins.skytils.json,mixins.skytils-events.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
                     "TweakClass" to "gg.skytils.skytilsmod.tweaker.SkytilsTweaker",
