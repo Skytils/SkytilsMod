@@ -15,19 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-plugins {
-    kotlin("jvm") version "1.8.22"
-    id("gg.essential.loom") version "1.3.12"
-    id("gg.essential.defaults") version "0.3.0"
-}
 
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
-    compileOnly("org.spongepowered:mixin:0.8.5")
-}
+package gg.skytils.event
 
-java.toolchain {
-    languageVersion = JavaLanguageVersion.of(8)
+open class Event {
 }

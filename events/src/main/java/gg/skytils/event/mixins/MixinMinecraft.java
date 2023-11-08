@@ -15,19 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-plugins {
-    kotlin("jvm") version "1.8.22"
-    id("gg.essential.loom") version "1.3.12"
-    id("gg.essential.defaults") version "0.3.0"
-}
 
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
-    compileOnly("org.spongepowered:mixin:0.8.5")
-}
+package gg.skytils.event.mixins;
 
-java.toolchain {
-    languageVersion = JavaLanguageVersion.of(8)
+import gg.skytils.event.Events;
+import gg.skytils.event.impl.TickEvent;
+import net.minecraft.client.Minecraft;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(Minecraft.class)
+public class MixinMinecraft {
+    @Inject(
+            method = "runTick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/profiler/Profiler;endSection()V",
+                    shift = At.Shift.BEFORE
+            )
+    )
+    private void tick(CallbackInfo ci) {
+        Events.INSTANCE.postSync(new TickEvent());
+    }
 }
