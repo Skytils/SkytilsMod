@@ -37,4 +37,12 @@ object Events {
 
     suspend inline fun <reified T : Event> on(noinline block: suspend (T) -> Unit) =
         events.filterIsInstance<T>().onEach(block).launchIn(CoroutineScope(currentCoroutineContext()))
+
+    suspend inline fun <reified T : Event> await() =
+        events.filterIsInstance<T>().first()
+
+    suspend inline fun <reified T : Event> await(repetitions: Int) =
+        repeat(repetitions) {
+            await<T>()
+        }
 }
