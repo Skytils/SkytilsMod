@@ -37,9 +37,4 @@ object Events {
 
     suspend inline fun <reified T : Event> on(noinline block: suspend (T) -> Unit) =
         events.filterIsInstance<T>().onEach(block).launchIn(CoroutineScope(currentCoroutineContext()))
-
-    inline fun <reified T : Event> onSync(noinline block: (T) -> Unit) =
-        runBlocking {
-            on<T>(block)
-        }
 }
