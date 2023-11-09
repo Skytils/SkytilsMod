@@ -16,19 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://maven.architectury.dev/")
-        maven("https://maven.fabricmc.net")
-        maven("https://maven.minecraftforge.net/")
-        maven("https://repo.essential.gg/repository/maven-releases/")
-        maven("https://jitpack.io")
+package gg.skytils.event.mixins;
+
+import gg.skytils.event.Events;
+import gg.skytils.event.impl.TickEvent;
+import net.minecraft.client.Minecraft;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(Minecraft.class)
+public class MixinMinecraft {
+    @Inject(
+            method = "runTick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/profiler/Profiler;endSection()V",
+                    shift = At.Shift.BEFORE
+            )
+    )
+    private void tick(CallbackInfo ci) {
+        Events.INSTANCE.postSync(new TickEvent());
     }
 }
-
-rootProject.name = "SkytilsMod"
-include("events")

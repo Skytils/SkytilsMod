@@ -16,19 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://maven.architectury.dev/")
-        maven("https://maven.fabricmc.net")
-        maven("https://maven.minecraftforge.net/")
-        maven("https://repo.essential.gg/repository/maven-releases/")
-        maven("https://jitpack.io")
-    }
+package gg.skytils.skytilsmod.core
+
+import gg.skytils.event.Events
+import gg.skytils.event.impl.TickEvent
+import kotlinx.coroutines.*
+
+object Tick : CoroutineScope {
+    @OptIn(DelicateCoroutinesApi::class)
+    val dispatcher = newFixedThreadPoolContext(5, "Skytils Tick")
+    override val coroutineContext = dispatcher + SupervisorJob()
 }
 
-rootProject.name = "SkytilsMod"
-include("events")
+fun tickTimer(ticks: Int, task: () -> Unit) =
+    Tick.launch {
+        while (true) {
+            Events.await<TickEvent>(ticks)
+            task()
+        }
+    }

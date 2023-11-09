@@ -15,20 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://maven.architectury.dev/")
-        maven("https://maven.fabricmc.net")
-        maven("https://maven.minecraftforge.net/")
-        maven("https://repo.essential.gg/repository/maven-releases/")
-        maven("https://jitpack.io")
-    }
+plugins {
+    kotlin("jvm") version "1.8.22"
+    id("gg.essential.loom") version "1.3.12"
+    id("gg.essential.defaults") version "0.3.0"
 }
 
-rootProject.name = "SkytilsMod"
-include("events")
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    compileOnly("org.spongepowered:mixin:0.8.5")
+}
+
+java.toolchain {
+    languageVersion = JavaLanguageVersion.of(8)
+}
