@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
@@ -219,14 +218,6 @@ object Utils {
 
     fun getKeyDisplayStringSafe(keyCode: Int): String =
         runCatching { GameSettings.getKeyDisplayString(keyCode) }.getOrNull() ?: "Key $keyCode"
-
-    fun getTextShadowSetting(): SmartFontRenderer.TextShadow {
-        return when (Skytils.config.textShadow) {
-            1 -> SmartFontRenderer.TextShadow.NONE
-            2 -> SmartFontRenderer.TextShadow.OUTLINE
-            else -> SmartFontRenderer.TextShadow.NORMAL
-        }
-    }
 }
 
 inline val AxisAlignedBB.minVec: Vec3
