@@ -775,7 +775,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     y.toFloat(),
                     CommonColors.WHITE,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
                 if (message.time > 4000) {
                     spamMessages.remove(message)
@@ -797,7 +797,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 y.toFloat(),
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
