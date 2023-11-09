@@ -30,6 +30,7 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.entity.monster.EntityZombie
@@ -507,7 +508,7 @@ object ScoreCalculation {
         HugeCryptsCounter()
     }
 
-    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, x = 200, y = 200) {
+    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, x = 200, y = 200, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
 
@@ -546,7 +547,7 @@ object ScoreCalculation {
         }
     }
 
-    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", x = 200, y = 100) {
+    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", x = 200, y = 100, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
                 RenderUtil.drawAllInList(this, text)

@@ -264,7 +264,7 @@ object MythologicalTracker : Tracker("mythological") {
         write(writer)
     }
 
-    object MythologicalTrackerElement : GuiElement("Mythological Tracker", x = 150, y = 120) {
+    object MythologicalTrackerElement : GuiElement("Mythological Tracker", x = 150, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inSkyblock && GriffinBurrows.hasSpadeInHotbar && SBInfo.mode == SkyblockIsland.Hub.mode) {
 
@@ -277,7 +277,7 @@ object MythologicalTracker : Tracker("mythological") {
                     0f,
                     CommonColors.YELLOW,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
                 var drawnLines = 1
                 for (mob in BurrowMob.values()) {
@@ -288,7 +288,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -300,7 +300,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -318,7 +318,7 @@ object MythologicalTracker : Tracker("mythological") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
             var drawnLines = 1
             for (mob in BurrowMob.values()) {
@@ -328,7 +328,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
                 drawnLines++
             }
@@ -339,7 +339,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
                 drawnLines++
             }

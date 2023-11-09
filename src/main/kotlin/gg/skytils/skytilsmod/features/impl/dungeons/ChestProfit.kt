@@ -27,6 +27,7 @@ import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -175,7 +176,7 @@ object ChestProfit {
                 element.scaleY,
                 chest.displayColor,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow_
             )
 
             for (item in chest.items) {
@@ -186,7 +187,7 @@ object ChestProfit {
                     element.scaleY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
                     CommonColors.WHITE,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow_
                 )
                 drawnLines++
             }
@@ -253,11 +254,13 @@ object ChestProfit {
         }
     }
 
+    private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
-    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120) {
+    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
                 val leftAlign = scaleX < sr.scaledWidth / 2f
+                textShadow_ = textShadow
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
                 DungeonChest.values().filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
@@ -268,7 +271,7 @@ object ChestProfit {
                         (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         chest.displayColor,
                         if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 }
             }

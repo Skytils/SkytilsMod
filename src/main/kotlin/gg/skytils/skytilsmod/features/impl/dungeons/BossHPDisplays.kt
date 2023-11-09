@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -147,7 +148,7 @@ object BossHPDisplays {
         GlStateManager.enableCull()
     }
 
-    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", x = 200, y = 30) {
+    class GuardianRespawnTimer : GuiElement("Guardian Respawn Timer", x = 200, y = 30, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && guardianRespawnTimers.isNotEmpty()) {
                 RenderUtil.drawAllInList(this, guardianRespawnTimers)
@@ -164,7 +165,7 @@ object BossHPDisplays {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
@@ -181,7 +182,7 @@ object BossHPDisplays {
         }
     }
 
-    class GiantHPElement : GuiElement("Show Giant HP", x = 200, y = 30) {
+    class GiantHPElement : GuiElement("Show Giant HP", x = 200, y = 30, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && giantNames.isNotEmpty()) {
                 RenderUtil.drawAllInList(

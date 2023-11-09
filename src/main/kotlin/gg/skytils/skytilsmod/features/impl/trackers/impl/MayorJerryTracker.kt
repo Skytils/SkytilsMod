@@ -161,7 +161,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         JerryTrackerElement()
     }
 
-    class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", x = 150, y = 120) {
+    class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", x = 150, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
 
@@ -177,7 +177,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.WHITE,
                         alignment,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -189,7 +189,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.WHITE,
                         alignment,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -207,7 +207,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 

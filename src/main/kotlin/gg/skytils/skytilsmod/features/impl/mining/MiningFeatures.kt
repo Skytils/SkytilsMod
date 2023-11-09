@@ -39,6 +39,7 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -406,7 +407,7 @@ object MiningFeatures {
         waypoints.clear()
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", x = 0, y = 0) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", x = 0, y = 0, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
 
         enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {

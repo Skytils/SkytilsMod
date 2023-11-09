@@ -599,7 +599,7 @@ object SlayerFeatures : CoroutineScope {
 
     }
 
-    class SlayerDisplayElement : GuiElement("Slayer Display", x = 150, y = 20) {
+    class SlayerDisplayElement : GuiElement("Slayer Display", x = 150, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (Utils.inSkyblock) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -617,7 +617,7 @@ object SlayerFeatures : CoroutineScope {
                                 0f,
                                 CommonColors.WHITE,
                                 alignment,
-                                Utils.getTextShadowSetting()
+                                textShadow
                             )
                         }
                     }
@@ -632,7 +632,7 @@ object SlayerFeatures : CoroutineScope {
                                 10f,
                                 CommonColors.WHITE,
                                 alignment,
-                                Utils.getTextShadowSetting()
+                                textShadow
                             )
                         }
                     }
@@ -654,7 +654,7 @@ object SlayerFeatures : CoroutineScope {
                 0f,
                 CommonColors.WHITE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§c☠ §bRevenant Horror §a500§c❤§r",
@@ -662,7 +662,7 @@ object SlayerFeatures : CoroutineScope {
                 10f,
                 CommonColors.WHITE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
@@ -679,7 +679,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SeraphDisplayElement : GuiElement("Seraph Display", x = 20, y = 20) {
+    class SeraphDisplayElement : GuiElement("Seraph Display", x = 20, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -696,7 +696,7 @@ object SlayerFeatures : CoroutineScope {
                             0f,
                             CommonColors.WHITE,
                             alignment,
-                            Utils.getTextShadowSetting()
+                            textShadow
                         )
                     }
                     entity.heldBlockState?.takeIf { it.block is BlockBeacon }?.run {
@@ -706,7 +706,7 @@ object SlayerFeatures : CoroutineScope {
                             10f,
                             CommonColors.WHITE,
                             alignment,
-                            Utils.getTextShadowSetting()
+                            textShadow
                         )
                     } ?: if (lastYangGlyphSwitchTicks != -1) {
                         ScreenRenderer.fontRenderer.drawString(
@@ -715,7 +715,7 @@ object SlayerFeatures : CoroutineScope {
                             10f,
                             CommonColors.WHITE,
                             alignment,
-                            Utils.getTextShadowSetting()
+                            textShadow
                         )
                     } else {
                         ScreenRenderer.fontRenderer.drawString(
@@ -724,7 +724,7 @@ object SlayerFeatures : CoroutineScope {
                             10f,
                             CommonColors.WHITE,
                             alignment,
-                            Utils.getTextShadowSetting()
+                            textShadow
                         )
                     }
                     ScreenRenderer.fontRenderer.drawString(
@@ -736,7 +736,7 @@ object SlayerFeatures : CoroutineScope {
                         20f,
                         CommonColors.WHITE,
                         alignment,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                     ScreenRenderer.fontRenderer.drawString(
                         if (nukekebiSkulls.size > 0)
@@ -747,7 +747,7 @@ object SlayerFeatures : CoroutineScope {
                         30f,
                         CommonColors.WHITE,
                         alignment,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 }
             }
@@ -763,7 +763,7 @@ object SlayerFeatures : CoroutineScope {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§bHolding beacon!",
@@ -771,7 +771,7 @@ object SlayerFeatures : CoroutineScope {
                 10f,
                 CommonColors.WHITE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§cNo yang glyph",
@@ -779,7 +779,7 @@ object SlayerFeatures : CoroutineScope {
                 20f,
                 CommonColors.WHITE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
@@ -796,7 +796,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    object TotemDisplayElement : GuiElement("Totem Display", x = 20, y = 50) {
+    object TotemDisplayElement : GuiElement("Totem Display", x = 20, y = 50, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             (slayer as? DemonlordSlayer)?.totemEntity?.run {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -808,7 +808,7 @@ object SlayerFeatures : CoroutineScope {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
             }
         }
@@ -823,7 +823,7 @@ object SlayerFeatures : CoroutineScope {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
@@ -840,7 +840,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", x = 150, y = 20) {
+    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", x = 150, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 

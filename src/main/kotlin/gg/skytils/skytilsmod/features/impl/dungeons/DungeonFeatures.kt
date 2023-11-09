@@ -35,6 +35,7 @@ import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.Job
@@ -737,7 +738,7 @@ object DungeonFeatures {
         terracottaSpawns.clear()
     }
 
-    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
+    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && lastLitUpTime != -1L) {
                 val time = lastLitUpTime + 3400
@@ -754,7 +755,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.PURPLE,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
             }
         }
@@ -769,7 +770,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.PURPLE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
@@ -786,7 +787,7 @@ object DungeonFeatures {
         }
     }
 
-    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f) {
+    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld
@@ -801,7 +802,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
             }
         }
@@ -817,7 +818,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 

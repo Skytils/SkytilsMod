@@ -76,7 +76,7 @@ object MayorJerry {
         }
     }
 
-    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", x = 10, y = 10) {
+    class JerryPerkGuiElement : GuiElement("Mayor Jerry Perk Display", x = 10, y = 10, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (Utils.inSkyblock && toggled && MayorInfo.currentMayor == "Jerry") {
                 if (MayorInfo.jerryMayor == null || MayorInfo.newJerryPerks <= System.currentTimeMillis()) {
@@ -93,7 +93,7 @@ object MayorJerry {
                         0f,
                         CommonColors.ORANGE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 }
             }
@@ -106,7 +106,7 @@ object MayorJerry {
                 0f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 
@@ -123,7 +123,7 @@ object MayorJerry {
         }
     }
 
-    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", x = 10, y = 10) {
+    class JerryTimerGuiElement : GuiElement("Hidden Jerry Timer", x = 10, y = 10, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         private val villagerEgg = ItemStack(Items.spawn_egg, 1, 120)
 
         override fun render() {
@@ -142,7 +142,7 @@ object MayorJerry {
                     5f,
                     CommonColors.ORANGE,
                     SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                    Utils.getTextShadowSetting()
+                    textShadow
                 )
             }
         }
@@ -155,7 +155,7 @@ object MayorJerry {
                 5f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 

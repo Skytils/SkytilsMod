@@ -76,7 +76,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
         CooldownDisplayElement()
     }
 
-    class CooldownDisplayElement : GuiElement("Item Cooldown Display", x = 10, y = 10) {
+    class CooldownDisplayElement : GuiElement("Item Cooldown Display", x = 10, y = 10, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
 
         override fun render() {
             if (Utils.inSkyblock && toggled) {
@@ -91,7 +91,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
                         (ScreenRenderer.fontRenderer.FONT_HEIGHT * i).toFloat(),
                         CommonColors.ORANGE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 }
             }
@@ -104,7 +104,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
                 0f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 

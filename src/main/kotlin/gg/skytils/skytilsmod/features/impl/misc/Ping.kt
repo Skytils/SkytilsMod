@@ -96,7 +96,7 @@ object Ping {
         }
     }
 
-    class PingDisplayElement : GuiElement(name = "Ping Display", x = 10, y = 10) {
+    class PingDisplayElement : GuiElement(name = "Ping Display", x = 10, y = 10, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (Utils.isOnHypixel && toggled && mc.thePlayer != null) {
                 when (Skytils.config.pingDisplay) {
@@ -136,7 +136,7 @@ object Ping {
                             else -> CommonColors.RED
                         },
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 }
             }
@@ -149,7 +149,7 @@ object Ping {
                 0f,
                 CommonColors.DARK_GREEN,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 

@@ -35,7 +35,7 @@ object RainTimer {
         while (nextRain < System.currentTimeMillis()) nextRain += 4850000
     }
 
-    class RainTimerGuiElement : GuiElement(name = "Rain Timer", x = 10, y = 10) {
+    class RainTimerGuiElement : GuiElement(name = "Rain Timer", x = 10, y = 10, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (Utils.inSkyblock && toggled) {
                 if (nextRain < System.currentTimeMillis()) nextRain += 4850000
@@ -47,7 +47,7 @@ object RainTimer {
                         0f,
                         CommonColors.BLUE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 } else {
                     val secondsToNext = (nextRain - System.currentTimeMillis()) / 1000L
@@ -57,7 +57,7 @@ object RainTimer {
                         0f,
                         CommonColors.ORANGE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        Utils.getTextShadowSetting()
+                        textShadow
                     )
                 }
             }
@@ -70,7 +70,7 @@ object RainTimer {
                 0f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                Utils.getTextShadowSetting()
+                textShadow
             )
         }
 

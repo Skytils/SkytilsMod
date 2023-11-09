@@ -862,7 +862,7 @@ object RenderUtil {
                 (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                element.textShadow
             )
         }
     }

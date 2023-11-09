@@ -27,6 +27,7 @@ import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -233,7 +234,7 @@ object DungeonTimer {
         scoreShownAt = -1
     }
 
-    class DungeonTimerElement : GuiElement("Dungeon Timer", x = 200, y = 80) {
+    class DungeonTimerElement : GuiElement("Dungeon Timer", x = 200, y = 80, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inDungeons && dungeonStartTime != -1L) {
                 val time =
@@ -294,7 +295,7 @@ object DungeonTimer {
         }
     }
 
-    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", x = 200, y = 120) {
+    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", x = 200, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
@@ -346,7 +347,7 @@ object DungeonTimer {
         }
     }
 
-    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", x = 200, y = 120) {
+    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", x = 200, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,

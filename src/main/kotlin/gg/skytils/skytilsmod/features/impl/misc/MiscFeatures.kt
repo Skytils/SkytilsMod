@@ -41,8 +41,8 @@ import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
@@ -507,7 +507,7 @@ object MiscFeatures {
         }
     }
 
-    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20) {
+    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
@@ -522,7 +522,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -534,7 +534,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -551,7 +551,7 @@ object MiscFeatures {
         }
     }
 
-    class PlayersInRangeDisplay : GuiElement("Players In Range Display", x = 50, y = 50) {
+    class PlayersInRangeDisplay : GuiElement("Players In Range Display", x = 50, y = 50, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             if (toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
@@ -561,7 +561,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -574,7 +574,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -591,7 +591,7 @@ object MiscFeatures {
         }
     }
 
-    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", x = 50, y = 60) {
+    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", x = 50, y = 60, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
@@ -603,7 +603,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -616,7 +616,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -647,7 +647,7 @@ object MiscFeatures {
         }
     }
 
-    class WorldAgeDisplay : GuiElement("World Age Display", x = 50, y = 60) {
+    class WorldAgeDisplay : GuiElement("World Age Display", x = 50, y = 60, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
 
         var usesBaldTimeChanger = false
 
@@ -660,7 +660,7 @@ object MiscFeatures {
                         0f,
                         CommonColors.RED,
                         TextAlignment.LEFT_RIGHT,
-                        TextShadow.NORMAL
+                        textShadow
                     )
                     return
                 }
@@ -672,7 +672,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -687,7 +687,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.RED,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
                 return
             }
@@ -697,7 +697,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -714,7 +714,7 @@ object MiscFeatures {
         }
     }
 
-    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", x = 50, y = 60) {
+    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", x = 50, y = 60, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             //This is a placeholder
         }
@@ -726,7 +726,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -743,7 +743,7 @@ object MiscFeatures {
         }
     }
 
-    object ActionBarDummy : GuiElement("Action Bar", x = 50, y = 70) {
+    object ActionBarDummy : GuiElement("Action Bar", x = 50, y = 70, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         override fun render() {
             //This is a placeholder
         }
@@ -755,7 +755,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 

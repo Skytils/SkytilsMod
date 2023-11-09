@@ -31,6 +31,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.RegexAsString
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -725,7 +726,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     data class SpamMessage(var message: String, var time: Long, var height: Double)
-    class SpamGuiElement : GuiElement("Spam Gui", scale = 1.0f, x = 0.65f, y = 0.925f) {
+    class SpamGuiElement : GuiElement("Spam Gui", scale = 1.0f, x = 0.65f, y = 0.925f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         /**
          * Based off of Soopyboo32's SoopyApis module
          * https://github.com/Soopyboo32

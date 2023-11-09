@@ -135,7 +135,7 @@ object VisitorHelper {
      * of this class so that the user can move the element around normally.
      * @see ContainerSellValue
      */
-    object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", x = 0.258f, y = 0.283f) {
+    object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", x = 0.258f, y = 0.283f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
         internal val rightAlign: Boolean
             get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
                     (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)
@@ -147,6 +147,7 @@ object VisitorHelper {
 
         override fun render() {
             // Rendering is handled in the BackgroundDrawnEvent to give the text proper lighting
+            textShadow_ = textShadow
         }
 
         override fun demoRender() {
@@ -157,7 +158,7 @@ object VisitorHelper {
             ).forEachIndexed { i, str ->
                 fr.drawString(
                     str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
+                    CommonColors.WHITE, alignment, textShadow
                 )
             }
         }
@@ -174,6 +175,7 @@ object VisitorHelper {
         }
     }
 
+    private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private fun drawLine(index: Int, str: String) {
         ScreenRenderer.fontRenderer.drawString(
             str,
@@ -181,7 +183,7 @@ object VisitorHelper {
             (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
             CommonColors.WHITE,
             VisitorHelperDisplay.alignment,
-            SmartFontRenderer.TextShadow.NORMAL
+            textShadow_
         )
     }
 
