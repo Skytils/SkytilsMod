@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.structure.LocationButton
 import gg.skytils.skytilsmod.core.structure.ResizeButton
 import gg.skytils.skytilsmod.core.structure.ResizeButton.Corner
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -103,10 +104,17 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        if (mouseButton == 1) {
-            buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
+        when (mouseButton) {
+            1 -> buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
                 it.element.setPos(10, 10)
                 it.element.scale = 1f
+            }
+            2 -> buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
+                it.element.textShadow = when (it.element.textShadow) {
+                    SmartFontRenderer.TextShadow.NONE -> SmartFontRenderer.TextShadow.NORMAL
+                    SmartFontRenderer.TextShadow.NORMAL -> SmartFontRenderer.TextShadow.OUTLINE
+                    SmartFontRenderer.TextShadow.OUTLINE -> SmartFontRenderer.TextShadow.NONE
+                }
             }
         }
         super.mouseClicked(mouseX, mouseY, mouseButton)
