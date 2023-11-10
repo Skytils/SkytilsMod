@@ -441,7 +441,7 @@ class Skytils {
     }
 
     init {
-        tickTimer(20) {
+        tickTimer(20, repeats = true) {
             if (mc.thePlayer != null) {
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
