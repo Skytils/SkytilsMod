@@ -25,10 +25,8 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.SoundQueue
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
@@ -46,6 +44,7 @@ import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import net.minecraft.block.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiChat
@@ -188,7 +187,7 @@ object SlayerFeatures : CoroutineScope {
     }
 
     init {
-        TickTask(4, repeats = true) {
+        tickTimer(4, repeats = true) {
             if (Utils.inSkyblock && Skytils.config.showRNGMeter) {
                 for ((index, line) in sidebarLines.withIndex()) {
                     if (line == "Slayer Quest") {
@@ -363,7 +362,7 @@ object SlayerFeatures : CoroutineScope {
             ) {
                 slayer?.run {
                     launch {
-                        val (n, t) = detectSlayerEntities().await()
+                        val (n, t) = detectSlayerEntities().first()
                         nameEntity = n
                         timerEntity = t
                     }
@@ -958,74 +957,67 @@ object SlayerFeatures : CoroutineScope {
 
         init {
             launch {
-                val (n, t) = detectSlayerEntities().await()
+                val (n, t) = detectSlayerEntities().first()
                 nameEntity = n
                 timerEntity = t
             }
         }
 
         fun detectSlayerEntities() =
-            CompletableDeferred<Pair<EntityArmorStand, EntityArmorStand>>().apply {
-                launch {
-                    TickTask(5) {
-                        val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
-                            entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                        ) { nearbyEntity: Entity? ->
-                            if (nearbyEntity is EntityArmorStand) {
-                                if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
-                                    if (nearbyEntity.inventory.any { it != null }) {
-                                        // armor stand has equipment, abort!
-                                        return@getEntitiesInAABBexcluding false
-                                    }
-                                    // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
-                                    return@getEntitiesInAABBexcluding true
-                                }
+            tickTask(5) {
+                val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
+                    entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
+                ) { nearbyEntity: Entity? ->
+                    if (nearbyEntity is EntityArmorStand) {
+                        if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
+                            if (nearbyEntity.inventory.any { it != null }) {
+                                // armor stand has equipment, abort!
+                                return@getEntitiesInAABBexcluding false
                             }
-                            false
+                            // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
+                            return@getEntitiesInAABBexcluding true
                         }
-                        val potentialTimerEntities = arrayListOf<EntityArmorStand>()
-                        val potentialNameEntities = arrayListOf<EntityArmorStand>()
-                        for (nearby in nearbyArmorStands) {
-                            when {
-                                nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
-                                nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
-                                    printDevMessage(
-                                        "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
-                                        "slayer"
-                                    )
-                                    if (expectedHealth == entity.baseMaxHealth.toInt()) {
-                                        printDevMessage("hp matched", "slayer")
-                                        potentialNameEntities.add(nearby as EntityArmorStand)
-                                    }
-                                }
-
-                                nearby.displayName.formattedText.matches(timerRegex) -> {
-                                    printDevMessage("timer regex matched", "slayer")
-                                    potentialTimerEntities.add(nearby as EntityArmorStand)
-                                }
-                            }
-                        }
-                        (this@Slayer as? DemonlordSlayer)?.let {
-                            if (potentialTimerEntities.removeIf { it == quaziiTimer || it == typhoeusTimer }) {
-                                printDevMessage("Ignored demon timers", "slayer")
-                            }
-                        }
-                        if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
-                            return@TickTask potentialNameEntities.first() to potentialTimerEntities.first()
-                        } else {
+                    }
+                    false
+                }
+                val potentialTimerEntities = arrayListOf<EntityArmorStand>()
+                val potentialNameEntities = arrayListOf<EntityArmorStand>()
+                for (nearby in nearbyArmorStands) {
+                    when {
+                        nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
+                        nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
                             printDevMessage(
-                                "not the right entity! (${potentialNameEntities.size}, ${potentialTimerEntities.size})",
+                                "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
                                 "slayer"
                             )
-                            slayer = null
-                            throw IllegalStateException("Wrong entity!")
+                            if (expectedHealth == entity.baseMaxHealth.toInt()) {
+                                printDevMessage("hp matched", "slayer")
+                                potentialNameEntities.add(nearby as EntityArmorStand)
+                            }
                         }
-                    }.onComplete {
-                        complete(it)
+
+                        nearby.displayName.formattedText.matches(timerRegex) -> {
+                            printDevMessage("timer regex matched", "slayer")
+                            potentialTimerEntities.add(nearby as EntityArmorStand)
+                        }
                     }
                 }
+                (this@Slayer as? DemonlordSlayer)?.let {
+                    if (potentialTimerEntities.removeIf { it == quaziiTimer || it == typhoeusTimer }) {
+                        printDevMessage("Ignored demon timers", "slayer")
+                    }
+                }
+                if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
+                    return@tickTask potentialNameEntities.first() to potentialTimerEntities.first()
+                } else {
+                    printDevMessage(
+                        "not the right entity! (${potentialNameEntities.size}, ${potentialTimerEntities.size})",
+                        "slayer"
+                    )
+                    slayer = null
+                    throw IllegalStateException("Wrong entity!")
+                }
             }
-
         open fun tick(event: ClientTickEvent) {}
 
         open fun set() {}
@@ -1036,50 +1028,53 @@ object SlayerFeatures : CoroutineScope {
         Slayer<EntityZombie>(entity, "Revenant Horror", "§c☠ §bRevenant Horror", "§c☠ §fAtoned Horror") {
 
         override fun set() {
-            rev5PingTask.register()
+            rev5PingTask.start()
         }
 
         override fun unset() {
-            rev5PingTask.unregister()
+            rev5PingTask.cancel()
+            rev5PingTask = createrev5PingTask()
         }
 
         companion object {
-            private val rev5PingTask = TickTask(4, repeats = true, register = false) {
-                if (Utils.inSkyblock && Skytils.config.rev5TNTPing && mc.thePlayer != null) {
-                    if (hasSlayerText) {
-                        var under: BlockPos? = null
-                        if (mc.thePlayer.onGround) {
-                            under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                        } else {
-                            for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
-                                val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
-                                if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
-                                    under = test
-                                    break
+            private fun createrev5PingTask() =
+                tickTimer(4, repeats = true, register = false) {
+                    if (Utils.inSkyblock && Skytils.config.rev5TNTPing && mc.thePlayer != null) {
+                        if (hasSlayerText) {
+                            var under: BlockPos? = null
+                            if (mc.thePlayer.onGround) {
+                                under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
+                            } else {
+                                for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
+                                    val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
+                                    if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
+                                        under = test
+                                        break
+                                    }
                                 }
                             }
-                        }
-                        if (under != null) {
-                            val blockUnder = mc.theWorld.getBlockState(under)
-                            val isDanger = when {
-                                blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
-                                blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
-                                blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
-                                blockUnder.block === Blocks.stained_hardened_clay -> {
-                                    val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
-                                    color == 0 || color == 8 || color == 14
-                                }
+                            if (under != null) {
+                                val blockUnder = mc.theWorld.getBlockState(under)
+                                val isDanger = when {
+                                    blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
+                                    blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
+                                    blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
+                                    blockUnder.block === Blocks.stained_hardened_clay -> {
+                                        val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
+                                        color == 0 || color == 8 || color == 14
+                                    }
 
-                                blockUnder.block === Blocks.bedrock -> true
-                                else -> false
-                            }
-                            if (isDanger) {
-                                SoundQueue.addToQueue("random.orb", 1f)
+                                    blockUnder.block === Blocks.bedrock -> true
+                                    else -> false
+                                }
+                                if (isDanger) {
+                                    SoundQueue.addToQueue("random.orb", 1f)
+                                }
                             }
                         }
                     }
                 }
-            }
+            private var rev5PingTask = createrev5PingTask()
         }
     }
 
@@ -1138,7 +1133,7 @@ object SlayerFeatures : CoroutineScope {
         }
 
         override fun entityJoinWorld(event: EntityJoinWorldEvent) {
-            TickTask(1) {
+            tickTimer(1) {
                 (event.entity as? EntityArmorStand)?.let { e ->
                     if (e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)) {
                         val time = System.currentTimeMillis() - 50
@@ -1165,7 +1160,7 @@ object SlayerFeatures : CoroutineScope {
                             lastYangGlyphSwitch = -1L
                             lastYangGlyphSwitchTicks = -1
                         }
-                        return@TickTask
+                        return@tickTimer
                     } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
                             .intersectsWith(entity.entityBoundingBox)
                     ) {
@@ -1176,7 +1171,7 @@ object SlayerFeatures : CoroutineScope {
                             }) {
                             nukekebiSkulls.add(e)
                         }
-                        return@TickTask
+                        return@tickTimer
                     }
                 }
             }
@@ -1284,35 +1279,39 @@ object SlayerFeatures : CoroutineScope {
                 "SPIRIT" to Color(255, 255, 255)
             )
 
-            private val blazeFirePingTask = TickTask(4, repeats = true, register = false) {
-                if (Utils.inSkyblock && Skytils.config.blazeFireWarning && mc.thePlayer != null) {
-                    (slayer as? DemonlordSlayer)?.let {
-                        if (!mc.thePlayer.onGround) return@TickTask
-                        val under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                        if (under in it.activeFire) {
-                            // The reason this is a title and not just sound is because there is much less time
-                            // to react to the pit warning than a rev5 tnt ping
-                            createTitle("§c§lFire pit!", 4)
-                            SoundQueue.addToQueue("random.orb", 1f)
+            private fun createBlazeFirePingTask() =
+                tickTimer(4, repeats = true, register = false) {
+                    if (Utils.inSkyblock && Skytils.config.blazeFireWarning && mc.thePlayer != null) {
+                        (slayer as? DemonlordSlayer)?.let {
+                            if (!mc.thePlayer.onGround) return@tickTimer
+                            val under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
+                            if (under in it.activeFire) {
+                                // The reason this is a title and not just sound is because there is much less time
+                                // to react to the pit warning than a rev5 tnt ping
+                                createTitle("§c§lFire pit!", 4)
+                                SoundQueue.addToQueue("random.orb", 1f)
+                            }
                         }
                     }
                 }
-            }
+
+            private var blazeFirePingTask = createBlazeFirePingTask()
         }
 
         override fun set() {
-            blazeFirePingTask.register()
+            blazeFirePingTask.start()
         }
 
         override fun unset() {
-            blazeFirePingTask.unregister()
+            blazeFirePingTask.cancel()
+            blazeFirePingTask = createBlazeFirePingTask()
         }
 
         override fun tick(event: ClientTickEvent) {
             if (entity.isInvisible && !lastTickInvis) {
                 lastTickInvis = true
                 val prevBB = entity.entityBoundingBox.expand(3.0, 1.5, 3.0)
-                TickTask(10) {
+                tickTimer(10) {
                     val demons = entity.entityWorld.getEntitiesInAABBexcluding(
                         entity, prevBB
                     ) { it is EntityPigZombie || (it is EntitySkeleton && it.skeletonType == 1) }
@@ -1350,7 +1349,7 @@ object SlayerFeatures : CoroutineScope {
 
         override fun entityJoinWorld(event: EntityJoinWorldEvent) {
             (event.entity as? EntityArmorStand)?.let { e ->
-                TickTask(1) {
+                tickTimer(1) {
                     if (e.inventory[4]?.takeIf { it.item is ItemSkull }
                             ?.let { ItemUtil.getSkullTexture(it) == thrownTexture } == true) {
                         printDevMessage(
@@ -1358,7 +1357,7 @@ object SlayerFeatures : CoroutineScope {
                             "slayer",
                         )
                         thrownEntity = e
-                        return@TickTask
+                        return@tickTimer
                     } else if (e.name.matches(totemRegex) && e.getDistanceSq(totemPos) < 9) {
                         totemEntity = e
                     }

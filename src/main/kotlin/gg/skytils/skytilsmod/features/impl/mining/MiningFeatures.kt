@@ -31,8 +31,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.BossBarEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
@@ -175,7 +175,7 @@ object MiningFeatures {
                     s
                 )
             }, null)
-            TickTask(50) {
+            tickTimer(50) {
                 if (solution != null) {
                     UChat.chat("$successPrefix §aFetchur needs: §2${solution}§a!")
                 } else {

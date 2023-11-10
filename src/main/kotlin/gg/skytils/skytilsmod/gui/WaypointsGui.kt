@@ -33,7 +33,7 @@ import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -257,7 +257,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
             mc.displayGuiScreen(null)
-            TickTask(2) {
+            tickTimer(2) {
                 Skytils.displayScreen = WaypointShareGui()
             }
         }

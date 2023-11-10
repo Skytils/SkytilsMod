@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -48,8 +48,8 @@ object TicTacToeSolver {
     private var bestMove: BlockPos? = null
 
     init {
-        TickTask(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.ticTacToeSolver || mc.thePlayer == null) return@TickTask
+        tickTimer(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.ticTacToeSolver || mc.thePlayer == null) return@tickTimer
             if (SuperSecretSettings.azooPuzzoo || DungeonListener.missingPuzzles.contains("Tic Tac Toe")) {
                 updatePuzzleState()
             } else {

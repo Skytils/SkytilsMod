@@ -24,7 +24,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
@@ -76,8 +76,8 @@ object MasterMode7Features {
     }
 
     init {
-        TickTask(15, repeats = true) {
-            if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || mc.thePlayer == null) return@TickTask
+        tickTimer(15, repeats = true) {
+            if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || mc.thePlayer == null) return@tickTimer
             if (Skytils.config.witherKingDragonSlashAlert) {
                 if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
                     GuiManager.createTitle("Dimensional Slash!", 10)

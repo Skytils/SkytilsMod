@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -58,10 +58,10 @@ object WaterBoardSolver {
     private var job: Job? = null
 
     init {
-        TickTask(20, repeats = true) {
-            if (!Skytils.config.waterBoardSolver || !Utils.inDungeons) return@TickTask
-            val player = mc.thePlayer ?: return@TickTask
-            val world = mc.theWorld ?: return@TickTask
+        tickTimer(20, repeats = true) {
+            if (!Skytils.config.waterBoardSolver || !Utils.inDungeons) return@tickTimer
+            val player = mc.thePlayer ?: return@tickTimer
+            val world = mc.theWorld ?: return@tickTimer
             if (DungeonListener.missingPuzzles.contains("Water Board") && variant == -1 && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
                 job = Skytils.launch {
                     prevInWaterRoom = inWaterRoom

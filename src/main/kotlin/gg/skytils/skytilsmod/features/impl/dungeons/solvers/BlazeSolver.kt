@@ -22,7 +22,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -51,7 +51,7 @@ object BlazeSolver {
     var lastKilledBlazeHp = 0
 
     init {
-        TickTask(4, repeats = true) {
+        tickTimer(4, repeats = true) {
             if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Higher Or Lower"
                 )
@@ -59,7 +59,7 @@ object BlazeSolver {
                 calcOrder()
             }
         }
-        TickTask(20, repeats = true) {
+        tickTimer(20, repeats = true) {
             if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Higher Or Lower"
                 )

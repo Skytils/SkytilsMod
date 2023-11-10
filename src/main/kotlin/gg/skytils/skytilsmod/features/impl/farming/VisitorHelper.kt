@@ -22,8 +22,8 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
@@ -55,15 +55,15 @@ object VisitorHelper {
     }
 
     init {
-        TickTask(4, repeats = true) {
-            if (!Skytils.config.visitorOfferHelper) return@TickTask
+        tickTimer(4, repeats = true) {
+            if (!Skytils.config.visitorOfferHelper) return@tickTimer
 
             textLines.clear()
             totalItemCost = 0.0
 
-            if (!inGarden) return@TickTask
+            if (!inGarden) return@tickTimer
 
-            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@TickTask
+            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@tickTimer
             val chestName = container.lowerChestInventory.name
             val npcSummary: ItemStack? = container.getSlot(13).stack
             val acceptOffer: ItemStack? = container.getSlot(29).stack
@@ -75,7 +75,7 @@ object VisitorHelper {
                 textLines.add("§eRewards:")
 
                 val rewardIndex = lore.indexOf("§7Rewards:")
-                if (rewardIndex == -1) return@TickTask
+                if (rewardIndex == -1) return@tickTimer
 
                 lore.drop(rewardIndex + 1)
                     .takeWhile { it != "" }

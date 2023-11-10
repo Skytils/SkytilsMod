@@ -25,7 +25,7 @@ import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
@@ -65,7 +65,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
             is S02PacketChat -> {
                 val message = event.packet.chatComponent.formattedText
                 if (message.startsWithAny("§a§lBUFF! §f", "§r§aYou ate ")) {
-                    TickTask(1) {
+                    tickTimer(1) {
                         UMessage(
                             UTextComponent("${Skytils.prefix} §fYour potion effects have been updated! Click me to update your effect timers.").setClick(
                                 MCClickEventAction.RUN_COMMAND,
@@ -145,7 +145,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
                 if (currPage != neededPage) return
                 if (item.item == Items.arrow && item.displayName == "§aNext Page") {
                     neededPage++
-                    TickTask(20) {
+                    tickTimer(20) {
                         UChat.chat("${Skytils.prefix} §fMoving to the next page ${neededPage}... Don't close your inventory!")
                         mc.playerController.windowClick(
                             event.container.windowId,
@@ -157,7 +157,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
                     }
                 } else {
                     shouldReadEffects = false
-                    TickTask(20) {
+                    tickTimer(20) {
                         mc.thePlayer.closeScreen()
                         UChat.chat("${Skytils.successPrefix} §aYour ${potionEffectTimers.size} potion effects have been updated!")
                     }

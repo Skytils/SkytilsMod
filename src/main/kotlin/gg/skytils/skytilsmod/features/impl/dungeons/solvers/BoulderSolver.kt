@@ -23,7 +23,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -55,7 +55,7 @@ object BoulderSolver {
     private var job: Job? = null
 
     init {
-        TickTask(20, repeats = true, task = ::update)
+        tickTimer(20, repeats = true, task = ::update)
     }
 
     @SubscribeEvent

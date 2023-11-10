@@ -556,7 +556,7 @@ class Skytils {
         val old = mc.currentScreen
         if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
-                TickTask(1) {
+                tickTimer(1) {
                     if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
                         displayScreen = OptionsGui()
                 }

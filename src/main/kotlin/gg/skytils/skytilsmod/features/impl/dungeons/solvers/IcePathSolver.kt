@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -49,8 +49,8 @@ object IcePathSolver {
     private var silverfishPos: Point? = null
 
     init {
-        TickTask(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null) return@TickTask
+        tickTimer(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null) return@tickTimer
             if (DungeonListener.missingPuzzles.contains("Ice Path")) {
                 val silverfish = mc.theWorld.getEntities(
                     EntitySilverfish::class.java

@@ -26,7 +26,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
@@ -93,14 +93,14 @@ object DungeonListener {
                 team.clear()
                 deads.clear()
                 missingPuzzles.clear()
-                TickTask(40) {
+                tickTimer(40) {
                     getMembers()
                 }
             } else if (text.stripControlCodes()
                     .trim() == "> EXTRA STATS <"
             ) {
                 if (Skytils.config.dungeonDeathCounter) {
-                    TickTask(6) {
+                    tickTimer(6) {
                         UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
                             team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
                                 "  §c☠ ${it.playerName}:§r ${it.deaths}"
@@ -127,8 +127,8 @@ object DungeonListener {
     }
 
     init {
-        TickTask(4, repeats = true) {
-            if (!Utils.inDungeons) return@TickTask
+        tickTimer(4, repeats = true) {
+            if (!Utils.inDungeons) return@tickTimer
             val localMissingPuzzles = TabListUtils.tabEntries.mapNotNull {
                 val name = it.second
                 if (name.contains("✦")) {
@@ -155,7 +155,7 @@ object DungeonListener {
                 missingPuzzles.addAll(localMissingPuzzles)
             }
         }
-        TickTask(2, repeats = true) {
+        tickTimer(2, repeats = true) {
             if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 val self = team[mc.thePlayer.name]
@@ -195,7 +195,7 @@ object DungeonListener {
             printDevMessage(isFirstDeath.toString(), "spiritpet")
             printDevMessage(ScoreCalculation.firstDeathHadSpirit.toString(), "spiritpet")
             if (Skytils.config.dungeonDeathCounter) {
-                TickTask(1) {
+                tickTimer(1) {
                     UChat.chat(
                         "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total tracked deaths.${
                             " §6(SPIRIT)".toStringIfTrue(
@@ -228,7 +228,7 @@ object DungeonListener {
         val tabEntries = TabListUtils.tabEntries
 
         if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
-            TickTask(5) {
+            tickTimer(5) {
                 getMembers()
             }
             return
@@ -237,7 +237,7 @@ object DungeonListener {
         val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
         if (partyCount == null) {
             println("Couldn't get party count")
-            TickTask(5) {
+            tickTimer(5) {
                 getMembers()
             }
             return

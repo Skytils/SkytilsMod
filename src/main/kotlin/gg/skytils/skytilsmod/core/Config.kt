@@ -2960,7 +2960,7 @@ object Config : Vigilant(
         addDependency("assumeWitherImpact", "witherShieldCooldown")
 
         registerListener("protectItemBINThreshold") { _: String ->
-            TickTask(1) {
+            tickTimer(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
                 if (protectItemBINThreshold != "0") fetchLowestBINPrices = true
@@ -2978,7 +2978,7 @@ object Config : Vigilant(
                     val loc = ResourceLocation("skytils:gui/customrarity.png")
                     mc.resourceManager.getResource(loc)
                 }.onFailure {
-                    TickTask(1) {
+                    tickTimer(1) {
                         if (itemRarityShape == 4) {
                             itemRarityShape = old
                             EssentialAPI.getNotifications()

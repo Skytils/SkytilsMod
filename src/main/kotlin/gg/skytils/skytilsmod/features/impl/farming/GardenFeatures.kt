@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.farming
 import gg.essential.api.EssentialAPI
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
@@ -72,7 +72,7 @@ object GardenFeatures {
     }
 
     init {
-        TickTask(5, repeats = true) {
+        tickTimer(5, repeats = true) {
             if (mc.thePlayer != null) {
                 val inGarden = SBInfo.mode == SkyblockIsland.TheGarden.mode
 

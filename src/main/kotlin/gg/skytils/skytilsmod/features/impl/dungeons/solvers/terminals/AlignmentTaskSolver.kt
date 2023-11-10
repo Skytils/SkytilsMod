@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -61,12 +61,12 @@ object AlignmentTaskSolver {
     private val directionSet = HashMap<Point, Int>()
 
     init {
-        TickTask(20, repeats = true) {
+        tickTimer(20, repeats = true) {
             if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || mc.thePlayer == null || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L) || !Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
                     "F7", "M7"
                 ))
-            ) return@TickTask
+            ) return@tickTimer
             if (mc.thePlayer.getDistanceSqToCenter(topLeft) <= 25 * 25) {
                 if (grid.size < 25) {
                     val frames = mc.theWorld.getEntities(EntityItemFrame::class.java) {
