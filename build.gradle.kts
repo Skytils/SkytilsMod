@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import dev.architectury.pack200.java.Pack200Adapter
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
@@ -25,10 +24,9 @@ plugins {
     kotlin("jvm") version "1.8.22"
     kotlin("plugin.serialization") version "1.8.22"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("gg.essential.loom") version "0.10.0.+"
-    id("dev.architectury.architectury-pack200") version "0.1.3"
     id("io.github.juuxel.loom-quiltflower") version "1.10.0"
-    java
+    id("gg.essential.loom") version "1.3.12"
+    id("gg.essential.defaults") version "0.3.0"
     idea
     signing
 }
@@ -50,8 +48,9 @@ quiltflower {
 
 loom {
     silentMojangMappingsLicense()
-    launchConfigs {
+    runConfigs {
         getByName("client") {
+            isIdeConfigGenerated = true
             property("fml.coreMods.load", "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
             property("elementa.dev", "true")
             property("elementa.debug", "true")
@@ -63,22 +62,17 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
-            arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
-            arg("--mixin", "mixins.skytils.json")
-        }
-    }
-    runConfigs {
-        getByName("client") {
-            isIdeConfigGenerated = true
+            programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
+            programArgs("--mixin", "mixins.skytils.json")
+            programArgs("--mixin", "mixins.skytils-events.json")
         }
         remove(getByName("server"))
     }
     forge {
-        pack200Provider.set(Pack200Adapter())
-        mixinConfig("mixins.skytils.json")
+        mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
     }
     mixin {
-        defaultRefmapName.set("mixins.skytils.refmap.json")
+        defaultRefmapName = "mixins.skytils.refmap.json"
     }
 }
 
@@ -91,9 +85,6 @@ val shadowMeMod: Configuration by configurations.creating {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
-    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     shadowMe("gg.essential:loader-launchwrapper:1.2.1")
     implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
@@ -140,6 +131,8 @@ dependencies {
     shadowMe(ktorServer("host-common"))
     shadowMe(ktorServer("auth"))
 
+    shadowMe(project(":events"))
+
 
 
 
@@ -173,7 +166,7 @@ tasks {
                     "FMLCorePlugin" to "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,
-                    "MixinConfigs" to "mixins.skytils.json",
+                    "MixinConfigs" to "mixins.skytils.json,mixins.skytils-events.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
                     "TweakClass" to "gg.skytils.skytilsmod.tweaker.SkytilsTweaker",

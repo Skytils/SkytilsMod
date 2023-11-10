@@ -16,19 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://maven.architectury.dev/")
-        maven("https://maven.fabricmc.net")
-        maven("https://maven.minecraftforge.net/")
-        maven("https://repo.essential.gg/repository/maven-releases/")
-        maven("https://jitpack.io")
-    }
-}
+package gg.skytils.event
 
-rootProject.name = "SkytilsMod"
-include("events")
+open class Event {
+}

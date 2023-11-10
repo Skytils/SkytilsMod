@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 
 class SkytilsMixinPlugin : IMixinConfigPlugin {
     val mixinPackage = "gg.skytils.skytilsmod.mixins.transformers"
+    val eventsPackage = "gg.skytils.events.mixins"
     var deobfEnvironment = false
 
     override fun onLoad(mixinPackage: String) {
@@ -39,7 +40,7 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
     override fun getRefMapperConfig(): String? = null
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
-        if (!mixinClassName.startsWith(mixinPackage)) {
+        if (!mixinClassName.startsWith(mixinPackage) && !mixinClassName.startsWith(eventsPackage)) {
             println("Woah, how did mixin $mixinClassName for $targetClassName get here?")
             return false
         }
