@@ -23,6 +23,7 @@ import gg.skytils.event.impl.TickEvent
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 private object Tick : CoroutineScope {
     @OptIn(DelicateCoroutinesApi::class)
@@ -36,9 +37,9 @@ fun tickTimer(ticks: Int, repeats: Boolean = false, register: Boolean = true, ta
     }
 
 fun <T> tickTask(ticks: Int, repeats: Boolean = false, task: () -> T) =
-    flow<T> {
+    flow {
         do {
             Events.await<TickEvent>(ticks)
             emit(task())
         } while (repeats)
-    }
+    }.flowOn(Tick.dispatcher)
