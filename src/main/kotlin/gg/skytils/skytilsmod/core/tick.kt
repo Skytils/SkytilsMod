@@ -21,17 +21,24 @@ package gg.skytils.skytilsmod.core
 import gg.skytils.event.Events
 import gg.skytils.event.impl.TickEvent
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 
-object Tick : CoroutineScope {
+private object Tick : CoroutineScope {
     @OptIn(DelicateCoroutinesApi::class)
     val dispatcher = newFixedThreadPoolContext(5, "Skytils Tick")
     override val coroutineContext = dispatcher + SupervisorJob()
 }
 
-fun tickTimer(ticks: Int, task: () -> Unit) =
-    Tick.launch {
-        while (true) {
+fun tickTimer(ticks: Int, repeats: Boolean = false, register: Boolean = true, task: () -> Unit) =
+    Tick.launch(start = if (register) CoroutineStart.DEFAULT else CoroutineStart.LAZY) {
+        tickTask(ticks, repeats, task).collect()
+    }
+
+fun <T> tickTask(ticks: Int, repeats: Boolean = false, task: () -> T) =
+    flow<T> {
+        do {
             Events.await<TickEvent>(ticks)
-            task()
-        }
+            emit(task())
+        } while (repeats)
     }
