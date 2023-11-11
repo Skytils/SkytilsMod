@@ -31,3 +31,7 @@ dependencies {
 java.toolchain {
     languageVersion = JavaLanguageVersion.of(8)
 }
+
+loom.mixin {
+    defaultRefmapName = "mixins.skytils-events.refmap.json"
+}
