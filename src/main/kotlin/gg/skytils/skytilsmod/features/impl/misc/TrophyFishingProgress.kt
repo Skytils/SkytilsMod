@@ -59,7 +59,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TrophyFishingProgress {
 
-    private val element = TrophyFishingProgressDisplay()
     private const val TROPHY_FISH_MESSAGE_PREFIX: String = "TROPHY FISH! You caught a "
     private var trophyFishMissing = mutableListOf(
         "§c§lTrophy Fishes Missing:",
