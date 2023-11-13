@@ -59,7 +59,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TrophyFishingProgress {
 
-    private val trophyFishingProgressDisplay = TrophyFishingProgressDisplay()
+    private val trophyFishingProgressDisplay = TrophyFishingProgressDisplay() //do not delete this otherwise the HUD WONT SHOW
     private const val TROPHY_FISH_MESSAGE_PREFIX: String = "TROPHY FISH! You caught a "
     private var trophyFishMissing = mutableListOf(
         "§c§lTrophy Fishes Missing:",
