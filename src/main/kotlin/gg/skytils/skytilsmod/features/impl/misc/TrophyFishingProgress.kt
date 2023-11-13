@@ -56,6 +56,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 *   @author Erymanthus | RayDeeUx
 */
+
 object TrophyFishingProgress {
 
     private val element = TrophyFishingProgressDisplay()
@@ -97,7 +98,6 @@ object TrophyFishingProgress {
         "§6G",
         "§bD",
     )
-    private var allowRefresh = false //this is the only way i could think of to prevent the display from getting infinitely long
 
     private fun String.removeJunk(theAbbreviation: String) =
         replace(theAbbreviation, "") //initial removal of the tier that was discovered
@@ -167,7 +167,6 @@ object TrophyFishingProgress {
         if (!chestName.endsWith("Trophy Fishing")) return
         if (!Skytils.config.trophyFishingProgress) return
 
-        allowRefresh = true
         var listBuilding = mutableListOf("§c§lTrophy Fish Missing:")
 
         val slots = container.inventorySlots.filter {
