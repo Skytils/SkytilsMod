@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -186,11 +185,9 @@ object TrophyFishingProgress {
             if ((stack.displayName.startsWith("§c§k"))) {
                 val trophyFishName = clone.first()
                 listBuilding.add("$trophyFishName§r: §bD§r / §6G§r / §7S§r / §8B§r")
-                Skytils.mc.thePlayer.addChatMessage(ChatComponentText("trophyFishName: $trophyFishName"))
                 clone.remove(trophyFishName)
             } else if ((stack.displayName.startsWith("§"))) {
                 clone.remove(stack.displayName)
-                Skytils.mc.thePlayer.addChatMessage(ChatComponentText("stack.displayName: ${stack.displayName}"))
                 var stringBuilding = "${stack.displayName}§r: "
                 val missingTiers = getItemLore(stack).filter {
                     it.contains("§c✖")
@@ -221,7 +218,6 @@ object TrophyFishingProgress {
 
         //why it requires .contains i have no clue
         if (!formatted.contains("§6§lTROPHY FISH! §r§bYou caught a")) return
-        Skytils.mc.thePlayer.addChatMessage(ChatComponentText(unformatted))
         if (!possibleTrophyTiers.any { unformatted.contains(it) }) return
         val trophyAndTier = unformatted.replace("caught an", "caught a").removePrefix(TROPHY_FISH_MESSAGE_PREFIX).removeSuffix(".")
         val trophyTier = trophyAndTier.split(" ").last()
@@ -241,14 +237,12 @@ object TrophyFishingProgress {
 
         for (entry in clone) {
             if (entry.contains(trophyFish) && entry.contains(theAbbreviation)) {
-                //Skytils.mc.thePlayer.addChatMessage(ChatComponentText(entry))
                 //§fGusher§r: §bD§r / §6G§r
                 val newEntry = entry
                     .replace("§6Golden Fish", "§6golden fish")
                     .removeJunk(theAbbreviation)
                     .replace("§6golden fish", "§6Golden Fish")
                 //this edge case can commit bathtub toaster
-                Skytils.mc.thePlayer.addChatMessage(ChatComponentText(newEntry))
                 if (possibleAbbreviations.any{ newEntry.contains(it) } && newEntry.split("§r:").last().isNotEmpty()) {
                     listBuildingAgain.add(newEntry)
                 }
