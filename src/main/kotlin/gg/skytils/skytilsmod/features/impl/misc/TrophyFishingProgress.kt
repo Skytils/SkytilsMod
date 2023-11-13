@@ -102,10 +102,10 @@ object TrophyFishingProgress {
 
     private fun String.removeJunk(theAbbreviation: String) =
         replace(theAbbreviation, "") //initial removal of the tier that was discovered
-        .replace("| §r |", "|") //remove space (for discoveries of gold and silver trophies)
-        .replace("§r: §r | §", "§r: §") //remove space (for discoveries of diamond trophies)
-        .removeSuffix("§r | ") //remove space (for discoveries of bronze trophies)
-        .removeSuffix("§r | §r") //remove space (funky edge cases, i guess)
+        .replace("| §r /", "|") //remove space (for discoveries of gold and silver trophies)
+        .replace("§r: §r / §", "§r: §") //remove space (for discoveries of diamond trophies)
+        .removeSuffix("§r / ") //remove space (for discoveries of bronze trophies)
+        .removeSuffix("§r / §r") //remove space (funky edge cases, i guess)
         .trim() //remove space (at the end)
 
     class TrophyFishingProgressDisplay : GuiElement("Trophy Fishing Progress Display", x = 150, y = 20) {
@@ -121,7 +121,7 @@ object TrophyFishingProgress {
             if (toggled && Utils.inSkyblock && player != null && SBInfo.mode == SkyblockIsland.CrimsonIsle.mode) {
                 var i = 0
                 for (trophyFish in trophyFishMissing) {
-                    if (!Skytils.config.noProgressTrophies && (trophyFish.endsWith("§r: §bD§r | §6G§r | §7S§r | §8B"))) {
+                    if (!Skytils.config.noProgressTrophies && (trophyFish.endsWith("§r: §bD§r / §6G§r / §7S§r / §8B§r"))) {
                         continue
                     }
                     fr.drawString(
@@ -136,10 +136,10 @@ object TrophyFishingProgress {
         override fun demoRender() {
             listOf(
                 "§c§lTrophy Fish Missing:",
-                "§fSteaming-Hot Flounder§r: §bD§r | §6G§r | §7S§r | §8B",
-                "§9Vanille§r: §bD§r | §6G§r | §8B",
-                "§6Golden Fish§r: §bD§r | §7S§r | §8B",
-                "§5Karate Fish§r: §6G§r | §8B",
+                "§fSteaming-Hot Flounder§r: §bD§r / §6G§r / §7S§r / §8B",
+                "§9Vanille§r: §bD§r / §6G§r / §8B",
+                "§6Golden Fish§r: §bD§r / §7S§r / §8B",
+                "§5Karate Fish§r: §6G§r / §8B",
             ).forEachIndexed { i, str ->
                 fr.drawString(
                     str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
@@ -151,7 +151,7 @@ object TrophyFishingProgress {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§fSteaming-Hot Flounder§r: §bD§r | §6G§r | §7S§r | §8B")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§fSteaming-Hot Flounder§r: §bD§r / §6G§r / §7S§r / §8B")
 
         override val toggled: Boolean
             get() = Skytils.config.trophyFishingProgress
@@ -185,7 +185,7 @@ object TrophyFishingProgress {
             if (stack.displayName.isEmpty()) continue
             if ((stack.displayName.startsWith("§c§k"))) {
                 val trophyFishName = clone.first()
-                listBuilding.add("$trophyFishName§r: §bD§r | §6G§r | §7S§r | §8B")
+                listBuilding.add("$trophyFishName§r: §bD§r / §6G§r / §7S§r / §8B§r")
                 Skytils.mc.thePlayer.addChatMessage(ChatComponentText("trophyFishName: $trophyFishName"))
                 clone.remove(trophyFishName)
             } else if ((stack.displayName.startsWith("§"))) {
@@ -196,9 +196,9 @@ object TrophyFishingProgress {
                     it.contains("§c✖")
                 }
                 missingTiers.forEach {
-                    stringBuilding = "$stringBuilding${it.take(3)}§r | "
+                    stringBuilding = "$stringBuilding${it.take(3)}§r / "
                 }
-                listBuilding.add(stringBuilding.removeSuffix("§r | "))
+                listBuilding.add(stringBuilding.removeSuffix("§r / "))
             }
         }
         trophyFishMissing = listBuilding
@@ -242,11 +242,14 @@ object TrophyFishingProgress {
         for (entry in clone) {
             if (entry.contains(trophyFish) && entry.contains(theAbbreviation)) {
                 //Skytils.mc.thePlayer.addChatMessage(ChatComponentText(entry))
-                //§fGusher§r: §bD§r | §6G§r
-                val newEntry = entry.removeJunk(theAbbreviation)
-                    .replace("olden Fish", "§6Golden Fish") //this edge case can commit bathtub toaster
+                //§fGusher§r: §bD§r / §6G§r
+                val newEntry = entry
+                    .replace("§6Golden Fish", "§6golden fish")
+                    .removeJunk(theAbbreviation)
+                    .replace("§6golden fish", "§6Golden Fish")
+                //this edge case can commit bathtub toaster
                 Skytils.mc.thePlayer.addChatMessage(ChatComponentText(newEntry))
-                if (possibleAbbreviations.any{ newEntry.contains(it) }) {
+                if (possibleAbbreviations.any{ newEntry.contains(it) } && newEntry.split("§r:").last().isNotEmpty()) {
                     listBuildingAgain.add(newEntry)
                 }
             }
