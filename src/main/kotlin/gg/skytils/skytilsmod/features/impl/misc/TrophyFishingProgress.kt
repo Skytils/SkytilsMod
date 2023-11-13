@@ -62,7 +62,7 @@ object TrophyFishingProgress {
     private val element = TrophyFishingProgressDisplay()
     private const val TROPHY_FISH_MESSAGE_PREFIX: String = "TROPHY FISH! You caught a "
     private var trophyFishMissing = mutableListOf(
-        "§c§lTrophy Fish Missing:",
+        "§c§lTrophy Fishes Missing:",
         "§c§lVisit Odger!",
     )
     //TODO: maybe move the below list to the skytils mod data repo
@@ -134,7 +134,7 @@ object TrophyFishingProgress {
 
         override fun demoRender() {
             listOf(
-                "§c§lTrophy Fish Missing:",
+                "§c§lTrophy Fishes Missing:",
                 "§fSteaming-Hot Flounder§r: §bD§r / §6G§r / §7S§r / §8B",
                 "§9Vanille§r: §bD§r / §6G§r / §8B",
                 "§6Golden Fish§r: §bD§r / §7S§r / §8B",
@@ -167,7 +167,7 @@ object TrophyFishingProgress {
         if (!chestName.endsWith("Trophy Fishing")) return
         if (!Skytils.config.trophyFishingProgress) return
 
-        var listBuilding = mutableListOf("§c§lTrophy Fish Missing:")
+        var listBuilding = mutableListOf("§c§lTrophy Fishes Missing:")
 
         val slots = container.inventorySlots.filter {
             it.hasStack && it.inventory != Skytils.mc.thePlayer.inventory
