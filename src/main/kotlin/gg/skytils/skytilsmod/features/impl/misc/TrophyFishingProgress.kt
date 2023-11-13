@@ -102,7 +102,7 @@ object TrophyFishingProgress {
 
     private fun String.removeJunk(theAbbreviation: String) =
         replace(theAbbreviation, "") //initial removal of the tier that was discovered
-        .replace("| §r /", "|") //remove space (for discoveries of gold and silver trophies)
+        .replace("/ §r /", "/") //remove space (for discoveries of gold and silver trophies)
         .replace("§r: §r / §", "§r: §") //remove space (for discoveries of diamond trophies)
         .removeSuffix("§r / ") //remove space (for discoveries of bronze trophies)
         .removeSuffix("§r / §r") //remove space (funky edge cases, i guess)
