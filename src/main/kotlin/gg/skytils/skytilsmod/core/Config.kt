@@ -1667,7 +1667,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Include Undiscovered Trophies",
-        description = "Includes your undiscovered Trophy Fishes. Requires re-calling or re-visiting Odger if disabling.",
+        description = "Includes your undiscovered Trophy Fishes.",
         category = "Miscellaneous", subcategory = "Other"
     )
     var noProgressTrophies = false
