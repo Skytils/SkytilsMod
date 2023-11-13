@@ -244,6 +244,7 @@ object TrophyFishingProgress {
                 //Skytils.mc.thePlayer.addChatMessage(ChatComponentText(entry))
                 //§fGusher§r: §bD§r | §6G§r
                 val newEntry = entry.removeJunk(theAbbreviation)
+                    .replace("olden Fish", "§6Golden Fish") //this edge case can commit bathtub toaster
                 Skytils.mc.thePlayer.addChatMessage(ChatComponentText(newEntry))
                 if (possibleAbbreviations.any{ newEntry.contains(it) }) {
                     listBuildingAgain.add(newEntry)
