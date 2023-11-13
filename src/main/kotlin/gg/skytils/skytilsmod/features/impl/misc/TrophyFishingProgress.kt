@@ -59,13 +59,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TrophyFishingProgress {
 
+    private val trophyFishingProgressDisplay = TrophyFishingProgressDisplay()
     private const val TROPHY_FISH_MESSAGE_PREFIX: String = "TROPHY FISH! You caught a "
     private var trophyFishMissing = mutableListOf(
         "§c§lTrophy Fishes Missing:",
         "§c§lVisit Odger!",
     )
     //TODO: maybe move the below list to the skytils mod data repo
-    private var noProgressTrophyFishes = listOf(
+    private val noProgressTrophyFishes = listOf(
         "§fSulphur Skitter",
         "§fObfuscated 1",
         "§fSteaming-Hot Flounder",
