@@ -332,6 +332,7 @@ class Skytils {
             TicTacToeSolver,
             TreasureHunter,
             TriviaSolver,
+            TrophyFishingProgress,
             VisitorHelper,
             WaterBoardSolver,
             Waypoints,
