@@ -32,8 +32,10 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
@@ -64,7 +66,7 @@ object TrophyFishingProgress {
         "§c§lVisit Odger!",
     )
     //TODO: maybe move the below list to the skytils mod data repo
-    private var noProgressTrophyFishes = mutableListOf(
+    private var noProgressTrophyFishes = listOf(
         "§fSulphur Skitter",
         "§fObfuscated 1",
         "§fSteaming-Hot Flounder",
@@ -84,6 +86,18 @@ object TrophyFishingProgress {
         "§5Karate Fish",
         "§6Golden Fish",
     )
+    private val possibleTrophyTiers = listOf(
+        "BRONZE",
+        "SILVER",
+        "GOLD",
+        "DIAMOND",
+    )
+    private val possibleAbbreviations = listOf(
+        "§8B",
+        "§7S",
+        "§6G",
+        "§bD",
+    )
     private var allowRefresh = false //this is the only way i could think of to prevent the display from getting infinitely long
 
     private fun String.removeJunk(theAbbreviation: String) =
@@ -91,10 +105,12 @@ object TrophyFishingProgress {
         .replace("| §r |", "|") //remove space (for discoveries of gold and silver trophies)
         .replace("§r: §r | §", "§r: §") //remove space (for discoveries of diamond trophies)
         .removeSuffix("§r | ") //remove space (for discoveries of bronze trophies)
+        .removeSuffix("§r | §r") //remove space (funky edge cases, i guess)
         .trim() //remove space (at the end)
+
     class TrophyFishingProgressDisplay : GuiElement("Trophy Fishing Progress Display", x = 150, y = 20) {
         internal val rightAlign: Boolean
-            get() = scaleX < UResolution.scaledWidth / 2f
+            get() = scaleX > UResolution.scaledWidth / 2f
         internal val textPosX: Float
             get() = if (rightAlign) scaleWidth else 0f
         internal val alignment: SmartFontRenderer.TextAlignment
@@ -103,16 +119,16 @@ object TrophyFishingProgress {
         override fun render() {
             val player = Skytils.mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && SBInfo.mode == SkyblockIsland.CrimsonIsle.mode) {
-                if (!trophyFishMissing.any { it == "§c§lVisit Odger!" } && Skytils.config.noProgressTrophies && allowRefresh) {
-                    trophyFishMissing.add("§c§lUndiscovered Trophies:") //header
-                    trophyFishMissing.addAll(noProgressTrophyFishes)
-                    allowRefresh = false
-                }
-                trophyFishMissing.forEachIndexed { i, str ->
+                var i = 0
+                for (trophyFish in trophyFishMissing) {
+                    if (!Skytils.config.noProgressTrophies && (trophyFish.endsWith("§r: §bD§r | §6G§r | §7S§r | §8B"))) {
+                        continue
+                    }
                     fr.drawString(
-                        str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
+                        trophyFish, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
                         CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
                     )
+                    i++
                 }
             }
         }
@@ -161,11 +177,20 @@ object TrophyFishingProgress {
             && (!it.stack.displayName.endsWith("Fillet Trophy Fish"))
         }
 
+        val clone = noProgressTrophyFishes.toMutableList()
+
         for (s in slots) {
             val stack = s.stack
-            
-            if (stack.displayName.isNotEmpty() && !(stack.displayName.startsWith("§c§k"))) {
-                noProgressTrophyFishes.remove(stack.displayName)
+            if (clone.isEmpty()) break
+            if (stack.displayName.isEmpty()) continue
+            if ((stack.displayName.startsWith("§c§k"))) {
+                val trophyFishName = clone.first()
+                listBuilding.add("$trophyFishName§r: §bD§r | §6G§r | §7S§r | §8B")
+                Skytils.mc.thePlayer.addChatMessage(ChatComponentText("trophyFishName: $trophyFishName"))
+                clone.remove(trophyFishName)
+            } else if ((stack.displayName.startsWith("§"))) {
+                clone.remove(stack.displayName)
+                Skytils.mc.thePlayer.addChatMessage(ChatComponentText("stack.displayName: ${stack.displayName}"))
                 var stringBuilding = "${stack.displayName}§r: "
                 val missingTiers = getItemLore(stack).filter {
                     it.contains("§c✖")
@@ -179,47 +204,56 @@ object TrophyFishingProgress {
         trophyFishMissing = listBuilding
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST) //not sure why i needed to specify eventpriority to get this part of the feature working but here we are
     fun onChat(event: ClientChatReceivedEvent) {
         if (trophyFishMissing.any { it == "§c§lVisit Odger!" }) return
         if (!(Utils.inSkyblock && SBInfo.mode == SkyblockIsland.CrimsonIsle.mode)) return
         if (event.type.toInt() == 2) return
 
-        //§6§lTROPHY FISH! §r§bYou caught a §r§9Vanille§r§r§r §r§l§r§8§lBRONZE§r§b.§r
+        val formatted = event.message.formattedText
+        val unformatted = event.message.unformattedText.stripControlCodes()
+
+        //§6§lTROPHY FISH! §r§bYou caught a §r§9Vanille§r§r§r §r§l§r§8§lBRONZE§r§b.
         //TROPHY FISH! You caught a Vanille BRONZE.
         //Vanille BRONZE
+        //§6§lTROPHY FISH! §r§bYou caught a §r§aSlugfish§r§r§r §r§l§r§8§lBRONZE§r§b.
+        //§6§lTROPHY FISH! §r§bYou caught a §r§fBlobfish§r§r§r §r§l§r§8§lBRONZE§r§b.
 
-        val cleanString = event.message.unformattedText.stripControlCodes()
-        if (!cleanString.startsWith(TROPHY_FISH_MESSAGE_PREFIX)) return
-        val trophyAndTier = cleanString.removePrefix(TROPHY_FISH_MESSAGE_PREFIX).replace(".", "")
-        val trophyTier = trophyAndTier.split(" ").last().take(1)
-        val trophyFish = trophyTier.removeSuffix(" $trophyTier") //because some trophy fish tier names contain space chars
+        //why it requires .contains i have no clue
+        if (!formatted.contains("§6§lTROPHY FISH! §r§bYou caught a")) return
+        Skytils.mc.thePlayer.addChatMessage(ChatComponentText(unformatted))
+        if (!possibleTrophyTiers.any { unformatted.contains(it) }) return
+        val trophyAndTier = unformatted.replace("caught an", "caught a").removePrefix(TROPHY_FISH_MESSAGE_PREFIX).removeSuffix(".")
+        val trophyTier = trophyAndTier.split(" ").last()
+        val trophyFish = trophyAndTier.removeSuffix(" $trophyTier") //because some trophy fish tier names contain space chars
 
-        allowRefresh = true
-
-        val theAbbreviation = when (trophyTier) {
+        val theAbbreviation = when (trophyTier.take(1)) {
             //"§bDiamond §c✖", "§6Gold §c✖", "§7Silver §a✔", "§8Bronze §c✖"
             "B" -> "§8B"
             "S" -> "§7S"
             "G" -> "§6G"
             "D" -> "§bD"
-            else -> "§5${trophyTier}"
+            else -> "§5${trophyTier.take(1)}"
         }
 
-        if (noProgressTrophyFishes.any { it.contains (trophyFish) }) {
-            val placeHolder = noProgressTrophyFishes.find { it.contains(trophyFish) } ?: return
-            noProgressTrophyFishes.removeAt(noProgressTrophyFishes.indexOfFirst { it.contains(trophyFish) })
-            trophyFishMissing.add(("$placeHolder§r: §bD§r | §6G§r | §7S§r | §8B").removeJunk(theAbbreviation))
-        } else {
-            val originalStringFromHUD = noProgressTrophyFishes.find { it.contains(trophyFish) } ?: return
-            val indexToReplace = trophyFishMissing.indexOfFirst { it.contains(trophyFish) }
-            if (originalStringFromHUD.contains(theAbbreviation)) return
-            val theResult = originalStringFromHUD.removeJunk(theAbbreviation)
-            if (theResult.endsWith("§r:")) {
-                trophyFishMissing.removeAt(indexToReplace)
-            } else {
-                trophyFishMissing[indexToReplace] = theResult
+        val clone = trophyFishMissing
+        val listBuildingAgain = mutableListOf<String>()
+
+        for (entry in clone) {
+            if (entry.contains(trophyFish) && entry.contains(theAbbreviation)) {
+                //Skytils.mc.thePlayer.addChatMessage(ChatComponentText(entry))
+                //§fGusher§r: §bD§r | §6G§r
+                val newEntry = entry.removeJunk(theAbbreviation)
+                Skytils.mc.thePlayer.addChatMessage(ChatComponentText(newEntry))
+                if (possibleAbbreviations.any{ newEntry.contains(it) }) {
+                    listBuildingAgain.add(newEntry)
+                }
+            }
+            else {
+                listBuildingAgain.add(entry)
             }
         }
+
+        trophyFishMissing = listBuildingAgain
     }
 }
