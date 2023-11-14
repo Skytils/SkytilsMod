@@ -40,7 +40,6 @@ import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
 import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.handlers.*
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
-import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
 import gg.skytils.skytilsmod.features.impl.misc.*
 import gg.skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
 import gg.skytils.skytilsmod.features.impl.protectitems.ProtectItems
@@ -323,7 +322,6 @@ class Skytils {
             SpamHider,
             SpiritLeap,
             StartsWithSequenceSolver,
-            StupidTreasureChestOpeningThing,
             TankDisplayStuff,
             TechnoMayor,
             TeleportMazeSolver,
