@@ -39,7 +39,6 @@ import gg.skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import gg.skytils.skytilsmod.utils.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
@@ -52,12 +51,12 @@ object DataFetcher {
     private fun loadData(): Job {
         return Skytils.IO.launch {
             try {
-                client.get("${dataUrl}constants/domain.txt").bodyAsText().apply {
+                get<String>("${dataUrl}constants/domain.txt") {
                     if (isNotBlank()) {
                         domain = trim()
                     }
                 }
-                client.get("${dataUrl}constants/enchants.json").body<JsonObject>().apply {
+                get<JsonObject>("${dataUrl}constants/enchants.json") {
                     Utils.checkThreadAndQueue {
                         EnchantUtil.enchants.clear()
                         EnchantUtil.enchants.addAll(
@@ -71,19 +70,19 @@ object DataFetcher {
                         )
                     }
                 }
-                client.get("${dataUrl}solvers/fetchur.json").body<Map<String, String>>().apply {
+                get<Map<String, String>>("${dataUrl}solvers/fetchur.json") {
                     Utils.checkThreadAndQueue {
                         MiningFeatures.fetchurItems.clear()
                         MiningFeatures.fetchurItems.putAll(this)
                     }
                 }
-                client.get("${dataUrl}solvers/hungryhiker.json").body<Map<String, String>>().apply {
+                get<Map<String, String>>("${dataUrl}solvers/hungryhiker.json") {
                     Utils.checkThreadAndQueue {
                         FarmingFeatures.hungerHikerItems.clear()
                         FarmingFeatures.hungerHikerItems.putAll(this)
                     }
                 }
-                client.get("${dataUrl}constants/levelingxp.json").body<LevelingXPData>().apply {
+                get<LevelingXPData>("${dataUrl}constants/levelingxp.json") {
                     Utils.checkThreadAndQueue {
                         SkillUtils.maxSkillLevels.clear()
                         SkillUtils.maxSkillLevels.putAll(defaultCaps)
@@ -99,19 +98,19 @@ object DataFetcher {
                         SkillUtils.runeXp.putAll(hotmXp)
                     }
                 }
-                client.get("${dataUrl}constants/mayors.json").body<List<Mayor>>().apply {
+                get<List<Mayor>>("${dataUrl}constants/mayors.json") {
                     Utils.checkThreadAndQueue {
                         MayorInfo.mayorData.clear()
                         MayorInfo.mayorData.addAll(this)
                     }
                 }
-                client.get("${dataUrl}solvers/threeweirdos.json").body<List<String>>().apply {
+                get<List<String>>("${dataUrl}solvers/threeweirdos.json") {
                     Utils.checkThreadAndQueue {
                         ThreeWeirdosSolver.solutions.clear()
                         ThreeWeirdosSolver.solutions.addAll(this)
                     }
                 }
-                client.get("${dataUrl}solvers/treasurehunter.json").body<Map<String, String>>().apply {
+                get<Map<String, String>>("${dataUrl}solvers/treasurehunter.json") {
                     Utils.checkThreadAndQueue {
                         TreasureHunter.treasureHunterLocations.clear()
                         entries.associateTo(TreasureHunter.treasureHunterLocations) { (key, value) ->
@@ -120,13 +119,13 @@ object DataFetcher {
                         }
                     }
                 }
-                client.get("${dataUrl}solvers/oruotrivia.json").body<Map<String, List<String>>>().apply {
+                get<Map<String, List<String>>>("${dataUrl}solvers/oruotrivia.json") {
                     Utils.checkThreadAndQueue {
                         TriviaSolver.triviaSolutions.clear()
                         TriviaSolver.triviaSolutions.putAll(this)
                     }
                 }
-                client.get("${dataUrl}constants/relics.json").body<List<JsonElement>>().apply {
+                get<List<JsonElement>>("${dataUrl}constants/relics.json") {
                     Utils.checkThreadAndQueue {
                         RelicWaypoints.relicLocations.clear()
                         mapTo(RelicWaypoints.relicLocations) {
@@ -135,7 +134,7 @@ object DataFetcher {
                     }
                 }
                 // no key required
-                client.get("https://api.hypixel.net/resources/skyblock/items").body<JsonObject>().apply {
+                get<JsonObject>("https://api.hypixel.net/resources/skyblock/items") {
                     if (get("success")?.jsonPrimitive?.booleanOrNull == true) {
                         val items: List<ItemFeatures.APISBItem> = json.decodeFromJsonElement(
                             get("items")!!
@@ -151,19 +150,19 @@ object DataFetcher {
                         }
                     }
                 }
-                client.get("${dataUrl}constants/slayerhealth.json").body<Map<String, HashMap<String, Int>>>().apply {
+                get<Map<String, HashMap<String, Int>>>("${dataUrl}constants/slayerhealth.json") {
                     Utils.checkThreadAndQueue {
                         SlayerFeatures.BossHealths.clear()
                         SlayerFeatures.BossHealths.putAll(this)
                     }
                 }
-                client.get("${dataUrl}SpamFilters.json").body<List<SpamHider.Filter>>().apply {
+                get<List<SpamHider.Filter>>("${dataUrl}SpamFilters.json") {
                     Utils.checkThreadAndQueue {
                         SpamHider.repoFilters.clear()
                         SpamHider.repoFilters.addAll(this)
                     }
                 }
-                client.get("${dataUrl}constants/summons.json").body<Map<String, String>>().apply {
+                get<Map<String, String>>("${dataUrl}constants/summons.json") {
                     Utils.checkThreadAndQueue {
                         SummonSkins.skinMap.clear()
                         SummonSkins.skinMap.putAll(this)
@@ -176,6 +175,11 @@ object DataFetcher {
             }
         }
     }
+
+    private suspend inline fun <reified T> get(url: String, crossinline block: T.() -> Unit) =
+        Skytils.IO.launch {
+            client.get(url).body<T>().apply(block)
+        }
 
     @JvmStatic
     fun reloadData() =
