@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gg.skytils.skytilsmod.features.impl.misc
+package gg.skytils.skytilsmod.features.impl.slayer
 
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
@@ -34,6 +34,12 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.handlers.PotionEffectTimers
+import gg.skytils.skytilsmod.features.impl.slayer.base.Slayer
+import gg.skytils.skytilsmod.features.impl.slayer.base.ThrowingSlayer
+import gg.skytils.skytilsmod.features.impl.slayer.impl.BloodfiendSlayer
+import gg.skytils.skytilsmod.features.impl.slayer.impl.DemonlordSlayer
+import gg.skytils.skytilsmod.features.impl.slayer.impl.RevenantSlayer
+import gg.skytils.skytilsmod.features.impl.slayer.impl.SeraphSlayer
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.NumberUtil.toRoman
@@ -52,7 +58,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
@@ -61,9 +66,6 @@ import net.minecraft.entity.monster.*
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
-import net.minecraft.item.EnumDyeColor
-import net.minecraft.item.Item
-import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
@@ -85,7 +87,6 @@ import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.concurrent.Executors
-import kotlin.math.abs
 import kotlin.math.floor
 
 
@@ -107,9 +108,9 @@ object SlayerFeatures : CoroutineScope {
     // there might be a point replacing this with §c\d+:\d+(?:§r)?$ and only partially check for matches
     // but that requires a more extensive testing of all skyblock timers,
     // something I am not quite particularly fond of doing
-    private val timerRegex =
+    internal val timerRegex =
         Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d |§4§lIMMUNE )?§c\\d+:\\d+(?:§r)?")
-    private val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
+    internal val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
         set(value) {
             field?.unset()
@@ -146,7 +147,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    private fun getTier(name: String): String {
+    internal fun getTier(name: String): String {
         return sidebarLines.find { it.startsWith(name) }?.substringAfter(name)?.drop(1)
             ?: (if (Skytils.config.slayerCarryMode > 0) Skytils.config.slayerCarryMode.toRoman() else "")
     }
@@ -935,483 +936,4 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    /**
-     * Represents a slayer entity
-     *
-     * [nameEntity] and [timerEntity] must be mutable as the entity changes for Inferno Demonlord
-     */
-    open class Slayer<T : EntityLivingBase>(
-        val entity: T,
-        private val name: String,
-        private vararg val nameStart: String,
-    ) {
-        var nameEntity: EntityArmorStand? = null
-        var timerEntity: EntityArmorStand? = null
-        val entityClass
-            get() = entity.javaClass
-        private val currentTier = getTier(name)
-        private val expectedHealth =
-            (if ("DOUBLE MOBS HP!!!" in MayorInfo.mayorPerks) 2 else 1) * (BossHealths[name.substringBefore(
-                " "
-            )]?.get(currentTier) ?: 0)
-
-        init {
-            launch {
-                val (n, t) = detectSlayerEntities().first()
-                nameEntity = n
-                timerEntity = t
-            }
-        }
-
-        fun detectSlayerEntities() =
-            tickTask(5) {
-                val nearbyArmorStands = entity.entityWorld.getEntitiesInAABBexcluding(
-                    entity, entity.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                ) { nearbyEntity: Entity? ->
-                    if (nearbyEntity is EntityArmorStand) {
-                        if (nearbyEntity.isInvisible && nearbyEntity.hasCustomName()) {
-                            if (nearbyEntity.inventory.any { it != null }) {
-                                // armor stand has equipment, abort!
-                                return@getEntitiesInAABBexcluding false
-                            }
-                            // armor stand has a custom name, is invisible and has no equipment -> probably a "name tag"-armor stand
-                            return@getEntitiesInAABBexcluding true
-                        }
-                    }
-                    false
-                }
-                val potentialTimerEntities = arrayListOf<EntityArmorStand>()
-                val potentialNameEntities = arrayListOf<EntityArmorStand>()
-                for (nearby in nearbyArmorStands) {
-                    when {
-                        nearby.displayName.formattedText.startsWith("§8[§7Lv") -> continue
-                        nameStart.any { nearby.displayName.formattedText.startsWith(it) } -> {
-                            printDevMessage(
-                                "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}",
-                                "slayer"
-                            )
-                            if (expectedHealth == entity.baseMaxHealth.toInt()) {
-                                printDevMessage("hp matched", "slayer")
-                                potentialNameEntities.add(nearby as EntityArmorStand)
-                            }
-                        }
-
-                        nearby.displayName.formattedText.matches(timerRegex) -> {
-                            printDevMessage("timer regex matched", "slayer")
-                            potentialTimerEntities.add(nearby as EntityArmorStand)
-                        }
-                    }
-                }
-                (this@Slayer as? DemonlordSlayer)?.let {
-                    if (potentialTimerEntities.removeIf { it == quaziiTimer || it == typhoeusTimer }) {
-                        printDevMessage("Ignored demon timers", "slayer")
-                    }
-                }
-                if (potentialNameEntities.size == 1 && potentialTimerEntities.size == 1) {
-                    return@tickTask potentialNameEntities.first() to potentialTimerEntities.first()
-                } else {
-                    printDevMessage(
-                        "not the right entity! (${potentialNameEntities.size}, ${potentialTimerEntities.size})",
-                        "slayer"
-                    )
-                    slayer = null
-                    throw IllegalStateException("Wrong entity!")
-                }
-            }
-        open fun tick(event: ClientTickEvent) {}
-
-        open fun set() {}
-        open fun unset() {}
-    }
-
-    class RevenantSlayer(entity: EntityZombie) :
-        Slayer<EntityZombie>(entity, "Revenant Horror", "§c☠ §bRevenant Horror", "§c☠ §fAtoned Horror") {
-
-        override fun set() {
-            rev5PingTask.start()
-        }
-
-        override fun unset() {
-            rev5PingTask.cancel()
-            rev5PingTask = createrev5PingTask()
-        }
-
-        companion object {
-            private fun createrev5PingTask() =
-                tickTimer(4, repeats = true, register = false) {
-                    if (Utils.inSkyblock && Skytils.config.rev5TNTPing && mc.thePlayer != null) {
-                        if (hasSlayerText) {
-                            var under: BlockPos? = null
-                            if (mc.thePlayer.onGround) {
-                                under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                            } else {
-                                for (i in (mc.thePlayer.posY - 0.5f).toInt() downTo 0 step 1) {
-                                    val test = BlockPos(mc.thePlayer.posX, i.toDouble(), mc.thePlayer.posZ)
-                                    if (mc.theWorld.getBlockState(test).block !== Blocks.air) {
-                                        under = test
-                                        break
-                                    }
-                                }
-                            }
-                            if (under != null) {
-                                val blockUnder = mc.theWorld.getBlockState(under)
-                                val isDanger = when {
-                                    blockUnder.block === Blocks.stone_slab && blockUnder.getValue(BlockHalfStoneSlab.VARIANT) == BlockStoneSlab.EnumType.QUARTZ -> true
-                                    blockUnder.block === Blocks.quartz_stairs || blockUnder.block === Blocks.acacia_stairs -> true
-                                    blockUnder.block === Blocks.wooden_slab && blockUnder.getValue(BlockHalfWoodSlab.VARIANT) == BlockPlanks.EnumType.ACACIA -> true
-                                    blockUnder.block === Blocks.stained_hardened_clay -> {
-                                        val color = Blocks.stained_hardened_clay.getMetaFromState(blockUnder)
-                                        color == 0 || color == 8 || color == 14
-                                    }
-
-                                    blockUnder.block === Blocks.bedrock -> true
-                                    else -> false
-                                }
-                                if (isDanger) {
-                                    SoundQueue.addToQueue("random.orb", 1f)
-                                }
-                            }
-                        }
-                    }
-                }
-            private var rev5PingTask = createrev5PingTask()
-        }
-    }
-
-    /**
-     * Represents a slayer which can throw a thing
-     *
-     * Subtype of [Slayer]
-     */
-    abstract class ThrowingSlayer<T : EntityLiving>(entity: T, name: String, nameStart: String) : Slayer<T>(
-        entity, name, nameStart,
-    ) {
-        var thrownLocation: BlockPos? = null
-        var thrownEntity: EntityArmorStand? = null
-
-        open fun entityJoinWorld(event: EntityJoinWorldEvent) {}
-
-        abstract fun blockChange(event: BlockChangeEvent)
-    }
-
-    class SeraphSlayer(entity: EntityEnderman) :
-        ThrowingSlayer<EntityEnderman>(entity, "Voidgloom Seraph", "§c☠ §bVoidgloom Seraph") {
-        val nukekebiSkulls = mutableListOf<EntityArmorStand>()
-        var yangGlyphAdrenalineStressCount = -1L
-        var lastYangGlyphSwitch = -1L
-        var lastYangGlyphSwitchTicks = -1
-        var thrownBoundingBox: AxisAlignedBB? = null
-        val hitPhase: Boolean
-            get() = nameEntity?.customNameTag?.dropLastWhile { it == 's' }?.endsWith(" Hit") ?: false
-
-        override fun tick(event: ClientTickEvent) {
-            if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
-            if (lastYangGlyphSwitchTicks > 120) lastYangGlyphSwitchTicks = -1
-            if (Skytils.config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && thrownEntity == null && thrownLocation == null) {
-                mc.theWorld.getEntitiesWithinAABB(
-                    EntityArmorStand::class.java,
-                    entity.entityBoundingBox.expand(20.69, 20.69, 20.69)
-                ) { e ->
-                    e as EntityArmorStand
-                    e.ticksExisted <= 300 && lastYangGlyphSwitchTicks + 5 > e.ticksExisted &&
-                            e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)
-                }.minByOrNull {
-                    (abs(lastYangGlyphSwitchTicks - it.ticksExisted) * 10) + slayerEntity!!.getDistanceSqToEntity(
-                        it
-                    )
-                }?.let { suspect ->
-                    printDevMessage(
-                        "Found suspect glyph, $lastYangGlyphSwitchTicks switched, ${suspect.ticksExisted} existed, ${
-                            entity.getDistanceSqToEntity(
-                                suspect
-                            )
-                        } distance", "slayer", "seraph", "seraphGlyph"
-                    )
-                    thrownEntity = suspect
-                }
-            }
-        }
-
-        override fun entityJoinWorld(event: EntityJoinWorldEvent) {
-            tickTimer(1) {
-                (event.entity as? EntityArmorStand)?.let { e ->
-                    if (e.inventory[4]?.item == Item.getItemFromBlock(Blocks.beacon)) {
-                        val time = System.currentTimeMillis() - 50
-                        printDevMessage(
-                            "Found beacon armor stand, time diff ${time - lastYangGlyphSwitch}",
-                            "slayer",
-                            "seraph",
-                            "seraphGlyph"
-                        )
-                        if (lastYangGlyphSwitch != -1L && time - lastYangGlyphSwitch < 300 && e.entityBoundingBox.expand(
-                                4.5,
-                                4.0,
-                                4.5
-                            )
-                                .intersectsWith(thrownBoundingBox ?: e.entityBoundingBox)
-                        ) {
-                            printDevMessage(
-                                "Beacon armor stand is close to slayer entity",
-                                "slayer",
-                                "seraph",
-                                "seraphGlyph"
-                            )
-                            thrownEntity = e
-                            lastYangGlyphSwitch = -1L
-                            lastYangGlyphSwitchTicks = -1
-                        }
-                        return@tickTimer
-                    } else if (e.entityBoundingBox.expand(2.0, 3.0, 2.0)
-                            .intersectsWith(entity.entityBoundingBox)
-                    ) {
-                        printDevMessage("Found nearby armor stand", "slayer", "seraph", "seraphGlyph", "seraphFixation")
-                        if (e.inventory.any {
-                                it?.takeIf { it.item == Items.skull }
-                                    ?.let { ItemUtil.getSkullTexture(it) } == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
-                            }) {
-                            nukekebiSkulls.add(e)
-                        }
-                        return@tickTimer
-                    }
-                }
-            }
-        }
-
-        override fun blockChange(event: BlockChangeEvent) {
-            if (event.pos == thrownLocation && event.old.block is BlockBeacon && event.update.block !is BlockBeacon) {
-                thrownLocation = null
-                thrownEntity = null
-                return
-            }
-            thrownEntity?.let { entity ->
-                printDevMessage("Glyph Entity exists", "slayer", "seraph", "seraphGlyph")
-                if (event.update.block is BlockBeacon && entity.position.distanceSq(event.pos) <= 3.5 * 3.5) {
-                    printDevMessage("Beacon entity near beacon block!", "slayer", "seraph", "seraphGlyph")
-                    thrownLocation = event.pos
-                    thrownEntity = null
-                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
-                        "§cYang Glyph!",
-                        30
-                    )
-                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
-                    lastYangGlyphSwitchTicks = -1
-                }
-            }
-            if (Skytils.config.experimentalYangGlyphDetection && thrownLocation == null) {
-                if (lastYangGlyphSwitchTicks in 0..5 && entity.getDistanceSq(event.pos) <= 5 * 5) {
-                    if (Skytils.config.yangGlyphPing && Skytils.config.yangGlyphPingOnLand) createTitle(
-                        "§cYang Glyph!",
-                        30
-                    )
-                    printDevMessage(
-                        "Beacon was close to slayer, $lastYangGlyphSwitchTicks", "slayer", "seraph", "seraphGlyph"
-                    )
-                    thrownLocation = event.pos
-                    lastYangGlyphSwitchTicks = -1
-                    yangGlyphAdrenalineStressCount = System.currentTimeMillis() + 5000L
-                }
-            }
-        }
-    }
-
-    class DemonlordSlayer(entity: EntityBlaze) :
-        ThrowingSlayer<EntityBlaze>(entity, "Inferno Demonlord", "§c☠ §bInferno Demonlord") {
-        var totemEntity: EntityArmorStand? = null
-        var totemPos: BlockPos? = null
-
-        private var lastTickInvis = false
-        val relevantEntity: Entity?
-            get() {
-                return if (entity.isInvisible) {
-                    if (quazii == null || typhoeus == null) {
-                        null
-                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true
-                        || (typhoeus?.health ?: 0f) <= 0f
-                    ) {
-                        quazii
-                    } else {
-                        typhoeus
-                    }
-                } else {
-                    entity
-                }
-            }
-        val relevantColor: Color?
-            get() {
-                val relevantTimer = if (entity.isInvisible) {
-                    if (quazii == null || typhoeus == null) {
-                        null
-                    } else if (typhoeusTimer?.displayName?.formattedText?.contains("IMMUNE") == true
-                        || (typhoeus?.health ?: 0f) <= 0f
-                    ) {
-                        quaziiTimer
-                    } else {
-                        typhoeusTimer
-                    }
-                } else {
-                    timerEntity
-                } ?: return null
-                val attunement = relevantTimer.displayName.unformattedText.substringBefore(" ").stripControlCodes()
-                return attunementColors[attunement]
-            }
-
-        // Is there a point making a class for the demons and storing the entity and the timer in the same place?
-        var quazii: EntitySkeleton? = null
-        var quaziiTimer: EntityArmorStand? = null
-        var typhoeus: EntityPigZombie? = null
-        var typhoeusTimer: EntityArmorStand? = null
-
-        val activeFire = mutableSetOf<BlockPos>()
-
-        companion object {
-            private const val thrownTexture =
-                "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
-            private const val quaziiTexture = // this the wither skeleton
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTZjYTE0NWJhNDM1YjM3NWY3NjNmZjUzYjRjZTA0YjJhMGM4NzNlOGZmNTQ3ZThiMTRiMzkyZmRlNmZiZmQ5NCJ9fX0="
-            private const val typhoeusTexture = // and this is the pig
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTJmMjk5NDVhYTUzY2Q5NWEwOTc4YTYyZWYxYThjMTk3ODgwMzM5NWE4YWQ1YzA5MjFkOWNiZTVlMTk2YmI4YiJ9fX0="
-
-            // Taken directly from https://minecraft.fandom.com/wiki/Formatting_codes#Color_codes
-            private val attunementColors = mapOf(
-                "ASHEN" to Color(85, 85, 85),
-                "CRYSTAL" to Color(85, 255, 255),
-                "AURIC" to Color(255, 255, 85),
-                "SPIRIT" to Color(255, 255, 255)
-            )
-
-            private fun createBlazeFirePingTask() =
-                tickTimer(4, repeats = true, register = false) {
-                    if (Utils.inSkyblock && Skytils.config.blazeFireWarning && mc.thePlayer != null) {
-                        (slayer as? DemonlordSlayer)?.let {
-                            if (!mc.thePlayer.onGround) return@tickTimer
-                            val under = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ)
-                            if (under in it.activeFire) {
-                                // The reason this is a title and not just sound is because there is much less time
-                                // to react to the pit warning than a rev5 tnt ping
-                                createTitle("§c§lFire pit!", 4)
-                                SoundQueue.addToQueue("random.orb", 1f)
-                            }
-                        }
-                    }
-                }
-
-            private var blazeFirePingTask = createBlazeFirePingTask()
-        }
-
-        override fun set() {
-            blazeFirePingTask.start()
-        }
-
-        override fun unset() {
-            blazeFirePingTask.cancel()
-            blazeFirePingTask = createBlazeFirePingTask()
-        }
-
-        override fun tick(event: ClientTickEvent) {
-            if (entity.isInvisible && !lastTickInvis) {
-                lastTickInvis = true
-                val prevBB = entity.entityBoundingBox.expand(3.0, 1.5, 3.0)
-                tickTimer(10) {
-                    val demons = entity.entityWorld.getEntitiesInAABBexcluding(
-                        entity, prevBB
-                    ) { it is EntityPigZombie || (it is EntitySkeleton && it.skeletonType == 1) }
-                    for (demon in demons) {
-                        val helmet = ItemUtil.getSkullTexture(demon.inventory.getOrNull(4) ?: continue)
-                        val helmetTexture = if (demon is EntitySkeleton) {
-                            quaziiTexture
-                        } else {
-                            typhoeusTexture
-                        }
-                        if (helmet == helmetTexture) {
-                            demon.entityWorld.getEntitiesInAABBexcluding(
-                                demon, demon.entityBoundingBox.expand(0.2, 3.0, 0.2)
-                            ) {
-                                it is EntityArmorStand && it.isInvisible && it.hasCustomName()
-                                        && it.displayName.formattedText.matches(timerRegex)
-                            }.firstOrNull()?.let {
-                                if (demon is EntitySkeleton) {
-                                    quazii = demon
-                                    quaziiTimer = it as EntityArmorStand
-                                    printDevMessage("Quazii", "slayer")
-                                } else if (demon is EntityPigZombie) {
-                                    typhoeus = demon
-                                    typhoeusTimer = it as EntityArmorStand
-                                    printDevMessage("Typhoeus", "slayer")
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (!entity.isInvisible && lastTickInvis) {
-                lastTickInvis = false
-            }
-        }
-
-        override fun entityJoinWorld(event: EntityJoinWorldEvent) {
-            (event.entity as? EntityArmorStand)?.let { e ->
-                tickTimer(1) {
-                    if (e.inventory[4]?.takeIf { it.item is ItemSkull }
-                            ?.let { ItemUtil.getSkullTexture(it) == thrownTexture } == true) {
-                        printDevMessage(
-                            "Found skull armor stand",
-                            "slayer",
-                        )
-                        thrownEntity = e
-                        return@tickTimer
-                    } else if (e.name.matches(totemRegex) && e.getDistanceSq(totemPos) < 9) {
-                        totemEntity = e
-                    }
-                }
-            }
-        }
-
-        override fun blockChange(event: BlockChangeEvent) {
-            if (totemEntity != null && event.old.block == Blocks.stained_hardened_clay && event.update.block is BlockAir) {
-                totemEntity = null
-                printDevMessage("removed totem entity", "totem")
-                return
-            } else if ((thrownEntity?.position?.distanceSq(event.pos) ?: 0.0) < 9.0
-                && event.old.block is BlockAir && event.update.block == Blocks.stained_hardened_clay
-            ) {
-                thrownEntity = null
-                totemPos = event.pos
-            }
-
-            // This also triggers on the totem, could check for yellow clay replacing red clay,
-            // but might be better to not delay anything
-            if (event.update.block == Blocks.stained_hardened_clay
-                && event.update.getValue(BlockColored.COLOR) == EnumDyeColor.RED
-            ) {
-                activeFire.add(event.pos)
-            } else if (event.old.block == Blocks.fire && event.update.block == Blocks.air) {
-                activeFire.remove(event.pos.down())
-            }
-        }
-    }
-
-    class BloodfiendSlayer(entity: EntityOtherPlayerMP) :
-        Slayer<EntityOtherPlayerMP>(entity, "Riftstalker Bloodfiend", "§c☠ §4Bloodfiend") {
-
-        var lastHadTwinclaws = false
-        var isStakeable = false
-        private val stakeTitle = "§cSteak Stake!"
-
-        fun nameEntityChanged(newName: String) {
-            if (!isStakeable && newName.contains("҉")) {
-                isStakeable = true
-                if (Skytils.config.oneShotAlert) createTitle(stakeTitle, 10)
-            } else {
-                isStakeable = false
-            }
-        }
-
-        fun timerEntityChanged(newName: String) {
-            if (!lastHadTwinclaws && newName.contains("TWINCLAWS")) {
-                if (Skytils.config.twinclawAlert && GuiManager.title != stakeTitle) createTitle("§6§lTWINCLAWS!", 10)
-                lastHadTwinclaws = true
-            } else {
-                lastHadTwinclaws = false
-            }
-        }
-    }
 }

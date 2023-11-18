@@ -19,8 +19,9 @@ package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
-import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures
-import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures.slayer
+import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures.slayer
+import gg.skytils.skytilsmod.features.impl.slayer.impl.DemonlordSlayer
+import gg.skytils.skytilsmod.features.impl.slayer.impl.SeraphSlayer
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
@@ -42,7 +43,7 @@ fun setColorMultiplier(
     if (Skytils.config.recolorSeraphBoss && Utils.inSkyblock && entity is EntityEnderman) {
         if (slayer?.entity != entity) return
         entity.hurtTime = 0
-        (slayer as? SlayerFeatures.SeraphSlayer)?.run {
+        (slayer as? SeraphSlayer)?.run {
             if (thrownEntity != null || thrownLocation != null) {
                 cir.returnValue = Skytils.config.seraphBeaconPhaseColor.withAlpha(169)
             } else if (hitPhase) {
@@ -52,7 +53,7 @@ fun setColorMultiplier(
             }
         }
     } else if (Skytils.config.attunementDisplay && Utils.inSkyblock && entity is EntityLiving) {
-        (slayer as? SlayerFeatures.DemonlordSlayer)?.let {
+        (slayer as? DemonlordSlayer)?.let {
             if (entity == it.relevantEntity) {
                 entity.hurtTime = 0
                 it.relevantColor?.let {
