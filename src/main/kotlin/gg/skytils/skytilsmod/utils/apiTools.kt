@@ -45,8 +45,13 @@ data class SkyblockProfile(val members: Map<NonDashedUUID, ProfileMember>)
 
 @Serializable
 data class ProfileMember(
+    val slayer: SlayerData
+)
+
+@Serializable
+class SlayerData(
     @SerialName("slayer_bosses")
-    val slayerBosses: Map<MobName, SlayerBoss> = emptyMap(),
+    val slayerBosses: Map<MobName, SlayerBoss> = emptyMap()
 )
 
 @Serializable
