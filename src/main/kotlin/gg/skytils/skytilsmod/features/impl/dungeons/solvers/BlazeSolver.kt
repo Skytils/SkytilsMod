@@ -202,6 +202,17 @@ object BlazeSolver {
                     event.partialTicks,
                     matrixStack
                 )
+                if (Skytils.config.lineToNextBlaze) {
+                    val secondLowestBlaze = orderedBlazes.getOrNull(1)?.blaze ?: return
+                    RenderUtil.draw3DLine(
+                        Vec3(lowestBlaze.posX, lowestBlaze.posY + 1.5, lowestBlaze.posZ),
+                        Vec3(secondLowestBlaze.posX, secondLowestBlaze.posY + 1.5, secondLowestBlaze.posZ),
+                        5,
+                        Skytils.config.lineToNextBlazeColor,
+                        event.partialTicks,
+                        matrixStack
+                    )
+                }
             }
             if (blazeMode > 0) {
                 val shootableBlaze = orderedBlazes.last()
@@ -213,6 +224,17 @@ object BlazeSolver {
                     event.partialTicks,
                     matrixStack
                 )
+                if (Skytils.config.lineToNextBlaze) {
+                    val secondHighestBlaze = orderedBlazes.getOrNull(orderedBlazes.size - 2)?.blaze ?: return
+                    RenderUtil.draw3DLine(
+                        Vec3(highestBlaze.posX, highestBlaze.posY + 1.5, highestBlaze.posZ),
+                        Vec3(secondHighestBlaze.posX, secondHighestBlaze.posY + 1.5, secondHighestBlaze.posZ),
+                        5,
+                        Skytils.config.lineToNextBlazeColor,
+                        event.partialTicks,
+                        matrixStack
+                    )
+                }
             }
         }
     }
