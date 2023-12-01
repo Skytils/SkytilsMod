@@ -217,6 +217,10 @@ tasks {
         )
         mergeServiceFiles()
     }
+    withType<AbstractArchiveTask> {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
