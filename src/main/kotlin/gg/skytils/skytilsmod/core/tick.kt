@@ -49,6 +49,8 @@ fun <T> tickTask(ticks: Int, repeats: Boolean = false, task: () -> T) =
     flow {
         do {
             Events.await<TickEvent>(ticks)
-            emit(task())
+            emit(withContext(Dispatchers.MC) {
+                task()
+            })
         } while (repeats)
     }.flowOn(Tick.dispatcher)
