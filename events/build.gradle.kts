@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import org.apache.tools.ant.filters.FixCrLfFilter
+
 plugins {
     kotlin("jvm") version "1.8.22"
     id("gg.essential.loom") version "1.3.12"
@@ -34,4 +36,15 @@ java.toolchain {
 
 loom.mixin {
     defaultRefmapName = "mixins.skytils-events.refmap.json"
+}
+
+tasks.processResources {
+    filesMatching("**/*.json") {
+        filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+    }
+}
+
+tasks.withType<AbstractArchiveTask> {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
 }
