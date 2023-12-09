@@ -56,6 +56,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
     private val categoryContainers = HashMap<UIContainer, Category>()
 
     init {
+        lastUpdatedPlayerPosition = mc.thePlayer?.position
+
         scrollComponent = ScrollComponent(
             innerPadding = 4f,
         ).childOf(window).constrain {
@@ -692,13 +694,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             a.name.compareTo(b.name)
         }),
         CLOSEST("Closest", { a, b ->
-            val distanceA = mc.thePlayer?.getDistanceSq(a.pos) ?: 0.0
-            val distanceB = mc.thePlayer?.getDistanceSq(b.pos) ?: 0.0
+            val distanceA = lastUpdatedPlayerPosition?.distanceSq(a.pos) ?: 0.0
+            val distanceB = lastUpdatedPlayerPosition?.distanceSq(b.pos) ?: 0.0
             distanceA.compareTo(distanceB)
         }),
         FARTHEST("Farthest", { a, b ->
-            val distanceA = mc.thePlayer?.getDistanceSq(a.pos) ?: 0.0
-            val distanceB = mc.thePlayer?.getDistanceSq(b.pos) ?: 0.0
+            val distanceA = lastUpdatedPlayerPosition?.distanceSq(a.pos) ?: 0.0
+            val distanceB = lastUpdatedPlayerPosition?.distanceSq(b.pos) ?: 0.0
             distanceB.compareTo(distanceA)
         }),
         RECENT("Recent", { a, b ->
@@ -715,6 +717,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
 
     companion object {
         const val CATEGORY_INNER_PADDING = 7.5
+        var lastUpdatedPlayerPosition: BlockPos? = null
     }
 }
 
