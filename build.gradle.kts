@@ -131,8 +131,7 @@ dependencies {
     shadowMe(ktorServer("auth"))
 
     shadowMe(project(":events"))
-
-
+    shadowMe(project(":hypixel-api:types"))
 
 
     shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")

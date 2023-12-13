@@ -1,0 +1,3 @@
+[submodule "hypixel-api"]
+	path = hypixel-api
+	url = https://github.com/Skytils/hypixel-api
