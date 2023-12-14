@@ -50,13 +50,30 @@ object IcePathSolver {
 
     init {
         tickTimer(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null) return@tickTimer
-            if (DungeonListener.missingPuzzles.contains("Ice Path")) {
-                val silverfish = mc.theWorld.getEntities(
-                    EntitySilverfish::class.java
-                ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceSqToEntity(s) < 20 * 20 }
-                if (silverfish.size > 0) {
-                    this.silverfish = silverfish[0]
+            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null || "Ice Path" !in DungeonListener.missingPuzzles) return@tickTimer
+            if (silverfishChestPos != null && roomFacing != null) {
+                if (grid == null) {
+                    grid = layout
+                    silverfishPos = getGridPointFromPos(silverfish!!.position)
+                    steps.clear()
+                    if (silverfishPos != null) {
+                        steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                    }
+                } else if (silverfish != null) {
+                    val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
+                    if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
+                        silverfishPos = silverfishGridPos
+                        if (silverfishPos != null) {
+                            steps.clear()
+                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                        }
+                    }
+                }
+            } else {
+                mc.theWorld.loadedEntityList.find {
+                    it is EntitySilverfish && !it.isInvisible && mc.thePlayer.getDistanceSqToEntity(it) < 20 * 20
+                }?.let {
+                    silverfish = it as EntitySilverfish
                     if (silverfishChestPos == null || roomFacing == null) {
                         Skytils.launch {
                             findChest@ for (te in mc.theWorld.loadedTileEntityList) {
@@ -88,25 +105,6 @@ object IcePathSolver {
                     }
                 }
             }
-            if (silverfishChestPos != null && roomFacing != null) {
-                if (grid == null) {
-                    grid = layout
-                    silverfishPos = getGridPointFromPos(silverfish!!.position)
-                    steps.clear()
-                    if (silverfishPos != null) {
-                        steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
-                    }
-                } else if (silverfish != null) {
-                    val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
-                    if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
-                        silverfishPos = silverfishGridPos
-                        if (silverfishPos != null) {
-                            steps.clear()
-                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -114,12 +112,10 @@ object IcePathSolver {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.icePathSolver) return
         if (silverfishChestPos != null && roomFacing != null && grid != null && silverfish!!.isEntityAlive) {
-            for (i in 0 until steps.size - 1) {
-                val point = steps[i]
-                val point2 = steps[i + 1]
+            GlStateManager.disableCull()
+            steps.zipWithNext().forEach { (point, point2) ->
                 val pos = getVec3RelativeToGrid(point!!.x, point.y)
                 val pos2 = getVec3RelativeToGrid(point2!!.x, point2.y)
-                GlStateManager.disableCull()
                 RenderUtil.draw3DLine(
                     pos!!.addVector(0.5, 0.5, 0.5),
                     pos2!!.addVector(0.5, 0.5, 0.5),
@@ -128,8 +124,8 @@ object IcePathSolver {
                     event.partialTicks,
                     UMatrixStack.Compat.get()
                 )
-                GlStateManager.enableCull()
             }
+            GlStateManager.enableCull()
         }
     }
 
