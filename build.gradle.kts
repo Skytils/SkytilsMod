@@ -233,7 +233,7 @@ tasks {
                     "-Xbackend-threads=0",
                     /*"-Xuse-k2"*/
                 )
-            languageVersion = "1.7"
+            languageVersion = "1.9"
         }
         kotlinDaemonJvmArguments.set(
             listOf(
