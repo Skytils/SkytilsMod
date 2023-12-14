@@ -156,13 +156,13 @@ object CataCommand : StatCommand("skytilscata") {
             val completionObj = cataData.tier_completions
             val highestFloor = cataData.highest_tier_completed.toInt()
 
-            if (completionObj != null && highestFloor != 0) {
+            if (highestFloor != 0) {
                 component.append(UTextComponent(" §aFloor Completions: §7(Hover)\n").setHoverText(buildString {
                     for (i in 0..highestFloor) {
                         append("§2§l●§a ")
                         append(if (i == 0) "Entrance: " else "Floor $i: ")
                         append("§e")
-                        append(completionObj["$i"])
+                        append(completionObj["$i"]!!.toInt())
                         append(if (i < highestFloor) "\n" else "")
                     }
                 }))
@@ -214,7 +214,7 @@ object CataCommand : StatCommand("skytilscata") {
                             append("§2§l●§a ")
                             append("Floor $i: ")
                             append("§e")
-                            append(if ("$i" in masterCompletionObj) masterCompletionObj["$i"] else "§cDNF")
+                            append(masterCompletionObj["$i"]?.toInt() ?: "§cDNF")
                             append(if (i < highestMasterFloor) "\n" else "")
                         }
                     }))
