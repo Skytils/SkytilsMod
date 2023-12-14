@@ -243,7 +243,7 @@ object DungeonListener {
             return
         }
         println("There are $partyCount members in this party")
-        for (i in 0 until partyCount) {
+        for (i in 0..<partyCount) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].second
             val matcher = classPattern.find(text)

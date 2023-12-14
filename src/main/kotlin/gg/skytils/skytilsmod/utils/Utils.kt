@@ -395,7 +395,7 @@ operator fun Vec3.times(scaleValue: Double): Vec3 = Vec3(xCoord * scaleValue, yC
  */
 fun <T> List<T>.elementPairs() = sequence {
     val arr = this@elementPairs
-    for (i in 0 until arr.size - 1)
-        for (j in i + 1 until arr.size)
+    for (i in 0..<arr.size - 1)
+        for (j in i + 1..<arr.size)
             yield(arr[i] to arr[j])
 }

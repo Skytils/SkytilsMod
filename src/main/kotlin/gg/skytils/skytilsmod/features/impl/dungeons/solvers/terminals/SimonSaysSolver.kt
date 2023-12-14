@@ -90,7 +90,7 @@ object SimonSaysSolver {
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
             val matrixStack = UMatrixStack()
 
-            for (i in clickNeeded until clickInOrder.size) {
+            for (i in clickNeeded..<clickInOrder.size) {
                 val pos = clickInOrder[i]
                 val x = pos.x - viewerX
                 val y = pos.y - viewerY + .372

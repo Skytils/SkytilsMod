@@ -118,7 +118,7 @@ object ItemUtil {
             if (display.hasKey("Lore", NBT_LIST)) {
                 val lore = display.getTagList("Lore", NBT_STRING)
                 val loreAsList = ArrayList<String>(lore.tagCount())
-                for (lineNumber in 0 until lore.tagCount()) {
+                for (lineNumber in 0..<lore.tagCount()) {
                     loreAsList.add(lore.getStringTagAt(lineNumber))
                 }
                 return Collections.unmodifiableList(loreAsList)

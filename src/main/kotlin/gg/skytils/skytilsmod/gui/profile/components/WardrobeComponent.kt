@@ -56,7 +56,7 @@ class WardrobeComponent(val profileState: State<Member?>) : UIContainer() {
             Window.enqueueRenderOperation {
                 wardrobeContainer.clearChildren()
                 profile?.wardrobe?.items?.run {
-                    (0 until size / 4).map { slot ->
+                    (0..<size / 4).map { slot ->
                         val page = slot / 9
                         profileState.alwaysMap { prof ->
                             Inventory(

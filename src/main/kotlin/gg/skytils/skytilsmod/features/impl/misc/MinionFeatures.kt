@@ -72,7 +72,7 @@ object MinionFeatures {
                 if (!item.isItemEnchanted && item.item != Items.skull) {
                     if (event.chestName == "Minion Chest") {
                         if (!blockUnenchanted) {
-                            for (i in 0 until inventory.sizeInventory) {
+                            for (i in 0..<inventory.sizeInventory) {
                                 val stack = inventory.getStackInSlot(i) ?: continue
                                 if (stack.isItemEnchanted || stack.item == Items.skull) {
                                     blockUnenchanted = true
