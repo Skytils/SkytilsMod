@@ -28,7 +28,7 @@ import java.util.UUID
 
 object API {
     private val client = Skytils.client
-    private val baseUrl = "hypixel.skytils.gg"
+    private const val baseUrl = "hypixel.skytils.gg"
 
     suspend fun getSkyblockProfiles(uuid: UUID) =
         client.get {

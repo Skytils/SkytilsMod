@@ -66,7 +66,7 @@ object CataCommand : StatCommand("skytilscata") {
             val masterCataData = catacombsObj.master
 
             val cataLevel =
-                SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
+                SkillUtils.calcXpWithProgress(catacombsObj.experience, SkillUtils.dungeoneeringXp.values)
 
             val archXP = dungeonsData.player_classes["archer"]?.experience ?: 0.0
             val bersXP = dungeonsData.player_classes["berserk"]?.experience ?: 0.0
@@ -116,7 +116,7 @@ object CataCommand : StatCommand("skytilscata") {
                 .append(
                     UTextComponent("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n").setHover(
                         MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(catacombsObj.experience ?: 0.0)} XP"
+                        "§e${nf.format(catacombsObj.experience)} XP"
                     )
                 )
                 .append("§9 ☠ Class Avg: §l➡ §e${nf.format(classAvgCapped)} §7(${nf.format(classAvgOverflow)})\n\n")

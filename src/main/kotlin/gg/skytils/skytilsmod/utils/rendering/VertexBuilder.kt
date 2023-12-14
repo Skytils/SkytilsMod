@@ -291,10 +291,10 @@ class VertexBuffer(val id: Int, vao: VertexArray) : PhantomReference<VertexArray
 }
 
 sealed interface VertexFormats<S : VertexScope> {
-    object Position : VertexFormats<PositionScope>
-    object PositionColor : VertexFormats<PositionColorScope>
-    object PositionTexture : VertexFormats<PositionTextureScope>
-    object PositionTextureColor : VertexFormats<PositionTextureColorScope>
+    data object Position : VertexFormats<PositionScope>
+    data object PositionColor : VertexFormats<PositionColorScope>
+    data object PositionTexture : VertexFormats<PositionTextureScope>
+    data object PositionTextureColor : VertexFormats<PositionTextureColorScope>
 
     @Suppress("UNCHECKED_CAST")
     fun scopeInstance() = MasterScope() as S
