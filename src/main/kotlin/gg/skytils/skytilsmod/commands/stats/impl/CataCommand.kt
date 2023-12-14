@@ -245,7 +245,7 @@ object CataCommand : StatCommand("skytilscata") {
                     " §aBlood Mobs Killed: §l➡ §e${
                         nf.format(
                             (profileData.player_stats.kills["watcher_summon_undead"]?.toInt() ?: 0) +
-                                    (profileData.player_stats.kills["kills_master_watcher_summon_undead"]?.toInt() ?: 0)
+                                    (profileData.player_stats.kills["master_watcher_summon_undead"]?.toInt() ?: 0)
                         )
                     }\n"
                 )
