@@ -18,12 +18,18 @@
 
 package gg.skytils.skytilsmod.utils
 
+import gg.skytils.hypixel.types.skyblock.Profile
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.IntArraySerializer
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import net.minecraft.util.BlockPos
 import java.awt.Color
 import java.util.*
@@ -36,6 +42,12 @@ sealed class HypixelResponse {
     abstract val success: Boolean
     val cause: String? = null
 }
+
+@Serializable
+data class TypesProfileResponse(
+    override val success: Boolean,
+    val profiles: List<Profile>
+) : HypixelResponse()
 
 @Serializable
 data class ProfileResponse(override val success: Boolean, val profile: SkyblockProfile) : HypixelResponse()

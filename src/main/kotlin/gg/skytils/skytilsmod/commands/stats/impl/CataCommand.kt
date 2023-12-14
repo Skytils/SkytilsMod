@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.commands.stats.impl
 import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.commands.stats.StatCommand
@@ -30,10 +31,10 @@ import gg.skytils.skytilsmod.utils.append
 import gg.skytils.skytilsmod.utils.formattedName
 import gg.skytils.skytilsmod.utils.setHoverText
 import skytils.hylin.request.HypixelAPIException
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.dungeons.DungeonClass
 import java.util.*
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 
 object CataCommand : StatCommand("skytilscata") {
@@ -51,24 +52,27 @@ object CataCommand : StatCommand("skytilscata") {
         }
 
         try {
-            val dungeonsData = profileData.dungeons
+            val dungeonsData = profileData.dungeons ?: run {
+                printMessage("$failPrefix §c${username} has not entered any dungeons!")
+                return
+            }
 
-            val catacombsObj = dungeonsData.dungeons["catacombs"]
+            val catacombsObj = dungeonsData.dungeon_types["catacombs"]
             if (catacombsObj?.experience == null) {
                 printMessage("$failPrefix §c${username} has not entered The Catacombs!")
                 return
             }
-            val cataData = catacombsObj.normal!!
+            val cataData = catacombsObj.normal
             val masterCataData = catacombsObj.master
 
             val cataLevel =
                 SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
 
-            val archXP = dungeonsData.classExperiences?.get(DungeonClass.ARCHER) ?: 0.0
-            val bersXP = dungeonsData.classExperiences?.get(DungeonClass.BERSERK) ?: 0.0
-            val healerXP = dungeonsData.classExperiences?.get(DungeonClass.HEALER) ?: 0.0
-            val mageXP = dungeonsData.classExperiences?.get(DungeonClass.MAGE) ?: 0.0
-            val tankXP = dungeonsData.classExperiences?.get(DungeonClass.TANK) ?: 0.0
+            val archXP = dungeonsData.player_classes["archer"]?.experience ?: 0.0
+            val bersXP = dungeonsData.player_classes["berserk"]?.experience ?: 0.0
+            val healerXP = dungeonsData.player_classes["healer"]?.experience ?: 0.0
+            val mageXP = dungeonsData.player_classes["mage"]?.experience ?: 0.0
+            val tankXP = dungeonsData.player_classes["tank"]?.experience ?: 0.0
 
             val archLevel =
                 SkillUtils.calcXpWithProgress(
@@ -149,29 +153,29 @@ object CataCommand : StatCommand("skytilscata") {
                 .append("§a§l➜ Floor Completions:\n")
 
 
-            val completionObj = cataData.completions
-            val highestFloor = cataData.highestCompletion
+            val completionObj = cataData.tier_completions
+            val highestFloor = cataData.highest_tier_completed.toInt()
 
-            if (completionObj != null && highestFloor != null) {
+            if (completionObj != null && highestFloor != 0) {
                 component.append(UTextComponent(" §aFloor Completions: §7(Hover)\n").setHoverText(buildString {
                     for (i in 0..highestFloor) {
                         append("§2§l●§a ")
                         append(if (i == 0) "Entrance: " else "Floor $i: ")
                         append("§e")
-                        append(completionObj[i])
+                        append(completionObj["$i"])
                         append(if (i < highestFloor) "\n" else "")
                     }
                 }))
 
-                val fastestSTimes = cataData.fastestTimeS
-                if (fastestSTimes != null) {
+                val fastestSTimes = cataData.fastest_time_s
+                if (fastestSTimes.isNotEmpty()) {
                     component.append(UTextComponent(" §aFastest §2S §aCompletions: §7(Hover)\n").setHoverText(
                         buildString {
                             for (i in 0..highestFloor) {
                                 append("§2§l●§a ")
                                 append(if (i == 0) "Entrance: " else "Floor $i: ")
                                 append("§e")
-                                append(fastestSTimes[i]?.timeFormat() ?: "§cNo S Completion")
+                                append(fastestSTimes["$i"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo S Completion")
                                 append(if (i < highestFloor) "\n" else "")
                             }
                         }
@@ -179,8 +183,8 @@ object CataCommand : StatCommand("skytilscata") {
                 }
 
 
-                val fastestSPlusTimes = cataData.fastestTimeSPlus
-                if (fastestSPlusTimes != null) {
+                val fastestSPlusTimes = cataData.fastest_time_s_plus
+                if (fastestSPlusTimes.isNotEmpty()) {
                     component.append(
                         UTextComponent(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n").setHoverText(
                             buildString {
@@ -188,7 +192,7 @@ object CataCommand : StatCommand("skytilscata") {
                                     append("§2§l●§a ")
                                     append(if (i == 0) "Entrance: " else "Floor $i: ")
                                     append("§e")
-                                    append(fastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
+                                    append(fastestSPlusTimes["$i"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo S+ Completion")
                                     append(if (i < highestFloor) "\n" else "")
                                 }
                             }
@@ -197,11 +201,10 @@ object CataCommand : StatCommand("skytilscata") {
                 }
             }
 
-            if (masterCataData?.completions != null) {
-                val masterCompletionObj = masterCataData.completions
-                val highestMasterFloor = masterCataData.highestCompletion
+            masterCataData?.tier_completions?.let { masterCompletionObj ->
+                val highestMasterFloor = masterCataData.highest_tier_completed.toInt()
 
-                if (masterCompletionObj != null && highestMasterFloor != null) {
+                if (masterCompletionObj.isNotEmpty() && highestMasterFloor != 0) {
 
                     component
                         .append("§a§l➜ Master Mode:\n")
@@ -211,7 +214,7 @@ object CataCommand : StatCommand("skytilscata") {
                             append("§2§l●§a ")
                             append("Floor $i: ")
                             append("§e")
-                            append(if (i in masterCompletionObj) masterCompletionObj[i] else "§cDNF")
+                            append(if ("$i" in masterCompletionObj) masterCompletionObj["$i"] else "§cDNF")
                             append(if (i < highestMasterFloor) "\n" else "")
                         }
                     }))
@@ -219,43 +222,34 @@ object CataCommand : StatCommand("skytilscata") {
 
                     val masterFastestS = UTextComponent(" §aFastest §2S §aCompletions: §7(Hover)\n")
 
-                    if (masterCataData.fastestTimeS != null) {
-                        val masterFastestSTimes = masterCataData.fastestTimeS!!
-                        masterFastestS.setHoverText(buildString {
-                            for (i in 1..highestMasterFloor) {
-                                append("§2§l●§a ")
-                                append("Floor $i: ")
-                                append("§e")
-                                append(masterFastestSTimes[i]?.timeFormat() ?: "§cNo S Completion")
-                                append(if (i < highestMasterFloor) "\n" else "")
-                            }
-                        })
-                    } else {
-                        masterFastestS.setHoverText("§cNo S Completions")
-                    }
+                    masterCataData.fastest_time_s.takeUnless(Map<*, *>::isEmpty)?.map { (floor, time) ->
+                        "§2§l●§a Floor $floor: §e${time.toDuration(DurationUnit.MILLISECONDS).timeFormat()}"
+                    }?.let { lines ->
+                        val list = lines.toMutableList()
+                        repeat(highestMasterFloor - lines.size - 1) { i ->
+                            list += "§2§l●§a Floor $i: §e§cNo S Completion"
+                        }
+                        masterFastestS.setHoverText(list.joinToString("\n"))
+                    } ?:  masterFastestS.setHoverText("§cNo S Completions")
+
                     component.append(masterFastestS)
 
 
                     val masterFastestSPlus = UTextComponent(" §aFastest §2S+ §aCompletions: §7(Hover)\n\n")
 
-                    if (masterCataData.fastestTimeSPlus != null) {
-                        val masterFastestSPlusTimes = masterCataData.fastestTimeSPlus!!
-                        masterFastestSPlus.setHoverText(buildString {
-                            for (i in 1..highestMasterFloor) {
-                                append("§2§l●§a ")
-                                append("Floor $i: ")
-                                append("§e")
-                                append(masterFastestSPlusTimes[i]?.timeFormat() ?: "§cNo S+ Completion")
-                                append(if (i < highestMasterFloor) "\n" else "")
-                            }
-                        })
-                    } else {
-                        masterFastestSPlus.setHoverText(
-                            "§cNo S+ Completions"
-                        )
-                    }
+                    masterCataData.fastest_time_s_plus.takeUnless(Map<*, *>::isEmpty)?.map { (floor, time) ->
+                        "§2§l●§a Floor $floor: §e${time.toDuration(DurationUnit.MILLISECONDS).timeFormat()}"
+                    }?.let { lines ->
+                        val list = lines.toMutableList()
+                        repeat(highestMasterFloor - lines.size - 1) { i ->
+                            list += "§2§l●§a Floor $i: §e§cNo S+ Completion"
+                        }
+                        masterFastestSPlus.setHoverText(list.joinToString("\n"))
+                    } ?:  masterFastestSPlus.setHoverText("§cNo S+ Completions")
+
                     component.append(masterFastestSPlus)
                 }
+
             }
 
             component
@@ -264,8 +258,8 @@ object CataCommand : StatCommand("skytilscata") {
                 .append(
                     " §aBlood Mobs Killed: §l➡ §e${
                         nf.format(
-                            (profileData.stats?.get("kills_watcher_summon_undead") ?: 0) +
-                                    (profileData.stats?.get("kills_master_watcher_summon_undead") ?: 0)
+                            (profileData.player_stats.kills["watcher_summon_undead"]?.toInt() ?: 0) +
+                                    (profileData.player_stats.kills["kills_master_watcher_summon_undead"]?.toInt() ?: 0)
                         )
                     }\n"
                 )
