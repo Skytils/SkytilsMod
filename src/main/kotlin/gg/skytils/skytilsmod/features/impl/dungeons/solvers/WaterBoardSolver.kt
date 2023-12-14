@@ -232,13 +232,13 @@ object WaterBoardSolver {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Skytils.config.waterBoardSolver || !DungeonListener.missingPuzzles.contains("Water Board")) return
         if (chestPos == null || roomFacing == null || variant == -1) return
-        val leverStates = LeverBlock.values().associateWithTo(EnumMap(LeverBlock::class.java)) {
+        val leverStates = LeverBlock.entries.associateWithTo(EnumMap(LeverBlock::class.java)) {
             getLeverToggleState(it.leverPos)
         }
         val renderTimes = HashMap<LeverBlock, Int>()
         var matching = 0
         val matrixStack = UMatrixStack()
-        for (color in WoolColor.values()) {
+        for (color in WoolColor.entries) {
             val renderColor = Color(color.dyeColor.mapColor.colorValue).brighter()
             if (color.isExtended) {
                 val solution = solutions[color] ?: continue

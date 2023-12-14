@@ -188,7 +188,7 @@ object UpdateChecker {
         val specialVersionType by lazy {
             val typeString = matched!!.groups["type"]?.value ?: return@lazy UpdateType.RELEASE
 
-            return@lazy UpdateType.values().find { typeString == it.prefix } ?: UpdateType.UNKNOWN
+            return@lazy UpdateType.entries.find { typeString == it.prefix } ?: UpdateType.UNKNOWN
         }
         val specialVersion by lazy {
             if (specialVersionType == UpdateType.RELEASE) return@lazy null

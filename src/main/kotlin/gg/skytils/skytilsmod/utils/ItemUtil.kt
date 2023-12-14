@@ -160,7 +160,7 @@ object ItemUtil {
             val rarityMatcher = RARITY_PATTERN.find(currentLine)
             if (rarityMatcher != null) {
                 val rarity = rarityMatcher.groups["rarity"]?.value ?: continue
-                ItemRarity.values().find {
+                ItemRarity.entries.find {
                     it.rarityName == rarity.stripControlCodes().substringAfter("SHINY ")
                 }?.let {
                     return it

@@ -57,7 +57,7 @@ object ChatTabs {
         if (style.chatTabType == null) {
             val cc = event.packet.chatComponent
             val formatted = cc.formattedText
-            style.chatTabType = ChatTab.values().filter { it.isValid(cc, formatted) }.toTypedArray()
+            style.chatTabType = ChatTab.entries.filter { it.isValid(cc, formatted) }.toTypedArray()
         }
     }
 
@@ -73,7 +73,7 @@ object ChatTabs {
         style as ExtensionChatStyle
         if (style.chatTabType == null) {
             style.chatTabType =
-                ChatTab.values().filter { it.isValid(component, component.formattedText) }.toTypedArray()
+                ChatTab.entries.filter { it.isValid(component, component.formattedText) }.toTypedArray()
         }
         return style.chatTabType!!.contains(selectedTab)
     }
@@ -240,7 +240,7 @@ object ChatTabs {
         val button = CleanButton(-69420, 2 + 22 * ordinal, 0, 20, 20, text)
 
         companion object {
-            val buttons by lazy { values().associateWith { it.button } }
+            val buttons by lazy { entries.associateWith { it.button } }
         }
     }
 }

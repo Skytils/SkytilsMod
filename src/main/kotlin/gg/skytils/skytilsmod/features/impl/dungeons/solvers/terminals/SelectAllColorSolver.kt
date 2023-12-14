@@ -41,7 +41,7 @@ object SelectAllColorSolver {
                 "Select all the"
             )
         ) {
-            val promptColor = EnumDyeColor.values().find {
+            val promptColor = EnumDyeColor.entries.find {
                 event.chestName.contains(it.getName().replace("_", " ").uppercase())
             }?.unlocalizedName
             if (promptColor != colorNeeded) {

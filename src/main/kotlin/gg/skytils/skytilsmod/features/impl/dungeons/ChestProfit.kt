@@ -58,7 +58,7 @@ object ChestProfit {
         val inv = event.container.lowerChestInventory
 
         if (event.chestName == "Croesus") {
-            DungeonChest.values().forEach(DungeonChest::reset)
+            DungeonChest.entries.forEach(DungeonChest::reset)
             return
         }
 
@@ -196,7 +196,7 @@ object ChestProfit {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        DungeonChest.values().forEach(DungeonChest::reset)
+        DungeonChest.entries.forEach(DungeonChest::reset)
         rerollBypass = false
     }
 
@@ -247,7 +247,7 @@ object ChestProfit {
         companion object {
             fun getFromName(name: String?): DungeonChest? {
                 if (name.isNullOrBlank()) return null
-                return values().find {
+                return entries.find {
                     it.displayText == name
                 }
             }
@@ -261,7 +261,7 @@ object ChestProfit {
                 val leftAlign = scaleX < sr.scaledWidth / 2f
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
-                DungeonChest.values().filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
+                DungeonChest.entries.filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
                     val profit = chest.value - chest.price
                     ScreenRenderer.fontRenderer.drawString(
                         "${chest.displayText}§f: §${(if (profit > 0) "a" else "c")}${NumberUtil.format(profit.toLong())}",
@@ -276,11 +276,11 @@ object ChestProfit {
         }
 
         override fun demoRender() {
-            RenderUtil.drawAllInList(this, DungeonChest.values().map { "${it.displayText}: §a+300M" })
+            RenderUtil.drawAllInList(this, DungeonChest.entries.map { "${it.displayText}: §a+300M" })
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * DungeonChest.values().size
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * DungeonChest.entries.size
         override val width: Int
             get() = ScreenRenderer.fontRenderer.getStringWidth("Obsidian Chest: 300M")
 

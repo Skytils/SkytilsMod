@@ -193,7 +193,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
             PrimitiveSerialDescriptor("SkyblockIsland", PrimitiveKind.STRING)
 
         override fun deserialize(decoder: Decoder): SkyblockIsland =
-            decoder.decodeString().let { s -> values().firstOrNull { it.mode == s } ?: Unknown }
+            decoder.decodeString().let { s -> entries.firstOrNull { it.mode == s } ?: Unknown }
 
         override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
     }
@@ -207,7 +207,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
         override fun deserialize(decoder: Decoder): SkyblockIsland = decoder.decodeStructure(descriptor) {
             while (true) {
                 when (val index = decodeElementIndex(descriptor)) {
-                    1 -> return@decodeStructure SkyblockIsland.values()
+                    1 -> return@decodeStructure entries
                         .first { it.mode == decodeStringElement(descriptor, index) }
 
                     CompositeDecoder.DECODE_DONE -> break

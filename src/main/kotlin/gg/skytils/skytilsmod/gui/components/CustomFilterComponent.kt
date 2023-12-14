@@ -82,13 +82,13 @@ class CustomFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UICo
 
     init {
         val filterType = DropDown(
-            SpamHider.FilterType.values().indexOf(filter.type),
-            SpamHider.FilterType.values().map { it.name.toTitleCase() })
+            SpamHider.FilterType.entries.indexOf(filter.type),
+            SpamHider.FilterType.entries.map { it.name.toTitleCase() })
             .constrain {
                 y = SiblingConstraint() + 3.pixels()
                 width = basicWidthConstraint {
                     fontProvider.getStringWidth(
-                        SpamHider.FilterType.values().map { it.name.toTitleCase() }
+                        SpamHider.FilterType.entries.map { it.name.toTitleCase() }
                             .maxByOrNull { it.length }!!,
                         this.getTextScale()
                     ) * 1.5f
@@ -96,7 +96,7 @@ class CustomFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UICo
                 fontProvider = DefaultFonts.VANILLA_FONT_RENDERER
             } childOf textBoundingBox
         filterType.onValueChange {
-            filter.type = SpamHider.FilterType.values()[it]
+            filter.type = SpamHider.FilterType.entries[it]
         }
 
         val filterPattern by UITextInput()
