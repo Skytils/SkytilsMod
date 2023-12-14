@@ -38,6 +38,7 @@ object ClickInOrderSolver {
 
     private val slotOrder = HashMap<Int, Int>()
     private var neededClick = 0
+    private val menuSlots = (10..16) + (19..25)
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
@@ -50,13 +51,11 @@ object ClickInOrderSolver {
         if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver || event.container !is ContainerChest) return
         val invSlots = event.container.inventorySlots
         if (event.chestName == "Click in order!") {
-            for (i in 10..25) {
-                if (i == 17 || i == 18) continue
+            for (i in menuSlots) {
                 val itemStack = invSlots[i].stack ?: continue
-                if (itemStack.item !== Item.getItemFromBlock(Blocks.stained_glass_pane)) continue
-                if (itemStack.itemDamage != 14 && itemStack.itemDamage != 5) continue
-                if (itemStack.itemDamage == 5) {
-                    if (itemStack.stackSize > neededClick) neededClick = itemStack.stackSize
+                if (itemStack.item != Item.getItemFromBlock(Blocks.stained_glass_pane) || (itemStack.itemDamage != 14 && itemStack.itemDamage != 5)) continue
+                if (itemStack.itemDamage == 5 && itemStack.stackSize > neededClick) {
+                    neededClick = itemStack.stackSize
                 }
                 slotOrder[itemStack.stackSize - 1] = i
             }
@@ -114,13 +113,10 @@ object ClickInOrderSolver {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.clickInOrderTerminalSolver) return
-        if (event.toolTip == null) return
-        if (mc.thePlayer.openContainer is ContainerChest) {
-            val chest = mc.thePlayer.openContainer as ContainerChest
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText
+        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
+        val chest = mc.thePlayer.openContainer
+        if (chest is ContainerChest) {
+            val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (chestName == "Click in order!") {
                 event.toolTip.clear()
             }

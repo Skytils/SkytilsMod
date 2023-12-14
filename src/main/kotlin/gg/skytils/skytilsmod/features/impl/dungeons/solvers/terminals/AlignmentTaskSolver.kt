@@ -24,9 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -69,52 +67,40 @@ object AlignmentTaskSolver {
             ) return@tickTimer
             if (mc.thePlayer.getDistanceSqToCenter(topLeft) <= 25 * 25) {
                 if (grid.size < 25) {
-                    val frames = mc.theWorld.getEntities(EntityItemFrame::class.java) {
-                        it != null && box.contains(it.position) && it.displayedItem != null && Utils.equalsOneOf(
+                    @Suppress("UNCHECKED_CAST")
+                    val frames = mc.theWorld.loadedEntityList.filter {
+                        it is EntityItemFrame && box.contains(it.position) && it.displayedItem != null && Utils.equalsOneOf(
                             it.displayedItem.item,
                             Items.arrow,
                             Item.getItemFromBlock(Blocks.wool)
                         )
-                    }
+                    } as List<EntityItemFrame>
                     if (frames.isNotEmpty()) {
                         for ((i, pos) in box.withIndex()) {
-                            val row = i % 5
-                            val column = floor((i / 5f).toDouble()).toInt()
-                            val coords = Point(row, column)
+                            val coords = Point(i % 5, i / 5)
                             val frame = frames.find { it.position == pos }
-                            if (frame != null) {
-                                val type = with(frame.displayedItem) {
-                                    when (item) {
-                                        Items.arrow -> SpaceType.PATH
-                                        Item.getItemFromBlock(Blocks.wool) -> {
-                                            when (itemDamage) {
-                                                5 -> SpaceType.STARTER
-                                                14 -> SpaceType.END
-                                                else -> SpaceType.PATH
-                                            }
-                                        }
-
-                                        else -> SpaceType.EMPTY
+                            val type = frame?.displayedItem?.let {
+                                when (it.item) {
+                                    Items.arrow -> SpaceType.PATH
+                                    Item.getItemFromBlock(Blocks.wool) -> when (it.itemDamage) {
+                                        5 -> SpaceType.STARTER
+                                        14 -> SpaceType.END
+                                        else -> SpaceType.PATH
                                     }
+                                    else -> SpaceType.EMPTY
                                 }
-                                grid.add(MazeSpace(frame.hangingPosition, type, coords))
-                            } else {
-                                grid.add(MazeSpace(type = SpaceType.EMPTY, coords = coords))
-                            }
+                            } ?: SpaceType.EMPTY
+                            grid.add(MazeSpace(frame?.hangingPosition, type, coords))
                         }
                     }
                 } else if (directionSet.isEmpty()) {
                     val startPositions = grid.filter { it.type == SpaceType.STARTER }
                     val endPositions = grid.filter { it.type == SpaceType.END }
                     val layout = layout
-                    for (start in startPositions) {
-                        for (endPosition in endPositions) {
-                            val pointMap = solve(layout, start.coords, endPosition.coords)
-                            if (pointMap.size == 0) continue
-                            val moveSet = convertPointMapToMoves(pointMap)
-                            for (move in moveSet) {
-                                directionSet[move.point] = move.directionNum
-                            }
+                    startPositions.zip(endPositions).forEach { (start, end) ->
+                        val pointMap = solve(layout, start.coords, end.coords)
+                        for (move in convertPointMapToMoves(pointMap)) {
+                            directionSet[move.point] = move.directionNum
                         }
                     }
                 }
@@ -137,7 +123,7 @@ object AlignmentTaskSolver {
             if (neededClicks == 0) continue
             if (neededClicks < 0) neededClicks += 8
             RenderUtil.drawLabel(
-                getVec3RelativeToGrid(space.coords.x, space.coords.y).addVector(0.5, 0.5, 0.5),
+                space.framePos.middleVec(),
                 neededClicks.toString(),
                 Color.RED,
                 event.partialTicks,
@@ -163,32 +149,23 @@ object AlignmentTaskSolver {
 
     data class GridMove(val point: Point, val directionNum: Int)
 
-    private fun convertPointMapToMoves(solution: ArrayList<Point>): ArrayList<GridMove> {
-        solution.reverse()
-        val moves = arrayListOf<GridMove>()
-        for (i in 0 until solution.size - 1) {
-            val current = solution[i]
-            val next = solution[i + 1]
+    private fun convertPointMapToMoves(solution: List<Point>): List<GridMove> {
+        if (solution.isEmpty()) return emptyList()
+        return solution.asReversed().zipWithNext { current, next ->
             val diffX = current.x - next.x
             val diffY = current.y - next.y
-            directionCheck@ for (dir in EnumFacing.HORIZONTALS) {
-                val dirX = dir.directionVec.x
-                val dirY = dir.directionVec.z
-                if (dirX == diffX && dirY == diffY) {
-                    val rotation = when (dir.opposite) {
-                        EnumFacing.EAST -> 1
-                        EnumFacing.WEST -> 5
-                        EnumFacing.SOUTH -> 3
-                        EnumFacing.NORTH -> 7
-                        else -> 0
-                    }
-                    moves.add(GridMove(current, rotation))
-                    break@directionCheck
-                }
+            val dir = EnumFacing.HORIZONTALS.first {
+                it.directionVec.x == diffX && it.directionVec.z == diffY
             }
+            val rotation = when (dir.opposite) {
+                EnumFacing.EAST -> 1
+                EnumFacing.WEST -> 5
+                EnumFacing.SOUTH -> 3
+                EnumFacing.NORTH -> 7
+                else -> 0
+            }
+            return@zipWithNext GridMove(current, rotation)
         }
-        solution.reverse()
-        return moves
     }
 
     private val layout: Array<IntArray>
@@ -202,10 +179,6 @@ object AlignmentTaskSolver {
             }
             return grid
         }
-
-    private fun getVec3RelativeToGrid(row: Int, column: Int): Vec3 {
-        return Vec3(topLeft.down().north(row).down(column))
-    }
 
     private val directions = EnumFacing.HORIZONTALS.reversed()
 

@@ -73,8 +73,7 @@ object StartsWithSequenceSolver {
 
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.startsWithSequenceTerminalSolver) return
+        if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
         if (event.container is ContainerChest) {
             val slot = event.slot
             if (event.chestName.startsWith("What starts with:")) {
@@ -87,13 +86,10 @@ object StartsWithSequenceSolver {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.startsWithSequenceTerminalSolver) return
-        if (event.toolTip == null) return
+        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
         val container = mc.thePlayer?.openContainer
         if (container is ContainerChest) {
-            val inv = container.lowerChestInventory
-            val chestName = inv.displayName.unformattedText
+            val chestName = container.lowerChestInventory.displayName.unformattedText
             if (chestName.startsWith("What starts with:")) {
                 event.toolTip.clear()
             }
