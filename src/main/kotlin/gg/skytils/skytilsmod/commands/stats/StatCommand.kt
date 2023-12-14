@@ -56,6 +56,7 @@ abstract class StatCommand(
                 val profile = try {
                     API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     printMessage(
                         "$failPrefix §cUnable to retrieve profile information: ${
                             e.message
