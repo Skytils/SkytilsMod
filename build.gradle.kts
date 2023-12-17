@@ -24,10 +24,13 @@ plugins {
     kotlin("jvm") version "1.9.20"
     kotlin("plugin.serialization") version "1.9.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("net.kyori.blossom") version "2.0.0"
     id("io.github.juuxel.loom-quiltflower") version "1.10.0"
     id("gg.essential.loom") version "1.3.12"
     id("gg.essential.defaults") version "0.3.0"
     idea
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+
     signing
 }
 
@@ -143,17 +146,20 @@ dependencies {
 sourceSets {
     main {
         output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
+        blossom {
+            javaSources {
+                property("version", project.version.toString())
+            }
+            resources {
+                property("version", project.version.toString())
+                property("mcversion", "1.8.9")
+            }
+        }
     }
 }
 
 tasks {
     processResources {
-        inputs.property("version", project.version)
-        inputs.property("mcversion", "1.8.9")
-
-        filesMatching("mcmod.info") {
-            expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
-        }
         dependsOn(compileJava)
     }
     named<Jar>("jar") {
