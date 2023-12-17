@@ -31,7 +31,6 @@ import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
@@ -56,7 +55,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
     private val categoryContainers = HashMap<UIContainer, Category>()
 
     init {
-        lastUpdatedPlayerPosition = mc.thePlayer?.position
+        lastUpdatedPlayerPosition = Skytils.mc.thePlayer?.position ?: BlockPos.ORIGIN
 
         scrollComponent = ScrollComponent(
             innerPadding = 4f,
@@ -694,13 +693,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             a.name.compareTo(b.name)
         }),
         CLOSEST("Closest", { a, b ->
-            val distanceA = lastUpdatedPlayerPosition?.distanceSq(a.pos) ?: 0.0
-            val distanceB = lastUpdatedPlayerPosition?.distanceSq(b.pos) ?: 0.0
+            val distanceA = lastUpdatedPlayerPosition.distanceSq(a.pos)
+            val distanceB = lastUpdatedPlayerPosition.distanceSq(b.pos)
             distanceA.compareTo(distanceB)
         }),
         FARTHEST("Farthest", { a, b ->
-            val distanceA = lastUpdatedPlayerPosition?.distanceSq(a.pos) ?: 0.0
-            val distanceB = lastUpdatedPlayerPosition?.distanceSq(b.pos) ?: 0.0
+            val distanceA = lastUpdatedPlayerPosition.distanceSq(a.pos)
+            val distanceB = lastUpdatedPlayerPosition.distanceSq(b.pos)
             distanceB.compareTo(distanceA)
         }),
         RECENT("Recent", { a, b ->
@@ -717,7 +716,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
 
     companion object {
         const val CATEGORY_INNER_PADDING = 7.5
-        var lastUpdatedPlayerPosition: BlockPos? = null
+        var lastUpdatedPlayerPosition: BlockPos = BlockPos.ORIGIN
     }
 }
 
