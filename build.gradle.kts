@@ -137,8 +137,7 @@ dependencies {
     shadowMe(project(":hypixel-api:types"))
 
 
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
+    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.2")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
