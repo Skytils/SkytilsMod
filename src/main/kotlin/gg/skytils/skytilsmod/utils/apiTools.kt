@@ -18,12 +18,18 @@
 
 package gg.skytils.skytilsmod.utils
 
+import gg.skytils.hypixel.types.skyblock.Profile
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.IntArraySerializer
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import net.minecraft.util.BlockPos
 import java.awt.Color
 import java.util.*
@@ -38,6 +44,12 @@ sealed class HypixelResponse {
 }
 
 @Serializable
+data class TypesProfileResponse(
+    override val success: Boolean,
+    val profiles: List<Profile>
+) : HypixelResponse()
+
+@Serializable
 data class ProfileResponse(override val success: Boolean, val profile: SkyblockProfile) : HypixelResponse()
 
 @Serializable
@@ -45,8 +57,13 @@ data class SkyblockProfile(val members: Map<NonDashedUUID, ProfileMember>)
 
 @Serializable
 data class ProfileMember(
+    val slayer: SlayerData
+)
+
+@Serializable
+class SlayerData(
     @SerialName("slayer_bosses")
-    val slayerBosses: Map<MobName, SlayerBoss> = emptyMap(),
+    val slayerBosses: Map<MobName, SlayerBoss> = emptyMap()
 )
 
 @Serializable

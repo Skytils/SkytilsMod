@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
@@ -41,9 +42,12 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
     override fun getCommandUsage(player: EntityPlayerSP): String = "/sthw x y z location"
 
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
+        if (!Skytils.config.crystalHollowWaypoints) {
+            UChat.chat("$failPrefix §cCrystal Hollows Waypoints is currently disabled.")
+        }
         if (args.isEmpty()) {
             val message = UMessage("$prefix §eWaypoints:\n")
-            for (loc in MiningFeatures.CrystalHollowsMap.Locations.values()) {
+            for (loc in MiningFeatures.CrystalHollowsMap.Locations.entries) {
                 if (!loc.loc.exists()) continue
                 message.append("${loc.displayName} ")
                 message.append(copyMessage("${loc.cleanName}: ${loc.loc}"))
@@ -77,7 +81,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                         y = match.groups["y"]!!.value.toDouble()
                         z = match.groups["z"]!!.value.toDouble()
                     }
-                    val internalLoc = MiningFeatures.CrystalHollowsMap.Locations.values().find { it.id == loc }?.loc
+                    val internalLoc = MiningFeatures.CrystalHollowsMap.Locations.entries.find { it.id == loc }?.loc
                     if (internalLoc != null) {
                         internalLoc.locX = (x - 200).coerceIn(0.0, 624.0)
                         internalLoc.locY = y
@@ -91,7 +95,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                 "remove", "delete" -> {
                     if (args.size >= 2) {
                         val name = args.drop(1).joinToString(" ")
-                        if (MiningFeatures.CrystalHollowsMap.Locations.values()
+                        if (MiningFeatures.CrystalHollowsMap.Locations.entries
                                 .find { it.id == name }?.loc?.reset() != null
                         )
                             UChat.chat("$successPrefix §aSuccessfully removed waypoint ${name}!")
@@ -104,7 +108,7 @@ object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw
                 }
 
                 "clear" -> {
-                    MiningFeatures.CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
+                    MiningFeatures.CrystalHollowsMap.Locations.entries.forEach { it.loc.reset() }
                     MiningFeatures.waypoints.clear()
                     UChat.chat("$successPrefix §aSuccessfully cleared all waypoints.")
                 }

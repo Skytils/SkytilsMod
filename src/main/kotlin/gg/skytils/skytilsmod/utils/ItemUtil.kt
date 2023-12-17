@@ -118,7 +118,7 @@ object ItemUtil {
             if (display.hasKey("Lore", NBT_LIST)) {
                 val lore = display.getTagList("Lore", NBT_STRING)
                 val loreAsList = ArrayList<String>(lore.tagCount())
-                for (lineNumber in 0 until lore.tagCount()) {
+                for (lineNumber in 0..<lore.tagCount()) {
                     loreAsList.add(lore.getStringTagAt(lineNumber))
                 }
                 return Collections.unmodifiableList(loreAsList)
@@ -160,7 +160,7 @@ object ItemUtil {
             val rarityMatcher = RARITY_PATTERN.find(currentLine)
             if (rarityMatcher != null) {
                 val rarity = rarityMatcher.groups["rarity"]?.value ?: continue
-                ItemRarity.values().find {
+                ItemRarity.entries.find {
                     it.rarityName == rarity.stripControlCodes().substringAfter("SHINY ")
                 }?.let {
                     return it

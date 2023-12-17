@@ -44,7 +44,7 @@ data class GIFResource(
         ).use { stream ->
             ImageIO.getImageReaders(stream).nextOrNull()?.run {
                 input = stream
-                (0 until getNumImages(true)).map {
+                (0..<getNumImages(true)).map {
                     DynamicResource("skytils_${name}_frame", read(it))
                 }
             }

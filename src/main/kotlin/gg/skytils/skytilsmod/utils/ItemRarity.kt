@@ -40,13 +40,13 @@ enum class ItemRarity(val rarityName: String, val baseColor: ChatColor, val colo
     VERY_SPECIAL("VERY SPECIAL", ChatColor.RED, Color(170, 0, 0));
 
     companion object {
-        private val VALUES = values().sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()
+        private val VALUES = entries.sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()
         val RARITY_PATTERN: Regex
 
-        fun byBaseColor(color: String) = values().find { rarity -> rarity.baseColor.toString() == color }
+        fun byBaseColor(color: String) = entries.find { rarity -> rarity.baseColor.toString() == color }
 
         init {
-            values().forEach { rarity -> VALUES[rarity.ordinal] = rarity }
+            entries.forEach { rarity -> VALUES[rarity.ordinal] = rarity }
             RARITY_PATTERN =
                 Regex("(?:§[\\da-f]§l§ka§r )?(?<rarity>${VALUES.joinToString("|") { "(?:${it.baseColor}§l)+(?:SHINY )?${it.rarityName}" }})")
         }

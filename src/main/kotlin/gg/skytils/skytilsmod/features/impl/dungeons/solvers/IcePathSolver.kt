@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -39,6 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
+import kotlin.math.abs
 
 object IcePathSolver {
     private val steps: MutableList<Point?> = ArrayList()
@@ -49,14 +50,31 @@ object IcePathSolver {
     private var silverfishPos: Point? = null
 
     init {
-        TickTask(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null) return@TickTask
-            if (DungeonListener.missingPuzzles.contains("Ice Path")) {
-                val silverfish = mc.theWorld.getEntities(
-                    EntitySilverfish::class.java
-                ) { s: EntitySilverfish? -> mc.thePlayer.getDistanceSqToEntity(s) < 20 * 20 }
-                if (silverfish.size > 0) {
-                    this.silverfish = silverfish[0]
+        tickTimer(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null || "Ice Path" !in DungeonListener.missingPuzzles) return@tickTimer
+            if (silverfishChestPos != null && roomFacing != null) {
+                if (grid == null) {
+                    grid = getGridLayout()
+                    silverfishPos = getGridPointFromPos(silverfish!!.position)
+                    steps.clear()
+                    if (silverfishPos != null) {
+                        steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                    }
+                } else if (silverfish != null) {
+                    val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
+                    if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
+                        silverfishPos = silverfishGridPos
+                        if (silverfishPos != null) {
+                            steps.clear()
+                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
+                        }
+                    }
+                }
+            } else {
+                mc.theWorld.loadedEntityList.find {
+                    it is EntitySilverfish && !it.isInvisible && mc.thePlayer.getDistanceSqToEntity(it) < 20 * 20
+                }?.let {
+                    silverfish = it as EntitySilverfish
                     if (silverfishChestPos == null || roomFacing == null) {
                         Skytils.launch {
                             findChest@ for (te in mc.theWorld.loadedTileEntityList) {
@@ -88,25 +106,6 @@ object IcePathSolver {
                     }
                 }
             }
-            if (silverfishChestPos != null && roomFacing != null) {
-                if (grid == null) {
-                    grid = layout
-                    silverfishPos = getGridPointFromPos(silverfish!!.position)
-                    steps.clear()
-                    if (silverfishPos != null) {
-                        steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
-                    }
-                } else if (silverfish != null) {
-                    val silverfishGridPos = getGridPointFromPos(silverfish!!.position)
-                    if (silverfish!!.isEntityAlive && silverfishGridPos != silverfishPos) {
-                        silverfishPos = silverfishGridPos
-                        if (silverfishPos != null) {
-                            steps.clear()
-                            steps.addAll(solve(grid!!, silverfishPos!!.x, silverfishPos!!.y, 9, 0))
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -114,12 +113,10 @@ object IcePathSolver {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.icePathSolver) return
         if (silverfishChestPos != null && roomFacing != null && grid != null && silverfish!!.isEntityAlive) {
-            for (i in 0 until steps.size - 1) {
-                val point = steps[i]
-                val point2 = steps[i + 1]
+            GlStateManager.disableCull()
+            steps.zipWithNext().forEach { (point, point2) ->
                 val pos = getVec3RelativeToGrid(point!!.x, point.y)
                 val pos2 = getVec3RelativeToGrid(point2!!.x, point2.y)
-                GlStateManager.disableCull()
                 RenderUtil.draw3DLine(
                     pos!!.addVector(0.5, 0.5, 0.5),
                     pos2!!.addVector(0.5, 0.5, 0.5),
@@ -128,8 +125,8 @@ object IcePathSolver {
                     event.partialTicks,
                     UMatrixStack.Compat.get()
                 )
-                GlStateManager.enableCull()
             }
+            GlStateManager.enableCull()
         }
     }
 
@@ -144,47 +141,51 @@ object IcePathSolver {
     }
 
     private fun getVec3RelativeToGrid(column: Int, row: Int): Vec3? {
-        return if (silverfishChestPos == null || roomFacing == null) null else Vec3(
-            silverfishChestPos!!
-                .offset(roomFacing!!.opposite, 4)
-                .offset(roomFacing!!.rotateYCCW(), 8)
-                .offset(roomFacing!!.rotateY(), column)
-                .offset(roomFacing!!.opposite, row)
-        )
+        return silverfishChestPos?.let { chestPos ->
+            roomFacing?.let { facing ->
+                Vec3(chestPos.offset(facing.opposite, 4)
+                    .offset(facing.rotateYCCW(), 8)
+                    .offset(facing.rotateY(), column)
+                    .offset(facing.opposite, row))
+            }
+        }
     }
 
     private fun getGridPointFromPos(pos: BlockPos): Point? {
         if (silverfishChestPos == null || roomFacing == null) return null
+        val topLeft = silverfishChestPos!!.offset(roomFacing!!.opposite, 4).offset(roomFacing!!.rotateYCCW(), 8)
+        val diff = pos.subtract(topLeft)
+
+        return Point(abs(diff.getValueOnAxis(roomFacing!!.rotateY().axis)), abs(diff.getValueOnAxis(roomFacing!!.opposite.axis)))
+    }
+
+    private fun BlockPos.getValueOnAxis(axis: EnumFacing.Axis): Int {
+        return when (axis) {
+            EnumFacing.Axis.X -> this.x
+            EnumFacing.Axis.Y -> this.y
+            EnumFacing.Axis.Z -> this.z
+        }
+    }
+
+    fun getGridLayout(): Array<IntArray>? {
+        if (silverfishChestPos == null || roomFacing == null) return null
+        val grid = Array(17) { IntArray(17) }
         for (row in 0..16) {
             for (column in 0..16) {
-                if (BlockPos(getVec3RelativeToGrid(column, row)) == pos) {
-                    return Point(column, row)
-                }
+                grid[row][column] = if (mc.theWorld.getBlockState(
+                        BlockPos(
+                            getVec3RelativeToGrid(
+                                column,
+                                row
+                            )
+                        )
+                    ).block !== Blocks.air
+                ) 1 else 0
             }
+            if (row == 16) return grid
         }
         return null
     }
-
-    private val layout: Array<IntArray>?
-        get() {
-            if (silverfishChestPos == null || roomFacing == null) return null
-            val grid = Array(17) { IntArray(17) }
-            for (row in 0..16) {
-                for (column in 0..16) {
-                    grid[row][column] = if (mc.theWorld.getBlockState(
-                            BlockPos(
-                                getVec3RelativeToGrid(
-                                    column,
-                                    row
-                                )
-                            )
-                        ).block !== Blocks.air
-                    ) 1 else 0
-                }
-                if (row == 16) return grid
-            }
-            return null
-        }
 
     /**
      * This code was modified into returning an ArrayList and was taken under CC BY-SA 4.0

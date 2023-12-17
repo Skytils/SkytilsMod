@@ -106,7 +106,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 showMessage(missingDependency);
                 exit();
             }
-            if (!KotlinVersion.CURRENT.isAtLeast(1, 5, 0)) {
+            if (!KotlinVersion.CURRENT.isAtLeast(1, 9, 0)) {
                 final File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 File realFile = file;
                 for (int i = 0; i < 5; i++) {

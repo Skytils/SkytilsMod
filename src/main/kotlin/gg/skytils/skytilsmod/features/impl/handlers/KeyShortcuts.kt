@@ -110,7 +110,7 @@ object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) 
         fun inBitfield(field: Int) = (field and bitValue) == bitValue
 
         companion object {
-            fun getPressed() = values().filter { it.pressed() }
+            fun getPressed() = entries.filter { it.pressed() }
             fun getBitfield(modifiers: List<Modifiers>): Int {
                 var bits = 0
                 for (modifier in modifiers) {
@@ -119,7 +119,7 @@ object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) 
                 return bits
             }
 
-            fun fromBitfield(field: Int) = values().filter { it.inBitfield(field) }
+            fun fromBitfield(field: Int) = entries.filter { it.inBitfield(field) }
 
             fun fromUCraftBitfield(modifiers: UKeyboard.Modifiers) = getBitfield(fromUCraft(modifiers))
 

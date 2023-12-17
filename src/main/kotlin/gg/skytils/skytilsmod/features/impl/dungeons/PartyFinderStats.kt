@@ -44,7 +44,7 @@ object PartyFinderStats {
 
     private val partyFinderRegex = Regex(
         "^Party Finder > (?<name>\\w+) joined the dungeon group! \\((?<class>${
-            DungeonClass.values().joinToString("|") { it.className }
+            DungeonClass.entries.joinToString("|") { it.className }
         }) Level (?<classLevel>\\d+)\\)$"
     )
 

@@ -24,8 +24,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
@@ -286,7 +286,7 @@ object MiscFeatures {
     fun onJoin(event: EntityJoinWorldEvent) {
         if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return
         if (event.entity is EntityArmorStand) {
-            TickTask(5) {
+            tickTimer(5) {
                 val entity = event.entity as EntityArmorStand
                 val headSlot = entity.getCurrentArmor(3)
                 if (Skytils.config.trickOrTreatChestAlert && mc.thePlayer != null && headSlot != null && headSlot.item === Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(

@@ -24,8 +24,8 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
@@ -70,7 +70,7 @@ object Funny {
         if (classification.size != machineLearningModel.size) {
             Skytils.sendMessageQueue.addFirst("/lobby ptl")
 
-            TickTask(10) {
+            tickTimer(10) {
                 val cheetos = classification - machineLearningModel
 
                 UChat.chat(

@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -48,8 +48,8 @@ object IceFillSolver {
     private var job: Job? = null
 
     init {
-        TickTask(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.iceFillSolver || mc.thePlayer == null) return@TickTask
+        tickTimer(20, repeats = true) {
+            if (!Utils.inDungeons || !Skytils.config.iceFillSolver || mc.thePlayer == null) return@tickTimer
             val world: World = mc.theWorld
             if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
                 if (chestPos == null || roomFacing == null) {

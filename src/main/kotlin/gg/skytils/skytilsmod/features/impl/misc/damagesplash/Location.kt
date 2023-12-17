@@ -59,4 +59,7 @@ class Location(x: Double, y: Double, z: Double) : Point3d(x, y, z) {
         return "[${x.roundToInt()}, ${y.roundToInt()}, ${z.roundToInt()}]"
     }
 
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
 }

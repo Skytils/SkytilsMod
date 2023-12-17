@@ -18,17 +18,19 @@
 package gg.skytils.skytilsmod.commands.stats
 
 import gg.essential.universal.wrappers.message.UMessage
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.BaseCommand
+import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.MojangUtil
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import skytils.hylin.request.HypixelAPIException
-import skytils.hylin.skyblock.Member
+import skytils.hylin.extension.nonDashedString
+import java.lang.Exception
 import java.util.*
 
 abstract class StatCommand(
@@ -52,8 +54,9 @@ abstract class StatCommand(
             } ?: return@launch
             if (needProfile) {
                 val profile = try {
-                    Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(uuid)
-                } catch (e: HypixelAPIException) {
+                    API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())
+                } catch (e: Exception) {
+                    e.printStackTrace()
                     printMessage(
                         "$failPrefix §cUnable to retrieve profile information: ${
                             e.message

@@ -713,6 +713,13 @@ object Config : Vigilant(
     var showNextBlaze = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Line to Next Blaze",
+        description = "Draws line to next blaze to shoot in Higher or Lower.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var lineToNextBlaze = false
+
+    @Property(
         type = PropertyType.COLOR, name = "Lowest Blaze Color",
         description = "Color used to highlight the lowest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
@@ -732,6 +739,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Solvers"
     )
     var nextBlazeColor = Color(255, 255, 0, 200)
+
+    @Property(
+        type = PropertyType.COLOR, name = "Line to Next Blaze Color",
+        description = "Color used to draw line to the next blaze in.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var lineToNextBlazeColor = Color(255, 255, 0, 200)
 
     @Property(
         type = PropertyType.SWITCH, name = "Boulder Solver",
@@ -2932,9 +2946,11 @@ object Config : Vigilant(
         addDependency("highlightDoorOpener", "spiritLeapNames")
 
         addDependency("showNextBlaze", "blazeSolver")
+        addDependency("lineToNextBlaze", "showNextBlaze")
         addDependency("lowestBlazeColor", "blazeSolver")
         addDependency("highestBlazeColor", "blazeSolver")
         addDependency("nextBlazeColor", "showNextBlaze")
+        addDependency("lineToNextBlazeColor", "lineToNextBlaze")
         addDependency("teleportMazeSolverColor", "teleportMazeSolver")
         addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
@@ -2977,7 +2993,7 @@ object Config : Vigilant(
         addDependency("noProgressTrophies", "trophyFishingProgress")
 
         registerListener("protectItemBINThreshold") { _: String ->
-            TickTask(1) {
+            tickTimer(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
                 if (protectItemBINThreshold != "0") fetchLowestBINPrices = true
@@ -2995,7 +3011,7 @@ object Config : Vigilant(
                     val loc = ResourceLocation("skytils:gui/customrarity.png")
                     mc.resourceManager.getResource(loc)
                 }.onFailure {
-                    TickTask(1) {
+                    tickTimer(1) {
                         if (itemRarityShape == 4) {
                             itemRarityShape = old
                             EssentialAPI.getNotifications()

@@ -43,7 +43,7 @@ object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
             return
         }
 
-        val slayersObject = profileResponse.profile.members[uuid.nonDashedString()]?.slayerBosses?.ifNull {
+        val slayersObject = profileResponse.profile.members[uuid.nonDashedString()]?.slayer?.slayerBosses?.ifNull {
             printMessage("$failPrefix §cUnable to retrieve slayer information")
             return@ifNull
         }

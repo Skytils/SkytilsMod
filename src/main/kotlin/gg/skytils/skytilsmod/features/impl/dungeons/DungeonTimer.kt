@@ -19,8 +19,8 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -110,7 +110,7 @@ object DungeonTimer {
 
             bossEntryTime != -1L && bossClearTime == -1L && message.contains("§r§c☠ §r§eDefeated §r") -> {
                 bossClearTime = System.currentTimeMillis()
-                TickTask(5) {
+                tickTimer(5) {
                     arrayListOf<String>().apply {
                         if (Skytils.config.dungeonTimer) {
                             add("§7Wither Doors: $witherDoors")

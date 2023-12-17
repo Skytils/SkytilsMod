@@ -93,11 +93,11 @@ object MythologicalTracker : Tracker("mythological") {
 
         companion object {
             fun getFromId(id: String?): BurrowDrop? {
-                return values().find { it.itemId == id }
+                return entries.find { it.itemId == id }
             }
 
             fun getFromName(name: String?): BurrowDrop? {
-                return values().find { it.itemName == name }
+                return entries.find { it.itemName == name }
             }
         }
     }
@@ -119,11 +119,11 @@ object MythologicalTracker : Tracker("mythological") {
 
         companion object {
             fun getFromId(id: String?): BurrowMob? {
-                return values().find { it.mobId == id }
+                return entries.find { it.mobId == id }
             }
 
             fun getFromName(name: String?): BurrowMob? {
-                return values().find { it.mobName == name }
+                return entries.find { it.mobName == name }
             }
         }
     }
@@ -158,7 +158,7 @@ object MythologicalTracker : Tracker("mythological") {
                     burrowsDug++
                     markDirty<MythologicalTracker>()
                 } else if (unformatted.startsWith("RARE DROP! ")) {
-                    for (drop in BurrowDrop.values()) {
+                    for (drop in BurrowDrop.entries) {
                         if (!drop.mobDrop) continue
                         if (unformatted.startsWith("RARE DROP! ${drop.itemName}")) {
                             drop.droppedTimes++
@@ -227,8 +227,8 @@ object MythologicalTracker : Tracker("mythological") {
 
     override fun resetLoot() {
         burrowsDug = 0L
-        BurrowDrop.values().forEach { it.droppedTimes = 0L }
-        BurrowMob.values().forEach { it.dugTimes = 0L }
+        BurrowDrop.entries.forEach { it.droppedTimes = 0L }
+        BurrowMob.entries.forEach { it.dugTimes = 0L }
     }
 
     // TODO: 5/3/2022 fix this
@@ -244,8 +244,8 @@ object MythologicalTracker : Tracker("mythological") {
     override fun read(reader: Reader) {
         val save = json.decodeFromString<TrackerSave>(reader.readText())
         burrowsDug = save.burrowsDug
-        BurrowDrop.values().forEach { it.droppedTimes = save.drops[it.itemId] ?: 0L }
-        BurrowMob.values().forEach { it.dugTimes = save.mobs[it.mobId] ?: 0L }
+        BurrowDrop.entries.forEach { it.droppedTimes = save.drops[it.itemId] ?: 0L }
+        BurrowMob.entries.forEach { it.dugTimes = save.mobs[it.mobId] ?: 0L }
     }
 
     override fun write(writer: Writer) {
@@ -253,8 +253,8 @@ object MythologicalTracker : Tracker("mythological") {
             json.encodeToString(
                 TrackerSave(
                     burrowsDug,
-                    BurrowDrop.values().associate { it.itemId to it.droppedTimes },
-                    BurrowMob.values().associate { it.mobId to it.dugTimes }
+                    BurrowDrop.entries.associate { it.itemId to it.droppedTimes },
+                    BurrowMob.entries.associate { it.mobId to it.dugTimes }
                 )
             )
         )
@@ -280,7 +280,7 @@ object MythologicalTracker : Tracker("mythological") {
                     SmartFontRenderer.TextShadow.NORMAL
                 )
                 var drawnLines = 1
-                for (mob in BurrowMob.values()) {
+                for (mob in BurrowMob.entries) {
                     if (mob.dugTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "${mob.mobName}§f: ${nf.format(mob.dugTimes)}",
@@ -292,7 +292,7 @@ object MythologicalTracker : Tracker("mythological") {
                     )
                     drawnLines++
                 }
-                for (item in BurrowDrop.values()) {
+                for (item in BurrowDrop.entries) {
                     if (item.droppedTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "${item.rarity.baseColor}${item.itemName}§f: §r${nf.format(item.droppedTimes)}",
@@ -321,7 +321,7 @@ object MythologicalTracker : Tracker("mythological") {
                 SmartFontRenderer.TextShadow.NORMAL
             )
             var drawnLines = 1
-            for (mob in BurrowMob.values()) {
+            for (mob in BurrowMob.entries) {
                 ScreenRenderer.fontRenderer.drawString(
                     "${mob.mobName}§f: 100",
                     if (leftAlign) 0f else width.toFloat(),
@@ -332,7 +332,7 @@ object MythologicalTracker : Tracker("mythological") {
                 )
                 drawnLines++
             }
-            for (item in BurrowDrop.values()) {
+            for (item in BurrowDrop.entries) {
                 ScreenRenderer.fontRenderer.drawString(
                     "${item.rarity.baseColor}${item.itemName}§f: §r100",
                     if (leftAlign) 0f else width.toFloat(),

@@ -42,7 +42,7 @@ enum class Damage(val symbol: String, val color: CustomColor) {
 
     companion object {
         fun fromSymbol(symbol: String): Damage? {
-            return values().find { it.symbol == symbol }
+            return entries.find { it.symbol == symbol }
         }
     }
 }

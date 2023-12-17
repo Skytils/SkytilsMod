@@ -23,8 +23,8 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.GuiRenderItemEvent
@@ -143,7 +143,7 @@ object ItemFeatures {
     )
 
     init {
-        TickTask(4, repeats = true) {
+        tickTimer(4, repeats = true) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
                 val held = mc.thePlayer.inventory.getCurrentItem()
                 if (Skytils.config.showItemRarity) {

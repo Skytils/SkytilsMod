@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.*
@@ -89,7 +89,7 @@ object CreeperSolver {
     }
 
     init {
-        TickTask(20, repeats = true) {
+        tickTimer(20, repeats = true) {
             if (Skytils.config.creeperBeamsSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Creeper Beams"
                 )

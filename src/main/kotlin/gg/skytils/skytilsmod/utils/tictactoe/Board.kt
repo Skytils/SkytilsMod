@@ -71,13 +71,13 @@ class Board internal constructor() {
      * available at the start of the game).
      */
     private fun initialize() {
-        for (row in 0 until BOARD_WIDTH) {
-            for (col in 0 until BOARD_WIDTH) {
+        for (row in 0..<BOARD_WIDTH) {
+            for (col in 0..<BOARD_WIDTH) {
                 board[row][col] = State.Blank
             }
         }
         availableMoves.clear()
-        for (i in 0 until BOARD_WIDTH * BOARD_WIDTH) {
+        for (i in 0..<BOARD_WIDTH * BOARD_WIDTH) {
             availableMoves.add(i)
         }
     }
@@ -178,7 +178,7 @@ class Board internal constructor() {
      * @param row       the row to check
      */
     private fun checkRow(row: Int) {
-        for (i in 1 until BOARD_WIDTH) {
+        for (i in 1..<BOARD_WIDTH) {
             if (board[row][i] != board[row][i - 1]) {
                 break
             }
@@ -194,7 +194,7 @@ class Board internal constructor() {
      * @param column    the column to check
      */
     private fun checkColumn(column: Int) {
-        for (i in 1 until BOARD_WIDTH) {
+        for (i in 1..<BOARD_WIDTH) {
             if (board[i][column] != board[i - 1][column]) {
                 break
             }
@@ -212,7 +212,7 @@ class Board internal constructor() {
      */
     private fun checkDiagonalFromTopLeft(x: Int, y: Int) {
         if (x == y) {
-            for (i in 1 until BOARD_WIDTH) {
+            for (i in 1..<BOARD_WIDTH) {
                 if (board[i][i] != board[i - 1][i - 1]) {
                     break
                 }
@@ -231,7 +231,7 @@ class Board internal constructor() {
      */
     private fun checkDiagonalFromTopRight(x: Int, y: Int) {
         if (BOARD_WIDTH - 1 - x == y) {
-            for (i in 1 until BOARD_WIDTH) {
+            for (i in 1..<BOARD_WIDTH) {
                 if (board[BOARD_WIDTH - 1 - i][i] != board[BOARD_WIDTH - i][i - 1]) {
                     break
                 }
@@ -264,8 +264,8 @@ class Board internal constructor() {
 
     override fun toString(): String {
         val sb = StringBuilder()
-        for (y in 0 until BOARD_WIDTH) {
-            for (x in 0 until BOARD_WIDTH) {
+        for (y in 0..<BOARD_WIDTH) {
+            for (x in 0..<BOARD_WIDTH) {
                 if (board[y][x] == State.Blank) {
                     sb.append("-")
                 } else {

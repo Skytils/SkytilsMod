@@ -837,7 +837,7 @@ class ScreenRenderer {
         /** refresh
          * Triggered by a slower loop(client tick), refresh
          * updates the screen resolution to match the window
-         * size and sets the font renderer in until its ok.
+         * size and sets the font renderer in..<its ok.
          * Do not call this method from anywhere in the mod!
          */
         @JvmStatic

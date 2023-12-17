@@ -23,7 +23,7 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.MojangUtil
@@ -86,7 +86,7 @@ object ScamCheck {
             ?: return@launch UChat.chat("${Skytils.failPrefix} §cUnable to get the UUID for ${otherParty}! Could they be nicked?")
             val result = checkScammer(uuid, "tradewindow")
             if (result.isScammer) {
-                TickTask(1) {
+                tickTimer(1) {
                     mc.thePlayer?.closeScreen()
                 }
             }

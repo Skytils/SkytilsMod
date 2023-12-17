@@ -81,7 +81,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     fun addToast(toast: Toast) {
-        val index = (0 until maxToasts).firstOrNull { it !in takenSlots }
+        val index = (0..<maxToasts).firstOrNull { it !in takenSlots }
         if (index != null) {
             gui.addChild(toast)
             toast.constraints.y = (index * 32).pixels

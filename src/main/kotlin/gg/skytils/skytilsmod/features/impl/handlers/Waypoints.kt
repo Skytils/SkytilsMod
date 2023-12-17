@@ -22,7 +22,7 @@ import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.*
@@ -93,7 +93,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 }
             }
         } else if (sbeWaypointFormat.containsMatchIn(str)) {
-            val island = SkyblockIsland.values().find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
+            val island = SkyblockIsland.entries.find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
             val waypoints = sbeWaypointFormat.findAll(str.trim().replace("\n", "")).map {
                 Waypoint(
                     it.groups["name"]!!.value,
@@ -124,7 +124,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
             visibleWaypoints = emptyList()
             return
         }
-        val isUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
+        val isUnknownIsland = SkyblockIsland.entries.none { it.mode == SBInfo.mode }
         visibleWaypoints = categories.filter {
             it.island.mode == SBInfo.mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
         }.flatMap { category ->
@@ -139,7 +139,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     
     @SubscribeEvent
     fun onLocraw(event: LocrawReceivedEvent) {
-        TickTask(20, task = ::computeVisibleWaypoints)
+        tickTimer(20, task = ::computeVisibleWaypoints)
     }
 
     @SubscribeEvent
