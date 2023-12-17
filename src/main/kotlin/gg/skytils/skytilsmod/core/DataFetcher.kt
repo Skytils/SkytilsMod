@@ -46,6 +46,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import net.minecraft.util.BlockPos
 import kotlin.concurrent.fixedRateTimer
+import kotlin.reflect.jvm.jvmName
 
 object DataFetcher {
     private fun loadData(): Job {
@@ -178,7 +179,16 @@ object DataFetcher {
 
     private suspend inline fun <reified T> get(url: String, crossinline block: T.() -> Unit) =
         Skytils.IO.launch {
-            client.get(url).body<T>().apply(block)
+            runCatching {
+                client.get(url).body<T>().apply(block)
+            }.onFailure {
+                it.printStackTrace()
+                UChat.chat("""
+                    |$failPrefix §cFailed to fetch data! Some features may not work as expected.
+                    | URL: $url
+                    | §c${it::class.qualifiedName ?: it::class.jvmName}: ${it.message ?: "Unknown"}
+                """.trimMargin())
+            }
         }
 
     @JvmStatic
