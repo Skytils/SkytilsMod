@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.utils
 
 import gg.skytils.hypixel.types.skyblock.Profile
+import gg.skytils.hypixel.types.util.Inventory
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -30,9 +31,14 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.CompressedStreamTools
 import net.minecraft.util.BlockPos
+import net.minecraftforge.common.util.Constants
 import java.awt.Color
 import java.util.*
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 private typealias NonDashedUUID = String
 private typealias MobName = String
@@ -179,3 +185,12 @@ object UUIDAsString : KSerializer<UUID> {
     override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString().toDashedUUID())
     override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
 }
+
+@OptIn(ExperimentalEncodingApi::class)
+fun Inventory.toMCItems() =
+    data.let { data ->
+        val list = CompressedStreamTools.readCompressed(Base64.decode(data).inputStream()).getTagList("i", Constants.NBT.TAG_COMPOUND)
+        (0 until list.tagCount()).map { idx ->
+            list.getCompoundTagAt(idx).takeUnless { it.hasNoTags() }?.let { ItemStack.loadItemStackFromNBT(it) }
+        }
+    }
