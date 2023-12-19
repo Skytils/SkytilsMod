@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.tweaker;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import gg.skytils.skytilsmod.Reference;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.io.IOUtils;
@@ -27,15 +29,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
+import java.util.Locale;
 
 public class TweakerUtil {
     public static void exit() {
@@ -134,6 +141,12 @@ public class TweakerUtil {
     }
 
     public static String makeRequest(String url) throws IOException {
+        try (InputStream in = makeRequestStream(url)) {
+            return IOUtils.toString(in);
+        }
+    }
+
+    public static InputStream makeRequestStream(String url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestMethod("GET");
         conn.setDoOutput(true);
@@ -141,7 +154,53 @@ public class TweakerUtil {
         conn.setConnectTimeout(10000);
         conn.setReadTimeout(30000);
 
-        return IOUtils.toString(conn.getInputStream());
+        return conn.getInputStream();
+    }
+
+    public static void downloadFile(String url, File file) throws IOException {
+        try (InputStream in = makeRequestStream(url)) {
+            Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    static void updateEssential(File essentialLoc) {
+        try {
+            System.out.println("Attempting to replace Essential at " + essentialLoc);
+
+            System.out.println("Requesting Essential metadata");
+            JsonObject jsonObject = JsonParser.parseString(makeRequest("https://downloads.essential.gg/v1/mods/essential/essential/")).getAsJsonObject();
+            System.out.println("Got metadata: " + jsonObject);
+            String essentialDownloadURL = jsonObject.getAsJsonObject("stable").getAsJsonObject("forge_1-8-9").get("url").getAsString();
+            System.out.println("Latest essential build: " + essentialDownloadURL);
+
+            File updateDir = new File(new File(Launch.minecraftHome, "skytils"), "updates");
+            String taskURL = "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.2.0.jar";
+            File taskFile = new File(new File(updateDir, "tasks"), "SkytilsInstaller-1.2.0.jar");
+            if (taskFile.mkdirs() || taskFile.createNewFile()) {
+                System.out.println("Downloading task file");
+                downloadFile(taskURL, taskFile);
+                System.out.println("Successfully downloaded task file");
+            }
+            System.out.println("Downloading Essential");
+            File newEssentialJar = new File(updateDir, "Essential.jar");
+            downloadFile(essentialDownloadURL, newEssentialJar);
+            System.out.println("Successfully downloaded Essential");
+
+            String runtime = getJavaRuntime();
+            System.out.println("Using runtime " + runtime);
+            Runtime.getRuntime().exec("\"" + runtime + "\" -jar \"" + taskFile.getAbsolutePath() + "\" replace \"" + essentialLoc.getAbsolutePath() + "\" \"" + newEssentialJar.getAbsolutePath() + "\"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String getJavaRuntime() throws IOException {
+        String os = System.getProperty("os.name");
+        String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + (os != null && os.toLowerCase(Locale.ENGLISH).startsWith("windows") ? "java.exe" : "java");
+        if (!(new File(java)).isFile()) {
+            throw new IOException("Unable to find suitable java runtime at $java");
+        }
+        return java;
     }
 
     public static void trySetLookAndFeel() {

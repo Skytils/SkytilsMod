@@ -22,12 +22,16 @@ import kotlin.KotlinVersion;
 import kotlin.text.StringsKt;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
+import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Map;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.exit;
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.updateEssential;
 
 @IFMLLoadingPlugin.Name("Skytils On Top")
 @IFMLLoadingPlugin.SortingIndex(69)
@@ -122,8 +126,21 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 String name = realFile.getName().contains(".jar") ? realFile.getName() : StringsKt.substringAfterLast(StringsKt.substringBeforeLast(file.getAbsolutePath(), ".jar", "unknown"), "/", "Unknown");
 
                 if (name.endsWith("!")) name = name.substring(0, name.length() - 1);
-
-                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
+                String errorMessage = kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>";
+                if (name.equals("Essential (forge_1.8.9).jar")) {
+                    JButton button = new JButton("Update Essential");
+                    final File essentialLoc = realFile;
+                    button.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent event) {
+                            updateEssential(essentialLoc);
+                            exit();
+                        }
+                    });
+                    showMessage(errorMessage, button);
+                } else {
+                    showMessage(errorMessage);
+                }
                 exit();
             }
             if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
