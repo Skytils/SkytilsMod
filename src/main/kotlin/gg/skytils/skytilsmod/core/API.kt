@@ -58,4 +58,9 @@ object API {
                 parameter("uuid", uuid.toString())
             }
         }.body<PlayerResponse>().player
+
+    fun getPlayerSync(uuid: UUID) =
+        runBlocking {
+            getPlayer(uuid)
+        }
 }

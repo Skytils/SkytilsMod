@@ -22,9 +22,9 @@ import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.hypixel.types.skyblock.Member
-import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.NumberUtil.nf
 import gg.skytils.skytilsmod.utils.SkillUtils
 import gg.skytils.skytilsmod.utils.append
@@ -41,7 +41,7 @@ object CataCommand : StatCommand("skytilscata") {
 
     override fun displayStats(username: String, uuid: UUID, profileData: Member) {
         val playerResponse = try {
-            Skytils.hylinAPI.getPlayerSync(uuid)
+            API.getPlayerSync(uuid)
         } catch (e: HypixelAPIException) {
             printMessage(
                 "$failPrefix §cFailed to get dungeon stats: ${
