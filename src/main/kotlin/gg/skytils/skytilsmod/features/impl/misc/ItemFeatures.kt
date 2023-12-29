@@ -520,7 +520,8 @@ object ItemFeatures {
                 "BAT_WAND",
                 "STARRED_BAT_WAND",
                 "WEIRD_TUBA",
-                "WEIRDER_TUBA"
+                "WEIRDER_TUBA",
+                "PUMPKIN_LAUNCHER"
             ))
         ) {
             val block = mc.theWorld.getBlockState(event.pos)
