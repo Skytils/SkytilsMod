@@ -1421,7 +1421,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Prevent Placing Weapons",
-        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, and Weird Tuba items.",
+        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, Pumpkin Launcher and Weird Tuba items.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var preventPlacingWeapons = false
