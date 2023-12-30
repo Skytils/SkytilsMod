@@ -52,7 +52,7 @@ data class TypesProfileResponse(
 ) : HypixelResponse()
 
 @Serializable
-data class PlayerResponse(override val success: Boolean, val player: Player) : HypixelResponse()
+data class PlayerResponse(override val success: Boolean, val player: Player?) : HypixelResponse()
 
 @Serializable
 data class ProfileResponse(override val success: Boolean, val profile: SkyblockProfile) : HypixelResponse()

@@ -100,7 +100,7 @@ object CataCommand : StatCommand("skytilscata") {
                     SkillUtils.dungeoneeringXp.values
                 )
 
-            val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
+            val secrets = playerResponse?.achievements?.getOrDefault("skyblock_treasure_hunter", 0) ?: 0
 
             val classAvgOverflow = (archLevel + bersLevel + healerLevel + mageLevel + tankLevel) / 5.0
             val classAvgCapped =
@@ -110,7 +110,7 @@ object CataCommand : StatCommand("skytilscata") {
 
             val component = UMessage("§a➜ Catacombs Statistics Viewer\n")
                 .append(
-                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse.formattedName}§7§o.\n\n"
+                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse?.formattedName}§7§o.\n\n"
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
                 .append(
