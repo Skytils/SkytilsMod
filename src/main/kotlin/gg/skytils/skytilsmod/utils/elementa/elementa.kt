@@ -22,6 +22,7 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.dsl.childOf
 
 class ComponentBuilder(private val parent: UIComponent) {
+    var name: String by parent::componentName
 
     operator fun <T: UIComponent> T.invoke(constraints: Constraints = Constraints, block: ComponentBuilder.() -> Unit = {}) =
         apply {
