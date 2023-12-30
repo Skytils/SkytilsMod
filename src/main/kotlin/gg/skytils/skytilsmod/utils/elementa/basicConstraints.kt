@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.utils.elementa
 
 import gg.essential.elementa.constraints.*
 
-fun Constraints.x(value: XConstraint) =
+fun Constraints.xConstraint(value: XConstraint) =
     this + {
         val oldX = this.constraints.x
         setX(value);
@@ -29,7 +29,7 @@ fun Constraints.x(value: XConstraint) =
         }
     }
 
-fun Constraints.y(value: YConstraint) =
+fun Constraints.yConstraint(value: YConstraint) =
     this + {
         val oldY = this.constraints.y
         setY(value);
@@ -38,7 +38,7 @@ fun Constraints.y(value: YConstraint) =
         }
     }
 
-fun Constraints.width(value: WidthConstraint) =
+fun Constraints.widthConstraint(value: WidthConstraint) =
     this + {
         val oldWidth = this.constraints.width
         setWidth(value);
@@ -47,7 +47,7 @@ fun Constraints.width(value: WidthConstraint) =
         }
     }
 
-fun Constraints.height(value: HeightConstraint) =
+fun Constraints.heightConstraint(value: HeightConstraint) =
     this + {
         val oldHeight = this.constraints.height
         setHeight(value);
@@ -56,7 +56,7 @@ fun Constraints.height(value: HeightConstraint) =
         }
     }
 
-fun Constraints.color(value: ColorConstraint) =
+fun Constraints.colorConstraint(value: ColorConstraint) =
     this + {
         val oldColor = this.constraints.color
         setColor(value);
