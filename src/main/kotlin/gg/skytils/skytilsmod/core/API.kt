@@ -42,7 +42,7 @@ object API {
         }.body<TypesProfileResponse>().profiles
 
     suspend fun getSelectedSkyblockProfile(uuid: UUID) =
-        getSkyblockProfiles(uuid).find { it.selected }
+        getSkyblockProfiles(uuid)?.find { it.selected }
 
     fun getSelectedSkyblockProfileSync(uuid: UUID) =
         runBlocking {

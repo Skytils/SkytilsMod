@@ -48,7 +48,7 @@ sealed class HypixelResponse {
 @Serializable
 data class TypesProfileResponse(
     override val success: Boolean,
-    val profiles: List<Profile>
+    val profiles: List<Profile>?
 ) : HypixelResponse()
 
 @Serializable
