@@ -19,13 +19,19 @@
 package gg.skytils.skytilsmod.utils.elementa
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
 
 class ComponentBuilder(private val parent: UIComponent) {
     var name: String by parent::componentName
 
     operator fun <T: UIComponent> T.invoke(constraints: Constraints = Constraints, block: ComponentBuilder.() -> Unit = {}) =
         apply {
+            constrain {
+                x = SiblingConstraint()
+                y = SiblingConstraint()
+            }
             constraints.apply(this)
             ComponentBuilder(this).block()
             this childOf this@ComponentBuilder.parent
