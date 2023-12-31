@@ -19,6 +19,9 @@
 package gg.skytils.skytilsmod.utils.elementa
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.UIConstraints
+import gg.essential.elementa.constraints.*
+import kotlin.reflect.KMutableProperty1
 
 interface Constraints {
     fun apply(component: UIComponent): () -> Unit
@@ -50,3 +53,17 @@ operator fun Constraints.plus(block: UIComponent.() -> (() -> Unit)) =
             return component.block()
         }
     }
+
+sealed class Constraint<T: SuperConstraint<*>>(private val field: KMutableProperty1<UIConstraints, T>) {
+
+    fun set(receiver: UIConstraints, value: T) =
+        field.set(receiver, value)
+
+    fun get(receiver: UIConstraints) =
+        field.get(receiver)
+
+    object X: Constraint<XConstraint>(UIConstraints::x)
+    object Y: Constraint<YConstraint>(UIConstraints::y)
+    object Width: Constraint<WidthConstraint>(UIConstraints::width)
+    object Height: Constraint<HeightConstraint>(UIConstraints::height)
+}
