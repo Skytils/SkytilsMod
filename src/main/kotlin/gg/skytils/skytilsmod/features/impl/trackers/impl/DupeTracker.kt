@@ -189,7 +189,7 @@ object DupeTracker : Tracker("duped_items") {
 
     private fun ItemStack?.getUUID(): String? = ItemUtil.getExtraAttributes(this)?.getString("uuid")?.ifEmpty { null }
 
-    init {
+/*    init {
         fixedRateTimer(name = "Skytils-FetchDupeData", period = 7 * 60 * 1000L) {
             if (Utils.inSkyblock && Skytils.config.dupeTracker) {
                 Skytils.IO.launch {
@@ -202,7 +202,7 @@ object DupeTracker : Tracker("duped_items") {
                 }
             }
         }
-    }
+    }*/
 }
 
 @Serializable
