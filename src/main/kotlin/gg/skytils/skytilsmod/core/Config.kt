@@ -232,6 +232,20 @@ object Config : Vigilant(
     var noChildLeftBehind = false
 
     @Property(
+        type = PropertyType.BUTTON, name = "Dungeon Sweat",
+        description = "Click if dungeon sweat???",
+        category = "Dungeons", subcategory = "Miscellaneous",
+        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver"]
+    )
+    fun openDungeonSweat() {
+        EssentialAPI.getNotifications().push("azoopuzzoo", "hmmmmm... nice pb + ratio + sub 3 + FAST S+ + no bers + no healer + no tank + 4m 1a + no hype = kick", 3f) {
+            onClose = {
+                UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+            }
+        }
+    }
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Timer",
         description = "Shows the time taken for certain actions in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous"
