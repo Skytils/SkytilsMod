@@ -188,7 +188,7 @@ object ItemFeatures {
         }
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (chestName.startsWithAny("Salvage", "Ender Chest") || Utils.equalsOneOf(
+            if (chestName.startsWithAny("Salvage", "Ender Chest") || equalsOneOf(
                     chestName,
                     "Ophelia",
                     "Trades"
@@ -226,7 +226,7 @@ object ItemFeatures {
                     }
                 }
             }
-            if (Skytils.config.combineHelper && Utils.equalsOneOf(
+            if (Skytils.config.combineHelper && equalsOneOf(
                     event.chestName,
                     "Anvil",
                     "Attribute Fusion"
@@ -425,7 +425,7 @@ object ItemFeatures {
             if (this is S2APacketParticles) {
                 if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
                     if (isLongDistance && count == 8 && speed == 8f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                        val dist = (if (DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
+                        val dist = (if (DungeonFeatures.hasBossSpawned && equalsOneOf(
                                 DungeonFeatures.dungeonFloor,
                                 "F7",
                                 "M7"
@@ -459,7 +459,7 @@ object ItemFeatures {
                         it.startsWith("§aSelected: §")
                     }?.substringAfter("§aSelected: ") ?: "§cUnknown"
                 }
-                if (Utils.equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
+                if (equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
                     getItemLore(item).find {
                         it.startsWith("§7Internalized: ")
                     }?.substringAfter("§7Internalized: ")?.let { s ->
@@ -512,7 +512,7 @@ object ItemFeatures {
         if (event.entity !== mc.thePlayer) return
         val item = event.entityPlayer.heldItem
         val itemId = getSkyBlockItemID(item) ?: return
-        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (Utils.equalsOneOf(
+        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (equalsOneOf(
                 itemId,
                 "FLOWER_OF_TRUTH",
                 "BOUQUET_OF_LIES",
@@ -675,7 +675,7 @@ object ItemFeatures {
     @SubscribeEvent
     fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Skytils.config.combineHelper || !Utils.inSkyblock) return
-        if (event.container !is ContainerChest || !Utils.equalsOneOf(
+        if (event.container !is ContainerChest || !equalsOneOf(
                 event.chestName,
                 "Anvil",
                 "Attribute Fusion"
@@ -754,7 +754,7 @@ object ItemFeatures {
         return mc.theWorld.getBlockState(pos).block.material.isSolid && (1..2).all {
             val newPos = pos.up(it)
             val newBlock = mc.theWorld.getBlockState(newPos)
-            if (sideHit === EnumFacing.UP && (Utils.equalsOneOf(
+            if (sideHit === EnumFacing.UP && (equalsOneOf(
                     newBlock.block,
                     Blocks.fire,
                     Blocks.skull
