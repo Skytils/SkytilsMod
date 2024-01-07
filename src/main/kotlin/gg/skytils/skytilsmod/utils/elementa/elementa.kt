@@ -26,6 +26,13 @@ import gg.essential.elementa.dsl.constrain
 class ComponentBuilder(private val parent: UIComponent) {
     var name: String by parent::componentName
 
+    fun constraints(block: Constraints.() -> Constraints) {
+        Constraints.block().apply(parent)
+    }
+
+    fun UIComponent.build(constraints: Constraints = Constraints, block: ComponentBuilder.() -> Unit) =
+        invoke(constraints, block)
+
     operator fun <T: UIComponent> T.invoke(constraints: Constraints = Constraints, block: ComponentBuilder.() -> Unit = {}) =
         apply {
             constrain {
