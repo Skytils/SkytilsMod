@@ -60,7 +60,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object TrophyFishingProgress {
 
     private val trophyFishingProgressDisplay = TrophyFishingProgressDisplay() //do not delete this otherwise the HUD WONT SHOW
-    private const val TROPHY_FISH_MESSAGE_PREFIX: String = "TROPHY FISH! You caught a "
+    private val TROPHY_FISH_MESSAGE_REGEX = Regex("(?:[^:\\n]*)(?:§.)+TROPHY FISH! (?:§.)+You caught an? (?:§.)+(?<trophyFishType>[\\w ]+)(?:§.)+ (?:§.)+(?<trophyFishTier>[A-Z]+)(?:§.)+\\.(?:[^:\\n]*)").toPattern()
     private var trophyFishMissing = mutableListOf(
         "§c§lTrophy Fishes Missing:",
         "§c§lVisit Odger!",
@@ -216,11 +216,11 @@ object TrophyFishingProgress {
         //§6§lTROPHY FISH! §r§bYou caught a §r§fBlobfish§r§r§r §r§l§r§8§lBRONZE§r§b.
 
         //why it requires .contains i have no clue
-        if (!formatted.contains("§6§lTROPHY FISH! §r§bYou caught a")) return
+        val trophyFishMatcherOnFormatted = TROPHY_FISH_MESSAGE_REGEX.matcher(formatted)
+        if (!trophyFishMatcherOnFormatted.matches()) return
         if (!possibleTrophyTiers.any { unformatted.contains(it) }) return
-        val trophyAndTier = unformatted.replace("caught an", "caught a").removePrefix(TROPHY_FISH_MESSAGE_PREFIX).removeSuffix(".")
-        val trophyTier = trophyAndTier.split(" ").last()
-        val trophyFish = trophyAndTier.removeSuffix(" $trophyTier") //because some trophy fish tier names contain space chars
+        val trophyFish = trophyFishMatcherOnFormatted.group("trophyFishType")
+        val trophyTier = trophyFishMatcherOnFormatted.group("trophyFishTier")
 
         val theAbbreviation = when (trophyTier.take(1)) {
             //"§bDiamond §c✖", "§6Gold §c✖", "§7Silver §a✔", "§8Bronze §c✖"
